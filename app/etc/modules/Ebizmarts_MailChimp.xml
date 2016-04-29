@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Ebizmarts_MailChimp>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Ebizmarts_MailChimp>
+    </modules>
+</config>
