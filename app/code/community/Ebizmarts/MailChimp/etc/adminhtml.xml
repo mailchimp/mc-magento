@@ -1,5 +1,29 @@
 <?xml version="1.0"?>
 <config>
+    <menu>
+        <system>
+            <depends>
+                <module>Ebizmarts_MailChimp</module>
+            </depends>
+            <children>
+                <email_template>
+                    <children>
+                        <mailchimp translate="title" module="mailchimp">
+                            <title>MailChimp</title>
+                            <sort_order>10</sort_order>
+                            <children>
+                                <mailchimp_syncronization translate="title" module="mailchimp">
+                                    <title>Ecommerce Data Syncronization</title>
+                                    <sort_order>10</sort_order>
+                                    <action>adminhtml/mailchimpEcommerceSyncronization</action>
+                                </mailchimp_syncronization>
+                            </children>
+                        </mailchimp>
+                    </children>
+                </email_template>
+            </children>
+        </system>
+    </menu>
     <acl>
         <resources>
             <admin>
@@ -13,6 +37,18 @@
                                     </mailchimp>
                                 </children>
                             </config>
+                            <email_template>
+                                <children>
+                                    <mailchimp translate="title" module="mailchimp">
+                                        <title>MailChimp</title>
+                                        <children>
+                                            <mailchimp_syncronization translate="title" module="mailchimp">
+                                                <title>Ecommerce Data Syncronization</title>
+                                            </mailchimp_syncronization>
+                                        </children>
+                                    </mailchimp>
+                                </children>
+                            </email_template>
                         </children>
                     </system>
                 </children>

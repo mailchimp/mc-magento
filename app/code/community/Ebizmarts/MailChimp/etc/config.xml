@@ -33,11 +33,12 @@
                 </observers>
             </customer_save_after>
         </events>-->
-        <!--<models>
+        <models>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Model</class>
                 <resourceModel>mailchimp_mysql4</resourceModel>
-            </mailchimp>-->
+            </mailchimp>
+        </models>
             <!--<mailchimp_mysql4>
                 <class>Ebizmarts_MailChimp_Model_Mysql4</class>
                 <entities>

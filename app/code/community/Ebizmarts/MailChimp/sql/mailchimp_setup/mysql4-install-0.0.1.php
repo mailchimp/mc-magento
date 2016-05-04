@@ -36,6 +36,11 @@ $installer->run("
       PRIMARY KEY  (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+    ALTER TABLE `{$this->getTable('customer_entity')}`
+      ADD `mailchimp_sync_delta` TIMESTAMP NULL,
+      ADD `mailchimp_last_batch_id` INT NOT NULL,
+      ADD `mailchimp_sync_details` TEXT NOT NULL;
+
 ");
 
 $installer->run("
