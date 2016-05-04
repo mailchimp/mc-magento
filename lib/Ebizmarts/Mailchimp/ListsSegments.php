@@ -24,6 +24,6 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
         {
             $_params['fields'] = $fields;
         }
-        return $this->master->call('lists/'.$listId.'/segments',$_params,Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/segments',$_params,Ebizmarts_Mailchimp::GET);
     }
 }

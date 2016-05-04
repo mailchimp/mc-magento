@@ -27,10 +27,12 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/CampaignsSendChecklist.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/Conversations.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/ConversationsMessages.php';
+    require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/Ecommerce.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceStores.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceCarts.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceCustomers.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceOrders.php';
+    require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceOrdersLines.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceProducts.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/EcommerceProductsVariants.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/FileManagerFiles.php';
@@ -82,10 +84,12 @@ else {
     require_once dirname(__FILE__) . '/Mailchimp/CampaignsSendChecklist.php';
     require_once dirname(__FILE__) . '/Mailchimp/Conversations.php';
     require_once dirname(__FILE__) . '/Mailchimp/ConversationsMessages.php';
+    require_once dirname(__FILE__) . '/Mailchimp/Ecommerce.php';
     require_once dirname(__FILE__) . '/Mailchimp/EcommerceStores.php';
     require_once dirname(__FILE__) . '/Mailchimp/EcommerceCarts.php';
     require_once dirname(__FILE__) . '/Mailchimp/EcommerceCustomers.php';
     require_once dirname(__FILE__) . '/Mailchimp/EcommerceOrders.php';
+    require_once dirname(__FILE__) . '/Mailchimp/EcommerceOrdersLines.php';
     require_once dirname(__FILE__) . '/Mailchimp/EcommerceProducts.php';
     require_once dirname(__FILE__) . '/Mailchimp/EcommerceProductsVariants.php';
     require_once dirname(__FILE__) . '/Mailchimp/FileManagerFiles.php';

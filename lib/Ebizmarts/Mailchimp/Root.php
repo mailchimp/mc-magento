@@ -23,6 +23,6 @@ class Mailchimp_Root extends Mailchimp_Abstract
         {
             $_params['exclude_fields'] = $excludeFields;
         }
-        return $this->master->call('',$_params,Mailchimp::GET);
+        return $this->master->call('',$_params,Ebizmarts_Mailchimp::GET);
     }
 }

@@ -78,7 +78,7 @@ class Mailchimp_Lists extends Mailchimp_Abstract
         $_params= array('name'=>$name,'contact'=>$contact,'permission_remainder'=>$permissionRemanider,'use_archive_bar'=>$useArchiveBar,
             'campaignDefaults'=>$campaingDefaults,'notify_on_subscribe'=>$notifyOnSubscribe,'notify_on_unsubscribe'=>$notifyOnUnsubscribe,
             'email_type_option'=>$emailTypeOption,'visibility'=>$visibility);
-        return $this->master->call('lists',$_params,Mailchimp::POST);
+        return $this->master->call('lists',$_params,Ebizmarts_Mailchimp::POST);
     }
     public function getLists($id=null,$fields=null,$excludeFields=null,$count=null,$offset=null,$beforeDateCreated=null,$sinceDateCreated=null,
                                 $beforeCampaignLastSent=null,$sinceCampaignLastSent=null,$email=null)
@@ -121,11 +121,11 @@ class Mailchimp_Lists extends Mailchimp_Abstract
             $_params['email'] = $email;
         }
         if($id) {
-            return $this->master->call('lists/'.$id, $_params, Mailchimp::GET);
+            return $this->master->call('lists/'.$id, $_params, Ebizmarts_Mailchimp::GET);
         }
         else
         {
-            return $this->master->call('lists', $_params, Mailchimp::GET);
+            return $this->master->call('lists', $_params, Ebizmarts_Mailchimp::GET);
         }
     }
 
@@ -155,7 +155,7 @@ class Mailchimp_Lists extends Mailchimp_Abstract
         if($notifyOnSubscribe) $_params['notify_on_subscribe'] = $notifyOnSubscribe;
         if($notifyOnUnsubscribe) $_params['notify_on_unsubscribe'] = $notifyOnUnsubscribe;
         if($visibility) $_params['visibility'] = $visibility;
-        return $this->master->call('lists/'.$listId, $_params, Mailchimp::PATCH);
+        return $this->master->call('lists/'.$listId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -166,6 +166,6 @@ class Mailchimp_Lists extends Mailchimp_Abstract
      */
     public function delete($listId)
     {
-        return $this->master->call('lists/'.$listId, null, Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }
