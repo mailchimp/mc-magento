@@ -38,29 +38,30 @@ $installer->run("
 
 ");
 
-$setup = new Mage_Eav_Model_Entity_Setup('core_setup');
-$setup->startSetup();
+$entityTypeId     = $installer->getEntityTypeId('customer');
+$attributeSetId   = $installer->getDefaultAttributeSetId($entityTypeId);
+$attributeGroupId = $installer->getDefaultAttributeGroupId($entityTypeId, $attributeSetId);
 
-$setup->addAttribute(
-    'customer',
+$installer->addAttribute('customer', 'mailchimp_sync_delta', array(
+    'input'         => 'text', //or select or whatever you like
+    'type'          => 'int', //or varchar or anything you want it
+    'label'         => 'Attribute description goes here',
+    'visible'       => 1,
+    'required'      => 0, //mandatory? then 1
+    'user_defined' => 1,
+));
+
+$installer->addAttributeToGroup(
+    $entityTypeId,
+    $attributeSetId,
+    $attributeGroupId,
     'mailchimp_sync_delta',
-    array(
-        'group'                => 'Default',
-        'type'                 => 'timestamp',
-        'label'                => 'Mailchimp Date Synced Delta',
-        'input'                => 'select',
-        'source'               => 'eav/entity_attribute_source_boolean',
-        'global'               => Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_STORE,
-        'required'             => 0,
-        'default'              => 0,
-        'visible_on_front'     => 1,
-        'used_for_price_rules' => 0,
-        'adminhtml_only'       => 1,
-    )
+    '100'
 );
 
-$setup->updateAttribute('customer_entity', 'mailchimp_sync_delta', 'backend_model', '');
-$setup->endSetup();
+$oAttribute = Mage::getSingleton('eav/config')->getAttribute('customer', 'mailchimp_sync_delta');
+$oAttribute->setData('used_in_forms', array('adminhtml_customer'));
+$oAttribute->save();
 
 $installer->run("
 UPDATE `{$installer->getTable('mailchimp_orders')}` A JOIN `{$installer->getTable('sales_flat_order')}` B

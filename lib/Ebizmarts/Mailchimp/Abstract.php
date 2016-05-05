@@ -13,13 +13,12 @@
 class Mailchimp_Abstract
 {
     /**
-     * @var Ebizmarts_Mailchimp
+     * @var Mailchimp
      */
     protected $master;
 
     /**
-     * Mailchimp_Abstract constructor.
-     * @param Ebizmarts_Mailchimp $m
+     * @param Mailchimp $m
      */
     public function __construct(Ebizmarts_Mailchimp $m)
     {
