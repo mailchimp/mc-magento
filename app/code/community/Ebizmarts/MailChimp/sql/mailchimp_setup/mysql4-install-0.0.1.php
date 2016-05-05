@@ -36,12 +36,31 @@ $installer->run("
       PRIMARY KEY  (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-    ALTER TABLE `{$this->getTable('customer_entity')}`
-      ADD `mailchimp_sync_delta` TIMESTAMP NULL,
-      ADD `mailchimp_last_batch_id` INT NOT NULL,
-      ADD `mailchimp_sync_details` TEXT NOT NULL;
-
 ");
+
+$setup = new Mage_Eav_Model_Entity_Setup('core_setup');
+$setup->startSetup();
+
+$setup->addAttribute(
+    'customer',
+    'mailchimp_sync_delta',
+    array(
+        'group'                => 'Default',
+        'type'                 => 'timestamp',
+        'label'                => 'Mailchimp Date Synced Delta',
+        'input'                => 'select',
+        'source'               => 'eav/entity_attribute_source_boolean',
+        'global'               => Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_STORE,
+        'required'             => 0,
+        'default'              => 0,
+        'visible_on_front'     => 1,
+        'used_for_price_rules' => 0,
+        'adminhtml_only'       => 1,
+    )
+);
+
+$setup->updateAttribute('customer_entity', 'mailchimp_sync_delta', 'backend_model', '');
+$setup->endSetup();
 
 $installer->run("
 UPDATE `{$installer->getTable('mailchimp_orders')}` A JOIN `{$installer->getTable('sales_flat_order')}` B

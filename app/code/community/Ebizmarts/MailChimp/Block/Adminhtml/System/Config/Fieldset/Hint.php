@@ -18,11 +18,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Hint
 
     public function getMailChimpVersion()
     {
-        /**
-         * testing
-         */
-        Mage::getModel('mailchimp/api_customers')->SyncBatch(1);
-
         return (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
     }
 }

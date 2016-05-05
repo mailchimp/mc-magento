@@ -38,43 +38,43 @@
                 <class>Ebizmarts_MailChimp_Model</class>
                 <resourceModel>mailchimp_mysql4</resourceModel>
             </mailchimp>
-        </models>
-            <!--<mailchimp_mysql4>
+            <mailchimp_mysql4>
                 <class>Ebizmarts_MailChimp_Model_Mysql4</class>
-                <entities>
-                    <apidebug>
-                        <table>magemailchimp_api_debug</table>
-                    </apidebug>
-                    <ecommerce>
-                        <table>magemailchimp_ecommerce360</table>
-                    </ecommerce>
-                    <bulksync_export>
-                        <table>magemailchimp_bulksync_export</table>
-                    </bulksync_export>
-                    <bulksync_import>
-                        <table>magemailchimp_bulksync_import</table>
-                    </bulksync_import>
-                    <asyncsubscribers>
-                        <table>magemailchimp_async_subscribers</table>
-                    </asyncsubscribers>
-                    <asyncorders>
-                        <table>magemailchimp_async_orders</table>
-                    </asyncorders>
-                    <lastorder>
-                        <table>magemailchimp_last_order</table>
-                    </lastorder>
-                </entities>
+                <!--<entities>-->
+                    <!--<apidebug>-->
+                        <!--<table>magemailchimp_api_debug</table>-->
+                    <!--</apidebug>-->
+                    <!--<ecommerce>-->
+                        <!--<table>magemailchimp_ecommerce360</table>-->
+                    <!--</ecommerce>-->
+                    <!--<bulksync_export>-->
+                        <!--<table>magemailchimp_bulksync_export</table>-->
+                    <!--</bulksync_export>-->
+                    <!--<bulksync_import>-->
+                        <!--<table>magemailchimp_bulksync_import</table>-->
+                    <!--</bulksync_import>-->
+                    <!--<asyncsubscribers>-->
+                        <!--<table>magemailchimp_async_subscribers</table>-->
+                    <!--</asyncsubscribers>-->
+                    <!--<asyncorders>-->
+                        <!--<table>magemailchimp_async_orders</table>-->
+                    <!--</asyncorders>-->
+                    <!--<lastorder>-->
+                        <!--<table>magemailchimp_last_order</table>-->
+                    <!--</lastorder>-->
+                <!--</entities>-->
             </mailchimp_mysql4>
-            <newsletter>
-                <rewrite>
-                    <subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>
-                </rewrite>
-            </newsletter>-->
-        <!--</models>-->
-        <!--<resources>
+            <!--<newsletter>-->
+                <!--<rewrite>-->
+                    <!--<subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>-->
+                <!--</rewrite>-->
+            <!--</newsletter>-->
+        </models>
+        <resources>
             <mailchimp_setup>
                 <setup>
                     <module>Ebizmarts_MailChimp</module>
+                    <class>Mage_Eav_Model_Entity_Setup</class>
                 </setup>
                 <connection>
                     <use>core_setup</use>
@@ -90,7 +90,7 @@
                     <use>core_read</use>
                 </connection>
             </mailchimp_read>
-        </resources>-->
+        </resources>
         <blocks>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Block</class>

@@ -228,9 +228,9 @@ class Ebizmarts_Mailchimp
         $this->templates                                    = new Mailchimp_Templates($this);
         $this->templates->defaultContent                    = new Mailchimp_TemplatesDefaultContent($this);
     }
-    public function call($url,$params,$method='GET')
+    public function call($url,$params,$method='GET',$encodeJson=true)
     {
-        if(count($params))
+        if(count($params) && $encodeJson)
         {
             $params = json_encode($params);
         }
@@ -249,12 +249,18 @@ class Ebizmarts_Mailchimp
         $response_body = curl_exec($ch);
 
         $info = curl_getinfo($ch);
-        if(curl_error($ch)) {
-            throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
-        }
+
         $result = json_decode($response_body, true);
 
+        if(curl_error($ch)) {
+            echo "<h1>ERROR MESSAGE</h1>";
+            var_dump($result);
+            throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
+        }
+
         if(floor($info['http_code'] / 100) >= 4) {
+            echo "<h1>ERROR MESSAGE</h1>";
+            var_dump($result);
             throw new Mailchimp_Error($result['title'].' : '.$result['detail']);
         }
 
