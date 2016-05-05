@@ -10,7 +10,7 @@
  * @date: 4/29/16 4:57 PM
  * @file: FileManagerFolders.php
  */
-class Mailchimp_FileManagerFolders extends Mailchimp
+class Mailchimp_FileManagerFolders extends Mailchimp_Abstract
 {
 
 }
