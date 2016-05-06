@@ -10,6 +10,17 @@
  * @date: 4/29/16 3:47 PM
  * @file: AuthorizedApps.php
  */
-class Mailchimp_AuthorizedApps extends Mailchimp_Abstract
+class Mailchimp_AuthorizedApps
 {
+    /**
+     * @var Mailchimp
+     */
+    protected $master;
+    /**
+     * @param Mailchimp $m
+     */
+    public function __construct(Mailchimp $m)
+    {
+        $this->master = $m;
+    }
 }
