@@ -21,12 +21,12 @@ class Ebizmarts_MailChimp_TestController extends Mage_Core_Controller_Front_Acti
         try {
             $response = Mage::getModel('mailchimp/api_customers')->SyncBatch(1);
 
-            $mailchimpApi = new Ebizmarts_Mailchimp("2cb911e2b6951805cdab47df20997033-us13");
-//            $response = $mailchimpApi->batchOperation->status("769b814601");
+//            $mailchimpApi = new Ebizmarts_Mailchimp("2cb911e2b6951805cdab47df20997033-us13");
+//            $response = $mailchimpApi->batchOperation->status("fb207083a5");
 
 //            $response = $mailchimpApi->ecommerce->stores->get();
 
-//            $response = $mailchimpApi->ecommerce->customers
+//            $response = $mailchimpApi->ecommerce->customers->getAll();
 
             echo "<h1>RESPONSE</h1>";
             var_dump($response);
