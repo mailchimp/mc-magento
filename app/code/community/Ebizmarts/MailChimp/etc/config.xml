@@ -38,7 +38,7 @@
                 <class>Ebizmarts_MailChimp_Model</class>
                 <resourceModel>mailchimp_mysql4</resourceModel>
             </mailchimp>
-            <mailchimp_mysql4>
+            <!--<mailchimp_mysql4>
                 <class>Ebizmarts_MailChimp_Model_Mysql4</class>
                 <!--<entities>-->
                     <!--<apidebug>-->
@@ -63,14 +63,14 @@
                         <!--<table>magemailchimp_last_order</table>-->
                     <!--</lastorder>-->
                 <!--</entities>-->
-            </mailchimp_mysql4>
+            <!--</mailchimp_mysql4>-->
             <!--<newsletter>-->
                 <!--<rewrite>-->
                     <!--<subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>-->
                 <!--</rewrite>-->
             <!--</newsletter>-->
         </models>
-        <resources>
+        <!--<resources>
             <mailchimp_setup>
                 <setup>
                     <module>Ebizmarts_MailChimp</module>
@@ -191,8 +191,8 @@
             </adminhtml>
         </routers>
     </admin>
-    <!--<adminhtml>
-        <layout>
+    <adminhtml>
+        <!--<layout>
             <updates>
                 <magemailchimp>
                     <file>magemailchimp.xml</file>
@@ -207,9 +207,9 @@
                     </files>
                 </Ebizmarts_MailChimp>
             </modules>
-        </translate>
+        </translate>-->
         <events>
-            <controller_action_predispatch_adminhtml_dashboard_index>
+            <!--<controller_action_predispatch_adminhtml_dashboard_index>
                 <observers>
                     <mailchimp_up>
                         <type>model</type>
@@ -225,7 +225,7 @@
                         <method>massActionOption</method>
                     </mailchimp_order_addmassbutton>
                 </observers>
-            </core_block_abstract_prepare_layout_before>
+            </core_block_abstract_prepare_layout_before>-->
             <admin_system_config_changed_section_mailchimp>
                 <observers>
                     <mailchimp_save_config>
@@ -234,7 +234,7 @@
                     </mailchimp_save_config>
                 </observers>
             </admin_system_config_changed_section_mailchimp>
-            <controller_action_predispatch_adminhtml_system_config_edit>
+            <!--<controller_action_predispatch_adminhtml_system_config_edit>
                 <observers>
                     <mailchimp_load_config>
                         <class>mailchimp/observer</class>
@@ -250,10 +250,10 @@
                         <method>alterNewsletterGrid</method>
                     </mailchimp_alter_newsletter_grid>
                 </observers>
-            </adminhtml_block_html_before>
+            </adminhtml_block_html_before>-->
         </events>
     </adminhtml>
-    <default>
+    <!--<default>
         <mailchimp>
             <custom_groupings>
                 <segment_grouping_name><![CDATA[MAGE_CUSTOMER_SEGMENTS]]></segment_grouping_name>
