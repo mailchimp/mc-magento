@@ -15,5 +15,14 @@ $eav->addAttribute('customer', 'mailchimp_sync_delta', array(
     'position'  => 1,
 ));
 
+$installer->run("
+	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_sync_batches')}` (
+	  `id` int(10) unsigned NOT NULL auto_increment,
+	  `status` varchar(10) NOT NULL,
+	  `response_url` text,
+	  PRIMARY KEY  (`id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+");
+
 $installer->endSetup();
 

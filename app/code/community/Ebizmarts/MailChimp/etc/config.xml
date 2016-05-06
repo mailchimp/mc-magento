@@ -38,8 +38,8 @@
                 <class>Ebizmarts_MailChimp_Model</class>
                 <resourceModel>mailchimp_mysql4</resourceModel>
             </mailchimp>
-            <!--<mailchimp_mysql4>
-                <class>Ebizmarts_MailChimp_Model_Mysql4</class>
+            <!--<mailchimp_mysql4>-->
+                <!--<class>Ebizmarts_MailChimp_Model_Mysql4</class>-->
                 <!--<entities>-->
                     <!--<apidebug>-->
                         <!--<table>magemailchimp_api_debug</table>-->
@@ -70,7 +70,7 @@
                 <!--</rewrite>-->
             <!--</newsletter>-->
         </models>
-        <!--<resources>
+        <resources>
             <mailchimp_setup>
                 <setup>
                     <module>Ebizmarts_MailChimp</module>

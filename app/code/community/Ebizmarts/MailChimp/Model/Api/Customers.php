@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mailchimp-lib Magento Component
  *
@@ -16,30 +17,30 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function SyncBatch($mailchimpStoreId)
     {
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        if ($apiKey) {
 
             //create missing customers first
             $collection = mage::getModel('customer/customer')->getCollection()
                 ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)),'','left');
+                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)), '', 'left');
             $collection->getSelect()->limit(self::BATCH_LIMIT);
 
 
             //if all synced, start updating old ones
-        if($collection->getSize() == 0)
-        {
-            $collection = mage::getModel('customer/customer')->getCollection()
-                ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))),'','left');
-            $collection->getSelect()->limit(self::BATCH_LIMIT);
-            var_dump($collection->getSelect()->__toString());
-        }
+            if ($collection->getSize() == 0) {
+                $collection = mage::getModel('customer/customer')->getCollection()
+                    ->addAttributeToSelect('mailchimp_sync_delta')
+                    ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
+                $collection->getSelect()->limit(self::BATCH_LIMIT);
+                var_dump($collection->getSelect()->__toString());
+            }
 
             $batchJson = '{"operations": [';
             $operationsCount = 0;
             $batchId = "CUS-" . date('Y-m-d-H-i-s');
 
-            foreach ($collection as $customer)
-            {
+            foreach ($collection as $customer) {
                 $customerJson = $this->GeneratePOSTPayload($customer);
                 if (!empty($customerJson)) {
                     $operationsCount += 1;
@@ -49,7 +50,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     $batchJson .= '{"method": "PUT",';
                     $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers/' . $customer->getId() . '",';
                     $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
-                    $batchJson .= '"body": "' . addcslashes($customerJson,'"') . '"';
+                    $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
                     $batchJson .= '}';
 
                     //update customers delta
@@ -57,15 +58,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     $customer->save();
                 }
             }
-
             $batchJson .= ']}';
 
-            $mailchimpApi = new Ebizmarts_Mailchimp("2cb911e2b6951805cdab47df20997033-us13");
+            $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+            $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
-        echo "<h1>REQUEST</h1>";
-        var_dump($batchJson);
-
-        return $mailchimpApi->batchOperation->add($batchJson);
+            //@toDo
+            //save batch id to db
+        }
     }
 
     protected function GeneratePOSTPayload($customer)
@@ -85,8 +85,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             $jsonData = json_encode($data);
 
-        } catch (Exception $e)
-        {
+        } catch (Exception $e) {
             //json encode failed
             //@toDo log somewhere
         }
