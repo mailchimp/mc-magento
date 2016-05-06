@@ -70,16 +70,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </account_details>
-                        <maxlistsamount translate="label comment">
-                            <label>Max amount of lists to show</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                        </maxlistsamount>
-                        <!--<list translate="label comment">
+                        <list translate="label comment">
                             <label>General Subscription</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_list</source_model>
@@ -88,9 +79,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list]]></comment>
+                            <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list.]]></comment>
                         </list>
-                        <cutomergroup translate="label comment">
+                        <!--<cutomergroup translate="label comment">
                             <label>Subscriber Group</label>
                             <frontend_type>multiselect</frontend_type>
                             <source_model>mailchimp/system_config_source_customerGroup</source_model>
