@@ -73,49 +73,49 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getStoreName()
     {
-        $name = null;
-        if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) // store level
-        {
-            $store = Mage::getModel('core/store')->load($code);
-            $storeName = $store->getGroup()->getName();
-            $storeViewName = $store->getName();
-            $websiteName = Mage::getModel('core/store')->load($code)->getWebsite()->getName();
-            $name = $websiteName.'-'.$storeName.'-'.$storeViewName;
-        }
-        elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) // website level
-        {
-            $websiteName = Mage::getModel('core/website')->load($code)->getName();
-            $name = $websiteName;
-        }
-        else
-        {
+//        $name = null;
+//        if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) // store level
+//        {
+//            $store = Mage::getModel('core/store')->load($code);
+//            $storeName = $store->getGroup()->getName();
+//            $storeViewName = $store->getName();
+//            $websiteName = Mage::getModel('core/store')->load($code)->getWebsite()->getName();
+//            $name = $websiteName.'-'.$storeName.'-'.$storeViewName;
+//        }
+//        elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) // website level
+//        {
+//            $websiteName = Mage::getModel('core/website')->load($code)->getName();
+//            $name = $websiteName;
+//        }
+//        else
+//        {
             $name = 'Default Scope';
-        }
+//        }
         return $name;
 
     }
 
     public function getStoreId()
     {
-        $id = null;
-        if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) // store level
-        {
-            $store = Mage::getModel('core/store')->load($code);
-            $storeName = $store->getGroup()->getName();
-            $storeNameCode = strtolower(str_replace(' ', '_', $storeName));
-            $websiteCode = Mage::getModel('core/store')->load($code)->getWebsite()->getCode();
-            $id = $websiteCode.'-'.$storeNameCode.'-'.$code;
-        }
-        elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) // website level
-        {
-            $website = Mage::getModel('core/website')->load($code);
-            $websiteCode = $website->getCode();
-            $id = $websiteCode;
-        }
-        else
-        {
+//        $id = null;
+//        if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) // store level
+//        {
+//            $store = Mage::getModel('core/store')->load($code);
+//            $storeName = $store->getGroup()->getName();
+//            $storeNameCode = strtolower(str_replace(' ', '_', $storeName));
+//            $websiteCode = Mage::getModel('core/store')->load($code)->getWebsite()->getCode();
+//            $id = $websiteCode.'-'.$storeNameCode.'-'.$code;
+//        }
+//        elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) // website level
+//        {
+//            $website = Mage::getModel('core/website')->load($code);
+//            $websiteCode = $website->getCode();
+//            $id = $websiteCode;
+//        }
+//        else
+//        {
             $id = 'default_scope';
-        }
+//        }
         return $id;
     }
 
