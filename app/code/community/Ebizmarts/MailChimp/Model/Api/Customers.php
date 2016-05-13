@@ -12,60 +12,50 @@
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
-    const BATCH_LIMIT = 1;
-    const DEFAULT_OPT_IN = false;
+    const BATCH_LIMIT = 1000;
+    const DEFAULT_OPT_IN = true;
 
-    public function SyncBatch($mailchimpStoreId)
+    public function CreateBatchJson($mailchimpStoreId)
     {
-        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-        if ($apiKey) {
+        //create missing customers first
+        $collection = mage::getModel('customer/customer')->getCollection()
+            ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)), '', 'left');
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-            //create missing customers first
+
+        //if all synced, start updating old ones
+        if ($collection->getSize() == 0) {
             $collection = mage::getModel('customer/customer')->getCollection()
                 ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)), '', 'left');
+                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
             $collection->getSelect()->limit(self::BATCH_LIMIT);
-
-
-            //if all synced, start updating old ones
-            if ($collection->getSize() == 0) {
-                $collection = mage::getModel('customer/customer')->getCollection()
-                    ->addAttributeToSelect('mailchimp_sync_delta')
-                    ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
-                $collection->getSelect()->limit(self::BATCH_LIMIT);
-                var_dump($collection->getSelect()->__toString());
-            }
-
-            $batchJson = '{"operations": [';
-            $operationsCount = 0;
-            $batchId = "CUS-" . date('Y-m-d-H-i-s');
-
-            foreach ($collection as $customer) {
-                $customerJson = $this->GeneratePOSTPayload($customer);
-                if (!empty($customerJson)) {
-                    $operationsCount += 1;
-                    if ($operationsCount > 1) {
-                        $batchJson .= ',';
-                    }
-                    $batchJson .= '{"method": "PUT",';
-                    $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers/' . $customer->getId() . '",';
-                    $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
-                    $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
-                    $batchJson .= '}';
-
-                    //update customers delta
-                    $customer->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $customer->save();
-                }
-            }
-            $batchJson .= ']}';
-
-            $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-            $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-
-            //@toDo
-            //save batch id to db
         }
+
+        $batchJson = "";
+        $operationsCount = 0;
+        $batchId = "CUS-" . date('Y-m-d-H-i-s');
+
+        foreach ($collection as $customer) {
+            $customerJson = $this->GeneratePOSTPayload($customer);
+            if (!empty($customerJson)) {
+                $operationsCount += 1;
+                if ($operationsCount > 1) {
+                    $batchJson .= ',';
+                }
+                $batchJson .= '{"method": "PUT",';
+                $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers/' . $customer->getId() . '",';
+                $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
+                $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
+                $batchJson .= '}';
+
+                //update customers delta
+                $customer->setData("mailchimp_sync_delta", Varien_Date::now());
+                $customer->save();
+            }
+        }
+
+        return $batchJson;
     }
 
     protected function GeneratePOSTPayload($customer)
@@ -92,5 +82,4 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         return $jsonData;
     }
-
 }

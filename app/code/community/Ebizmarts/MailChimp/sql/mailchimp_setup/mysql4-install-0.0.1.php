@@ -11,9 +11,23 @@ $eav->addAttribute('customer', 'mailchimp_sync_delta', array(
     'type'      => 'datetime',
     'input'     => 'text',
     'visible'   => true,
-    'required'  => true,
+    'required'  => false,
     'position'  => 1,
 ));
+
+$eav->addAttribute('catalog_product', 'mailchimp_sync_delta', array(
+    'label'     => 'MailChimp last sync timestamp',
+    'type'      => 'datetime',
+    'input'     => 'text',
+    'visible'   => true,
+    'required'  => false,
+    'position'  => 1,
+));
+
+$installer->run("
+ ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
+ ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
+");
 
 $installer->run("
 	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_sync_batches')}` (

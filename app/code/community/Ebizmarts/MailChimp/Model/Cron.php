@@ -18,7 +18,6 @@ class Ebizmarts_MailChimp_Model_Cron
 
     public function syncEcommerceData($cron)
     {
-        //@toDo
-        return $this;
+        Mage::getModel('mailchimp/api_batches')->SendBatch("base"); //hardcoding store for now
     }
 }

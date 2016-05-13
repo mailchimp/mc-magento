@@ -280,65 +280,65 @@
                 <check_frequency>86400</check_frequency>
             </notifications>
         </mailchimp>
-    </default>
+    </default>-->
     <crontab>
         <jobs>
-            <mailchimp_bulksync_export_subscribers>
+            <mailchimp_bulksync_ecommerce_data>
                 <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
+                    <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>mailchimp/cron::bulksyncExportSubscribers</model>
+                    <model>mailchimp/cron::syncEcommerceData</model>
                 </run>
-            </mailchimp_bulksync_export_subscribers>
-            <mailchimp_bulksync_import_subscribers>
-                <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::bulksyncImportSubscribers</model>
-                </run>
-            </mailchimp_bulksync_import_subscribers>
-            <mailchimp_autoexport_subscribers>
-                <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::autoExportSubscribers</model>
-                </run>
-            </mailchimp_autoexport_subscribers>
-            <mailchimp_sendorders_asynch>
-                <schedule>
-                    <cron_expr>*/15 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::sendordersAsync</model>
-                </run>
-            </mailchimp_sendorders_asynch>
-            <mailchimp_cleanorders_asynch>
-                <schedule>
-                    <cron_expr>0 0 1 * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::cleanordersAsync</model>
-                </run>
-            </mailchimp_cleanorders_asynch>
-            <mailchimp_sendsubscribers_asynch>
-                <schedule>
-                    <cron_expr>*/15 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::sendSubscribersAsync</model>
-                </run>
-            </mailchimp_sendsubscribers_asynch>
-            <mailchimp_cleansubscribers_asynch>
-                <schedule>
-                    <cron_expr>0 0 1 * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::cleanSubscribersAsync</model>
-                </run>
-            </mailchimp_cleansubscribers_asynch>
+            </mailchimp_bulksync_ecommerce_data>
+            <!--<mailchimp_bulksync_import_subscribers>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>0 * * * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>mailchimp/cron::bulksyncImportSubscribers</model>-->
+                <!--</run>-->
+            <!--</mailchimp_bulksync_import_subscribers>-->
+            <!--<mailchimp_autoexport_subscribers>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>0 * * * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>mailchimp/cron::autoExportSubscribers</model>-->
+                <!--</run>-->
+            <!--</mailchimp_autoexport_subscribers>-->
+            <!--<mailchimp_sendorders_asynch>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>*/15 * * * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>mailchimp/cron::sendordersAsync</model>-->
+                <!--</run>-->
+            <!--</mailchimp_sendorders_asynch>-->
+            <!--<mailchimp_cleanorders_asynch>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>0 0 1 * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>mailchimp/cron::cleanordersAsync</model>-->
+                <!--</run>-->
+            <!--</mailchimp_cleanorders_asynch>-->
+            <!--<mailchimp_sendsubscribers_asynch>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>*/15 * * * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>mailchimp/cron::sendSubscribersAsync</model>-->
+                <!--</run>-->
+            <!--</mailchimp_sendsubscribers_asynch>-->
+            <!--<mailchimp_cleansubscribers_asynch>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>0 0 1 * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>mailchimp/cron::cleanSubscribersAsync</model>-->
+                <!--</run>-->
+            <!--</mailchimp_cleansubscribers_asynch>-->
         </jobs>
-    </crontab>-->
+    </crontab>
 </config>
