@@ -127,6 +127,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         try {
             $storeExists = $api->ecommerce->stores->get($storeId);
 
+            $storeExists = json_decode($storeExists);
+
         }catch (Exception $e){
             Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
         }

@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $batchJson = "";
         $operationsCount = 0;
-        $batchId = "CUS-" . date('Y-m-d-H-i-s');
+        $batchId = "CUS_" . date('Y-m-d-H-i-s');
 
         foreach ($collection as $customer) {
             $customerJson = $this->GeneratePOSTPayload($customer);
@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 }
                 $batchJson .= '{"method": "PUT",';
                 $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers/' . $customer->getId() . '",';
-                $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
+                $batchJson .= '"operation_id": "' . $batchId . '_' . $customer->getId() . '",';
                 $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
                 $batchJson .= '}';
 
