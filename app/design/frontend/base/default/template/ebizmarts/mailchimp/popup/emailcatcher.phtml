@@ -42,17 +42,7 @@
         if (navigator.cookieEnabled) {
             <?php if(isset($_COOKIE['email'])):
                 if($_COOKIE['email'] != 'none'):
-                    Print(json_decode($this->_handleCookie()));
-                    $cookie = str_replace(' ', '+', $_COOKIE['email']);
-                    $this->_createCoupon($cookie);
-//                    if(isset($_COOKIE['subscribe'])):
-//                        $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
-//                        if(!$subscriber->getId()):
-//                            Mage::getModel('newsletter/subscriber')->setImportMode(TRUE)->subscribe($email); ?>
-//            document.cookie = 'subscribe=; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-//                location.reload();
-//            <?php //endif; ?>
-<!--            --><?php //endif; ?>
+                    Print(json_decode($this->_handleCookie())); ?>
             <?php endif; ?>
             <?php elseif($this->_canCancel()): ?>
             document.observe('keydown', function (evt) {
@@ -83,26 +73,25 @@
                     onCancel: function (win) {
                         <?php if(isset($_COOKIE['counter'])):
                         //check cookie counter for customer id and check actual counter
-                            $counterId = $_COOKIE['counter'];
-                            $counter = Mage::getSingleton('core/session')->getMailChimpCounter();
+                            $counter = $_COOKIE['counter'];
                             //if(counter en config == counter en db){
-                            if($counter+=1 >= Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId())):
-                                ?>
+                            if(($counter+1) >= Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId())): ?>
                         document.cookie = 'counter=; expires=Thu, 01 Jan 1970 00:00:01 GMT';
                         createCookie('email=none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
-                        <?php else :
-                        $counter->setCounter(($counter->getCounter()+1));
-                        $counter->save();
-                        endif; ?>
+                        <?php else: ?>
+                        createCookie('counter='+<?php Print(json_encode((1+$counter))); ?>,<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+//                        $counter->setCounter(($counter->getCounter()+1));
+//                        $counter->save();
+                        <?php endif; ?>
                         <?php else:
                         //create cookie counter in 0
                             if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId()) == 1): ?>
                         createCookie('email=none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
-                        <?php else:
-                            $newCounter = Mage::getModel('mailchimp/popup');
-                            $newCounter->setCounter(1)->save();
-                            ?>
-                        createCookie('counter=' +<?php Print(json_encode($newCounter->getId())); ?>, <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        <?php else: ?>
+                        createCookie('counter=1',<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+//                            $newCounter = Mage::getModel('mailchimp/popup');
+//                            $newCounter->setCounter(1)->save();
+//                        createCookie('counter=' +<?php //Print(json_encode($newCounter->getId())); ?>//, <?php //Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>//);
                         <?php endif; ?>
                         <?php endif; ?>
                     },

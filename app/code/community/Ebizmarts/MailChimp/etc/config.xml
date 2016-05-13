@@ -70,7 +70,7 @@
                 </rewrite>
             </newsletter>-->
         </models>
-        <!--<resources>
+        <resources>
             <mailchimp_setup>
                 <setup>
                     <module>Ebizmarts_MailChimp</module>
@@ -89,7 +89,7 @@
                     <use>core_read</use>
                 </connection>
             </mailchimp_read>
-        </resources>-->
+        </resources>
         <blocks>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Block</class>
@@ -224,23 +224,23 @@
                     </mailchimp_save_config>
                 </observers>
             </admin_system_config_changed_section_mailchimp>
-            <!--<controller_action_predispatch_adminhtml_system_config_edit>
-                <observers>
-                    <mailchimp_load_config>
-                        <class>mailchimp/observer</class>
-                        <method>loadConfig</method>
-                    </mailchimp_load_config>
-                </observers>
-            </controller_action_predispatch_adminhtml_system_config_edit>
             <adminhtml_block_html_before>
                 <observers>
-                    <mailchimp_alter_newsletter_grid>
+                    <monkey_alter_newsletter_grid>
                         <type>model</type>
                         <class>mailchimp/observer</class>
                         <method>alterNewsletterGrid</method>
-                    </mailchimp_alter_newsletter_grid>
+                    </monkey_alter_newsletter_grid>
                 </observers>
-            </adminhtml_block_html_before>-->
+            </adminhtml_block_html_before>
+            <!--<controller_action_predispatch_adminhtml_system_config_edit>-->
+                <!--<observers>-->
+                    <!--<mailchimp_load_config>-->
+                        <!--<class>mailchimp/observer</class>-->
+                        <!--<method>loadConfig</method>-->
+                    <!--</mailchimp_load_config>-->
+                <!--</observers>-->
+            <!--</controller_action_predispatch_adminhtml_system_config_edit>-->
         </events>
     </adminhtml>
     <default>

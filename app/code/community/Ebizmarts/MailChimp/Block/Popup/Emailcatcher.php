@@ -36,26 +36,6 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
         return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_SUBSCRIPTION, $storeId);
     }
 
-    protected function _createCoupon($cookie)
-    {
-        $storeId = Mage::app()->getStore()->getId();
-        if(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_CREATE_COUPON, $storeId)) {
-            $cookieValues = explode('/', $cookie);
-            $email = $cookieValues[0];
-            $email = str_replace(' ', '+', $email);
-            if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_CREATE_COUPON, $storeId)) {
-                $collection = Mage::getModel('mailchimp/popup')->getCollection()
-                    ->addFieldToFilter('email', array('eq' => $email));
-                if (!count($collection)) {
-                    $addEmail = Mage::getModel('mailchimp/popup');
-                    $addEmail->setEmail($email)
-                        ->setStoreId(Mage::app()->getStore()->getId())
-                        ->save();
-                }
-            }
-        }
-    }
-
     protected function _getStoreId()
     {
         return Mage::app()->getStore()->getId();
@@ -64,12 +44,15 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
     protected function _handleCookie(){
         $storeId = Mage::app()->getStore()->getId();
         $emailCookie = Mage::getModel('core/cookie')->get('email');
+        Mage::log($emailCookie, null, 'ebizmarts.log', true);
         $subscribeCookie = Mage::getModel('core/cookie')->get('subscribe');
         $cookieValues = explode('/', $emailCookie);
         $email = $cookieValues[0];
         $email = str_replace(' ', '+', $email);
         $fName = $cookieValues[1];
         $lName = $cookieValues[2];
+        Mage::log($fName, null, 'ebizmarts.log', true);
+        Mage::log($lName, null, 'ebizmarts.log', true);
         if($subscribeCookie == 'true'){
             $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
             if(!$subscriber->getId()) {
