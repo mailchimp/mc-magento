@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addJs" ifconfig="mailchimp/emailcatcher/popup_general">
+                <script>prototype/window.js</script>
+            </action>
+            <action method="addJs" ifconfig="mailchimp/emailcatcher/popup_general">
+                <script>scriptaculous/scriptaculous.js</script>
+            </action>
+            <action method="addItem" ifconfig="mailchimp/emailcatcher/popup_general">
+                <type>js_css</type>
+                <script>prototype/windows/themes/default.css</script>
+            </action>
+            <action method="addItem" ifconfig="mailchimp/emailcatcher/popup_general">
+                <type>js_css</type>
+                <script>ebizmarts/mailchimp/popup.css</script>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="mailchimp/popup_emailcatcher" name="emailcatcher"
+                   template="ebizmarts/mailchimp/popup/emailcatcher.phtml"></block>
+        </reference>
+    </default>
+</layout>

@@ -4,6 +4,13 @@ $installer = $this;
 
 $installer->startSetup();
 
+$installer->getConnection()->addColumn(
+    $installer->getTable('newsletter_subscriber'), 'subscriber_firstname', 'varchar(50)'
+);
+
+$installer->getConnection()->addColumn(
+    $installer->getTable('newsletter_subscriber'), 'subscriber_lastname', 'varchar(50)'
+);
 $eav = new Mage_Eav_Model_Entity_Setup('core_setup');
 
 $eav->addAttribute('customer', 'mailchimp_sync_delta', array(

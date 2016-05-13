@@ -22,12 +22,6 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
-        $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $storeId = Mage::helper('mailchimp')->getStoreId();
-        $storeName = Mage::helper('mailchimp')->getStoreName();
-        $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
-        $store_email = 'santiago@ebizmarts.com';
-        $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
 
         if($isEnabled) {
             //Check if the api key exist
@@ -35,26 +29,54 @@ class Ebizmarts_MailChimp_Model_Observer
                 $message = Mage::helper('mailchimp')->__('There is no API Key provided. Please add an API Key to get this working.');
                 Mage::getSingleton('adminhtml/session')->addError($message);
             }else{
-                $api = new Ebizmarts_Mailchimp($apiKey);
-                $storeExists = false;
-                try {
-                    $storeExists = $api->ecommerce->stores->get($storeId);
-
-                }catch (Exception $e){
-                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+                $mailchimpStore = Mage::helper('mailchimp')->getMailChimpStore();
+//                $api = new Ebizmarts_Mailchimp($apiKey);
+//                $storeExists = false;
+//                try {
+//                    $storeExists = $api->ecommerce->stores->get($storeId);
+//
+//                }catch (Exception $e){
+//                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+//                }
+                if(!$mailchimpStore) {
+                    Mage::helper('mailchimp')->createMailChimpStore();
                 }
-                try{
-                    if(!$storeExists) {
-                        $response = $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
-                    }
-                }catch(Exception $e){
-                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
-                }
+//                try{
+//                    if(!$mailchimpStore) {
+//                        $response = $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
+//                    }
+//                }catch(Exception $e){
+//                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+//                }
             }
         }
 
         return $observer;
 
+    }
+
+    public function alterNewsletterGrid(Varien_Event_Observer $observer){
+
+        $block = $observer->getEvent()->getBlock();
+        if (!isset($block)) {
+            return $this;
+        }
+        if($block instanceof Mage_Adminhtml_Block_Newsletter_Subscriber_Grid) {
+
+            $block->addColumnAfter('firstname', array(
+                'header' => Mage::helper('newsletter')->__('Customer First Name'),
+                'index' => 'customer_firstname',
+                'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_firstname',
+            ), 'type'
+            );
+
+            $block->addColumnAfter('lastname', array(
+                'header' => Mage::helper('newsletter')->__('Customer Last Name'),
+                'index' => 'customer_lastname',
+                'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_lastname'
+            ), 'firstname');
+        }
+        return $observer;
     }
 
 }
