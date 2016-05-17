@@ -36,7 +36,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         if ($apiKey) {
 
-            $batchJson = '{"operations": [';
+            $batchJson = '';
 
             //customer operations
             $customersJson = Mage::getModel('mailchimp/api_customers')->CreateBatchJson($mailchimpStoreId);
@@ -52,7 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if($batchJson!='') {
                 $batchJson = '{"operations": ['.$batchJson.']}';
-
+                Mage::log($batchJson);
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
                 $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
@@ -104,7 +104,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $files = array();
         $baseDir = Mage::getBaseDir();
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-//        $apiKey = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,$storeId);
         $api = new Ebizmarts_Mailchimp($apiKey);
         // check the status of the job
         $response = $api->batchOperation->status($batchId);
@@ -150,7 +149,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             {
                 if($item->status_code != 200) {
                     $line = explode('_', $item->operation_id);
-                    $error = $item->response->detail;
+                    $response = json_decode($item->response);
+                    $error = $response->detail;
                     $type = $line[0];
                     $id = $line[2];
                     switch ($type) {

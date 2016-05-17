@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         //create missing customers first
         $collection = mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('mailchimp_sync_delta')
-            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)), '', 'left');
+            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true),array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
 
