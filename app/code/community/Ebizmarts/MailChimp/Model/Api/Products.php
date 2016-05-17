@@ -12,7 +12,7 @@
 class Ebizmarts_MailChimp_Model_Api_Products
 {
 
-    const BATCH_LIMIT = 1000;
+    const BATCH_LIMIT = 3;
 
     public function CreateBatchJson($mailchimpStoreId)
     {
@@ -21,8 +21,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('name')
             ->addAttributeToFilter('type_id', array('eq' => 'simple'))//GET ONLY SIMPLE PRODUCTS FOR NOW
-            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)), '', 'left');
+            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true),array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
+        Mage::log((string)$collection->getSelect());
 
         $updatingProducts = false;
 
@@ -40,7 +41,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $batchJson = '';
         $operationsCount = 0;
-        $batchId = "PRO_" . date('Y-m-d-H-i-s');
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT.'_'.date('Y-m-d-H-i-s');
 
         foreach ($collection as $product)
         {
@@ -73,11 +74,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
+                $product->setData("mailchimp_sync_error","");
                 $product->save();
             }
-
-            return $batchJson;
         }
+        return $batchJson;
     }
 
     protected function GeneratePOSTPayload($product)
