@@ -54,6 +54,8 @@ class Ebizmarts_MailChimp_Model_Config
 //    const ECOMMERCE360_ORDER_STATUS = 'mailchimp/ecommerce360/order_status';
 //    const ECOMMERCE360_ORDER_MAX = 'mailchimp/ecommerce360/order_max';
 //    const ECOMMERCE360_ATTRIBUTES = 'mailchimp/ecommerce360/attributes';
-    const IS_CUSTOMER = "CUS";
-    const IS_PRODUCT   = "PRO";
+    const IS_CUSTOMER   = "CUS";
+    const IS_PRODUCT    = "PRO";
+    const IS_ORDER      = "ORD";
+    const IS_QUOTE      = "QUO";
 }

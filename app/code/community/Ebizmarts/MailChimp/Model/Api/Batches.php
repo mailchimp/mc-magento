@@ -52,11 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if($batchJson!='') {
                 $batchJson = '{"operations": ['.$batchJson.']}';
-                $baseDir = Mage::getBaseDir();
-                $fd =fopen($baseDir.DS.'var'.DS.'mailchimp'.DS.'request',"a+");
-                fwrite($fd,$batchJson);
-                fwrite($fd,"\n");
-                fclose($fd);
+                Mage::log($batchJson,null,'Mailchimp_Request');
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
                 $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
@@ -168,10 +164,21 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $c->setData("mailchimp_sync_error",$error);
                             $c->save();
                             break;
+                        case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
+                            $o = Mage::getModel('sales/order')->load($id);
+                            $o->setData("mailchimp_sync_error",$error);
+                            $o->save();
+                            break;
+                        case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
+                            $q = Mage::getModel('sales/quote')->load($id);
+                            $q->setData("mailchimp_sync_error",$error);
+                            $q->save();
+                            break;
                         default:
-                            Mage::log("Error: no identification found");
+                            Mage::log("Error: no identification $type found",null,'Mailchimp_Errors');
                             break;
                     }
+                    Mage::log($item,null,"Mailchimp_Errors");
                 }
             }
             unlink($file);

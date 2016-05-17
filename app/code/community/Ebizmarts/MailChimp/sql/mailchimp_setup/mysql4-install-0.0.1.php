@@ -79,7 +79,9 @@ $eav->addAttribute('catalog_product', 'mailchimp_sync_error', array(
 
 $installer->run("
  ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
+ ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_sync_error` VARCHAR(255) NOT NULL;
  ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
+ ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD column `mailchimp_sync_error` VARCHAR(255) NOT NULL;
 ");
 
 $installer->run("
