@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 }
                 $batchJson .= '{"method": "POST",';
                 $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/products",';
-                $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
+                $batchJson .= '"operation_id": "' . $batchId . '_' . $product->getId() . '",';
                 $batchJson .= '"body": "' . addcslashes($productJson, '"') . '"';
                 $batchJson .= '}';
 

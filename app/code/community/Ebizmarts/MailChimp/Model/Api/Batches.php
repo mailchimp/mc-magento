@@ -31,34 +31,16 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $batchJson = '{"operations": [';
 
             //customer operations
-            $customerJson = Mage::getModel('mailchimp/api_customers')->CreateBatchJson($mailchimpStoreId);
-            if(strlen($customerJson))
-            {
-                $batchJson .= $customerJson;
-            }
-
+            $customersJson = Mage::getModel('mailchimp/api_customers')->CreateBatchJson($mailchimpStoreId);
+            $batchJson .= $customersJson;
 
             //product operations
-            $productJson = Mage::getModel('mailchimp/api_products')->CreateBatchJson($mailchimpStoreId);
-            if(strlen($productJson)) {
-                if(strlen($customerJson))
-                {
-                    $batchJson .= ',';
-                }
-                $batchJson .= $productJson;
-            }
-
+            $productsJson = Mage::getModel('mailchimp/api_products')->CreateBatchJson($mailchimpStoreId);
+            $batchJson .= $customersJson != "" && $productsJson != "" ? ",".$productsJson : $productsJson;
 
             //order operations
             $ordersJson = Mage::getModel('mailchimp/api_orders')->CreateBatchJson($mailchimpStoreId);
-            if(strlen($ordersJson))
-            {
-                if(strlen($customerJson)||strlen($productJson))
-                {
-                    $batchJson .= ',';
-                }
-                $batchJson .= $ordersJson;
-            }
+            $batchJson .= ($customersJson != "" || $ordersJson != "") && $ordersJson != "" ? ",".$ordersJson : $ordersJson;
 
             $batchJson .= ']}';
 

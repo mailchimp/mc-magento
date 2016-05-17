@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
             $batchJson = '';
             $operationsCount = 0;
-            $batchId = "ORD-" . date('Y-m-d-H-i-s');
+            $batchId = "ORD_" . date('Y-m-d-H-i-s');
 
             foreach ($collection as $order) {
                 $orderJson = $this->GeneratePOSTPayload($order);
@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     }
                     $batchJson .= '{"method": "POST",';
                     $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/orders",';
-                    $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
+                    $batchJson .= '"operation_id": "' . $batchId . '_' . $order->getEntityId() . '",';
                     $batchJson .= '"body": "' . addcslashes($orderJson, '"') . '"';
                     $batchJson .= '}';
 

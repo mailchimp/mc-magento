@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 }
                 $batchJson .= '{"method": "PUT",';
                 $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers/' . $customer->getId() . '",';
-                $batchJson .= '"operation_id": "' . $batchId . '-' . $operationsCount . '",';
+                $batchJson .= '"operation_id": "' . $batchId . '_' . $customer->getId() . '",';
                 $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
                 $batchJson .= '}';
 
