@@ -20,7 +20,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         foreach($collection as $item)
         {
             $files = $this->getBatchResponse($item->getBatchId(),$storeId);
-            $this->processEachResponseFile($files);
+            if(count($files)) {
+                $this->processEachResponseFile($files);
+                $item->setStatus('completed');
+                $item->save();
+            }
+            $baseDir = Mage::getBaseDir();
+            if(is_dir($baseDir.DS.'var'.DS.'mailchimp'.DS.$item->getBatchId())) {
+                rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $item->getBatchId());
+            }
         }
     }
     public function SendBatch($mailchimpStoreId)
@@ -42,21 +50,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $ordersJson = Mage::getModel('mailchimp/api_orders')->CreateBatchJson($mailchimpStoreId);
             $batchJson .= ($customersJson != "" || $ordersJson != "") && $ordersJson != "" ? ",".$ordersJson : $ordersJson;
 
-            $batchJson .= ']}';
+            if($batchJson!='') {
+                $batchJson = '{"operations": ['.$batchJson.']}';
 
-//            Mage::log($batchJson);
+                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+                $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
-            $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-            $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-
-            //save batch id to db
-            $batch = Mage::getModel('mailchimp/synchbatches');
-            $batch->setStoreId($mailchimpStoreId)
-                ->setBatchId($batchResponse->id)
-                ->setStatus($batchResponse->status);
-            $batch->save();
-
-            return $batchResponse;
+                //save batch id to db
+                $batch = Mage::getModel('mailchimp/synchbatches');
+                $batch->setStoreId($mailchimpStoreId)
+                    ->setBatchId($batchResponse['id'])
+                    ->setStatus($batchResponse['status']);
+                $batch->save();
+                return $batchResponse;
+            }
         }
 
         return null;
@@ -96,7 +103,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $files = array();
         $baseDir = Mage::getBaseDir();
-        $apiKey = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,$storeId);
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+//        $apiKey = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,$storeId);
         $api = new Ebizmarts_Mailchimp($apiKey);
         // check the status of the job
         $response = $api->batchOperation->status($batchId);
@@ -124,6 +132,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId.'/'.$d;
                 }
             }
+            unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
+            unlink($fileName . '.tar.gz');
         }
         return $files;
     }
@@ -155,11 +165,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $c->save();
                             break;
                         default:
-                            echo "Error: no identification found\n";
+                            Mage::log("Error: no identification found");
                             break;
                     }
                 }
             }
+            unlink($file);
         }
     }
 }
