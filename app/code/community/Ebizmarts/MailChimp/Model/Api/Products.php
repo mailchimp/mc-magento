@@ -24,27 +24,49 @@ class Ebizmarts_MailChimp_Model_Api_Products
             ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true)), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
+        $updatingProducts = false;
+
         //if all synced, start updating old ones
-//            if ($collection->getSize() == 0) {
-//                $collection = mage::getModel('catalog/product')->getCollection()
-//                    ->addAttributeToSelect('mailchimp_sync_delta')
-//                    ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
-//                $collection->getSelect()->limit(self::BATCH_LIMIT);
-//            }
+        if ($collection->getSize() == 0) {
+            $updatingProducts = true;
+
+            $collection = mage::getModel('catalog/product')->getCollection()
+                ->addAttributeToSelect('mailchimp_sync_delta')
+                ->addAttributeToSelect('name')
+                ->addAttributeToFilter('type_id', array('eq' => 'simple'))//GET ONLY SIMPLE PRODUCTS FOR NOW
+                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
+            $collection->getSelect()->limit(self::BATCH_LIMIT);
+        }
 
         $batchJson = '';
         $operationsCount = 0;
         $batchId = "PRO_" . date('Y-m-d-H-i-s');
 
-        foreach ($collection as $product) {
-            $productJson = $this->GeneratePOSTPayload($product);
-            if (!empty($productJson)) {
+        foreach ($collection as $product)
+        {
+            if ($updatingProducts)
+            {
+                $productJson = $this->GeneratePOSTPayloadVariantUpdate($product);
+            } else {
+                $productJson = $this->GeneratePOSTPayload($product);
+            }
+
+            if (!empty($productJson))
+            {
                 $operationsCount += 1;
                 if ($operationsCount > 1) {
                     $batchJson .= ',';
                 }
-                $batchJson .= '{"method": "POST",';
-                $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/products",';
+
+                if ($updatingProducts) {
+                    $batchJson .= '{"method": "PUT",';
+                    //updating variants of simple products only
+                    $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/products/' . $product->getId() . '/variants/' . $product->getId() . '",';
+                } else {
+                    $batchJson .= '{"method": "POST",';
+                    $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/products",';
+                }
+
                 $batchJson .= '"operation_id": "' . $batchId . '_' . $product->getId() . '",';
                 $batchJson .= '"body": "' . addcslashes($productJson, '"') . '"';
                 $batchJson .= '}';
@@ -77,6 +99,28 @@ class Ebizmarts_MailChimp_Model_Api_Products
             //@toDo bundle
             //@toDo grouped
         }
+
+        $jsonData = "";
+
+        //enconde to JSON
+        try {
+
+            $jsonData = json_encode($data);
+
+        } catch (Exception $e) {
+            //json encode failed
+            //@toDo log somewhere
+        }
+
+        return $jsonData;
+    }
+
+    protected function GeneratePOSTPayloadVariantUpdate($product)
+    {
+        $data = [
+            "title" => $product->getName(),
+            "sku" => $product->getSku()
+        ];
 
         $jsonData = "";
 
