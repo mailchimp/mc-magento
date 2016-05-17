@@ -52,7 +52,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if($batchJson!='') {
                 $batchJson = '{"operations": ['.$batchJson.']}';
-                Mage::log($batchJson);
+                $baseDir = Mage::getBaseDir();
+                $fd =fopen($baseDir.DS.'var'.DS.'mailchimp'.DS.'request',"a+");
+                fwrite($fd,$batchJson);
+                fwrite($fd,"\n");
+                fclose($fd);
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
                 $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 

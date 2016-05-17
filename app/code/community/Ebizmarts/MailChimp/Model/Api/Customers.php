@@ -12,7 +12,7 @@
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
-    const BATCH_LIMIT = 5;
+    const BATCH_LIMIT = 500;
     const DEFAULT_OPT_IN = true;
 
     public function CreateBatchJson($mailchimpStoreId)
