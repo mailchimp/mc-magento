@@ -12,7 +12,7 @@
 class Ebizmarts_MailChimp_Model_Api_Products
 {
 
-    const BATCH_LIMIT = 1000;
+    const BATCH_LIMIT = 5;
 
     public function CreateBatchJson($mailchimpStoreId)
     {
@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $batchJson = '';
         $operationsCount = 0;
-        $batchId = "PROD-" . date('Y-m-d-H-i-s');
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT.'_'.date('Y-m-d-H-i-s');
 
         foreach ($collection as $product) {
             $productJson = $this->GeneratePOSTPayload($product);
@@ -51,11 +51,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
+                $product->setData("mailchimp_sync_error","");
                 $product->save();
             }
-
-            return $batchJson;
         }
+        return $batchJson;
     }
 
     protected function GeneratePOSTPayload($product)

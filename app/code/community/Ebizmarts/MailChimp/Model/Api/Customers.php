@@ -12,7 +12,7 @@
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
-    const BATCH_LIMIT = 1000;
+    const BATCH_LIMIT = 5;
     const DEFAULT_OPT_IN = true;
 
     public function CreateBatchJson($mailchimpStoreId)
@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $batchJson = "";
         $operationsCount = 0;
-        $batchId = "CUS-" . date('Y-m-d-H-i-s');
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER.'_'.date('Y-m-d-H-i-s');
 
         foreach ($collection as $customer) {
             $customerJson = $this->GeneratePOSTPayload($customer);
@@ -51,10 +51,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
                 //update customers delta
                 $customer->setData("mailchimp_sync_delta", Varien_Date::now());
+                $customer->setData("mailchimp_sync_error","");
                 $customer->save();
             }
         }
-
         return $batchJson;
     }
 
