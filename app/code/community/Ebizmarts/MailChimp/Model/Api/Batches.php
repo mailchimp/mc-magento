@@ -42,6 +42,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $customersJson = Mage::getModel('mailchimp/api_customers')->CreateBatchJson($mailchimpStoreId);
             $batchJson .= $customersJson;
 
+//            echo "<h1>REQUEST</h1>";
+//            var_dump($batchJson);
+
             //product operations
             $productsJson = Mage::getModel('mailchimp/api_products')->CreateBatchJson($mailchimpStoreId);
             $batchJson .= $customersJson != "" && $productsJson != "" ? ",".$productsJson : $productsJson;
@@ -67,31 +70,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         return null;
-    }
-
-    protected function GeneratePOSTPayload($customer)
-    {
-        $data = array();
-        $data["id"] = $customer->getId();
-        $data["email_address"] = $customer->getEmail();
-//        $data["first_name"] = $customer->getFirstname();
-//        $data["last_name"] = $customer->getLastname();
-
-        $data["opt_in_status"] = self::DEFAULT_OPT_IN;
-
-        $jsonData = "";
-
-        //enconde to JSON
-        try {
-
-            $jsonData = json_encode($data);
-
-        } catch (Exception $e) {
-            //json encode failed
-            //@toDo log somewhere
-        }
-
-        return $jsonData;
     }
 
     /**

@@ -12,7 +12,7 @@
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
-    const BATCH_LIMIT = 5;
+    const BATCH_LIMIT = 500;
     const DEFAULT_OPT_IN = true;
 
     public function CreateBatchJson($mailchimpStoreId)
@@ -20,6 +20,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         //create missing customers first
         $collection = mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToSelect('firstname')
+            ->addAttributeToSelect('lastname')
             ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true),array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
@@ -63,10 +65,34 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data = array();
         $data["id"] = $customer->getId();
         $data["email_address"] = $customer->getEmail();
-//        $data["first_name"] = $customer->getFirstname();
-//        $data["last_name"] = $customer->getLastname();
-
+        $data["first_name"] = $customer->getFirstname();
+        $data["last_name"] = $customer->getLastname();
         $data["opt_in_status"] = self::DEFAULT_OPT_IN;
+
+        //addresses data
+        foreach ($customer->getAddresses() as $address)
+        {
+            if(!array_key_exists("address",$data)) //send only first address
+            {
+                $data["address"] = [
+                    "address1" => $address->getStreet()[0],
+                    "address2" => $address->getStreet()[1] ? $address->getStreet()[1] : "",
+                    "city" => $address->getCity(),
+                    "province" => $address->getRegion() ? $address->getRegion() : "",
+                    "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
+                    "postal_code" => $address->getPostcode(),
+                    "country" => Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName(),
+                    "country_code" => $address->getCountry()
+                ];
+
+                //company
+                if($address->getCompany())
+                {
+                    $data["company"] = $address->getCompany();
+                }
+                break;
+            }
+        }
 
         $jsonData = "";
 
