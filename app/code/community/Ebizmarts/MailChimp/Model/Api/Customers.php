@@ -69,6 +69,19 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["last_name"] = $customer->getLastname();
         $data["opt_in_status"] = self::DEFAULT_OPT_IN;
 
+        //customer orders data
+        $orderCollection = Mage::getModel('sales/order')->getCollection()
+            ->addFieldToFilter('status', 'complete')
+            ->addAttributeToFilter('customer_id',array('eq'=>$customer->getId()));
+        $totalOrders = 0;
+        $totalAmountSpent = 0;
+        foreach($orderCollection as $order){
+            $totalOrders += 1;
+            $totalAmountSpent += (int)$order->getGrandTotal();
+        }
+        $data["orders_count"] = $totalOrders;
+        $data["total_spent"] = $totalAmountSpent;
+
         //addresses data
         foreach ($customer->getAddresses() as $address)
         {
