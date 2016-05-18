@@ -25,17 +25,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 ->addFieldToFilter('mailchimp_sync_delta', array('null' => true));
             $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-            //if all synced, start updating old ones
-//            if ($collection->getSize() == 0) {
-//                $collection = mage::getModel('catalog/product')->getCollection()
-//                    ->addAttributeToSelect('mailchimp_sync_delta')
-//                    ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
-//                $collection->getSelect()->limit(self::BATCH_LIMIT);
-//            }
-
             $batchJson = '';
             $operationsCount = 0;
-            $batchId = "ORD_" . date('Y-m-d-H-i-s');
+            $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
 
             foreach ($collection as $order) {
                 $orderJson = $this->GeneratePOSTPayload($order);
@@ -91,7 +83,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
             );
         } else {
-            //@toDo logged in customers
+            $data["customer"] = array(
+                "id" => $order->getCustomerId(),
+                "email_address" => $order->getCustomerEmail(),
+                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+            );
         }
 
         $jsonData = "";
