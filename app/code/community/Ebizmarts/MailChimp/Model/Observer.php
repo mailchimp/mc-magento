@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $message = Mage::helper('mailchimp')->__('There is no API Key provided. Please add an API Key to get this working.');
                 Mage::getSingleton('adminhtml/session')->addError($message);
             }else{
-                $mailchimpStore = Mage::helper('mailchimp')->getMailChimpStore();
+                $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
 //                $api = new Ebizmarts_Mailchimp($apiKey);
 //                $storeExists = false;
 //                try {
@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_Observer
 //                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 //                }
                 if(!$mailchimpStore) {
-                    Mage::helper('mailchimp')->createMailChimpStore();
+                    Mage::getModel('mailchimp/api_stores')->createMailChimpStore();
                 }
 //                try{
 //                    if(!$mailchimpStore) {
