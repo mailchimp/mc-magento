@@ -55,55 +55,55 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 //        return $batchJson;
 //    }
 
-    protected function GeneratePOSTPayload($quote_from_collection)
-    {
-        $quote = Mage::getModel('sales/quote')->load($quote_from_collection->getEntityId());
-
-        $data = array();
-        $data["id"] = $quote->getEntityId();
-        $data["currency_code"] = $quote->getOrderCurrencyCode();
-        $data["order_total"] = $quote->getGrandTotal();
-        $data["lines"] = [];
-
-        //order lines
-        $items = $quote->getAllVisibleItems();
-        $item_count = 0;
-        foreach ($items as $item) {
-            $item_count += 1;
-            $data["lines"][] = [
-                "id" => (string)$item_count,
-                "product_id" => $item->getProductId(),
-                "product_variant_id" => $item->getProductId(),
-                "quantity" => (int)$item->getQtyOrdered(),
-                "price" => $item->getPrice(),
-            ];
-        }
-
-        //customer data
-        if ((bool)$quote->getCustomerIsGuest()) {
-            $data["customer"] = array(
-                "id" => "GUEST-" . date('Y-m-d-H-i-s'),
-                "email_address" => $quote->getCustomerEmail(),
-                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
-            );
-        } else {
-            $data["customer"] = array(
-                "id" => $quote->getCustomerId()
-            );
-        }
-
-        $jsonData = "";
-
-        //enconde to JSON
-        try {
-
-            $jsonData = json_encode($data);
-
-        } catch (Exception $e) {
-            //json encode failed
-            //@toDo log somewhere
-        }
-
-        return $jsonData;
-    }
+//    protected function GeneratePOSTPayload($quote_from_collection)
+//    {
+//        $quote = Mage::getModel('sales/quote')->load($quote_from_collection->getEntityId());
+//
+//        $data = array();
+//        $data["id"] = $quote->getEntityId();
+//        $data["currency_code"] = $quote->getOrderCurrencyCode();
+//        $data["order_total"] = $quote->getGrandTotal();
+//        $data["lines"] = [];
+//
+//        //order lines
+//        $items = $quote->getAllVisibleItems();
+//        $item_count = 0;
+//        foreach ($items as $item) {
+//            $item_count += 1;
+//            $data["lines"][] = [
+//                "id" => (string)$item_count,
+//                "product_id" => $item->getProductId(),
+//                "product_variant_id" => $item->getProductId(),
+//                "quantity" => (int)$item->getQtyOrdered(),
+//                "price" => $item->getPrice(),
+//            ];
+//        }
+//
+//        //customer data
+//        if ((bool)$quote->getCustomerIsGuest()) {
+//            $data["customer"] = array(
+//                "id" => "GUEST-" . date('Y-m-d-H-i-s'),
+//                "email_address" => $quote->getCustomerEmail(),
+//                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+//            );
+//        } else {
+//            $data["customer"] = array(
+//                "id" => $quote->getCustomerId()
+//            );
+//        }
+//
+//        $jsonData = "";
+//
+//        //enconde to JSON
+//        try {
+//
+//            $jsonData = json_encode($data);
+//
+//        } catch (Exception $e) {
+//            //json encode failed
+//            //@toDo log somewhere
+//        }
+//
+//        return $jsonData;
+//    }
 }

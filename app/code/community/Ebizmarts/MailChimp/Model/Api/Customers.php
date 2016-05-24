@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('firstname')
             ->addAttributeToSelect('lastname')
-            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true),array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
+            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true), array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
 
@@ -36,31 +36,42 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $batchJson = "";
         $operationsCount = 0;
-        $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER.'_'.date('Y-m-d-H-i-s');
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
 
         foreach ($collection as $customer) {
-            $customerJson = $this->GeneratePOSTPayload($customer);
+            $data = $this->_buildCustomerData($customer);
+            $customerJson = "";
+
+            //enconde to JSON
+            try {
+                $customerJson = json_encode($data);
+
+            } catch (Exception $e) {
+                //json encode failed
+                //@toDo log somewhere
+            }
+
             if (!empty($customerJson)) {
                 $operationsCount += 1;
                 if ($operationsCount > 1) {
                     $batchJson .= ',';
                 }
-                $batchJson .= '{"method": "PUT",';
-                $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers/' . $customer->getId() . '",';
+                $batchJson .= '{"method": "POST",';
+                $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers",';
                 $batchJson .= '"operation_id": "' . $batchId . '_' . $customer->getId() . '",';
                 $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
                 $batchJson .= '}';
 
                 //update customers delta
                 $customer->setData("mailchimp_sync_delta", Varien_Date::now());
-                $customer->setData("mailchimp_sync_error","");
+                $customer->setData("mailchimp_sync_error", "");
                 $customer->save();
             }
         }
         return $batchJson;
     }
 
-    protected function GeneratePOSTPayload($customer)
+    protected function _buildCustomerData($customer)
     {
         $data = array();
         $data["id"] = $customer->getId();
@@ -72,10 +83,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         //customer orders data
         $orderCollection = Mage::getModel('sales/order')->getCollection()
             ->addFieldToFilter('status', 'complete')
-            ->addAttributeToFilter('customer_id',array('eq'=>$customer->getId()));
+            ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
         $totalOrders = 0;
         $totalAmountSpent = 0;
-        foreach($orderCollection as $order){
+        foreach ($orderCollection as $order) {
             $totalOrders += 1;
             $totalAmountSpent += (int)$order->getGrandTotal();
         }
@@ -83,9 +94,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["total_spent"] = $totalAmountSpent;
 
         //addresses data
-        foreach ($customer->getAddresses() as $address)
-        {
-            if(!array_key_exists("address",$data)) //send only first address
+        foreach ($customer->getAddresses() as $address) {
+            if (!array_key_exists("address", $data)) //send only first address
             {
                 $data["address"] = [
                     "address1" => $address->getStreet()[0],
@@ -99,26 +109,61 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 ];
 
                 //company
-                if($address->getCompany())
-                {
+                if ($address->getCompany()) {
                     $data["company"] = $address->getCompany();
                 }
                 break;
             }
         }
 
-        $jsonData = "";
+        return $data;
+    }
 
-        //enconde to JSON
+    public function Update($customer)
+    {
         try {
 
-            $jsonData = json_encode($data);
+            if($customer->getUpdatedAt() == $customer->getMailchimpSyncDelta())
+            {
+                //this has already ran, abort...
+                return;
+            }
 
-        } catch (Exception $e) {
-            //json encode failed
-            //@toDo log somewhere
+            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+            if ($apiKey) {
+                $mailchimpStoreId = Mage::helper('mailchimp')->getStoreId();
+
+                $data = $this->_buildCustomerData($customer);
+
+                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+                $mailchimpApi->ecommerce->customers->modify(
+                    $mailchimpStoreId,
+                    $data["id"],
+                    $data["opt_in_status"],
+                    $data["company"],
+                    $data["first_name"],
+                    $data["last_name"],
+                    $data["orders_count"],
+                    $data["total_spent"],
+                    $data["address"]
+                );
+
+                //update customers delta
+                $customer->setData("mailchimp_sync_delta", Varien_Date::now());
+                $customer->setData("mailchimp_sync_error", "");
+                $customer->save();
+
+            }else{
+                throw new Exception('You must provide a MailChimp API key');
+            }
+        } catch (Exception $e)
+        {
+            Mage::log($e, null, 'Mailchimp_Request');
+            
+            //update customers delta
+            $customer->setData("mailchimp_sync_delta", Varien_Date::now());
+            $customer->setData("mailchimp_sync_error", $e->getMessage());
+            $customer->save();
         }
-
-        return $jsonData;
     }
 }
