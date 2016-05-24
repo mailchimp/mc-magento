@@ -150,10 +150,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $q->save();
                             break;
                         default:
-                            Mage::log("Error: no identification $type found", null, 'Mailchimp_Errors');
+                            Mage::helper('mailchimp')->log("Error: no identification ".$type." found");
                             break;
                     }
-                    Mage::log($item, null, "Mailchimp_Errors");
+                    Mage::helper('mailchimp')->log($item);
                 }
             }
             unlink($file);

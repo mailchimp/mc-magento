@@ -110,7 +110,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Mailchimp::PATCH);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Ebizmarts_Mailchimp::PATCH);
     }
 
     /**

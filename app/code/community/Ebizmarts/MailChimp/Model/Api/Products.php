@@ -82,9 +82,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             try {
                 $productJson = json_encode($data);
 
-            } catch (Exception $e) {
+            } catch (Exception $e)
+            {
                 //json encode failed
-                //@toDo log somewhere
+                Mage::helper('mailchimp')->log("Product ".$product->getId()." json encode failed");
 
                 continue;
             }
@@ -134,7 +135,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //stock
             $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product);
-            $data["inventory_quantity"] = (int)$stock->getQty();
+            //$data["inventory_quantity"] = (int)$stock->getQty();
+            $data["inventory_quantity"] = "fail";
             $data["backorders"] = (string)$stock->getBackorders();
 
             $data["visibility"] = $product->getVisibility();
@@ -169,12 +171,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         try {
 
-            if($product->getUpdatedAt() == $product->getMailchimpSyncDelta())
-            {
-                //this has already ran, abort...
-                return;
-            }
-
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             if ($apiKey) {
                 $mailchimpStoreId = Mage::helper('mailchimp')->getStoreId();
@@ -183,9 +179,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 {
                     $data = $this->_buildProductData($product);
 
+                    $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+
+                    if(empty($parentIds)){
+                        $parentIds = [$product->getId()];
+                    }
+
                 } else if ($product->getTypeId() == "configurable")
                 {
-                    throw new Exception('Mailchimp root products can not be updated');
+                    throw new Mailchimp_Error('Mailchimp root products can not be updated');
 
                 } else {
                     //@toDo bundle
@@ -193,21 +195,27 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     //@toDo virtual
                     //@toDo download
 
-                    throw new Exception('These type of products are not supported');
+                    throw new Mailchimp_Error('These type of products are not supported');
                 }
 
-//                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-//                $mailchimpApi->ecommerce->products->variants->modify(
-//                    $mailchimpStoreId,
-//                    $data["title"],
-//                    $data["url"],
-//                    $data["image_url"],
-//                    $data["sku"],
-//                    $data["price"],
-//                    $data["inventory_quantity"],
-//                    $data["backorders"],
-//                    $data["visibility"]
-//                );
+                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+
+                foreach($parentIds as $parentId)
+                {
+                    $mailchimpApi->ecommerce->products->variants->modify(
+                        $mailchimpStoreId,
+                        $parentId,
+                        $data["id"],
+                        $data["title"],
+                        $data["url"],
+                        $data["sku"],
+                        $data["price"],
+                        $data["inventory_quantity"],
+                        $data["image_url"],
+                        $data["backorders"],
+                        $data["visibility"]
+                    );
+                }
 
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -215,13 +223,22 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->save();
 
             }else{
-                throw new Exception ('You must provide a MailChimp API key');
+                throw new Mailchimp_Error ('You must provide a MailChimp API key');
             }
+        } catch (Mailchimp_Error $e)
+        {
+            Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+            
+            //update product delta
+            $product->setData("mailchimp_sync_delta", Varien_Date::now());
+            $product->setData("mailchimp_sync_error", $e->getFriendlyMessage());
+            $product->save();
+
         } catch (Exception $e)
         {
-            Mage::log($e, null, 'Mailchimp_Request');
-            
-            //update customers delta
+            Mage::helper('mailchimp')->log($e->getMessage());
+
+            //update product delta
             $product->setData("mailchimp_sync_delta", Varien_Date::now());
             $product->setData("mailchimp_sync_error", $e->getMessage());
             $product->save();

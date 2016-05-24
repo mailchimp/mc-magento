@@ -99,7 +99,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         } catch (Exception $e) {
             //json encode failed
-            //@toDo log somewhere
+            Mage::helper('mailchimp')->log("Order ".$order->getId()." json encode failed");
         }
 
         return $jsonData;

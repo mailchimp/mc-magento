@@ -83,6 +83,13 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $customer = $observer->getEvent()->getCustomer();
 
+        if($customer->getMailchimpUpdateObserverRan())
+        {
+            return;
+        }else{
+            $customer->setMailchimpUpdateObserverRan(true);
+        }
+
         //update mailchimp ecommerce data for that customer
         Mage::getModel('mailchimp/api_customers')->Update($customer);
     }
@@ -90,6 +97,13 @@ class Ebizmarts_MailChimp_Model_Observer
     public function productSaveAfter(Varien_Event_Observer $observer)
     {
         $product = $observer->getEvent()->getProduct();
+
+        if($product->getMailchimpUpdateObserverRan())
+        {
+            return;
+        }else{
+            $product->setMailchimpUpdateObserverRan(true);
+        }
 
         //update mailchimp ecommerce data for that product variant
         Mage::getModel('mailchimp/api_products')->Update($product);

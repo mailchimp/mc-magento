@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $storeExists = json_decode($storeExists);
 
         } catch (Exception $e) {
-            Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+            Mage::helper('mailchimp')->log($e->getMessage());
         }
         return $storeExists;
     }
@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api = new Ebizmarts_Mailchimp($apiKey);
             $response = $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
         } catch (Exception $e) {
-            Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+            Mage::helper('mailchimp')->log($e->getMessage());
         }
         return $response;
     }
