@@ -121,13 +121,19 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
-            foreach ($items as $item) {
-                if ($item->status_code != 200) {
+            foreach ($items as $item)
+            {
+                if ($item->status_code != 200)
+                {
                     $line = explode('_', $item->operation_id);
-                    $response = json_decode($item->response);
-                    $error = $response->detail;
                     $type = $line[0];
                     $id = $line[2];
+
+                    //parse error
+                    $response = json_decode($item->response);
+                    $error_exception = new Mailchimp_Error($response->title,$response->detail,$response->error);
+                    $error = $error_exception->getFriendlyMessage();
+
                     switch ($type) {
                         case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
                             $p = Mage::getModel('catalog/product')->load($id);
