@@ -22,8 +22,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
 
     /**
      * Load lists and store on class property
-     *
-     * @return void
      */
     public function __construct()
     {

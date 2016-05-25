@@ -20,39 +20,27 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function saveConfig(Varien_Event_Observer $observer)
     {
-        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
 
-        if($isEnabled) {
-            //Check if the api key exist
-            if (!$apiKey) {
-                $message = Mage::helper('mailchimp')->__('There is no API Key provided. Please add an API Key to get this working.');
-                Mage::getSingleton('adminhtml/session')->addError($message);
-            }else{
+        if($isEnabled)
+        {
+            try {
+
+                /**
+                 * CREATE MAILCHIMP STORE
+                 */
                 $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
-//                $api = new Ebizmarts_Mailchimp($apiKey);
-//                $storeExists = false;
-//                try {
-//                    $storeExists = $api->ecommerce->stores->get($storeId);
-//
-//                }catch (Exception $e){
-//                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
-//                }
                 if(!$mailchimpStore) {
-                    Mage::getModel('mailchimp/api_stores')->createMailChimpStore();
+                    Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
-//                try{
-//                    if(!$mailchimpStore) {
-//                        $response = $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
-//                    }
-//                }catch(Exception $e){
-//                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
-//                }
+
+            } catch (Exception $e)
+            {
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
 
         return $observer;
-
     }
 
     public function alterNewsletterGrid(Varien_Event_Observer $observer){
