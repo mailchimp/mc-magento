@@ -98,7 +98,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCMinSyncDateFlag()
     {
-        //@toDo return generated minimum date for sync elements
+        //@toDo return generated minimum date for sync elements in config
     }
 
     /**

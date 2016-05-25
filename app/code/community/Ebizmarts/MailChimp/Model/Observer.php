@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
         //Generating Webhooks URL
-        $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProdcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
+        $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
 
         if (FALSE != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
@@ -67,7 +67,7 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function _saveCustomerGroups($listId, $apiKey, $hookUrl)
     {
         $api = new Ebizmarts_Mailchimp($apiKey);
-        $webhookId = Mage::helper('mailchimp')->getStoreId();
+        $webhookId = Mage::helper('mailchimp')->getMCStoreId();
         $events = array(
             'subscribe' => true,
             'unsubscribe' => true,
@@ -83,9 +83,10 @@ class Ebizmarts_MailChimp_Model_Observer
         );
         try {
             $response = $api->lists->webhooks->get($listId, $webhookId);
+            Mage::helper('mailchimp')->log('$response');
             Mage::helper('mailchimp')->log($response);
             if(!is_array($response)) {
-                $api->lists->webhooks->add($listId, $webhookId, $hookUrl, $events, $sources);
+                $api->lists->webhooks->add($listId, $webhookId, $hookUrl, $events, $sources, $listId);
                 }
             }
         catch (Exception $e){

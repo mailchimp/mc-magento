@@ -9,7 +9,7 @@
  * @date: 5/19/16 3:55 PM
  * @file: ProdcessWebhook.php
  */
-class Ebizmarts_MailChimp_Model_ProdcessWebhook
+class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
     /**
      * Webhooks request url path

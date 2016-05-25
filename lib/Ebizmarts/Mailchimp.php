@@ -241,6 +241,7 @@ class Ebizmarts_Mailchimp
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         }
         else {
+            Mage::log($params, null, 'ebizmarts.log', true);
             $_params = http_build_query($params);
             $url .= '?'.$_params;
         }
@@ -263,6 +264,8 @@ class Ebizmarts_Mailchimp
 
         if(floor($info['http_code'] / 100) >= 4)
         {
+            Mage::log('$result', null, 'ebizmarts.log', true);
+            Mage::log($result, null, 'ebizmarts.log', true);
             throw new Mailchimp_Error($result['title'],$result['detail'], $result['errors']);
         }
 
