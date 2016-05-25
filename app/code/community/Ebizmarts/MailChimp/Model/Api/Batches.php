@@ -33,8 +33,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     public function SendBatch($mailchimpStoreId)
     {
-        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-        if ($apiKey) {
+
+        if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+
+            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 
             $batchJson = '';
 

@@ -171,9 +171,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         try {
 
-            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            if ($apiKey) {
-                $mailchimpStoreId = Mage::helper('mailchimp')->getStoreId();
+            if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled())
+            {
+                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
 
                 if ($product->getTypeId() == "simple")
                 {
@@ -222,8 +223,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->setData("mailchimp_sync_error", "");
                 $product->save();
 
-            }else{
-                throw new Mailchimp_Error ('You must provide a MailChimp API key');
             }
         } catch (Mailchimp_Error $e)
         {
