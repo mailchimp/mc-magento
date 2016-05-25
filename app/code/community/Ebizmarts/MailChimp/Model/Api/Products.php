@@ -9,6 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 class Ebizmarts_MailChimp_Model_Api_Products
 {
 
@@ -167,9 +168,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $data;
     }
 
-    public function Update($product)
+    public function update($product)
     {
         try {
+
+            Mage::log("Product " . $product->getId() . " update called.", null, 'Mailchimp_Request');
 
             if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled())
             {
@@ -188,7 +191,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
                 } else if ($product->getTypeId() == "configurable")
                 {
-                    throw new Mailchimp_Error('Mailchimp root products can not be updated');
+                    throw new Exception('MailChimp root products can not be updated');
 
                 } else {
                     //@toDo bundle
@@ -196,7 +199,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     //@toDo virtual
                     //@toDo download
 
-                    throw new Mailchimp_Error('These type of products are not supported');
+                    throw new Exception('These type of products are not supported');
                 }
 
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
