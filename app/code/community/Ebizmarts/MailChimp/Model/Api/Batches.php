@@ -9,6 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 class Ebizmarts_MailChimp_Model_Api_Batches
 {
 
@@ -133,8 +134,22 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     //parse error
                     $response = json_decode($item->response);
-                    $error_exception = new Mailchimp_Error($response->title,$response->detail,$response->error);
-                    $error = $error_exception->getFriendlyMessage();
+                    $error_details = "";
+                    if(!empty($response->errors))
+                    {
+                        foreach($response->errors as $error)
+                        {
+                            if(array_key_exists("field",$error) && array_key_exists("message",$error)){
+                                $error_details .= $error_details != "" ? " / " : "";
+                                $error_details .= $error["field"] . " : " . $error["message"];
+                            }
+                        }
+                    }
+                    if($error_details != ""){
+                        $error = $response->title . " : " . $error_details;
+                    }else{
+                        $error = $response->title . " : " . $response->detail;
+                    }
 
                     switch ($type) {
                         case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:

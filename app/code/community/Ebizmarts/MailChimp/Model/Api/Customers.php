@@ -9,6 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
@@ -119,9 +120,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $data;
     }
 
-    public function Update($customer)
+    public function update($customer)
     {
         try {
+
+            Mage::log("Customer " . $customer->getId() . " update called.", null, 'Mailchimp_Request');
 
             if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
 
