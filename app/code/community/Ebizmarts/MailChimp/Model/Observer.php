@@ -82,11 +82,10 @@ class Ebizmarts_MailChimp_Model_Observer
             'api' => true
         );
         try {
-            $response = $api->lists->webhooks->get($listId, $webhookId);
-            Mage::log('$response', null, 'ebizmarts.log', true);
-            Mage::log($response, null, 'ebizmarts.log', true);
-            if(!is_array($response)) {
-                $api->lists->webhooks->add($listId, $webhookId, $hookUrl, $events, $sources, $listId);
+            $response = $api->lists->webhooks->getAll($listId);
+            if(count($response['webhooks']) == 0) {
+                $createResponse = $api->lists->webhooks->add($listId, $webhookId, $hookUrl, $events, $sources, $listId);
+                Mage::log('createResponse', null, 'ebizmarts.log', true);
                 }
             }
         catch (Exception $e){

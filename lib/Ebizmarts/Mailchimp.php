@@ -234,10 +234,6 @@ class Ebizmarts_Mailchimp
         {
             $params = json_encode($params);
         }
-        elseif (!$params)
-        {
-            $params = array();
-        }
 
         $ch = $this->_ch;
         if(count($params)&&$method!=Ebizmarts_Mailchimp::GET)
@@ -245,8 +241,10 @@ class Ebizmarts_Mailchimp
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         }
         else {
-            $_params = http_build_query($params);
-            $url .= '?'.$_params;
+            if(count($params)) {
+                $_params = http_build_query($params);
+                $url .= '?' . $_params;
+            }
         }
         curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
@@ -259,6 +257,10 @@ class Ebizmarts_Mailchimp
         $info = curl_getinfo($ch);
 
         $result = json_decode($response_body, true);
+        Mage::log('$info', null, 'MailChimp_E.log', true);
+        Mage::log($info, null, 'ebizmarts.log', true);
+        Mage::log('$result', null, 'ebizmarts.log', true);
+        Mage::log($result, null, 'ebizmarts.log', true);
 
         if(curl_error($ch))
         {
@@ -267,7 +269,8 @@ class Ebizmarts_Mailchimp
 
         if(floor($info['http_code'] / 100) >= 4)
         {
-            throw new Mailchimp_Error($result['title'],$result['detail'], $result['errors']);
+            $errors = (isset($result['errors'])) ? $result['errors'] : '';
+            throw new Mailchimp_Error($result['title'],$result['detail'], $errors);
         }
 
         return $result;

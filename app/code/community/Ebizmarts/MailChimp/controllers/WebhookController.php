@@ -32,18 +32,18 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         Mage::app()->setCurrentStore(Mage::app()->getDefaultStoreView());
 
         $data = $this->getRequest()->getPost('data');
-        $myKey = Mage::helper('mailchimp')->getWebhooksKey(null, $data['list_id']);
+        $myKey = Mage::helper('mailchimp')->getWebhooksKey();
 
         //Validate "wkey" GET parameter
-        if ($this->getRequest()->getPost('type')) {
-            Mage::getModel('mailchimp/processwebhook')->processWebhookData($this->getRequest()->getPost());
-        } else {
+//        if ($this->getRequest()->getPost('type')) {
+//            Mage::getModel('mailchimp/processwebhook')->processWebhookData($this->getRequest()->getPost());
+//        } else {
             if ($myKey != $requestKey) {
                 Mage::helper('mailchimp')->log($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey));
             }
 
             Mage::helper('mailchimp')->log($this->__('Webhook call ended'));
-        }
+//        }
 
 
     }
