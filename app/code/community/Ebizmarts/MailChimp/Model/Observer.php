@@ -83,9 +83,8 @@ class Ebizmarts_MailChimp_Model_Observer
         );
         try {
             $response = $api->lists->webhooks->getAll($listId);
-            if(count($response['webhooks']) == 0) {
-                $createResponse = $api->lists->webhooks->add($listId, $webhookId, $hookUrl, $events, $sources, $listId);
-                Mage::log('createResponse', null, 'ebizmarts.log', true);
+            if(count($response['webhooks'][0]['url']) == $hookUrl) {
+                $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
                 }
             }
         catch (Exception $e){

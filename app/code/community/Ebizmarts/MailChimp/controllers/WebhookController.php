@@ -27,11 +27,13 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 ->sendResponse();
             return $this;
         }
-        Mage::helper('mailchimp')->log(var_export($this->getRequest()->getPost(), true));
-
-        Mage::app()->setCurrentStore(Mage::app()->getDefaultStoreView());
 
         $data = $this->getRequest()->getPost('data');
+        $data2 = $this->getRequest()->getParams();
+        Mage::log('$data', null, 'ebizmarts.log', true);
+        Mage::log($data, null, 'ebizmarts.log', true);
+        Mage::log('$data2', null, 'ebizmarts.log', true);
+        Mage::log($data2, null, 'ebizmarts.log', true);
         $myKey = Mage::helper('mailchimp')->getWebhooksKey();
 
         //Validate "wkey" GET parameter

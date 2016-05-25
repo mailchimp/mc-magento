@@ -23,15 +23,12 @@ class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$id=null,$url=null,$events=null,$sources=null,$_links=null)
+    public function add($listId,$url=null,$events=null,$sources=null)
     {
         $_params = array();
-        if($id) $_params['id'] = $id;
         if($url) $_params['url'] = $url;
         if($events) $_params['events'] = $events;
         if($sources) $_params['sources'] = $sources;
-        if($listId) $_params['list_id'] = $listId;
-        if($_links) $_params['_links'] = $_links;
         
         return $this->master->call('lists/'.$listId.'/webhooks',$_params,Ebizmarts_Mailchimp::POST);
     }
