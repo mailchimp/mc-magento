@@ -111,7 +111,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function resetMCEcommerceData($deleteDataInMailchimp=false)
     {
 
-        //@toDo delete store id and data from mailchimp
+        //delete store id and data from mailchimp
+        if($deleteDataInMailchimp && $this->getMCStoreId() && $this->getMCStoreId() != "")
+        {
+            Mage::getModel('mailchimp/api_stores')->deleteStore($this->getMCStoreId());
+        }
 
         //@toDo generate a new store id in the config (upload store_id before saving just in case)
         /**

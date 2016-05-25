@@ -12,6 +12,10 @@
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
 
+    /**
+     * @return bool|mixed
+     * @throws Mailchimp_Error
+     */
     public function getMailChimpStore()
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
@@ -21,7 +25,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $storeExists = false;
             $storeId = Mage::helper('mailchimp')->getMCStoreId();
 
-            if(is_null($storeId) || $storeId == ""){
+            if (is_null($storeId) || $storeId == "") {
                 throw new Mailchimp_Error ('Invalid MailChimp Store Id');
             }
 
@@ -35,6 +39,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         }
     }
 
+    /**
+     * @throws Mailchimp_Error
+     */
     public function createMailChimpStore()
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
@@ -56,6 +63,18 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             }
         } else {
             throw new Mailchimp_Error ('You must provide a MailChimp API key');
+        }
+    }
+
+    /**
+     * @param $storeId
+     */
+    public function deleteStore($storeId)
+    {
+        if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+            $api = new Ebizmarts_Mailchimp($apiKey);
+            $api->ecommerce->stores->delete($storeId);
         }
     }
 }
