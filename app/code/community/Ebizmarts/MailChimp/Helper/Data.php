@@ -14,6 +14,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Get storeId and/or websiteId if scope selected on back end
+     *
      * @param null $storeId
      * @param null $websiteId
      * @return array
@@ -37,6 +38,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Get configuration value from back end unless storeId is sent, in this last case it gets the configuration from the store Id sent
+     *
      * @param $path
      * @param null $storeId  If this is null, assume the value is asked from back end
      * @return mixed|null
@@ -71,17 +73,65 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $configValue;
     }
 
-    public function getStoreName()
+    /**
+     * Get MC store name
+     *
+     * @return string
+     */
+    public function getMCStoreName()
     {
-            $name = 'Default Scope';
-        return $name;
-
+        //@toDo return installation name
+        return "Default Store Name";
     }
 
-    public function getStoreId()
+    /**
+     * @return string
+     */
+    public function getMCStoreId()
     {
-            $id = 'default_scope';
-        return $id;
+        //@toDo return generated store id form config
+        return "default_store";
+    }
+
+    /**
+     * Minimum date for which ecommerce data needs to be re-uploaded.
+     */
+    public function getMCMinSyncDateFlag()
+    {
+        //@toDo return generated minimum date for sync elements
+    }
+
+    /**
+     * delete MC ecommerce store
+     * reset mailchimp store id in the config
+     * reset all deltas
+     *
+     * @param bool|false $deleteDataInMailchimp
+     */
+    public function resetMCEcommerceData($deleteDataInMailchimp=false)
+    {
+
+        //@toDo delete store id and data from mailchimp
+
+        //@toDo generate a new store id in the config (upload store_id before saving just in case)
+        /**
+         * FORMAT: <STORE_DOMAIN>_<TIMESTAMP>
+         */
+
+        //@toDo reset flag of "minimum date to sync" so sync CRON can start uploading all data again
+    }
+
+    /**
+     * Check if API key is set and the mailchimp store id was configured
+     *
+     * @return bool
+     */
+    public function isEcommerceSyncDataEnabled()
+    {
+        $api_key = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+
+        return !is_null($this->getMCStoreId()) && $this->getMCStoreId() != null
+        && !is_null($api_key) && $api_key != "";
     }
 
     public function log($message)

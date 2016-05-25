@@ -24,16 +24,21 @@ class Ebizmarts_MailChimp_Model_Observer
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
 
-        if($isEnabled) {
-            //Check if the api key exist
-            if (!$apiKey) {
-                $message = Mage::helper('mailchimp')->__('There is no API Key provided. Please add an API Key to get this working.');
-                Mage::getSingleton('adminhtml/session')->addError($message);
-            }else{
+        if($isEnabled)
+        {
+            try {
+
+                /**
+                 * CREATE MAILCHIMP STORE
+                 */
                 $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
                 if(!$mailchimpStore) {
-                    Mage::getModel('mailchimp/api_stores')->createMailChimpStore();
+                    Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
+
+            } catch (Exception $e)
+            {
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
 
@@ -57,7 +62,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $this->_saveCustomerGroups($listId, $apiKey, $hookUrl);
 
         return $observer;
-
     }
 
     protected function _saveCustomerGroups($listId, $apiKey, $hookUrl)

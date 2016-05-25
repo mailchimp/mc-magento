@@ -123,9 +123,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         try {
 
-            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            if ($apiKey) {
-                $mailchimpStoreId = Mage::helper('mailchimp')->getStoreId();
+            if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+
+                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+
+                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
 
                 $data = $this->_buildCustomerData($customer);
 
@@ -147,8 +149,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->setData("mailchimp_sync_error", "");
                 $customer->save();
 
-            }else{
-                throw new Mailchimp_Error('You must provide a MailChimp API key');
             }
         } catch (Mailchimp_Error $e)
         {
