@@ -13,7 +13,7 @@
 class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
 {
     /**
-     * @param $listId               The unique id for the list.
+     * @param string $listId               The unique id for the list.
      * @param null $id              An string that uniquely identifies this webhook.
      * @param null $url             Email address for a subscriber.
      * @param null $events          The events that can trigger the webhook and whether they are enabled.
@@ -32,6 +32,7 @@ class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
         if($sources) $_params['sources'] = $sources;
         if($listId) $_params['list_id'] = $listId;
         if($_links) $_params['_links'] = $_links;
+        
         return $this->master->call('lists/'.$listId.'/webhooks',$_params,Ebizmarts_Mailchimp::POST);
     }
 
