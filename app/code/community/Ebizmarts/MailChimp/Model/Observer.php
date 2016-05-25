@@ -63,39 +63,30 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function _saveCustomerGroups($listId, $apiKey, $hookUrl)
     {
         $api = new Ebizmarts_Mailchimp($apiKey);
-        /**
-         * Customer Group - Interest Grouping
-         */
-        $magentoGroups = Mage::helper('customer')->getGroups()->toOptionHash();
-        array_push($magentoGroups, "NOT LOGGED IN");
-        $customerGroup = array('field_type' => 'dropdown', 'choices' => $magentoGroups);
-//        $mergeVars = $api->lists->mergeFields
-//        $mergeExist = false;
-//        foreach ($mergeVars as $vars) {
-//            if ($vars['tag'] == 'CGROUP') {
-//                $mergeExist = true;
-//                if ($magentoGroups === $vars['choices']) {
-//                    $update = false;
-//                } else {
-//                    $update = true;
-//                }
-//            }
-//        }
-//        if ($mergeExist) {
-//            if ($update) {
-//                $newValue = array('choices' => $magentoGroups);
-//                $api->listMergeVarUpdate($list['id'], 'CGROUP', $newValue);
-//            }
-//        } else {
-//            $api->listMergeVarAdd($list['id'], 'CGROUP', 'Customer Groups', $customerGroup);
-//        }
-//        /**
-//         * Customer Group - Interest Grouping
-//         */
-//
-//        /**
-//         * Adding Webhooks
-//         */
+        $webhookId = Mage::helper('mailchimp')->getStoreId();
+        $events = array(
+            'subscribe' => true,
+            'unsubscribe' => true,
+            'profile' => true,
+            'cleaned' => true,
+            'upemail' => true,
+            'campaign' => false
+        );
+        $sources = array(
+            'user' => true,
+            'admin' => true,
+            'api' => true
+        );
+        try {
+            $response = $api->lists->webhooks->get($listId, $webhookId);
+            Mage::helper('mailchimp')->log($response);
+            if(!is_array($response)) {
+                $api->lists->webhooks->add($listId, $webhookId, $hookUrl, $events, $sources);
+                }
+            }
+        catch (Exception $e){
+            Mage::helper('mailchimp')->log($e->getMessage());
+        }
 //        $api->listWebhookAdd($list['id'], $hookUrl);
 //
 //        //If webhook was not added, add a message on Admin panel
