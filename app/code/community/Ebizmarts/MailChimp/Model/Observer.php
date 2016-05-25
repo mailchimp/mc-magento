@@ -30,9 +30,9 @@ class Ebizmarts_MailChimp_Model_Observer
                 $message = Mage::helper('mailchimp')->__('There is no API Key provided. Please add an API Key to get this working.');
                 Mage::getSingleton('adminhtml/session')->addError($message);
             }else{
-                $mailchimpStore = Mage::helper('mailchimp')->getMailChimpStore();
+                $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
                 if(!$mailchimpStore) {
-                    Mage::helper('mailchimp')->createMailChimpStore();
+                    Mage::getModel('mailchimp/api_stores')->createMailChimpStore();
                 }
             }
         }
@@ -134,4 +134,33 @@ class Ebizmarts_MailChimp_Model_Observer
         return $observer;
     }
 
+    public function customerSaveAfter(Varien_Event_Observer $observer)
+    {
+        $customer = $observer->getEvent()->getCustomer();
+
+        if($customer->getMailchimpUpdateObserverRan())
+        {
+            return;
+        }else{
+            $customer->setMailchimpUpdateObserverRan(true);
+        }
+
+        //update mailchimp ecommerce data for that customer
+        Mage::getModel('mailchimp/api_customers')->Update($customer);
+    }
+
+    public function productSaveAfter(Varien_Event_Observer $observer)
+    {
+        $product = $observer->getEvent()->getProduct();
+
+        if($product->getMailchimpUpdateObserverRan())
+        {
+            return;
+        }else{
+            $product->setMailchimpUpdateObserverRan(true);
+        }
+
+        //update mailchimp ecommerce data for that product variant
+        Mage::getModel('mailchimp/api_products')->Update($product);
+    }
 }

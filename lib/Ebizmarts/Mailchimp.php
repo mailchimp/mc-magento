@@ -256,16 +256,14 @@ class Ebizmarts_Mailchimp
 
         $result = json_decode($response_body, true);
 
-        if(curl_error($ch)) {
-            echo "<h1>ERROR MESSAGE</h1>";
-            var_dump($result);
+        if(curl_error($ch))
+        {
             throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
         }
 
-        if(floor($info['http_code'] / 100) >= 4) {
-            echo "<h1>ERROR MESSAGE</h1>";
-            var_dump($result);
-            throw new Mailchimp_Error($result['title'].' : '.$result['detail']);
+        if(floor($info['http_code'] / 100) >= 4)
+        {
+            throw new Mailchimp_Error($result['title'],$result['detail'], $result['errors']);
         }
 
         return $result;
