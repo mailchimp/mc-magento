@@ -80,8 +80,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCStoreName()
     {
-        //@toDo return installation name
-        return "Default Store Name";
+        return parse_url(Mage::getBaseUrl(), PHP_URL_HOST);
     }
 
     /**
@@ -89,8 +88,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCStoreId()
     {
-        //@toDo return generated store id form config
-        return "default_store";
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
     }
 
     /**
@@ -98,7 +96,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCMinSyncDateFlag()
     {
-        //@toDo return generated minimum date for sync elements
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG);
     }
 
     /**
@@ -110,19 +108,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetMCEcommerceData($deleteDataInMailchimp=false)
     {
-
         //delete store id and data from mailchimp
         if($deleteDataInMailchimp && $this->getMCStoreId() && $this->getMCStoreId() != "")
         {
             Mage::getModel('mailchimp/api_stores')->deleteStore($this->getMCStoreId());
         }
 
-        //@toDo generate a new store id in the config (upload store_id before saving just in case)
-        /**
-         * FORMAT: <STORE_DOMAIN>_<TIMESTAMP>
-         */
+        //generate store id
+        $date = date('Y-m-d-His');
+        $store_id = parse_url(Mage::getBaseUrl(), PHP_URL_HOST). '_' . $date;
 
-        //@toDo reset flag of "minimum date to sync" so sync CRON can start uploading all data again
+        //create store in mailchimp
+        Mage::getModel('mailchimp/api_stores')->createMailChimpStore($store_id);
+
+        //save in config
+        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $store_id);
+
+
+        //reset mailchimp minimum date to sync flag
+        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG, $date);
     }
 
     /**
@@ -141,6 +145,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function log($message)
     {
         Mage::log($message, null, 'MailChimp_Errors.log', true);
+    }
+
+    public function getWebhooksKey()
+    {
+        $crypt = md5((string)Mage::getConfig()->getNode('global/crypt/key'));
+        $key = substr($crypt, 0, (strlen($crypt) / 2));
+
+        return $key;
     }
 
 }
