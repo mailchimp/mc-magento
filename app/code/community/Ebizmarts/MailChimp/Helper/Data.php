@@ -115,7 +115,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         //generate store id
-        $date = Mage::helper('core')->formatDate();
+        $date = date('Y-m-d-His');
         $store_id = parse_url(Mage::getBaseUrl(), PHP_URL_HOST). '_' . $date;
 
         //create store in mailchimp

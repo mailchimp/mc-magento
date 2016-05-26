@@ -89,9 +89,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         foreach ($customer->getAddresses() as $address) {
             if (!array_key_exists("address", $data)) //send only first address
             {
+                $street = $address->getStreet();
                 $data["address"] = [
-                    "address1" => $address->getStreet()[0],
-                    "address2" => $address->getStreet()[1] ? $address->getStreet()[1] : "",
+                    "address1" => $street[0],
+                    "address2" => count($street)>1 ? $street[1] : "",
                     "city" => $address->getCity(),
                     "province" => $address->getRegion() ? $address->getRegion() : "",
                     "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
@@ -126,11 +127,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $data = $this->_buildCustomerData($customer);
 
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-                $mailchimpApi->ecommerce->customers->modify(
+                $mailchimpApi->ecommerce->customers->addOrModify(
                     $mailchimpStoreId,
                     $data["id"],
+                    $data["email_address"],
                     $data["opt_in_status"],
-                    $data["company"],
+                    array_key_exists("company",$data) ? $data["company"] : null,
                     $data["first_name"],
                     $data["last_name"],
                     $data["orders_count"],
