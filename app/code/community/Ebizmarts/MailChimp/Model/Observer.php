@@ -23,24 +23,22 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+        if($isEnabled)
+        {
+            try {
+                /**
+                 * CREATE MAILCHIMP STORE
+                 */
+                $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
+                if(!$mailchimpStore) {
+                    Mage::helper('mailchimp')->resetMCEcommerceData();
+                }
 
-//        if($isEnabled)
-//        {
-//            try {
-//
-//                /**
-//                 * CREATE MAILCHIMP STORE
-//                 */
-//                $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
-//                if(!$mailchimpStore) {
-//                    Mage::helper('mailchimp')->resetMCEcommerceData();
-//                }
-//
-//            } catch (Exception $e)
-//            {
-//                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-//            }
-//        }
+            } catch (Exception $e)
+            {
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+            }
+        }
 
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
@@ -83,7 +81,7 @@ class Ebizmarts_MailChimp_Model_Observer
         );
         try {
             $response = $api->lists->webhooks->getAll($listId);
-            if(count($response['webhooks'][0]['url']) == $hookUrl) {
+            if(isset($response['webhooks'][0]) && count($response['webhooks'][0]['url']) == $hookUrl) {
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
                 }
             }

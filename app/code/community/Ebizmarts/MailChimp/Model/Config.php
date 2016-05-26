@@ -16,6 +16,8 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_OAUTH_WIZARD = 'mailchimp/general/oauth_wizard';
     const GENERAL_ACCOUNT_DETAILS = 'mailchimp/general/account_details';
     const GENERAL_LIST = 'mailchimp/general/list';
+    const GENERAL_MCSTOREID = 'mailchimp/general/storeid';
+    const GENERAL_MCMINSYNCDATEFLAG = 'mailchimp/general/mcminsyncdateflag';
 
     const ENABLE_POPUP = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING = 'mailchimp/emailcatcher/popup_heading';

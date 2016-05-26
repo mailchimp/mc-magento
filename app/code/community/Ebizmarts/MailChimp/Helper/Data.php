@@ -80,8 +80,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCStoreName()
     {
-        //@toDo return installation name
-        return "Default Store Name";
+        return parse_url(Mage::getBaseUrl(), PHP_URL_HOST);
+    }
+
+    /**
+     * Save MC Store Id on config.
+     */
+    protected function createMCStoreId()
+    {
+        $path = Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID;
+        $date = Mage::helper('core')->formatDate();
+        $configValue = parse_url(Mage::getBaseUrl(), PHP_URL_HOST). '_' . $date;
+        Mage::getConfig()->saveConfig($path, $configValue);
     }
 
     /**
@@ -89,8 +99,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCStoreId()
     {
-        //@toDo return generated store id form config
-        return "default_store";
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
+    }
+
+    /**
+     * Save Last Sync Date on config.
+     */
+    protected function createMCMinSyncDateFlag()
+    {
+        $path = Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG;
+        $date = Mage::helper('core')->formatDate();
+        Mage::getConfig()->saveConfig($path, $date);
     }
 
     /**
@@ -98,7 +117,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCMinSyncDateFlag()
     {
-        //@toDo return generated minimum date for sync elements in config
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG);
+    }
+
+    /**
+     * Save all the values needed for sync on config.
+     */
+    public function createMCSyncConfigValues()
+    {
+        $this->createMCStoreId();
+        $this->createMCMinSyncDateFlag();
     }
 
     /**
@@ -110,19 +138,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetMCEcommerceData($deleteDataInMailchimp=false)
     {
-
         //delete store id and data from mailchimp
         if($deleteDataInMailchimp && $this->getMCStoreId() && $this->getMCStoreId() != "")
         {
             Mage::getModel('mailchimp/api_stores')->deleteStore($this->getMCStoreId());
         }
+        try
+        {
+            Mage::getModel('mailchimp/api_stores')->createMailChimpStore();
+        }
+        catch (Exception $e)
+        {
+            $this->log($e->getMessage());
+        }
 
-        //@toDo generate a new store id in the config (upload store_id before saving just in case)
-        /**
-         * FORMAT: <STORE_DOMAIN>_<TIMESTAMP>
-         */
 
-        //@toDo reset flag of "minimum date to sync" so sync CRON can start uploading all data again
     }
 
     /**
