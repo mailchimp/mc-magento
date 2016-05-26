@@ -53,9 +53,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $ordersJson = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
             $batchJson .= ($customersJson != "" || $productsJson != "") && $ordersJson != "" ? ",".$ordersJson : $ordersJson;
 
-//            echo "<h1>REQUEST</h1>";
-//            var_dump($batchJson);
-
             if ($batchJson != '') {
                 $batchJson = '{"operations": [' . $batchJson . ']}';
                 Mage::log($batchJson, null, 'Mailchimp_Request');

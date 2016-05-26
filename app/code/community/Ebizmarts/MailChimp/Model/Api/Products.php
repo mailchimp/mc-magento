@@ -189,9 +189,49 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         $parentIds = [$product->getId()];
                     }
 
+                    $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+                    foreach($parentIds as $parentId)
+                    {
+                        $mailchimpApi->ecommerce->products->variants->modify(
+                            $mailchimpStoreId,
+                            $parentId,
+                            $data["id"],
+                            $data["title"],
+                            $data["url"],
+                            $data["sku"],
+                            $data["price"],
+                            $data["inventory_quantity"],
+                            $data["image_url"],
+                            $data["backorders"],
+                            $data["visibility"]
+                        );
+                    }
+
                 } else if ($product->getTypeId() == "configurable")
                 {
-                    throw new Exception('MailChimp root products can not be updated');
+                    //check if it was never uploaded and create it
+                    if(!$product->getMailchimpSyncDelta())
+                    {
+                        Mage::log("NEVER UPLOADED");
+
+//                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+//                        $mailchimpApi->ecommerce->products->add(
+//                                $mailchimpStoreId,
+//                                $parentId,
+//                                $data["id"],
+//                                $data["title"],
+//                                $data["url"],
+//                                $data["sku"],
+//                                $data["price"],
+//                                $data["inventory_quantity"],
+//                                $data["image_url"],
+//                                $data["backorders"],
+//                                $data["visibility"]
+//                            );
+//                        }
+                    }else{
+                        throw new Exception('MailChimp root products can not be updated');
+                    }
 
                 } else {
                     //@toDo bundle
@@ -199,26 +239,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     //@toDo virtual
                     //@toDo download
 
-                    throw new Exception('These type of products are not supported');
-                }
-
-                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-
-                foreach($parentIds as $parentId)
-                {
-                    $mailchimpApi->ecommerce->products->variants->modify(
-                        $mailchimpStoreId,
-                        $parentId,
-                        $data["id"],
-                        $data["title"],
-                        $data["url"],
-                        $data["sku"],
-                        $data["price"],
-                        $data["inventory_quantity"],
-                        $data["image_url"],
-                        $data["backorders"],
-                        $data["visibility"]
-                    );
+                    throw new Exception('These type of products are not yet supported');
                 }
 
                 //update product delta
