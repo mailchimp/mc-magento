@@ -117,7 +117,6 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
      * @param $storeId                  The store id.
      * @param $productId                The id for the product of a store.
      * @param $variantId                The id for the product variant.
-     * @param $id                       A unique identifier for the product variant.
      * @param $title                    The title of a product variant.
      * @param null $url                 The URL for a product variant.
      * @param null $sku                 The stock keeping unit (SKU) of a product variant.
@@ -129,10 +128,10 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function addOrModify($storeId,$productId,$variantId,$id,$title,$url=null,$sku=null,$price=null,
+    public function addOrModify($storeId,$productId,$variantId,$title,$url=null,$sku=null,$price=null,
                                 $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null)
     {
-        $_params=array('id'=>$id,'title'=>$title);
+        $_params=array('id'=>$variantId,'title'=>$title);
         if($url) $_params['url'] = $url;
         if($sku) $_params['sku'] = $sku;
         if($price) $_params['price'] = $price;

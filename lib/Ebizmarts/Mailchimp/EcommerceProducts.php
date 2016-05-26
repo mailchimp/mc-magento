@@ -46,7 +46,7 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
         if($vendor) $_params['vendor'] = $vendor;
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($publishedAtForeign) $_params['published_at_foreign'] = $publishedAtForeign;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/products',$_params,Mailchimp::POST);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/products',$_params,Ebizmarts_Mailchimp::POST);
     }
 
     /**
