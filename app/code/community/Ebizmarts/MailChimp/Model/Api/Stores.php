@@ -43,22 +43,21 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * @throws Exception
      */
-    public function createMailChimpStore()
+    public function createMailChimpStore($store_id)
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 
         if (!is_null($apiKey) && $apiKey != "") {
             $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
 
-            if (!is_null($listId) && $listId != "") {
-                Mage::helper('mailchimp')->createMCSyncConfigValues();
-                $storeId = Mage::helper('mailchimp')->getMCStoreId();
+            if (!is_null($listId) && $listId != "")
+            {
                 $storeName = Mage::helper('mailchimp')->getMCStoreName();
                 $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
                 $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
 
                 $api = new Ebizmarts_Mailchimp($apiKey);
-                $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
+                $api->ecommerce->stores->add($store_id, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
 
             } else {
                 throw new Exception ('You don\'t have any lists configured in MailChimp');
