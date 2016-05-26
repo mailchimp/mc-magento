@@ -16,24 +16,15 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     const BATCH_LIMIT = 500;
     const DEFAULT_OPT_IN = true;
 
-    public function CreateBatchJson($mailchimpStoreId)
+    public function createBatchJson($mailchimpStoreId)
     {
-        //create missing customers first
+        //get customers
         $collection = mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('firstname')
             ->addAttributeToSelect('lastname')
             ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true), array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
-
-
-        //if all synced, start updating old ones
-        if ($collection->getSize() == 0) {
-            $collection = mage::getModel('customer/customer')->getCollection()
-                ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
-            $collection->getSelect()->limit(self::BATCH_LIMIT);
-        }
 
         $batchJson = "";
         $operationsCount = 0;

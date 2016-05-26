@@ -34,6 +34,11 @@ class Ebizmarts_MailChimp_Model_Observer
                     Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
 
+            } catch (Mailchimp_Error $e)
+            {
+                Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+                Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+
             } catch (Exception $e)
             {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());

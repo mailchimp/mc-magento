@@ -54,11 +54,11 @@
         </helpers>
         <fieldsets>
             <customer_account>
-                <mailchimp_synced_delta>
+                <mailchimp_sync_delta>
                     <create>1</create>
                     <update>1</update>
                     <name>1</name>
-                </mailchimp_synced_delta>
+                </mailchimp_sync_delta>
             </customer_account>
         </fieldsets>
     </global>

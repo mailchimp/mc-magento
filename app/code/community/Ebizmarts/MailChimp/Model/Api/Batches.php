@@ -42,15 +42,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $batchJson = '';
 
             //customer operations
-            $customersJson = Mage::getModel('mailchimp/api_customers')->CreateBatchJson($mailchimpStoreId);
+            $customersJson = Mage::getModel('mailchimp/api_customers')->createBatchJson($mailchimpStoreId);
             $batchJson .= $customersJson;
 
             //product operations
-            $productsJson = Mage::getModel('mailchimp/api_products')->CreateBatchJson($mailchimpStoreId);
+            $productsJson = Mage::getModel('mailchimp/api_products')->createBatchJson($mailchimpStoreId);
             $batchJson .= $customersJson != "" && $productsJson != "" ? ",".$productsJson : $productsJson;
 
             //order operations
-            $ordersJson = Mage::getModel('mailchimp/api_orders')->CreateBatchJson($mailchimpStoreId);
+            $ordersJson = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
             $batchJson .= ($customersJson != "" || $productsJson != "") && $ordersJson != "" ? ",".$ordersJson : $ordersJson;
 
 //            echo "<h1>REQUEST</h1>";

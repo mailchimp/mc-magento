@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     const BATCH_LIMIT = 1000;
 
-    public function CreateBatchJson($mailchimpStoreId)
+    public function createBatchJson($mailchimpStoreId)
     {
             //create missing products first
             $collection = Mage::getModel('sales/order')->getCollection()

@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $storeId = Mage::helper('mailchimp')->getMCStoreId();
 
             if (is_null($storeId) || $storeId == "") {
-                throw new Exception ('Invalid MailChimp Store Id');
+                return null;
             }
 
             $storeExists = $api->ecommerce->stores->get($storeId);
@@ -54,6 +54,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             {
                 $storeName = Mage::helper('mailchimp')->getMCStoreName();
                 $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
+                if (strpos($store_email, 'example.com') !== false) {
+                    $store_email = null;
+                }
+
                 $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
 
                 $api = new Ebizmarts_Mailchimp($apiKey);
