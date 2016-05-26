@@ -51,6 +51,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
 
             if (!is_null($listId) && $listId != "") {
+                Mage::helper('mailchimp')->createMCSyncConfigValues();
                 $storeId = Mage::helper('mailchimp')->getMCStoreId();
                 $storeName = Mage::helper('mailchimp')->getMCStoreName();
                 $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');

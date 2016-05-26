@@ -20,12 +20,12 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function saveConfig(Varien_Event_Observer $observer)
     {
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
-
+        $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
         if($isEnabled)
         {
             try {
-
                 /**
                  * CREATE MAILCHIMP STORE
                  */
@@ -40,7 +40,66 @@ class Ebizmarts_MailChimp_Model_Observer
             }
         }
 
+        $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
+
+        //Generating Webhooks URL
+        $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
+
+        if (FALSE != strstr($hookUrl, '?', true)) {
+            $hookUrl = strstr($hookUrl, '?', true);
+        }
+
+//        if ($api->errorCode) {
+//            Mage::getSingleton('adminhtml/session')->addError($api->errorMessage);
+//            return $observer;
+//        }
+//
+//        $lists = $api->lists();
+//
+//        $selectedLists = array($listId);
+        $this->_saveCustomerGroups($listId, $apiKey, $hookUrl);
+
         return $observer;
+    }
+
+    protected function _saveCustomerGroups($listId, $apiKey, $hookUrl)
+    {
+        $api = new Ebizmarts_Mailchimp($apiKey);
+        $webhookId = Mage::helper('mailchimp')->getMCStoreId();
+        $events = array(
+            'subscribe' => true,
+            'unsubscribe' => true,
+            'profile' => true,
+            'cleaned' => true,
+            'upemail' => true,
+            'campaign' => false
+        );
+        $sources = array(
+            'user' => true,
+            'admin' => true,
+            'api' => true
+        );
+        try {
+            $response = $api->lists->webhooks->getAll($listId);
+            if(isset($response['webhooks'][0]) && count($response['webhooks'][0]['url']) == $hookUrl) {
+                $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                }
+            }
+        catch (Exception $e){
+            Mage::helper('mailchimp')->log($e->getMessage());
+        }
+//        $api->listWebhookAdd($list['id'], $hookUrl);
+//
+//        //If webhook was not added, add a message on Admin panel
+//        if ($api->errorCode && Mage::helper('mailchimp')->isAdmin()) {
+//
+//            //Don't show an error if webhook already in, otherwise, show error message and code
+//            if ($api->errorMessage !== "Setting up multiple WebHooks for one URL is not allowed.") {
+//                $message = Mage::helper('mailchimp')->__('Could not add Webhook "%s" for list "%s", error code %s, %s', $hookUrl, $list['name'], $api->errorCode, $api->errorMessage);
+//                Mage::getSingleton('adminhtml/session')->addError($message);
+//            }
+//
+//        }
     }
 
     public function alterNewsletterGrid(Varien_Event_Observer $observer){
