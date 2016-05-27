@@ -257,6 +257,10 @@ class Ebizmarts_Mailchimp
         $info = curl_getinfo($ch);
 
         $result = json_decode($response_body, true);
+        Mage::log('$info', null, 'ebizmarts.log', true);
+        Mage::log($info, null, 'ebizmarts.log', true);
+        Mage::log('$result', null, 'ebizmarts.log', true);
+        Mage::log($result, null, 'ebizmarts.log', true);
 
         if(curl_error($ch))
         {
