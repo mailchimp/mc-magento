@@ -28,12 +28,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     public function processWebhookData(array $data)
     {
         $listId = $data['data']['list_id']; //According to the docs, the events are always related to a list_id
-        $store = Mage::helper('mailchimp')->getStoreByList($listId);
+        //$store = Mage::helper('mailchimp')->getStoreByList($listId);
 
-        if (!is_null($store)) {
-            $curstore = Mage::app()->getStore();
-            Mage::app()->setCurrentStore($store);
-        }
+//        if (!is_null($store)) {
+//            $curstore = Mage::app()->getStore();
+//            Mage::app()->setCurrentStore($store);
+//        }
 
         //Object for cache clean
         $object = new stdClass();
@@ -58,23 +58,22 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 $this->_clean($data);
                 $cacheHelper->clearCache('listUnsubscribe', $object);
                 break;
-            case 'campaign':
-                $this->_campaign($data);
-                break;
-            //case 'profile': Cuando se actualiza email en MC como merchant, te manda un upmail y un profile (no siempre en el mismo órden)
+//            case 'campaign':
+//                $this->_campaign($data);
+//                break;
             case 'upemail':
                 $this->_updateEmail($data);
                 $cacheHelper->clearCache('listUpdateMember', $object);
                 break;
-            case 'profile':
-                $this->_profile($data);
-                $cacheHelper->clearCache('listUpdateMember', $object);
-                break;
+//            case 'profile':
+//                $this->_profile($data);
+//                $cacheHelper->clearCache('listUpdateMember', $object);
+//                break;
         }
 
-        if (!is_null($store)) {
-            Mage::app()->setCurrentStore($curstore);
-        }
+//        if (!is_null($store)) {
+//            Mage::app()->setCurrentStore($curstore);
+//        }
     }
 
     /**
@@ -97,6 +96,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 ->save();
         } elseif (!$newSubscriber->getId() && !$oldSubscriber->getId()) {
 
+            //@Todo Handle merge vars on the configuration
             Mage::getModel('newsletter/subscriber')
                 ->setImportMode(TRUE)
                 ->setStoreId(Mage::app()->getStore()->getId())
@@ -134,25 +134,25 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-    /**
-     * Add "Campaign Sending Status" notification to Adminnotification Inbox <campaign>
-     *
-     * @param array $data
-     * @return void
-     */
-    protected function _campaign(array $data)
-    {
-
-        if (Mage::helper('mailchimp')->isAdminNotificationEnabled()) {
-            $text = Mage::helper('mailchimp')->__('MailChimp Campaign Send: %s %s at %s', $data['data']['subject'], $data['data']['status'], $data['fired_at']);
-
-            $this->_getInbox()
-                ->setTitle($text)
-                ->setDescription($text)
-                ->save();
-        }
-
-    }
+//    /**
+//     * Add "Campaign Sending Status" notification to Adminnotification Inbox <campaign>
+//     *
+//     * @param array $data
+//     * @return void
+//     */
+//    protected function _campaign(array $data)
+//    {
+//
+//        if (Mage::helper('mailchimp')->isAdminNotificationEnabled()) {
+//            $text = Mage::helper('mailchimp')->__('MailChimp Campaign Send: %s %s at %s', $data['data']['subject'], $data['data']['status'], $data['fired_at']);
+//
+//            $this->_getInbox()
+//                ->setTitle($text)
+//                ->setDescription($text)
+//                ->save();
+//        }
+//
+//    }
 
     /**
      * Subscribe email to Magento list, store aware
