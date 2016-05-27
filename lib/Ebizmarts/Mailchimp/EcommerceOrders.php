@@ -53,7 +53,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($updateAtForeign) $_params['update_at_foreign'] = $updateAtForeign;
         if($shippingAddress) $_params['shipping_address'] = $shippingAddress;
         if($billingAddress) $_params['billing_address'] = $billingAddress;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders',$_params,Mailchimp::POST);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/orders',$_params,Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -75,7 +75,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         if($customerId) $_params['customer_id'] = $customerId;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders',$_params,Mailchimp::GET);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/orders',$_params,Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -92,7 +92,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields']= $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId,$_params,Mailchimp::GET);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId,$_params,Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -133,7 +133,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($shippingAddress) $_params['shipping_address'] = $shippingAddress;
         if($billingAddress) $_params['billing_address'] = $billingAddress;
         if($lines) $_params['lines'] = $lines;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId,$_params,Mailchimp::PATCH);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId,$_params,Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -145,6 +145,6 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
      */
     public function delete($storeId,$orderId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId,null,Mailchimp::DELETE);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId,null,Ebizmarts_Mailchimp::DELETE);
     }
 }

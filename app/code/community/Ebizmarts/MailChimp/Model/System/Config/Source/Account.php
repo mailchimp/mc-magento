@@ -28,16 +28,25 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     public function __construct()
     {
         $configValue = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $mcStoreId = (Mage::helper('mailchimp')->getMCStoreId()) ? Mage::helper('mailchimp')->getMCStoreId() : null;
         $api = null;
         if($configValue){
             $api = new Ebizmarts_Mailchimp($configValue);
         }
-        //TODO pedir solo campos necesarios
         if($api) {
             try {
                 $this->_account_details = $api->root->info('account_name,pro_enabled,total_subscribers');
+                if(Mage::helper('mailchimp')->getMCStoreId()) {
+                    $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
+                    $this->_account_details['total_customers'] = $totalCustomers['total_items'];
+                    $totalProducts = $api->ecommerce->products->getAll($mcStoreId, 'total_items');
+                    $this->_account_details['total_products'] = $totalProducts['total_items'];
+                    $totalOrders = $api->ecommerce->orders->getAll($mcStoreId, 'total_items');
+                    $this->_account_details['total_orders'] = $totalOrders['total_items'];
+                }
             }catch (Exception $e){
                 $this->_account_details = "--- Invalid API Key ---";
+                Mage::helper('mailchimp')->logError($e->getMessage());
             }
         }
     }
@@ -55,6 +64,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 array('value' => 0, 'label' => Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_account_details['account_name']),
                 array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Plan type:') . ' ' . ($this->_account_details['pro_enabled'] ? 'Pro' : 'Free')),
                 array('value' => 2, 'label' => Mage::helper('mailchimp')->__('Total Subscribers:') . ' ' . $this->_account_details['total_subscribers']),
+                array('value' => 3, 'label' => Mage::helper('mailchimp')->__('Total Customers:') . ' ' . $this->_account_details['total_customers']),
+                array('value' => 4, 'label' => Mage::helper('mailchimp')->__('Total Products:') . ' ' . $this->_account_details['total_products']),
+                array('value' => 5, 'label' => Mage::helper('mailchimp')->__('Total Orders:') . ' ' . $this->_account_details['total_orders'])
             );
         } elseif(!$this->_account_details) {
             return array(array('value' => '', 'label' => $helper->__('--- Enter your API KEY first ---')));
