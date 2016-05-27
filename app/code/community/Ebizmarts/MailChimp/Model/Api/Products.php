@@ -31,7 +31,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 //                Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_SEARCH,
 //                Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
 //            )))
-            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true), array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
+            ->addAttributeToFilter(array(
+                array('attribute' => 'mailchimp_sync_delta', 'null' => true),
+                array('attribute' => 'mailchimp_sync_delta', 'eq' => ''),
+                array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchJson = '';

@@ -12,7 +12,7 @@
 class Ebizmarts_MailChimp_Model_Api_Orders
 {
 
-    const BATCH_LIMIT = 1000;
+    const BATCH_LIMIT = 100;
 
     public function createBatchJson($mailchimpStoreId)
     {
@@ -22,7 +22,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 ->addAttributeToSelect('mailchimp_sync_delta')
                 ->addAttributeToSelect('entity_id')
                 ->addFieldToFilter('status', 'complete')
-                ->addFieldToFilter('mailchimp_sync_delta', array('null' => true));
+                ->addFieldToFilter('mailchimp_sync_delta', array(
+                    array('null' => true),
+                    array('eq' => ''),
+                    array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+                ));
             $collection->getSelect()->limit(self::BATCH_LIMIT);
 
             $batchJson = '';

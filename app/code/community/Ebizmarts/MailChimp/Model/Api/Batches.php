@@ -32,8 +32,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
     }
 
-    public function SendBatch($mailchimpStoreId)
+    public function sendBatch($mailchimpStoreId)
     {
+
+        try {
 
         if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
 
@@ -67,6 +69,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $batch->save();
                 return $batchResponse;
             }
+        }
+
+        } catch (Mailchimp_Error $e)
+        {
+            Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+
+        } catch (Exception $e)
+        {
+            Mage::helper('mailchimp')->log($e->getMessage());
         }
 
         return null;
@@ -136,9 +147,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     {
                         foreach($response->errors as $error)
                         {
-                            if(array_key_exists("field",$error) && array_key_exists("message",$error)){
+                            if(isset($error->field) && isset($error->message)){
                                 $error_details .= $error_details != "" ? " / " : "";
-                                $error_details .= $error["field"] . " : " . $error["message"];
+                                $error_details .= $error->field . " : " . $error->message;
                             }
                         }
                     }
@@ -152,21 +163,25 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
                             $p = Mage::getModel('catalog/product')->load($id);
                             $p->setData("mailchimp_sync_error", $error);
+                            //$p->setData("mailchimp_sync_delta", null);
                             $p->save();
                             break;
                         case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
                             $c = Mage::getModel('customer/customer')->load($id);
                             $c->setData("mailchimp_sync_error", $error);
+                            //$c->setData("mailchimp_sync_delta", null);
                             $c->save();
                             break;
                         case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
                             $o = Mage::getModel('sales/order')->load($id);
                             $o->setData("mailchimp_sync_error", $error);
+                            //$o->setData("mailchimp_sync_delta", null);
                             $o->save();
                             break;
                         case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
                             $q = Mage::getModel('sales/quote')->load($id);
                             $q->setData("mailchimp_sync_error", $error);
+                            //$q->setData("mailchimp_sync_delta", null);
                             $q->save();
                             break;
                         default:
