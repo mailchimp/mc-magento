@@ -1,3 +1,24 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function reseterrors() {
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method: 'get',
+            onSuccess: function (transport) {
+
+                if (transport.responseText == 1) {
+                    alert('All errors was cleaned')
+                }
+                else {
+                    alert('An error happened resetting the local errors')
+                }
+            },
+            onFailure: function () {
+                alert('Something went wrong')
+            }
+        });
+    }
+    //]]>
+</script>
 
 
 <?php echo $this->getButtonHtml(); ?>
