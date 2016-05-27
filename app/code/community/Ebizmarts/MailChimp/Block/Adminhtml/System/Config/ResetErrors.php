@@ -30,9 +30,15 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
             ->setData(array(
                 'id' => 'reseterrors_button',
                 'label' => $this->helper('mailchimp')->__('Reset Local Errors'),
-                'onclick' => 'javascript:check(); return false;'
+                'onclick' => 'javascript:reseterrors(); return false;'
             ));
 
         return $button->toHtml();
     }
+    public function getAjaxCheckUrl()
+    {
+//        $store = $this->getRequest()->getParam('store');
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetLocalErrors');
+    }
+
 }

@@ -30,9 +30,15 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
             ->setData(array(
                 'id' => 'resetecommercedata_button',
                 'label' => $this->helper('mailchimp')->__('Reset Ecommerce Data'),
-                'onclick' => 'javascript:check(); return false;'
+                'onclick' => 'javascript:resetecommerce(); return false;'
             ));
 
         return $button->toHtml();
     }
+    public function getAjaxCheckUrl()
+    {
+//        $store = $this->getRequest()->getParam('store');
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetEcommerceData');
+    }
+
 }
