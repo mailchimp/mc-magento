@@ -57,7 +57,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if ($batchJson != '') {
                 $batchJson = '{"operations": [' . $batchJson . ']}';
-                Mage::log($batchJson, null, 'Mailchimp_Request');
+
+                //log request
+                Mage::helper('mailchimp')->logRequest($batchJson);
+
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
                 $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
@@ -73,11 +76,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         } catch (Mailchimp_Error $e)
         {
-            Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
 
         } catch (Exception $e)
         {
-            Mage::helper('mailchimp')->log($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage());
         }
 
         return null;
@@ -185,10 +188,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $q->save();
                             break;
                         default:
-                            Mage::helper('mailchimp')->log("Error: no identification ".$type." found");
+                            Mage::helper('mailchimp')->logError("Error: no identification ".$type." found");
                             break;
                     }
-                    Mage::helper('mailchimp')->log($error);
+                    Mage::helper('mailchimp')->logError($error);
                 }
             }
             unlink($file);

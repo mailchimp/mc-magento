@@ -142,9 +142,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         && !is_null($api_key) && $api_key != "";
     }
 
-    public function log($message)
+    public function logError($message)
     {
         Mage::log($message, null, 'MailChimp_Errors.log', true);
+    }
+
+    public function logRequest($message)
+    {
+        Mage::log($message, null, 'MailChimp_Requests.log', true);
     }
 
     public function getWebhooksKey()

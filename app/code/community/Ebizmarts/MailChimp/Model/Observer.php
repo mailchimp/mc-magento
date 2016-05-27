@@ -36,7 +36,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             } catch (Mailchimp_Error $e)
             {
-                Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
                 Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
 
             } catch (Exception $e)
@@ -91,7 +91,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
             }
         catch (Exception $e){
-            Mage::helper('mailchimp')->log($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage());
         }
 //        $api->listWebhookAdd($list['id'], $hookUrl);
 //

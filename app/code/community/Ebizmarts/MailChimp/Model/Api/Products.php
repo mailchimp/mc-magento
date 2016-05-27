@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             } catch (Exception $e) {
                 //json encode failed
-                Mage::helper('mailchimp')->log("Product " . $product->getId() . " json encode failed");
+                Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
 
                 continue;
             }
@@ -172,8 +172,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         try {
 
-            Mage::log("Product " . $product->getId() . " update called.", null, 'Mailchimp_Request');
-
             if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
                 $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
                 $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
@@ -246,7 +244,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
         } catch (Mailchimp_Error $e) {
-            Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
 
             //update product delta
             $product->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -255,7 +253,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         } catch
         (Exception $e) {
-            Mage::helper('mailchimp')->log($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage());
 
             //update product delta
             $product->setData("mailchimp_sync_delta", Varien_Date::now());

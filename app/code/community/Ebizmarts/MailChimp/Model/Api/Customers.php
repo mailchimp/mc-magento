@@ -44,7 +44,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             } catch (Exception $e) {
                 //json encode failed
-                Mage::helper('mailchimp')->log("Customer ".$customer->getId()." json encode failed");
+                Mage::helper('mailchimp')->logError("Customer ".$customer->getId()." json encode failed");
             }
 
             if (!empty($customerJson)) {
@@ -120,8 +120,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         try {
 
-            Mage::log("Customer " . $customer->getId() . " update called.", null, 'Mailchimp_Request');
-
             if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
 
                 $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
@@ -152,7 +150,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
         } catch (Mailchimp_Error $e)
         {
-            Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
 
             //update customers delta
             $customer->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -161,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         } catch (Exception $e)
         {
-            Mage::helper('mailchimp')->log($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage());
 
             //update customers delta
             $customer->setData("mailchimp_sync_delta", Varien_Date::now());
