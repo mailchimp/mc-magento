@@ -12,9 +12,9 @@
 class Ebizmarts_MailChimp_Model_Api_Orders
 {
 
-    const BATCH_LIMIT = 1000;
+    const BATCH_LIMIT = 100;
 
-    public function CreateBatchJson($mailchimpStoreId)
+    public function createBatchJson($mailchimpStoreId)
     {
             //create missing products first
             $collection = Mage::getModel('sales/order')->getCollection()
@@ -22,7 +22,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 ->addAttributeToSelect('mailchimp_sync_delta')
                 ->addAttributeToSelect('entity_id')
                 ->addFieldToFilter('status', 'complete')
-                ->addFieldToFilter('mailchimp_sync_delta', array('null' => true));
+                ->addFieldToFilter('mailchimp_sync_delta', array(
+                    array('null' => true),
+                    array('eq' => ''),
+                    array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+                ));
             $collection->getSelect()->limit(self::BATCH_LIMIT);
 
             $batchJson = '';
@@ -99,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         } catch (Exception $e) {
             //json encode failed
-            Mage::helper('mailchimp')->log("Order ".$order->getId()." json encode failed");
+            Mage::helper('mailchimp')->logError("Order ".$order->getId()." json encode failed");
         }
 
         return $jsonData;

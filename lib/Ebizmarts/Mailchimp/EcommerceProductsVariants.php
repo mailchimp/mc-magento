@@ -38,7 +38,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants',$_params,Mailchimp::POST);
+        $this->master->call('/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants',$_params,Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -61,7 +61,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants',$_params,Mailchimp::GET);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants',$_params,Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -80,7 +80,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         $_params=array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Mailchimp::GET);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -117,11 +117,39 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
      * @param $storeId                  The store id.
      * @param $productId                The id for the product of a store.
      * @param $variantId                The id for the product variant.
+     * @param $title                    The title of a product variant.
+     * @param null $url                 The URL for a product variant.
+     * @param null $sku                 The stock keeping unit (SKU) of a product variant.
+     * @param null $price               The price of a product variant.
+     * @param null $inventoryQuantity   The inventory quantity of a product variant.
+     * @param null $imageUrl            The image URL for a product variant.
+     * @param null $backorders          The backorders of a product variant.
+     * @param null $visibility          The visibility of a product variant.
+     * @throws Mailchimp_Error
+     * @throws Mailchimp_HttpError
+     */
+    public function addOrModify($storeId,$productId,$variantId,$title,$url=null,$sku=null,$price=null,
+                                $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null)
+    {
+        $_params=array('id'=>$variantId,'title'=>$title);
+        if($url) $_params['url'] = $url;
+        if($sku) $_params['sku'] = $sku;
+        if($price) $_params['price'] = $price;
+        if($inventoryQuantity) $_params['inventory_quantity'] = $inventoryQuantity;
+        if($imageUrl) $_params['image_url'] = $imageUrl;
+        if($backorders) $_params['backorders'] = $backorders;
+        if($visibility) $_params['visibility'] = $visibility;
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Ebizmarts_Mailchimp::PUT);
+    }
+    /**
+     * @param $storeId                  The store id.
+     * @param $productId                The id for the product of a store.
+     * @param $variantId                The id for the product variant.
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
     public function delete($storeId,$productId,$variantId)
     {
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,null,Mailchimp::DELETE);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,null,Ebizmarts_Mailchimp::DELETE);
     }
 }

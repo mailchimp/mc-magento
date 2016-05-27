@@ -9,30 +9,26 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
-    const BATCH_LIMIT = 500;
+    const BATCH_LIMIT = 100;
     const DEFAULT_OPT_IN = true;
 
-    public function CreateBatchJson($mailchimpStoreId)
+    public function createBatchJson($mailchimpStoreId)
     {
-        //create missing customers first
+        //get customers
         $collection = mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('firstname')
             ->addAttributeToSelect('lastname')
-            ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'null' => true), array('attribute' => 'mailchimp_sync_delta', 'eq' => '')), '', 'left');
+            ->addAttributeToFilter(array(
+                array('attribute' => 'mailchimp_sync_delta', 'null' => true),
+                array('attribute' => 'mailchimp_sync_delta', 'eq' => ''),
+                array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
-
-
-        //if all synced, start updating old ones
-        if ($collection->getSize() == 0) {
-            $collection = mage::getModel('customer/customer')->getCollection()
-                ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToFilter(array(array('attribute' => 'mailchimp_sync_delta', 'lt' => new Zend_Db_Expr('updated_at'))), '', 'left');
-            $collection->getSelect()->limit(self::BATCH_LIMIT);
-        }
 
         $batchJson = "";
         $operationsCount = 0;
@@ -48,7 +44,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             } catch (Exception $e) {
                 //json encode failed
-                Mage::helper('mailchimp')->log("Customer ".$customer->getId()." json encode failed");
+                Mage::helper('mailchimp')->logError("Customer ".$customer->getId()." json encode failed");
             }
 
             if (!empty($customerJson)) {
@@ -97,9 +93,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         foreach ($customer->getAddresses() as $address) {
             if (!array_key_exists("address", $data)) //send only first address
             {
+                $street = $address->getStreet();
                 $data["address"] = [
-                    "address1" => $address->getStreet()[0],
-                    "address2" => $address->getStreet()[1] ? $address->getStreet()[1] : "",
+                    "address1" => $street[0],
+                    "address2" => count($street)>1 ? $street[1] : "",
                     "city" => $address->getCity(),
                     "province" => $address->getRegion() ? $address->getRegion() : "",
                     "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
@@ -119,7 +116,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $data;
     }
 
-    public function Update($customer)
+    public function update($customer)
     {
         try {
 
@@ -132,11 +129,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $data = $this->_buildCustomerData($customer);
 
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-                $mailchimpApi->ecommerce->customers->modify(
+                $mailchimpApi->ecommerce->customers->addOrModify(
                     $mailchimpStoreId,
                     $data["id"],
+                    $data["email_address"],
                     $data["opt_in_status"],
-                    $data["company"],
+                    array_key_exists("company",$data) ? $data["company"] : null,
                     $data["first_name"],
                     $data["last_name"],
                     $data["orders_count"],
@@ -152,7 +150,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
         } catch (Mailchimp_Error $e)
         {
-            Mage::helper('mailchimp')->log($e->getFriendlyMessage());
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
 
             //update customers delta
             $customer->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -161,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         } catch (Exception $e)
         {
-            Mage::helper('mailchimp')->log($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage());
 
             //update customers delta
             $customer->setData("mailchimp_sync_delta", Varien_Date::now());

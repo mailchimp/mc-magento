@@ -34,6 +34,11 @@ class Ebizmarts_MailChimp_Model_Observer
                     Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
 
+            } catch (Mailchimp_Error $e)
+            {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+
             } catch (Exception $e)
             {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
@@ -84,8 +89,9 @@ class Ebizmarts_MailChimp_Model_Observer
             if (isset($response['webhooks'][0]) && count($response['webhooks'][0]['url']) == $hookUrl) {
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
             }
-        } catch (Exception $e) {
-            Mage::helper('mailchimp')->log($e->getMessage());
+        }
+        catch (Exception $e){
+            Mage::helper('mailchimp')->logError($e->getMessage());
         }
     }
 
@@ -125,7 +131,7 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         //update mailchimp ecommerce data for that customer
-        Mage::getModel('mailchimp/api_customers')->Update($customer);
+        Mage::getModel('mailchimp/api_customers')->update($customer);
     }
 
     public function productSaveAfter(Varien_Event_Observer $observer)
@@ -140,6 +146,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         //update mailchimp ecommerce data for that product variant
-        Mage::getModel('mailchimp/api_products')->Update($product);
+        Mage::getModel('mailchimp/api_products')->update($product);
     }
 }

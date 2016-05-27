@@ -9,12 +9,13 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
+
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
 
     /**
      * @return bool|mixed
-     * @throws Mailchimp_Error
+     * @throws Exception
      */
     public function getMailChimpStore()
     {
@@ -26,7 +27,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $storeId = Mage::helper('mailchimp')->getMCStoreId();
 
             if (is_null($storeId) || $storeId == "") {
-                throw new Mailchimp_Error ('Invalid MailChimp Store Id');
+                return null;
             }
 
             $storeExists = $api->ecommerce->stores->get($storeId);
@@ -35,35 +36,38 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             return $storeExists;
 
         } else {
-            throw new Mailchimp_Error ('You must provide a MailChimp API key');
+            throw new Exception ('You must provide a MailChimp API key');
         }
     }
 
     /**
-     * @throws Mailchimp_Error
+     * @throws Exception
      */
-    public function createMailChimpStore()
+    public function createMailChimpStore($store_id)
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 
         if (!is_null($apiKey) && $apiKey != "") {
             $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
 
-            if (!is_null($listId) && $listId != "") {
-                Mage::helper('mailchimp')->createMCSyncConfigValues();
-                $storeId = Mage::helper('mailchimp')->getMCStoreId();
+            if (!is_null($listId) && $listId != "")
+            {
                 $storeName = Mage::helper('mailchimp')->getMCStoreName();
                 $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
+                if (strpos($store_email, 'example.com') !== false) {
+                    $store_email = null;
+                }
+
                 $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
 
                 $api = new Ebizmarts_Mailchimp($apiKey);
-                $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
+                $api->ecommerce->stores->add($store_id, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
 
             } else {
-                throw new Mailchimp_Error ('You don\'t have any lists configured in MailChimp');
+                throw new Exception ('You don\'t have any lists configured in MailChimp');
             }
         } else {
-            throw new Mailchimp_Error ('You must provide a MailChimp API key');
+            throw new Exception ('You must provide a MailChimp API key');
         }
     }
 
