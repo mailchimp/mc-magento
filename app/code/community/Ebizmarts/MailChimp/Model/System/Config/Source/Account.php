@@ -28,16 +28,19 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     public function __construct()
     {
         $configValue = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $mcStoreId = (Mage::helper('mailchimp')->getMCStoreId()) ? Mage::helper('mailchimp')->getMCStoreId() : null;
         $api = null;
         if($configValue){
             $api = new Ebizmarts_Mailchimp($configValue);
         }
-        //TODO pedir solo campos necesarios
         if($api) {
             try {
                 $this->_account_details = $api->root->info('account_name,pro_enabled,total_subscribers');
+                $new = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
+                Mage::log($new, null, 'accountdata.log', true);
             }catch (Exception $e){
                 $this->_account_details = "--- Invalid API Key ---";
+                Mage::helper('mailchimp')->log($e->getMessage());
             }
         }
     }

@@ -3,8 +3,8 @@
 Credentials for testing:<br />
 Front end: http://mc-magento.ebizmarts.com/<br />
 Back end: http://mc-magento.ebizmarts.com/admin<br />
-Username: admin<br />
-Password: q1w2e3r4
+Username: mailchimp<br />
+Password: p4ssword
 
 
 Integration to sync all the Magento data (Newsletter subscriber, Customers, Orders, Products) with MailChimp. It allows to use all the MailChimp potential for email Marketing such as sending Campaigns, Automations and more.
