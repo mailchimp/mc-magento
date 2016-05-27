@@ -15,23 +15,23 @@
             <tab>mailchimp</tab>
             <sort_order>100</sort_order>
             <show_in_default>1</show_in_default>
-            <show_in_website>1</show_in_website>
-            <show_in_store>1</show_in_store>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
             <groups>
                 <hint>
                     <frontend_model>mailchimp/adminhtml_system_config_fieldset_hint</frontend_model>
                     <sort_order>0</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                 </hint>
                 <general translate="label comment">
                     <comment><![CDATA[<a href="http://mailchimp.com/signup/?pid=ebizmart&source=website" target="_blank">Get a free MailChimp account now</a>]]></comment>
                     <label>MailChimp integration by ebizmarts</label>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <sort_order>1</sort_order>
                     <fields>
                         <active translate="label">
@@ -40,16 +40,16 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </active>
                         <apikey translate="label comment">
                             <label>API Key</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment><![CDATA[Please click the button below to get your API key.]]></comment>
                         </apikey>
                         <oauth_wizard translate="button_label">
@@ -58,8 +58,8 @@
                             <frontend_model>mailchimp/adminhtml_system_config_oauthWizard</frontend_model>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </oauth_wizard>
                         <account_details translate="label comment">
                             <label>Account details</label>
@@ -67,8 +67,8 @@
                             <source_model>Ebizmarts_MailChimp_Model_System_Config_Source_Account</source_model>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </account_details>
                         <list translate="label comment">
                             <label>General Subscription</label>
@@ -76,8 +76,8 @@
                             <source_model>mailchimp/system_config_source_list</source_model>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list.]]></comment>
                         </list>
@@ -87,8 +87,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only]]></comment>
                         </webhook_active>
@@ -98,8 +98,8 @@
                             <source_model>mailchimp/system_config_source_webhookDelete</source_model>
                             <sort_order>70</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment></comment>
                         </webhook_delete>
                         <enable_log translate="label comment">
@@ -108,8 +108,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>80</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment>File is {{base_dir}}/var/log/MailChimp_ApiCall.log</comment>
                         </enable_log>
                     </fields>
@@ -119,8 +119,8 @@
                     <sort_order>200</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <reset_errors translate="label comment">
                             <label>Reset Products</label>
@@ -128,8 +128,8 @@
                             <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
                             <sort_order>210</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment>Select carefully the correct scope</comment>
                         </reset_errors>
                         <reset_ecommerce_data translate="label comment">
@@ -138,8 +138,8 @@
                             <frontend_model>mailchimp/adminhtml_system_config_resetEcommerceData</frontend_model>
                             <sort_order>220</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment>Select carefully the correct scope</comment>
                         </reset_ecommerce_data>
                     </fields>
@@ -149,8 +149,8 @@
                     <sort_order>400</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <popup_general translate="label comment">
                             <label>Catch Email on Popup</label>
@@ -158,8 +158,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>410</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment><![CDATA[Create popup when customer access the site for the first time to catch email to use later on Abandoned Cart mailing.]]></comment>
                         </popup_general>
                         <popup_heading translate="label comment">
@@ -167,8 +167,8 @@
                             <frontend_type>text</frontend_type>
                             <sort_order>420</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[This field can be empty.]]></comment>
                             <depends>
@@ -180,8 +180,8 @@
                             <frontend_type>textarea</frontend_type>
                             <sort_order>430</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[This field can be empty.]]></comment>
                             <depends>
@@ -194,8 +194,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>440</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <depends>
                                 <popup_general>1</popup_general>
@@ -207,8 +207,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>450</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <depends>
                                 <popup_general>1</popup_general>
@@ -219,8 +219,8 @@
                             <frontend_type>text</frontend_type>
                             <sort_order>460</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[This is a percentage of the window width.]]></comment>
                             <depends>
@@ -232,8 +232,8 @@
                             <frontend_type>text</frontend_type>
                             <sort_order>470</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[This is a percentage of the window height.]]></comment>
                             <depends>
@@ -246,8 +246,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>480</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment><![CDATA[When email confirmed on popup subscribe customer to newsletter.]]></comment>
                             <depends>
                                 <popup_general>1</popup_general>
@@ -259,8 +259,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>490</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment><![CDATA[Popup can be closed without giving an email.]]></comment>
                             <depends>
                                 <popup_general>1</popup_general>
@@ -271,8 +271,8 @@
                             <frontend_type>text</frontend_type>
                             <sort_order>500</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment><![CDATA[This field is in days.]]></comment>
                             <depends>
                                 <popup_general>1</popup_general>
@@ -284,8 +284,8 @@
                             <frontend_type>text</frontend_type>
                             <sort_order>510</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                             <comment><![CDATA[If customer doesn't confirm popup, it will be shown this many times each time the customer reload the page.]]></comment>
                             <depends>
                                 <popup_general>1</popup_general>
