@@ -81,25 +81,12 @@ class Ebizmarts_MailChimp_Model_Observer
         );
         try {
             $response = $api->lists->webhooks->getAll($listId);
-            if(isset($response['webhooks'][0]) && count($response['webhooks'][0]['url']) == $hookUrl) {
+            if (isset($response['webhooks'][0]) && count($response['webhooks'][0]['url']) == $hookUrl) {
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
-                }
             }
-        catch (Exception $e){
+        } catch (Exception $e) {
             Mage::helper('mailchimp')->log($e->getMessage());
         }
-//        $api->listWebhookAdd($list['id'], $hookUrl);
-//
-//        //If webhook was not added, add a message on Admin panel
-//        if ($api->errorCode && Mage::helper('mailchimp')->isAdmin()) {
-//
-//            //Don't show an error if webhook already in, otherwise, show error message and code
-//            if ($api->errorMessage !== "Setting up multiple WebHooks for one URL is not allowed.") {
-//                $message = Mage::helper('mailchimp')->__('Could not add Webhook "%s" for list "%s", error code %s, %s', $hookUrl, $list['name'], $api->errorCode, $api->errorMessage);
-//                Mage::getSingleton('adminhtml/session')->addError($message);
-//            }
-//
-//        }
     }
 
     public function alterNewsletterGrid(Varien_Event_Observer $observer){
