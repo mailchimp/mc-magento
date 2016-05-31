@@ -124,7 +124,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
      */
     public function addOrModify($storeId,$customerId,$emailAddress,$optInStatus,$company=null,$firstName=null,$lastName=null,$ordersCount=null,$totalSpent=null,$address=null)
     {
-        $_params = array('id'=>$id,'email_address'=>$emailAddress,'opt_in_status'=>$optInStatus);
+        $_params = array('id'=>$customerId,'email_address'=>$emailAddress,'opt_in_status'=>$optInStatus);
         if($company) $_params['company'] = $company;
         if($firstName) $_params['first_name'] = $firstName;
         if($lastName) $_params['last_name'] = $lastName;

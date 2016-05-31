@@ -16,6 +16,20 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_OAUTH_WIZARD = 'mailchimp/general/oauth_wizard';
     const GENERAL_ACCOUNT_DETAILS = 'mailchimp/general/account_details';
     const GENERAL_LIST = 'mailchimp/general/list';
+    const GENERAL_MCSTOREID = 'mailchimp/general/storeid';
+    const GENERAL_MCMINSYNCDATEFLAG = 'mailchimp/general/mcminsyncdateflag';
+
+    const ENABLE_POPUP = 'mailchimp/emailcatcher/popup_general';
+    const POPUP_HEADING = 'mailchimp/emailcatcher/popup_heading';
+    const POPUP_TEXT = 'mailchimp/emailcatcher/popup_text';
+    const POPUP_FNAME = 'mailchimp/emailcatcher/popup_fname';
+    const POPUP_LNAME = 'mailchimp/emailcatcher/popup_lname';
+    const POPUP_WIDTH = 'mailchimp/emailcatcher/popup_width';
+    const POPUP_HEIGHT = 'mailchimp/emailcatcher/popup_height';
+    const POPUP_SUBSCRIPTION = 'mailchimp/emailcatcher/popup_subscription';
+    const POPUP_CAN_CANCEL = 'mailchimp/emailcatcher/popup_cancel';
+    const POPUP_COOKIE_TIME = 'mailchimp/emailcatcher/popup_cookie_time';
+    const POPUP_INSIST = 'mailchimp/emailcatcher/popup_insist';
 
 //    const GENERAL_RESET_LOCALECOMMERCE360 = 'mailchimp/general/reset_localecommerce360';
 //    const GENERAL_RESET_REMOTEECOMMERCE360 = 'mailchimp/general/reset_remoteecommerce360';
@@ -42,4 +56,8 @@ class Ebizmarts_MailChimp_Model_Config
 //    const ECOMMERCE360_ORDER_STATUS = 'mailchimp/ecommerce360/order_status';
 //    const ECOMMERCE360_ORDER_MAX = 'mailchimp/ecommerce360/order_max';
 //    const ECOMMERCE360_ATTRIBUTES = 'mailchimp/ecommerce360/attributes';
+    const IS_CUSTOMER   = "CUS";
+    const IS_PRODUCT    = "PRO";
+    const IS_ORDER      = "ORD";
+    const IS_QUOTE      = "QUO";
 }

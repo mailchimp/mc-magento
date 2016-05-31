@@ -23,38 +23,129 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $storeId = Mage::helper('mailchimp')->getStoreId();
-        $storeName = Mage::helper('mailchimp')->getStoreName();
-        $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
-        $store_email = 'santiago@ebizmarts.com';
-        $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
-
-        if($isEnabled) {
-            //Check if the api key exist
-            if (!$apiKey) {
-                $message = Mage::helper('mailchimp')->__('There is no API Key provided. Please add an API Key to get this working.');
-                Mage::getSingleton('adminhtml/session')->addError($message);
-            }else{
-                $api = new Ebizmarts_Mailchimp($apiKey);
-                $storeExists = false;
-                try {
-                    $storeExists = $api->ecommerce->stores->get($storeId);
-
-                }catch (Exception $e){
-                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+        if($isEnabled)
+        {
+            try {
+                /**
+                 * CREATE MAILCHIMP STORE
+                 */
+                $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
+                if(!$mailchimpStore) {
+                    Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
-                try{
-                    if(!$storeExists) {
-                        $response = $api->ecommerce->stores->add($storeId, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
-                    }
-                }catch(Exception $e){
-                    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
-                }
+
+            } catch (Mailchimp_Error $e)
+            {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+
+            } catch (Exception $e)
+            {
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
 
-        return $observer;
+        $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
+        //Generating Webhooks URL
+        $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
+
+        if (FALSE != strstr($hookUrl, '?', true)) {
+            $hookUrl = strstr($hookUrl, '?', true);
+        }
+
+//        if ($api->errorCode) {
+//            Mage::getSingleton('adminhtml/session')->addError($api->errorMessage);
+//            return $observer;
+//        }
+//
+//        $lists = $api->lists();
+//
+//        $selectedLists = array($listId);
+        $this->_saveCustomerGroups($listId, $apiKey, $hookUrl);
+
+        return $observer;
     }
 
+    protected function _saveCustomerGroups($listId, $apiKey, $hookUrl)
+    {
+        $api = new Ebizmarts_Mailchimp($apiKey);
+        $webhookId = Mage::helper('mailchimp')->getMCStoreId();
+        $events = array(
+            'subscribe' => true,
+            'unsubscribe' => true,
+            'profile' => true,
+            'cleaned' => true,
+            'upemail' => true,
+            'campaign' => false
+        );
+        $sources = array(
+            'user' => true,
+            'admin' => true,
+            'api' => true
+        );
+        try {
+            $response = $api->lists->webhooks->getAll($listId);
+            if (isset($response['webhooks'][0]) && count($response['webhooks'][0]['url']) == $hookUrl) {
+                $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+            }
+        }
+        catch (Exception $e){
+            Mage::helper('mailchimp')->logError($e->getMessage());
+        }
+    }
+
+    public function alterNewsletterGrid(Varien_Event_Observer $observer){
+
+        $block = $observer->getEvent()->getBlock();
+        if (!isset($block)) {
+            return $this;
+        }
+        if($block instanceof Mage_Adminhtml_Block_Newsletter_Subscriber_Grid) {
+
+            $block->addColumnAfter('firstname', array(
+                'header' => Mage::helper('newsletter')->__('Customer First Name'),
+                'index' => 'customer_firstname',
+                'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_firstname',
+            ), 'type'
+            );
+
+            $block->addColumnAfter('lastname', array(
+                'header' => Mage::helper('newsletter')->__('Customer Last Name'),
+                'index' => 'customer_lastname',
+                'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_lastname'
+            ), 'firstname');
+        }
+        return $observer;
+    }
+
+    public function customerSaveAfter(Varien_Event_Observer $observer)
+    {
+        $customer = $observer->getEvent()->getCustomer();
+
+        if($customer->getMailchimpUpdateObserverRan())
+        {
+            return;
+        }else{
+            $customer->setMailchimpUpdateObserverRan(true);
+        }
+
+        //update mailchimp ecommerce data for that customer
+        Mage::getModel('mailchimp/api_customers')->update($customer);
+    }
+
+    public function productSaveAfter(Varien_Event_Observer $observer)
+    {
+        $product = $observer->getEvent()->getProduct();
+
+        if($product->getMailchimpUpdateObserverRan())
+        {
+            return;
+        }else{
+            $product->setMailchimpUpdateObserverRan(true);
+        }
+
+        //update mailchimp ecommerce data for that product variant
+        Mage::getModel('mailchimp/api_products')->update($product);
+    }
 }

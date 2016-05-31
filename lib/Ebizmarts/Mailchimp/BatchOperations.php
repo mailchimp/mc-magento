@@ -20,7 +20,7 @@ class Mailchimp_BatchOperations extends Mailchimp_Abstract
      */
     public function add($operations)
     {
-        return $this->master->call('batches',$operations,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('batches',$operations,Ebizmarts_Mailchimp::POST,false);
     }
 
     /**

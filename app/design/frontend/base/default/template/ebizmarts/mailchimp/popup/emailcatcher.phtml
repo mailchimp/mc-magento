@@ -1,0 +1,166 @@
+<?php if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, $this->_getStoreId()) && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $this->_getStoreId())): ?>
+
+    <div id="email" style="text-align:right; display:none">
+
+
+
+        <div id="popup-heading">
+            <h2><?php echo $this->_popupHeading(); ?></h2>
+        </div>
+        <div id="popup-form-content">
+            <div id="popup-text">
+                <p><?php echo $this->_popupMessage(); ?></p>
+            </div>
+
+            <p><span id='email_error_msg' class="email_error" style="display:none">&nbsp;</span></p>
+
+            <div id="popup-form-data">
+                <p>
+                    <span class="required"></span>
+                    <span class="email_label">Email:</span>
+                    <span class="email_input"><input type="text"/></span>
+                </p>
+
+                <?php if(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_FNAME, $this->_getStoreId())): ?>
+                <p>
+                    <span class="fname_label" style="margin-right: 5px">First Name:</span>
+                    <span class="fname_input"><input type="text"/></span>
+                </p>
+                <?php endif;
+                if(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_LNAME, $this->_getStoreId())): ?>
+                <p>
+                    <span class="lname_label" style="margin-right: 5px">Last Name:</span>
+                    <span class="lname_input"><input type="text"/></span>
+                </p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        <?php if(!Mage::getSingleton('customer/session')->isLoggedIn()): ?>
+        if (navigator.cookieEnabled) {
+            <?php if(isset($_COOKIE['email'])):
+                if($_COOKIE['email'] != 'none'):
+                    Print(json_decode($this->_handleCookie())); ?>
+            <?php endif; ?>
+            <?php elseif($this->_canCancel()): ?>
+            document.observe('keydown', function (evt) {
+                if (evt.keyCode == 27) {
+                    win.cancelCallback();
+                }
+            });
+            <?php endif; ?>
+            document.observe('keydown', function (evt) {
+                if (evt.keyCode == 13) {
+                    win.okCallback();
+                }
+            });
+            var cookieStored = emailCookieExists();
+            if (!cookieStored && $('popupDialog') == undefined) {
+                var popupWidth = <?php Print(json_decode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_WIDTH, $this->_getStoreId()))); ?>*window.innerWidth/100;
+                var popupHeight = <?php Print(json_decode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_HEIGHT, $this->_getStoreId()))); ?>*window.innerHeight/100;
+                var win = Dialog.confirm($('email').innerHTML, {
+                    className: "popup",
+                    id: "popupDialog",
+                    width: popupWidth,
+
+                    zIndex: 2001,
+                    okLabel: '<?php echo $this->__('Confirm') ?>',
+                    <?php if(!$this->_canCancel()): ?>closeOnEsc: false,
+                    <?php else: ?>
+                    cancelLabel: '<?php echo $this->__('Close') ?>',
+                    onCancel: function (win) {
+                        <?php if(isset($_COOKIE['counter'])):
+                        //check cookie counter for customer id and check actual counter
+                            $counter = $_COOKIE['counter'];
+                            //if(counter en config == counter en db){
+                            if(($counter+1) >= Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId())): ?>
+                        document.cookie = 'counter=; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+                        createCookie('email=none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        <?php else: ?>
+                        createCookie('counter='+<?php Print(json_encode((1+$counter))); ?>,<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+//                        $counter->setCounter(($counter->getCounter()+1));
+//                        $counter->save();
+                        <?php endif; ?>
+                        <?php else:
+                        //create cookie counter in 0
+                            if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId()) == 1): ?>
+                        createCookie('email=none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        <?php else: ?>
+                        createCookie('counter=1',<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+//                            $newCounter = Mage::getModel('mailchimp/popup');
+//                            $newCounter->setCounter(1)->save();
+//                        createCookie('counter=' +<?php //Print(json_encode($newCounter->getId())); ?>//, <?php //Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>//);
+                        <?php endif; ?>
+                        <?php endif; ?>
+                    },
+                    <?php endif; ?>
+                    onOk: function (win) {
+                        var inputFieldEmail = $$('.email_input input[type=text]').first();
+                        var inputFieldFName = $$('.fname_input input[type=text]').first();
+                        var inputFieldLName = $$('.lname_input input[type=text]').first();
+                        var email = inputFieldEmail.value;
+                        var fname = '';
+                        var lname = '';
+                        if(inputFieldFName) {
+                            fname = inputFieldFName.value;
+                        }
+                        if(inputFieldLName) {
+                            lname = inputFieldLName.value;
+                        }
+                        if (validateEmail(email)) {
+                            var cookie = 'email=' + email + '/' + fname + '/' + lname;
+                            createCookie(cookie, 365);
+                            <?php if($this->_modalSubscribe()): ?>
+                            createCookie('subscribe=true', 365);
+                            location.reload();
+                            <?php else: ?>
+                            win.close();
+                            <?php endif ?>
+                        } else {
+                            $('email_error_msg').innerHTML = '<?php echo $this->__('Not a valid e-mail address') ?>';
+                            $('email_error_msg').setStyle({color: '#F00'});
+                            $('email_error_msg').show();
+                            Windows.focusedWindow.updateHeight();
+                            new Effect.Shake(Windows.focusedWindow.getId());
+                        }
+                    }
+                });
+                <?php if(!$this->_canCancel()): ?>
+                $$('.cancel_button').each(function (element) {
+                    element.remove();
+                });
+                <?php else: ?>
+                Event.observe(window, 'load', function () {
+                    $('overlay_modal').observe('click', function () {
+                        win.close();
+                        win.cancelCallback();
+                    });
+                });
+                <?php endif; ?>
+            }
+        }
+        <?php endif; ?>
+        function validateEmail(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+        function emailCookieExists() {
+            var cookie = document.cookie;
+            var cookieArr = cookie.split(';');
+            var cookieStored = false;
+            for (var i = 0; i < cookieArr.length; i++) {
+                if (cookieArr[i].indexOf('email=') > -1) {
+                    cookieStored = true;
+                }
+            }
+            return cookieStored;
+        }
+        function createCookie(cookie, expirationInDays) {
+            var now = new Date();
+            var expire = new Date(now.getTime() + (expirationInDays * 24 * 60) * 60000);//[(1 * 365 * 24 * 60) * 60000] == 1 year  -- (Years * Days * Hours * Minutes) * 60000
+            document.cookie = cookie + '; expires=' + expire + '; path=/';
+        }
+    </script>
+<?php endif; ?>

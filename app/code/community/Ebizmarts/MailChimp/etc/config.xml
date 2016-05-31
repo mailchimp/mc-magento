@@ -7,73 +7,25 @@
         </Ebizmarts_MailChimp>
     </modules>
     <global>
-        <!--<events>
-            <newsletter_subscriber_save_before>
-                <observers>
-                    <mailchimp_subscribe_observer>
-                        <class>mailchimp/observer</class>
-                        <method>handleSubscriber</method>
-                    </mailchimp_subscribe_observer>
-                </observers>
-            </newsletter_subscriber_save_before>
-            <newsletter_subscriber_delete_after>
-                <observers>
-                    <mailchimp_subscribe_delete_observer>
-                        <class>mailchimp/observer</class>
-                        <method>handleSubscriberDeletion</method>
-                    </mailchimp_subscribe_delete_observer>
-                </observers>
-            </newsletter_subscriber_delete_after>
-            <customer_save_after>
-                <observers>
-                    <mailchimp_update_customer>
-                        <class>mailchimp/observer</class>
-                        <method>updateCustomer</method>
-                    </mailchimp_update_customer>
-                </observers>
-            </customer_save_after>
-        </events>-->
         <models>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Model</class>
                 <resourceModel>mailchimp_mysql4</resourceModel>
             </mailchimp>
-            <!--<mailchimp_mysql4>
+            <mailchimp_mysql4>
                 <class>Ebizmarts_MailChimp_Model_Mysql4</class>
                 <entities>
-                    <apidebug>
-                        <table>magemailchimp_api_debug</table>
-                    </apidebug>
-                    <ecommerce>
-                        <table>magemailchimp_ecommerce360</table>
-                    </ecommerce>
-                    <bulksync_export>
-                        <table>magemailchimp_bulksync_export</table>
-                    </bulksync_export>
-                    <bulksync_import>
-                        <table>magemailchimp_bulksync_import</table>
-                    </bulksync_import>
-                    <asyncsubscribers>
-                        <table>magemailchimp_async_subscribers</table>
-                    </asyncsubscribers>
-                    <asyncorders>
-                        <table>magemailchimp_async_orders</table>
-                    </asyncorders>
-                    <lastorder>
-                        <table>magemailchimp_last_order</table>
-                    </lastorder>
+                    <synchbatches>
+                        <table>mailchimp_sync_batches</table>
+                    </synchbatches>
                 </entities>
             </mailchimp_mysql4>
-            <newsletter>
-                <rewrite>
-                    <subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>
-                </rewrite>
-            </newsletter>-->
         </models>
-        <!--<resources>
+        <resources>
             <mailchimp_setup>
                 <setup>
                     <module>Ebizmarts_MailChimp</module>
+                    <class>Mage_Eav_Model_Entity_Setup</class>
                 </setup>
                 <connection>
                     <use>core_setup</use>
@@ -89,7 +41,7 @@
                     <use>core_read</use>
                 </connection>
             </mailchimp_read>
-        </resources>-->
+        </resources>
         <blocks>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Block</class>
@@ -102,7 +54,7 @@
         </helpers>
     </global>
     <frontend>
-        <!--<translate>
+        <translate>
             <modules>
                 <Ebizmarts_MailChimp>
                     <files>
@@ -110,7 +62,7 @@
                     </files>
                 </Ebizmarts_MailChimp>
             </modules>
-        </translate>-->
+        </translate>
         <routers>
             <mailchimp>
                 <use>standard</use>
@@ -120,55 +72,13 @@
                 </args>
             </mailchimp>
         </routers>
-        <!--<layout>
+        <layout>
             <updates>
                 <magemailchimp>
-                    <file>magemailchimp.xml</file>
+                    <file>ebizmarts/mailchimp.xml</file>
                 </magemailchimp>
             </updates>
         </layout>
-        <events>
-            <controller_action_predispatch_onestepcheckout_index_index>
-                <observers>
-                    <mailchimp_subscribe_checkout>
-                        <class>mailchimp/observer</class>
-                        <method>registerCheckoutSubscribe</method>
-                    </mailchimp_subscribe_checkout>
-                </observers>
-            </controller_action_predispatch_onestepcheckout_index_index>
-            <controller_action_postdispatch_checkout_onepage_saveOrder>
-                <observers>
-                    <mailchimp_subscribe_checkout>
-                        <class>mailchimp/observer</class>
-                        <method>registerCheckoutSubscribe</method>
-                    </mailchimp_subscribe_checkout>
-                </observers>
-            </controller_action_postdispatch_checkout_onepage_saveOrder>
-            <checkout_onepage_controller_success_action>
-                <observers>
-                    <mailchimp_subscribe_checkoutsuccess>
-                        <class>mailchimp/observer</class>
-                        <method>registerCheckoutSuccess</method>
-                    </mailchimp_subscribe_checkoutsuccess>
-                </observers>
-            </checkout_onepage_controller_success_action>
-            <controller_action_postdispatch>
-                <observers>
-                    <mailchimp_ecomm_tracking_cookie>
-                        <class>mailchimp/ecommerce360</class>
-                        <method>saveCookie</method>
-                    </mailchimp_ecomm_tracking_cookie>
-                </observers>
-            </controller_action_postdispatch>
-            <sales_order_place_after>
-                <observers>
-                    <mailchimp_ecomm_tracking_sendorder>
-                        <class>mailchimp/ecommerce360</class>
-                        <method>run</method>
-                    </mailchimp_ecomm_tracking_sendorder>
-                </observers>
-            </sales_order_place_after>
-        </events>-->
     </frontend>
     <admin>
         <routers>
@@ -182,40 +92,7 @@
         </routers>
     </admin>
     <adminhtml>
-        <!--<layout>
-            <updates>
-                <magemailchimp>
-                    <file>magemailchimp.xml</file>
-                </magemailchimp>
-            </updates>
-        </layout>
-        <translate>
-            <modules>
-                <Ebizmarts_MailChimp>
-                    <files>
-                        <default>Ebizmarts_MailChimp.csv</default>
-                    </files>
-                </Ebizmarts_MailChimp>
-            </modules>
-        </translate>-->
         <events>
-            <!--<controller_action_predispatch_adminhtml_dashboard_index>
-                <observers>
-                    <mailchimp_up>
-                        <type>model</type>
-                        <class>mailchimp/feed_updates</class>
-                        <method>check</method>
-                    </mailchimp_up>
-                </observers>
-            </controller_action_predispatch_adminhtml_dashboard_index>
-            <core_block_abstract_prepare_layout_before>
-                <observers>
-                    <mailchimp_order_addmassbutton>
-                        <class>mailchimp/observer</class>
-                        <method>massActionOption</method>
-                    </mailchimp_order_addmassbutton>
-                </observers>
-            </core_block_abstract_prepare_layout_before>-->
             <admin_system_config_changed_section_mailchimp>
                 <observers>
                     <mailchimp_save_config>
@@ -224,14 +101,6 @@
                     </mailchimp_save_config>
                 </observers>
             </admin_system_config_changed_section_mailchimp>
-            <!--<controller_action_predispatch_adminhtml_system_config_edit>
-                <observers>
-                    <mailchimp_load_config>
-                        <class>mailchimp/observer</class>
-                        <method>loadConfig</method>
-                    </mailchimp_load_config>
-                </observers>
-            </controller_action_predispatch_adminhtml_system_config_edit>
             <adminhtml_block_html_before>
                 <observers>
                     <mailchimp_alter_newsletter_grid>
@@ -240,95 +109,55 @@
                         <method>alterNewsletterGrid</method>
                     </mailchimp_alter_newsletter_grid>
                 </observers>
-            </adminhtml_block_html_before>-->
+            </adminhtml_block_html_before>
+            <adminhtml_customer_save_after>
+                <observers>
+                    <mailchimp_save_after_customer>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>customerSaveAfter</method>
+                    </mailchimp_save_after_customer>
+                </observers>
+            </adminhtml_customer_save_after>
+            <catalog_product_save_after>
+                <observers>
+                    <mailchimp_save_after_product>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>productSaveAfter</method>
+                    </mailchimp_save_after_product>
+                </observers>
+            </catalog_product_save_after>
         </events>
     </adminhtml>
-    <!--<default>
-        <mailchimp>
-            <custom_groupings>
-                <segment_grouping_name><![CDATA[MAGE_CUSTOMER_SEGMENTS]]></segment_grouping_name>
-            </custom_groupings>
-            <general>
-                <active>0</active>
-                <double_optin>System->Configuration->Customers->Newsletter->Subscription Options->Need to Confirm</double_optin>
-                <showreallistname>0</showreallistname>
-                <maxlistsamount>25</maxlistsamount>
-                <checkout_subscribe>0</checkout_subscribe>
-                <transactional_emails>false</transactional_emails>
-                <map_fields><![CDATA[a:15:{i:0;a:2:{s:7:"magento";s:9:"firstname";s:9:"mailchimp";s:5:"FNAME";}i:1;a:2:{s:7:"magento";s:8:"lastname";s:9:"mailchimp";s:5:"LNAME";}i:2;a:2:{s:7:"magento";s:3:"dob";s:9:"mailchimp";s:3:"DOB";}i:3;a:2:{s:7:"magento";s:6:"prefix";s:9:"mailchimp";s:7:"PRENAME";}i:4;a:2:{s:7:"magento";s:15:"billing_address";s:9:"mailchimp";s:7:"BILLING";}i:5;a:2:{s:7:"magento";s:16:"shipping_address";s:9:"mailchimp";s:8:"SHIPPING";}i:6;a:2:{s:7:"magento";s:6:"gender";s:9:"mailchimp";s:6:"GENDER";}i:7;a:2:{s:7:"magento";s:8:"store_id";s:9:"mailchimp";s:7:"STOREID";}i:8;a:2:{s:7:"magento";s:10:"website_id";s:9:"mailchimp";s:7:"WEBSITE";}i:9;a:2:{s:7:"magento";s:16:"date_of_purchase";s:9:"mailchimp";s:3:"DOP";}i:10;a:2:{s:7:"magento";s:19:"ee_customer_balance";s:9:"mailchimp";s:9:"STORECRED";}i:11;a:2:{s:7:"magento";s:8:"group_id";s:9:"mailchimp";s:6:"CGROUP";}i:12;a:2:{s:7:"magento";s:9:"telephone";s:9:"mailchimp";s:9:"TELEPHONE";}i:13;a:2:{s:7:"magento";s:7:"company";s:9:"mailchimp";s:7:"COMPANY";}i:14;a:2:{s:7:"magento";s:10:"store_code";s:9:"mailchimp";s:8:"STORECOD";}}]]></map_fields>
-                <cron_export>200</cron_export>
-                <enable_log>1</enable_log>
-                <checkout_async>1</checkout_async>
-                <markfield>HASCLICKED</markfield>
-            </general>
-            <ecommerce360>
-                <active>0</active>
-                <order_status>all_status</order_status>
-            </ecommerce360>
-            <notifications>
-                <updates_url><![CDATA[http://store.ebizmarts.com/media/feeds/]]></updates_url>
-                <check_frequency>86400</check_frequency>
-            </notifications>
-        </mailchimp>
+    <default>
+        <default>
+            <mailchimp>
+                <emailcatcher>
+                    <popup_cancel>1</popup_cancel>
+                    <popup_subscription>1</popup_subscription>
+                    <popup_heading>Welcome to our store!</popup_heading>
+                    <popup_text>Please enter your email address to get the most out of our store and improve your
+                        shopping experience.
+                    </popup_text>
+                    <popup_width>50</popup_width>
+                    <popup_height>20</popup_height>
+                    <popup_cookie_time>1</popup_cookie_time>
+                    <popup_insist>1</popup_insist>
+                </emailcatcher>
+            </mailchimp>
+        </default>
     </default>
     <crontab>
         <jobs>
-            <mailchimp_bulksync_export_subscribers>
+            <mailchimp_bulksync_ecommerce_data>
                 <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
+                    <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>mailchimp/cron::bulksyncExportSubscribers</model>
+                    <model>mailchimp/cron::syncEcommerceData</model>
                 </run>
-            </mailchimp_bulksync_export_subscribers>
-            <mailchimp_bulksync_import_subscribers>
-                <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::bulksyncImportSubscribers</model>
-                </run>
-            </mailchimp_bulksync_import_subscribers>
-            <mailchimp_autoexport_subscribers>
-                <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::autoExportSubscribers</model>
-                </run>
-            </mailchimp_autoexport_subscribers>
-            <mailchimp_sendorders_asynch>
-                <schedule>
-                    <cron_expr>*/15 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::sendordersAsync</model>
-                </run>
-            </mailchimp_sendorders_asynch>
-            <mailchimp_cleanorders_asynch>
-                <schedule>
-                    <cron_expr>0 0 1 * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::cleanordersAsync</model>
-                </run>
-            </mailchimp_cleanorders_asynch>
-            <mailchimp_sendsubscribers_asynch>
-                <schedule>
-                    <cron_expr>*/15 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::sendSubscribersAsync</model>
-                </run>
-            </mailchimp_sendsubscribers_asynch>
-            <mailchimp_cleansubscribers_asynch>
-                <schedule>
-                    <cron_expr>0 0 1 * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>mailchimp/cron::cleanSubscribersAsync</model>
-                </run>
-            </mailchimp_cleansubscribers_asynch>
+            </mailchimp_bulksync_ecommerce_data>
         </jobs>
-    </crontab>-->
+    </crontab>
 </config>
