@@ -1,0 +1,123 @@
+.overlay_popup {
+    background-color: #85BBEF;
+    filter: alpha(opacity=60);
+    -moz-opacity: 0.6;
+    opacity: 0.6;
+}
+
+.popup_content {
+    width:100%;
+    height: auto;
+    overflow: visible;
+    color: #000;
+    font-family: Tahoma, Arial, sans-serif;
+    font: 12px arial;
+    background: #FDFDFD;
+    margin: 1% 1% 1% 0%;
+}
+
+.popup_message {
+    font: 12px arial;
+    text-align: center;
+    width: 100%;
+    height: 84%;
+}
+
+.popup_buttons {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+}
+
+#popup-heading {
+    background: rgb(36, 131, 199);
+    align-items: center;
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cancel_button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-style : none;
+    color: transparent;
+    height: 32px;
+    width: 32px;
+    background: url(xmark.png) no-repeat;
+}
+
+#popup-form-content {
+    width: 100%;
+    text-align: center;
+}
+
+.ok_button{
+    position: relative;
+    top: 5%;
+    bottom: 0;
+}
+
+@media (min-width: 720px) {
+    #popup-heading {
+        width: 30%;
+        height: 100%;
+        background: rgb(36, 131, 199);
+        float: right;
+        display: flex;
+        vertical-align: middle
+    }
+    .cancel_button {
+        position: relative;
+        top: -119%;
+        right: -45%;
+        border-style : none;
+        color: transparent;
+        height: 32px;
+        width: 32px;
+        background: url(xmark.png) no-repeat;
+    }
+    #popup-form-content {
+        width: 70%;
+        text-align: center;
+    }
+    .popup_message {
+        font: 12px arial;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+    }
+    .ok_button{
+        position: relative;
+        top: -10%;
+    }
+}
+
+
+#popup-heading > h2 {
+    color: white;
+    overflow: visible;
+}
+
+#popup-form-data {
+    margin-right: 6%;
+    line-height: 45px;
+}
+
+#popup-form-data .required {
+    margin-left: 13pt;
+}
+
+#popup-form-data input {
+    width: 60%;
+}
+
+.email_label {
+    margin: 1%;
+}
+
+#popup-text {
+    margin: 2%;
+}
+

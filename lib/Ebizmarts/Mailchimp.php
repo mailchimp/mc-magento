@@ -228,9 +228,9 @@ class Ebizmarts_Mailchimp
         $this->templates                                    = new Mailchimp_Templates($this);
         $this->templates->defaultContent                    = new Mailchimp_TemplatesDefaultContent($this);
     }
-    public function call($url,$params,$method=Ebizmarts_Mailchimp::GET)
+    public function call($url,$params,$method=Ebizmarts_Mailchimp::GET,$encodeJson=true)
     {
-        if(count($params)&&$method!=Ebizmarts_Mailchimp::GET)
+        if(count($params) && $encodeJson && $method!=Ebizmarts_Mailchimp::GET)
         {
             $params = json_encode($params);
         }
@@ -241,8 +241,10 @@ class Ebizmarts_Mailchimp
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         }
         else {
-            $_params = http_build_query($params);
-            $url .= '?'.$_params;
+            if(count($params)) {
+                $_params = http_build_query($params);
+                $url .= '?' . $_params;
+            }
         }
         curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
@@ -253,13 +255,22 @@ class Ebizmarts_Mailchimp
         $response_body = curl_exec($ch);
 
         $info = curl_getinfo($ch);
-        if(curl_error($ch)) {
+
+        $result = json_decode($response_body, true);
+        Mage::log('$info', null, 'ebizmarts.log', true);
+        Mage::log($info, null, 'ebizmarts.log', true);
+        Mage::log('$result', null, 'ebizmarts.log', true);
+        Mage::log($result, null, 'ebizmarts.log', true);
+
+        if(curl_error($ch))
+        {
             throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
         }
-        $result = json_decode($response_body, true);
 
-        if(floor($info['http_code'] / 100) >= 4) {
-            throw new Mailchimp_Error($result['title'].' : '.$result['detail']);
+        if(floor($info['http_code'] / 100) >= 4)
+        {
+            $errors = (isset($result['errors'])) ? $result['errors'] : '';
+            throw new Mailchimp_Error($result['title'],$result['detail'], $errors);
         }
 
         return $result;

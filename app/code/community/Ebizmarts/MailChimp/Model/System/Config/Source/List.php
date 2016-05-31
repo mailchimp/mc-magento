@@ -22,14 +22,15 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
 
     /**
      * Load lists and store on class property
-     *
-     * @return void
      */
     public function __construct()
     {
         if (is_null($this->_lists)) {
-            $api = new Ebizmarts_Mailchimp(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY));
-            $this->_lists = $api->lists->getLists(null, 'lists', 100);
+            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+                if ($apiKey) {
+                    $api = new Ebizmarts_Mailchimp($apiKey);
+                    $this->_lists = $api->lists->getLists(null, 'lists', 100);
+                }
         }
     }
 
