@@ -94,7 +94,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             if (!array_key_exists("address", $data)) //send only first address
             {
                 $street = $address->getStreet();
-                $data["address"] = [
+                $data["address"] = array(
                     "address1" => $street[0],
                     "address2" => count($street)>1 ? $street[1] : "",
                     "city" => $address->getCity(),
@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     "postal_code" => $address->getPostcode(),
                     "country" => Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName(),
                     "country_code" => $address->getCountry()
-                ];
+                );
 
                 //company
                 if ($address->getCompany()) {
