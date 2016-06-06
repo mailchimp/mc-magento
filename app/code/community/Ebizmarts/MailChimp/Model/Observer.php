@@ -95,6 +95,44 @@ class Ebizmarts_MailChimp_Model_Observer
         }
     }
 
+    public function handleSubscriber(Varien_Event_Observer $observer)
+    {
+        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        if($isEnabled){
+            $subscriber = $observer->getEvent()->getSubscriber();
+            if (TRUE === $subscriber->getIsStatusChanged()) {
+                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+                $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+                //@Todo Create Api/Subscriber class for subscriber functions
+                $status = Mage::helper('mailchimp')->getStatus();
+                $api = new Ebizmarts_Mailchimp($apiKey);
+                try {
+                    $api->lists->members->add($listId, null, $status, $subscriber->getEmail());
+                }catch (Exception $e){
+                    Mage::helper('mailchimp')->logError($e->getMessage());
+                }
+            }
+        }
+    }
+
+    public function handleSubscriberDeletion(Varien_Event_Observer $observer)
+    {
+        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        if($isEnabled){
+            $subscriber = $observer->getEvent()->getSubscriber();
+            if (TRUE === $subscriber->getIsStatusChanged()) {
+                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+                $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+                $api = new Ebizmarts_Mailchimp($apiKey);
+                try {
+                    $api->lists->members->add($listId, null, 'unsubscribed', $subscriber->getEmail());
+                }catch (Exception $e){
+                    Mage::helper('mailchimp')->logError($e->getMessage());
+                }
+            }
+        }
+    }
+
     public function alterNewsletterGrid(Varien_Event_Observer $observer){
 
         $block = $observer->getEvent()->getBlock();

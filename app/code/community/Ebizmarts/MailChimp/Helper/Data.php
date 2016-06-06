@@ -198,4 +198,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $connection->update($resource->getMainTable(),array('mailchimp_sync_error'=>'','mailchimp_sync_delta'=>'0000-00-00 00:00:00'),"mailchimp_sync_error <> ''");
     }
 
+    /**
+     * Get status to send confirmation if Need to Confirm enabled on Magento
+     *
+     * @return string
+     */
+    public function getStatus()
+    {
+        if($this->getConfigValue(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG))
+        {
+            $status = 'pending';
+        }
+        else
+        {
+            $status = 'subscribed';
+        }
+        return $status;
+    }
+
 }
