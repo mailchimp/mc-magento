@@ -29,11 +29,11 @@ class Mailchimp_Error extends Exception
      */
     protected $_mailchimp_details;
 
-    public function __construct($title = "", $details = "", $errors=null)
+    public function __construct($url = "", $title = "", $details = "", $errors = null)
     {
-        parent::__construct($title . " : " . $details);
-
-        $this->_mailchimp_title = $title;
+        $titleComplete = $title . " for Api Call: " . $url;
+        parent::__construct($titleComplete . " - " . $details);
+        $this->_mailchimp_title = $titleComplete;
         $this->_mailchimp_details = $details;
         $this->_mailchimp_errors = $errors;
     }
@@ -45,9 +45,12 @@ class Mailchimp_Error extends Exception
         {
             foreach($this->_mailchimp_errors as $error)
             {
-                if(array_key_exists("field",$error) && array_key_exists("message",$error)){
+                if(array_key_exists("message",$error)){
                     $error_details .= $error_details != "" ? " / " : "";
-                    $error_details .= $error["field"] . " : " . $error["message"];
+                    if(array_key_exists("field", $error) && $error['field']){
+                        $error_details .= $error["field"] . " : ";
+                    }
+                    $error_details .= $error["message"];
                 }
             }
         }

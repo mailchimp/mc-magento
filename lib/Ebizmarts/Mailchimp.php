@@ -257,12 +257,7 @@ class Ebizmarts_Mailchimp
         $info = curl_getinfo($ch);
 
         $result = json_decode($response_body, true);
-//        Mage::log('$info', null, 'ebizmarts.log', true);
-//        Mage::log($info, null, 'ebizmarts.log', true);
-//        Mage::log('$result', null, 'ebizmarts.log', true);
-//        Mage::log($result, null, 'ebizmarts.log', true);
-//        Mage::log('method, if null is GET', null, 'ebizmarts.log', true);
-//        Mage::log($method, null, 'ebizmarts.log', true);
+
 
         if(curl_error($ch))
         {
@@ -272,7 +267,7 @@ class Ebizmarts_Mailchimp
         if(floor($info['http_code'] / 100) >= 4)
         {
             $errors = (isset($result['errors'])) ? $result['errors'] : '';
-            throw new Mailchimp_Error($result['title'],$result['detail'], $errors);
+            throw new Mailchimp_Error($url, $result['title'],$result['detail'], $errors);
         }
 
         return $result;

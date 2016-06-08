@@ -29,6 +29,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @param $listId               The unique id for the list.
      * @param null $emailType       Type of email this member asked to get (‘html’ or ‘text’).
      * @param $status               Subscriber’s current status. (subscribed | unsubscribed | cleaned | pending)
+     * @param $email_address        Subscriber's email address.
      * @param null $mergeFields     An individual merge var and value for a member.
      * @param null $interest        The key of this object’s properties is the ID of the interest in question.
      * @param null $language        If set/detected, the subscriber’s language.
@@ -39,9 +40,9 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$emailType=null,$status, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,$ipOpt=null)
+    public function add($listId,$emailType=null,$status, $email_address, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,$ipOpt=null)
     {
-        $_params = array('status'=>$status);
+        $_params = array('status'=>$status, 'email_address' => $email_address);
         if($emailType) $_params['email_type'] = $emailType;
         if($mergeFields) $_params['merge_fields'] = $mergeFields;
         if($interests) $_params['interests'] = $interests;
