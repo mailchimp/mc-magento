@@ -90,8 +90,67 @@ class Ebizmarts_MailChimp_Model_Observer
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
             }
         }
+        catch(Mailchimp_Error $e)
+        {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+        }
         catch (Exception $e){
             Mage::helper('mailchimp')->logError($e->getMessage());
+        }
+    }
+
+    public function handleSubscriber(Varien_Event_Observer $observer)
+    {
+        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        if($isEnabled){
+            $subscriber = $observer->getEvent()->getSubscriber();
+            if (TRUE === $subscriber->getIsStatusChanged()) {
+                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+                $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+                //@Todo Create Api/Subscriber class for subscriber functions
+                $status = Mage::helper('mailchimp')->getStatus();
+                $api = new Ebizmarts_Mailchimp($apiKey);
+                $mergeVars = array();
+                if($subscriber->getFirstName()){
+                    $mergeVars['FNAME'] = $subscriber->getFirstName();
+                }
+                if($subscriber->getLastName()){
+                    $mergeVars['LNAME'] = $subscriber->getLastName();
+                }
+                try {
+                    $api->lists->members->add($listId, null, $status, $subscriber->getEmail(), $mergeVars);
+                }catch(Mailchimp_Error $e){
+                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+                }catch (Exception $e){
+                    Mage::helper('mailchimp')->logError($e->getMessage());
+                }
+            }
+        }
+    }
+
+    public function handleSubscriberDeletion(Varien_Event_Observer $observer)
+    {
+        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        if($isEnabled){
+            $subscriber = $observer->getEvent()->getSubscriber();
+            if (TRUE === $subscriber->getIsStatusChanged()) {
+                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+                $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+                $api = new Ebizmarts_Mailchimp($apiKey);
+                try {
+                    $md5HashEmail = md5(strtolower($subscriber->getEmail()));
+                    $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
+                }
+                catch(Mailchimp_Error $e){
+                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+                }
+                catch (Exception $e){
+                    Mage::helper('mailchimp')->logError($e->getMessage());
+                }
+            }
         }
     }
 
