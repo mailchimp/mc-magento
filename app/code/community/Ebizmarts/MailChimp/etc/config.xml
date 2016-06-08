@@ -3,10 +3,28 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>0.0.1</version>
+            <version>1.0.1</version>
         </Ebizmarts_MailChimp>
     </modules>
     <global>
+        <events>
+            <newsletter_subscriber_save_before>
+                <observers>
+                    <monkey_subscribe_observer>
+                        <class>mailchimp/observer</class>
+                        <method>handleSubscriber</method>
+                    </monkey_subscribe_observer>
+                </observers>
+            </newsletter_subscriber_save_before>
+            <newsletter_subscriber_delete_after>
+                <observers>
+                    <monkey_subscribe_delete_observer>
+                        <class>monkey/observer</class>
+                        <method>handleSubscriberDeletion</method>
+                    </monkey_subscribe_delete_observer>
+                </observers>
+            </newsletter_subscriber_delete_after>
+        </events>
         <models>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Model</class>

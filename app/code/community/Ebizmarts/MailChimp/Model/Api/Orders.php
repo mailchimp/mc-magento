@@ -63,20 +63,20 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data["id"] = $order->getEntityId();
         $data["currency_code"] = $order->getOrderCurrencyCode();
         $data["order_total"] = $order->getGrandTotal();
-        $data["lines"] = [];
+        $data["lines"] = array();
 
         //order lines
         $items = $order->getAllVisibleItems();
         $item_count = 0;
         foreach ($items as $item) {
             $item_count += 1;
-            $data["lines"][] = [
+            $data["lines"][] = array(
                 "id" => (string)$item_count,
                 "product_id" => $item->getProductId(),
                 "product_variant_id" => $item->getProductId(),
                 "quantity" => (int)$item->getQtyOrdered(),
                 "price" => $item->getPrice(),
-            ];
+            );
         }
 
         //customer data
