@@ -159,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data["handle"] = "";
 
             //variants
-            $data["variants"] = [];
+            $data["variants"] = array();
             foreach ($variants as $variant) {
                 $data["variants"][] = $this->_buildProductData($variant);
             }
