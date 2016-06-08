@@ -90,6 +90,11 @@ class Ebizmarts_MailChimp_Model_Observer
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
             }
         }
+        catch(Mailchimp_Error $e)
+        {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+        }
         catch (Exception $e){
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
@@ -106,8 +111,18 @@ class Ebizmarts_MailChimp_Model_Observer
                 //@Todo Create Api/Subscriber class for subscriber functions
                 $status = Mage::helper('mailchimp')->getStatus();
                 $api = new Ebizmarts_Mailchimp($apiKey);
+                $mergeVars = array();
+                if($subscriber->getFirstName()){
+                    $mergeVars['FNAME'] = $subscriber->getFirstName();
+                }
+                if($subscriber->getLastName()){
+                    $mergeVars['LNAME'] = $subscriber->getLastName();
+                }
                 try {
-                    $api->lists->members->add($listId, null, $status, $subscriber->getEmail());
+                    $api->lists->members->add($listId, null, $status, $subscriber->getEmail(), $mergeVars);
+                }catch(Mailchimp_Error $e){
+                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
                 }catch (Exception $e){
                     Mage::helper('mailchimp')->logError($e->getMessage());
                 }
@@ -125,8 +140,14 @@ class Ebizmarts_MailChimp_Model_Observer
                 $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
                 $api = new Ebizmarts_Mailchimp($apiKey);
                 try {
-                    $api->lists->members->add($listId, null, 'unsubscribed', $subscriber->getEmail());
-                }catch (Exception $e){
+                    $md5HashEmail = md5(strtolower($subscriber->getEmail()));
+                    $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
+                }
+                catch(Mailchimp_Error $e){
+                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+                }
+                catch (Exception $e){
                     Mage::helper('mailchimp')->logError($e->getMessage());
                 }
             }
