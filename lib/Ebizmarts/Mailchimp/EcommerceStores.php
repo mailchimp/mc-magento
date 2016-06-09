@@ -108,6 +108,6 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      */
     public function delete($storeId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('ecommerce/stores/'.$storeId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

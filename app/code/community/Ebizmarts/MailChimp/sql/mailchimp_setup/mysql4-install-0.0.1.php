@@ -77,12 +77,18 @@ $eav->addAttribute('catalog_product', 'mailchimp_sync_error', array(
     'position'  => 1,
 ));
 
-$installer->run("
+try {
+    $installer->run("
  ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
  ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_sync_error` VARCHAR(255) NOT NULL;
  ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
  ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD column `mailchimp_sync_error` VARCHAR(255) NOT NULL;
 ");
+}
+catch (Exception $e)
+{
+    Mage::helper('mailchimp')->logError($e->getMessage());
+}
 
 $installer->run("
 	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_sync_batches')}` (
@@ -96,7 +102,12 @@ $installer->run("
 
 $baseDir = Mage::getBaseDir();
 
-mkdir($baseDir.DS.'var'.DS.'mailchimp');
+try {
+    mkdir($baseDir . DS . 'var' . DS . 'mailchimp');
+}
+catch (Exception $e){
+    Mage::helper('mailchimp')->logError($e->getMessage());
+}
 
 $installer->endSetup();
 

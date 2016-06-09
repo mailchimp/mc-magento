@@ -62,7 +62,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 Mage::helper('mailchimp')->logRequest($batchJson);
 
                 $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-                $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                try {
+                    $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                }
+                catch(Mailchimp_Error $e){
+                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+                }
+                catch (Exception $e){
+                    Mage::helper('mailchimp')->logError($e->getMessage());
+                }
 
                 //save batch id to db
                 $batch = Mage::getModel('mailchimp/synchbatches');
