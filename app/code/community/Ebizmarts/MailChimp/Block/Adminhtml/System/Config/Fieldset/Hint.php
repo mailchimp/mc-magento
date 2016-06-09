@@ -13,7 +13,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Hint
     extends Mage_Adminhtml_Block_Abstract
     implements Varien_Data_Form_Element_Renderer_Interface
 {
-    protected $_template = 'mailchimp/system/config/fieldset/hint.phtml';
+    protected $_template = 'ebizmarts/mailchimp/system/config/fieldset/hint.phtml';
 
     /**
      * Render fieldset html

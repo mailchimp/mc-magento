@@ -16,7 +16,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
     protected function _construct()
     {
         parent::_construct();
-        $this->setTemplate('mailchimp/system/config/reseterrors.phtml');
+        $this->setTemplate('ebizmarts/mailchimp/system/config/reseterrors.phtml');
     }
 
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
@@ -37,7 +37,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
     }
     public function getAjaxCheckUrl()
     {
-//        $store = $this->getRequest()->getParam('store');
         return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetLocalErrors');
     }
 
