@@ -53,15 +53,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if (FALSE != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
         }
-
-//        if ($api->errorCode) {
-//            Mage::getSingleton('adminhtml/session')->addError($api->errorMessage);
-//            return $observer;
-//        }
-//
-//        $lists = $api->lists();
-//
-//        $selectedLists = array($listId);
+        
         $this->_saveCustomerGroups($listId, $apiKey, $hookUrl);
 
         return $observer;
