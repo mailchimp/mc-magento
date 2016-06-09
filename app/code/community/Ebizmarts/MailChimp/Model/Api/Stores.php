@@ -80,6 +80,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             $api = new Ebizmarts_Mailchimp($apiKey);
             $api->ecommerce->stores->delete($storeId);
+            $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+            $resource = Mage::getResourceModel('mailchimp/synchbatches');
+            $connection->update($resource->getMainTable(),array('status'=>'canceled'),"status = 'pending'");
         }
     }
 }
