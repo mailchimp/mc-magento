@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_OauthWizard extends Mage
     {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
-            $this->setTemplate('mailchimp/system/config/oauth_wizard.phtml');
+            $this->setTemplate('ebizmarts/mailchimp/system/config/oauth_wizard.phtml');
         }
         return $this;
     }
@@ -48,13 +48,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_OauthWizard extends Mage
 
         $label = $originalData['button_label'];
 
-        //Check if api key works
-//        $ping = Mage::getModel('mailchimp/api');
-//        $ping->ping();
-//        if (!$ping->errorCode) {
-//            $label = "Change API credentials";
-//        }
-//
         $this->addData(array(
             'button_label' => $this->helper('mailchimp')->__($label),
             'button_url' => $this->helper('mailchimp/oauth2')->authorizeRequestUrl(),

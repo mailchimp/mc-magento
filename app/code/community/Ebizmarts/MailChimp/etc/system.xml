@@ -26,7 +26,7 @@
                     <show_in_store>0</show_in_store>
                 </hint>
                 <general translate="label comment">
-                    <comment><![CDATA[<a href="http://mailchimp.com/signup/?pid=ebizmart&source=website" target="_blank">Get a free MailChimp account now</a>]]></comment>
+                    <!--<comment><![CDATA[<a href="http://mailchimp.com/signup/?pid=ebizmart&source=website" target="_blank">Get a free MailChimp account now</a>]]></comment>-->
                     <label>MailChimp integration by ebizmarts</label>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
