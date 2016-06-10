@@ -151,6 +151,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $type = $line[0];
                     $id = $line[2];
 
+                    $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
+
                     //parse error
                     $response = json_decode($item->response);
                     $error_details = "";
@@ -195,6 +197,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             Mage::helper('mailchimp')->logError("Error: no identification ".$type." found");
                             break;
                     }
+                    $mailchimpErrors->setType($response->type);
+                    $mailchimpErrors->setTitle($response->title);
+                    $mailchimpErrors->setStatus($item->status_code);
+                    $mailchimpErrors->setErrors($error_details);
+                    $mailchimpErrors->setRegtype($type);
+                    $mailchimpErrors->setOriginalId($id);
+                    $mailchimpErrors->save();
                     Mage::helper('mailchimp')->logError($error);
                 }
             }
