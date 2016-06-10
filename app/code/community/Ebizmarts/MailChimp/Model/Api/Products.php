@@ -38,8 +38,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             ), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-        $batchJson = '';
-        $operationsCount = 0;
+        $batchArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
 
         foreach ($collection as $product) {
@@ -66,13 +65,16 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 }
             } else if ($product->getTypeId() == "configurable") {
                 //get children
-                $childProducts = Mage::getModel('catalog/product_type_configurable')->getUsedProducts(null, $product);
+                $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
+                Mage::log($childProducts, null, 'ebizmarts2.log', true);
 
                 //add itself as variant
                 $variantProducts[] = $product;
 
-                foreach ($childProducts as $child) {
-                    $variantProducts[] = $child;
+                if(count($childProducts[0])) {
+                    foreach ($childProducts[0] as $childId) {
+                        $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
+                    }
                 }
             } else {
                 //@toDo bundle
@@ -95,16 +97,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
             if (!empty($productJson)) {
-                $operationsCount += 1;
-                if ($operationsCount > 1) {
-                    $batchJson .= ',';
-                }
-
-                $batchJson .= '{"method": "POST",';
-                $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/products",';
-                $batchJson .= '"operation_id": "' . $batchId . '_' . $product->getId() . '",';
-                $batchJson .= '"body": "' . addcslashes($productJson, '"') . '"';
-                $batchJson .= '}';
+                $batchArray['method'] = "POST";
+                $batchArray['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products";
+                $batchArray['operation_id'] = $batchId . '_' . $product->getId();
+                $batchArray['body'] = $productJson;
 
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -112,7 +108,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->save();
             }
         }
-        return $batchJson;
+        return $batchArray;
     }
 
     protected function _buildProductData($product, $isVarient = true, $variants = null)
@@ -182,7 +178,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
 
                     if (empty($parentIds)) {
-                        $parentIds = [$product->getId()];
+                        $parentIds = array($product->getId());
                     }
 
                     //add or update variant
@@ -207,7 +203,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     //check if it was never uploaded and create it
                     if (!$product->getMailchimpSyncDelta()) {
 
-                        $dataRootProduct = $this->_buildProductData($product, false, [$product]);
+                        $dataRootProduct = $this->_buildProductData($product, false, array($product));
 
                         $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
                         $mailchimpApi->ecommerce->products->add(
