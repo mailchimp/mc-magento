@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
     const BATCH_LIMIT = 100;
-    const DEFAULT_OPT_IN = true;
+    const DEFAULT_OPT_IN = false;
 
     public function createBatchJson($mailchimpStoreId)
     {
@@ -30,8 +30,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             ), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-        $batchJson = "";
-        $operationsCount = 0;
+        $customerArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
 
         foreach ($collection as $customer) {
@@ -48,15 +47,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
 
             if (!empty($customerJson)) {
-                $operationsCount += 1;
-                if ($operationsCount > 1) {
-                    $batchJson .= ',';
-                }
-                $batchJson .= '{"method": "POST",';
-                $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/customers",';
-                $batchJson .= '"operation_id": "' . $batchId . '_' . $customer->getId() . '",';
-                $batchJson .= '"body": "' . addcslashes($customerJson, '"') . '"';
-                $batchJson .= '}';
+                $customerArray['method'] = "POST";
+                $customerArray['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
+                $customerArray['operation_id'] = $batchId . '_' . $customer->getId();
+                $customerArray['body'] = $customerJson;
 
                 //update customers delta
                 $customer->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -64,7 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->save();
             }
         }
-        return $batchJson;
+        return $customerArray;
     }
 
     protected function _buildCustomerData($customer)
