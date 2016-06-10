@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
                 if ($apiKey) {
                     $api = new Ebizmarts_Mailchimp($apiKey);
-                    $this->_lists = $api->lists->getLists(null, 'lists', 100);
+                    $this->_lists = $api->lists->getLists(null, 'lists', null, null, 100);
                 }
         }
     }

@@ -29,22 +29,16 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 ));
             $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-            $batchJson = '';
-            $operationsCount = 0;
+            $batchArray = array();
             $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
 
             foreach ($collection as $order) {
                 $orderJson = $this->GeneratePOSTPayload($order);
                 if (!empty($orderJson)) {
-                    $operationsCount += 1;
-                    if ($operationsCount > 1) {
-                        $batchJson .= ',';
-                    }
-                    $batchJson .= '{"method": "POST",';
-                    $batchJson .= '"path": "/ecommerce/stores/' . $mailchimpStoreId . '/orders",';
-                    $batchJson .= '"operation_id": "' . $batchId . '_' . $order->getEntityId() . '",';
-                    $batchJson .= '"body": "' . addcslashes($orderJson, '"') . '"';
-                    $batchJson .= '}';
+                    $batchArray['method'] = "POST";
+                    $batchArray['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                    $batchArray['operation_id'] = $batchId . '_' . $order->getEntityId();
+                    $batchArray['body'] = $orderJson;
 
                     //update order delta
                     $order->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -52,7 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
 
-            return $batchJson;
+            return $batchArray;
     }
 
     protected function GeneratePOSTPayload($order_from_collection)
