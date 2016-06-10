@@ -113,6 +113,13 @@
         </routers>
     </admin>
     <adminhtml>
+        <layout>
+            <updates>
+                <mailchimp>
+                    <file>ebizmarts/mailchimp.xml</file>
+                </mailchimp>
+            </updates>
+        </layout>
         <events>
             <admin_system_config_changed_section_mailchimp>
                 <observers>

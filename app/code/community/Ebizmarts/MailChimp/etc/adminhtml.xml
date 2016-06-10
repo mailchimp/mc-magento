@@ -1,6 +1,20 @@
 <?xml version="1.0"?>
 <config>
     <menu>
+        <newsletter>
+            <children>
+                <mailchimp translate="title" module="mailchimp">
+                    <title>Mailchimp</title>
+                    <children>
+                            <mailchimperrors translate="title" module="mailchimp">
+                                <title>Mailchimp Errors</title>
+                                <sort_order>810</sort_order>
+                                <action>adminhtml/mailchimperrors/index</action>
+                        </mailchimperrors>
+                    </children>
+                </mailchimp>
+            </children>
+        </newsletter>
         <system>
             <depends>
                 <module>Ebizmarts_MailChimp</module>
@@ -28,6 +42,18 @@
         <resources>
             <admin>
                 <children>
+                    <newsletter>
+                        <children>
+                            <mailchimp translate="title" module="mailchimp">
+                                <title>Mailchimp</title>
+                                <children>
+                                    <mailchimperrors translate="title" module="mailchimp">
+                                        <title>Mailchimp Errors</title>
+                                    </mailchimperrors>
+                                </children>
+                            </mailchimp>
+                        </children>
+                    </newsletter>
                     <system>
                         <children>
                             <config>
