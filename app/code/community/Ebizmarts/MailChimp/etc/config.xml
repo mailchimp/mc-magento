@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </Ebizmarts_MailChimp>
     </modules>
     <global>
@@ -36,6 +36,9 @@
                     <synchbatches>
                         <table>mailchimp_sync_batches</table>
                     </synchbatches>
+                    <mailchimperrors>
+                        <table>mailchimp_errors</table>
+                    </mailchimperrors>
                 </entities>
             </mailchimp_mysql4>
         </models>

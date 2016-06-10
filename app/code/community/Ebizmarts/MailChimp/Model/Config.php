@@ -18,7 +18,6 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_LIST              = 'mailchimp/general/list';
     const GENERAL_MCSTOREID         = 'mailchimp/general/storeid';
     const GENERAL_MCMINSYNCDATEFLAG = 'mailchimp/general/mcminsyncdateflag';
-    const GENERAL_REPORT_EMAIL      = 'mailchimp/general/reportemail';
 
     const ENABLE_POPUP              = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING             = 'mailchimp/emailcatcher/popup_heading';
