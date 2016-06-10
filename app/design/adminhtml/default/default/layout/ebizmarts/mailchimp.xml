@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_mailchimperrors_grid>
+        <update handle="formkey"/>
+        <block type="mailchimp/adminhtml_mailchimperrors_grid"
+               name="mailchimp_mailchimperrors.grid" output="toHtml"></block>
+    </adminhtml_mailchimperrors_grid>
+    <adminhtml_mailchimperrors_index>
+        <reference name="content">
+            <block type="mailchimp/adminhtml_mailchimperrors"
+                   name="mailchimp_mailchimperrors.grid.container"></block>
+        </reference>
+    </adminhtml_mailchimperrors_index>
+</layout>
