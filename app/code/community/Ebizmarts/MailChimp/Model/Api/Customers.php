@@ -33,6 +33,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $customerArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
 
+        $counter = 0;
         foreach ($collection as $customer) {
             $data = $this->_buildCustomerData($customer);
             $customerJson = "";
@@ -47,16 +48,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
 
             if (!empty($customerJson)) {
-                $customerArray['method'] = "POST";
-                $customerArray['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
-                $customerArray['operation_id'] = $batchId . '_' . $customer->getId();
-                $customerArray['body'] = $customerJson;
+                $customerArray[$counter]['method'] = "POST";
+                $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
+                $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer->getId();
+                $customerArray[$counter]['body'] = $customerJson;
 
                 //update customers delta
                 $customer->setData("mailchimp_sync_delta", Varien_Date::now());
                 $customer->setData("mailchimp_sync_error", "");
                 $customer->save();
             }
+            $counter += 1;
         }
         return $customerArray;
     }
