@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             }
 
             try {
-                $store = $api->ecommerce->stores->get($storeId);
+                $store = (object)$api->ecommerce->stores->get($storeId);
                 if(is_array($store) && $store->getId()){
                     $storeExists = $store;
                 }
