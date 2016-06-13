@@ -63,19 +63,24 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if (!empty($batchArray)) {
                 $batchJson = json_encode($batchArray);
+                if(!$batchJson || $batchJson=='' )
+                {
+                    Mage::helper('mailchimp')->logRequest('An empty operation was detected');
+                }
+                else {
+                    //log request
+                    Mage::helper('mailchimp')->logRequest($batchJson);
 
-                //log request
-                Mage::helper('mailchimp')->logRequest($batchJson);
+                    $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+                    $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
-                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-                $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-
-                //save batch id to db
-                $batch = Mage::getModel('mailchimp/synchbatches');
-                $batch->setStoreId($mailchimpStoreId)
-                    ->setBatchId($batchResponse['id'])
-                    ->setStatus($batchResponse['status']);
-                $batch->save();
+                    //save batch id to db
+                    $batch = Mage::getModel('mailchimp/synchbatches');
+                    $batch->setStoreId($mailchimpStoreId)
+                        ->setBatchId($batchResponse['id'])
+                        ->setStatus($batchResponse['status']);
+                    $batch->save();
+                }
                 return $batchResponse;
             }
         }
@@ -205,7 +210,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     Mage::helper('mailchimp')->logError($error);
                 }
             }
-            unlink($file);
+//            unlink($file);
         }
     }
 }
