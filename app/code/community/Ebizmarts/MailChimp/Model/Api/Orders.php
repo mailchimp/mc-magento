@@ -31,19 +31,20 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
             $batchArray = array();
             $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
-
+            $counter = 0;
             foreach ($collection as $order) {
                 $orderJson = $this->GeneratePOSTPayload($order);
                 if (!empty($orderJson)) {
-                    $batchArray['method'] = "POST";
-                    $batchArray['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray['operation_id'] = $batchId . '_' . $order->getEntityId();
-                    $batchArray['body'] = $orderJson;
+                    $batchArray[$counter]['method'] = "POST";
+                    $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                    $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
+                    $batchArray[$counter]['body'] = $orderJson;
 
                     //update order delta
                     $order->setData("mailchimp_sync_delta", Varien_Date::now());
                     $order->save();
                 }
+                $counter += 1;
             }
 
             return $batchArray;
