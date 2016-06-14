@@ -213,7 +213,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     Mage::helper('mailchimp')->logError($error);
                 }
             }
-//            unlink($file);
+            unlink($file);
         }
     }
 }
