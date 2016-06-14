@@ -246,6 +246,7 @@ class Ebizmarts_Mailchimp
                 $url .= '?' . $_params;
             }
         }
+
         curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);

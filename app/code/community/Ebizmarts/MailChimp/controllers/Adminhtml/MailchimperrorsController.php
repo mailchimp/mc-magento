@@ -21,4 +21,9 @@ class Ebizmarts_Mailchimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         $this->_setActiveMenu('newsletter/mailchimp');
         $this->renderLayout();
     }
+    public function gridAction()
+    {
+        $this->loadLayout(false);
+        $this->renderLayout();
+    }
 }

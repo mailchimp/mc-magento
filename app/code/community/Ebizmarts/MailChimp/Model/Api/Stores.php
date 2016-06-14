@@ -31,8 +31,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             }
 
             try {
-                $store = (object)$api->ecommerce->stores->get($storeId);
-                if(is_array($store) && $store->getId()){
+                $store = $api->ecommerce->stores->get($storeId);
+                if(is_array($store) && isset($store['id'])){
                     $storeExists = $store;
                 }
             }
@@ -65,6 +65,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $store_email = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
                 if (strpos($store_email, 'example.com') !== false) {
                     $store_email = null;
+                    throw new Exception ('Please, change the general email in Store Email Addresses/General Contact');
                 }
 
                 $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
