@@ -40,11 +40,11 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
 //            'index' => 'action',
 //            'sortable' => false
 //        ));
-        $this->addColumn('type', array(
-            'header' => Mage::helper('mailchimp')->__('Type'),
-            'index' => 'type',
-            'sortable' => true
-        ));
+//        $this->addColumn('type', array(
+//            'header' => Mage::helper('mailchimp')->__('Type'),
+//            'index' => 'type',
+//            'sortable' => true
+//        ));
         $this->addColumn('title', array(
             'header' => Mage::helper('mailchimp')->__('Title'),
             'index' => 'title',
