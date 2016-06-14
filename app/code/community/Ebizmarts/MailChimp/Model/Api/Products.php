@@ -81,6 +81,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 //@toDo grouped
                 //@toDo virtual
                 //@toDo download
+                continue;
             }
 
             $data = $this->_buildProductData($product, false, $variantProducts);

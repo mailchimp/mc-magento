@@ -49,14 +49,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 //            if(!empty($customersArray)) {
 //                $batchArray['operations'] = $customersArray;
 //            }
-            Mage::log($customersArray);
 
             //product operations
             $productsArray = Mage::getModel('mailchimp/api_products')->createBatchJson($mailchimpStoreId);
 //            if(!empty($productsArray)) {
 //                $batchArray['operations'] = $productsArray;
 //            }
-            Mage::log($productsArray);
             if(empty($productsArray)) {
                 //order operations
                 $ordersArray = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
@@ -174,11 +172,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             }
                         }
                     }
-                    if($error_details != ""){
-                        $error = $response->title . " : " . $error_details;
-                    }else{
-                        $error = $response->title . " : " . $response->detail;
+                    if($error_details == ""){
+                        $error_details = $response->detail;
                     }
+
+                    $error = $response->title . " : " . $response->detail;
 
                     switch ($type) {
                         case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
