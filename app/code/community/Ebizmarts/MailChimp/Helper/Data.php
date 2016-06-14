@@ -177,13 +177,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         // reset customers with errors
         $collection = Mage::getModel('customer/customer')->getCollection()
-            ->addAttributeToSelect('mailchimp_sync_delta')
+//            ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToFilter(array(
                 array('attribute' => 'mailchimp_sync_error', 'neq' => '')
             ));
         foreach ($collection as $customer) {
-            Mage::log($customer->getId());
-            $customer->setData("mailchimp_sync_delta", null);
+            $customer->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
             $customer->setData("mailchimp_sync_error", '');
             $customer->setMailchimpUpdateObserverRan(true);
             $customer->save();
@@ -196,6 +195,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         // reset quotes with errors
         $resource = Mage::getResourceModel('sales/quote');
         $connection->update($resource->getMainTable(),array('mailchimp_sync_error'=>'','mailchimp_sync_delta'=>'0000-00-00 00:00:00'),"mailchimp_sync_error <> ''");
+        $resource = Mage::getResourceModel('mailchimp/mailchimperrors');
+        $connection->query('TRUNCATE TABLE '.$resource->getMainTable());
     }
 
     /**
