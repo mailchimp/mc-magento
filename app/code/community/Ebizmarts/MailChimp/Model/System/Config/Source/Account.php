@@ -62,12 +62,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         if (is_array($this->_account_details)) {
             return array(
                 array('value' => 0, 'label' => Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_account_details['account_name']),
-                array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Plan type:') . ' ' . ($this->_account_details['pro_enabled'] ? 'Pro' : 'Free')),
-                array('value' => 2, 'label' => Mage::helper('mailchimp')->__('Data uploaded to MailChimp:')),
-                array('value' => 3, 'label' => Mage::helper('mailchimp')->__('  Total Subscribers:') . ' ' . $this->_account_details['total_subscribers']),
-                array('value' => 4, 'label' => Mage::helper('mailchimp')->__('  Total Customers:') . ' ' . $this->_account_details['total_customers']),
-                array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Products:') . ' ' . $this->_account_details['total_products']),
-                array('value' => 6, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_account_details['total_orders'])
+                array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Data uploaded to MailChimp:')),
+                array('value' => 2, 'label' => Mage::helper('mailchimp')->__('  Total Subscribers:') . ' ' . $this->_account_details['total_subscribers']),
+                array('value' => 3, 'label' => Mage::helper('mailchimp')->__('  Total Customers:') . ' ' . $this->_account_details['total_customers']),
+                array('value' => 4, 'label' => Mage::helper('mailchimp')->__('  Total Products:') . ' ' . $this->_account_details['total_products']),
+                array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_account_details['total_orders'])
             );
         } elseif(!$this->_account_details) {
             return array(array('value' => '', 'label' => $helper->__('--- Enter your API KEY first ---')));
