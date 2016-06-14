@@ -44,17 +44,18 @@ class Ebizmarts_MailChimp_Model_Observer
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
+        if($listId != '' && Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_TWO_WAY_SYNC)) {
+            $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
-        $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
+            //Generating Webhooks URL
+            $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
 
-        //Generating Webhooks URL
-        $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
+            if (FALSE != strstr($hookUrl, '?', true)) {
+                $hookUrl = strstr($hookUrl, '?', true);
+            }
 
-        if (FALSE != strstr($hookUrl, '?', true)) {
-            $hookUrl = strstr($hookUrl, '?', true);
+            $this->_saveCustomerGroups($listId, $apiKey, $hookUrl);
         }
-        
-        $this->_saveCustomerGroups($listId, $apiKey, $hookUrl);
 
         return $observer;
     }
