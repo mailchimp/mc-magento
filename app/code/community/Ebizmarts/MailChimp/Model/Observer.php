@@ -44,7 +44,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
-        if($listId != '') {
+        if($listId != '' && Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_TWO_WAY_SYNC)) {
             $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
             //Generating Webhooks URL
