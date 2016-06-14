@@ -25,7 +25,7 @@ $installer->run("
 	  `errors` TEXT,
 	  `regtype` CHAR(3) DEFAULT '',
 	  `original_id` INT(10) DEFAULT 0,
-      `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  PRIMARY KEY  (`id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
