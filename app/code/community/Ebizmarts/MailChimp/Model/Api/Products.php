@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $product) {
             //define variants and root products
             $variantProducts = array();
-            if ($product->getTypeId() == "simple") {
+            if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
                 //check if parent exists
                 $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
                 if (!empty($parentIds)) {
@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     //a simple product has only one variant (itself)
                     $variantProducts[] = $product;
                 }
-            } else if ($product->getTypeId() == "configurable") {
+            } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 //get children
                 $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
 
@@ -76,11 +76,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
                     }
                 }
+            } else if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
+                $variantProducts = array();
+                $variantProducts[] = $product;
             } else {
                 //@toDo bundle
                 //@toDo grouped
-                //@toDo virtual
-                //@toDo download
                 continue;
             }
 
