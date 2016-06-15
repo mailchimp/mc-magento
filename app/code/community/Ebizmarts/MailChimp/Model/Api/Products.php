@@ -76,7 +76,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
                     }
                 }
-            } else if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") { //closes #7 #8
+            } else if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
                 $variantProducts = array();
                 $variantProducts[] = $product;
             } else {
