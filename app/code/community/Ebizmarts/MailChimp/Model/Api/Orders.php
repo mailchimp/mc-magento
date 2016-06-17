@@ -65,10 +65,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $item_count = 0;
         foreach ($items as $item) {
             $item_count += 1;
+            if($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+                $options = $item->getProductOptions();
+                $sku = $options['simple_sku'];
+                $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
+            }
+            else {
+                $variant = $item->getProductId();
+            }
             $data["lines"][] = array(
                 "id" => (string)$item_count,
                 "product_id" => $item->getProductId(),
-                "product_variant_id" => $item->getProductId(),
+                "product_variant_id" => $variant,
                 "quantity" => (int)$item->getQtyOrdered(),
                 "price" => $item->getPrice(),
             );
