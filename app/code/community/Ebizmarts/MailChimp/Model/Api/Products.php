@@ -47,23 +47,23 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $variantProducts = array();
             if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
                 //check if parent exists
-                $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-                if (!empty($parentIds)) {
-                    /**
-                     * this product will be uploaded within his parent so we abort the data build
-                     * we update the delta anyway
-                     */
-
-                    //update product delta
-                    $product->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $product->setData("mailchimp_sync_error", "");
-                    $product->save();
-
-                    continue;
-                } else {
+//                $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+//                if (!empty($parentIds)) {
+//                    /**
+//                     * this product will be uploaded within his parent so we abort the data build
+//                     * we update the delta anyway
+//                     */
+//
+//                    //update product delta
+//                    $product->setData("mailchimp_sync_delta", Varien_Date::now());
+//                    $product->setData("mailchimp_sync_error", "");
+//                    $product->save();
+//
+//                    continue;
+//                } else {
                     //a simple product has only one variant (itself)
                     $variantProducts[] = $product;
-                }
+//                }
             } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 //get children
                 $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
@@ -80,8 +80,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $variantProducts = array();
                 $variantProducts[] = $product;
             } else {
+                // don't need to send the grouped products
                 //@toDo bundle
-                //@toDo grouped
                 continue;
             }
 
@@ -175,10 +175,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
                 $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
 
-                if ($product->getTypeId() == "simple") {
+                if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE || $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
                     $data = $this->_buildProductData($product);
 
                     $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+//                    $parentIds = $product->getTypeInstance()->getParentIdsByChild($product->getId());
 
                     if (empty($parentIds)) {
                         $parentIds = array($product->getId());
@@ -202,7 +203,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         );
                     }
 
-                } else if ($product->getTypeId() == "configurable") {
+                } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                     //check if it was never uploaded and create it
                     if (!$product->getMailchimpSyncDelta()) {
 
@@ -229,9 +230,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
                 } else {
                     //@toDo bundle
-                    //@toDo grouped
-                    //@toDo virtual
-                    //@toDo download
 
                     throw new Exception('These type of products are not yet supported');
                 }
