@@ -29,7 +29,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
             ), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
-        Mage::log((string)$collection->getSelect());
 
         $customerArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
