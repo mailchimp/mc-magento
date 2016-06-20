@@ -93,7 +93,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data["customer"] = array(
                 "id" => $order->getCustomerId(),
                 "email_address" => $order->getCustomerEmail(),
-                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                "opt_in_status" => false
             );
         }
 
