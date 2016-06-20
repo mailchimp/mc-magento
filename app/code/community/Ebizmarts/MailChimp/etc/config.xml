@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </Ebizmarts_MailChimp>
     </modules>
     <global>
