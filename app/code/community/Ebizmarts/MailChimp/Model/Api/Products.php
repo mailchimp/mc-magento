@@ -34,7 +34,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             ->addAttributeToFilter(array(
                 array('attribute' => 'mailchimp_sync_delta', 'null' => true),
                 array('attribute' => 'mailchimp_sync_delta', 'eq' => ''),
-                array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+                array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()),
+                array('attribute' => 'mailchimp_sync_modified', 'eq' => 1)
             ), '', 'left');
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
@@ -46,24 +47,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             //define variants and root products
             $variantProducts = array();
             if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
-                //check if parent exists
-//                $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-//                if (!empty($parentIds)) {
-//                    /**
-//                     * this product will be uploaded within his parent so we abort the data build
-//                     * we update the delta anyway
-//                     */
-//
-//                    //update product delta
-//                    $product->setData("mailchimp_sync_delta", Varien_Date::now());
-//                    $product->setData("mailchimp_sync_error", "");
-//                    $product->save();
-//
-//                    continue;
-//                } else {
-                    //a simple product has only one variant (itself)
                     $variantProducts[] = $product;
-//                }
             } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 //get children
                 $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
@@ -107,6 +91,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
                 $product->setData("mailchimp_sync_error", "");
+                $product->setData('mailchimp_sync_modified',0);
+                $product->setMailchimpUpdateObserverRan(true);
                 $product->save();
             }
             $counter += 1;

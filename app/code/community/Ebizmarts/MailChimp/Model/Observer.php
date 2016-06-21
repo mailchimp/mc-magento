@@ -192,12 +192,13 @@ class Ebizmarts_MailChimp_Model_Observer
 
         if($product->getMailchimpUpdateObserverRan())
         {
-            return;
+            return $observer;
         }else{
             $product->setMailchimpUpdateObserverRan(true);
         }
 
         //update mailchimp ecommerce data for that product variant
-//        Mage::getModel('mailchimp/api_products')->update($product);
+        Mage::getModel('mailchimp/api_products')->update($product);
+        return $observer;
     }
 }
