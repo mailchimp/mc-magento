@@ -55,10 +55,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $order = Mage::getModel('sales/order')->load($order_from_collection->getEntityId());
 
         $data = array();
-        $data["id"] = $order->getEntityId();
-        $data["currency_code"] = $order->getOrderCurrencyCode();
-        $data["order_total"] = $order->getGrandTotal();
-        $data["lines"] = array();
+        $data['id'] = $order->getEntityId();
+        $data['currency_code'] = $order->getOrderCurrencyCode();
+        $data['order_total'] = $order->getGrandTotal();
+        $data['processed_at_foreign'] = $order->getCreatedAt();
+        $data['lines'] = array();
 
         //order lines
         $items = $order->getAllVisibleItems();
@@ -87,7 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data["customer"] = array(
                 "id" => "GUEST-" . date('Y-m-d-H-i-s'),
                 "email_address" => $order->getCustomerEmail(),
-                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                "opt_in_status" => false
             );
         } else {
             $data["customer"] = array(

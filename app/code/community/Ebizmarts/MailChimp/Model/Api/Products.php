@@ -166,8 +166,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         return $data;
     }
-
     public function update($product)
+    {
+        if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+            $product->setData('mailchimp_sync_delta', null);
+            $product->setData('mailchimp_sync_error', '');
+            $product->setData('mailchimp_sync_modified',1);
+        }
+    }
+    public function old_update($product)
     {
         try {
 

@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </Ebizmarts_MailChimp>
     </modules>
     <global>
@@ -147,15 +147,15 @@
                     </mailchimp_save_after_customer>
                 </observers>
             </adminhtml_customer_save_after>
-            <catalog_product_save_after>
+            <catalog_product_save_before>
                 <observers>
-                    <mailchimp_save_after_product>
+                    <mailchimp_save_before_product>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>productSaveAfter</method>
-                    </mailchimp_save_after_product>
+                        <method>productSaveBefore</method>
+                    </mailchimp_save_before_product>
                 </observers>
-            </catalog_product_save_after>
+            </catalog_product_save_before>
         </events>
     </adminhtml>
     <default>
