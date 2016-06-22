@@ -37,12 +37,15 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             try {
                 $this->_account_details = $api->root->info('account_name,pro_enabled,total_subscribers');
                 if(Mage::helper('mailchimp')->getMCStoreId()) {
+                    $this->_account_details['store_exists'] = true;
                     $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
                     $this->_account_details['total_customers'] = $totalCustomers['total_items'];
                     $totalProducts = $api->ecommerce->products->getAll($mcStoreId, 'total_items');
                     $this->_account_details['total_products'] = $totalProducts['total_items'];
                     $totalOrders = $api->ecommerce->orders->getAll($mcStoreId, 'total_items');
                     $this->_account_details['total_orders'] = $totalOrders['total_items'];
+                }else{
+                    $this->_account_details['store_exists'] = false;
                 }
             }catch (Exception $e){
                 $this->_account_details = "--- Invalid API Key ---";
@@ -60,14 +63,20 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     {
         $helper = Mage::helper('mailchimp');
         if (is_array($this->_account_details)) {
-            return array(
-                array('value' => 0, 'label' => Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_account_details['account_name']),
-                array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Data uploaded to MailChimp:')),
-                array('value' => 2, 'label' => Mage::helper('mailchimp')->__('  Total Subscribers:') . ' ' . $this->_account_details['total_subscribers']),
-                array('value' => 3, 'label' => Mage::helper('mailchimp')->__('  Total Customers:') . ' ' . $this->_account_details['total_customers']),
-                array('value' => 4, 'label' => Mage::helper('mailchimp')->__('  Total Products:') . ' ' . $this->_account_details['total_products']),
-                array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_account_details['total_orders'])
-            );
+            $returnArray = array(array('value' => 0, 'label' => Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_account_details['account_name']));
+            if($this->_account_details['store_exists']){
+                $returnArray = array_merge($returnArray,
+                array(
+                    array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Data uploaded to MailChimp:')),
+                    array('value' => 2, 'label' => Mage::helper('mailchimp')->__('  Total Subscribers:') . ' ' . $this->_account_details['total_subscribers']),
+                    array('value' => 3, 'label' => Mage::helper('mailchimp')->__('  Total Customers:') . ' ' . $this->_account_details['total_customers']),
+                    array('value' => 4, 'label' => Mage::helper('mailchimp')->__('  Total Products:') . ' ' . $this->_account_details['total_products']),
+                    array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_account_details['total_orders'])
+                    ));
+            }else{
+                $returnArray = array_merge($returnArray, array(array('value' => 6, 'label' => Mage::helper('mailchimp')->__('Warning: The MailChimp store was not created properly, please save your configuration again.'))));
+            }
+            return $returnArray;
         } elseif(!$this->_account_details) {
             return array(array('value' => '', 'label' => $helper->__('--- Enter your API KEY first ---')));
         }else{

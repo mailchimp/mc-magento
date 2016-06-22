@@ -33,6 +33,10 @@ class Ebizmarts_MailChimp_Model_Observer
                 if(!$mailchimpStore) {
                     Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
+                if(Mage::helper('mailchimp')->getMCStoreId())
+                {
+                    Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration again.');
+                }
 
             } catch (Mailchimp_Error $e)
             {
@@ -201,5 +205,19 @@ class Ebizmarts_MailChimp_Model_Observer
         //update mailchimp ecommerce data for that product variant
         Mage::getModel('mailchimp/api_products')->update($product);
         return $observer;
+    }
+
+    public function saveCampaignData(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+        $campaignCookie = $this->_getCampaignCookie();
+        if($campaignCookie) {
+            $order->setMailchimpCampaignId($campaignCookie);
+        }
+    }
+
+    protected function _getCampaignCookie()
+    {
+        return $this->getCookie()->get('mailchimp_campaign_id');
     }
 }
