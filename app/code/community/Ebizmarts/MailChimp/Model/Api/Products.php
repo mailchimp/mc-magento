@@ -26,11 +26,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             ->addAttributeToSelect('image')
             ->addAttributeToSelect('price')
             ->addAttributeToSelect('visibility')
+            ->addAttributeToSelect('mailchimp_sync_modified')
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
-//            ->addAttributeToFilter('visibility', array('in' => array(
-//                Mage_Catalog_Model_Product_Visibility::VISIBILITY_IN_SEARCH,
-//                Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH,
-//            )))
             ->addAttributeToFilter(array(
                 array('attribute' => 'mailchimp_sync_delta', 'null' => true),
                 array('attribute' => 'mailchimp_sync_delta', 'eq' => ''),
@@ -45,48 +42,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $product) {
             //define variants and root products
-            $variantProducts = array();
-            if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
-                    $variantProducts[] = $product;
-            } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
-                //get children
-                $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
-
-                //add itself as variant
-                $variantProducts[] = $product;
-
-                if(count($childProducts[0])) {
-                    foreach ($childProducts[0] as $childId) {
-                        $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
-                    }
-                }
-            } else if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
-                $variantProducts = array();
-                $variantProducts[] = $product;
-            } else {
-                // don't need to send the grouped products
-                //@toDo bundle
-                continue;
+            if($product->getMailchimpSyncModified()&&!$product->getMailchimpSyncDelta()) {
+                $data = $this->_buildOldProductRequest($product,$batchId,$mailchimpStoreId);
+            }
+            else {
+                $data = $this->_buildNewProductRequest($product,$batchId,$mailchimpStoreId);
             }
 
-            $data = $this->_buildProductData($product, false, $variantProducts);
-
-            //enconde to JSON
-            try {
-                $productJson = json_encode($data);
-
-            } catch (Exception $e) {
-                //json encode failed
-                Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
-
-                continue;
-            }
-
-            if (!empty($productJson)) {
-                $batchArray[$counter]['method'] = "POST";
-                $batchArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products";
-                $batchArray[$counter]['operation_id'] = $batchId . '_' . $product->getId();
-                $batchArray[$counter]['body'] = $productJson;
+            if (!empty($data)) {
+                $batchArray[$counter] = $data;
 
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -95,11 +59,100 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->setMailchimpUpdateObserverRan(true);
                 $product->save();
             }
+            else {
+                continue;
+            }
             $counter += 1;
         }
         return $batchArray;
     }
 
+    protected function _buildNewProductRequest($product,$batchId,$mailchimpStoreId)
+    {
+        $variantProducts = array();
+        if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
+            $variantProducts[] = $product;
+        } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            //get children
+            $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
+
+            //add itself as variant
+            $variantProducts[] = $product;
+
+            if(count($childProducts[0])) {
+                foreach ($childProducts[0] as $childId) {
+                    $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
+                }
+            }
+        } else if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
+            $variantProducts = array();
+            $variantProducts[] = $product;
+        } else {
+            // don't need to send the grouped products
+            //@toDo bundle
+            return array();
+        }
+
+        $data = $this->_buildProductData($product, false, $variantProducts);
+        try {
+            $body = json_encode($data);
+
+        } catch (Exception $e) {
+            //json encode failed
+            Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
+            return array();
+        }
+        $data = array();
+        $data['method'] = "POST";
+        $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products";
+        $data['operation_id'] = $batchId . '_' . $product->getId();
+        $data['body'] = $body;
+        return $data;
+    }
+    protected  function _buildOldProductRequest($product,$batchId,$mailchimpStoreId)
+    {
+        $operations = array();
+        if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE || $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
+            $data = $this->_buildProductData($product);
+
+            $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+
+            if (empty($parentIds)) {
+                $parentIds = array($product->getId());
+            }
+
+            //add or update variant
+            foreach ($parentIds as $parentId) {
+                    $variendata = array();
+                    //$variendata["id"] = $data["id"];
+                    $variendata["title"] = $data["title"];
+                    $variendata["url"] = $data["url"];
+                    $variendata["sku"] = $data["sku"];
+                    $variendata["price"] = $data["price"];
+                    $variendata["inventory_quantity"] = $data["inventory_quantity"];
+                    $variendata["image_url"] = $data["image_url"];
+                    $variendata["backorders"] = $data["backorders"];
+                    $variendata["visibility"] = $data["visibility"];
+                    $productdata = array();
+                    $productdata['method'] = "PUT";
+                    $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/".$parentId.'/variants/'.$data['id'];
+                    $productsdata['operation_id'] = $batchId . '_' . $parentId;
+                    try {
+                        $body = json_encode($variendata);
+
+                    } catch (Exception $e) {
+                        //json encode failed
+                        Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
+                        continue;
+                    }
+                    $productdata['body'] = $body;
+                    $operations[] = $productdata;
+
+            }
+
+        }
+        return $operations;
+    }
     protected function _buildProductData($product, $isVarient = true, $variants = null)
     {
         $data = array();
