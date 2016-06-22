@@ -19,7 +19,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account
         $html = '<ul class="checkboxes">';
 
         foreach ($values as $dat) {
-            $html .= "<li>{$dat['label']}</li>";
+            if($dat['value'] == 6){
+                $html .= "<li style='color:red;font-weight: bold;'>{$dat['label']}</li>";
+            }else {
+                $html .= "<li>{$dat['label']}</li>";
+            }
         }
 
         $html .= '</ul>';

@@ -3,6 +3,9 @@
 <layout version="0.1.0">
     <default>
         <reference name="head">
+            <action method="addJs" module="mailchimp">
+                <script helper="mailchimp/getCanShowCampaignJs"></script>
+            </action>
             <action method="addJs" ifconfig="mailchimp/emailcatcher/popup_general">
                 <script>prototype/window.js</script>
             </action>
