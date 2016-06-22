@@ -33,6 +33,10 @@ class Ebizmarts_MailChimp_Model_Observer
                 if(!$mailchimpStore) {
                     Mage::helper('mailchimp')->resetMCEcommerceData();
                 }
+                if(Mage::helper('mailchimp')->getMCStoreId())
+                {
+                    Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration again.');
+                }
 
             } catch (Mailchimp_Error $e)
             {
