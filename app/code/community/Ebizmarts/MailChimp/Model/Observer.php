@@ -201,4 +201,18 @@ class Ebizmarts_MailChimp_Model_Observer
         Mage::getModel('mailchimp/api_products')->update($product);
         return $observer;
     }
+
+    public function saveCampaignData(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+        $campaignCookie = $this->_getCampaignCookie();
+        if($campaignCookie) {
+            $order->setMailchimpCampaignId($campaignCookie);
+        }
+    }
+
+    protected function _getCampaignCookie()
+    {
+        return $this->getCookie()->get('mailchimp_campaign_id');
+    }
 }
