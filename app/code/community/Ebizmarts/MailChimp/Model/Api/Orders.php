@@ -56,6 +56,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         $data = array();
         $data['id'] = $order->getEntityId();
+        if($order->getMailChimpCampaignId()) {
+            $data['campaign_id'] = $order->getMailChimpCampaignId();
+        }
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
         $data['processed_at_foreign'] = $order->getCreatedAt();
@@ -96,6 +99,24 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 "email_address" => $order->getCustomerEmail(),
                 "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
             );
+            $billingAddress = $order->getBillingAddress();
+            $street = $billingAddress->getStreet();
+            $data["customer"]["first_name"] = $order->getCustomerFirstname();
+            $data["customer"]["last_name"] = $order->getCustomerLastname();
+            $data["customer"]["address"] = array(
+                "address1" => $street[0],
+                "address2" => count($street)>1 ? $street[1] : "",
+                "city" => $billingAddress->getCity(),
+                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+                "postal_code" => $billingAddress->getPostcode(),
+                "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+                "country_code" => $billingAddress->getCountry()
+            );
+            //company
+            if ($billingAddress->getCompany()) {
+                $data["customer"]["company"] = $billingAddress->getCompany();
+            }
         }
 
         $jsonData = "";

@@ -10,20 +10,28 @@
         <events>
             <newsletter_subscriber_save_before>
                 <observers>
-                    <monkey_subscribe_observer>
+                    <mailchimp_subscribe_observer>
                         <class>mailchimp/observer</class>
                         <method>handleSubscriber</method>
-                    </monkey_subscribe_observer>
+                    </mailchimp_subscribe_observer>
                 </observers>
             </newsletter_subscriber_save_before>
             <newsletter_subscriber_delete_after>
                 <observers>
-                    <monkey_subscribe_delete_observer>
-                        <class>monkey/observer</class>
+                    <mailchimp_subscribe_delete_observer>
+                        <class>mailchimp/observer</class>
                         <method>handleSubscriberDeletion</method>
-                    </monkey_subscribe_delete_observer>
+                    </mailchimp_subscribe_delete_observer>
                 </observers>
             </newsletter_subscriber_delete_after>
+            <sales_order_place_before>
+                <observers>
+                    <mailchimp_subscribe_checkout>
+                        <class>mailchimp/observer</class>
+                        <method>saveCampaignData</method>
+                    </mailchimp_subscribe_checkout>
+                </observers>
+            </sales_order_place_before>
         </events>
         <models>
             <mailchimp>
