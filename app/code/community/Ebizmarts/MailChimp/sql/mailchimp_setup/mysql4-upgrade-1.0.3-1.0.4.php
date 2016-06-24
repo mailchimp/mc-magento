@@ -40,4 +40,8 @@ $eav->addAttribute('customer', 'mailchimp_sync_modified', array(
     'default'   => 0
 ));
 
+$installer->run("
+  ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD COLUMN `mailchimp_campaign_id` VARCHAR(16) DEFAULT NULL;
+");
+
 $installer->endSetup();
