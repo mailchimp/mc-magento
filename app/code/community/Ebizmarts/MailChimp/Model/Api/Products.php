@@ -17,7 +17,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function createBatchJson($mailchimpStoreId)
     {
         //create missing products first
-        $collection = mage::getModel('catalog/product')->getCollection()
+        $collection = Mage::getModel('catalog/product')->getCollection()
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('name')
             ->addAttributeToSelect('type_id')
@@ -207,7 +207,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
     public function update($product)
     {
-        if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+        if (Mage::helper('mailchimp')->isSyncDataEnabled()) {
 //            $product->setData('mailchimp_sync_delta', null);
             $product->setData('mailchimp_sync_error', '');
             $product->setData('mailchimp_sync_modified',1);
@@ -217,7 +217,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 //    {
 //        try {
 //
-//            if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+//            if (Mage::helper('mailchimp')->isSyncDataEnabled()) {
 //                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 //                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
 //

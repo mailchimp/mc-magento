@@ -113,7 +113,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         {
             Mage::getModel('mailchimp/api_stores')->deleteStore($this->getMCStoreId());
         }
-
         //generate store id
         $date = date('Y-m-d-His');
         $store_id = parse_url(Mage::getBaseUrl(), PHP_URL_HOST). '_' . $date;
@@ -135,22 +134,26 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    public function isEcommerceSyncDataEnabled()
+    public function isSyncDataEnabled()
     {
         $api_key = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-
+        $moduleEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         return !is_null($this->getMCStoreId()) && $this->getMCStoreId() != null
-        && !is_null($api_key) && $api_key != "";
+        && !is_null($api_key) && $api_key != "" && $moduleEnabled;
     }
 
     public function logError($message)
     {
-        Mage::log($message, null, 'MailChimp_Errors.log', true);
+        if($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
+            Mage::log($message, null, 'MailChimp_Errors.log', true);
+        }
     }
 
     public function logRequest($message)
     {
-        Mage::log($message, null, 'MailChimp_Requests.log', true);
+        if($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
+            Mage::log($message, null, 'MailChimp_Requests.log', true);
+        }
     }
 
     public function getWebhooksKey()
@@ -174,7 +177,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $product->save();
         }
 
-
+        // reset subscribers with errors
+        $collection = Mage::getModel('newsletter/subscriber')->getCollection()
+            ->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
+        foreach ($collection as $subscriber) {
+            $subscriber->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
+            $subscriber->setData("mailchimp_sync_error", '');
+            $subscriber->save();
+        }
 
         // reset customers with errors
         $collection = Mage::getModel('customer/customer')->getCollection()
@@ -188,6 +198,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $customer->setMailchimpUpdateObserverRan(true);
             $customer->save();
         }
+
         // reset orders with errors
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 
@@ -203,11 +214,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get status to send confirmation if Need to Confirm enabled on Magento
      *
+     * @param null $subscriber
      * @return string
      */
-    public function getStatus()
+    public function getStatus($subscriber = null)
     {
-        if($this->getConfigValue(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG))
+        if($this->getConfigValue(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG) && (!$subscriber || $subscriber->getStatus() != 'subscribed'))
         {
             $status = 'pending';
         }
@@ -217,5 +229,4 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $status;
     }
-
 }

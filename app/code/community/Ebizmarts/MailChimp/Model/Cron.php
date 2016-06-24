@@ -16,11 +16,11 @@
 class Ebizmarts_MailChimp_Model_Cron
 {
 
-    public function syncEcommerceData($cron)
+    public function syncBatchData($cron)
     {
-        $storeId = Mage::helper('mailchimp')->getMCStoreId();
+        $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
 
-        Mage::getModel('mailchimp/api_batches')->getResults($storeId);
-        Mage::getModel('mailchimp/api_batches')->sendBatch($storeId);
+        Mage::getModel('mailchimp/api_batches')->getResults($mailchimpStoreId);
+        Mage::getModel('mailchimp/api_batches')->sendBatch($mailchimpStoreId);
     }
 }
