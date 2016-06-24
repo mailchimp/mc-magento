@@ -28,6 +28,8 @@ $eav->addAttribute('catalog_product', 'mailchimp_sync_modified', array(
     'default'   => 0
 ));
 
+// create mailchimp_sync_modified to the customer
+
 $eav->addAttribute('customer', 'mailchimp_sync_modified', array(
     'label'     => 'MailChimp Modified',
     'type'      => 'int',
