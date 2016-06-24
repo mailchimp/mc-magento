@@ -68,7 +68,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $items = $order->getAllVisibleItems();
         $item_count = 0;
         foreach ($items as $item) {
-            $item_count += 1;
             if($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
@@ -77,15 +76,26 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             else {
                 $variant = $item->getProductId();
             }
-            $data["lines"][] = array(
-                "id" => (string)$item_count,
-                "product_id" => $item->getProductId(),
-                "product_variant_id" => $variant,
-                "quantity" => (int)$item->getQtyOrdered(),
-                "price" => $item->getPrice(),
-            );
-        }
+            // load the product and check if the product was already sent to mailchimp
+            $syncDelta = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_delta',$order->getStoreId());
+            $syncError = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_error',$order->getStoreId());
 
+            if($syncDelta&&$syncError==0) {
+                $item_count += 1;
+                $data["lines"][] = array(
+                    "id" => (string)$item_count,
+                    "product_id" => $item->getProductId(),
+                    "product_variant_id" => $variant,
+                    "quantity" => (int)$item->getQtyOrdered(),
+                    "price" => $item->getPrice(),
+                );
+            }
+        }
+        if(!$item_count)
+        {
+            return "";
+            unset($data['lines']);
+        }
         //customer data
         if ((bool)$order->getCustomerIsGuest()) {
             $data["customer"] = array(
