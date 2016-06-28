@@ -49,6 +49,11 @@
                     </mailchimperrors>
                 </entities>
             </mailchimp_mysql4>
+            <newsletter>
+                <rewrite>
+                    <subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>
+                </rewrite>
+            </newsletter>
         </models>
         <resources>
             <mailchimp_setup>
@@ -169,6 +174,9 @@
     <default>
         <default>
             <mailchimp>
+                <general>
+                    <webhook_active>1</webhook_active>
+                </general>
                 <emailcatcher>
                     <popup_cancel>1</popup_cancel>
                     <popup_subscription>1</popup_subscription>
@@ -186,14 +194,14 @@
     </default>
     <crontab>
         <jobs>
-            <mailchimp_bulksync_ecommerce_data>
+            <mailchimp_bulksync_data>
                 <schedule>
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>mailchimp/cron::syncEcommerceData</model>
+                    <model>mailchimp/cron::syncBatchData</model>
                 </run>
-            </mailchimp_bulksync_ecommerce_data>
+            </mailchimp_bulksync_data>
         </jobs>
     </crontab>
 </config>

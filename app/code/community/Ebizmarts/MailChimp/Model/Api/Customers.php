@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function createBatchJson($mailchimpStoreId)
     {
         //get customers
-        $collection = mage::getModel('customer/customer')->getCollection()
+        $collection = Mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('mailchimp_sync_modified')
             ->addAttributeToSelect('firstname')
@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
     public function update($customer)
     {
-        if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
 //        $customer->setData("mailchimp_sync_delta", Varien_Date::now());
             $customer->setData("mailchimp_sync_error", "");
             $customer->setData("mailchimp_sync_modified", 1);
@@ -133,7 +133,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 //    {
 //        try {
 //
-//            if (Mage::helper('mailchimp')->isEcommerceSyncDataEnabled()) {
+//            if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
 //
 //                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 //
