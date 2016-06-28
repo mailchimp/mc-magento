@@ -18,14 +18,6 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     {
         //get subscribers
         $collection = Mage::getModel('newsletter/subscriber')->getCollection()
-//            ->addAttributeToSelect('subscriber_id')
-//            ->addAttributeToSelect('mailchimp_sync_delta')
-//            ->addAttributeToSelect('mailchimp_sync_error')
-//            ->addAttributeToSelect('subscriber_email')
-//            ->addAttributeToSelect('subscriber_firstname')
-//            ->addAttributeToSelect('subscriber_lastname')
-//            ->addAttributeToSelect('store_id')
-//            ->addAttributeToSelect('subscriber_status')
             ->addFieldToFilter('subscriber_status', array('eq' => 1))
             ->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter('mailchimp_sync_delta', array(
@@ -34,7 +26,6 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
                 array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
             ));
         $collection->getSelect()->limit($limit);
-
         $subscriberArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . date('Y-m-d-H-i-s');
 

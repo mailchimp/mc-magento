@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function deleteStore($storeId)
     {
-        if (Mage::helper('mailchimp')->isSyncDataEnabled()) {
+        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             $api = new Ebizmarts_Mailchimp($apiKey);
             $api->ecommerce->stores->delete($storeId);

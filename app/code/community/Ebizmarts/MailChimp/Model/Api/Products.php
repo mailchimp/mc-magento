@@ -207,7 +207,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
     public function update($product)
     {
-        if (Mage::helper('mailchimp')->isSyncDataEnabled()) {
+        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
 //            $product->setData('mailchimp_sync_delta', null);
             $product->setData('mailchimp_sync_error', '');
             $product->setData('mailchimp_sync_modified',1);
@@ -217,7 +217,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 //    {
 //        try {
 //
-//            if (Mage::helper('mailchimp')->isSyncDataEnabled()) {
+//            if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
 //                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 //                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
 //
