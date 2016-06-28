@@ -19,8 +19,18 @@ class Ebizmarts_MailChimp_Model_Cron
     public function syncBatchData($cron)
     {
         $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
+        $subscriberLimit = Ebizmarts_MailChimp_Model_Api_subscribers::BATCH_LIMIT;
+        $stores = Mage::app()->getStores();
 
         Mage::getModel('mailchimp/api_batches')->getResults($mailchimpStoreId);
-        Mage::getModel('mailchimp/api_batches')->sendBatch($mailchimpStoreId);
+        Mage::getModel('mailchimp/api_batches')->sendEcommerceBatch($mailchimpStoreId);
+        foreach ($stores as $store) {
+            if($subscriberLimit > 0) {
+                $batchResponse = array();
+                list($batchResponse, $subscriberLimit) = Mage::getModel('mailchimp/api_batches')->sendSubscriberBatch($store->getId(), $subscriberLimit);
+            }else{
+                break;
+            }
+        }
     }
 }
