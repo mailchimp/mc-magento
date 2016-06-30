@@ -104,7 +104,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     //subscriber operations
                     $subscribersArray = Mage::getModel('mailchimp/api_subscribers')->createBatchJson($listId, $storeId, $limit);
                     $limit -= count($subscribersArray);
-                    Mage::log($subscribersArray, null, 'ebizmarts2.log', true);
                 }
 
                 $batchArray['operations'] = $subscribersArray;
