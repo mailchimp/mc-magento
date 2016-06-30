@@ -109,7 +109,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetMCEcommerceData($deleteDataInMailchimp=false)
     {
-        $ecommerceEnabled = Mage::helper('mailchimp')->isEcomSyncDataEnabled();
+        $ecommerceEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE);
         //delete store id and data from mailchimp
         if($deleteDataInMailchimp && $this->getMCStoreId() && $this->getMCStoreId() != "")
         {
@@ -143,8 +143,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $api_key = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $moduleEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $ecommerceEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE);
-        return !is_null($this->getMCStoreId()) && $this->getMCStoreId() != null
-        && !is_null($api_key) && $api_key != "" && $moduleEnabled && $ecommerceEnabled;
+        $ret = !is_null($this->getMCStoreId()) && $this->getMCStoreId() != null
+            && !is_null($api_key) && $api_key != "" && $moduleEnabled && $ecommerceEnabled;
+        return $ret;
     }
 
     public function logError($message)
