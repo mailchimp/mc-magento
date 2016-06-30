@@ -36,8 +36,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         if($api) {
             try {
                 $this->_account_details = $api->root->info('account_name,total_subscribers');
-                Mage::log('getMCStoreId', null, 'ebizmarts.log', true);
-                Mage::log(Mage::helper('mailchimp')->getMCStoreId(), null, 'ebizmarts.log', true);
                 if(Mage::helper('mailchimp')->getMCStoreId()) {
                     $this->_account_details['store_exists'] = true;
                     $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
