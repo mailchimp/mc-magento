@@ -209,6 +209,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     protected function _getCampaignCookie()
     {
-        return $this->getCookie()->get('mailchimp_campaign_id');
+        return Mage::app()->getCookie()->get('mailchimp_campaign_id');
     }
 }
