@@ -200,15 +200,15 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function saveCampaignData(Varien_Event_Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
         $campaignCookie = $this->_getCampaignCookie();
         if($campaignCookie) {
-            $order->setMailchimpCampaignId($campaignCookie);
+            $observer->getEvent()->getOrder()->setMailchimpCampaignId($campaignCookie);
         }
     }
 
     protected function _getCampaignCookie()
     {
-        return Mage::app()->getCookie()->get('mailchimp_campaign_id');
+        $ret = Mage::app()->getCookie()->get('mailchimp_campaign_id');
+        return $ret;
     }
 }
