@@ -56,8 +56,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         $data = array();
         $data['id'] = $order->getEntityId();
-        if($order->getMailChimpCampaignId()) {
-            $data['campaign_id'] = $order->getMailChimpCampaignId();
+        if($order->getMailchimpCampaignId()) {
+            $data['campaign_id'] = $order->getMailchimpCampaignId();
         }
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
