@@ -61,6 +61,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
+        $data['tax_total'] = $order->getTaxAmount();
+        $data['shipping_total'] = $order->getShippingAmount();
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['lines'] = array();
 
