@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.0.4</version>
+            <version>1.0.4.2</version>
         </Ebizmarts_MailChimp>
     </modules>
     <global>
@@ -49,6 +49,11 @@
                     </mailchimperrors>
                 </entities>
             </mailchimp_mysql4>
+            <newsletter>
+                <rewrite>
+                    <subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>
+                </rewrite>
+            </newsletter>
         </models>
         <resources>
             <mailchimp_setup>
@@ -167,33 +172,32 @@
         </events>
     </adminhtml>
     <default>
-        <default>
-            <mailchimp>
-                <emailcatcher>
-                    <popup_cancel>1</popup_cancel>
-                    <popup_subscription>1</popup_subscription>
-                    <popup_heading>Welcome to our store!</popup_heading>
-                    <popup_text>Please enter your email address to get the most out of our store and improve your
-                        shopping experience.
-                    </popup_text>
-                    <popup_width>50</popup_width>
-                    <popup_height>20</popup_height>
-                    <popup_cookie_time>1</popup_cookie_time>
-                    <popup_insist>1</popup_insist>
-                </emailcatcher>
-            </mailchimp>
-        </default>
+        <mailchimp>
+            <general>
+                <webhook_active>1</webhook_active>
+            </general>
+            <emailcatcher>
+                <popup_cancel>1</popup_cancel>
+                <popup_subscription>1</popup_subscription>
+                <popup_heading>Welcome to our store!</popup_heading>
+                <popup_text>Please enter your email address to get the most out of our store and improve your shopping experience.</popup_text>
+                <popup_width>50</popup_width>
+                <popup_height>20</popup_height>
+                <popup_cookie_time>1</popup_cookie_time>
+                <popup_insist>1</popup_insist>
+            </emailcatcher>
+        </mailchimp>
     </default>
     <crontab>
         <jobs>
-            <mailchimp_bulksync_ecommerce_data>
+            <mailchimp_bulksync_data>
                 <schedule>
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>mailchimp/cron::syncEcommerceData</model>
+                    <model>mailchimp/cron::syncBatchData</model>
                 </run>
-            </mailchimp_bulksync_ecommerce_data>
+            </mailchimp_bulksync_data>
         </jobs>
     </crontab>
 </config>
