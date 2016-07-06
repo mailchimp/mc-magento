@@ -10,6 +10,9 @@
  * @date: 7/6/16 10:14 AM
  * @file: CartController.php
  */
+
+require_once Mage::getModuleDir('controllers', 'Mage_Checkout') . DS . 'CartController.php';
+
 class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
 {
     public function loadquoteAction()
