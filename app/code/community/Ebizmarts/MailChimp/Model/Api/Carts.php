@@ -12,11 +12,135 @@
 class Ebizmarts_MailChimp_Model_Api_Carts
 {
 
-    const BATCH_LIMIT = 1000;
+    const BATCH_LIMIT = 100;
+    const NEWCART = 'new';
+    const OLDCART = 'old';
 
-    /**
-     * WE WONT BE SENDING ABANDONED CARTS WITH BATCHES BUT INDIVIDUALLY
-     *
-     */
 
+    public function createBatchJson($mailchimpStoreId)
+    {
+        $allCarts = array();
+        if(!Mage::getConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE))
+        {
+            return $allCarts;
+        }
+        $firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_FIRSTDATE);
+        $counter = 0;
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.date('Y-m-d-H-i-s');
+        // get all the carts converted in orders (must be deleted on mailchimp)
+        $convertedCarts = Mage::getModel('sales/quote')->getCollection();
+        // get only the converted quotes
+        $convertedCarts->addFieldToFilter('is_active',array('eq'=>0));
+        // be sure that the quote are already in mailchimp
+        $convertedCarts->AddFieldToFilter('mailchimp_sync_delta',array(
+           array('neq' => '0000-00-00 00:00:00'),
+            array('null',false)
+        ));
+        // and not deleted
+        $convertedCarts->addFieldToFilter('mailchimp_deleted',array('eq'=>0));
+        // limit the collection
+        $convertedCarts->getSelect()->limit(self::BATCH_LIMIT);
+        foreach($convertedCarts as $cart)
+        {
+            $allCarts[$counter]['method'] = 'DELETE';
+            $allCarts[$counter]['path'] =  '/ecommerce/stores/' . $mailchimpStoreId . '/carts/'.$cart->getEntityId();
+            $allCarts[$counter]['operation_id'] = $batchId . '_' . $cart->getEntityId();
+            $allCarts[$counter]['body'] = '';
+            $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+            $cart->setMailchimpDeleted(1);
+            $cart->save();
+            $counter += 1;
+        }
+
+        // get all the carts modified but not converted in orders
+
+        // get new carts
+        $newCarts = Mage::getModel('sales/quote')->getCollection();
+        $newCarts->addFieldToFilter('is_active',array('eq'=>1))
+            ->addFieldToFilter('mailchimp_sync_delta',
+                array(
+                    array('eq'=>'0000-00-00 00:00:00'),
+                    array('null'=>true)
+                )
+            );
+        $newCarts->addFieldToFilter('created_at',array('from'=>$firstDate));
+        $newCarts->getSelect()->limit(self::BATCH_LIMIT);
+//        error_log((string)$newCarts->getSelect());
+
+        foreach($newCarts as $cart)
+        {
+            $cartJson = $this->_makeCart($cart,self::NEWCART);
+            $allCarts[$counter]['method'] = 'POST';
+            $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+            $allCarts[$counter]['operation_id'] = $batchId . '_' . $cart->getEntityId();
+            $allCarts[$counter]['body'] = $cartJson;
+            $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+            $cart->save();
+            $counter += 1;
+        }
+        return $allCarts;
+    }
+
+    protected function _makeCart($cart,$mode)
+    {
+        $oneCart = array();
+        $oneCart['id'] = $cart->getEntityId();
+        $oneCart['customer'] = $this->_getCustomer($cart);
+        $oneCart['campaign_id'] = 0;
+        $oneCart['checkout_url'] = $this->_getCheckoutUrl($cart);
+        $oneCart['currency_code'] = $cart->getQuoteCurrencyCode();
+        $oneCart['order_total'] = $cart->getGranTotal();
+        $oneCart['tax_total'] = 0;
+        $lines = array();
+        // get all items on the cart
+        $items = $cart->getAllVisibleItems();
+        $item_count = 0;
+        foreach($items as $item)
+        {
+            $line = array();
+            if($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+                $options = $item->getProductOptions();
+                $sku = $options['simple_sku'];
+                $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
+            }
+            else {
+                $variant = $item->getProductId();
+            }
+
+            $line['id'] = (string)$item_count;
+            $line['product_id'] = $item->getProductId();
+            $line['product_variant_id'] = $variant;
+            $line['quantity'] = (int)$item->getQtyOrdered();
+            $line['price'] = $item->getPrice();
+            $lines[] = $line;
+            $item_count += 1;
+        }
+        $oneCart['lines'] = $lines;
+
+        $jsonData = "";
+
+        //enconde to JSON
+        try {
+
+            $jsonData = json_encode($oneCart);
+
+        } catch (Exception $e) {
+            //json encode failed
+            Mage::helper('mailchimp')->logError("Carts ".$cart->getId()." json encode failed");
+        }
+
+        return $jsonData;
+    }
+    // @todo calculate the checkout url for the cart
+    protected function _getCheckoutUrl($cart)
+    {
+        $token = md5(rand(0, 9999999));
+        $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
+        $cart->setMailchimpToken($token);
+        return $url;
+    }
+    protected function _getCustomer($cart)
+    {
+        return '';
+    }
 }
