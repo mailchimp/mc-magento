@@ -36,6 +36,10 @@ class Ebizmarts_MailChimp_Model_Config
     const POPUP_COOKIE_TIME         = 'mailchimp/emailcatcher/popup_cookie_time';
     const POPUP_INSIST              = 'mailchimp/emailcatcher/popup_insist';
 
+    const ABANDONEDCART_ACTIVE      = 'mailchimp/abandonedcart/active';
+    const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
+    const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
+
     const IS_CUSTOMER   = "CUS";
     const IS_PRODUCT    = "PRO";
     const IS_ORDER      = "ORD";
