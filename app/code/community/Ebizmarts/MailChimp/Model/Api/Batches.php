@@ -34,7 +34,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     public function sendEcommerceBatch($mailchimpStoreId)
     {
-
         try {
 
         if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE) && Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
@@ -52,9 +51,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if (empty($productsArray)) {
                 //order operations
+                $cartsArray =Mage::getModel('mailchimp/api_carts')->createBatchJson($mailchimpStoreId);
+                Mage::log($cartsArray);
                 $ordersArray = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
             }
-            $batchArray['operations'] = array_merge($customersArray,$productsArray,$ordersArray);
+            $batchArray['operations'] = array_merge($customersArray,$productsArray,$ordersArray,$cartsArray);
 
             if (!empty($batchArray['operations'])) {
                 $batchJson = json_encode($batchArray);
