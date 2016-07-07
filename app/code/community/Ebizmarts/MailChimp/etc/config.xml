@@ -86,6 +86,13 @@
                 <class>Ebizmarts_MailChimp_Helper</class>
             </mailchimp>
         </helpers>
+        <fieldsets>
+            <sales_convert_quote>
+                <mailchimp_abandonedcart_flag>
+                    <to_order>*</to_order>
+                </mailchimp_abandonedcart_flag>
+            </sales_convert_quote>
+        </fieldsets>
     </global>
     <frontend>
         <translate>
