@@ -213,7 +213,6 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     public function addAbandonedToSalesOrderGrid($observer) {
-        Mage::log(__METHOD__);
         $block = $observer->getEvent()->getBlock();
         if($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
             $block->addColumnAfter('mailchimp_abandonedcart_flag', array(

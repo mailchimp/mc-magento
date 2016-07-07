@@ -8,15 +8,6 @@
     </modules>
     <global>
         <events>
-            <core_block_abstract_to_html_before>
-                <observers>
-                    <mailchimp_add_abandoned_to_grid_order>
-                        <type>model</type>
-                        <class>mailchimp/observer</class>
-                        <method>addAbandonedToSalesOrderGrid</method>
-                    </mailchimp_add_abandoned_to_grid_order>
-                </observers>
-            </core_block_abstract_to_html_before>
             <newsletter_subscriber_save_before>
                 <observers>
                     <mailchimp_subscribe_observer>
@@ -150,6 +141,15 @@
             </updates>
         </layout>
         <events>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <mailchimp_add_abandoned_to_grid_order>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>addAbandonedToSalesOrderGrid</method>
+                    </mailchimp_add_abandoned_to_grid_order>
+                </observers>
+            </core_block_abstract_to_html_before>
             <admin_system_config_changed_section_mailchimp>
                 <observers>
                     <mailchimp_save_config>
