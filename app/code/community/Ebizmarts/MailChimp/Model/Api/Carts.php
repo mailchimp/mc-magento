@@ -78,6 +78,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         // get all the carts modified but not converted in orders
 
+
         // get new carts
         $newCarts = Mage::getModel('sales/quote')->getCollection();
         $newCarts->addFieldToFilter('is_active',array('eq'=>1))
