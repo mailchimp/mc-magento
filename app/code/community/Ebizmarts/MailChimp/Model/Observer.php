@@ -211,4 +211,22 @@ class Ebizmarts_MailChimp_Model_Observer
         $ret = Mage::app()->getCookie()->get('mailchimp_campaign_id');
         return $ret;
     }
+
+    public function addAbandonedToSalesOrderGrid($observer) {
+        Mage::log(__METHOD__);
+        $block = $observer->getEvent()->getBlock();
+        if($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
+            $block->addColumnAfter('mailchimp_abandonedcart_flag', array(
+                    'header' => Mage::helper('mailchimp')->__('Cart Recovered'),
+                    'index' => 'mailchimp_abandonedcart_flag',
+                    'align' => 'center',
+                    'filter' => false,
+                    'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_abandoned',
+                    'sortable' => false,
+                    'width' => 170
+                )
+                , 'created_at');
+        }
+        return $observer;
+    }
 }
