@@ -13,9 +13,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 {
 
     const BATCH_LIMIT = 100;
-    const NEWCART = 'new';
-    const OLDCART = 'old';
+//    const NEWCART = 'new';
+//    const OLDCART = 'old';
 
+    protected $firstDate;
+    protected $counter;
+    protected $batchId;
 
     public function createBatchJson($mailchimpStoreId)
     {
@@ -24,16 +27,27 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         {
             return $allCarts;
         }
-        $firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_FIRSTDATE);
-        $counter = 0;
-        $batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.date('Y-m-d-H-i-s');
+        $this->firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_FIRSTDATE);
+        $this->counter = 0;
+        $$this->batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.date('Y-m-d-H-i-s');
         // get all the carts converted in orders (must be deleted on mailchimp)
+        $allCarts = array_merge($allCarts,$this->_getConvertedQuotes($mailchimpStoreId));
+        // get all the carts modified but not converted in orders
+        $allCarts = array_merge($allCarts,$this->_getModifiedQuotes($mailchimpStoreId));
+        // get new carts
+        $allCarts = array_merge($allCarts,$this->_getNewQuotes($mailchimpStoreId));
+        return $allCarts;
+    }
+
+    protected function _getConvertedQuotes($mailchimpStoreId)
+    {
+        $allCarts = array();
         $convertedCarts = Mage::getModel('sales/quote')->getCollection();
         // get only the converted quotes
         $convertedCarts->addFieldToFilter('is_active',array('eq'=>0));
         // be sure that the quote are already in mailchimp
         $convertedCarts->addFieldToFilter('mailchimp_sync_delta',array(
-           array('neq' => '0000-00-00 00:00:00'),
+            array('neq' => '0000-00-00 00:00:00'),
             array('null',false)
         ));
         // and not deleted
@@ -55,31 +69,63 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCartsForEmail->addFieldToFilter('customer_email',array('eq'=>$cart->getCustomerEmail()));
                 foreach($allCartsForEmail as $cartForEmail)
                 {
-                    $allCarts[$counter]['method'] = 'DELETE';
-                    $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartForEmail->getEntityId();
-                    $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartForEmail->getEntityId();
-                    $allCarts[$counter]['body'] = '';
+                    $allCarts[$this->counter]['method'] = 'DELETE';
+                    $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartForEmail->getEntityId();
+                    $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cartForEmail->getEntityId();
+                    $allCarts[$this->counter]['body'] = '';
                     $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
                     $cartForEmail->setMailchimpDeleted(1);
                     $cartForEmail->save();
-                    $counter += 1;
+                    $this->counter += 1;
                 }
                 $allCartsForEmail->clear();
             }
-            $allCarts[$counter]['method'] = 'DELETE';
-            $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cart->getEntityId();
-            $allCarts[$counter]['operation_id'] = $batchId . '_' . $cart->getEntityId();
-            $allCarts[$counter]['body'] = '';
+            $allCarts[$this->counter]['method'] = 'DELETE';
+            $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cart->getEntityId();
+            $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->counter]['body'] = '';
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
             $cart->setMailchimpDeleted(1);
             $cart->save();
-            $counter += 1;
+            $this->counter += 1;
         }
-
-        // get all the carts modified but not converted in orders
-
-
-        // get new carts
+        return $allCarts;
+    }
+    protected function _getModifiedQuotes($mailchimpStoreId)
+    {
+        $allCarts = array();
+        $modifiedCarts = Mage::getModel('sales/quote')->getCollection();
+        // select carts with no orders
+        $modifiedCarts->addFieldToFilter('is_active',array('eq'=>1));
+        // select carts already sent to mailchimp and moodifief after
+        $modifiedCarts->addFieldToFilter('mailchimp_sync_delta',array(
+            array('neq' => '0000-00-00 00:00:00'),
+            array('null',false)
+        ));
+        $modifiedCarts->addFieldToFilter('mailchimp_sync_delta',array('lt'=>new Zend_Db_Expr('updated_at')));
+        // and not deleted in mailchimp
+        $modifiedCarts->addFieldToFilter('mailchimp_deleted',array('eq'=>0));
+        foreach($modifiedCarts as $cart)
+        {
+            $allCarts[$this->counter]['method'] = 'DELETE';
+            $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cart->getEntityId();
+            $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->counter]['body'] = '';
+            $this->counter += 1;
+            $cartJson = $this->_makeCart($cart);
+            $allCarts[$this->counter]['method'] = 'POST';
+            $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+            $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->counter]['body'] = $cartJson;
+            $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+            $cart->save();
+            $this->counter += 1;
+        }
+        return $allCarts;
+    }
+    protected function _getNewQuotes($mailchimpStoreId)
+    {
+        $allCarts = array();
         $newCarts = Mage::getModel('sales/quote')->getCollection();
         $newCarts->addFieldToFilter('is_active',array('eq'=>1))
             ->addFieldToFilter('mailchimp_sync_delta',
@@ -88,25 +134,24 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     array('null'=>true)
                 )
             );
-        $newCarts->addFieldToFilter('created_at',array('from'=>$firstDate));
+        $newCarts->addFieldToFilter('created_at',array('from'=>$this->firstDate));
         $newCarts->addFieldToFilter('customer_email',array('notnull'=>true));
         $newCarts->getSelect()->limit(self::BATCH_LIMIT);
 
         foreach($newCarts as $cart)
         {
-            $cartJson = $this->_makeCart($cart,self::NEWCART);
-            $allCarts[$counter]['method'] = 'POST';
-            $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
-            $allCarts[$counter]['operation_id'] = $batchId . '_' . $cart->getEntityId();
-            $allCarts[$counter]['body'] = $cartJson;
+            $cartJson = $this->_makeCart($cart);
+            $allCarts[$this->counter]['method'] = 'POST';
+            $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+            $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->counter]['body'] = $cartJson;
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
             $cart->save();
-            $counter += 1;
+            $this->counter += 1;
         }
         return $allCarts;
     }
-
-    protected function _makeCart($cart,$mode)
+    protected function _makeCart($cart)
     {
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
