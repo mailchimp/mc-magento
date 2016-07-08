@@ -17,7 +17,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Abandoned  e
         $order = Mage::getModel('sales/order')->load($row->getData('entity_id'));
         if($order->getMailchimpAbandonedcartFlag())
         {
-            $result = '<img src="' . $this->getSkinUrl("mailchimp/images/logo-freddie-monocolor-200.png") . '" width="40" />';
+            $result = '<img src="' . $this->getSkinUrl("mailchimp/images/logo-freddie-monocolor-200.png") . '" width="40" title="recovered cart by Mailchimp" />';
         }
         else {
             $result = '';
