@@ -31,7 +31,7 @@ After these steps are finished all the Products, Customers and Orders will start
 
 ## Support
 
-Need support? [Click here](http://ebizmarts.com/contact-us)
+Need support? [Click here](http://ebizmarts.com/forums/view/6)
 
 ## License
 
