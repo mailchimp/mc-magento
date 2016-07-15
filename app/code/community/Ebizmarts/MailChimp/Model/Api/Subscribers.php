@@ -23,7 +23,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
             ->addFieldToFilter('mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
-                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+                array('lt' => Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG, $storeId))
             ));
         $collection->getSelect()->limit($limit);
         $subscriberArray = array();

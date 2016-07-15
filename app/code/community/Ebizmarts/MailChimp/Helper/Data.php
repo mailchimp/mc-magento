@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param null $websiteId
      * @return array
      */
-    public function getConfigScopeId($storeId = null, $websiteId = null)
+    protected function _getConfigScopeId($storeId = null, $websiteId = null)
     {
         $scopeArray = array();
         if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) // store level
@@ -37,41 +37,100 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get configuration value from back end and front end unless storeId is sent, in this last case it gets the configuration from the store Id sent
+     * Get current scope on back end
+     *
+     * @return array
+     */
+    public function getScope(){
+        $scopeArray = $this->_getConfigScopeId();
+        $scopeData = array();
+        if(isset($scopeArray['websiteId']) && $scopeArray['websiteId']){
+            $scopeData['scope'] = 'websites';
+            $scopeData['id'] = $scopeArray['websiteId'];
+        }elseif(isset($scopeArray['storeId']) && $scopeArray['storeId']){
+            $scopeData['scope'] = 'stores';
+            $scopeData['id'] = $scopeArray['storeId'];
+        }else{
+            $scopeData['scope'] = 'default';
+            $scopeData['id'] = 0;
+        }
+        return $scopeData;
+    }
+
+    /**
+     *  Get configuration value from back end and front end unless storeId is sent, in this last case it gets the configuration from the store Id sent
      *
      * @param $path
-     * @param null $storeId  If this is null it gets the config for the current store (works for back end and front end)
+     * @param null $storeId If this is null it gets the config for the current store (works for back end and front end)
+     * @param bool $returnParentValueIfNull
      * @return mixed|null
+     * @throws Mage_Core_Exception
      */
-    public function getConfigValue($path, $storeId = null)
+    public function getConfigValue($path, $storeId = null, $returnParentValueIfNull = false)
     {
         $scopeArray = array();
+        $configValue = null;
 
         //Get store scope for back end or front end
         if(!$storeId) {
-            $scopeArray = $this->getConfigScopeId();
-
+            $scopeArray = $this->_getConfigScopeId();
         }else{
-            $scopeArray['storeId'] = $storeId;
+//            if($returnParentValueIfNull) {
+//                //Array is returned in this case
+//                $configValue = $this->_getConfigValueWithScope($path, $storeId);
+//            }else{
+                $scopeArray['storeId'] = $storeId;
+//            }
         }
-        $configValue = null;
-        if (isset($scopeArray['websiteId']) && $scopeArray['websiteId']) {
-            //Website scope
-            if (Mage::app()->getWebsite($scopeArray['websiteId'])->getConfig($path)) {
-                $configValue = Mage::app()->getWebsite($scopeArray['websiteId'])->getConfig($path);
-            }
-        } elseif (isset($scopeArray['storeId']) && $scopeArray['storeId']) {
-            //Store view scope
-            if (Mage::getStoreConfig($path, $scopeArray['storeId'])) {
-                $configValue = Mage::getStoreConfig($path, $scopeArray['storeId']);
-            }
-        } else {
-            //Default config scope
-            if (Mage::getStoreConfig($path)) {
-                $configValue = Mage::getStoreConfig($path);
+        if(!$returnParentValueIfNull) {
+            if (isset($scopeArray['websiteId']) && $scopeArray['websiteId']) {
+                //Website scope
+                if (Mage::app()->getWebsite($scopeArray['websiteId'])->getConfig($path) !== null) {
+                    $configValue = Mage::app()->getWebsite($scopeArray['websiteId'])->getConfig($path);
+                }
+            } elseif (isset($scopeArray['storeId']) && $scopeArray['storeId']) {
+                //Store view scope
+                if (Mage::getStoreConfig($path, $scopeArray['storeId']) !== null) {
+                    $configValue = Mage::getStoreConfig($path, $scopeArray['storeId']);
+                }
+            } else {
+                //Default config scope
+                if (Mage::getStoreConfig($path) !== null) {
+                    $configValue = Mage::getStoreConfig($path);
+                }
             }
         }
         return $configValue;
+    }
+
+    /**
+     * If the config does not exist on that store view go up (storeId -> website -> default config) until config value is found and set scope and scopeId of the level where the config value was found.
+     *
+     * @param $path
+     * @param $storeId
+     * @return mixed|null
+     * @throws Mage_Core_Exception
+     */
+    protected function _getConfigValueWithScope($path, $storeId){
+        $configWithScopeArray = array();
+        $configValue = $this->getConfigValue($path, $storeId);
+        $scope = 'stores';
+        $scopeId = $storeId;
+        if ($configValue === null) {
+            $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+            $configValue = Mage::app()->getWebsite($websiteId)->getConfig($path);
+            $scope = 'websites';
+            $scopeId = $websiteId;
+            if ($configValue === null) {
+                $configValue = $this->getConfigValue($path, 0);
+                $scope = 'default';
+                $scopeId = 0;
+            }
+        }
+        $configWithScopeArray['scope'] = $scope;
+        $configWithScopeArray['scopeId'] = $scopeId;
+        $configWithScopeArray['value'] = $configValue;
+        return $configWithScopeArray;
     }
 
     /**
@@ -130,7 +189,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         //reset mailchimp minimum date to sync flag
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG, Varien_Date::now());
-            Mage::getConfig()->cleanCache();
+        Mage::getConfig()->cleanCache();
     }
 
     /**
@@ -148,6 +207,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $ret;
     }
 
+    /**
+     * Save error response from MailChimp's API in "MailChimp_Error.log" file.
+     * 
+     * @param $message
+     */
     public function logError($message)
     {
         if($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
@@ -155,6 +219,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Save request made to MailChimp's API in "MailChimp_Requests.log" file.
+     * 
+     * @param $message
+     */
     public function logRequest($message)
     {
         if($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
@@ -162,6 +231,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * @return string
+     */
     public function getWebhooksKey()
     {
         $crypt = md5((string)Mage::getConfig()->getNode('global/crypt/key'));
@@ -169,6 +241,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $key;
     }
+
+    /**
+     * Reset error messages from Products, Subscribers, Customers, Orders, Quotes and set them to be sent again.
+     */
     public function resetErrors()
     {
         // reset products with errors
@@ -234,5 +310,58 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $status = 'subscribed';
         }
         return $status;
+    }
+
+    /**
+     * Reset Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG on correct scope if list changes on back end's configuration.
+     *
+     * @param $storeId
+     * @return bool
+     */
+    public function handleListChange($storeId)
+    {
+        $clearCache = false;
+        $scopes = unserialize($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, 0));
+        if(isset($scopes['stores'])){
+            $pos = strpos($scopes['stores'], $storeId);
+            if($pos !== false){
+                $scopes = $this->_removeScopeData($scopes, 'stores', $storeId);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG, Varien_Date::now(), 'stores', $storeId);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($scopes), 'default', 0);
+                $clearCache = true;
+            }
+        }elseif(isset($scopes['websites'])){
+            $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+            $pos = strpos($scopes['websites'], $websiteId);
+            if($pos !== false){
+                $scopes = $this->_removeScopeData($scopes, 'websites', $websiteId);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG, Varien_Date::now(), 'websites', $websiteId);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($scopes), 'default', 0);
+                $clearCache = true;
+            }
+        }elseif(isset($scopes['default'])) {
+            $scopes = $this->_removeScopeData($scopes, 'default', 0);
+            Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG, Varien_Date::now(), 'default', 0);
+            Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($scopes), 'default', 0);
+            $clearCache = true;
+        }
+        return $clearCache;
+    }
+
+    /**
+     * Removes $scopeData from $scopesArray
+     * 
+     * @param $scopesArray
+     * @param $key
+     * @param $scopeData
+     * @return mixed
+     */
+    protected function _removeScopeData($scopesArray, $key, $scopeData){
+        $searchedValues = array($scopeData, ','.$scopeData, $scopeData.',');
+        $clearedArray = str_replace($searchedValues, '', $scopesArray[$key]);
+        if($clearedArray[$key] == ''){
+            unset($clearedArray[$key]);
+        }
+        return $clearedArray;
     }
 }

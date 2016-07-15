@@ -24,30 +24,15 @@ class Ebizmarts_MailChimp_Model_Observer
         $generalEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $ecommerceEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+        $oldList = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST);
         if($generalEnabled) {
             if($ecommerceEnabled) {
-                try {
-                    /**
-                     * CREATE MAILCHIMP STORE
-                     */
-                    $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
-                    if (!$mailchimpStore) {
-                        Mage::helper('mailchimp')->resetMCEcommerceData();
-                    }
-                    if (!Mage::helper('mailchimp')->getMCStoreId()) {
-                        Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration to create it.');
-                    }
-
-                } catch (Mailchimp_Error $e) {
-                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-
-                } catch (Exception $e) {
-                    Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                }
+                $this->_createMailChimpStore();
             }
 
             $this->_createWebhook($listId, $apiKey);
+            $this->_handleListChangeConfigValues($listId, $oldList);
+            
         }
 
         return $observer;
@@ -210,5 +195,49 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $ret = Mage::app()->getCookie()->get('mailchimp_campaign_id');
         return $ret;
+    }
+
+    protected function _createMailChimpStore(){
+        try {
+            /**
+             * CREATE MAILCHIMP STORE
+             */
+            $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
+            if (!$mailchimpStore) {
+                Mage::helper('mailchimp')->resetMCEcommerceData();
+            }
+            if (!Mage::helper('mailchimp')->getMCStoreId()) {
+                Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration to create it.');
+            }
+
+        } catch (Mailchimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        }
+    }
+    
+    protected function _handleListChangeConfigValues($listId, $oldListId){
+        $scopeData = Mage::helper('mailchimp')->getScope();
+        $listChangedScope = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, 0));
+        if(!is_array($listChangedScope)){
+            $listChangedScope = array();
+            $listChangedScope[$scopeData['scope']] = $scopeData['id'];
+        }elseif(!isset($listChangedScope[$scopeData['scope']])){
+            $listChangedScope[$scopeData['scope']] = $scopeData['id'];
+        }elseif(strpos($listChangedScope[$scopeData['scope']], $scopeData['id']) === false){
+                $listChangedScope[$scopeData['scope']] .= ','.$scopeData['id'];
+        }
+        if($oldListId){
+            if($listId != $oldListId){
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($listChangedScope));
+            }
+        }else{
+            Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($listChangedScope));
+        }
+        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST, $listId, $scopeData['scope'], $scopeData['id']);
+        Mage::getConfig()->cleanCache();
     }
 }
