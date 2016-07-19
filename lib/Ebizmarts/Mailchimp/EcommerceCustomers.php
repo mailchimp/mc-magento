@@ -78,6 +78,22 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
     }
 
     /**
+     * @param $storeId              The store id.
+     * @param $customerEmail        The email for the customer of a store.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @return mixed
+     * @throws Mailchimp_Error
+     * @throws Mailchimp_HttpError
+     */
+    public function getByEmail($storeId,$customerEmail,$fields=null,$excludeFields=null)
+    {
+        $_params = array('email_address'=>$customerEmail);
+        if($fields) $_params['fields']= $fields;
+        if($excludeFields) $_params['exclude_fields'] = $excludeFields;
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers',$_params,Ebizmarts_Mailchimp::GET);
+    }
+    /**
      * @param $storeId          The store id.
      * @param $customerId       A unique identifier for the customer.
      * @param $optInStatus      The customer’s opt-in status. This value will never overwrite the opt-in status of a pre-existing MailChimp list member,
