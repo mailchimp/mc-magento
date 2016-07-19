@@ -19,6 +19,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected $firstDate;
     protected $counter;
     protected $batchId;
+    protected $api = null;
 
     public function createBatchJson($mailchimpStoreId)
     {
@@ -29,7 +30,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
         $this->firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_FIRSTDATE);
         $this->counter = 0;
-        $$this->batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.date('Y-m-d-H-i-s');
+        $this->batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.date('Y-m-d-H-i-s');
         // get all the carts converted in orders (must be deleted on mailchimp)
         $allCarts = array_merge($allCarts,$this->_getConvertedQuotes($mailchimpStoreId));
         // get all the carts modified but not converted in orders
@@ -112,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
             $allCarts[$this->counter]['body'] = '';
             $this->counter += 1;
-            $cartJson = $this->_makeCart($cart);
+            $cartJson = $this->_makeCart($cart,$mailchimpStoreId);
             $allCarts[$this->counter]['method'] = 'POST';
             $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
             $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
@@ -140,7 +141,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         foreach($newCarts as $cart)
         {
-            $cartJson = $this->_makeCart($cart);
+            $cartJson = $this->_makeCart($cart,$mailchimpStoreId);
             $allCarts[$this->counter]['method'] = 'POST';
             $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
             $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
@@ -151,11 +152,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
         return $allCarts;
     }
-    protected function _makeCart($cart)
+    protected function _makeCart($cart,$mailchimpStoreId)
     {
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
-        $oneCart['customer'] = $this->_getCustomer($cart);
+        $oneCart['customer'] = $this->_getCustomer($cart,$mailchimpStoreId);
 //        $oneCart['campaign_id'] = '';
         $oneCart['checkout_url'] = $this->_getCheckoutUrl($cart);
         $oneCart['currency_code'] = $cart->getQuoteCurrencyCode();
@@ -209,39 +210,64 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $cart->setMailchimpToken($token);
         return $url;
     }
-    protected function _getCustomer($cart)
+    protected function _getCustomer($cart,$mailchimpStoreId)
     {
-        if (!$cart->getCustomerId()) {
+        $api = $this->_getApi();
+        $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
+        if($customers['total_items']>0)
+        {
             $customer = array(
-                "id" => "GUEST-" . date('Y-m-d-H-i-s'),
-                "email_address" => $cart->getCustomerEmail(),
-                "opt_in_status" => false
+              'id' => $customers['customers'][0]['id']
             );
-        } else {
-            $customer = array(
-                "id" => $cart->getCustomerId(),
-                "email_address" => $cart->getCustomerEmail(),
-                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
-            );
-            $billingAddress = $cart->getBillingAddress();
-            $street = $billingAddress->getStreet();
-            $customer["first_name"] = $cart->getCustomerFirstname();
-            $customer["last_name"] = $cart->getCustomerLastname();
-            $customer["address"] = array(
-                "address1" => $street[0],
-                "address2" => count($street) > 1 ? $street[1] : "",
-                "city" => $billingAddress->getCity(),
-                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-                "postal_code" => $billingAddress->getPostcode(),
-                "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
-                "country_code" => $billingAddress->getCountry()
-            );
-            //company
-            if ($billingAddress->getCompany()) {
-                $customer["company"] = $billingAddress->getCompany();
+        }
+        else {
+            if (!$cart->getCustomerId()) {
+                $customer = array(
+                    "id" => "GUEST-" . date('Y-m-d-H-i-s'),
+                    "email_address" => $cart->getCustomerEmail(),
+                    "opt_in_status" => false
+                );
+            } else {
+                try {
+                    $customer = array(
+                        "id" => $cart->getCustomerId(),
+                        "email_address" => $cart->getCustomerEmail(),
+                        "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                    );
+                    $customer["first_name"] = $cart->getCustomerFirstname();
+                    $customer["last_name"] = $cart->getCustomerLastname();
+                    $billingAddress = $cart->getBillingAddress();
+                    if ($billingAddress) {
+                        $street = $billingAddress->getStreet();
+                        $customer["address"] = array(
+                            "address1" => $street[0],
+                            "address2" => count($street) > 1 ? $street[1] : "",
+                            "city" => $billingAddress->getCity(),
+                            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+                            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+                            "postal_code" => $billingAddress->getPostcode(),
+                            "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+                            "country_code" => $billingAddress->getCountry()
+                        );
+                    }
+                    //company
+                    if ($billingAddress->getCompany()) {
+                        $customer["company"] = $billingAddress->getCompany();
+                    }
+                } catch (Exception $e) {
+                    Mage::log($e->getMessage());
+                }
             }
         }
         return $customer;
+    }
+    protected function _getApi()
+    {
+        if(!$this->api)
+        {
+            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+            $this->api = new Ebizmarts_Mailchimp($apiKey);
+        }
+        return $this->api;
     }
 }
