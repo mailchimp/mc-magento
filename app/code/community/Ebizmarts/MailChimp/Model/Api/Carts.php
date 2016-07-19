@@ -13,8 +13,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 {
 
     const BATCH_LIMIT = 100;
-//    const NEWCART = 'new';
-//    const OLDCART = 'old';
 
     protected $firstDate;
     protected $counter;
