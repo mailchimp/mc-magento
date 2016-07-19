@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
                             ->setRedirect($url, 301);
                     } else {
                         Mage::getSingleton('customer/session')->addNotice("Login to complete your order");
-                        $this->_redirect('customer/account');
+                        $this->_redirect('customer/account/login?mc_cid='.$params['mc_cid']);
                     }
                 }
             }
