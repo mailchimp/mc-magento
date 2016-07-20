@@ -1,4 +1,3 @@
-
     function getCampaign() {
         var urlparams = location.search.substr(1).split('&');
         var params = new Array();
