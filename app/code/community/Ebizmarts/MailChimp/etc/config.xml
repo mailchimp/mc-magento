@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.0.4.2</version>
+            <version>1.0.6</version>
         </Ebizmarts_MailChimp>
     </modules>
     <global>
@@ -26,12 +26,20 @@
             </newsletter_subscriber_delete_after>
             <sales_order_place_before>
                 <observers>
-                    <mailchimp_subscribe_checkout>
+                    <mailchimp_subscribe_checkout_before>
                         <class>mailchimp/observer</class>
                         <method>saveCampaignData</method>
-                    </mailchimp_subscribe_checkout>
+                    </mailchimp_subscribe_checkout_before>
                 </observers>
             </sales_order_place_before>
+            <sales_order_place_after>
+                <observers>
+                    <mailchimp_subscribe_checkout_after>
+                        <class>mailchimp/observer</class>
+                        <method>removeCampaignData</method>
+                    </mailchimp_subscribe_checkout_after>
+                </observers>
+            </sales_order_place_after>
         </events>
         <models>
             <mailchimp>
@@ -86,6 +94,13 @@
                 <class>Ebizmarts_MailChimp_Helper</class>
             </mailchimp>
         </helpers>
+        <fieldsets>
+            <sales_convert_quote>
+                <mailchimp_abandonedcart_flag>
+                    <to_order>*</to_order>
+                </mailchimp_abandonedcart_flag>
+            </sales_convert_quote>
+        </fieldsets>
     </global>
     <frontend>
         <translate>
@@ -134,6 +149,15 @@
             </updates>
         </layout>
         <events>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <mailchimp_add_abandoned_to_grid_order>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>addAbandonedToSalesOrderGrid</method>
+                    </mailchimp_add_abandoned_to_grid_order>
+                </observers>
+            </core_block_abstract_to_html_before>
             <admin_system_config_changed_section_mailchimp>
                 <observers>
                     <mailchimp_save_config>
