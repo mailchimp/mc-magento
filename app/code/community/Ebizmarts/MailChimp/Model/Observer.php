@@ -24,30 +24,15 @@ class Ebizmarts_MailChimp_Model_Observer
         $generalEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $ecommerceEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+        $oldList = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST);
         if($generalEnabled) {
             if($ecommerceEnabled) {
-                try {
-                    /**
-                     * CREATE MAILCHIMP STORE
-                     */
-                    $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
-                    if (!$mailchimpStore) {
-                        Mage::helper('mailchimp')->resetMCEcommerceData();
-                    }
-                    if (!Mage::helper('mailchimp')->getMCStoreId()) {
-                        Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration to create it.');
-                    }
-
-                } catch (Mailchimp_Error $e) {
-                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-
-                } catch (Exception $e) {
-                    Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                }
+                $this->_createMailChimpStore();
             }
 
             $this->_createWebhook($listId, $apiKey);
+            $this->_handleListChangeConfigValues($listId, $oldList);
+            
         }
 
         return $observer;
@@ -126,7 +111,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if($isEnabled){
             $subscriber = $observer->getEvent()->getSubscriber();
             if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->addGuestSubscriber($subscriber);
+                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
             }
         }
     }
@@ -137,7 +122,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if($isEnabled){
             $subscriber = $observer->getEvent()->getSubscriber();
             if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->removeSubscriber($subscriber);
+                Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
             }
         }
     }
@@ -233,6 +218,70 @@ class Ebizmarts_MailChimp_Model_Observer
                     'width' => 170
                 )
                 , 'created_at');
+        }
+        return $observer;
+    }
+
+    protected function _createMailChimpStore(){
+        try {
+            /**
+             * CREATE MAILCHIMP STORE
+             */
+            $mailchimpStore = Mage::getModel('mailchimp/api_stores')->getMailChimpStore();
+            if (!$mailchimpStore) {
+                Mage::helper('mailchimp')->resetMCEcommerceData();
+            }
+            if (!Mage::helper('mailchimp')->getMCStoreId()) {
+                Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration to create it.');
+            }
+
+        } catch (Mailchimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+
+        } catch (Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        }
+    }
+    
+    protected function _handleListChangeConfigValues($listId, $oldListId){
+        $scopeData = Mage::helper('mailchimp')->getScope();
+        $listChangedScope = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, 0));
+        if(!is_array($listChangedScope)){
+            $listChangedScope = array();
+            $listChangedScope[$scopeData['scope']] = $scopeData['id'];
+        }elseif(!isset($listChangedScope[$scopeData['scope']])){
+            $listChangedScope[$scopeData['scope']] = $scopeData['id'];
+        }elseif(strpos($listChangedScope[$scopeData['scope']], $scopeData['id']) === false){
+                $listChangedScope[$scopeData['scope']] .= ','.$scopeData['id'];
+        }
+        if($oldListId){
+            if($listId != $oldListId){
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($listChangedScope));
+            }
+        }else{
+            Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($listChangedScope));
+        }
+        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST, $listId, $scopeData['scope'], $scopeData['id']);
+        Mage::getConfig()->cleanCache();
+    }
+
+    public function loadCustomerToQuote(Varien_Event_Observer $observer)
+    {
+        $quote = $observer->getEvent()->getQuote();
+        if (!Mage::getSingleton('customer/session')->isLoggedIn() && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $quote->getStoreId())) {
+            $action = Mage::app()->getRequest()->getActionName();
+            $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' || $action == 'saveShippingMethod' || $action == 'saveBilling');
+            if(Mage::getModel('core/cookie')->get('email') && Mage::getModel('core/cookie')->get('email')!= 'none' && !$onCheckout) {
+                $emailCookie = Mage::getModel('core/cookie')->get('email');
+                $emailCookieArr = explode('/', $emailCookie);
+                $email = $emailCookieArr[0];
+                $email = str_replace(' ', '+', $email);
+                if ($quote->getCustomerEmail() != $email) {
+                    $quote->setCustomerEmail($email)
+                        ->save();
+                }
+            }
         }
         return $observer;
     }

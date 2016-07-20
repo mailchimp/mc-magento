@@ -130,7 +130,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
