@@ -76,19 +76,20 @@
                             $counter = $_COOKIE['counter'];
                             //if(counter en config == counter en db){
                             if(($counter+1) >= Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId())): ?>
-                        document.cookie = 'counter=; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-                        createCookie('email=none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        Mage.Cookies.clear('counter');
+                        //document.cookie = 'counter=; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+                        createCookie('email', 'none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
                         <?php else: ?>
-                        createCookie('counter='+<?php Print(json_encode((1+$counter))); ?>,<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        createCookie('counter',<?php Print(json_encode((1+$counter))); ?>,<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
 //                        $counter->setCounter(($counter->getCounter()+1));
 //                        $counter->save();
                         <?php endif; ?>
                         <?php else:
                         //create cookie counter in 0
                             if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_INSIST, Mage::app()->getStore()->getId()) == 1): ?>
-                        createCookie('email=none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        createCookie('email','none', <?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
                         <?php else: ?>
-                        createCookie('counter=1',<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
+                        createCookie('counter',1,<?php Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>);
 //                            $newCounter = Mage::getModel('mailchimp/popup');
 //                            $newCounter->setCounter(1)->save();
 //                        createCookie('counter=' +<?php //Print(json_encode($newCounter->getId())); ?>//, <?php //Print(json_encode(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_COOKIE_TIME, $this->_getStoreId()))); ?>//);
@@ -111,9 +112,9 @@
                         }
                         if (validateEmail(email)) {
                             var cookie = 'email=' + email + '/' + fname + '/' + lname;
-                            createCookie(cookie, 365);
+                            createCookie('email',email + '/' + fname + '/' + lname, 365);
                             <?php if($this->_modalSubscribe()): ?>
-                            createCookie('subscribe=true', 365);
+                            createCookie('subscribe','true', 365);
                             location.reload();
                             <?php else: ?>
                             win.close();
@@ -147,20 +148,28 @@
             return re.test(email);
         }
         function emailCookieExists() {
-            var cookie = document.cookie;
-            var cookieArr = cookie.split(';');
-            var cookieStored = false;
-            for (var i = 0; i < cookieArr.length; i++) {
-                if (cookieArr[i].indexOf('email=') > -1) {
-                    cookieStored = true;
-                }
+            if(Mage.Cookies.get('email')) {
+                return true
             }
-            return cookieStored;
+            else {
+                return false
+            }
+//            var cookie = document.cookie;
+//            var cookieArr = cookie.split(';');
+//            var cookieStored = false;
+//            for (var i = 0; i < cookieArr.length; i++) {
+//                if (cookieArr[i].indexOf('email=') > -1) {
+//                    cookieStored = true;
+//                }
+//            }
+//            return cookieStored;
         }
-        function createCookie(cookie, expirationInDays) {
+        function createCookie(name, value, expirationInDays) {
             var now = new Date();
             var expire = new Date(now.getTime() + (expirationInDays * 24 * 60) * 60000);//[(1 * 365 * 24 * 60) * 60000] == 1 year  -- (Years * Days * Hours * Minutes) * 60000
-            document.cookie = cookie + '; expires=' + expire + '; path=/';
+            //document.cookie = cookie + '; expires=' + expire + '; path=/';
+            var mageCookie = Mage.Cookies.set(name,value)
+            mageCookie.expires = expire
         }
     </script>
 <?php endif; ?>
