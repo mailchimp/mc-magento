@@ -264,7 +264,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if(!$this->api)
         {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            $this->api = new Ebizmarts_Mailchimp($apiKey);
+            $this->api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         }
         return $this->api;
     }

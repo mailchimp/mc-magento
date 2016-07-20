@@ -137,7 +137,7 @@ class Ebizmarts_Mailchimp
     const DELETE    = 'DELETE';
     const PUT       = 'PUT';
 
-    public function __construct($apiKey=null,$opts=array())
+    public function __construct($apiKey=null,$opts=array(),$userAgent=null)
     {
         if(!$apiKey)
         {
@@ -167,8 +167,12 @@ class Ebizmarts_Mailchimp
         if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
             curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, true);
         }
-
-        curl_setopt($this->_ch, CURLOPT_USERAGENT, 'Ebizmart-MailChimp-PHP/3.0.0');
+        if($userAgent) {
+            curl_setopt($this->_ch, CURLOPT_USERAGENT, $userAgent);
+        }
+        else {
+            curl_setopt($this->_ch, CURLOPT_USERAGENT, 'Ebizmart-MailChimp-PHP/3.0.0');
+        }
         curl_setopt($this->_ch, CURLOPT_HEADER, false);
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT, 30);

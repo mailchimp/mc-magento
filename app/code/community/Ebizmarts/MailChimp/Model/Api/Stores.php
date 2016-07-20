@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 
         if (!is_null($apiKey) && $apiKey != "") {
-            $api = new Ebizmarts_Mailchimp($apiKey);
+            $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
             $storeExists = null;
             $storeId = Mage::helper('mailchimp')->getMCStoreId();
 
@@ -70,7 +70,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
                 $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
 
-                $api = new Ebizmarts_Mailchimp($apiKey);
+                $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
                 $api->ecommerce->stores->add($store_id, $listId, $storeName, 'Magento', null, $store_email, $currencyCode);
 
             } else {
@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            $api = new Ebizmarts_Mailchimp($apiKey);
+            $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
             $api->ecommerce->stores->delete($storeId);
             $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/synchbatches');

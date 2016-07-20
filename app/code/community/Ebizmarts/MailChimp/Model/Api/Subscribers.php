@@ -77,7 +77,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
         $status = Mage::helper('mailchimp')->getStatus();
-        $api = new Ebizmarts_Mailchimp($apiKey);
+        $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         $mergeVars = $this->getMergeVars($subscriber);
         try {
             $api->lists->members->add($listId, null, $status, $subscriber->getSubscriberEmail(), $mergeVars);
@@ -92,7 +92,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     public function removeSubscriber($subscriber){
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $api = new Ebizmarts_Mailchimp($apiKey);
+        $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');

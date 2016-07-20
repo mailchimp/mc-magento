@@ -63,7 +63,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if (FALSE != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
         }
-        $api = new Ebizmarts_Mailchimp($apiKey);
+        $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         if(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_TWO_WAY_SYNC)) {
             $events = array(
                 'subscribe' => true,

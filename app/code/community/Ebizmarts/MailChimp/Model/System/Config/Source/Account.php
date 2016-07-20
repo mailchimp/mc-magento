@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         $mcStoreId = (Mage::helper('mailchimp')->getMCStoreId()) ? Mage::helper('mailchimp')->getMCStoreId() : null;
         $api = null;
         if($configValue){
-            $api = new Ebizmarts_Mailchimp($configValue);
+            $api = new Ebizmarts_Mailchimp($configValue,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         }
         if($api) {
             try {

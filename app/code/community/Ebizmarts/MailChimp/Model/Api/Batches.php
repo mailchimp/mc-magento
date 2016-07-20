@@ -70,7 +70,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         //log request
                         Mage::helper('mailchimp')->logRequest($batchJson);
 
-                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
                         $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
                         //save batch id to db
@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         //log request
                         Mage::helper('mailchimp')->logRequest($batchJson);
 
-                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
+                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
                         $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
 
                         //save batch id to db
@@ -155,7 +155,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $files = array();
         $baseDir = Mage::getBaseDir();
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-        $api = new Ebizmarts_Mailchimp($apiKey);
+        $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         // check the status of the job
         $response = $api->batchOperation->status($batchId);
         if ($response['status'] == 'finished') {
