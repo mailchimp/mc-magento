@@ -266,7 +266,7 @@ class Ebizmarts_MailChimp_Model_Observer
         Mage::getConfig()->cleanCache();
     }
 
-    public function loadCustomer(Varien_Event_Observer $observer)
+    public function loadCustomerToQuote(Varien_Event_Observer $observer)
     {
         $quote = $observer->getEvent()->getQuote();
         if (!Mage::getSingleton('customer/session')->isLoggedIn() && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $quote->getStoreId())) {

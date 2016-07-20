@@ -168,8 +168,8 @@
             var now = new Date();
             var expire = new Date(now.getTime() + (expirationInDays * 24 * 60) * 60000);//[(1 * 365 * 24 * 60) * 60000] == 1 year  -- (Years * Days * Hours * Minutes) * 60000
             //document.cookie = cookie + '; expires=' + expire + '; path=/';
-            var mageCookie = Mage.Cookies.set(name,value)
-            mageCookie.expires = expire
+            Mage.Cookies.expires = expire;
+            Mage.Cookies.set(name,value);
         }
     </script>
 <?php endif; ?>
