@@ -42,7 +42,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $product) {
             //define variants and root products
-            if($product->getMailchimpSyncModified()&&!$product->getMailchimpSyncDelta()) {
+            if($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
                 $data = $this->_buildOldProductRequest($product,$batchId,$mailchimpStoreId);
             }
             else {
@@ -66,7 +66,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
         return $batchArray;
     }
-
     protected function _buildNewProductRequest($product,$batchId,$mailchimpStoreId)
     {
         $variantProducts = array();
