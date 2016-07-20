@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
     const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
     const GENERAL_LOG                   = 'mailchimp/general/enable_log';
+    const GENERAL_MAP_FIELDS        = 'mailchimp/general/map_fields';
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
 

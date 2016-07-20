@@ -294,25 +294,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get status to send confirmation if Need to Confirm enabled on Magento
-     *
-     * @param null $subscriber
-     * @return string
-     */
-    public function getStatus($subscriber = null)
-    {
-        if($this->getConfigValue(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG) && (!$subscriber || $subscriber->getStatus() != 'subscribed'))
-        {
-            $status = 'pending';
-        }
-        else
-        {
-            $status = 'subscribed';
-        }
-        return $status;
-    }
-
-    /**
      * Reset Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG on correct scope if list changes on back end's configuration.
      *
      * @param $storeId

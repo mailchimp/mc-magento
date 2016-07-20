@@ -111,7 +111,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if($isEnabled){
             $subscriber = $observer->getEvent()->getSubscriber();
             if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->addGuestSubscriber($subscriber);
+                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
             }
         }
     }
@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if($isEnabled){
             $subscriber = $observer->getEvent()->getSubscriber();
             if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->removeSubscriber($subscriber);
+                Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
             }
         }
     }
