@@ -206,10 +206,18 @@ class Ebizmarts_MailChimp_Model_Observer
         }
     }
 
+    public function removeCampaignData(Varien_Event_Observer $observer)
+    {
+        if($this->_getCampaignCookie())
+        {
+            Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
+        }
+        return $observer;
+    }
+
     protected function _getCampaignCookie()
     {
-        $ret = Mage::app()->getCookie()->get('mailchimp_campaign_id');
-        return $ret;
+        return Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
     }
 
     public function addAbandonedToSalesOrderGrid($observer) {
