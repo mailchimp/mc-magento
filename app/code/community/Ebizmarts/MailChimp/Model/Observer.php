@@ -265,4 +265,24 @@ class Ebizmarts_MailChimp_Model_Observer
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST, $listId, $scopeData['scope'], $scopeData['id']);
         Mage::getConfig()->cleanCache();
     }
+
+    public function loadCustomer(Varien_Event_Observer $observer)
+    {
+        $quote = $observer->getEvent()->getQuote();
+        if (!Mage::getSingleton('customer/session')->isLoggedIn() && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $quote->getStoreId())) {
+            $action = Mage::app()->getRequest()->getActionName();
+            $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' || $action == 'saveShippingMethod' || $action == 'saveBilling');
+            if(Mage::getModel('core/cookie')->get('email') && Mage::getModel('core/cookie')->get('email')!= 'none' && !$onCheckout) {
+                $emailCookie = Mage::getModel('core/cookie')->get('email');
+                $emailCookieArr = explode('/', $emailCookie);
+                $email = $emailCookieArr[0];
+                $email = str_replace(' ', '+', $email);
+                if ($quote->getCustomerEmail() != $email) {
+                    $quote->setCustomerEmail($email)
+                        ->save();
+                }
+            }
+        }
+        return $observer;
+    }
 }

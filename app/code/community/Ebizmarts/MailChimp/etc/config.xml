@@ -103,6 +103,16 @@
         </fieldsets>
     </global>
     <frontend>
+        <events>
+            <sales_quote_save_before>
+                <observers>
+                    <ebizmarts_mailchimp_quote_save>
+                        <class>mailchimp/observer</class>
+                        <method>loadCustomerToQuote</method>
+                    </ebizmarts_mailchimp_quote_save>
+                </observers>
+            </sales_quote_save_before>
+        </events>
         <translate>
             <modules>
                 <Ebizmarts_MailChimp>
