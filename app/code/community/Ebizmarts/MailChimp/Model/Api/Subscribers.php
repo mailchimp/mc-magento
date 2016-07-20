@@ -76,7 +76,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     public function updateSubscriber($subscriber){
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $status = Mage::helper('mailchimp')->getStatus();
+        $status = $this->_getMCStatus($subscriber->getStatus());
         $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         $mergeVars = $this->getMergeVars($subscriber);
         try {

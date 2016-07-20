@@ -218,8 +218,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $files = array();
         $baseDir = Mage::getBaseDir();
-        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY, $storeId);
         $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        $response = array();
         // check the status of the job
         try {
             $response = $api->batchOperation->status($batchId);
