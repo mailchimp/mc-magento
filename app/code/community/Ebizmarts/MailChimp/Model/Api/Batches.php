@@ -84,7 +84,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $batchArray['operations'] = array_merge($batchArray['operations'],$productsArray);
             if (empty($productsArray)) {
                 //order operations
-                $cartsArray =Mage::getModel('mailchimp/api_carts')->createBatchJson($mailchimpStoreId);
+                $cartsArray = Mage::getModel('mailchimp/api_carts')->createBatchJson($mailchimpStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'],$cartsArray);
                 $ordersArray = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'],$ordersArray);
