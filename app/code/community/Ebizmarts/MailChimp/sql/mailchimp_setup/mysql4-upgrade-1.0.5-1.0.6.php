@@ -19,6 +19,7 @@ $installer->startSetup();
 try {
     $installer->run("
  ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_deleted` INT(1) NOT NULL DEFAULT 0;
+ ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_deleted` INT(1) NOT NULL DEFAULT 0;
  ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_token` VARCHAR(255) NOT NULL DEFAULT '';
  ALTER TABLE `{$this->getTable('sales_flat_quote')}` ADD column `mailchimp_abandonedcart_flag` INT(1) NOT NULL DEFAULT 0;
  ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD column `mailchimp_abandonedcart_flag` INT(1) NOT NULL DEFAULT 0;
@@ -26,7 +27,7 @@ try {
 }
 catch (Exception $e)
 {
-    Mage::helper('mailchimp')->logError($e->getMessage());
+    Mage::log($e->getMessage());
 }
 
 $installer->endSetup();
