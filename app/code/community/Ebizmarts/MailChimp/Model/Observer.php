@@ -278,8 +278,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $email = $emailCookieArr[0];
                 $email = str_replace(' ', '+', $email);
                 if ($quote->getCustomerEmail() != $email) {
-                    $quote->setCustomerEmail($email)
-                        ->save();
+                    $quote->setCustomerEmail($email);
                 }
             }
         }

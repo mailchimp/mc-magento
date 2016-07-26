@@ -17,38 +17,70 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     public function createBatchJson($mailchimpStoreId)
     {
-            //create missing products first
-            $collection = Mage::getModel('sales/order')->getCollection()
-                ->addAttributeToSelect('status')
-                ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToSelect('entity_id')
-                ->addFieldToFilter('status', 'complete')
-                ->addFieldToFilter('mailchimp_sync_delta', array(
-                    array('null' => true),
-                    array('eq' => ''),
-                    array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
-                ));
-            $collection->getSelect()->limit(self::BATCH_LIMIT);
+        //create missing products first
+        $collection = Mage::getModel('sales/order')->getCollection()
+            ->addAttributeToSelect('status')
+            ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToSelect('entity_id')
+            ->addFieldToFilter('state', 'complete')
+            ->addFieldToFilter('mailchimp_sync_delta', array(
+                array('null' => true),
+                array('eq' => ''),
+                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ));
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-            $batchArray = array();
-            $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
-            $counter = 0;
-            foreach ($collection as $order) {
-                $orderJson = $this->GeneratePOSTPayload($order,$mailchimpStoreId);
-                if (!empty($orderJson)) {
-                    $batchArray[$counter]['method'] = "POST";
-                    $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
-                    $batchArray[$counter]['body'] = $orderJson;
+        $batchArray = array();
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
+        $counter = 0;
+        foreach ($collection as $order) {
+            $orderJson = $this->GeneratePOSTPayload($order,$mailchimpStoreId);
+            if (!empty($orderJson)) {
+                $batchArray[$counter]['method'] = "POST";
+                $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
+                $batchArray[$counter]['body'] = $orderJson;
 
-                    //update order delta
-                    $order->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $order->save();
-                }
-                $counter += 1;
+                //update order delta
+                $order->setData("mailchimp_sync_delta", Varien_Date::now());
+                $order->save();
             }
+            $counter += 1;
+        }
 
-            return $batchArray;
+        return $batchArray;
+    }
+
+    public function createCanceledBatchJson($mailchimpStoreId)
+    {
+        //create missing products first
+        $collection = Mage::getModel('sales/order')->getCollection()
+            ->addAttributeToSelect('status')
+            ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToSelect('entity_id')
+            ->addFieldToFilter('state', 'canceled')
+            ->addFieldToFilter('mailchimp_sync_delta', array(
+                array('null' => true),
+                array('eq' => ''),
+                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ));
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
+
+        $batchArray = array();
+        $counter = 0;
+        foreach ($collection as $order) {
+            if (!empty($orderJson)) {
+                $batchArray[$counter]['method'] = "DELETE";
+                $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getEntityId();
+
+                //update order delta
+                $order->setData("mailchimp_sync_delta", Varien_Date::now());
+                $order->save();
+            }
+            $counter += 1;
+        }
+
+        return $batchArray;
     }
 
     protected function GeneratePOSTPayload($order_from_collection,$mailchimpStoreId)
