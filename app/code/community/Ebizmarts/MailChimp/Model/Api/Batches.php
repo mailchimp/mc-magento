@@ -299,23 +299,43 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     switch ($type) {
                         case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
                             $p = Mage::getModel('catalog/product')->load($id);
-                            $p->setData("mailchimp_sync_error", $error);
-                            $p->save();
+                            if($p->getId()==$id) {
+                                $p->setData("mailchimp_sync_error", $error);
+                                $p->save();
+                            }
+                            else {
+                                Mage::helper('mailchimp')->logError("Error: product ".$id." not found");
+                            }
                             break;
                         case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
                             $c = Mage::getModel('customer/customer')->load($id);
-                            $c->setData("mailchimp_sync_error", $error);
-                            $c->save();
+                            if($c->getId()==$id) {
+                                $c->setData("mailchimp_sync_error", $error);
+                                $c->save();
+                            }
+                            else {
+                                Mage::helper('mailchimp')->logError("Error: customer ".$id." not found");
+                            }
                             break;
                         case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
                             $o = Mage::getModel('sales/order')->load($id);
-                            $o->setData("mailchimp_sync_error", $error);
-                            $o->save();
+                            if($o->getId()==$id) {
+                                $o->setData("mailchimp_sync_error", $error);
+                                $o->save();
+                            }
+                            else {
+                                Mage::helper('mailchimp')->logError("Error: order ".$id." not found");
+                            }
                             break;
                         case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
                             $q = Mage::getModel('sales/quote')->load($id);
-                            $q->setData("mailchimp_sync_error", $error);
-                            $q->save();
+                            if($q->getId()==$id) {
+                                $q->setData("mailchimp_sync_error", $error);
+                                $q->save();
+                            }
+                            else {
+                                Mage::helper('mailchimp')->logError("Error: quote ".$id." not found");
+                            }
                             break;
                         default:
                             Mage::helper('mailchimp')->logError("Error: no identification ".$type." found");
