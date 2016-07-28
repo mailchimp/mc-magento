@@ -151,10 +151,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
                 $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
                 $allCarts[$this->counter]['body'] = $cartJson;
-                $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cart->save();
-                $this->counter += 1;
             }
+            $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+            $cart->save();
+            $this->counter += 1;
         }
         return $allCarts;
     }
@@ -176,9 +176,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             );
         $newCarts->addFieldToFilter('created_at',array('from'=>$this->firstDate));
         $newCarts->addFieldToFilter('customer_email',array('notnull'=>true));
+        $newCarts->addFieldToFilter('items_count',array('gt'=>0));
         $newCarts->getSelect()->limit(self::BATCH_LIMIT);
         foreach($newCarts as $cart)
         {
+            if(!count($cart->getAllVisibleItems())) {
+                continue;
+            }
             $customer = Mage::getModel("customer/customer");
             $customer->setWebsiteId(Mage::getModel('core/store')->load($cart->getStoreId())->getWebsiteId());
             $customer->loadByEmail($cart->getCustomerEmail());
@@ -200,16 +204,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             {
                 continue;
             }
-            if(count($cart->getAllVisibleItems())) {
-                $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
-                $allCarts[$this->counter]['method'] = 'POST';
-                $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
-                $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
-                $allCarts[$this->counter]['body'] = $cartJson;
-                $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cart->save();
-                $this->counter += 1;
-            }
+            $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
+            $allCarts[$this->counter]['method'] = 'POST';
+            $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+            $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->counter]['body'] = $cartJson;
+            $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+            $cart->save();
+            $this->counter += 1;
         }
         return $allCarts;
     }
