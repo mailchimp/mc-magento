@@ -145,7 +145,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             {
                 continue;
             }
-            if($cart->getAllVisibleItems().count()) {
+            if(count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
                 $allCarts[$this->counter]['method'] = 'POST';
                 $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
@@ -200,7 +200,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             {
                 continue;
             }
-            if($cart->getAllVisibleItems().count()) {
+            if(count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
                 $allCarts[$this->counter]['method'] = 'POST';
                 $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
