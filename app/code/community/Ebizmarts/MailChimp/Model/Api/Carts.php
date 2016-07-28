@@ -143,10 +143,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
                 $allCarts[$this->counter]['operation_id'] = $this->batchId . '_' . $cart->getEntityId();
                 $allCarts[$this->counter]['body'] = $cartJson;
+                $this->counter += 1;
             }
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
             $cart->save();
-            $this->counter += 1;
         }
         return $allCarts;
     }
