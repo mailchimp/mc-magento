@@ -311,35 +311,37 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     "opt_in_status" => false
                 );
             } else {
-                try {
-                    $customer = array(
-                        "id" => $cart->getCustomerId(),
-                        "email_address" => $cart->getCustomerEmail(),
-                        "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
-                    );
-                    $customer["first_name"] = $cart->getCustomerFirstname();
-                    $customer["last_name"] = $cart->getCustomerLastname();
-                    $billingAddress = $cart->getBillingAddress();
-                    if ($billingAddress) {
-                        $street = $billingAddress->getStreet();
-                        $customer["address"] = array(
-                            "address1" => $street[0],
-                            "address2" => count($street) > 1 ? $street[1] : "",
-                            "city" => $billingAddress->getCity(),
-                            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-                            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-                            "postal_code" => $billingAddress->getPostcode(),
-                            "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
-                            "country_code" => $billingAddress->getCountry()
-                        );
-                    }
-                    //company
-                    if ($billingAddress->getCompany()) {
-                        $customer["company"] = $billingAddress->getCompany();
-                    }
-                } catch (Exception $e) {
-                    Mage::log($e->getMessage());
-                }
+                $customer = array(
+                    "id" => $cart->getCustomerId(),
+                    "email_address" => $cart->getCustomerEmail(),
+                    "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                );
+            }
+            $firstName = $cart->getCustomerFirstname();
+            if($firstName) {
+                $customer["first_name"] = $firstName;
+            }
+            $lastName = $cart->getCustomerLastname();
+            if($lastName) {
+                $customer["last_name"] = $lastName;
+            }
+            $billingAddress = $cart->getBillingAddress();
+            if ($billingAddress) {
+                $street = $billingAddress->getStreet();
+                $customer["address"] = array(
+                    "address1" => $street[0],
+                    "address2" => count($street) > 1 ? $street[1] : "",
+                    "city" => $billingAddress->getCity(),
+                    "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+                    "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+                    "postal_code" => $billingAddress->getPostcode(),
+                    "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+                    "country_code" => $billingAddress->getCountry()
+                );
+            }
+            //company
+            if ($billingAddress->getCompany()) {
+                $customer["company"] = $billingAddress->getCompany();
             }
         }
         return $customer;

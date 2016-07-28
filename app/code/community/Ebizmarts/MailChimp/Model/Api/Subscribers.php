@@ -219,7 +219,9 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
                                         $mergeVars[$key] = $customerGroup[$group_id];
                                         break;
                                     default:
-                                        $mergeVars[$key] = $customer->getData($attributeCode);
+                                        if($customer->getData($attributeCode)) {
+                                            $mergeVars[$key] = $customer->getData($attributeCode);
+                                        }
                                         break;
                                 }
                             }
