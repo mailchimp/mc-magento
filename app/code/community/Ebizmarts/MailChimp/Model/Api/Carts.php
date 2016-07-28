@@ -184,6 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer->loadByEmail($cart->getCustomerEmail());
             if($customer->getEmail()!=$cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail());
+                Mage::helper('mailchimp')->logRequest('Create new cart for '.$cart->getCustomerEmail(). ' Cart Id: '. $cart->getEntityId());
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $allCarts[$this->counter]['method'] = 'DELETE';
                     $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartForEmail->getEntityId();
@@ -200,6 +201,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             {
                 continue;
             }
+            Mage::helper('mailchimp')->logRequest('Visible items for cart: '.$cart->getAllVisibleItems().count());
+            Mage::helper('mailchimp')->logRequest('Visible items for cart: '.count($cart->getAllVisibleItems()));
             if(count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
                 $allCarts[$this->counter]['method'] = 'POST';
