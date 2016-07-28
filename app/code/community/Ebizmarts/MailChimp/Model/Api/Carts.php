@@ -145,7 +145,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             {
                 continue;
             }
-            if($cart->getAllVisibleItems().count()) {
+            if(count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
                 $allCarts[$this->counter]['method'] = 'POST';
                 $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
@@ -184,6 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer->loadByEmail($cart->getCustomerEmail());
             if($customer->getEmail()!=$cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail());
+                Mage::helper('mailchimp')->logRequest('Create new cart for '.$cart->getCustomerEmail(). ' Cart Id: '. $cart->getEntityId());
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $allCarts[$this->counter]['method'] = 'DELETE';
                     $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartForEmail->getEntityId();
@@ -200,7 +201,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             {
                 continue;
             }
-            if($cart->getAllVisibleItems().count()) {
+            Mage::helper('mailchimp')->logRequest('Visible items for cart: '.$cart->getAllVisibleItems().count());
+            Mage::helper('mailchimp')->logRequest('Visible items for cart: '.count($cart->getAllVisibleItems()));
+            if(count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
                 $allCarts[$this->counter]['method'] = 'POST';
                 $allCarts[$this->counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
@@ -311,35 +314,37 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     "opt_in_status" => false
                 );
             } else {
-                try {
-                    $customer = array(
-                        "id" => $cart->getCustomerId(),
-                        "email_address" => $cart->getCustomerEmail(),
-                        "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
-                    );
-                    $customer["first_name"] = $cart->getCustomerFirstname();
-                    $customer["last_name"] = $cart->getCustomerLastname();
-                    $billingAddress = $cart->getBillingAddress();
-                    if ($billingAddress) {
-                        $street = $billingAddress->getStreet();
-                        $customer["address"] = array(
-                            "address1" => $street[0],
-                            "address2" => count($street) > 1 ? $street[1] : "",
-                            "city" => $billingAddress->getCity(),
-                            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-                            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-                            "postal_code" => $billingAddress->getPostcode(),
-                            "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
-                            "country_code" => $billingAddress->getCountry()
-                        );
-                    }
-                    //company
-                    if ($billingAddress->getCompany()) {
-                        $customer["company"] = $billingAddress->getCompany();
-                    }
-                } catch (Exception $e) {
-                    Mage::log($e->getMessage());
-                }
+                $customer = array(
+                    "id" => $cart->getCustomerId(),
+                    "email_address" => $cart->getCustomerEmail(),
+                    "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                );
+            }
+            $firstName = $cart->getCustomerFirstname();
+            if($firstName) {
+                $customer["first_name"] = $firstName;
+            }
+            $lastName = $cart->getCustomerLastname();
+            if($lastName) {
+                $customer["last_name"] = $lastName;
+            }
+            $billingAddress = $cart->getBillingAddress();
+            if ($billingAddress) {
+                $street = $billingAddress->getStreet();
+                $customer["address"] = array(
+                    "address1" => $street[0],
+                    "address2" => count($street) > 1 ? $street[1] : "",
+                    "city" => $billingAddress->getCity(),
+                    "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+                    "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+                    "postal_code" => $billingAddress->getPostcode(),
+                    "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+                    "country_code" => $billingAddress->getCountry()
+                );
+            }
+            //company
+            if ($billingAddress->getCompany()) {
+                $customer["company"] = $billingAddress->getCompany();
             }
         }
         return $customer;
