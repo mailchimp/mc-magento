@@ -340,7 +340,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _removeScopeData($scopesArray, $key, $scopeData){
         $searchedValues = array($scopeData, ','.$scopeData, $scopeData.',');
         $clearedArray = str_replace($searchedValues, '', $scopesArray[$key]);
-        if($clearedArray[$key] == ''){
+        if(isset($clearedArray[$key]) && $clearedArray[$key] == ''){
             unset($clearedArray[$key]);
         }
         return $clearedArray;
