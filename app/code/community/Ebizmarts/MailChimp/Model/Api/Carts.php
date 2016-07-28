@@ -65,14 +65,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         foreach($convertedCarts as $cart)
         {
                 // we need to delete all the carts associated with this email
-//                $allCartsForEmail = Mage::getModel('sales/quote')->getCollection();
-//                $allCartsForEmail->addFieldToFilter('is_active',array('eq'=>1));
-//                $allCartsForEmail->addFieldToFilter('mailchimp_sync_delta',array(
-//                    array('neq' => '0000-00-00 00:00:00'),
-//                    array('null',false)
-//                ));
-//                $allCartsForEmail->addFieldToFilter('mailchimp_deleted',array('eq'=>0));
-//                $allCartsForEmail->addFieldToFilter('customer_email',array('eq'=>$cart->getCustomerEmail()));
             $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail());
             foreach($allCartsForEmail as $cartForEmail)
             {
