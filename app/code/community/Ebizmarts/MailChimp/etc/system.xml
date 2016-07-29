@@ -92,6 +92,19 @@
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list.]]></comment>
                         </list>
+                        <reset_list translate="label comment">
+                            <label></label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>mailchimp/adminhtml_system_config_resetList</frontend_model>
+                            <sort_order>52</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Warning, read the manual before change the list.]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </reset_list>
                         <map_fields translate="label comment">
                             <label>Customer Fields Mapping</label>
                             <frontend_model>mailchimp/adminhtml_system_config_form_field_mapfields</frontend_model>

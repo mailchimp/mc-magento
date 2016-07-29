@@ -44,6 +44,9 @@ class Ebizmarts_MailChimp_Model_Config
     const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
     const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
 
+    const WARNING_MESSAGE           = 'mailchimp/warning_message';
+    const POPUP_MESSAGE           = 'mailchimp/popup_message';
+
     const IS_CUSTOMER   = "CUS";
     const IS_PRODUCT    = "PRO";
     const IS_ORDER      = "ORD";

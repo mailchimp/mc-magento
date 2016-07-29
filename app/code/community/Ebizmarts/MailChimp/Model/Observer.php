@@ -264,6 +264,17 @@ class Ebizmarts_MailChimp_Model_Observer
         }
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST, $listId, $scopeData['scope'], $scopeData['id']);
         Mage::getConfig()->cleanCache();
+        if($listId!=$oldListId&&$scopeData['scope']=='default')
+        {
+            if($oldListId!='') {
+                Mage::helper('mailchimp')->resetMCEcommerceData(true);
+                Mage::helper('mailchimp')->resetErrors();
+            }
+            else {
+                Mage::helper('mailchimp')->resetMCEcommerceData(false);
+                Mage::helper('mailchimp')->resetErrors();
+            }
+        }
     }
 
     public function loadCustomerToQuote(Varien_Event_Observer $observer)
