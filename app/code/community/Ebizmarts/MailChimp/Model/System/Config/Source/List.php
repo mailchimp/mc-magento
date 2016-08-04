@@ -28,8 +28,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
         if (is_null($this->_lists)) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
                 if ($apiKey) {
-                    $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
-                    $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
+                    try {
+                        $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+                        $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
+                    } catch(Mailchimp_Error $e) {
+                        Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+                    }
                 }
         }
     }
