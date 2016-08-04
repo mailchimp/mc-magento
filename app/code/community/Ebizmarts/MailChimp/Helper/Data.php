@@ -345,4 +345,30 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $clearedArray;
     }
+    public function resetCampaign()
+    {
+        $orderCollection = Mage::getModel('sales/order')->getCollection()
+            ->addAttributeToFilter('mailchimp_campaign_id',array(
+                array('neq'=>0)))
+            ->addAttributeToFilter('mailchimp_campaign_id',array(
+                array('notnull'=>true)
+            ));
+        foreach($orderCollection as $order)
+        {
+            $order->setMailchimpCampaignId(0);
+            $order->save();
+        }
+        $quoteCollection = Mage::getModel('sales/quote')
+            ->getCollection()
+            ->addAttributeToFilter('mailchimp_campaign_id',array(
+                array('neq'=>0)))
+            ->addAttributeToFilter('mailchimp_campaign_id',array(
+                array('notnull'=>true)
+            ));
+        foreach($quoteCollection as $quote)
+        {
+            $quote->setMailchimpCampaignId(0);
+            $quote->save();
+        }
+    }
 }

@@ -275,6 +275,7 @@ class Ebizmarts_MailChimp_Model_Observer
             if($oldListId!='') {
                 Mage::helper('mailchimp')->resetMCEcommerceData(true);
                 Mage::helper('mailchimp')->resetErrors();
+                Mage::helper('mailchimp')->resetCampaign();
             }
             else {
                 Mage::helper('mailchimp')->resetMCEcommerceData(false);
