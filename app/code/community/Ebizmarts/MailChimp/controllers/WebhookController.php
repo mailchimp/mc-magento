@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         //Validate "wkey" GET parameter
         if ($myKey == $requestKey) {
             if ($this->getRequest()->getPost('type')) {
-                Mage::getModel('mailchimp/processwebhook')->processWebhookData($this->getRequest()->getPost());
+                Mage::getModel('mailchimp/processWebhook')->processWebhookData($this->getRequest()->getPost());
             }
             else
             {
