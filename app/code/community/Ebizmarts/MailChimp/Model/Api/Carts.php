@@ -239,10 +239,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _makeCart($cart,$mailchimpStoreId)
     {
+        $campaignId = $cart->getMailChimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
         $oneCart['customer'] = $this->_getCustomer($cart,$mailchimpStoreId);
-//        $oneCart['campaign_id'] = '';
+        if($campaignId) {
+            $oneCart['campaign_id'] = $campaignId;
+        }
         $oneCart['checkout_url'] = $this->_getCheckoutUrl($cart);
         $oneCart['currency_code'] = $cart->getQuoteCurrencyCode();
         $oneCart['order_total'] = $cart->getGrandTotal();
