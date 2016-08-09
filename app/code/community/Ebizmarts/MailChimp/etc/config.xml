@@ -99,6 +99,9 @@
                 <mailchimp_abandonedcart_flag>
                     <to_order>*</to_order>
                 </mailchimp_abandonedcart_flag>
+                <mailchimp_campaign_id>
+                    <to_order>*</to_order>
+                </mailchimp_campaign_id>
             </sales_convert_quote>
         </fieldsets>
     </global>

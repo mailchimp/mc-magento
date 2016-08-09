@@ -291,6 +291,10 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
             }
         }
+        $campaignId = $this->_getCampaignCookie();
+        if($campaignId){
+            $quote->setMailChimpCampaignId($campaignId);
+        }
         return $observer;
     }
 }
