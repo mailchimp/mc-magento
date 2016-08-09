@@ -111,9 +111,9 @@
                             lname = inputFieldLName.value;
                         }
                         if (validateEmail(email)) {
-                            createCookie('email',email + '/' + fname + '/' + lname, 365);
+                            createCookie('email',email + '/' + fname + '/' + lname, 30);
                             <?php if($this->_modalSubscribe()): ?>
-                            createCookie('subscribe','true', 365);
+                            createCookie('subscribe','true', 30);
                             location.reload();
                             <?php else: ?>
                             win.close();

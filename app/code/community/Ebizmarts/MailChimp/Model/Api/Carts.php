@@ -217,7 +217,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
+     *
      * @param $email
+     * @return object
      */
     protected function _getAllCartsByEmail($email)
     {

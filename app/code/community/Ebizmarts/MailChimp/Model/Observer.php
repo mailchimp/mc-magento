@@ -117,8 +117,11 @@ class Ebizmarts_MailChimp_Model_Observer
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        $subscriber = $observer->getEvent()->getSubscriber();
         if($isEnabled){
-            $subscriber = $observer->getEvent()->getSubscriber();
+            if(!Mage::getSingleton('customer/session')->isLoggedIn()){
+                Mage::getModel('core/cookie')->set('email', $subscriber->getSubscriberEmail(), (30*3600));
+            }
             if (TRUE === $subscriber->getIsStatusChanged()) {
                 Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
             }
