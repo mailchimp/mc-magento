@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $generalEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
 
-        if($generalEnabled) {
+        if($generalEnabled && $listId) {
             $this->_createWebhook($listId, $apiKey);
         }
 
@@ -85,7 +85,14 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
             }
             if($createWebhook) {
-                $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                try{
+                    $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                }catch (Mailchimp_Error $e){
+                    if($e->getMailchimpDetails() == 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.'){
+                        Mage::getSingleton('adminhtml/session')->addWarning('Your store could not be accessed by MailChimp\'s Api. Please confirm the site is accessible externally.');
+                    }
+                }
+
             }
         }
         catch(Mailchimp_Error $e)
