@@ -1,0 +1,28 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function preshow() {
+        if($('mailchimp_general_list').value != '') {
+            $('mailchimp_general_list').setAttribute('disabled',true);
+            $('changelist_button').setAttribute('style','display:yes');
+        }
+    }
+    function resetlist() {
+        if(confirm('<?php echo $this->getPopupMessage(); ?>')) {
+            $('mailchimp_general_list').removeAttribute('disabled');
+            $('changelist_button').setAttribute('style','display:none');
+            $('row_mailchimp_general_reset_list').down(9).setAttribute('style','display:none');
+            //$('row_mailchimp_general_reset_list').childElements('value').childElements('p').setAttribute('style','display:none');
+            Event.observe($('mailchimp_general_list'),'change',function() {
+                $('row_mailchimp_general_reset_list').down(9).setAttribute('style','display:yes;color:red;padding:5px;font-weight:bold;');
+                $('row_mailchimp_general_reset_list').down(9).update('<?php echo $this->getMessage() ?>');
+                $('row_mailchimp_general_reset_list').down(8).className = '';
+            });
+        }
+    }
+    window.onload=preshow;
+    //]]>
+
+</script>
+
+
+<?php echo $this->getButtonHtml(); ?>

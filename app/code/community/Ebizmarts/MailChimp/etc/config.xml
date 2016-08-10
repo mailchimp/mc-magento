@@ -224,6 +224,8 @@
                 <popup_cookie_time>1</popup_cookie_time>
                 <popup_insist>1</popup_insist>
             </emailcatcher>
+            <warning_message><![CDATA[Warning. If you save the configuration, the current store in mailchimp will be recreated]]></warning_message>
+            <popup_message><![CDATA[Are you sure?]]></popup_message>
         </mailchimp>
     </default>
     <crontab>

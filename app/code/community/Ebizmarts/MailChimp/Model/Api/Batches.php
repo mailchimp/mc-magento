@@ -139,21 +139,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $subscriberLimit = Ebizmarts_MailChimp_Model_Api_subscribers::BATCH_LIMIT;
         $stores = Mage::app()->getStores();
         $batchResponses = array();
-        $hasChanged = false;
-        foreach ($stores as $store) {
+        foreach($stores as $store) {
             $storeId = $store->getId();
             $this->_getResults($storeId, false);
-            if(Mage::helper('mailchimp')->handleListChange($storeId)){
-                $hasChanged = true;
-            }
             if($subscriberLimit > 0) {
-                list($batchResponses[], $subscriberLimit) = Mage::getModel('mailchimp/api_batches')->sendStoreSubscriberBatch($storeId, $subscriberLimit);
+                list($batchResponses[], $subscriberLimit) = $this->sendStoreSubscriberBatch($storeId, $subscriberLimit);
             }else{
                 break;
             }
-        }
-        if($hasChanged) {
-            Mage::getConfig()->cleanCache();
         }
         return $batchResponses;
     }

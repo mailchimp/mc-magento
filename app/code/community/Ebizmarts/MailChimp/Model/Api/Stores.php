@@ -53,11 +53,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * @throws Exception
      */
-    public function createMailChimpStore($store_id)
+    public function createMailChimpStore($store_id,$listId=null)
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         if (!is_null($apiKey) && $apiKey != "") {
-            $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+            if(!$listId) {
+                $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+            }
 
             if (!is_null($listId) && $listId != "")
             {

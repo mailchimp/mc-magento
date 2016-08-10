@@ -22,19 +22,10 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $generalEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
-        $ecommerceEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $oldList = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST);
-        if($generalEnabled) {
-            if($ecommerceEnabled) {
-                $this->_createMailChimpStore();
-            }
 
-            if($listId) {
-                $this->_createWebhook($listId, $apiKey);
-            }
-            $this->_handleListChangeConfigValues($listId, $oldList);
-            
+        if($generalEnabled && $listId) {
+            $this->_createWebhook($listId, $apiKey);
         }
 
         return $observer;
@@ -108,6 +99,7 @@ class Ebizmarts_MailChimp_Model_Observer
         {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError("If you are in a local environment this is ");
         }
         catch (Exception $e){
             Mage::helper('mailchimp')->logError($e->getMessage());
@@ -117,11 +109,13 @@ class Ebizmarts_MailChimp_Model_Observer
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
-        $subscriber = $observer->getEvent()->getSubscriber();
         if($isEnabled){
-            if(!Mage::getSingleton('customer/session')->isLoggedIn()){
-                Mage::getModel('core/cookie')->set('email', $subscriber->getSubscriberEmail(), (365*3600));
+            $subscriber = $observer->getEvent()->getSubscriber();
+            if(!Mage::getSingleton('customer/session')->isLoggedIn()&&!Mage::app()->getStore()->isAdmin()) {
+                Mage::getModel('core/cookie')->set('email', $subscriber->getSubscriberEmail(), null, null, null, null, false);
             }
+
+
             if (TRUE === $subscriber->getIsStatusChanged()) {
                 Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
             }
@@ -214,7 +208,13 @@ class Ebizmarts_MailChimp_Model_Observer
 
     protected function _getCampaignCookie()
     {
-        return Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
+        $cookie = Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
+        if($cookie&&Mage::getModel('core/cookie')->getLifetime('mailchimp_campaign_id')==3600) {
+            return $cookie;
+        }
+        else {
+            return null;
+        }
     }
 
     public function addAbandonedToSalesOrderGrid($observer) {
@@ -256,27 +256,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
     }
     
-    protected function _handleListChangeConfigValues($listId, $oldListId){
-        $scopeData = Mage::helper('mailchimp')->getScope();
-        $listChangedScope = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, 0));
-        if(!is_array($listChangedScope)){
-            $listChangedScope = array();
-            $listChangedScope[$scopeData['scope']] = $scopeData['id'];
-        }elseif(!isset($listChangedScope[$scopeData['scope']])){
-            $listChangedScope[$scopeData['scope']] = $scopeData['id'];
-        }elseif(strpos($listChangedScope[$scopeData['scope']], $scopeData['id']) === false){
-                $listChangedScope[$scopeData['scope']] .= ','.$scopeData['id'];
-        }
-        if($oldListId){
-            if($listId != $oldListId){
-                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($listChangedScope));
-            }
-        }else{
-            Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST_CHANGED_SCOPES, serialize($listChangedScope));
-        }
-        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_OLD_LIST, $listId, $scopeData['scope'], $scopeData['id']);
-        Mage::getConfig()->cleanCache();
-    }
 
     public function loadCustomerToQuote(Varien_Event_Observer $observer)
     {
