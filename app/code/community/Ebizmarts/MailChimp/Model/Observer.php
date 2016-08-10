@@ -92,6 +92,7 @@ class Ebizmarts_MailChimp_Model_Observer
         {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError("If you are in a local environment this is ");
         }
         catch (Exception $e){
             Mage::helper('mailchimp')->logError($e->getMessage());
@@ -103,6 +104,11 @@ class Ebizmarts_MailChimp_Model_Observer
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         if($isEnabled){
             $subscriber = $observer->getEvent()->getSubscriber();
+            if(!Mage::getSingleton('customer/session')->isLoggedIn()&&!Mage::app()->getStore()->isAdmin()) {
+                Mage::getModel('core/cookie')->set('email', $subscriber->getSubscriberEmail(), null, null, null, null, false);
+            }
+
+
             if (TRUE === $subscriber->getIsStatusChanged()) {
                 Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
             }
