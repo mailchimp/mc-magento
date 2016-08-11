@@ -15,6 +15,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     const BATCH_LIMIT = 100;
     protected $api = null;
 
+    /**
+     * Set the request for orders to be created on MailChimp
+     * 
+     * @param $mailchimpStoreId
+     * @return array
+     */
     public function createBatchJson($mailchimpStoreId)
     {
         //create missing products first
@@ -51,6 +57,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $batchArray;
     }
 
+    /**
+     * Set the orders to be removed from MailChimp because they were canceled
+     * 
+     * @param $mailchimpStoreId
+     * @return array
+     */
     public function createCanceledBatchJson($mailchimpStoreId)
     {
         //create missing products first
@@ -83,6 +95,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $batchArray;
     }
 
+    /**
+     * Set all the data for each order to be sent
+     *
+     * @param $order_from_collection
+     * @param $mailchimpStoreId
+     * @return string
+     */
     protected function GeneratePOSTPayload($order_from_collection,$mailchimpStoreId)
     {
         $order = Mage::getModel('sales/order')->load($order_from_collection->getEntityId());
@@ -154,24 +173,24 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
                 );
             }
-            $billingAddress = $order->getBillingAddress();
-            $street = $billingAddress->getStreet();
             $data["customer"]["first_name"] = $order->getCustomerFirstname();
             $data["customer"]["last_name"] = $order->getCustomerLastname();
-            $data["customer"]["address"] = array(
-                "address1" => $street[0],
-                "address2" => count($street) > 1 ? $street[1] : "",
-                "city" => $billingAddress->getCity(),
-                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-                "postal_code" => $billingAddress->getPostcode(),
-                "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
-                "country_code" => $billingAddress->getCountry()
-            );
-            //company
-            if ($billingAddress->getCompany()) {
-                $data["customer"]["company"] = $billingAddress->getCompany();
-            }
+        }
+        $billingAddress = $order->getBillingAddress();
+        $street = $billingAddress->getStreet();
+        $data["customer"]["address"] = array(
+            "address1" => $street[0],
+            "address2" => count($street) > 1 ? $street[1] : "",
+            "city" => $billingAddress->getCity(),
+            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+            "postal_code" => $billingAddress->getPostcode(),
+            "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+            "country_code" => $billingAddress->getCountry()
+        );
+        //company
+        if ($billingAddress->getCompany()) {
+            $data["customer"]["company"] = $billingAddress->getCompany();
         }
 
         $jsonData = "";
@@ -188,6 +207,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         return $jsonData;
     }
+
+    /**
+     * Get Api Object
+     *
+     * @return Ebizmarts_Mailchimp|null
+     */
     protected function _getApi()
     {
         if(!$this->api)

@@ -43,7 +43,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             //enconde to JSON
             try {
                 $customerJson = json_encode($data);
-
             } catch (Exception $e) {
                 //json encode failed
                 Mage::helper('mailchimp')->logError("Customer ".$customer->getId()." json encode failed");
@@ -127,6 +126,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 //        $customer->setData("mailchimp_sync_delta", Varien_Date::now());
             $customer->setData("mailchimp_sync_error", "");
             $customer->setData("mailchimp_sync_modified", 1);
+        }
+    }
+
+    public function updateOrderCount($mailchimpStoreId){
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        $mailchimpTotalCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId, 'total_items');
+        $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId, 'customers', null, $mailchimpTotalCustomers);
+        foreach($mailchimpCustomers as $customer){
+            $totalOrders = $mailchimpApi->ecommerce->orders->get($mailchimpStoreId, 'total_items', null, null, null, $customer['id']);
+            $mailchimpApi->ecommerce->customers->modify($mailchimpStoreId, $customer['id'], null, null, null, null, $totalOrders);
         }
     }
 //    public function updateOld($customer)
