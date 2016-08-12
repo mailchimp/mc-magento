@@ -88,13 +88,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function deleteStore($storeId)
     {
-        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
+//        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
             $api->ecommerce->stores->delete($storeId);
             $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/synchbatches');
             $connection->update($resource->getMainTable(),array('status'=>'canceled'),"status = 'pending'");
-        }
+//        }
     }
 }
