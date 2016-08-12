@@ -128,7 +128,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
         if($ecommerceEnabled&&$apikey&&$listId) {
-            Mage::log('try to create a mailchimp store');
             //generate store id
             $date = date('Y-m-d-His');
             $store_id = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;

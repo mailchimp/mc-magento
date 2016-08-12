@@ -17,14 +17,14 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_ACCOUNT_DETAILS       = 'mailchimp/general/account_details';
     const GENERAL_LIST                  = 'mailchimp/general/list';
     const GENERAL_OLD_LIST              = 'mailchimp/general/old_list';
-    const GENERAL_LIST_CHANGED_SCOPES    = 'mailchimp/general/list_changed_scopes';
+    const GENERAL_LIST_CHANGED_SCOPES   = 'mailchimp/general/list_changed_scopes';
     const GENERAL_MCSTOREID             = 'mailchimp/general/storeid';
     const GENERAL_MCMINSYNCDATEFLAG     = 'mailchimp/general/mcminsyncdateflag';
     const GENERAL_SUB_MCMINSYNCDATEFLAG = 'mailchimp/general/sub_mcminsyncdateflag';
     const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
     const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
     const GENERAL_LOG                   = 'mailchimp/general/enable_log';
-    const GENERAL_MAP_FIELDS        = 'mailchimp/general/map_fields';
+//    const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
 
@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
 
     const WARNING_MESSAGE           = 'mailchimp/warning_message';
-    const POPUP_MESSAGE           = 'mailchimp/popup_message';
+    const POPUP_MESSAGE             = 'mailchimp/popup_message';
 
     const IS_CUSTOMER   = "CUS";
     const IS_PRODUCT    = "PRO";

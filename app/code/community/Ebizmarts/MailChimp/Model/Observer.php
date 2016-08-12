@@ -85,21 +85,16 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
             }
             if($createWebhook) {
-                try{
-                    $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
-                }catch (Mailchimp_Error $e){
-                    if($e->getMailchimpDetails() == 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.'){
-                        Mage::getSingleton('adminhtml/session')->addWarning('Your store could not be accessed by MailChimp\'s Api. Please confirm the site is accessible externally.');
-                    }
-                }
-
+                $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
             }
         }
         catch(Mailchimp_Error $e)
         {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-            Mage::getSingleton('adminhtml/session')->addError("If you are in a local environment this is ");
+            if($e->getMailchimpDetails() == 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.'){
+                Mage::getSingleton('adminhtml/session')->addError('Your store could not be accessed by MailChimp\'s Api. Please confirm the site is accessible externally to allow the webhook creation.');
+            }
         }
         catch (Exception $e){
             Mage::helper('mailchimp')->logError($e->getMessage());
@@ -272,6 +267,10 @@ class Ebizmarts_MailChimp_Model_Observer
                     $quote->setCustomerEmail($email);
                 }
             }
+        }
+        $campaignId = $this->_getCampaignCookie();
+        if($campaignId){
+            $quote->setMailChimpCampaignId($campaignId);
         }
         return $observer;
     }
