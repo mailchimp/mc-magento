@@ -12,25 +12,7 @@
  */
 class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Core_Model_Config_Data
 {
-//    protected function _beforeSave()
-//    {
-//        $groups = $this->getData('groups');
-//        $active = $groups['general']['fields']['active']['value'];
-//        $apikey = $groups['general']['fields']['apikey']['value'];
-//        $list  = $groups['general']['fields']['list']['value'];
-//        $storeId = Mage::helper('mailchimp')->getMCStoreId();
-//
-//        if($this->isValueChanged()&&$active) {
-//            if($this->getScope()=='default') {
-//                if($this->getOldValue()&&$storeId) {
-//                    //Mage::helper('mailchimp')->resetMCEcommerceData(true);
-//                    Mage::helper('mailchimp')->deleteStore();
-//                    Mage::helper('mailchimp')->resetErrors();
-//                    Mage::helper('mailchimp')->resetCampaign();
-//                }
-//            }
-//        }
-//    }
+
     protected function _afterSave()
     {
         $groups = $this->getData('groups');
