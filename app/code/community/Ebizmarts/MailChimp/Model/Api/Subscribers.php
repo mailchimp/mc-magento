@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         $mergeVars = $this->getMergeVars($subscriber);
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->update($listId, $md5HashEmail, null, $status, $mergeVars);
+            $api->lists->members->addOrUpdate($listId, $md5HashEmail, null, $status, $mergeVars, null, null, null, null, null, null, null, $subscriber->getSubscriberEmail(), $status);
         }catch(Mailchimp_Error $e){
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());

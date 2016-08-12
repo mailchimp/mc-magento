@@ -51,6 +51,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     }
 
     /**
+     * @param $store_id
+     * @param null $listId
      * @throws Exception
      */
     public function createMailChimpStore($store_id,$listId=null)

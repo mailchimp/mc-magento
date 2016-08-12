@@ -262,7 +262,7 @@ class Ebizmarts_Mailchimp
         $info = curl_getinfo($ch);
 
         $result = json_decode($response_body, true);
-
+        
 
         if(curl_error($ch))
         {
