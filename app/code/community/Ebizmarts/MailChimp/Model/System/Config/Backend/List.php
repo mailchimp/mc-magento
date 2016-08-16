@@ -19,8 +19,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
 
         if($this->isValueChanged()&&$active) {
             if($this->getScope()=='default') {
-                if(!empty($this->getOldValue())) {
-                    //Mage::helper('mailchimp')->resetMCEcommerceData(true);
+                if($this->getOldValue()) {
                     Mage::helper('mailchimp')->deleteStore();
                     Mage::helper('mailchimp')->resetErrors();
                     Mage::helper('mailchimp')->resetCampaign();
