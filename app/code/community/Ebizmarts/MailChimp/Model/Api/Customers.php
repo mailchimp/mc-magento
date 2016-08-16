@@ -140,18 +140,24 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $counter = 0;
             $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
             foreach ($mailchimpCustomers['customers'] as $customer) {
-                $mailchimpOrders = $mailchimpApi->ecommerce->orders->getAll($mailchimpStoreId, null, null, null, null, $customer['id']);
+                //get all orders sent to MailChimp made with that same email address
+                $orderCollection = Mage::getModel('sales/order')->getCollection()
+                    ->addFieldToFilter('state', array('eq' =>'complete'))
+                    ->addFieldToFilter('customer_email', array('eq' => $customer['email_address']))
+                    ->addFieldToFilter('mailchimp_sync_delta', array('notnull' => true))
+                    ->addFieldToFilter('mailchimp_sync_delta', array('neq' => ''))
+                    ->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
                 $totalSpent = 0;
-                if($mailchimpOrders['total_items'] != $customer['orders_count']) {
-                    foreach ($mailchimpOrders['orders'] as $order) {
-                        $totalSpent += $order['order_total'];
+                // if MailChimp order count is different than the amount of orders successfully sent to MailChimp update values
+                if(count($orderCollection) != $customer['orders_count']) {
+                    foreach ($orderCollection as $order) {
+                        $totalSpent += $order->getGrandTotal();
                     }
-                    if ($mailchimpOrders['total_items'] || $totalSpent) {
-//                        $mailchimpApi->ecommerce->customers->modify($mailchimpStoreId, $customer['id'], null, null, null, null, $mailchimpOrders['total_items'], $totalSpent, null);
+                    if (count($orderCollection) || $totalSpent) {
                         $customerArray[$counter]['method'] = "PATCH";
-                        $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer->getId();
-                        $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer->getId();
-                        $customerArray[$counter]['body'] = json_encode(array('id' => $customer->getId(), 'orders_count' => $mailchimpOrders['total_items'], 'total_spent' => $totalSpent));
+                        $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer['id'];
+                        $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer['id'];
+                        $customerArray[$counter]['body'] = json_encode(array('id' => $customer['id'], 'orders_count' => count($orderCollection), 'total_spent' => $totalSpent));
                         $counter += 1;
                     }
                 }

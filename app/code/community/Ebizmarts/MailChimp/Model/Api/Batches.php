@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function handleEcommerceBatches(){
         $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
         $this->_getResults($mailchimpStoreId, true);
-        $this->_updateCustomerOrderCount($mailchimpStoreId);
+        $this->_updateCustomerOrderData($mailchimpStoreId);
         $this->_sendEcommerceBatch($mailchimpStoreId);
     }
 
@@ -60,7 +60,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
     }
 
-    protected function _updateCustomerOrderCount($mailchimpStoreId)
+    protected function _updateCustomerOrderData($mailchimpStoreId)
     {
         if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE) && Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
             $batchArray = array();
