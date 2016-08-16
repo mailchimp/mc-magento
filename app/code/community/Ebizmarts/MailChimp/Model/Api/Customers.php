@@ -129,13 +129,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
     }
 
-    public function updateOrderCount($mailchimpStoreId){
+    public function updateOrderData($mailchimpStoreId){
         try {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             $mailchimpApi = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
             $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId);
             $mailchimpTotalCustomers = $mailchimpCustomers['total_items'];
             $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId, 'customers', null, $mailchimpTotalCustomers);
+            $customerArray = array();
+            $counter = 0;
+            $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
             foreach ($mailchimpCustomers['customers'] as $customer) {
                 $mailchimpOrders = $mailchimpApi->ecommerce->orders->getAll($mailchimpStoreId, null, null, null, null, $customer['id']);
                 $totalSpent = 0;
@@ -144,10 +147,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                         $totalSpent += $order['order_total'];
                     }
                     if ($mailchimpOrders['total_items'] || $totalSpent) {
-                        $mailchimpApi->ecommerce->customers->modify($mailchimpStoreId, $customer['id'], null, null, null, null, $mailchimpOrders['total_items'], $totalSpent, null);
+//                        $mailchimpApi->ecommerce->customers->modify($mailchimpStoreId, $customer['id'], null, null, null, null, $mailchimpOrders['total_items'], $totalSpent, null);
+                        $customerArray[$counter]['method'] = "PATCH";
+                        $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer->getId();
+                        $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer->getId();
+                        $customerArray[$counter]['body'] = json_encode(array('id' => $customer->getId(), 'orders_count' => $mailchimpOrders['total_items'], 'total_spent' => $totalSpent));
+                        $counter += 1;
                     }
                 }
             }
+            return $customerArray;
         }
         catch(Mailchimp_Error $e){
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
