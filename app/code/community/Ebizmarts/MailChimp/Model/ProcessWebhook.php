@@ -35,39 +35,25 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 //            Mage::app()->setCurrentStore($store);
 //        }
 
-        //Object for cache clean
-        $object = new stdClass();
-        $object->requestParams = array();
-        $object->requestParams['id'] = $listId;
-
-        if (isset($data['data']['email'])) {
-            $object->requestParams['email_address'] = $data['data']['email'];
-        }
-        $cacheHelper = Mage::helper('mailchimp/cache');
 
         switch ($data['type']) {
             case 'subscribe':
                 $this->_subscribe($data);
-                $cacheHelper->clearCache('listSubscribe', $object);
                 break;
             case 'unsubscribe':
                 $this->_unsubscribe($data);
-                $cacheHelper->clearCache('listUnsubscribe', $object);
                 break;
             case 'cleaned':
                 $this->_clean($data);
-                $cacheHelper->clearCache('listUnsubscribe', $object);
                 break;
 //            case 'campaign':
 //                $this->_campaign($data);
 //                break;
             case 'upemail':
                 $this->_updateEmail($data);
-                $cacheHelper->clearCache('listUpdateMember', $object);
                 break;
 //            case 'profile':
 //                $this->_profile($data);
-//                $cacheHelper->clearCache('listUpdateMember', $object);
 //                break;
         }
 
