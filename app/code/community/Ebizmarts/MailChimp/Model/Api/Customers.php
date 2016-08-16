@@ -139,11 +139,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             foreach ($mailchimpCustomers['customers'] as $customer) {
                 $mailchimpOrders = $mailchimpApi->ecommerce->orders->getAll($mailchimpStoreId, null, null, null, null, $customer['id']);
                 $totalSpent = 0;
-                foreach ($mailchimpOrders['orders'] as $order){
-                    $totalSpent += $order['order_total'];
-                }
-                if($mailchimpOrders['total_items'] || $totalSpent) {
-                    $mailchimpApi->ecommerce->customers->modify($mailchimpStoreId, $customer['id'], null, null, null, null, $mailchimpOrders['total_items'], $totalSpent);
+                if($mailchimpOrders['total_items'] != $customer['orders_count']) {
+                    foreach ($mailchimpOrders['orders'] as $order) {
+                        $totalSpent += $order['order_total'];
+                    }
+                    if ($mailchimpOrders['total_items'] || $totalSpent) {
+                        $mailchimpApi->ecommerce->customers->modify($mailchimpStoreId, $customer['id'], null, null, null, null, $mailchimpOrders['total_items'], $totalSpent, null);
+                    }
                 }
             }
         }
