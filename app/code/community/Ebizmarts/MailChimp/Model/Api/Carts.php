@@ -335,16 +335,42 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if ($billingAddress)
         {
             $street = $billingAddress->getStreet();
-            $customer["address"] = array(
-                "address1" => $street[0],
-                "address2" => count($street) > 1 ? $street[1] : "",
-                "city" => $billingAddress->getCity(),
-                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-                "postal_code" => $billingAddress->getPostcode(),
-                "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : '',
-                "country_code" => $billingAddress->getCountry()
-            );
+            $address = array();
+            if($street[0]) {
+                $address['address1'] = $street[0];
+            }
+            if(count($street) > 1) {
+                $address['address1'] = $street[1];
+            }
+            if($billingAddress->getCity()) {
+                $address['city'] = $billingAddress->getCity();
+            }
+            if($billingAddress->getRegion()) {
+                $address['province'] = $billingAddress->getRegion();
+            }
+            if($billingAddress->getRegionCode()) {
+                $address['province_code'] = $billingAddress->getRegionCode();
+            }
+            if($billingAddress->getPostcode()) {
+                $address['postal_code'] = $billingAddress->getPostcode();
+            }
+            if($billingAddress->getCountry()) {
+                $address['country'] = $billingAddress->getCountry();
+                $address['country_code'] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+            }
+//            $customer["address"] = array(
+//                "address1" => $street[0],
+//                "address2" => count($street) > 1 ? $street[1] : "",
+//                "city" => $billingAddress->getCity(),
+//                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+//                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+//                "postal_code" => $billingAddress->getPostcode(),
+//                "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : '',
+//                "country_code" => $billingAddress->getCountry() ? $billingAddress->getCountry() : ''
+//            );
+            if(count($address)) {
+                $customer['address'] = $address;
+            }
         }
         //company
         if ($billingAddress->getCompany())
