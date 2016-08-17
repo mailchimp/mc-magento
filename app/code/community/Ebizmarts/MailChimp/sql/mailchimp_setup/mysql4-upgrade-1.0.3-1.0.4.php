@@ -49,7 +49,7 @@ try {
 }
 catch (Exception $e)
 {
-    Mage::helper('mailchimp')->logError($e->getMessage());
+    Mage::log($e->getMessage());
 }
 
 $installer->endSetup();

@@ -13,44 +13,96 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 {
 
     const BATCH_LIMIT = 100;
+    protected $api = null;
 
+    /**
+     * Set the request for orders to be created on MailChimp
+     * 
+     * @param $mailchimpStoreId
+     * @return array
+     */
     public function createBatchJson($mailchimpStoreId)
     {
-            //create missing products first
-            $collection = Mage::getModel('sales/order')->getCollection()
-                ->addAttributeToSelect('status')
-                ->addAttributeToSelect('mailchimp_sync_delta')
-                ->addAttributeToSelect('entity_id')
-                ->addFieldToFilter('status', 'complete')
-                ->addFieldToFilter('mailchimp_sync_delta', array(
-                    array('null' => true),
-                    array('eq' => ''),
-                    array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
-                ));
-            $collection->getSelect()->limit(self::BATCH_LIMIT);
+        //create missing products first
+        $collection = Mage::getModel('sales/order')->getCollection()
+            ->addAttributeToSelect('status')
+            ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToSelect('entity_id')
+            ->addFieldToFilter('state', 'complete')
+            ->addFieldToFilter('mailchimp_sync_delta', array(
+                array('null' => true),
+                array('eq' => ''),
+                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ));
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
 
-            $batchArray = array();
-            $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
-            $counter = 0;
-            foreach ($collection as $order) {
-                $orderJson = $this->GeneratePOSTPayload($order);
-                if (!empty($orderJson)) {
-                    $batchArray[$counter]['method'] = "POST";
-                    $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
-                    $batchArray[$counter]['body'] = $orderJson;
+        $batchArray = array();
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
+        $counter = 0;
+        foreach ($collection as $order) {
+            $orderJson = $this->GeneratePOSTPayload($order,$mailchimpStoreId);
+            if (!empty($orderJson)) {
+                $batchArray[$counter]['method'] = "POST";
+                $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
+                $batchArray[$counter]['body'] = $orderJson;
 
-                    //update order delta
-                    $order->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $order->save();
-                }
-                $counter += 1;
+                //update order delta
+                $order->setData("mailchimp_sync_delta", Varien_Date::now());
+                $order->save();
             }
+            $counter += 1;
+        }
 
-            return $batchArray;
+        return $batchArray;
     }
 
-    protected function GeneratePOSTPayload($order_from_collection)
+    /**
+     * Set the orders to be removed from MailChimp because they were canceled
+     * 
+     * @param $mailchimpStoreId
+     * @return array
+     */
+    public function createCanceledBatchJson($mailchimpStoreId)
+    {
+        //create missing products first
+        $collection = Mage::getModel('sales/order')->getCollection()
+            ->addAttributeToSelect('status')
+            ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToSelect('entity_id')
+            ->addFieldToFilter('state', 'canceled')
+            ->addFieldToFilter('mailchimp_sync_delta', array(
+                array('null' => true),
+                array('eq' => ''),
+                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ));
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
+
+        $batchArray = array();
+        $counter = 0;
+        foreach ($collection as $order) {
+            if (!empty($orderJson)) {
+                $batchArray[$counter]['method'] = "DELETE";
+                $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getEntityId();
+
+                //update order delta
+                $order->setData("mailchimp_sync_delta", Varien_Date::now());
+                $order->save();
+            }
+            $counter += 1;
+        }
+
+        return $batchArray;
+    }
+
+    /**
+     * Set all the data for each order to be sent
+     *
+     * @param $order_from_collection
+     * @param $mailchimpStoreId
+     * @return string
+     */
+    protected function GeneratePOSTPayload($order_from_collection,$mailchimpStoreId)
     {
         $order = Mage::getModel('sales/order')->load($order_from_collection->getEntityId());
 
@@ -61,6 +113,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
+        $data['tax_total'] = $order->getTaxAmount();
+        $data['shipping_total'] = $order->getShippingAmount();
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['lines'] = array();
 
@@ -97,36 +151,46 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             unset($data['lines']);
         }
         //customer data
-        if ((bool)$order->getCustomerIsGuest()) {
-            $data["customer"] = array(
-                "id" => "GUEST-" . date('Y-m-d-H-i-s'),
-                "email_address" => $order->getCustomerEmail(),
-                "opt_in_status" => false
+        $api = $this->_getApi();
+        $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
+        if($customers['total_items']>0)
+        {
+            $data['customer'] = array(
+                'id' => $customers['customers'][0]['id']
             );
-        } else {
-            $data["customer"] = array(
-                "id" => $order->getCustomerId(),
-                "email_address" => $order->getCustomerEmail(),
-                "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
-            );
-            $billingAddress = $order->getBillingAddress();
-            $street = $billingAddress->getStreet();
+        }
+        else {
+            if ((bool)$order->getCustomerIsGuest()) {
+                $data["customer"] = array(
+                    "id" => "GUEST-" . date('Y-m-d-H-i-s'),
+                    "email_address" => $order->getCustomerEmail(),
+                    "opt_in_status" => false
+                );
+            } else {
+                $data["customer"] = array(
+                    "id" => $order->getCustomerId(),
+                    "email_address" => $order->getCustomerEmail(),
+                    "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                );
+            }
             $data["customer"]["first_name"] = $order->getCustomerFirstname();
             $data["customer"]["last_name"] = $order->getCustomerLastname();
-            $data["customer"]["address"] = array(
-                "address1" => $street[0],
-                "address2" => count($street)>1 ? $street[1] : "",
-                "city" => $billingAddress->getCity(),
-                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-                "postal_code" => $billingAddress->getPostcode(),
-                "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
-                "country_code" => $billingAddress->getCountry()
-            );
-            //company
-            if ($billingAddress->getCompany()) {
-                $data["customer"]["company"] = $billingAddress->getCompany();
-            }
+        }
+        $billingAddress = $order->getBillingAddress();
+        $street = $billingAddress->getStreet();
+        $data["customer"]["address"] = array(
+            "address1" => $street[0],
+            "address2" => count($street) > 1 ? $street[1] : "",
+            "city" => $billingAddress->getCity(),
+            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+            "postal_code" => $billingAddress->getPostcode(),
+            "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+            "country_code" => $billingAddress->getCountry()
+        );
+        //company
+        if ($billingAddress->getCompany()) {
+            $data["customer"]["company"] = $billingAddress->getCompany();
         }
 
         $jsonData = "";
@@ -142,5 +206,20 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         return $jsonData;
+    }
+
+    /**
+     * Get Api Object
+     *
+     * @return Ebizmarts_Mailchimp|null
+     */
+    protected function _getApi()
+    {
+        if(!$this->api)
+        {
+            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+            $this->api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        }
+        return $this->api;
     }
 }

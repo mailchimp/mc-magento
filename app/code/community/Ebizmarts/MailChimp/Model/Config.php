@@ -11,30 +11,41 @@
  */
 class Ebizmarts_MailChimp_Model_Config
 {
-    const GENERAL_ACTIVE            = 'mailchimp/general/active';
-    const GENERAL_APIKEY            = 'mailchimp/general/apikey';
-    const GENERAL_OAUTH_WIZARD      = 'mailchimp/general/oauth_wizard';
-    const GENERAL_ACCOUNT_DETAILS   = 'mailchimp/general/account_details';
-    const GENERAL_LIST              = 'mailchimp/general/list';
-    const GENERAL_MCSTOREID         = 'mailchimp/general/storeid';
-    const GENERAL_MCMINSYNCDATEFLAG = 'mailchimp/general/mcminsyncdateflag';
-    const GENERAL_TWO_WAY_SYNC      = 'mailchimp/general/webhook_active';
-    const GENERAL_UNSUBSCRIBE       = 'mailchimp/general/webhook_delete';
-    const GENERAL_LOG               = 'mailchimp/general/enable_log';
+    const GENERAL_ACTIVE                = 'mailchimp/general/active';
+    const GENERAL_APIKEY                = 'mailchimp/general/apikey';
+    const GENERAL_OAUTH_WIZARD          = 'mailchimp/general/oauth_wizard';
+    const GENERAL_ACCOUNT_DETAILS       = 'mailchimp/general/account_details';
+    const GENERAL_LIST                  = 'mailchimp/general/list';
+    const GENERAL_OLD_LIST              = 'mailchimp/general/old_list';
+    const GENERAL_LIST_CHANGED_SCOPES   = 'mailchimp/general/list_changed_scopes';
+    const GENERAL_MCSTOREID             = 'mailchimp/general/storeid';
+    const GENERAL_MCMINSYNCDATEFLAG     = 'mailchimp/general/mcminsyncdateflag';
+    const GENERAL_SUB_MCMINSYNCDATEFLAG = 'mailchimp/general/sub_mcminsyncdateflag';
+    const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
+    const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
+    const GENERAL_LOG                   = 'mailchimp/general/enable_log';
+//    const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
 
-    const ECOMMERCE_ACTIVE          = 'mailchimp/ecommerce/active';
+    const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
 
-    const ENABLE_POPUP              = 'mailchimp/emailcatcher/popup_general';
-    const POPUP_HEADING             = 'mailchimp/emailcatcher/popup_heading';
-    const POPUP_TEXT                = 'mailchimp/emailcatcher/popup_text';
-    const POPUP_FNAME               = 'mailchimp/emailcatcher/popup_fname';
-    const POPUP_LNAME               = 'mailchimp/emailcatcher/popup_lname';
-    const POPUP_WIDTH               = 'mailchimp/emailcatcher/popup_width';
-    const POPUP_HEIGHT              = 'mailchimp/emailcatcher/popup_height';
-    const POPUP_SUBSCRIPTION        = 'mailchimp/emailcatcher/popup_subscription';
-    const POPUP_CAN_CANCEL          = 'mailchimp/emailcatcher/popup_cancel';
-    const POPUP_COOKIE_TIME         = 'mailchimp/emailcatcher/popup_cookie_time';
-    const POPUP_INSIST              = 'mailchimp/emailcatcher/popup_insist';
+    const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
+    const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';
+    const POPUP_TEXT                    = 'mailchimp/emailcatcher/popup_text';
+    const POPUP_FNAME                   = 'mailchimp/emailcatcher/popup_fname';
+    const POPUP_LNAME                   = 'mailchimp/emailcatcher/popup_lname';
+    const POPUP_WIDTH                   = 'mailchimp/emailcatcher/popup_width';
+    const POPUP_HEIGHT                  = 'mailchimp/emailcatcher/popup_height';
+    const POPUP_SUBSCRIPTION            = 'mailchimp/emailcatcher/popup_subscription';
+    const POPUP_CAN_CANCEL              = 'mailchimp/emailcatcher/popup_cancel';
+    const POPUP_COOKIE_TIME             = 'mailchimp/emailcatcher/popup_cookie_time';
+    const POPUP_INSIST                  = 'mailchimp/emailcatcher/popup_insist';
+
+    const ABANDONEDCART_ACTIVE      = 'mailchimp/abandonedcart/active';
+    const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
+    const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
+
+    const WARNING_MESSAGE           = 'mailchimp/warning_message';
+    const POPUP_MESSAGE             = 'mailchimp/popup_message';
 
     const IS_CUSTOMER   = "CUS";
     const IS_PRODUCT    = "PRO";

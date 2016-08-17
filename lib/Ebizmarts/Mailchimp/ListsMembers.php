@@ -130,7 +130,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -150,18 +150,18 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function addOrUpdate($listId,$subscriberHash,$emailType=null,$status, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,
-                                $emailAddress,$statusIfNew=null)
+    public function addOrUpdate($listId,$subscriberHash,$emailType=null,$status=null, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,
+                                $emailAddress,$statusIfNew)
     {
-        $_params = array('status'=>$status,'email_address'=>$emailAddress);
+        $_params = array('status'=>$statusIfNew,'email_address'=>$emailAddress);
         if($emailType) $_params['email_type'] = $emailType;
+        if($status) $_params['status'] = $status;
         if($mergeFields) $_params['merge_fields'] = $mergeFields;
         if($interests) $_params['interests'] = $interests;
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        if($statusIfNew) $_params['status_if_new'] = $statusIfNew;
-        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PUT);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PUT);
     }
 
     /**
@@ -173,6 +173,6 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      */
     public function delete($listId,$subscriberHash)
     {
-        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash,null,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,null,Ebizmarts_Mailchimp::DELETE);
     }
 }

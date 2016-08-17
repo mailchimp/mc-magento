@@ -27,10 +27,18 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     {
         if (is_null($this->_lists)) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-                if ($apiKey) {
-                    $api = new Ebizmarts_Mailchimp($apiKey);
+            if ($apiKey) {
+                try {
+                    $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
                     $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
+                    if (isset($this->_lists['lists']) && count($this->_lists['lists']) == 0) {
+                        $apiKeyArray = explode('-', $apiKey);
+                        Mage::getSingleton('adminhtml/session')->addWarning('Please create a list at <a target="_blank" href="https://' . $apiKeyArray[1] . '.admin.mailchimp.com/lists/new-list/">https://' . $apiKeyArray[1] . '.admin.mailchimp.com/lists/new-list/</a>');
+                    }
+                } catch(Mailchimp_Error $e) {
+                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
                 }
+            }
         }
     }
 

@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         $mcStoreId = (Mage::helper('mailchimp')->getMCStoreId()) ? Mage::helper('mailchimp')->getMCStoreId() : null;
         $api = null;
         if($configValue){
-            $api = new Ebizmarts_Mailchimp($configValue);
+            $api = new Ebizmarts_Mailchimp($configValue,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         }
         if($api) {
             try {
@@ -44,6 +44,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     $this->_account_details['total_products'] = $totalProducts['total_items'];
                     $totalOrders = $api->ecommerce->orders->getAll($mcStoreId, 'total_items');
                     $this->_account_details['total_orders'] = $totalOrders['total_items'];
+                    $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
+                    $this->_account_details['total_carts'] = $totalCarts['total_items'];
                 }else{
                     $this->_account_details['store_exists'] = false;
                 }
@@ -73,10 +75,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 array(
                     array('value' => 3, 'label' => Mage::helper('mailchimp')->__('  Total Customers:') . ' ' . $this->_account_details['total_customers']),
                     array('value' => 4, 'label' => Mage::helper('mailchimp')->__('  Total Products:') . ' ' . $this->_account_details['total_products']),
-                    array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_account_details['total_orders'])
+                    array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_account_details['total_orders']),
+                    array('value' => 6, 'label' => Mage::helper('mailchimp')->__('  Total Carts:') . ' ' . $this->_account_details['total_carts'])
                     ));
             }elseif(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE)){
-                $returnArray = array_merge($returnArray, array(array('value' => 6, 'label' => Mage::helper('mailchimp')->__('Warning: The MailChimp store was not created properly, please save your configuration again.'))));
+                $returnArray = array_merge($returnArray, array(array('value' => 7, 'label' => Mage::helper('mailchimp')->__('Warning: The MailChimp store was not created properly, please save your configuration again.'))));
             }
                 return $returnArray;
         } elseif(!$this->_account_details) {

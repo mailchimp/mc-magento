@@ -87,7 +87,7 @@ try {
 }
 catch (Exception $e)
 {
-    Mage::helper('mailchimp')->logError($e->getMessage());
+    Mage::log($e->getMessage());
 }
 
 $installer->run("
@@ -106,7 +106,7 @@ try {
     mkdir($baseDir . DS . 'var' . DS . 'mailchimp');
 }
 catch (Exception $e){
-    Mage::helper('mailchimp')->logError($e->getMessage());
+    Mage::log($e->getMessage());
 }
 
 $installer->endSetup();

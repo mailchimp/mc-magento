@@ -42,7 +42,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $product) {
             //define variants and root products
-            if($product->getMailchimpSyncModified()&&!$product->getMailchimpSyncDelta()) {
+            if($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
                 $data = $this->_buildOldProductRequest($product,$batchId,$mailchimpStoreId);
             }
             else {
@@ -66,7 +66,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
         return $batchArray;
     }
-
     protected function _buildNewProductRequest($product,$batchId,$mailchimpStoreId)
     {
         $variantProducts = array();
@@ -164,7 +163,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         //image
         $productMediaConfig = Mage::getModel('catalog/product_media_config');
-        $data["image_url"] = $productMediaConfig->getMediaUrl($product->getImage());;
+        $data["image_url"] = $productMediaConfig->getMediaUrl($product->getImage());
 
         //missing data
         $data["published_at_foreign"] = "";
@@ -208,100 +207,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function update($product)
     {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
-//            $product->setData('mailchimp_sync_delta', null);
             $product->setData('mailchimp_sync_error', '');
             $product->setData('mailchimp_sync_modified',1);
         }
     }
-//    public function old_update($product)
-//    {
-//        try {
-//
-//            if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
-//                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-//                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
-//
-//                if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE || $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
-//                    $data = $this->_buildProductData($product);
-//
-//                    $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-////                    $parentIds = $product->getTypeInstance()->getParentIdsByChild($product->getId());
-//
-//                    if (empty($parentIds)) {
-//                        $parentIds = array($product->getId());
-//                    }
-//
-//                    //add or update variant
-//                    $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-//                    foreach ($parentIds as $parentId) {
-//                        $mailchimpApi->ecommerce->products->variants->addOrModify(
-//                            $mailchimpStoreId,
-//                            $parentId,
-//                            $data["id"],
-//                            $data["title"],
-//                            $data["url"],
-//                            $data["sku"],
-//                            $data["price"],
-//                            $data["inventory_quantity"],
-//                            $data["image_url"],
-//                            $data["backorders"],
-//                            $data["visibility"]
-//                        );
-//                    }
-//
-//                } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
-//                    //check if it was never uploaded and create it
-//                    if (!$product->getMailchimpSyncDelta()) {
-//
-//                        $dataRootProduct = $this->_buildProductData($product, false, array($product));
-//
-//                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-//                        $mailchimpApi->ecommerce->products->add(
-//                            $mailchimpStoreId,
-//                            $dataRootProduct["id"],
-//                            $dataRootProduct["title"],
-//                            $dataRootProduct["handle"],
-//                            $dataRootProduct["url"],
-//                            $dataRootProduct["description"],
-//                            $dataRootProduct["type"],
-//                            $dataRootProduct["vendor"],
-//                            $dataRootProduct["image_url"],
-//                            $dataRootProduct["variants"],
-//                            $dataRootProduct["published_at_foreign"]
-//                        );
-//                    } else {
-//
-//                        throw new Exception('MailChimp root products can not be updated');
-//                    }
-//
-//                } else {
-//                    //@toDo bundle
-//
-//                    throw new Exception('These type of products are not yet supported');
-//                }
-//
-//                //update product delta
-//                $product->setData("mailchimp_sync_delta", Varien_Date::now());
-//                $product->setData("mailchimp_sync_error", "");
-//                $product->save();
-//            }
-//
-//        } catch (Mailchimp_Error $e) {
-//            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-//
-//            //update product delta
-//            $product->setData("mailchimp_sync_delta", Varien_Date::now());
-//            $product->setData("mailchimp_sync_error", $e->getFriendlyMessage());
-//            $product->save();
-//
-//        } catch
-//        (Exception $e) {
-//            Mage::helper('mailchimp')->logError($e->getMessage());
-//
-//            //update product delta
-//            $product->setData("mailchimp_sync_delta", Varien_Date::now());
-//            $product->setData("mailchimp_sync_error", $e->getMessage());
-//            $product->save();
-//        }
-//    }
 }
