@@ -24,7 +24,7 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
     {
         $_params = array();
         if($note) $_params['note'] = $note;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -45,7 +45,7 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -63,7 +63,7 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId,$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -79,10 +79,10 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
     {
         $_params = array();
         if($note) $_params['note'] = $note;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
     public function delete($listId,$subscriberHash,$noteId)
     {
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId,null,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

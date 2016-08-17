@@ -27,12 +27,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetList
     public function getButtonHtml()
     {
         $button = $this->getLayout()->createBlock('adminhtml/widget_button')
-            ->setData(array(
+            ->setData(
+                array(
                 'id' => 'changelist_button',
                 'label' => $this->helper('mailchimp')->__('Change List'),
                 'onclick' => 'javascript:resetlist(); return false;',
                 'style' => 'display:none'
-            ));
+                )
+            );
 
         return $button->toHtml();
     }

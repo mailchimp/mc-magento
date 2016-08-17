@@ -161,10 +161,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     ->save();
             } else {
                 $subscriber = Mage::getModel('newsletter/subscriber')->setImportMode(TRUE);
-                if(isset($data['data']['fname'])){
+                if (isset($data['data']['fname'])) {
                     $subscriber->setSubscriberFirstname($data['data']['fname']);
                 }
-                if(isset($data['data']['lname'])){
+                if (isset($data['data']['lname'])) {
                     $subscriber->setSubscriberLastname($data['data']['lname']);
                 }
                 $subscriber->subscribe($data['data']['email']);

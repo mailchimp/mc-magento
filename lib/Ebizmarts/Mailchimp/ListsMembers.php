@@ -29,9 +29,9 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @param $listId               The unique id for the list.
      * @param null $emailType       Type of email this member asked to get (‘html’ or ‘text’).
      * @param $status               Subscriber’s current status. (subscribed | unsubscribed | cleaned | pending)
-     * @param $email_address        Subscriber's email address.
+     * @param $emailAddress        Subscriber's email address.
      * @param null $mergeFields     An individual merge var and value for a member.
-     * @param null $interest        The key of this object’s properties is the ID of the interest in question.
+     * @param null $interests        The key of this object’s properties is the ID of the interest in question.
      * @param null $language        If set/detected, the subscriber’s language.
      * @param null $vip             VIP status for subscriber.
      * @param null $location        Subscriber location information.
@@ -40,9 +40,9 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$emailType=null,$status, $email_address, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,$ipOpt=null)
+    public function add($listId,$status, $emailAddress, $emailType=null, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,$ipOpt=null)
     {
-        $_params = array('status'=>$status, 'email_address' => $email_address);
+        $_params = array('status'=>$status, 'email_address' => $emailAddress);
         if($emailType) $_params['email_type'] = $emailType;
         if($mergeFields) $_params['merge_fields'] = $mergeFields;
         if($interests) $_params['interests'] = $interests;
@@ -50,7 +50,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
         if($ipOpt) $_params['ip_opt'] = $ipOpt;
-        return $this->master->call('lists/'.$listId.'/members',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('lists/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -86,7 +86,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($sinceLastChanged) $_params['since_last_changed'] = $sinceLastChanged;
         if($beforeLastChanged) $_params['before_last_changed'] = $beforeLastChanged;
         if($uniqueEmailId) $_params['unique_email_id'] = $uniqueEmailId;
-        return $this->master->call('list/'.$listId.'/members',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('list/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -103,7 +103,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -130,7 +130,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -150,8 +150,8 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function addOrUpdate($listId,$subscriberHash,$emailType=null,$status=null, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,
-                                $emailAddress,$statusIfNew)
+    public function addOrUpdate($listId, $subscriberHash, $emailAddress, $statusIfNew, $emailType=null, $status=null,
+                                $mergeFields=null, $interests=null, $language=null, $vip=null, $location=null)
     {
         $_params = array('status'=>$statusIfNew,'email_address'=>$emailAddress);
         if($emailType) $_params['email_type'] = $emailType;
@@ -161,7 +161,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::PUT);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::PUT);
     }
 
     /**
@@ -173,6 +173,6 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      */
     public function delete($listId,$subscriberHash)
     {
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,null,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

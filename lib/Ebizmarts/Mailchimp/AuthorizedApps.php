@@ -12,4 +12,8 @@
  */
 class Mailchimp_AuthorizedApps extends Mailchimp_Abstract
 {
+    /**
+     * @var Mailchimp_AuthorizedApps
+     */
+    public $apps;
 }

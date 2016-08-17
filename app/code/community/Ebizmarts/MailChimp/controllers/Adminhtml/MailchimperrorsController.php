@@ -26,4 +26,14 @@ class Ebizmarts_Mailchimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         $this->loadLayout(false);
         $this->renderLayout();
     }
+
+    protected function _isAllowed() {
+        switch ($this->getRequest()->getActionName()) {
+            case 'index':
+            case 'grid':
+                $acl = 'newsletter/mailchimp/mailchimperrors';
+                break;
+        }
+        return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
 }

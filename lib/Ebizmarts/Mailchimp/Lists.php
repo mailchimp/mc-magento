@@ -61,71 +61,63 @@ class Mailchimp_Lists extends Mailchimp_Abstract
      *          zip *       (The postal or zip code for the list contact)
      *          country *   (A two-character ISO3166 country code. Defaults to US if invalid.)
      * @param $permissionRemanider
-     * @param bool|false $useArchiveBar
+     * @param bool $useArchiveBar
      * @param $campaingDefaults
      *          fromName * (The default from name for campaigns sent to this list)
      *          fromEmail * (The email address to send unsubscribe notifications to)
      *          subject * (The default subject line for campaigns sent to this list)
      *          language *(The default language for this lists’s forms)
-     * @param bool|false $notifiyOnSubscribe
+     * @param bool $notifyOnSubscribe
      * @param $notifyOnUnsubscribe
      * @param $emailTypeOption
      * @param string $visibility
+     * @return mixed
+     * @throws Mailchimp_Error
+     * @throws Mailchimp_HttpError
      */
-    public function add($name,$contact,$permissionRemanider,$useArchiveBar=false,$campaingDefaults,$notifyOnSubscribe=false,$notifyOnUnsubscribe,$emailTypeOption,
-                        $visibility='pub')
+    public function add($name, $contact, $permissionRemanider, $campaingDefaults, $notifyOnUnsubscribe, $emailTypeOption,
+                        $useArchiveBar=false, $notifyOnSubscribe=false, $visibility='pub')
     {
         $_params= array('name'=>$name,'contact'=>$contact,'permission_remainder'=>$permissionRemanider,'use_archive_bar'=>$useArchiveBar,
             'campaignDefaults'=>$campaingDefaults,'notify_on_subscribe'=>$notifyOnSubscribe,'notify_on_unsubscribe'=>$notifyOnUnsubscribe,
             'email_type_option'=>$emailTypeOption,'visibility'=>$visibility);
-        return $this->master->call('lists',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('lists', $_params, Ebizmarts_Mailchimp::POST);
     }
     
     public function getLists($id=null,$fields=null,$excludeFields=null,$count=null,$offset=null,$beforeDateCreated=null,$sinceDateCreated=null,
                                 $beforeCampaignLastSent=null,$sinceCampaignLastSent=null,$email=null)
     {
         $_params = array();
-        if($fields)
-        {
+        if ($fields) {
             $_params['fields'] = $fields;
         }
-        if($excludeFields)
-        {
+        if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
-        if($count)
-        {
+        if ($count) {
             $_params['count'] = $count;
         }
-        if($offset)
-        {
+        if ($offset) {
             $_params['offset'] = $offset;
         }
-        if($beforeDateCreated)
-        {
+        if ($beforeDateCreated) {
             $_params['before_date_created'] = $beforeDateCreated;
         }
-        if($sinceDateCreated)
-        {
+        if ($sinceDateCreated) {
             $_params['since_date_created'] = $sinceDateCreated;
         }
-        if($beforeCampaignLastSent)
-        {
+        if ($beforeCampaignLastSent) {
             $_params['before_campaigns_last_sent'] = $beforeCampaignLastSent;
         }
-        if($sinceCampaignLastSent)
-        {
+        if ($sinceCampaignLastSent) {
             $_params['since_campaign_last_sent'] = $sinceCampaignLastSent;
         }
-        if($email)
-        {
+        if ($email) {
             $_params['email'] = $email;
         }
-        if($id) {
+        if ($id) {
             return $this->master->call('lists/'.$id, $_params, Ebizmarts_Mailchimp::GET);
-        }
-        else
-        {
+        } else {
             return $this->master->call('lists', $_params, Ebizmarts_Mailchimp::GET);
         }
     }
@@ -147,8 +139,8 @@ class Mailchimp_Lists extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function edit($listId,$name,$contact,$permissionRemainder,$useArchiveBar=null,$campaignDefaults=null,$notifyOnSubscribe=null,$notifyOnUnsubscribe=null,
-                         $emailTypeOption,$visibility=null)
+    public function edit($listId, $name, $contact, $permissionRemainder, $emailTypeOption, $useArchiveBar=null,
+                         $campaignDefaults=null, $notifyOnSubscribe=null, $notifyOnUnsubscribe=null, $visibility=null)
     {
         $_params = array('name'=>$name,'contact'=>$contact,'permission_remainder'=>$permissionRemainder,'email_type_option'=>$emailTypeOption);
         if($useArchiveBar) $_params['use_archive_bar'] = $useArchiveBar;

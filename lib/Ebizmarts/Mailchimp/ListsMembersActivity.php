@@ -26,6 +26,6 @@ class Mailchimp_ListsMembersActivity extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/activity',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/activity', $_params, Ebizmarts_Mailchimp::GET);
     }
 }

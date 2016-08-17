@@ -13,7 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 {
 
     const BATCH_LIMIT = 100;
-    protected $api = null;
+    protected $_api = null;
 
     /**
      * Set the request for orders to be created on MailChimp
@@ -29,18 +29,20 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('entity_id')
             ->addFieldToFilter('state', 'complete')
-            ->addFieldToFilter('mailchimp_sync_delta', array(
+            ->addFieldToFilter(
+                'mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
                 array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
-            ));
+                )
+            );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
         $counter = 0;
         foreach ($collection as $order) {
-            $orderJson = $this->GeneratePOSTPayload($order,$mailchimpStoreId);
+            $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
             if (!empty($orderJson)) {
                 $batchArray[$counter]['method'] = "POST";
                 $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
@@ -51,7 +53,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $order->setData("mailchimp_sync_delta", Varien_Date::now());
                 $order->save();
             }
-            $counter += 1;
+            $counter++;
         }
 
         return $batchArray;
@@ -71,11 +73,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             ->addAttributeToSelect('mailchimp_sync_delta')
             ->addAttributeToSelect('entity_id')
             ->addFieldToFilter('state', 'canceled')
-            ->addFieldToFilter('mailchimp_sync_delta', array(
+            ->addFieldToFilter(
+                'mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
                 array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
-            ));
+                )
+            );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
@@ -89,7 +93,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $order->setData("mailchimp_sync_delta", Varien_Date::now());
                 $order->save();
             }
-            $counter += 1;
+            $counter++;
         }
 
         return $batchArray;
@@ -98,17 +102,17 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * Set all the data for each order to be sent
      *
-     * @param $order_from_collection
+     * @param $orderFromCollection
      * @param $mailchimpStoreId
      * @return string
      */
-    protected function GeneratePOSTPayload($order_from_collection,$mailchimpStoreId)
+    protected function GeneratePOSTPayload($orderFromCollection,$mailchimpStoreId)
     {
-        $order = Mage::getModel('sales/order')->load($order_from_collection->getEntityId());
+        $order = Mage::getModel('sales/order')->load($orderFromCollection->getEntityId());
 
         $data = array();
         $data['id'] = $order->getEntityId();
-        if($order->getMailchimpCampaignId()) {
+        if ($order->getMailchimpCampaignId()) {
             $data['campaign_id'] = $order->getMailchimpCampaignId();
         }
         $data['currency_code'] = $order->getOrderCurrencyCode();
@@ -120,24 +124,23 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         //order lines
         $items = $order->getAllVisibleItems();
-        $item_count = 0;
+        $itemCount = 0;
         foreach ($items as $item) {
-            if($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            if ($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
                 $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
-            }
-            else {
+            } else {
                 $variant = $item->getProductId();
             }
             // load the product and check if the product was already sent to mailchimp
-            $syncDelta = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_delta',$order->getStoreId());
-            $syncError = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_error',$order->getStoreId());
+            $syncDelta = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_delta', $order->getStoreId());
+            $syncError = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_error', $order->getStoreId());
 
-            if($syncDelta&&$syncError==0) {
-                $item_count += 1;
+            if ($syncDelta&&$syncError==0) {
+                $itemCount++;
                 $data["lines"][] = array(
-                    "id" => (string)$item_count,
+                    "id" => (string)$itemCount,
                     "product_id" => $item->getProductId(),
                     "product_variant_id" => $variant,
                     "quantity" => (int)$item->getQtyOrdered(),
@@ -145,21 +148,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 );
             }
         }
-        if(!$item_count)
-        {
+        if (!$itemCount) {
             return "";
             unset($data['lines']);
         }
         //customer data
         $api = $this->_getApi();
         $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
-        if($customers['total_items']>0)
-        {
+        if ($customers['total_items']>0) {
             $data['customer'] = array(
                 'id' => $customers['customers'][0]['id']
             );
-        }
-        else {
+        } else {
             if ((bool)$order->getCustomerIsGuest()) {
                 $data["customer"] = array(
                     "id" => "GUEST-" . date('Y-m-d-H-i-s'),
@@ -215,11 +215,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      */
     protected function _getApi()
     {
-        if(!$this->api)
-        {
+        if (!$this->_api) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            $this->api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+            $this->_api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         }
-        return $this->api;
+        return $this->_api;
     }
 }

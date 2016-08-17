@@ -19,8 +19,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
         $active = $groups['general']['fields']['active']['value'];
         $storeId = Mage::helper('mailchimp')->getMCStoreId();
 
-        if($this->isValueChanged()&&$active&&!$storeId&&$this->getValue())
-        {
+        if ($this->isValueChanged()&&$active&&!$storeId&&$this->getValue()) {
             Mage::helper('mailchimp')->createStore($this->getValue());
         }
     }

@@ -41,28 +41,29 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
         return Mage::app()->getStore()->getId();
     }
 
-    protected function _handleCookie(){
+    protected function _handleCookie()
+    {
         $storeId = Mage::app()->getStore()->getId();
         $emailCookie = Mage::getModel('core/cookie')->get('email');
         $subscribeCookie = Mage::getModel('core/cookie')->get('subscribe');
         $cookieValues = explode('/', $emailCookie);
         $email = $cookieValues[0];
         $email = str_replace(' ', '+', $email);
-        if(isset($cookieValues[1])) {
+        if (isset($cookieValues[1])) {
             $fName = $cookieValues[1];
         }
-        if(isset($cookieValues[2])) {
+        if (isset($cookieValues[2])) {
             $lName = $cookieValues[2];
         }
-        if($subscribeCookie == 'true'){
+        if ($subscribeCookie == 'true') {
             $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
-            if(!$subscriber->getId()) {
+            if (!$subscriber->getId()) {
                 $subscriber = Mage::getModel('newsletter/subscriber')
                     ->setStoreId($storeId);
-                if($fName){
+                if ($fName) {
                     $subscriber->setSubscriberFirstname($fName);
                 }
-                if($lName){
+                if ($lName) {
                     $subscriber->setSubscriberLastname($lName);
                 }
                 $subscriber->setStoreId($storeId)

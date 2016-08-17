@@ -12,5 +12,8 @@
  */
 class Mailchimp_AutomationEmailsQuque extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_AutomationEmailsQuque
+     */
+    public $queue;
 }

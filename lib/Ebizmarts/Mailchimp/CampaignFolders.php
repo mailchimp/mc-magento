@@ -12,4 +12,8 @@
  */
 class Mailchimp_CampaignFolders extends Mailchimp_Abstract
 {
+    /**
+     * @var Mailchimp_CampaignFolders
+     */
+    public $folders;
 }

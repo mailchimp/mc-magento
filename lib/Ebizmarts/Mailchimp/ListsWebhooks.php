@@ -23,14 +23,14 @@ class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$url=null,$events=null,$sources=null)
+    public function add($listId, $url=null, $events=null, $sources=null)
     {
         $_params = array();
         if($url) $_params['url'] = $url;
         if($events) $_params['events'] = $events;
         if($sources) $_params['sources'] = $sources;
         
-        return $this->master->call('lists/'.$listId.'/webhooks',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('lists/'.$listId.'/webhooks', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -41,7 +41,7 @@ class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
      */
     public function getAll($listId)
     {
-        return $this->master->call('lists/'.$listId.'/webhooks',null,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/webhooks', null, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -51,9 +51,9 @@ class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function get($listId,$webhookId)
+    public function get($listId, $webhookId)
     {
-        return $this->master->call('lists/'.$listId.'/webhooks/'.$webhookId,null,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/webhooks/'.$webhookId, null, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -63,8 +63,8 @@ class Mailchimp_ListsWebhooks extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function delete($listId,$webhookId)
+    public function delete($listId, $webhookId)
     {
-        return $this->master->call('lists/'.$listId.'/webhooks/'.$webhookId,null,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId.'/webhooks/'.$webhookId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

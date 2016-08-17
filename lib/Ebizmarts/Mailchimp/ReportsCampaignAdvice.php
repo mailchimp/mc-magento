@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsCampaignAdvice extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsCampaignAdvice
+     */
+    public $campaignAdvice;
 }

@@ -17,9 +17,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $groups = $this->getData('groups');
         $active = $groups['ecommerce']['fields']['active']['value'];
 
-        if($this->isValueChanged()&&$active) {
-            if($this->getScope()=='default') {
-                if($this->getOldValue()) {
+        if ($this->isValueChanged()&&$active) {
+            if ($this->getScope()=='default') {
+                if ($this->getOldValue()) {
                     Mage::helper('mailchimp')->deleteStore();
                     Mage::helper('mailchimp')->resetErrors();
                     Mage::helper('mailchimp')->resetCampaign();
@@ -32,8 +32,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $groups = $this->getData('groups');
         $active = $groups['ecommerce']['fields']['active']['value'];
 
-        if($this->isValueChanged()&&$active)
-        {
+        if ($this->isValueChanged() && $active) {
             Mage::helper('mailchimp')->createStore($this->getValue());
         }
     }

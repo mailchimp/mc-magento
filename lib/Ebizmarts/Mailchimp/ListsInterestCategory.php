@@ -27,11 +27,11 @@ class Mailchimp_ListsInterestCategory extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$title,$displayOrder=null,$type)
+    public function add($listId, $title, $type, $displayOrder=null)
     {
         $_params = array('title'=>$title,'type'=>$type);
         if($displayOrder) $_params['display_order'] = $displayOrder;
-        return $this->master->call('lists/'.$listId.'/interest-categories',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('lists/'.$listId.'/interest-categories', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -53,7 +53,7 @@ class Mailchimp_ListsInterestCategory extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         if($type) $_params['type'] = $type;
-        return $this->master->call('lists/'.$listId.'/interest-categories',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/interest-categories', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -70,7 +70,7 @@ class Mailchimp_ListsInterestCategory extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/interest-categories/'.$interestCategoryId,$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/interest-categories/'.$interestCategoryId, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -84,11 +84,11 @@ class Mailchimp_ListsInterestCategory extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function modify($listId,$interestCategoryId,$title,$displayOrder=null,$type)
+    public function modify($listId, $interestCategoryId, $title, $type, $displayOrder=null)
     {
         $_params = array('title'=>$title,'type'=>$type);
         if($displayOrder) $_params['display_order'] = $displayOrder;
-        return $this->master->call('lists/'.$listId.'/interest-categories/'.$interestCategoryId,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('lists/'.$listId.'/interest-categories/'.$interestCategoryId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -100,7 +100,7 @@ class Mailchimp_ListsInterestCategory extends Mailchimp_Abstract
      */
     public function delete($listId,$interestCategoryId)
     {
-        return $this->master->call('lists/'.$listId.'/interest-categories/'.$interestCategoryId,null,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId.'/interest-categories/'.$interestCategoryId, null, Ebizmarts_Mailchimp::DELETE);
     }
 
 }

@@ -38,7 +38,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants',$_params,Ebizmarts_Mailchimp::POST);
+        $this->master->call('/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -61,7 +61,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants',$_params,Ebizmarts_Mailchimp::GET);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -80,7 +80,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         $_params=array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Ebizmarts_Mailchimp::GET);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -110,7 +110,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Ebizmarts_Mailchimp::PATCH);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -139,7 +139,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,$_params,Ebizmarts_Mailchimp::PUT);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, $_params, Ebizmarts_Mailchimp::PUT);
     }
     /**
      * @param $storeId                  The store id.
@@ -150,6 +150,6 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
      */
     public function delete($storeId,$productId,$variantId)
     {
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId,null,Ebizmarts_Mailchimp::DELETE);
+        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

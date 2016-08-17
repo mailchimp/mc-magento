@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsEmailActivity extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsEmailActivity
+     */
+    public $emailActivity;
 }

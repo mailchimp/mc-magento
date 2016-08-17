@@ -12,5 +12,8 @@
  */
 class Mailchimp_ConversationsMessages extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ConversationsMessages
+     */
+    public $messages;
 }

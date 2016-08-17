@@ -26,14 +26,14 @@ class Mailchimp_ListsSegmentsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function getAll($listId,$segmentId,$fields=null,$excludeFields=null,$count=null,$offset=null)
+    public function getAll($listId, $segmentId, $fields=null, $excludeFields=null, $count=null, $offset=null)
     {
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members',$_params,Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, Mailchimp::GET);
     }
 
     /**
@@ -44,13 +44,13 @@ class Mailchimp_ListsSegmentsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$segmentId,$emailAddress)
+    public function add($listId, $segmentId, $emailAddress)
     {
         $_params = array('email_address'=>$emailAddress);
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members',$_params,Mailchimp::POST);
+        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, Mailchimp::POST);
     }
-    public function delete($listId,$segmentId,$subscriberHash)
+    public function delete($listId, $segmentId, $subscriberHash)
     {
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members/'.$subscriberHash,null,Mailchimp::DELETE);
+        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members/'.$subscriberHash, null, Mailchimp::DELETE);
     }
 }

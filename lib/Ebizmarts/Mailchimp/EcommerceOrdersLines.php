@@ -28,7 +28,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
     {
         $_params=array('id'=>$id,'product_id'=>$productId,'product_variant_id'=>$productVariantId,'quantity'=>$quantity,
             'price'=>$price);
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines',$_params,Mailchimp::POST);
+        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId, '/lines', $_params, Mailchimp::POST);
     }
 
     /**
@@ -52,7 +52,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines',$_params,Mailchimp::GET);
+        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId, '/lines', $_params, Mailchimp::GET);
     }
 
     /**
@@ -72,7 +72,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines/'.$lineId,$_params,Mailchimp::GET);
+        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId, '/lines/'.$lineId, $_params, Mailchimp::GET);
     }
 
     /**
@@ -94,7 +94,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($productVariantId) $_params['product_variant_id'] = $productVariantId;
         if($quantity) $_params['quantity'] = $quantity;
         if($price) $_params['price'] = $price;
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines/'.$lineId,$_params,Mailchimp::PATCH);
+        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId, '/lines/'.$lineId, $_params, Mailchimp::PATCH);
     }
 
     /**
@@ -107,6 +107,6 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
      */
     public function delete($storeId,$orderId,$lineId)
     {
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines/'.$lineId,null,Mailchimp::DELETE);
+        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId, '/lines/'.$lineId, null, Mailchimp::DELETE);
     }
 }

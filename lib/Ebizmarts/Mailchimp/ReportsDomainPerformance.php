@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsDomainPerformance extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsDomainPerformance
+     */
+    public $domainPerformance;
 }

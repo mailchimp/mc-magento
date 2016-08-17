@@ -29,7 +29,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($id, $listId, $name, $platform = null, $domain = null, $emailAddress = null, $currencyCode, $moneyFormat = null,
+    public function add($id, $listId, $name, $currencyCode, $platform = null, $domain = null, $emailAddress = null, $moneyFormat = null,
                 $primaryLocale=null, $timezone = null,$phone=null,$address=null)
     {
         $_params = array('id'=>$id,'list_id'=>$listId,'name'=>$name,'currency_code'=>$currencyCode);
@@ -41,7 +41,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($timezone) $_params['timezone'] = $timezone;
         if($phone) $_params['phone'] = $phone;
         if($address)  $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -61,10 +61,9 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        if($id) {
+        if ($id) {
             return $this->master->call('ecommerce/stores/'.$id, $_params, Ebizmarts_Mailchimp::GET);
-        }
-        else {
+        } else {
             return $this->master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::GET);
         }
     }
@@ -84,8 +83,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function edit($storeId,$platform = null, $domain = null, $emailAddress = null,$currencyCode, $moneyFormat = null,
-                         $primaryLocale=null, $timezone = null,$phone=null,$address=null)
+    public function edit($storeId, $currencyCode, $platform = null, $domain = null, $emailAddress = null, $moneyFormat = null,
+                         $primaryLocale=null, $timezone = null, $phone=null, $address=null)
     {
         $_params=array();
         if($platform) $_params['platform'] = $platform;
@@ -97,7 +96,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($timezone) $_params['timezone'] = $timezone;
         if($phone) $_params['phone'] = $phone;
         if($address)  $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores/'.$storeId,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('ecommerce/stores/'.$storeId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**

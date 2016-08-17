@@ -17,66 +17,62 @@ class Mailchimp_Error extends Exception
     /**
      * @var array
      */
-    protected $_mailchimp_errors;
+    protected $_mailchimpErrors;
 
     /**
      * @var string
      */
-    protected $_mailchimp_title;
+    protected $_mailchimpTitle;
 
     /**
      * @var string
      */
-    protected $_mailchimp_details;
+    protected $_mailchimpDetails;
 
     public function __construct($url = "", $title = "", $details = "", $errors = null)
     {
         $titleComplete = $title . " for Api Call: " . $url;
         parent::__construct($titleComplete . " - " . $details);
-        $this->_mailchimp_title = $titleComplete;
-        $this->_mailchimp_details = $details;
-        $this->_mailchimp_errors = $errors;
+        $this->_mailchimpTitle = $titleComplete;
+        $this->_mailchimpDetails = $details;
+        $this->_mailchimpErrors = $errors;
     }
 
     public function getFriendlyMessage()
     {
-        $error_details = "";
-        if(!empty($this->_mailchimp_errors))
-        {
-            foreach($this->_mailchimp_errors as $error)
-            {
-                if(array_key_exists("message",$error)){
-                    $error_details .= $error_details != "" ? " / " : "";
-                    if(array_key_exists("field", $error) && $error['field']){
-                        $error_details .= $error["field"] . " : ";
+        $errorDetails = "";
+        if (!empty($this->_mailchimpErrors)) {
+            foreach ($this->_mailchimpErrors as $error) {
+                if (array_key_exists("message", $error)) {
+                    $errorDetails .= $errorDetails != "" ? " / " : "";
+                    if (array_key_exists("field", $error) && $error['field']) {
+                        $errorDetails .= $error["field"] . " : ";
                     }
-                    $error_details .= $error["message"];
+                    $errorDetails .= $error["message"];
                 }
             }
         }
 
-        if($error_details != ""){
-            return $this->_mailchimp_title . " : " . $error_details;
-        }else{
+        if ($errorDetails != "") {
+            return $this->_mailchimpTitle . " : " . $errorDetails;
+        } else {
             return $this->getMessage();
         }
     }
 
-    public function getMailchimpTitle(){
-        return $this->_mailchimp_title;
+    public function getMailchimpTitle()
+    {
+        return $this->_mailchimpTitle;
     }
 
-    public function getMailchimpDetails(){
-        return $this->_mailchimp_details;
+    public function getMailchimpDetails()
+    {
+        return $this->_mailchimpDetails;
     }
 
-    public function getMailchimpErrors(){
-        return $this->_mailchimp_errors;
+    public function getMailchimpErrors()
+    {
+        return $this->_mailchimpErrors;
     }
-
-}
-
-class Mailchimp_HttpError extends Mailchimp_Error
-{
 
 }

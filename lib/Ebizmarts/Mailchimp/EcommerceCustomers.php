@@ -37,7 +37,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
         if($ordersCount) $_params['orders_count'] = $ordersCount;
         if($totalSpent) $_params['total_spent'] = $totalSpent;
         if($address) $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -57,7 +57,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -74,7 +74,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields']= $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId,$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -91,7 +91,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
         $_params = array('email_address'=>$customerEmail);
         if($fields) $_params['fields']= $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers', $_params, Ebizmarts_Mailchimp::GET);
     }
     /**
      * @param $storeId          The store id.
@@ -119,7 +119,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
         if($ordersCount) $_params['orders_count'] = $ordersCount;
         if($totalSpent) $_params['total_spent'] = $totalSpent;
         if($address) $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -147,7 +147,7 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
         if($ordersCount) $_params['orders_count'] = $ordersCount;
         if($totalSpent) $_params['total_spent'] = $totalSpent;
         if($address) $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId,$_params,Ebizmarts_Mailchimp::PUT);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId, $_params, Ebizmarts_Mailchimp::PUT);
     }
 
     /**
@@ -159,6 +159,6 @@ class Mailchimp_EcommerceCustomers extends Mailchimp_Abstract
      */
     public function delete($storeId,$customerId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId,null,Ebizmarts_Mailchimp::DELETE);
+        return $this->master->call('ecommerce/stores/'.$storeId.'/customers/'.$customerId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

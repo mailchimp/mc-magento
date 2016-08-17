@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsEapURLReport extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsEapURLReport
+     */
+    public $report;
 }

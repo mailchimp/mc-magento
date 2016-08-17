@@ -20,11 +20,13 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         $collection = Mage::getModel('newsletter/subscriber')->getCollection()
             ->addFieldToFilter('subscriber_status', array('eq' => 1))
             ->addFieldToFilter('store_id', array('eq' => $storeId))
-            ->addFieldToFilter('mailchimp_sync_delta', array(
+            ->addFieldToFilter(
+                'mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
                 array('lt' => Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG, $storeId))
-            ));
+                )
+            );
         $collection->getSelect()->limit($limit);
         $subscriberArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . date('Y-m-d-H-i-s');
@@ -55,7 +57,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->save();
             }
-            $counter += 1;
+            $counter++;
         }
         return $subscriberArray;
     }
@@ -65,7 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
         $mergeVars = $this->getMergeVars($subscriber);
-        if($mergeVars) {
+        if ($mergeVars) {
             $data["merge_fields"] = $mergeVars;
         }
         $data["status_if_new"] = $this->_getMCStatus($subscriber->getStatus());
@@ -76,22 +78,23 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     /**
      * @param $subscriber
      */
-    public function updateSubscriber($subscriber){
+    public function updateSubscriber($subscriber)
+    {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
         $status = $this->_getMCStatus($subscriber->getStatus());
-        $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         $mergeVars = $this->getMergeVars($subscriber);
 
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->addOrUpdate($listId, $md5HashEmail, null, $status, $mergeVars, null, null, null, null, $subscriber->getSubscriberEmail(), $status);
+            $api->lists->members->addOrUpdate($listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $status, null, $status, $mergeVars, null, null, null, null);
             $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
             $subscriber->setData("mailchimp_sync_error", "");
-        }catch(Mailchimp_Error $e){
+        } catch(Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-        }catch (Exception $e){
+        } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
     }
@@ -104,33 +107,28 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
      */
     protected function _getMCStatus($status = null)
     {
-        if($status == Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+        if ($status == Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
             $status = 'unsubscribed';
-        }
-        elseif(Mage::helper('mailchimp')->getConfigValue(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG) && ($status == Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE || $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED))
-        {
+        } elseif (Mage::helper('mailchimp')->getConfigValue(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG) && ($status == Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE || $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED)) {
             $status = 'pending';
-        }
-        elseif($status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED)
-        {
+        } elseif ($status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
             $status = 'subscribed';
         }
         return $status;
     }
 
-    public function removeSubscriber($subscriber){
+    public function removeSubscriber($subscriber)
+    {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $api = new Ebizmarts_Mailchimp($apiKey,null,'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
-        }
-        catch(Mailchimp_Error $e){
+        } catch(Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-        }
-        catch (Exception $e){
+        } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
     }
@@ -138,19 +136,18 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     /**
      * @param $subscriber
      */
-    public function deleteSubscriber($subscriber){
+    public function deleteSubscriber($subscriber)
+    {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
         $api = new Ebizmarts_Mailchimp($apiKey);
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->update($listId, $md5HashEmail, null, 'cleaned');
-        }
-        catch(Mailchimp_Error $e){
+        } catch(Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-        }
-        catch (Exception $e){
+        } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
     }
@@ -158,10 +155,10 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     protected function getMergeVars($subscriber)
     {
         $mergeVars = array();
-        if($subscriber->getSubscriberFirstname()){
+        if ($subscriber->getSubscriberFirstname()) {
             $mergeVars['FNAME'] = $subscriber->getSubscriberFirstname();
         }
-        if($subscriber->getSubscriberLastname()){
+        if ($subscriber->getSubscriberLastname()) {
             $mergeVars['LNAME'] = $subscriber->getSubscriberLastname();
         }
         return (!empty($mergeVars)) ? $mergeVars : null;

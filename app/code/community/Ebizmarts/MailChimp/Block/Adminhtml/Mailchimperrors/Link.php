@@ -16,16 +16,15 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Admi
     {
         $id = $row->getData('original_id');
         $url = '#';
-        switch($row->getData('regtype'))
-        {
+        switch ($row->getData('regtype')) {
             case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
-                $url = Mage::helper("adminhtml")->getUrl("adminhtml/customer/edit",array('id'=>$id));
+                $url = Mage::helper("adminhtml")->getUrl("adminhtml/customer/edit", array('id'=>$id));
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
-                $url = Mage::helper("adminhtml")->getUrl("adminhtml/sales_order/view",array('order_id'=>$id));
+                $url = Mage::helper("adminhtml")->getUrl("adminhtml/sales_order/view", array('order_id'=>$id));
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
-                $url = Mage::helper("adminhtml")->getUrl("adminhtml/catalog_product/edit",array('id'=>$id));
+                $url = Mage::helper("adminhtml")->getUrl("adminhtml/catalog_product/edit", array('id'=>$id));
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
                 break;

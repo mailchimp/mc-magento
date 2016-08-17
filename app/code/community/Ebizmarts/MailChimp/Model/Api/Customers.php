@@ -24,12 +24,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             ->addAttributeToSelect('mailchimp_sync_modified')
             ->addAttributeToSelect('firstname')
             ->addAttributeToSelect('lastname')
-            ->addAttributeToFilter(array(
+            ->addAttributeToFilter(
+                array(
                 array('attribute' => 'mailchimp_sync_delta', 'null' => true),
                 array('attribute' => 'mailchimp_sync_delta', 'eq' => ''),
                 array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()),
                 array('attribute' => 'mailchimp_sync_modified', 'eq'=> 1)
-            ), '', 'left');
+                ), '', 'left'
+            );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $customerArray = array();
@@ -49,12 +51,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
 
             if (!empty($customerJson)) {
-                if($customer->getMailchimpSyncModified())
-                {
+                if ($customer->getMailchimpSyncModified()) {
                     $customerArray[$counter]['method'] = "PATCH";
                     $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer->getId();
-                }
-                else {
+                } else {
                     $customerArray[$counter]['method'] = "POST";
                     $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
                 }
@@ -67,7 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->setData("mailchimp_sync_modified", 0);
                 $customer->save();
             }
-            $counter += 1;
+            $counter++;
         }
         return $customerArray;
     }
@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $totalOrders = 0;
         $totalAmountSpent = 0;
         foreach ($orderCollection as $order) {
-            $totalOrders += 1;
+            $totalOrders++;
             $totalAmountSpent += (int)$order->getGrandTotal();
         }
         $data["orders_count"] = $totalOrders;
@@ -96,8 +96,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         //addresses data
         foreach ($customer->getAddresses() as $address) {
-            if (!array_key_exists("address", $data)) //send only first address
-            {
+            //send only first address
+            if (!array_key_exists("address", $data)) {
                 $street = $address->getStreet();
                 $data["address"] = array(
                     "address1" => $street[0],
@@ -129,7 +129,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
     }
 
-    public function updateOrderData($mailchimpStoreId){
+    public function updateOrderData($mailchimpStoreId)
+    {
         try {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             $mailchimpApi = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
@@ -149,7 +150,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     ->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
                 $totalSpent = 0;
                 // if MailChimp order count is different than the amount of orders successfully sent to MailChimp update values
-                if(count($orderCollection) != $customer['orders_count']) {
+                if (count($orderCollection) != $customer['orders_count']) {
                     foreach ($orderCollection as $order) {
                         $totalSpent += $order->getGrandTotal();
                     }
@@ -158,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                         $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer['id'];
                         $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer['id'];
                         $customerArray[$counter]['body'] = json_encode(array('id' => $customer['id'], 'orders_count' => count($orderCollection), 'total_spent' => $totalSpent));
-                        $counter += 1;
+                        $counter++;
                     }
                 }
             }

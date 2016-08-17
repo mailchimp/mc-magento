@@ -22,12 +22,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _getConfigScopeId($storeId = null, $websiteId = null)
     {
         $scopeArray = array();
-        if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) // store level
-        {
+        if ($code = Mage::getSingleton('adminhtml/config_data')->getStore()) {
+            // store level
             $storeId = Mage::getModel('core/store')->load($code)->getId();
-        }
-        elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) // website level
-        {
+        } elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) {
+            // website level
             $websiteId = Mage::getModel('core/website')->load($code)->getId();
             $storeId = Mage::app()->getWebsite($websiteId)->getDefaultStore()->getId();
         }
@@ -51,12 +50,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $configValue = null;
 
         //Get store scope for back end or front end
-        if(!$storeId) {
+        if (!$storeId) {
             $scopeArray = $this->_getConfigScopeId();
-        }else{
+        } else {
             $scopeArray['storeId'] = $storeId;
         }
-        if(!$returnParentValueIfNull) {
+        if (!$returnParentValueIfNull) {
             if (isset($scopeArray['websiteId']) && $scopeArray['websiteId']) {
                 //Website scope
                 if (Mage::app()->getWebsite($scopeArray['websiteId'])->getConfig($path) !== null) {
@@ -116,27 +115,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $apikey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
         //delete store id and data from mailchimp
-        if($deleteDataInMailchimp && $this->getMCStoreId() && $this->getMCStoreId() != "")
-        {
+        if ($deleteDataInMailchimp && $this->getMCStoreId() && $this->getMCStoreId() != "") {
             try {
                 Mage::getModel('mailchimp/api_stores')->deleteStore($this->getMCStoreId());
-            } catch(Mailchimp_Error $e)
-            {
-
+            } catch(Mailchimp_Error $e) {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             }
             //clear store config values
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
-        if($ecommerceEnabled&&$apikey&&$listId) {
+        if ($ecommerceEnabled&&$apikey&&$listId) {
             //generate store id
             $date = date('Y-m-d-His');
-            $store_id = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
+            $storeId = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
 
             //create store in mailchimp
             try {
-                Mage::getModel('mailchimp/api_stores')->createMailChimpStore($store_id);
+                Mage::getModel('mailchimp/api_stores')->createMailChimpStore($storeId);
                 //save in config
-                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $store_id);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
             } catch(Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
@@ -154,11 +151,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isEcomSyncDataEnabled()
     {
-        $api_key = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $moduleEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         $ecommerceEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE);
         $ret = !is_null($this->getMCStoreId()) && $this->getMCStoreId() != null
-            && !is_null($api_key) && $api_key != "" && $moduleEnabled && $ecommerceEnabled;
+            && !is_null($apiKey) && $apiKey != "" && $moduleEnabled && $ecommerceEnabled;
         return $ret;
     }
 
@@ -169,7 +166,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function logError($message)
     {
-        if($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
+        if ($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
             Mage::log($message, null, 'MailChimp_Errors.log', true);
         }
     }
@@ -181,7 +178,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function logRequest($message)
     {
-        if($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
+        if ($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
             Mage::log($message, null, 'MailChimp_Requests.log', true);
         }
     }
@@ -204,9 +201,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         // reset products with errors
         $collection = Mage::getModel('catalog/product')->getCollection()
-            ->addAttributeToFilter(array(
+            ->addAttributeToFilter(
+                array(
                 array('attribute' => 'mailchimp_sync_error', 'neq' => '')
-            ), '', 'left');
+                ), '', 'left'
+            );
         foreach ($collection as $product) {
             $product->setData("mailchimp_sync_delta", null);
             $product->setData("mailchimp_sync_error", '');
@@ -226,9 +225,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         // reset customers with errors
         $collection = Mage::getModel('customer/customer')->getCollection()
 //            ->addAttributeToSelect('mailchimp_sync_delta')
-            ->addAttributeToFilter(array(
+            ->addAttributeToFilter(
+                array(
                 array('attribute' => 'mailchimp_sync_error', 'neq' => '')
-            ));
+                )
+            );
         foreach ($collection as $customer) {
             $customer->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
             $customer->setData("mailchimp_sync_error", '');
@@ -240,13 +241,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
 
         $resource = Mage::getResourceModel('sales/order');
-        $connection->update($resource->getMainTable(),array('mailchimp_sync_error'=>'','mailchimp_sync_delta'=>'0000-00-00 00:00:00'),"mailchimp_sync_error <> ''");
+        $connection->update($resource->getMainTable(), array('mailchimp_sync_error'=>'','mailchimp_sync_delta'=>'0000-00-00 00:00:00'), "mailchimp_sync_error <> ''");
         // reset quotes with errors
         $resource = Mage::getResourceModel('sales/quote');
-        $connection->update($resource->getMainTable(),array('mailchimp_sync_error'=>'','mailchimp_sync_delta'=>'0000-00-00 00:00:00'),"mailchimp_sync_error <> ''");
+        $connection->update($resource->getMainTable(), array('mailchimp_sync_error'=>'','mailchimp_sync_delta'=>'0000-00-00 00:00:00'), "mailchimp_sync_error <> ''");
         $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection();
-        foreach($errorCollection as $item)
-        {
+        foreach ($errorCollection as $item) {
             $item->delete();
         }
     }
@@ -254,28 +254,31 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function resetCampaign()
     {
         $orderCollection = Mage::getModel('sales/order')->getCollection()
-            ->addFieldToFilter('mailchimp_campaign_id',array(
-                array('neq'=>0)))
-            ->addFieldToFilter('mailchimp_campaign_id',array(
+            ->addFieldToFilter(
+                'mailchimp_campaign_id', array(
+                array('neq'=>0))
+            )
+            ->addFieldToFilter(
+                'mailchimp_campaign_id', array(
                 array('notnull'=>true)
-            ));
-        foreach($orderCollection as $order)
-        {
+                )
+            );
+        foreach ($orderCollection as $order) {
             $order->setMailchimpCampaignId(0);
             $order->save();
         }
     }
     public function createStore($listId)
     {
-        if($listId) {
+        if ($listId) {
             //generate store id
             $date = date('Y-m-d-His');
-            $store_id = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
+            $storeId = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
             //create store in mailchimp
             try {
-                Mage::getModel('mailchimp/api_stores')->createMailChimpStore($store_id,$listId);
+                Mage::getModel('mailchimp/api_stores')->createMailChimpStore($storeId, $listId);
                 //save in config
-                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $store_id);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
@@ -284,10 +287,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function deleteStore()
     {
         $MCStoreId = $this->getMCStoreId();
-        if(!empty($MCStoreId)) {
+        if (!empty($MCStoreId)) {
             try {
                 Mage::getModel('mailchimp/api_stores')->deleteStore($MCStoreId);
             } catch (Mailchimp_Error $e) {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             }
             //clear store config values
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);

@@ -29,7 +29,7 @@ class Mailchimp_ListsGrowthHistory extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/growth-history',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/growth-history', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -48,7 +48,7 @@ class Mailchimp_ListsGrowthHistory extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/growth-history/'.$month,$_params,Ebizmarts_Mailchimp::GET);
+        return $this->master->call('lists/'.$listId.'/growth-history/'.$month, $_params, Ebizmarts_Mailchimp::GET);
 
     }
 }

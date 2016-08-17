@@ -38,4 +38,14 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         }
         Mage::app()->getResponse()->setBody($result);
     }
+
+    protected function _isAllowed() {
+        switch ($this->getRequest()->getActionName()) {
+            case 'resetLocalErrors':
+            case 'resetEcommerceData':
+                $acl = 'system/email_template/mailchimp/mailchimp_syncronization';
+                break;
+        }
+        return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
 }

@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsUnsubscribes extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsUnsubscribes
+     */
+    public $unsubscribes;
 }

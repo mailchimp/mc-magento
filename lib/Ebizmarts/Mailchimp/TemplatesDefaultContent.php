@@ -12,5 +12,8 @@
  */
 class Mailchimp_TemplatesDefaultContent extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_TemplatesDefaultContent
+     */
+    public $defaultContent;
 }
