@@ -24,7 +24,7 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
     {
         $_params = array();
         if($note) $_params['note'] = $note;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -49,7 +49,7 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes';
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -70,7 +70,7 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -87,11 +87,11 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         $_params = array();
         if($note) $_params['note'] = $note;
         $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
     public function delete($listId,$subscriberHash,$noteId)
     {
         $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId;
-        return $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

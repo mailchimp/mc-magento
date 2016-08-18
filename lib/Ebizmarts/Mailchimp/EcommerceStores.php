@@ -42,7 +42,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($timezone) $_params['timezone'] = $timezone;
         if($phone) $_params['phone'] = $phone;
         if($address)  $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -66,9 +66,9 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         if ($id) {
-            return $this->master->call('ecommerce/stores/'.$id, $_params, Ebizmarts_Mailchimp::GET);
+            return $this->_master->call('ecommerce/stores/'.$id, $_params, Ebizmarts_Mailchimp::GET);
         } else {
-            return $this->master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::GET);
+            return $this->_master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::GET);
         }
     }
 
@@ -100,7 +100,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($timezone) $_params['timezone'] = $timezone;
         if($phone) $_params['phone'] = $phone;
         if($address)  $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores/'.$storeId, $_params, Ebizmarts_Mailchimp::PATCH);
+        return $this->_master->call('ecommerce/stores/'.$storeId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -111,6 +111,6 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      */
     public function delete($storeId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call('ecommerce/stores/'.$storeId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

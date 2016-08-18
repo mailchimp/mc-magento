@@ -51,7 +51,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
         if($ipOpt) $_params['ip_opt'] = $ipOpt;
-        return $this->master->call('lists/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('lists/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -93,7 +93,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($sinceLastChanged) $_params['since_last_changed'] = $sinceLastChanged;
         if($beforeLastChanged) $_params['before_last_changed'] = $beforeLastChanged;
         if($uniqueEmailId) $_params['unique_email_id'] = $uniqueEmailId;
-        return $this->master->call('list/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('list/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -112,7 +112,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('list/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('list/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -140,7 +140,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::PATCH);
+        return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -173,7 +173,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($language) $_params['language'] = $language;
         if($vip) $_params['vip'] = $vip;
         if($location) $_params['location'] = $location;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::PUT);
+        return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::PUT);
     }
 
     /**
@@ -185,6 +185,6 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      */
     public function delete($listId,$subscriberHash)
     {
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

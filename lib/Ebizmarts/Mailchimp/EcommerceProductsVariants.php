@@ -39,7 +39,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
         $url = '/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
-        $this->master->call($url, $_params, Ebizmarts_Mailchimp::POST);
+        $this->_master->call($url, $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -63,7 +63,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
-        $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -83,7 +83,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
-        $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -114,7 +114,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
-        $this->master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
+        $this->_master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -144,7 +144,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
-        $this->master->call($url, $_params, Ebizmarts_Mailchimp::PUT);
+        $this->_master->call($url, $_params, Ebizmarts_Mailchimp::PUT);
     }
     /**
      * @param $storeId                  The store id.
@@ -156,6 +156,6 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
     public function delete($storeId,$productId,$variantId)
     {
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
-        $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
+        $this->_master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

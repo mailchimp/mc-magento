@@ -33,7 +33,7 @@ class Mailchimp_ListsSegmentsMembers extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, Mailchimp::GET);
     }
 
     /**
@@ -47,11 +47,11 @@ class Mailchimp_ListsSegmentsMembers extends Mailchimp_Abstract
     public function add($listId, $segmentId, $emailAddress)
     {
         $_params = array('email_address'=>$emailAddress);
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, Mailchimp::POST);
+        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, Mailchimp::POST);
     }
     public function delete($listId, $segmentId, $subscriberHash)
     {
         $url = 'lists/'.$listId.'/segments/'.$segmentId.'/members/'.$subscriberHash;
-        return $this->master->call($url, null, Mailchimp::DELETE);
+        return $this->_master->call($url, null, Mailchimp::DELETE);
     }
 }

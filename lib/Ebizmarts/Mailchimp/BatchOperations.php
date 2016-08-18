@@ -20,7 +20,7 @@ class Mailchimp_BatchOperations extends Mailchimp_Abstract
      */
     public function add($operations)
     {
-        return $this->master->call('batches', $operations, Ebizmarts_Mailchimp::POST, false);
+        return $this->_master->call('batches', $operations, Ebizmarts_Mailchimp::POST, false);
     }
 
     /**
@@ -38,7 +38,7 @@ class Mailchimp_BatchOperations extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('batches/'.$id, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('batches/'.$id, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -60,6 +60,6 @@ class Mailchimp_BatchOperations extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('batches', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('batches', $_params, Ebizmarts_Mailchimp::GET);
     }
 }
