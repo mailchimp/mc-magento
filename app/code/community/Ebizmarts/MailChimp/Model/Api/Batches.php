@@ -302,7 +302,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
             foreach ($items as $item) {
-                if ($item['status_code'] != 200) {
+                if ($item->status_code != 200) {
                     $line = explode('_', $item->operation_id);
                     $type = $line[0];
                     $id = $line[2];
@@ -369,7 +369,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                     $mailchimpErrors->setType($response->type);
                     $mailchimpErrors->setTitle($response->title);
-                    $mailchimpErrors->setStatus($item['status_code']);
+                    $mailchimpErrors->setStatus($item->status_code);
                     $mailchimpErrors->setErrors($errorDetails);
                     $mailchimpErrors->setRegtype($type);
                     $mailchimpErrors->setOriginalId($id);
