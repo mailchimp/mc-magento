@@ -22,7 +22,6 @@ $eav->addAttribute(
     'catalog_product', 'mailchimp_sync_modified', array(
     'label'     => 'MailChimp Modified',
     'type'      => 'int',
-    //    'input'     => 'int',
     'visible'   => false,
     'required'  => false,
     'position'  => 1,
@@ -36,7 +35,6 @@ $eav->addAttribute(
     'customer', 'mailchimp_sync_modified', array(
     'label'     => 'MailChimp Modified',
     'type'      => 'int',
-    //    'input'     => 'int',
     'visible'   => false,
     'required'  => false,
     'position'  => 1,

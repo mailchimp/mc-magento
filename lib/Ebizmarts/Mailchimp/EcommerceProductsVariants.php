@@ -38,19 +38,20 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants', $_params, Ebizmarts_Mailchimp::POST);
+        $url = '/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
+        $this->master->call($url, $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
-     * @param $storeId              The store id.
-     * @param $productId            The id for the product of a store.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with
-     *                              dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                              with dot notation.
-     * @param null $count           The number of records to return.
-     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
-     *                              with this parameter can be slow.
+     * @param $storeId             The store id.
+     * @param $productId           The id for the product of a store.
+     * @param null $fields         A comma-separated list of fields to return. Reference parameters of sub-objects with
+     *                             dot notation.
+     * @param null $excludeFields  A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                             with dot notation.
+     * @param null $count          The number of records to return.
+     * @param null $offset         The number of records from a collection to skip. Iterating over large collections
+     *                             with this parameter can be slow.
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
@@ -61,17 +62,18 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants', $_params, Ebizmarts_Mailchimp::GET);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
+        $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
-     * @param $storeId              The store id.
-     * @param $productId            The id for the product of a store.
-     * @param $variantId            The id for the product variant.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with
-     *                              dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                              with dot notation.
+     * @param $storeId             The store id.
+     * @param $productId           The id for the product of a store.
+     * @param $variantId           The id for the product variant.
+     * @param null $fields         A comma-separated list of fields to return. Reference parameters of sub-objects with
+     *                             dot notation.
+     * @param null $excludeFields  A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                             with dot notation.
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
@@ -80,7 +82,8 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         $_params=array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, $_params, Ebizmarts_Mailchimp::GET);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -110,7 +113,8 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, $_params, Ebizmarts_Mailchimp::PATCH);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $this->master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -139,7 +143,8 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($backorders) $_params['backorders'] = $backorders;
         if($visibility) $_params['visibility'] = $visibility;
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, $_params, Ebizmarts_Mailchimp::PUT);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $this->master->call($url, $_params, Ebizmarts_Mailchimp::PUT);
     }
     /**
      * @param $storeId                  The store id.
@@ -150,6 +155,7 @@ class Mailchimp_EcommerceProductsVariants extends Mailchimp_Abstract
      */
     public function delete($storeId,$productId,$variantId)
     {
-        $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId, null, Ebizmarts_Mailchimp::DELETE);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

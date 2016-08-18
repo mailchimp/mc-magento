@@ -51,6 +51,7 @@ class Mailchimp_ListsSegmentsMembers extends Mailchimp_Abstract
     }
     public function delete($listId, $segmentId, $subscriberHash)
     {
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId.'/members/'.$subscriberHash, null, Mailchimp::DELETE);
+        $url = 'lists/'.$listId.'/segments/'.$segmentId.'/members/'.$subscriberHash;
+        return $this->master->call($url, null, Mailchimp::DELETE);
     }
 }

@@ -14,7 +14,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
 {
     /**
      * @param $id              The unique identifier for the store
-     * @param $listId          The unique identifier for the MailChimp List associated with the store. The list_id for a specific store cannot change.
+     * @param $listId          The unique identifier for the MailChimp List associated with the store. The list_id for
+     *                         a specific store cannot change.
      * @param $name            The name of the store.
      * @param $platform        The e-commerce platform of the store.
      * @param $domain          The store domain.
@@ -29,8 +30,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($id, $listId, $name, $currencyCode, $platform = null, $domain = null, $emailAddress = null, $moneyFormat = null,
-                $primaryLocale=null, $timezone = null,$phone=null,$address=null)
+    public function add($id, $listId, $name, $currencyCode, $platform = null, $domain = null, $emailAddress = null,
+                        $moneyFormat = null, $primaryLocale=null, $timezone = null,$phone=null,$address=null)
     {
         $_params = array('id'=>$id,'list_id'=>$listId,'name'=>$name,'currency_code'=>$currencyCode);
         if($platform) $_params['platform'] = $platform;
@@ -46,10 +47,13 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
 
     /**
      * @param $id               The store id.
-     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with
+     *                          dot notation.
+     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with
+     *                          dot notation.
      * @param $count            The number of records to return.
-     * @param $offset           The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param $offset           The number of records from a collection to skip. Iterating over large collections with
+     *                          this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -83,8 +87,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function edit($storeId, $currencyCode, $platform = null, $domain = null, $emailAddress = null, $moneyFormat = null,
-                         $primaryLocale=null, $timezone = null, $phone=null, $address=null)
+    public function edit($storeId, $currencyCode, $platform = null, $domain = null, $emailAddress = null,
+                         $moneyFormat = null, $primaryLocale=null, $timezone = null, $phone=null, $address=null)
     {
         $_params=array();
         if($platform) $_params['platform'] = $platform;

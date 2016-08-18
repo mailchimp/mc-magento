@@ -25,8 +25,10 @@ class Mailchimp_BatchOperations extends Mailchimp_Abstract
 
     /**
      * @param $id               The unique id for the batch operation.
-     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                          with dot notation.
+     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                          with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -40,10 +42,13 @@ class Mailchimp_BatchOperations extends Mailchimp_Abstract
     }
 
     /**
-     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                          with dot notation.
+     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with
+     *                          dot notation.
      * @param $count            The number of records to return.
-     * @param $offset           The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param $offset           The number of records from a collection to skip. Iterating over large collections with
+     *                          this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError

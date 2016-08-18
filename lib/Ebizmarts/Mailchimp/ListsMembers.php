@@ -40,7 +40,8 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$status, $emailAddress, $emailType=null, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null,$ipOpt=null)
+    public function add($listId, $status, $emailAddress, $emailType=null, $mergeFields=null, $interests=null,
+                        $language=null, $vip=null, $location=null, $ipOpt=null)
     {
         $_params = array('status'=>$status, 'email_address' => $emailAddress);
         if($emailType) $_params['email_type'] = $emailType;
@@ -55,24 +56,30 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
 
     /**
      * @param $listId                   The unique id for the list.
-     * @param null $fields              A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields       A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields              A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                                  with dot notation.
+     * @param null $excludeFields       A comma-separated list of fields to exclude. Reference parameters of
+     *                                  sub-objects with dot notation.
      * @param null $count               The number of records to return.
-     * @param null $offset              The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param null $offset              The number of records from a collection to skip. Iterating over large
+     *                                  collections with this parameter can be slow.
      * @param null $emailType           The email type.
      * @param null $status              The subscriber’s status.
      * @param null $sinceTimpestampOpt  Restrict results to subscribers who opted-in after the set timeframe.
      * @param null $beforeTimestampOpt  Restrict results to subscribers who opted-in before the set timeframe.
-     * @param null $sinceLastChanged    Restrict results to subscribers whose information changed after the set timeframe.
-     * @param null $beforeLastChanged   Restrict results to subscribers whose information changed before the set timeframe.
-     * @param null $uniqueEmailId       A unique identifier for the email address across all MailChimp lists. This parameter can be found in any links with
-     *                                  Ecommerce 360 tracking enabled.
+     * @param null $sinceLastChanged    Restrict results to subscribers whose information changed after the set
+     *                                  timeframe.
+     * @param null $beforeLastChanged   Restrict results to subscribers whose information changed before the set
+     *                                  timeframe.
+     * @param null $uniqueEmailId       A unique identifier for the email address across all MailChimp lists.
+     *                                  This parameter can be found in any links with Ecommerce 360 tracking enabled.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function getAll($listId,$fields=null,$excludeFields=null,$count=null,$offset=null,$emailType=null,$status=null,$sinceTimpestampOpt=null,
-                        $beforeTimestampOpt=null,$sinceLastChanged=null,$beforeLastChanged=null,$uniqueEmailId=null)
+    public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $emailType=null,
+                           $status=null, $sinceTimpestampOpt=null, $beforeTimestampOpt=null,$sinceLastChanged=null,
+                           $beforeLastChanged=null, $uniqueEmailId=null)
     {
         $_params = array();
         if($fields) $_params['fields'] = $fields;
@@ -92,8 +99,10 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
     /**
      * @param $listId               The unique id for the list.
      * @param $subscriberHash       The MD5 hash of the lowercase version of the list member’s email address.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -120,7 +129,8 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function update($listId,$subscriberHash,$emailType=null,$status=null, $mergeFields=null,$interests=null,$language=null,$vip=null,$location=null)
+    public function update($listId, $subscriberHash, $emailType=null, $status=null, $mergeFields=null, $interests=null,
+                           $language=null, $vip=null, $location=null)
     {
         $_params = array();
         if($status) $_params['status'] = $status;
@@ -143,8 +153,10 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
      * @param null $language        If set/detected, the subscriber’s language.
      * @param null $vip             VIP status for subscriber.
      * @param null $location        Subscriber location information.
-     * @param $emailAddress         Email address for a subscriber used only on a PUT request if the email is not already present on the list.
-     * @param $statusIfNew          Subscriber’s status used only on a PUT request if the email is not already present on the list.
+     * @param $emailAddress         Email address for a subscriber used only on a PUT request if the email is not
+     *                              already present on the list.
+     * @param $statusIfNew          Subscriber’s status used only on a PUT request if the email is not already present
+     *                              on the list.
      *                              (subscribed | unsubscribed | cleaned | pending)
      * @return mixed
      * @throws Mailchimp_Error

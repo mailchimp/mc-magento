@@ -27,7 +27,8 @@ class Ebizmarts_Mailchimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         $this->renderLayout();
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed()
+    {
         switch ($this->getRequest()->getActionName()) {
             case 'index':
             case 'grid':

@@ -75,17 +75,19 @@ class Mailchimp_Lists extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($name, $contact, $permissionRemanider, $campaingDefaults, $notifyOnUnsubscribe, $emailTypeOption,
-                        $useArchiveBar=false, $notifyOnSubscribe=false, $visibility='pub')
+    public function add($name, $contact, $permissionRemanider, $campaingDefaults, $notifyOnUnsubscribe,
+                        $emailTypeOption, $useArchiveBar=false, $notifyOnSubscribe=false, $visibility='pub')
     {
-        $_params= array('name'=>$name,'contact'=>$contact,'permission_remainder'=>$permissionRemanider,'use_archive_bar'=>$useArchiveBar,
-            'campaignDefaults'=>$campaingDefaults,'notify_on_subscribe'=>$notifyOnSubscribe,'notify_on_unsubscribe'=>$notifyOnUnsubscribe,
-            'email_type_option'=>$emailTypeOption,'visibility'=>$visibility);
+        $_params= array('name'=>$name, 'contact'=>$contact, 'permission_remainder'=>$permissionRemanider,
+            'use_archive_bar'=>$useArchiveBar, 'campaignDefaults'=>$campaingDefaults,
+            'notify_on_subscribe'=>$notifyOnSubscribe, 'notify_on_unsubscribe'=>$notifyOnUnsubscribe,
+            'email_type_option'=>$emailTypeOption, 'visibility'=>$visibility);
         return $this->master->call('lists', $_params, Ebizmarts_Mailchimp::POST);
     }
     
-    public function getLists($id=null,$fields=null,$excludeFields=null,$count=null,$offset=null,$beforeDateCreated=null,$sinceDateCreated=null,
-                                $beforeCampaignLastSent=null,$sinceCampaignLastSent=null,$email=null)
+    public function getLists($id=null, $fields=null, $excludeFields=null, $count=null, $offset=null,
+                             $beforeDateCreated=null, $sinceDateCreated=null, $beforeCampaignLastSent=null,
+                             $sinceCampaignLastSent=null,$email=null)
     {
         $_params = array();
         if ($fields) {
@@ -125,15 +127,18 @@ class Mailchimp_Lists extends Mailchimp_Abstract
     /**
      * @param $listId                   The unique id for the list.
      * @param $name                     The name of the list.
-     * @param $contact                  Contact information displayed in campaign footers to comply with international spam laws.
+     * @param $contact                  Contact information displayed in campaign footers to comply with international
+     *                                  spam laws.
      * @param $permissionRemainder      The permission reminder for the list.
      * @param null $useArchiveBar       Whether campaigns for this list use the Archive Bar in archives by default.
      * @param null $campaignDefaults    Default values for campaigns created for this list.
      * @param null $notifyOnSubscribe   The email address to send subscribe notifications to.
      * @param null $notifyOnUnsubscribe The email address to send unsubscribe notifications to.
      * @param $emailTypeOption          Whether the list supports multiple formats for emails.
-     *                                  When set to true, subscribers can choose whether they want to receive HTML or plain-text emails.
-     *                                  When set to false, subscribers will receive HTML emails, with a plain-text alternative backup.
+     *                                  When set to true, subscribers can choose whether they want to receive HTML or
+     *                                  plain-text emails.
+     *                                  When set to false, subscribers will receive HTML emails, with a plain-text
+     *                                  alternative backup.
      * @param null $visibility          Whether this list is public or private. (pub/prv)
      * @return mixed
      * @throws Mailchimp_Error
@@ -142,7 +147,8 @@ class Mailchimp_Lists extends Mailchimp_Abstract
     public function edit($listId, $name, $contact, $permissionRemainder, $emailTypeOption, $useArchiveBar=null,
                          $campaignDefaults=null, $notifyOnSubscribe=null, $notifyOnUnsubscribe=null, $visibility=null)
     {
-        $_params = array('name'=>$name,'contact'=>$contact,'permission_remainder'=>$permissionRemainder,'email_type_option'=>$emailTypeOption);
+        $_params = array('name'=>$name, 'contact'=>$contact, 'permission_remainder'=>$permissionRemainder,
+            'email_type_option'=>$emailTypeOption);
         if($useArchiveBar) $_params['use_archive_bar'] = $useArchiveBar;
         if($campaignDefaults) $_params['campaign_defaults'] = $campaignDefaults;
         if($notifyOnSubscribe) $_params['notify_on_subscribe'] = $notifyOnSubscribe;

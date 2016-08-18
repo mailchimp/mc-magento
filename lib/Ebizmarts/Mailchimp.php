@@ -259,7 +259,7 @@ class Ebizmarts_Mailchimp
         
 
         if (curl_error($ch)) {
-            throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
+            throw new Mailchimp_Error("API call to $url failed: " . curl_error($ch));
         }
 
         if (floor($info['http_code'] / 100) >= 4) {

@@ -39,7 +39,8 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         Mage::app()->getResponse()->setBody($result);
     }
 
-    protected function _isAllowed() {
+    protected function _isAllowed()
+    {
         switch ($this->getRequest()->getActionName()) {
             case 'resetLocalErrors':
             case 'resetEcommerceData':

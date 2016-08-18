@@ -21,8 +21,9 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
     /**
      * @param $storeId                  The store id.
      * @param $id                       A unique identifier for the order.
-     * @param $customer                 Information about a specific customer. This information will update any existing
-     *                                  customer. If the customer doesn’t exist in the store, a new customer will be created.
+     * @param $customer                 Information about a specific customer. This information will update any
+     *                                  existing customer. If the customer doesn’t exist in the store, a new customer
+     *                                  will be created.
      * @param null $campaignId          A string that uniquely identifies the campaign for an order.
      * @param null $financialStatus     The order status. For example: refunded, processing, cancelled, etc.
      * @param null $fullfillmentStatus  The fulfillment status for the order. For example: partial, fulfilled, etc.
@@ -43,7 +44,8 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
                         $financialStatus=null, $fullfillmentStatus=null, $taxTotal=null, $processedAtForeign=null,
                         $cancelledAtForeign=null, $updateAtForeign=null, $shippingAddress=null, $billingAddress=null)
     {
-        $_params=array('id'=>$id,'customer'=>$customer,'currency_code'=>$currencyCode,'order_total'=>$orderTotal,'lines'=>$lines);
+        $_params=array('id'=>$id, 'customer'=>$customer, 'currency_code'=>$currencyCode, 'order_total'=>$orderTotal,
+            'lines'=>$lines);
         if($campaignId) $_params['campaign_id'] = $campaignId;
         if($financialStatus) $_params['financial_status'] = $financialStatus;
         if($fullfillmentStatus) $_params['fullfillment_status'] = $fullfillmentStatus;
@@ -58,10 +60,13 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
 
     /**
      * @param $storeId              The store id.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
-     * @param null $offset          The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
+     *                              with this parameter can be slow.
      * @param null $customerId      Restrict results to orders made by a specific customer.
      * @return mixed
      * @throws Mailchimp_Error
@@ -81,8 +86,10 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
     /**
      * @param $storeId              The store id.
      * @param $orderId              The id for the order in a store.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -92,14 +99,16 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields']= $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId, $_params, Ebizmarts_Mailchimp::GET);
+        $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
+        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
      * @param $storeId                  The store id.
      * @param $orderId                  The id for the order in a store.
-     * @param $customer                 Information about a specific customer. This information will update any existing
-     *                                  customer. If the customer doesn’t exist in the store, a new customer will be created.
+     * @param $customer                 Information about a specific customer. This information will update any
+     *                                  existing customer. If the customer doesn’t exist in the store, a new customer
+     *                                  will be created.
      * @param null $campaignId          A string that uniquely identifies the campaign for an order.
      * @param null $financialStatus     The order status. For example: refunded, processing, cancelled, etc.
      * @param null $fullfillmentStatus  The fulfillment status for the order. For example: partial, fulfilled, etc.
@@ -115,9 +124,10 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function modify($storeId,$orderId,$customer=null,$campaignId=null,$financialStatus=null,$fullfillmentStatus=null,
-                           $currencyCode=null,$orderTotal=null,$taxTotal=null,$processedAtForeign=null,$cancelledAtForeign=null,
-                           $updateAtForeign=null,$shippingAddress=null,$billingAddress=null,$lines=null)
+    public function modify($storeId, $orderId, $customer=null, $campaignId=null, $financialStatus=null,
+                           $fullfillmentStatus=null, $currencyCode=null, $orderTotal=null, $taxTotal=null,
+                           $processedAtForeign=null,$cancelledAtForeign=null, $updateAtForeign=null,
+                           $shippingAddress=null, $billingAddress=null, $lines=null)
     {
         $_params = array();
         if($customer) $_params['customer'] = $customer;
@@ -133,7 +143,8 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($shippingAddress) $_params['shipping_address'] = $shippingAddress;
         if($billingAddress) $_params['billing_address'] = $billingAddress;
         if($lines) $_params['lines'] = $lines;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId, $_params, Ebizmarts_Mailchimp::PATCH);
+        $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
+        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -145,6 +156,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
      */
     public function delete($storeId,$orderId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders/'.$orderId, null, Ebizmarts_Mailchimp::DELETE);
+        $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
+        return $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

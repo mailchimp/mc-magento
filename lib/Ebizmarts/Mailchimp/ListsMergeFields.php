@@ -96,8 +96,8 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function modify($listId,$mergeId,$displayOrder,$tag=null,$name=null,$type=null,$required=null,$defaulValue=null,$public=null,
-                           $options=null,$helpText=null)
+    public function modify($listId, $mergeId, $displayOrder, $tag=null, $name=null, $type=null, $required=null,
+                           $defaulValue=null, $public=null, $options=null, $helpText=null)
     {
         $_params = array();
         if($name) $_params['name'] = $name;

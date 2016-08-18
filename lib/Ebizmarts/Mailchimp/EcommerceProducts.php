@@ -51,10 +51,10 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
 
     /**
      * @param $storeId              The store id.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with
-     *                              dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with
-     *                              dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
      * @param null $offset          The number of records from a collection to skip. Iterating over large collections
      *                              with this parameter can be slow.
@@ -75,10 +75,10 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
     /**
      * @param $storeId              The store id.
      * @param $productId            The id for the product of a store.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with
-     *                              dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with
-     *                              dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -88,7 +88,8 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
         $_params=array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId, $_params, Ebizmarts_Mailchimp::GET);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId;
+        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -100,6 +101,7 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
      */
     public function delete($storeId,$productId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId.'/products/'.$productId, null, Ebizmarts_Mailchimp::DELETE);
+        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId;
+        return $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }
