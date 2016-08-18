@@ -65,23 +65,37 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     {
         $helper = Mage::helper('mailchimp');
         if (is_array($this->_accountDetails)) {
+            $username = Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_accountDetails['account_name'];
+            $title = Mage::helper('mailchimp')->__('Data uploaded to MailChimp:');
+            $totalSubscribersText = Mage::helper('mailchimp')->__('  Total Subscribers:');
+            $totalSubscribers = $totalSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
             $returnArray = array(
-                array('value' => 0, 'label' => Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_accountDetails['account_name']),
-                array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Data uploaded to MailChimp:')),
-                array('value' => 2, 'label' => Mage::helper('mailchimp')->__('  Total Subscribers:') . ' ' . $this->_accountDetails['total_subscribers'])
+                array('value' => 0, 'label' => $username),
+                array('value' => 1, 'label' => $title),
+                array('value' => 2, 'label' => $totalSubscribers)
             );
             if ($this->_accountDetails['store_exists']) {
+                $totalCustomersText = Mage::helper('mailchimp')->__('  Total Customers:');
+                $totalCustomers = $totalCustomersText . ' ' . $this->_accountDetails['total_customers'];
+                $totalProductsText = Mage::helper('mailchimp')->__('  Total Products:');
+                $totalProducts = $totalProductsText . ' ' . $this->_accountDetails['total_products'];
+                $totalOrdersText = Mage::helper('mailchimp')->__('  Total Orders:');
+                $totalOrders = $totalOrdersText . ' ' . $this->_accountDetails['total_orders'];
+                $totalCartsText = Mage::helper('mailchimp')->__('  Total Carts:');
+                $totalCarts = $totalCartsText . ' ' . $this->_accountDetails['total_carts'];
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                    array('value' => 3, 'label' => Mage::helper('mailchimp')->__('  Total Customers:') . ' ' . $this->_accountDetails['total_customers']),
-                    array('value' => 4, 'label' => Mage::helper('mailchimp')->__('  Total Products:') . ' ' . $this->_accountDetails['total_products']),
-                    array('value' => 5, 'label' => Mage::helper('mailchimp')->__('  Total Orders:') . ' ' . $this->_accountDetails['total_orders']),
-                    array('value' => 6, 'label' => Mage::helper('mailchimp')->__('  Total Carts:') . ' ' . $this->_accountDetails['total_carts'])
+                    array('value' => 3, 'label' => $totalCustomers),
+                    array('value' => 4, 'label' => $totalProducts),
+                    array('value' => 5, 'label' => $totalOrders),
+                    array('value' => 6, 'label' => $totalCarts)
                     )
                 );
             } elseif (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE)) {
-                $returnArray = array_merge($returnArray, array(array('value' => 7, 'label' => Mage::helper('mailchimp')->__('Warning: The MailChimp store was not created properly, please save your configuration again.'))));
+                $text = 'Warning: The MailChimp store was not created properly, please save your configuration again.';
+                $label = Mage::helper('mailchimp')->__($text);
+                $returnArray = array_merge($returnArray, array(array('value' => 7, 'label' => $label)));
             }
                 return $returnArray;
         } elseif (!$this->_accountDetails) {

@@ -36,12 +36,14 @@ class Ebizmarts_MailChimp_Model_Observer
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
         //Generating Webhooks URL
-        $hookUrl = Mage::getModel('core/url')->getUrl(Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH, array('wkey' => $webhooksKey));
+        $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
+        $hookUrl = Mage::getModel('core/url')->getUrl($url, array('wkey' => $webhooksKey));
 
         if (FALSE != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
         }
-        $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        $userAgent = 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
+        $api = new Ebizmarts_Mailchimp($apiKey, null, $userAgent);
         if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_TWO_WAY_SYNC)) {
             $events = array(
                 'subscribe' => true,
@@ -87,8 +89,10 @@ class Ebizmarts_MailChimp_Model_Observer
         } catch(Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-            if ($e->getMailchimpDetails() == 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.') {
-                Mage::getSingleton('adminhtml/session')->addError('Your store could not be accessed by MailChimp\'s Api. Please confirm the site is accessible externally to allow the webhook creation.');
+            $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
+            if ($e->getMailchimpDetails() == $textToCompare) {
+                $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the site is accessible externally to allow the webhook creation.';
+                Mage::getSingleton('adminhtml/session')->addError($errorMessage);
             }
         }
         catch (Exception $e) {
@@ -102,7 +106,9 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($isEnabled) {
             $subscriber = $observer->getEvent()->getSubscriber();
             if (!Mage::getSingleton('customer/session')->isLoggedIn()&&!Mage::app()->getStore()->isAdmin()) {
-                Mage::getModel('core/cookie')->set('email', $subscriber->getSubscriberEmail(), null, null, null, null, false);
+                Mage::getModel('core/cookie')->set(
+                    'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
+                );
             }
 
 
@@ -237,7 +243,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 Mage::helper('mailchimp')->resetMCEcommerceData();
             }
             if (!Mage::helper('mailchimp')->getMCStoreId()) {
-                Mage::getSingleton('adminhtml/session')->addWarning('The MailChimp store was not created properly, please save your configuration to create it.');
+                $warningMessage = 'The MailChimp store was not created properly, please save your configuration to create it.';
+                Mage::getSingleton('adminhtml/session')->addWarning($warningMessage);
             }
 
         } catch (Mailchimp_Error $e) {
@@ -253,10 +260,13 @@ class Ebizmarts_MailChimp_Model_Observer
     public function loadCustomerToQuote(Varien_Event_Observer $observer)
     {
         $quote = $observer->getEvent()->getQuote();
-        if (!Mage::getSingleton('customer/session')->isLoggedIn() && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $quote->getStoreId())) {
+        if (!Mage::getSingleton('customer/session')->isLoggedIn() &&
+            Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $quote->getStoreId())) {
             $action = Mage::app()->getRequest()->getActionName();
-            $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' || $action == 'saveShippingMethod' || $action == 'saveBilling');
-            if (Mage::getModel('core/cookie')->get('email') && Mage::getModel('core/cookie')->get('email')!= 'none' && !$onCheckout) {
+            $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
+                $action == 'saveShippingMethod' || $action == 'saveBilling');
+            if (Mage::getModel('core/cookie')->get('email') &&
+                Mage::getModel('core/cookie')->get('email')!= 'none' && !$onCheckout) {
                 $emailCookie = Mage::getModel('core/cookie')->get('email');
                 $emailCookieArr = explode('/', $emailCookie);
                 $email = $emailCookieArr[0];

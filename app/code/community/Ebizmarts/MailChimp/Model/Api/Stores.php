@@ -21,12 +21,12 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
 
-        if (!is_null($apiKey) && $apiKey != "") {
+        if ($apiKey != null && $apiKey != "") {
             $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
             $storeExists = null;
             $storeId = Mage::helper('mailchimp')->getMCStoreId();
 
-            if (is_null($storeId) || $storeId == "") {
+            if ($storeId == null || $storeId == "") {
                 return null;
             }
 
@@ -58,12 +58,12 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     public function createMailChimpStore($storeId, $listId=null)
     {
         $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-        if (!is_null($apiKey) && $apiKey != "") {
+        if ($apiKey != null && $apiKey != "") {
             if (!$listId) {
                 $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
             }
 
-            if (!is_null($listId) && $listId != "") {
+            if ($listId != null && $listId != "") {
                 $storeName = Mage::helper('mailchimp')->getMCStoreName();
                 $storeEmail = Mage::helper('mailchimp')->getConfigValue('trans_email/ident_general/email');
                 if (strpos($storeEmail, 'example.com') !== false) {
@@ -89,13 +89,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function deleteStore($storeId)
     {
-//        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
             $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
             $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
             $api->ecommerce->stores->delete($storeId);
             $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/synchbatches');
             $connection->update($resource->getMainTable(), array('status'=>'canceled'), "status = 'pending'");
-//        }
     }
 }

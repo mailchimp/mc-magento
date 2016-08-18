@@ -51,9 +51,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
 
             if (!empty($customerJson)) {
+                $patchPath = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/" . $customer->getId();
                 if ($customer->getMailchimpSyncModified()) {
                     $customerArray[$counter]['method'] = "PATCH";
-                    $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer->getId();
+                    $customerArray[$counter]['path'] = $patchPath;
                 } else {
                     $customerArray[$counter]['method'] = "POST";
                     $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
@@ -131,9 +132,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function updateOrderData($mailchimpStoreId)
     {
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $userAgent = 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
         try {
-            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            $mailchimpApi = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+            $mailchimpApi = new Ebizmarts_Mailchimp($apiKey, null, $userAgent);
             $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId);
             $mailchimpTotalCustomers = $mailchimpCustomers['total_items'];
             $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId, 'customers', null, $mailchimpTotalCustomers);
@@ -158,7 +160,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                         $customerArray[$counter]['method'] = "PATCH";
                         $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer['id'];
                         $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer['id'];
-                        $customerArray[$counter]['body'] = json_encode(array('id' => $customer['id'], 'orders_count' => count($orderCollection), 'total_spent' => $totalSpent));
+                        $customerArray[$counter]['body'] = json_encode(
+                            array(
+                            'id' => $customer['id'], 'orders_count' => count($orderCollection), 'total_spent' => $totalSpent
+                            )
+                        );
                         $counter++;
                     }
                 }
@@ -172,55 +178,4 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
     }
-//    public function updateOld($customer)
-//    {
-//        try {
-//
-//            if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
-//
-//                $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-//
-//                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
-//
-//                $data = $this->_buildCustomerData($customer);
-//
-//                $mailchimpApi = new Ebizmarts_Mailchimp($apiKey);
-//                $mailchimpApi->ecommerce->customers->addOrModify(
-//                    $mailchimpStoreId,
-//                    $data["id"],
-//                    $data["email_address"],
-//                    $data["opt_in_status"],
-//                    array_key_exists("company",$data) ? $data["company"] : null,
-//                    $data["first_name"],
-//                    $data["last_name"],
-//                    $data["orders_count"],
-//                    $data["total_spent"],
-//                    $data["address"]
-//                );
-//
-//                //update customers delta
-//                $customer->setData("mailchimp_sync_delta", Varien_Date::now());
-//                $customer->setData("mailchimp_sync_error", "");
-//                $customer->save();
-//
-//            }
-//        } catch (Mailchimp_Error $e)
-//        {
-//            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-//
-//            //update customers delta
-//            $customer->setData("mailchimp_sync_delta", Varien_Date::now());
-//            $customer->setData("mailchimp_sync_error", $e->getFriendlyMessage());
-//            $customer->save();
-//
-//        } catch (Exception $e)
-//        {
-//            Mage::helper('mailchimp')->logError($e->getMessage());
-//
-//            //update customers delta
-//            $customer->setData("mailchimp_sync_delta", Varien_Date::now());
-//            $customer->setData("mailchimp_sync_error", $e->getMessage());
-//            $customer->save();
-//        }
-//    }
 }
