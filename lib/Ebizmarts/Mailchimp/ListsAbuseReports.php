@@ -32,7 +32,7 @@ class Mailchimp_ListsAbuseReports extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/abuse_reports', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/abuse_reports', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -56,7 +56,7 @@ class Mailchimp_ListsAbuseReports extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/abuse_reports/'.$reportId, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/abuse_reports/'.$reportId, $_params, Ebizmarts_Mailchimp::GET);
 
     }
 }

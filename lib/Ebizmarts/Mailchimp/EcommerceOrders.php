@@ -55,7 +55,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($updateAtForeign) $_params['update_at_foreign'] = $updateAtForeign;
         if($shippingAddress) $_params['shipping_address'] = $shippingAddress;
         if($billingAddress) $_params['billing_address'] = $billingAddress;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders', $_params, Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('ecommerce/stores/'.$storeId.'/orders', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -80,7 +80,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         if($customerId) $_params['customer_id'] = $customerId;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/orders', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('ecommerce/stores/'.$storeId.'/orders', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -100,7 +100,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($fields) $_params['fields']= $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -144,7 +144,7 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
         if($billingAddress) $_params['billing_address'] = $billingAddress;
         if($lines) $_params['lines'] = $lines;
         $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -157,6 +157,6 @@ class Mailchimp_EcommerceOrders extends Mailchimp_Abstract
     public function delete($storeId,$orderId)
     {
         $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
-        return $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

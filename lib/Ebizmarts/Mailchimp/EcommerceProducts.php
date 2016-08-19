@@ -46,7 +46,7 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
         if($vendor) $_params['vendor'] = $vendor;
         if($imageUrl) $_params['image_url'] = $imageUrl;
         if($publishedAtForeign) $_params['published_at_foreign'] = $publishedAtForeign;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/products', $_params, Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('ecommerce/stores/'.$storeId.'/products', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -69,7 +69,7 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/products', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('ecommerce/stores/'.$storeId.'/products', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -89,7 +89,7 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -102,6 +102,6 @@ class Mailchimp_EcommerceProducts extends Mailchimp_Abstract
     public function delete($storeId,$productId)
     {
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId;
-        return $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

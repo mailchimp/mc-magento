@@ -34,7 +34,7 @@ class Mailchimp_ListInterestCategoryInterests extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId.'/interests';
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -55,7 +55,7 @@ class Mailchimp_ListInterestCategoryInterests extends Mailchimp_Abstract
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId.'/interests/'.$interestId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -78,7 +78,7 @@ class Mailchimp_ListInterestCategoryInterests extends Mailchimp_Abstract
         if($displayOrder) $_params['display_order'] = $displayOrder;
         if($_listId) $_params['list_id'] = $_listId;
         $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId.'/interests/'.$interestId;
-        return $this->master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -92,6 +92,6 @@ class Mailchimp_ListInterestCategoryInterests extends Mailchimp_Abstract
     public function delete($listId,$interestCategoryId,$interestId)
     {
         $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId.'/interests/'.$interestId;
-        return $this->master->call($url, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

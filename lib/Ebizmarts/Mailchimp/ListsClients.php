@@ -27,6 +27,6 @@ class Mailchimp_ListsClients extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/clients', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/clients', $_params, Ebizmarts_Mailchimp::GET);
     }
 }

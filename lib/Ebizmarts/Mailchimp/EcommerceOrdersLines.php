@@ -29,7 +29,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         $_params=array('id'=>$id,'product_id'=>$productId,'product_variant_id'=>$productVariantId,'quantity'=>$quantity,
             'price'=>$price);
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines';
-        return $this->master->call($url, $_params, Mailchimp::POST);
+        return $this->_master->call($url, $_params, Mailchimp::POST);
     }
 
     /**
@@ -54,7 +54,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines';
-        return $this->master->call($url, $_params, Mailchimp::GET);
+        return $this->_master->call($url, $_params, Mailchimp::GET);
     }
 
     /**
@@ -75,7 +75,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
-        return $this->master->call($url, $_params, Mailchimp::GET);
+        return $this->_master->call($url, $_params, Mailchimp::GET);
     }
 
     /**
@@ -98,7 +98,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($quantity) $_params['quantity'] = $quantity;
         if($price) $_params['price'] = $price;
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
-        return $this->master->call($url, $_params, Mailchimp::PATCH);
+        return $this->_master->call($url, $_params, Mailchimp::PATCH);
     }
 
     /**
@@ -112,6 +112,6 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
     public function delete($storeId,$orderId,$lineId)
     {
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
-        return $this->master->call($url, null, Mailchimp::DELETE);
+        return $this->_master->call($url, null, Mailchimp::DELETE);
     }
 }

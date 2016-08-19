@@ -1,6 +1,5 @@
 # MailChimp For Magento 1
 
-
 Integration to sync all the Magento data (Newsletter subscriber, Customers, Orders, Products) with MailChimp. It allows to use all the MailChimp potential for email Marketing such as sending Campaigns, Automations and more.
 
 ## Features
@@ -23,16 +22,15 @@ To get a copy of the project up and running on your local machine for developmen
 
 To enable MailChimp For Magento:
 
-1. Go to System -> Configuration -> MAILCHIMP -> MailChimp Configuration on your Magento’s back end.<br />
+1. Go to System -> Configuration -> MAILCHIMP -> MailChimp Configuration -> Select scope on your Magento’s back end.<br />
 2. Click the <b>Get API credentials</b> and place your MailChimp credentials, then an API Key will be shown.<br />
 3. Paste the API Key on MailChimp For Magento’s configuration and click <b>Save Config</b><br />
-4. When the page is loaded again select the desired list to sync with the Magento’s newsletter list and click <b>Save Config</b> again.
-
-After these steps are finished all the Products, Customers and Orders will start getting sent to MailChimp via cronjob tasks every 5 minutes.
+4. When the page is loaded again select the desired list to sync with the Magento’s newsletter list. At this point your Magento subscribers will start being sent to the configured MailChimp list.<br />
+5. If you have a paid MailChimp account and want to use MailChimp Automations go to "<b>Default Config</b>" scope and to the Ecommerce section and set it to Enabled. Now all your store information (Products, orders, customers and carts) will start being sent to MailChimp's associated list at your "<b>Default Config</b>" scope.
 
 ## Support
 
-Need support? [Click here](http://ebizmarts.com/contact-us)
+Need support? [Click here](http://ebizmarts.com/forums/view/6)
 
 ## License
 
