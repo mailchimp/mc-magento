@@ -12,5 +12,8 @@
  */
 class Mailchimp_CampaignsFeedback extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_CampaignsFeedback
+     */
+    public $feedback;
 }

@@ -27,11 +27,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
     public function getButtonHtml()
     {
         $button = $this->getLayout()->createBlock('adminhtml/widget_button')
-            ->setData(array(
+            ->setData(
+                array(
                 'id' => 'reseterrors_button',
                 'label' => $this->helper('mailchimp')->__('Reset Local Errors'),
                 'onclick' => 'javascript:reseterrors(); return false;'
-            ));
+                )
+            );
 
         return $button->toHtml();
     }

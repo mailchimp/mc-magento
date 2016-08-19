@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsClickReportsMembers extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsClickReportsMembers
+     */
+    public $members;
 }

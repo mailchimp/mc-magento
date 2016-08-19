@@ -14,10 +14,13 @@ class Mailchimp_ListsAbuseReports extends Mailchimp_Abstract
 {
     /**
      * @param $listId               The unique id for the list.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
-     * @param null $offset          The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
+     *                              with this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -29,16 +32,19 @@ class Mailchimp_ListsAbuseReports extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/abuse_reports',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/abuse_reports', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
      * @param $listId               The unique id for the list.
      * @param $reportId             The id for the abuse report.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
-     * @param null $offset          The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
+     *                              with this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -50,7 +56,7 @@ class Mailchimp_ListsAbuseReports extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/abuse_reports/'.$reportId,$_params,Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/abuse_reports/'.$reportId, $_params, Ebizmarts_Mailchimp::GET);
 
     }
 }

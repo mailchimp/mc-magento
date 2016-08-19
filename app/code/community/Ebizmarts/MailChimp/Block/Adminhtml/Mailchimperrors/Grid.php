@@ -45,35 +45,44 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
 //            'index' => 'type',
 //            'sortable' => true
 //        ));
-        $this->addColumn('title', array(
+        $this->addColumn(
+            'title', array(
             'header' => Mage::helper('mailchimp')->__('Title'),
             'index' => 'title',
             'sortable' => true
-        ));
-        $this->addColumn('status', array(
+            )
+        );
+        $this->addColumn(
+            'status', array(
             'header' => Mage::helper('mailchimp')->__('Status'),
             'index' => 'status',
             'width' => '100px',
             'sortable' => true
-        ));
-        $this->addColumn('regtype', array(
+            )
+        );
+        $this->addColumn(
+            'regtype', array(
             'header' => Mage::helper('mailchimp')->__('Reg Type'),
             'index' => 'regtype',
             'width' => '100px',
             'sortable' => true
-        ));
-        $this->addColumn('errors', array(
+            )
+        );
+        $this->addColumn(
+            'errors', array(
                 'header' => Mage::helper('mailchimp')->__('Error'),
                 'index'  => 'errors',
                 'sortable' => false
             )
         );
-        $this->addColumn('original_id', array(
+        $this->addColumn(
+            'original_id', array(
             'header' => Mage::helper('mailchimp')->__('Original'),
             'index' => 'original_id',
             'sortable' => false,
             'renderer' => 'mailchimp/adminhtml_mailchimperrors_link'
-        ));
+            )
+        );
 
         return parent::_prepareColumns();
     }

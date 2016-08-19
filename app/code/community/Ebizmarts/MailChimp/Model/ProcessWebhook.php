@@ -27,15 +27,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     public function processWebhookData(array $data)
     {
-        $listId = $data['data']['list_id']; //According to the docs, the events are always related to a list_id
-        //$store = Mage::helper('mailchimp')->getStoreByList($listId);
-
-//        if (!is_null($store)) {
-//            $curstore = Mage::app()->getStore();
-//            Mage::app()->setCurrentStore($store);
-//        }
-
-
         switch ($data['type']) {
             case 'subscribe':
                 $this->_subscribe($data);
@@ -46,20 +37,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             case 'cleaned':
                 $this->_clean($data);
                 break;
-//            case 'campaign':
-//                $this->_campaign($data);
-//                break;
             case 'upemail':
                 $this->_updateEmail($data);
                 break;
-//            case 'profile':
-//                $this->_profile($data);
-//                break;
         }
-
-//        if (!is_null($store)) {
-//            Mage::app()->setCurrentStore($curstore);
-//        }
     }
 
     /**
@@ -81,8 +62,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $oldSubscriber->setSubscriberEmail($new)
                 ->save();
         } elseif (!$newSubscriber->getId() && !$oldSubscriber->getId()) {
-
-            //@Todo Handle merge vars on the configuration
             Mage::getModel('newsletter/subscriber')
                 ->setImportMode(TRUE)
                 ->setStoreId(Mage::app()->getStore()->getId())
@@ -100,7 +79,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
 
         if (Mage::helper('mailchimp')->isAdminNotificationEnabled()) {
-            $text = Mage::helper('mailchimp')->__('MailChimp Cleaned Emails: %s %s at %s reason: %s', $data['data']['email'], $data['type'], $data['fired_at'], $data['data']['reason']);
+            $text = Mage::helper('mailchimp')->__(
+                'MailChimp Cleaned Emails: %s %s at %s reason: %s',
+                $data['data']['email'], $data['type'], $data['fired_at'], $data['data']['reason']
+            );
 
             $this->_getInbox()
                 ->setTitle($text)
@@ -120,26 +102,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-//    /**
-//     * Add "Campaign Sending Status" notification to Adminnotification Inbox <campaign>
-//     *
-//     * @param array $data
-//     * @return void
-//     */
-//    protected function _campaign(array $data)
-//    {
-//
-//        if (Mage::helper('mailchimp')->isAdminNotificationEnabled()) {
-//            $text = Mage::helper('mailchimp')->__('MailChimp Campaign Send: %s %s at %s', $data['data']['subject'], $data['data']['status'], $data['fired_at']);
-//
-//            $this->_getInbox()
-//                ->setTitle($text)
-//                ->setDescription($text)
-//                ->save();
-//        }
-//
-//    }
-
     /**
      * Subscribe email to Magento list, store aware
      *
@@ -150,10 +112,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         try {
 
-            //TODO: El método subscribe de Subscriber (Magento) hace un load by email
-            // entonces si existe en un store, lo acutaliza y lo cambia de store, no lo agrega a otra store
-            //VALIDAR si es lo que se requiere
-
             $subscriber = Mage::getModel('newsletter/subscriber')
                 ->loadByEmail($data['data']['email']);
             if ($subscriber->getId()) {
@@ -161,10 +119,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     ->save();
             } else {
                 $subscriber = Mage::getModel('newsletter/subscriber')->setImportMode(TRUE);
-                if(isset($data['data']['fname'])){
+                if (isset($data['data']['fname'])) {
                     $subscriber->setSubscriberFirstname($data['data']['fname']);
                 }
-                if(isset($data['data']['lname'])){
+                if (isset($data['data']['lname'])) {
                     $subscriber->setSubscriberLastname($data['data']['lname']);
                 }
                 $subscriber->subscribe($data['data']['email']);
@@ -216,7 +174,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         $email = $data['data']['email'];
         $subscriber = $this->loadByEmail($email);
-        $storeId = $subscriber->getStoreId();
 
         $customerCollection = Mage::getModel('customer/customer')->getCollection()
             ->addFieldToFilter('email', array('eq' => $email));

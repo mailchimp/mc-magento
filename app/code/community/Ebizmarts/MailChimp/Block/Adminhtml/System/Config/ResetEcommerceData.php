@@ -27,11 +27,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
     public function getButtonHtml()
     {
         $button = $this->getLayout()->createBlock('adminhtml/widget_button')
-            ->setData(array(
+            ->setData(
+                array(
                 'id' => 'resetecommercedata_button',
                 'label' => $this->helper('mailchimp')->__('Reset Ecommerce Data'),
                 'onclick' => 'javascript:resetecommerce(); return false;'
-            ));
+                )
+            );
 
         return $button->toHtml();
     }

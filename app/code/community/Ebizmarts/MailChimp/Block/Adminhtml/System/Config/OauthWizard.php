@@ -48,11 +48,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_OauthWizard extends Mage
 
         $label = $originalData['button_label'];
 
-        $this->addData(array(
+        $this->addData(
+            array(
             'button_label' => $this->helper('mailchimp')->__($label),
             'button_url' => $this->helper('mailchimp/oauth2')->authorizeRequestUrl(),
             'html_id' => $element->getHtmlId(),
-        ));
+            )
+        );
         return $this->_toHtml();
     }
 }

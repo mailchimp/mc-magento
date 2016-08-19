@@ -12,5 +12,8 @@
  */
 class Mailchimp_FileManagerFolders extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_FileManagerFolders
+     */
+    public $folders;
 }

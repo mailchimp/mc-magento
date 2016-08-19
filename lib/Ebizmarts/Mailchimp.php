@@ -66,8 +66,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/TemplateFolders.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/Templates.php';
     require_once dirname(__FILE__) . '/Ebizmarts/Mailchimp/TemplatesDefaultContent.php';
-}
-else {
+} else {
     require_once dirname(__FILE__) . '/Mailchimp/Abstract.php';
     require_once dirname(__FILE__) . '/Mailchimp/Root.php';
     require_once dirname(__FILE__) . '/Mailchimp/Automation.php';
@@ -139,13 +138,12 @@ class Ebizmarts_Mailchimp
 
     public function __construct($apiKey=null,$opts=array(),$userAgent=null)
     {
-        if(!$apiKey)
-        {
+        if (!$apiKey) {
             throw new Mailchimp_Error('You must provide a MailChimp API key');
         }
         $this->_apiKey   = $apiKey;
         $dc             = 'us1';
-        if (strstr($this->_apiKey, "-")){
+        if (strstr($this->_apiKey, "-")) {
             list($key, $dc) = explode("-", $this->_apiKey, 2);
             if (!$dc) {
                 $dc = "us1";
@@ -154,10 +152,10 @@ class Ebizmarts_Mailchimp
         $this->_root = str_replace('https://api', 'https://' . $dc . '.api', $this->_root);
         $this->_root = rtrim($this->_root, '/') . '/';
 
-        if (!isset($opts['timeout']) || !is_int($opts['timeout'])){
+        if (!isset($opts['timeout']) || !is_int($opts['timeout'])) {
             $opts['timeout'] = 600;
         }
-        if (isset($opts['debug'])){
+        if (isset($opts['debug'])) {
             $this->_debug = true;
         }
 
@@ -167,10 +165,9 @@ class Ebizmarts_Mailchimp
         if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
             curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, true);
         }
-        if($userAgent) {
+        if ($userAgent) {
             curl_setopt($this->_ch, CURLOPT_USERAGENT, $userAgent);
-        }
-        else {
+        } else {
             curl_setopt($this->_ch, CURLOPT_USERAGENT, 'Ebizmart-MailChimp-PHP/3.0.0');
         }
         curl_setopt($this->_ch, CURLOPT_HEADER, false);
@@ -234,18 +231,15 @@ class Ebizmarts_Mailchimp
     }
     public function call($url,$params,$method=Ebizmarts_Mailchimp::GET,$encodeJson=true)
     {
-        if(count($params) && $encodeJson && $method!=Ebizmarts_Mailchimp::GET)
-        {
+        if (count($params) && $encodeJson && $method!=Ebizmarts_Mailchimp::GET) {
             $params = json_encode($params);
         }
 
         $ch = $this->_ch;
-        if(count($params)&&$method!=Ebizmarts_Mailchimp::GET)
-        {
+        if (count($params)&&$method!=Ebizmarts_Mailchimp::GET) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        }
-        else {
-            if(count($params)) {
+        } else {
+            if (count($params)) {
                 $_params = http_build_query($params);
                 $url .= '?' . $_params;
             }
@@ -254,25 +248,23 @@ class Ebizmarts_Mailchimp
         curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST,$method);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 
 
-        $response_body = curl_exec($ch);
+        $responseBody = curl_exec($ch);
 
         $info = curl_getinfo($ch);
 
-        $result = json_decode($response_body, true);
+        $result = json_decode($responseBody, true);
         
 
-        if(curl_error($ch))
-        {
-            throw new Mailchimp_HttpError("API call to $url failed: " . curl_error($ch));
+        if (curl_error($ch)) {
+            throw new Mailchimp_Error("API call to $url failed: " . curl_error($ch));
         }
 
-        if(floor($info['http_code'] / 100) >= 4)
-        {
+        if (floor($info['http_code'] / 100) >= 4) {
             $errors = (isset($result['errors'])) ? $result['errors'] : '';
-            throw new Mailchimp_Error($url, $result['title'],$result['detail'], $errors);
+            throw new Mailchimp_Error($url, $result['title'], $result['detail'], $errors);
         }
 
         return $result;

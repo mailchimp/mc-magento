@@ -18,34 +18,38 @@ $installer->startSetup();
 
 $eav = new Mage_Eav_Model_Entity_Setup('core_setup');
 
-$eav->addAttribute('catalog_product', 'mailchimp_sync_modified', array(
+$eav->addAttribute(
+    'catalog_product', 'mailchimp_sync_modified', array(
     'label'     => 'MailChimp Modified',
     'type'      => 'int',
-//    'input'     => 'int',
     'visible'   => false,
     'required'  => false,
     'position'  => 1,
     'default'   => 0
-));
+    )
+);
 
 // create mailchimp_sync_modified to the customer
 
-$eav->addAttribute('customer', 'mailchimp_sync_modified', array(
+$eav->addAttribute(
+    'customer', 'mailchimp_sync_modified', array(
     'label'     => 'MailChimp Modified',
     'type'      => 'int',
-//    'input'     => 'int',
     'visible'   => false,
     'required'  => false,
     'position'  => 1,
     'default'   => 0
-));
+    )
+);
 
 try {
-    $installer->run("
+    $installer->run(
+        "
   ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD COLUMN `mailchimp_campaign_id` VARCHAR(16) DEFAULT NULL;
   ALTER TABLE `{$this->getTable('newsletter_subscriber')}` ADD column `mailchimp_sync_delta` datetime NOT NULL;
   ALTER TABLE `{$this->getTable('newsletter_subscriber')}` ADD column `mailchimp_sync_error` VARCHAR(255) NOT NULL;
-");
+"
+    );
 }
 catch (Exception $e)
 {

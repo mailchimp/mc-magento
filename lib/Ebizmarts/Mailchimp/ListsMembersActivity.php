@@ -15,8 +15,10 @@ class Mailchimp_ListsMembersActivity extends Mailchimp_Abstract
     /**
      * @param $listId           The unique id for the list.
      * @param $subscriberHash   The MD5 hash of the lowercase version of the list member’s email address.
-     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                          with dot notation.
+     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                          with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -26,6 +28,7 @@ class Mailchimp_ListsMembersActivity extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/activity',$_params,Ebizmarts_Mailchimp::GET);
+        $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/activity';
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 }

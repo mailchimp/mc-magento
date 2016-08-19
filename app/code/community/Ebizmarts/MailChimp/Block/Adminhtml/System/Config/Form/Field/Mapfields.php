@@ -16,14 +16,18 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
 
     public function __construct()
     {
-        $this->addColumn('mailchimp', array(
+        $this->addColumn(
+            'mailchimp', array(
             'label' => Mage::helper('mailchimp')->__('MailChimp'),
             'style' => 'width:120px',
-        ));
-        $this->addColumn('magento', array(
+            )
+        );
+        $this->addColumn(
+            'magento', array(
             'label' => Mage::helper('mailchimp')->__('Customer'),
             'style' => 'width:120px',
-        ));
+            )
+        );
         $this->_addAfter = false;
         $this->_addButtonLabel = Mage::helper('mailchimp')->__('Add new field');
         parent::__construct();
@@ -35,8 +39,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
             ->addSetInfo()
             ->getData();
 
-        foreach ($attrSetId as $option){
-            if($option['frontend_label']) {
+        foreach ($attrSetId as $option) {
+            if ($option['frontend_label']) {
                 $this->_customerAttributes[$option['attribute_id']] = $option['frontend_label'];
             }
         }

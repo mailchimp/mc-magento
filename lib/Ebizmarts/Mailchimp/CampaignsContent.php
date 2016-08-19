@@ -12,5 +12,8 @@
  */
 class Mailchimp_CampaignsContent extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_CampaignsContent
+     */
+    public $content;
 }

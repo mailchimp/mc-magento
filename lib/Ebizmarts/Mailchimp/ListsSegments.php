@@ -17,14 +17,13 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
      */
     public $segmentMembers;
 
-    public function getInformation($listId,$fields=null)
+    public function getInformation($listId, $fields=null)
     {
         $_params = array();
-        if($fields)
-        {
+        if ($fields) {
             $_params['fields'] = $fields;
         }
-        return $this->master->call('lists/'.$listId.'/segments',$_params,Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/segments', $_params, Mailchimp::GET);
     }
 
     /**
@@ -45,8 +44,8 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function getAll($listId,$fields=null,$excludeFields=null,$count=null,$offset=null,$type=null,
-                           $sinceCreatedAt=null,$beforeCreatedAt=null,$sinceUpdatedAt=null,$beforeUpdatedAt=null)
+    public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $type=null,
+                           $sinceCreatedAt=null, $beforeCreatedAt=null, $sinceUpdatedAt=null, $beforeUpdatedAt=null)
     {
         $_params = array();
         if($fields) $_params['fields'] = $fields;
@@ -58,7 +57,7 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
         if($beforeCreatedAt) $_params['before_created_at'] = $beforeCreatedAt;
         if($sinceUpdatedAt) $_params['since_updated_at'] = $sinceUpdatedAt;
         if($beforeUpdatedAt) $_params['before_updated_at'] = $beforeUpdatedAt;
-        return $this->master->call('lists/'.$listId.'/segments',$_params,Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/segments', $_params, Mailchimp::GET);
     }
 
     /**
@@ -68,9 +67,9 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function get($listId,$segmentId)
+    public function get($listId, $segmentId)
     {
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId,null,Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, null, Mailchimp::GET);
     }
 
     /**
@@ -85,12 +84,12 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$name,$staticSegment=null,$options=null)
+    public function add($listId, $name, $staticSegment=null, $options=null)
     {
         $_params = array('name'=>$name);
         if($staticSegment) $_params['static_segment'] = $staticSegment;
         if($options) $_params['options'] = $options;
-        return $this->master->call('lists/'.$listId.'/segments',$_params,Mailchimp::POST);
+        return $this->_master->call('lists/'.$listId.'/segments', $_params, Mailchimp::POST);
     }
     /**
      * @param $listId                   The unique id for the list.
@@ -105,13 +104,13 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function modify($listId,$segmentId,$name,$staticSegment=null,$options=null)
+    public function modify($listId, $segmentId, $name, $staticSegment=null, $options=null)
     {
         $_params = array();
         if($name) $_params['name'] =$name;
         if($staticSegment) $_params['static_segment'] = $staticSegment;
         if($options) $_params['options'] = $options;
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId,$_params,Mailchimp::PATCH);
+        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, $_params, Mailchimp::PATCH);
     }
 
     /**
@@ -121,8 +120,8 @@ class Mailchimp_ListsSegments extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function delete($listId,$segmentId)
+    public function delete($listId, $segmentId)
     {
-        return $this->master->call('lists/'.$listId.'/segments/'.$segmentId,null,Mailchimp::DELETE);
+        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, null, Mailchimp::DELETE);
     }
 }

@@ -28,12 +28,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
             ->addAttributeToSelect('visibility')
             ->addAttributeToSelect('mailchimp_sync_modified')
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
-            ->addAttributeToFilter(array(
+            ->addAttributeToFilter(
+                array(
                 array('attribute' => 'mailchimp_sync_delta', 'null' => true),
                 array('attribute' => 'mailchimp_sync_delta', 'eq' => ''),
                 array('attribute' => 'mailchimp_sync_delta', 'lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()),
                 array('attribute' => 'mailchimp_sync_modified', 'eq' => 1)
-            ), '', 'left');
+                ), '', 'left'
+            );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
@@ -42,11 +44,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $product) {
             //define variants and root products
-            if($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
-                $data = $this->_buildOldProductRequest($product,$batchId,$mailchimpStoreId);
-            }
-            else {
-                $data = $this->_buildNewProductRequest($product,$batchId,$mailchimpStoreId);
+            if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
+                $data = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
+            } else {
+                $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
             }
 
             if (!empty($data)) {
@@ -55,14 +56,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
                 $product->setData("mailchimp_sync_error", "");
-                $product->setData('mailchimp_sync_modified',0);
+                $product->setData('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
                 $product->save();
-            }
-            else {
+            } else {
                 continue;
             }
-            $counter += 1;
+            $counter++;
         }
         return $batchArray;
     }
@@ -78,12 +78,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
             //add itself as variant
             $variantProducts[] = $product;
 
-            if(count($childProducts[0])) {
+            if (count($childProducts[0])) {
                 foreach ($childProducts[0] as $childId) {
                     $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
                 }
             }
-        } else if($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
+        } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
             $variantProducts = array();
             $variantProducts[] = $product;
         } else {
@@ -208,7 +208,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
             $product->setData('mailchimp_sync_error', '');
-            $product->setData('mailchimp_sync_modified',1);
+            $product->setData('mailchimp_sync_modified', 1);
         }
     }
 }

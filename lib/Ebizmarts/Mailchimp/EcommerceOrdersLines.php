@@ -28,16 +28,17 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
     {
         $_params=array('id'=>$id,'product_id'=>$productId,'product_variant_id'=>$productVariantId,'quantity'=>$quantity,
             'price'=>$price);
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines',$_params,Mailchimp::POST);
+        $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines';
+        return $this->_master->call($url, $_params, Mailchimp::POST);
     }
 
     /**
      * @param $storeId              The store id.
      * @param $orderId              The id for the order in a store.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with
-     *                              dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with
-     *                              dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
      * @param null $offset          The number of records from a collection to skip. Iterating over large collections
      *                              with this parameter can be slow.
@@ -52,17 +53,18 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines',$_params,Mailchimp::GET);
+        $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines';
+        return $this->_master->call($url, $_params, Mailchimp::GET);
     }
 
     /**
      * @param $storeId              The store id.
      * @param $orderId              The id for the order in a store.
      * @param $lineId               The id for the line item of an order.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with
-     *                              dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with
-     *                              dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -72,17 +74,18 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines/'.$lineId,$_params,Mailchimp::GET);
+        $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
+        return $this->_master->call($url, $_params, Mailchimp::GET);
     }
 
     /**
-     * @param $storeId                  The store id.
-     * @param $orderId                  The id for the order in a store.
-     * @param $lineId                   The id for the line item of an order.
-     * @param null $productId           The unique identifier for the product associated with the order line item.
-     * @param null $productVariantId    A unique identifier for the product variant associated with the order line item.
-     * @param null $quantity            The quantity of an order line item.
-     * @param null $price               The price of an order line item.
+     * @param $storeId                 The store id.
+     * @param $orderId                 The id for the order in a store.
+     * @param $lineId                  The id for the line item of an order.
+     * @param null $productId          The unique identifier for the product associated with the order line item.
+     * @param null $productVariantId   A unique identifier for the product variant associated with the order line item.
+     * @param null $quantity           The quantity of an order line item.
+     * @param null $price              The price of an order line item.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -94,7 +97,8 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
         if($productVariantId) $_params['product_variant_id'] = $productVariantId;
         if($quantity) $_params['quantity'] = $quantity;
         if($price) $_params['price'] = $price;
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines/'.$lineId,$_params,Mailchimp::PATCH);
+        $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
+        return $this->_master->call($url, $_params, Mailchimp::PATCH);
     }
 
     /**
@@ -107,6 +111,7 @@ class Mailchimp_EcommerceOrdersLines extends Mailchimp_Abstract
      */
     public function delete($storeId,$orderId,$lineId)
     {
-        return $this->master->call('/ecommerce/stores/'.$storeId.'/orders/'.$orderId,'/lines/'.$lineId,null,Mailchimp::DELETE);
+        $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
+        return $this->_master->call($url, null, Mailchimp::DELETE);
     }
 }

@@ -9,8 +9,7 @@
  * @date: 4/29/16 3:55 PM
  * @file: Account.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account
-    extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
@@ -19,9 +18,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account
         $html = '<ul class="checkboxes">';
 
         foreach ($values as $dat) {
-            if($dat['value'] == 7){
+            if ($dat['value'] == 7) {
                 $html .= "<li style='color:red;font-weight: bold;'>{$dat['label']}</li>";
-            }else {
+            } else {
                 $html .= "<li>{$dat['label']}</li>";
             }
         }

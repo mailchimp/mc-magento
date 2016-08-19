@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
             //restore the quote
             $quote = Mage::getModel('sales/quote')->load($params['id']);
             $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $quote->getStoreId()));
-            if(isset($params['mc_cid'])) {
+            if (isset($params['mc_cid'])) {
                 $url .= '?mc_cid='.$params['mc_cid'];
             }
             if ((!isset($params['token']) || (isset($params['token']) && $params['token'] != $quote->getMailchimpToken()))) {
@@ -42,7 +42,7 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
                     } else {
                         Mage::getSingleton('customer/session')->addNotice("Login to complete your order");
                         $url = '/customer/account/login';
-                        if(isset($params['mc_cid'])) {
+                        if (isset($params['mc_cid'])) {
                             $url .= '?mc_cid='.$params['mc_cid'];
                         }
                         $this->getResponse()->setRedirect($url, 301);

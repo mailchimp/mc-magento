@@ -24,16 +24,19 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
     {
         $_params = array();
         if($note) $_params['note'] = $note;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash,$_params,Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
      * @param $listId               The unique id for the list.
      * @param $subscriberHash       The MD5 hash of the lowercase version of the list member’s email address.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
-     * @param null $offset          The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
+     *                              with this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -45,15 +48,18 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes',$_params,Ebizmarts_Mailchimp::GET);
+        $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes';
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
      * @param $listId               The unique id for the list.
      * @param $subscriberHash       The MD5 hash of the lowercase version of the list member’s email address.
      * @param $noteId               The id for the note.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -63,7 +69,8 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId,$_params,Ebizmarts_Mailchimp::GET);
+        $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId;
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -79,10 +86,12 @@ class Mailchimp_ListsMembersNotes extends Mailchimp_Abstract
     {
         $_params = array();
         if($note) $_params['note'] = $note;
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId,$_params,Ebizmarts_Mailchimp::PATCH);
+        $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId;
+        return $this->_master->call($url, $_params, Ebizmarts_Mailchimp::PATCH);
     }
     public function delete($listId,$subscriberHash,$noteId)
     {
-        return $this->master->call('lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId,null,Ebizmarts_Mailchimp::DELETE);
+        $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/notes/'.$noteId;
+        return $this->_master->call($url, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

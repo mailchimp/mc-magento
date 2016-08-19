@@ -15,7 +15,8 @@ $installer = $this;
 
 $installer->startSetup();
 
-$installer->run("
+$installer->run(
+    "
 
 	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_errors')}` (
 	  `id`     INT(10) unsigned NOT NULL auto_increment,
@@ -29,12 +30,15 @@ $installer->run("
 	  PRIMARY KEY  (`id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-");
+"
+);
 
 try{
-    $installer->run("
+    $installer->run(
+        "
       ALTER TABLE `{$this->getTable('mailchimp_sync_batches')}` MODIFY `store_id` VARCHAR(50) NOT NULL;
-    ");
+    "
+    );
 }
 catch(Exception $e){
     Mage::log($e->getMessage());

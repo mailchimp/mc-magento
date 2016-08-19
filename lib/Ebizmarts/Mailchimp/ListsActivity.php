@@ -14,8 +14,10 @@ class Mailchimp_ListsActivity extends Mailchimp_Abstract
 {
     /**
      * @param $listId               The unique id for the list.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -25,6 +27,6 @@ class Mailchimp_ListsActivity extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->master->call('lists/'.$listId.'/activity',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/activity', $_params, Ebizmarts_Mailchimp::GET);
     }
 }

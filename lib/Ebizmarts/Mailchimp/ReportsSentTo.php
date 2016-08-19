@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsSentTo extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsSentTo
+     */
+    public $sentTo;
 }

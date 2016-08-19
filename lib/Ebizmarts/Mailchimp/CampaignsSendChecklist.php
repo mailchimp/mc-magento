@@ -12,5 +12,8 @@
  */
 class Mailchimp_CampaignsSendChecklist extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_CampaignsSendChecklist
+     */
+    public $checklist;
 }

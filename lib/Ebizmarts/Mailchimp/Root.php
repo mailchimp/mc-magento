@@ -12,17 +12,15 @@
  */
 class Mailchimp_Root extends Mailchimp_Abstract
 {
-    public function info($fields=null,$excludeFields=null)
+    public function info($fields=null, $excludeFields=null)
     {
         $_params = array();
-        if($fields)
-        {
+        if ($fields) {
             $_params['fields'] = $fields;
         }
-        if($excludeFields)
-        {
+        if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
-        return $this->master->call('',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('', $_params, Ebizmarts_Mailchimp::GET);
     }
 }

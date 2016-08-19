@@ -20,8 +20,8 @@ class Ebizmarts_Mailchimp_Model_Mysql4_Synchbatches_Collection extends Mage_Core
      * @return void
      */
     public function _construct()
-{
+    {
     parent::_construct();
     $this->_init('mailchimp/synchbatches');
-}
+    }
 }

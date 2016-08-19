@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsSubReports extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsSubReports
+     */
+    public $subReports;
 }

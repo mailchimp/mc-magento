@@ -12,5 +12,8 @@
  */
 class Mailchimp_ReportsLocation extends Mailchimp_Abstract
 {
-
+    /**
+     * @var Mailchimp_ReportsLocation
+     */
+    public $location;
 }

@@ -14,10 +14,13 @@ class Mailchimp_EcommerceCarts extends Mailchimp_Abstract
 {
     /**
      * @param $storeId              The store id.
-     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @param null $count           The number of records to return.
-     * @param null $offset          The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
+     *                              with this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -29,6 +32,6 @@ class Mailchimp_EcommerceCarts extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        return $this->master->call('ecommerce/stores/'.$storeId.'/carts',$_params,Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('ecommerce/stores/'.$storeId.'/carts', $_params, Ebizmarts_Mailchimp::GET);
     }
 }

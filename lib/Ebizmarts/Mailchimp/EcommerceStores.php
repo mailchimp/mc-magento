@@ -14,7 +14,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
 {
     /**
      * @param $id              The unique identifier for the store
-     * @param $listId          The unique identifier for the MailChimp List associated with the store. The list_id for a specific store cannot change.
+     * @param $listId          The unique identifier for the MailChimp List associated with the store. The list_id for
+     *                         a specific store cannot change.
      * @param $name            The name of the store.
      * @param $platform        The e-commerce platform of the store.
      * @param $domain          The store domain.
@@ -29,8 +30,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($id, $listId, $name, $platform = null, $domain = null, $emailAddress = null, $currencyCode, $moneyFormat = null,
-                $primaryLocale=null, $timezone = null,$phone=null,$address=null)
+    public function add($id, $listId, $name, $currencyCode, $platform = null, $domain = null, $emailAddress = null,
+                        $moneyFormat = null, $primaryLocale=null, $timezone = null,$phone=null,$address=null)
     {
         $_params = array('id'=>$id,'list_id'=>$listId,'name'=>$name,'currency_code'=>$currencyCode);
         if($platform) $_params['platform'] = $platform;
@@ -41,15 +42,18 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($timezone) $_params['timezone'] = $timezone;
         if($phone) $_params['phone'] = $phone;
         if($address)  $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores',$_params,Ebizmarts_Mailchimp::POST);
+        return $this->_master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
      * @param $id               The store id.
-     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with dot notation.
-     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with dot notation.
+     * @param $fields           A comma-separated list of fields to return. Reference parameters of sub-objects with
+     *                          dot notation.
+     * @param $excludeFields    A comma-separated list of fields to exclude. Reference parameters of sub-objects with
+     *                          dot notation.
      * @param $count            The number of records to return.
-     * @param $offset           The number of records from a collection to skip. Iterating over large collections with this parameter can be slow.
+     * @param $offset           The number of records from a collection to skip. Iterating over large collections with
+     *                          this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
@@ -61,11 +65,10 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
         if($count) $_params['count'] = $count;
         if($offset) $_params['offset'] = $offset;
-        if($id) {
-            return $this->master->call('ecommerce/stores/'.$id, $_params, Ebizmarts_Mailchimp::GET);
-        }
-        else {
-            return $this->master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::GET);
+        if ($id) {
+            return $this->_master->call('ecommerce/stores/'.$id, $_params, Ebizmarts_Mailchimp::GET);
+        } else {
+            return $this->_master->call('ecommerce/stores', $_params, Ebizmarts_Mailchimp::GET);
         }
     }
 
@@ -84,8 +87,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function edit($storeId,$platform = null, $domain = null, $emailAddress = null,$currencyCode, $moneyFormat = null,
-                         $primaryLocale=null, $timezone = null,$phone=null,$address=null)
+    public function edit($storeId, $currencyCode, $platform = null, $domain = null, $emailAddress = null,
+                         $moneyFormat = null, $primaryLocale=null, $timezone = null, $phone=null, $address=null)
     {
         $_params=array();
         if($platform) $_params['platform'] = $platform;
@@ -97,7 +100,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($timezone) $_params['timezone'] = $timezone;
         if($phone) $_params['phone'] = $phone;
         if($address)  $_params['address'] = $address;
-        return $this->master->call('ecommerce/stores/'.$storeId,$_params,Ebizmarts_Mailchimp::PATCH);
+        return $this->_master->call('ecommerce/stores/'.$storeId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -108,6 +111,6 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      */
     public function delete($storeId)
     {
-        return $this->master->call('ecommerce/stores/'.$storeId, null, Ebizmarts_Mailchimp::DELETE);
+        return $this->_master->call('ecommerce/stores/'.$storeId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }

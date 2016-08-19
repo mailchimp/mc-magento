@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Apikey extends Mage_Core_M
         $active = $groups['ecommerce']['fields']['active']['value'];
         if ($this->isValueChanged()&&$active) {
             if ($this->getScope() == 'default') {
-                if($this->getOldValue()) {
+                if ($this->getOldValue()) {
                     Mage::helper('mailchimp')->deleteStore();
                     Mage::helper('mailchimp')->resetErrors();
                     Mage::helper('mailchimp')->resetCampaign();
