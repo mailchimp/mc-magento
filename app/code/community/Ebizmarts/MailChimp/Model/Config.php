@@ -47,6 +47,10 @@ class Ebizmarts_MailChimp_Model_Config
     const WARNING_MESSAGE           = 'mailchimp/warning_message';
     const POPUP_MESSAGE             = 'mailchimp/popup_message';
 
+    const MANDRILL_APIKEY           = 'mandrill/general/apikey';
+    const MANDRILL_ACTIVE           = 'mandrill/general/active';
+    const MANDRILL_LOG              = 'mandrill/general/enable_log';
+
     const IS_CUSTOMER   = "CUS";
     const IS_PRODUCT    = "PRO";
     const IS_ORDER      = "ORD";

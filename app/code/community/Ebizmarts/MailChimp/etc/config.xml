@@ -5,6 +5,9 @@
         <Ebizmarts_MailChimp>
             <version>1.0.6</version>
         </Ebizmarts_MailChimp>
+        <Ebizmarts_Mandrill>
+            <version>1.0.6</version>
+        </Ebizmarts_Mandrill>
     </modules>
     <global>
         <events>
