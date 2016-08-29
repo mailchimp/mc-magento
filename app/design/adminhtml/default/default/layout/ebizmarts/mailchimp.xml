@@ -11,4 +11,16 @@
                    name="mailchimp_mailchimperrors.grid.container"></block>
         </reference>
     </adminhtml_mailchimperrors_index>
+    <adminhtml_system_config_edit>
+        <reference name="head">
+            <action method="addCss">
+                <stylesheet>ebizmarts/mailchimp/css/mailchimp.css</stylesheet>
+            </action>
+        </reference>
+        <reference name="head">
+            <action method="addCss">
+                <stylesheet>ebizmarts/mandrill/css/mandrill.css</stylesheet>
+            </action>
+        </reference>
+    </adminhtml_system_config_edit>
 </layout>
