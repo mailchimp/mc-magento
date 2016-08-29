@@ -228,6 +228,17 @@ class Ebizmarts_MailChimp_Model_Observer
                     'width' => 170
                 ), 'created_at'
             );
+            $block->addColumnAfter(
+                'mailchimp_campaign_flag', array(
+                'header' => Mage::helper('mailchimp')->__('Mailchimp Campaign'),
+                'index' => 'mailchimp_campaign_flag',
+                'align' => 'center',
+                'filter' => false,
+                'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_campaign',
+                'sortable' => false,
+                'width' => 170
+            ), 'mailchimp_abandonedcart_flag'
+            );
         }
         return $observer;
     }
