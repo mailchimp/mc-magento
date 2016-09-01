@@ -17,7 +17,7 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
      */
     public function log($message)
     {
-        if ($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG)) {
+        if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG)) {
             Mage::log($message, null, 'Mandrill_Request.log', true);
         }
     }
