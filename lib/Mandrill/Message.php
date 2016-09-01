@@ -20,6 +20,11 @@ class Mandrill_Message extends Mandrill_Mandrill
     protected $_fromName;
 
 
+    public function getMail()
+    {
+        return $this;
+    }
+
     public function createAttachment($body,
                                      $mimeType = Zend_Mime::TYPE_OCTETSTREAM,
                                      $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,

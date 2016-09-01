@@ -34,36 +34,46 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
                         $parameters = new Varien_Object($message->getMessageParameters());
                         $mailer = $this->getMail($storeId);
-                        $mandrill = array(
-                            'subject' => $parameters->getSubject(),
-                            'to' => array(),
-                            'from_email' => $parameters->getFromEmail(),
-                            'from_name' => $parameters->getFromName(),
-                            'headers' => $mailer->getHeaders(),
-                            'html' => ($parameters->getIsPlain() ? "" : $message->getMessageBody()),
-                            'text' => ($parameters->getIsPlain() ? $message->getMessageBody() : ""),
-                        );
+                        $mailer->setFrom($parameters->getFromEmail(),$parameters->getFromName());
+                        $mailer->setSubject($parameters->getSubject());
+                        if ($parameters->getIsPlain()) {
+                            $mailer->setBodyText($message->getMessageBody());
+                        } else {
+                            $mailer->setBodyHtml($message->getMessageBody());
+                        }
                         foreach ($message->getRecipients() as $recipient) {
                             list($email, $name, $type) = $recipient;
-                            $mandrill['to'][] = array(
-                                'type' => ($type == self::EMAIL_TYPE_BCC ? "bcc" : "to"),
-                                'email' => $email,
-                                'name' => $name
-                            );
+                            switch ($type) {
+                                case self::EMAIL_TYPE_TO:
+                                case self::EMAIL_TYPE_CC:
+                                    $mailer->addTo($email,$name);
+                                    break;
+                                case self::EMAIL_TYPE_BCC:
+                                    $mailer->addBcc($email);
+                                    break;
+                            }
                         }
                         if ($parameters->getReplyTo() !== null) {
-                            $mandrill['headers'] = array_merge($mandrill['headers'], array('Reply-To' => $parameters->getReplyTo()));
+                            $mailer->setReplyTo($parameters->getReplyTo());
                         }
                         if ($parameters->getReturnTo() !== null) {
                             $mailer->setReturnPath($parameters->getReturnTo());
                         }
                         try {
-                            $mailer->messages->send($mandrill);
+                            Mage::dispatchEvent(
+                                'fooman_emailattachments_before_send_queue',
+                                array(
+                                    'mailer'         => $mailer,
+                                    'message'        => $message,
+                                    'mail_transport' => false
+
+                                )
+                            );
+                            $mailer->send();
                         } catch (Exception $e) {
                             Mage::logException($e);
                         }
                         unset($mailer);
-                        unset($mandrill);
                         $message->setProcessedAt(Varien_Date::formatDate(true));
                         $message->save();
                     }else{
@@ -104,6 +114,15 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                         }
 
                         try {
+                            Mage::dispatchEvent(
+                                'fooman_emailattachments_before_send_queue',
+                                array(
+                                    'mailer'         => $mailer,
+                                    'message'        => $message,
+                                    'mail_transport' => false
+
+                                )
+                            );
                             $mailer->send();
                         } catch (Exception $e) {
                             Mage::logException($e);
