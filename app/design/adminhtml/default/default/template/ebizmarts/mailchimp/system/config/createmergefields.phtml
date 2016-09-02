@@ -1,0 +1,24 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function createMergeFields() {
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method: 'get',
+            onSuccess: function (transport) {
+
+                if (transport.responseText == 1) {
+                    alert('The merge fields were successfully created.')
+                }
+                else {
+                    alert('There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information.')
+                }
+            },
+            onFailure: function () {
+                alert('Something went wrong.')
+            }
+        });
+    }
+    //]]>
+</script>
+
+
+<?php echo $this->getButtonHtml(); ?>

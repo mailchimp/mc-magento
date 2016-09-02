@@ -26,10 +26,14 @@ $_colspan = $_colspan > 1 ? 'colspan="' . $_colspan . '"' : '';
             </tr>
 
             <tr id="addRow<?php echo $_htmlId ?>">
-                <td colspan="<?php echo count($this->_columns) ?>"></td>
+                <td colspan="<?php echo count($this->_columns) ?>">
+                    <button style="" onclick="" class="scalable add" type="button" id="addNewType<?php echo $_htmlId ?>">
+                        <span><span><span><?php echo Mage::helper('mailchimp')->__('Add new custom data entry in the row of the right.') ?></span></span></span>
+                    </button>
+                </td>
                 <td <?php echo $_colspan?>>
                     <button style="" onclick="" class="scalable add" type="button" id="addToEndBtn<?php echo $_htmlId ?>">
-                        <span><span><span><?php echo $this->_addButtonLabel ?></span></span></span>
+                        <span><span><span><?php echo Mage::helper('mailchimp')->__('Add new row') ?></span></span></span>
                     </button>
                 </td>
             </tr>
@@ -104,6 +108,34 @@ $$('select[name*=' + templateData._id +']').each(function(row){
         this.rowsCount += 1;
     },
 
+    open: function () {
+        var url = '<?php echo $this->getUrl("adminhtml/mergevars/addmergevar/") ?>?';
+        var dialogWindow = Dialog.info(null, {
+            draggable:true,
+            resizable:false,
+            closable:true,
+            className:"magento",
+            windowClassName:"popup-window",
+            title:'Add new Merge Var to send to MailChimp',
+            top:50,
+            width:1000,
+            height:300,
+            zIndex:1000,
+            recenterAuto:false,
+            hideEffect:Element.hide,
+            showEffect:Element.show,
+            id:"browser_window",
+            url: url,
+            onClose:function (param, el) {
+                location.reload();
+                //@Todo add entry to see the new attribute in the dropdown similar to the one below
+                //arrayRow_57c73aa52d3ca.add({"mailchimp":"LASTSYNC","magento":"210","_id":"_1469027532689_689"}, '_1469027508616_616');
+//                arrayRow<?php //echo $_htmlId ?>//.add.({"mailchimp":"", "magento":<?php //echo $this->_getMailChimpValue ?>//, );
+//                this.add.bind(this, '', templateData._id)
+            }
+        });
+    },
+
     del : function(rowId)
     {
         $(rowId).remove();
@@ -122,6 +154,7 @@ $$('select[name*=' + templateData._id +']').each(function(row){
 
 // bind add action to "Add" button in last row
 Event.observe('addToEndBtn<?php echo $_htmlId ?>', 'click', arrayRow<?php echo $_htmlId ?>.add.bind(arrayRow<?php echo $_htmlId ?>, '', ''));
+Event.observe('addNewType<?php echo $_htmlId ?>', 'click', arrayRow<?php echo $_htmlId ?>.open.bind(this));
 
 // add existing rows
 <?php

@@ -130,6 +130,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
                 $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
+                if(!$variant){
+                    $variant = $options['simple_sku'];
+                }
             } else {
                 $variant = $item->getProductId();
             }
@@ -161,11 +164,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             );
         } else {
             if ((bool)$order->getCustomerIsGuest()) {
+                $guestId = "GUEST-" . date('Y-m-d-H-i-s');
                 $data["customer"] = array(
-                    "id" => "GUEST-" . date('Y-m-d-H-i-s'),
+                    "id" => $guestId,
                     "email_address" => $order->getCustomerEmail(),
                     "opt_in_status" => false
                 );
+                $guestCustomer = Mage::getModel('mailchimp/api_customers')->createGuestCustomer($guestId, $order);
+                $data['customer'] = array_merge(Mage::getModel('mailchimp/api_customers')->getMergeVars($guestCustomer), $data['customer']);
             } else {
                 $data["customer"] = array(
                     "id" => $order->getCustomerId(),
@@ -173,8 +179,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
                 );
             }
-            $data["customer"]["first_name"] = $order->getCustomerFirstname();
-            $data["customer"]["last_name"] = $order->getCustomerLastname();
+            if($order->getCustomerFirstname()) {
+                $data["customer"]["first_name"] = $order->getCustomerFirstname();
+            }
+            if($order->getCustomerLastname()) {
+                $data["customer"]["last_name"] = $order->getCustomerLastname();
+            }
         }
         $billingAddress = $order->getBillingAddress();
         $street = $billingAddress->getStreet();
@@ -192,7 +202,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($billingAddress->getCompany()) {
             $data["customer"]["company"] = $billingAddress->getCompany();
         }
-
         $jsonData = "";
 
         //enconde to JSON

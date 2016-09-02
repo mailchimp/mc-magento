@@ -68,7 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     {
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
-        $mergeVars = $this->getMergeVars($subscriber);
+        $mergeVars = Mage::getModel('mailchimp/api_customers')->getMergeVars($subscriber);
         if ($mergeVars) {
             $data["merge_fields"] = $mergeVars;
         }
@@ -87,7 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         $status = $this->_getMCStatus($subscriber->getStatus());
         $userAgent = 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
         $api = new Ebizmarts_Mailchimp($apiKey, null, $userAgent);
-        $mergeVars = $this->getMergeVars($subscriber);
+        $mergeVars = Mage::getModel('mailchimp/api_customers')->getMergeVars($subscriber);
 
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
@@ -162,129 +162,5 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
-    }
-
-    protected function getMergeVars($subscriber)
-    {
-        $mergeVars = array();
-        if ($subscriber->getSubscriberFirstname()) {
-            $mergeVars['FNAME'] = $subscriber->getSubscriberFirstname();
-        }
-        if ($subscriber->getSubscriberLastname()) {
-            $mergeVars['LNAME'] = $subscriber->getSubscriberLastname();
-        }
-        return (!empty($mergeVars)) ? $mergeVars : null;
-
-//        $storeId = $subscriber->getStoreId();
-//        $maps = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MAP_FIELDS, $storeId));
-//        $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
-//        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($subscriber->getSubscriberEmail());
-//        $mergeVars = array();
-//        foreach ($maps as $map) {
-//            $customAtt = $map['magento'];
-//            $chimpTag = $map['mailchimp'];
-//            if ($chimpTag && $customAtt) {
-//                $key = strtoupper($chimpTag);
-//                $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
-//                    ->setEntityTypeFilter(1)
-//                    ->addSetInfo()
-//                    ->getData();
-//                foreach ($attrSetId as $attribute) {
-//                    if ($attribute['attribute_id'] == $customAtt) {
-//                        $attributeCode = $attribute['attribute_code'];
-//                        if ($customer->getId()) {
-//                            if ($customer->getData($attributeCode)) {
-//                                switch ($attributeCode) {
-//                                    case 'default_billing':
-//                                    case 'default_shipping':
-//                                        $addr = explode('_', $attributeCode);
-//                                        $address = $customer->{'getPrimary' . ucfirst($addr[1]) . 'Address'}();
-//                                        if (!$address) {
-//                                            if ($customer->{'getDefault' . ucfirst($addr[1])}()) {
-//                                                $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[1])}());
-//                                            }
-//                                        }
-//                                        if ($address) {
-//                                            $mergeVars[$key] = array(
-//                                                'addr1' => $address->getStreet(1),
-//                                                'addr2' => $address->getStreet(2),
-//                                                'city' => $address->getCity(),
-//                                                'state' => (!$address->getRegion() ? $address->getCity() : $address->getRegion()),
-//                                                'zip' => $address->getPostcode(),
-//                                                'country' => $address->getCountryId()
-//                                            );
-//                                            $telephone = $address->getTelephone();
-//                                            if ($telephone) {
-//                                                $mergeVars['TELEPHONE'] = $telephone;
-//                                            }
-//                                            $company = $address->getCompany();
-//                                            if ($company) {
-//                                                $mergeVars['COMPANY'] = $company;
-//                                            }
-//                                            $country = $address->getCountryId();
-//                                            if ($country) {
-//                                                $countryName = Mage::getModel('directory/country')->load($country)->getName();
-//                                                $mergeVars['COUNTRY'] = $countryName;
-//                                            }
-//                                            $zipCode = $address->getPostcode();
-//                                            if ($zipCode) {
-//                                                $mergeVars['ZIPCODE'] = $zipCode;
-//                                            }
-//                                        }
-//                                        break;
-//                                    case 'gender':
-//                                        $genderValue = $customer->getData($attributeCode);
-//                                        if ($genderValue == 1) {
-//                                            $mergeVars[$key] = 'Male';
-//                                        } elseif ($genderValue == 2) {
-//                                            $mergeVars[$key] = 'Female';
-//                                        }
-//                                        break;
-//                                    case 'group_id':
-//                                        $group_id = (int)$customer->getData($attributeCode);
-//                                        $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
-//                                        $mergeVars[$key] = $customerGroup[$group_id];
-//                                        break;
-//                                    default:
-//                                        if($customer->getData($attributeCode)) {
-//                                            $mergeVars[$key] = $customer->getData($attributeCode);
-//                                        }
-//                                        break;
-//                                }
-//                            }
-//                        } else {
-//                            switch ($attributeCode) {
-//                                case 'group_id':
-//                                    $mergeVars[$key] = 'NOT LOGGED IN';
-//                                    break;
-//                                case 'store_id':
-//                                    $mergeVars[$key] = $storeId;
-//                                    break;
-//                                case 'website_id':
-//                                    $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
-//                                    $mergeVars[$key] = $websiteId;
-//                                    break;
-//                                case 'created_in':
-//                                    $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
-//                                    $mergeVars[$key] = $storeCode;
-//                                    break;
-//                                case 'firstname':
-//                                    $firstName = $subscriber->getSubscriberFirstname();
-//                                    if ($firstName) {
-//                                        $mergeVars[$key] = $firstName;
-//                                    }
-//                                    break;
-//                                case 'lastname':
-//                                    $lastName = $subscriber->getSubscriberLastname();
-//                                    if ($lastName) {
-//                                        $mergeVars[$key] = $lastName;
-//                                    }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return (!empty($mergeVars)) ? $mergeVars : null;
     }
 }

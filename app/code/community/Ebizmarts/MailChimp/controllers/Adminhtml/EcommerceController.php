@@ -39,11 +39,28 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         Mage::app()->getResponse()->setBody($result);
     }
 
+    public function createMergeFieldsAction()
+    {
+        $result = 1;
+        try {
+            Mage::helper('mailchimp')->createMergeFields();
+        }
+        catch(Mailchimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            $result = 0;
+        }
+        catch(Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage());
+        }
+        Mage::app()->getResponse()->setBody($result);
+    }
+
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
             case 'resetLocalErrors':
             case 'resetEcommerceData':
+            case 'createMergeFields':
                 $acl = 'system/config/mailchimp';
                 break;
         }

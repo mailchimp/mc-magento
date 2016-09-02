@@ -11,4 +11,26 @@
                    name="mailchimp_mailchimperrors.grid.container"></block>
         </reference>
     </adminhtml_mailchimperrors_index>
+    <adminhtml_mergevars_addmergevar>
+        <reference name="content">
+            <update handle="default"/>
+            <remove name="header"/>
+            <remove name="menu"/>
+            <remove name="footer"/>
+            <remove name="notifications"/>
+            <remove name="global_notices"/>
+            <block type="mailchimp/adminhtml_mergevars_add" name="adminhtml.mailchimp.add"></block>
+        </reference>
+    </adminhtml_mergevars_addmergevar>
+    <adminhtml_system_config_edit>
+        <reference name="head">
+            <action method="addItem">
+                <type>js_css</type>
+                <name>prototype/windows/themes/default.css</name>
+            </action>
+            <action method="addCss">
+                <name>lib/prototype/windows/themes/magento.css</name>
+            </action>
+        </reference>
+    </adminhtml_system_config_edit>
 </layout>

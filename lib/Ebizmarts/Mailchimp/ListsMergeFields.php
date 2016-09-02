@@ -36,7 +36,7 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
         if($offset) $_params['offset'] = $offset;
         if($type) $_params['type'] = $type;
         if($required) $_params['required'] = $required;
-        return $this->_master->call('lists/'.$listId.'/merge-fields', $_params, Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/merge-fields', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -48,7 +48,7 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
      */
     public function get($listId,$mergeId)
     {
-        return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, null, Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, null, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -58,15 +58,15 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
      * @param $type                 The type for the merge field.
      * @param null $required        The boolean value if the merge field is required.
      * @param null $defaulValue     The default value for the merge field if null.
-     * @param null $public          Whether the merge field is displayed on the signup form.
-     * @param $displayOrder         The order that the merge field displays on the list signup form.
+     * @param boolean $public          Whether the merge field is displayed on the signup form.
+     * @param null $displayOrder    The order that the merge field displays on the list signup form.
      * @param null $options         Extra options for some merge field types.
      * @param null $helpText        Extra text to help the subscriber fill out the form.
      * @return mixed
      * @throws Mailchimp_Error
      * @throws Mailchimp_HttpError
      */
-    public function add($listId,$name,$type,$displayOrder,$tag=null,$required=null,$defaulValue=null,$public=null,
+    public function add($listId,$name,$type,$displayOrder=null,$tag=null,$required=null,$defaulValue=null,$public=true,
                         $options=null,$helpText=null)
     {
         $_params = array('name'=>$name,'type'=>$type);
@@ -77,7 +77,7 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
         if($displayOrder) $_params['display_order'] = $displayOrder;
         if($options) $_params['options'] = $options;
         if($helpText) $_params['help_text'] = $helpText;
-        return $this->_master->call('lists/'.$listId.'/merge-fields/', $_params, Mailchimp::POST);
+        return $this->_master->call('lists/'.$listId.'/merge-fields/', $_params, Ebizmarts_Mailchimp::POST);
     }
 
     /**
@@ -109,7 +109,7 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
         if($displayOrder) $_params['display_order'] = $displayOrder;
         if($options) $_params['options'] = $options;
         if($helpText) $_params['help_text'] = $helpText;
-        return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, $_params, Mailchimp::PATCH);
+        return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, $_params, Ebizmarts_Mailchimp::PATCH);
     }
 
     /**
@@ -121,6 +121,6 @@ class Mailchimp_ListsMergeFields extends Mailchimp_Abstract
      */
     public function delete($listId,$mergeId)
     {
-        return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, null, Mailchimp::DELETE);
+        return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, null, Ebizmarts_Mailchimp::DELETE);
     }
 }
