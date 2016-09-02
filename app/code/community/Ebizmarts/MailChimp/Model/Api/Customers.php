@@ -118,7 +118,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 break;
             }
         }
-        $data = array_merge($this->getMergeVars($customer), $data);
+        $mergeFields = $this->getMergeVars($customer);
+        if (is_array($mergeFields)) {
+            $data = array_merge($mergeFields, $data);
+        }
 
         return $data;
     }
