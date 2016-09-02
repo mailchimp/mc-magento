@@ -118,6 +118,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 break;
             }
         }
+        $data = array_merge($this->getMergeVars($customer), $data);
 
         return $data;
     }
@@ -177,5 +178,193 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         catch(Exception $e){
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
+    }
+
+    public function getMergeVars($object)
+    {
+        $storeId = $object->getStoreId();
+        $maps = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MAP_FIELDS, $storeId));
+        $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+        if($object instanceof Mage_Newsletter_Model_Subscriber) {
+            $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($object->getSubscriberEmail());
+        } else {
+            $customer = $object;
+        }
+        $mergeVars = array();
+        foreach ($maps as $map) {
+            $customAtt = $map['magento'];
+            $chimpTag = $map['mailchimp'];
+            if ($chimpTag && $customAtt) {
+                $key = strtoupper($chimpTag);
+                $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
+                    ->setEntityTypeFilter(1)
+                    ->addSetInfo()
+                    ->getData();
+                foreach ($attrSetId as $attribute) {
+                    if ($attribute['attribute_id'] == $customAtt) {
+                        $attributeCode = $attribute['attribute_code'];
+                        if ($customer->getId()) {
+                            if ($customer->getData($attributeCode)) {
+                                switch ($attributeCode) {
+                                    case 'default_billing':
+                                    case 'default_shipping':
+                                        $addr = explode('_', $attributeCode);
+                                        $address = $customer->{'getPrimary' . ucfirst($addr[1]) . 'Address'}();
+                                        if (!$address) {
+                                            if ($customer->{'getDefault' . ucfirst($addr[1])}()) {
+                                                $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[1])}());
+                                            }
+                                        }
+                                        if ($address) {
+                                            $mergeVars[$key] = array(
+                                                'addr1' => $address->getStreet(1),
+                                                'addr2' => $address->getStreet(2),
+                                                'city' => $address->getCity(),
+                                                'state' => (!$address->getRegion() ? $address->getCity() : $address->getRegion()),
+                                                'zip' => $address->getPostcode(),
+                                                'country' => $address->getCountryId()
+                                            );
+                                        }
+                                        break;
+                                    case 'gender':
+                                        $genderValue = $customer->getData($attributeCode);
+                                        if ($genderValue == 1) {
+                                            $mergeVars[$key] = 'Male';
+                                        } elseif ($genderValue == 2) {
+                                            $mergeVars[$key] = 'Female';
+                                        }
+                                        break;
+                                    case 'group_id':
+                                        $group_id = (int)$customer->getData($attributeCode);
+                                        $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
+                                        $mergeVars[$key] = $customerGroup[$group_id];
+                                        break;
+                                    default:
+                                        if($customer->getData($attributeCode)) {
+                                            $mergeVars[$key] = $customer->getData($attributeCode);
+                                        }
+                                        break;
+                                }
+                            }
+                        } else {
+                            switch ($attributeCode) {
+                                case 'group_id':
+                                    $mergeVars[$key] = 'NOT LOGGED IN';
+                                    break;
+                                case 'store_id':
+                                    $mergeVars[$key] = $storeId;
+                                    break;
+                                case 'website_id':
+                                    $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+                                    $mergeVars[$key] = $websiteId;
+                                    break;
+                                case 'created_in':
+                                    $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
+                                    $mergeVars[$key] = $storeCode;
+                                    break;
+                                case 'firstname':
+                                    if($object instanceof Mage_Newsletter_Model_Subscriber) {
+                                        $firstName = $object->getSubscriberFirstname();
+                                    } else {
+                                        $firstName = $customer->getFirstname();
+                                    }
+                                    if ($firstName) {
+                                        $mergeVars[$key] = $firstName;
+                                    }
+                                    break;
+                                case 'lastname':
+                                    if($object instanceof Mage_Newsletter_Model_Subscriber) {
+                                        $lastName = $object->getSubscriberLastname();
+                                    } else {
+                                        $lastName = $customer->getLastname();
+                                    }
+                                    if ($lastName) {
+                                        $mergeVars[$key] = $lastName;
+                                    }
+                            }
+                        }
+                    }
+                }
+                switch ($customAtt) {
+                    case 'billing_company':
+                    case 'shipping_company':
+                        $addr = explode('_', $attributeCode);
+                        $address = $customer->{'getPrimary' . ucfirst($addr[0]) . 'Address'}();
+                        if (!$address) {
+                            if ($customer->{'getDefault' . ucfirst($addr[0])}()) {
+                                $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
+                            }
+                        }
+                        if ($address) {
+                            $company = $address->getCompany();
+                            if ($company) {
+                                $mergeVars[$key] = $company;
+                            }
+                        }
+                        break;
+                    case 'billing_telephone':
+                    case 'shipping_telephone':
+                        $addr = explode('_', $attributeCode);
+                        $address = $customer->{'getPrimary' . ucfirst($addr[0]) . 'Address'}();
+                        if (!$address) {
+                            if ($customer->{'getDefault' . ucfirst($addr[0])}()) {
+                                $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
+                            }
+                        }
+                        if ($address) {
+                            $telephone = $address->getTelephone();
+                            if ($telephone) {
+                                $mergeVars[$key] = $telephone;
+                            }
+                        }
+                        break;
+                    case 'billing_country':
+                    case 'shipping_country':
+                        $addr = explode('_', $attributeCode);
+                        $address = $customer->{'getPrimary' . ucfirst($addr[0]) . 'Address'}();
+                        if (!$address) {
+                            if ($customer->{'getDefault' . ucfirst($addr[0])}()) {
+                                $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
+                            }
+                        }
+                        if ($address) {
+                            $country = $address->getCountryId();
+                            if ($country) {
+                                $countryName = Mage::getModel('directory/country')->load($country)->getName();
+                                $mergeVars[$key] = $countryName;
+                            }
+                        }
+                        break;
+                    case 'billing_zipcode':
+                    case 'shipping_zipcode':
+                        $addr = explode('_', $attributeCode);
+                        $address = $customer->{'getPrimary' . ucfirst($addr[0]) . 'Address'}();
+                        if (!$address) {
+                            if ($customer->{'getDefault' . ucfirst($addr[0])}()) {
+                                $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
+                            }
+                        }
+                        if ($address) {
+                            $zipCode = $address->getPostcode();
+                            if ($zipCode) {
+                                $mergeVars[$key] = $zipCode;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+        return (!empty($mergeVars)) ? $mergeVars : null;
+    }
+
+    public function createGuestCustomer($guestId, $order) {
+        $guestCustomer = Mage::getModel('customer/customer')
+            ->setId($guestId)
+            ->setEmail($order->getCustomerEmail())
+            ->setFirstName($order->getCustomerFirstname())
+            ->setLastName($order->getCustomerLastname())
+            ->setPrimaryBillingAddress($order->getBillingAddress())
+            ->setPrimaryShippingAddress($order->getShippingAddress());
+        return $guestCustomer;
     }
 }

@@ -182,7 +182,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         } else {
             //this is for a root product
-            $data["description"] = $product->getDescription();
+            if($product->getDescription()) {
+                $data["description"] = $product->getDescription();
+            }
 
             //mailchimp product type (magento category)
             $categoryIds = $product->getCategoryIds();

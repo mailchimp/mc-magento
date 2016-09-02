@@ -29,7 +29,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
             )
         );
         $this->_addAfter = false;
-        $this->_addButtonLabel = Mage::helper('mailchimp')->__('Add new field');
         parent::__construct();
         $this->setTemplate('ebizmarts/mailchimp/system/config/form/field/array_dropdown.phtml');
 
@@ -42,6 +41,16 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
         foreach ($attrSetId as $option) {
             if ($option['frontend_label']) {
                 $this->_customerAttributes[$option['attribute_id']] = $option['frontend_label'];
+            }
+        }
+        $customFieldTypes = unserialize(
+            Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS)
+        );
+        if(is_array($customFieldTypes)) {
+            foreach ($customFieldTypes as $customFieldType) {
+                $label = $customFieldType['label'];
+                $value = $customFieldType['value'];
+                $this->_customerAttributes[$value] = $label;
             }
         }
         ksort($this->_customerAttributes);
@@ -65,5 +74,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
             return '<input type="text" name="' . $inputName . '" value="#{' . $columnName . '}" ' . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';
         }
         return $rendered;
+    }
+    
+    protected function _getMailChimpValue(){
+        return Mage::getSingleton('core/session')->getMailchimpValue();
+    }
+
+    protected function _getMailChimpLabel(){
+        return Mage::getSingleton('core/session')->getMailchimpLabel();
     }
 }
