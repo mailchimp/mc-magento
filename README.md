@@ -28,6 +28,10 @@ To enable MailChimp For Magento:
 4. When the page is loaded again select the desired list to sync with the Magento’s newsletter list. At this point your Magento subscribers will start being sent to the configured MailChimp list.<br />
 5. If you have a paid MailChimp account and want to use MailChimp Automations go to "<b>Default Config</b>" scope and to the Ecommerce section and set it to Enabled. Now all your store information (Products, orders, customers and carts) will start being sent to MailChimp's associated list at your "<b>Default Config</b>" scope.
 
+## Report issues
+
+For reporting issues, follow [this guidelines](https://github.com/mailchimp/mc-magento/wiki/Issue-reporting-guidelines) or your issue will be rejected
+
 ## Support
 
 Need support? [Click here](http://ebizmarts.com/forums/view/6)
