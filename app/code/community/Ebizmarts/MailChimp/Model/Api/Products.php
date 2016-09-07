@@ -58,6 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->setData("mailchimp_sync_error", "");
                 $product->setData('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
+                $product->getTierPrice();
                 $product->save();
             } else {
                 continue;
