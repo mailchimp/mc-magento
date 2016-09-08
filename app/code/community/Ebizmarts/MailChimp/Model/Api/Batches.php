@@ -19,7 +19,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
         $this->_getResults($mailchimpStoreId, true);
-        $this->_updateCustomerOrderData($mailchimpStoreId);
         $this->_sendEcommerceBatch($mailchimpStoreId);
     }
 
@@ -58,42 +57,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             } catch(Exception $e)
             {
                 Mage::log("Error with a response: ".$e->getMessage());
-            }
-        }
-    }
-
-    protected function _updateCustomerOrderData($mailchimpStoreId)
-    {
-        if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE) && Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
-            $batchArray = array();
-
-            //customer operations
-            $customerArray = Mage::getModel('mailchimp/api_customers')->updateOrderData($mailchimpStoreId);
-            $batchArray['operations'] = $customerArray;
-            if (!empty($batchArray['operations'])) {
-                try {
-                    $batchJson = json_encode($batchArray);
-                    if (!$batchJson || $batchJson == '') {
-                        Mage::helper('mailchimp')->logRequest('An empty operation was detected');
-                    } else {
-                        //log request
-                        Mage::helper('mailchimp')->logRequest($batchJson);
-
-                        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-                        $mailchimpApi = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
-                        $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-
-                        //save batch id to db
-                        $batch = Mage::getModel('mailchimp/synchbatches');
-                        $batch->setStoreId($mailchimpStoreId)
-                            ->setBatchId($batchResponse['id'])
-                            ->setStatus($batchResponse['status']);
-                        $batch->save();
-                        return $batchResponse;
-                    }
-                } catch(Exception $e) {
-                    Mage::log("Jsonenconde fails");
-                }
             }
         }
     }

@@ -84,7 +84,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         //customer orders data
         $orderCollection = Mage::getModel('sales/order')->getCollection()
-            ->addFieldToFilter('status', 'complete')
+            ->addFieldToFilter('state', 'complete')
             ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
         $totalOrders = 0;
         $totalAmountSpent = 0;
@@ -134,80 +134,31 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
     }
 
-    public function updateOrderData($mailchimpStoreId)
-    {
-        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-        $userAgent = 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
-        try {
-            $mailchimpApi = new Ebizmarts_Mailchimp($apiKey, null, $userAgent);
-            $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId);
-            $mailchimpTotalCustomers = $mailchimpCustomers['total_items'];
-            $mailchimpCustomers = $mailchimpApi->ecommerce->customers->getAll($mailchimpStoreId, 'customers', null, $mailchimpTotalCustomers);
-            $customerArray = array();
-            $counter = 0;
-            $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
-            foreach ($mailchimpCustomers['customers'] as $customer) {
-                //get all orders sent to MailChimp made with that same email address
-                $orderCollection = Mage::getModel('sales/order')->getCollection()
-                    ->addFieldToFilter('state', array('eq' =>'complete'))
-                    ->addFieldToFilter('customer_email', array('eq' => $customer['email_address']))
-                    ->addFieldToFilter('mailchimp_sync_delta', array('notnull' => true))
-                    ->addFieldToFilter('mailchimp_sync_delta', array('neq' => ''))
-                    ->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
-                $totalSpent = 0;
-                // if MailChimp order count is different than the amount of orders successfully sent to MailChimp update values
-                if (count($orderCollection) != $customer['orders_count']) {
-                    foreach ($orderCollection as $order) {
-                        $totalSpent += $order->getGrandTotal();
-                    }
-                    if (count($orderCollection) || $totalSpent) {
-                        $customerArray[$counter]['method'] = "PATCH";
-                        $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/".$customer['id'];
-                        $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer['id'];
-                        $customerArray[$counter]['body'] = json_encode(
-                            array(
-                            'id' => $customer['id'], 'orders_count' => count($orderCollection), 'total_spent' => $totalSpent
-                            )
-                        );
-                        $counter++;
-                    }
-                }
-            }
-            return $customerArray;
-        }
-        catch(Mailchimp_Error $e){
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-        }
-        catch(Exception $e){
-            Mage::helper('mailchimp')->logError($e->getMessage());
-        }
-    }
-
     public function getMergeVars($object)
     {
         $storeId = $object->getStoreId();
         $maps = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MAP_FIELDS, $storeId));
         $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+        $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
+            ->setEntityTypeFilter(1)
+            ->addSetInfo()
+            ->getData();
+        $mergeVars = array();
         if($object instanceof Mage_Newsletter_Model_Subscriber) {
             $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($object->getSubscriberEmail());
         } else {
             $customer = $object;
         }
-        $mergeVars = array();
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
             $chimpTag = $map['mailchimp'];
             if ($chimpTag && $customAtt) {
                 $key = strtoupper($chimpTag);
-                $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
-                    ->setEntityTypeFilter(1)
-                    ->addSetInfo()
-                    ->getData();
                 foreach ($attrSetId as $attribute) {
                     if ($attribute['attribute_id'] == $customAtt) {
                         $attributeCode = $attribute['attribute_code'];
                         if ($customer->getId()) {
-                            if ($customer->getData($attributeCode)) {
+//                            if ($customer->getData($attributeCode)) {
                                 switch ($attributeCode) {
                                     case 'default_billing':
                                     case 'default_shipping':
@@ -230,17 +181,21 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                         }
                                         break;
                                     case 'gender':
-                                        $genderValue = $customer->getData($attributeCode);
-                                        if ($genderValue == 1) {
-                                            $mergeVars[$key] = 'Male';
-                                        } elseif ($genderValue == 2) {
-                                            $mergeVars[$key] = 'Female';
+                                        if ($customer->getData($attributeCode)) {
+                                            $genderValue = $customer->getData($attributeCode);
+                                            if ($genderValue == 1) {
+                                                $mergeVars[$key] = 'Male';
+                                            } elseif ($genderValue == 2) {
+                                                $mergeVars[$key] = 'Female';
+                                            }
                                         }
                                         break;
                                     case 'group_id':
-                                        $group_id = (int)$customer->getData($attributeCode);
-                                        $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
-                                        $mergeVars[$key] = $customerGroup[$group_id];
+                                        if ($customer->getData($attributeCode)) {
+                                            $group_id = (int)$customer->getData($attributeCode);
+                                            $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
+                                            $mergeVars[$key] = $customerGroup[$group_id];
+                                        }
                                         break;
                                     default:
                                         if($customer->getData($attributeCode)) {
@@ -248,7 +203,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                         }
                                         break;
                                 }
-                            }
+//                            }
                         } else {
                             switch ($attributeCode) {
                                 case 'group_id':
