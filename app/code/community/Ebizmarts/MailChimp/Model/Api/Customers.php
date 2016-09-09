@@ -20,10 +20,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         //get customers
         $collection = Mage::getModel('customer/customer')->getCollection()
-            ->addAttributeToSelect('mailchimp_sync_delta')
-            ->addAttributeToSelect('mailchimp_sync_modified')
-            ->addAttributeToSelect('firstname')
-            ->addAttributeToSelect('lastname')
+            ->addAttributeToSelect('id')
             ->addAttributeToFilter(
                 array(
                 array('attribute' => 'mailchimp_sync_delta', 'null' => true),
@@ -38,7 +35,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
 
         $counter = 0;
-        foreach ($collection as $customer) {
+        foreach ($collection as $item) {
+            $customer = Mage::getModel('customer/customer')->load($item->getId());
             $data = $this->_buildCustomerData($customer);
             $customerJson = "";
 
@@ -66,6 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->setData("mailchimp_sync_delta", Varien_Date::now());
                 $customer->setData("mailchimp_sync_error", "");
                 $customer->setData("mailchimp_sync_modified", 0);
+                $customer->setMailchimpUpdateObserverRan(true);
                 $customer->save();
             }
             $counter++;

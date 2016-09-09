@@ -115,7 +115,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         return $batchResponse;
                     }
                 } catch(Exception $e) {
-                    Mage::log("Jsonenconde fails");
+                    Mage::helper('mailchimp')->logError($e->getMessage());
+                    Mage::log("Json enconde fails");
                 }
             }
         }

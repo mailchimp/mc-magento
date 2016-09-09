@@ -18,15 +18,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         //create missing products first
         $collection = Mage::getModel('catalog/product')->getCollection()
-            ->addAttributeToSelect('mailchimp_sync_delta')
-            ->addAttributeToSelect('name')
-            ->addAttributeToSelect('type_id')
-            ->addAttributeToSelect('description')
-            ->addAttributeToSelect('parent_product_ids')
-            ->addAttributeToSelect('image')
-            ->addAttributeToSelect('price')
-            ->addAttributeToSelect('visibility')
-            ->addAttributeToSelect('mailchimp_sync_modified')
+            ->addAttributeToSelect('id')
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ->addAttributeToFilter(
                 array(
@@ -42,28 +34,30 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
 
         $counter = 0;
-        foreach ($collection as $product) {
+        foreach ($collection as $item) {
+            $product = Mage::getModel('catalog/product')->load($item->getId());
+
             //define variants and root products
             if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
-                $data = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
+                $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId), $batchArray);
+                $counter = (count($batchArray) - 1);
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
             }
 
             if (!empty($data)) {
                 $batchArray[$counter] = $data;
+                $counter++;
 
                 //update product delta
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
                 $product->setData("mailchimp_sync_error", "");
                 $product->setData('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
-                $product->getTierPrice();
                 $product->save();
             } else {
                 continue;
             }
-            $counter++;
         }
         return $batchArray;
     }
@@ -93,9 +87,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
             return array();
         }
 
-        $data = $this->_buildProductData($product, false, $variantProducts);
+        $bodyData = $this->_buildProductData($product, false, $variantProducts);
         try {
-            $body = json_encode($data);
+            $body = json_encode($bodyData);
 
         } catch (Exception $e) {
             //json encode failed
@@ -123,31 +117,30 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //add or update variant
             foreach ($parentIds as $parentId) {
-                    $variendata = array();
-                    //$variendata["id"] = $data["id"];
-                    $variendata["title"] = $data["title"];
-                    $variendata["url"] = $data["url"];
-                    $variendata["sku"] = $data["sku"];
-                    $variendata["price"] = $data["price"];
-                    $variendata["inventory_quantity"] = $data["inventory_quantity"];
-                    $variendata["image_url"] = $data["image_url"];
-                    $variendata["backorders"] = $data["backorders"];
-                    $variendata["visibility"] = $data["visibility"];
-                    $productdata = array();
-                    $productdata['method'] = "PUT";
-                    $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/".$parentId.'/variants/'.$data['id'];
-                    $productsdata['operation_id'] = $batchId . '_' . $parentId;
-                    try {
-                        $body = json_encode($variendata);
+                $variendata = array();
+                //$variendata["id"] = $data["id"];
+                $variendata["title"] = $data["title"];
+                $variendata["url"] = $data["url"];
+                $variendata["sku"] = $data["sku"];
+                $variendata["price"] = $data["price"];
+                $variendata["inventory_quantity"] = $data["inventory_quantity"];
+                $variendata["image_url"] = $data["image_url"];
+                $variendata["backorders"] = $data["backorders"];
+                $variendata["visibility"] = $data["visibility"];
+                $productdata = array();
+                $productdata['method'] = "PUT";
+                $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/".$parentId.'/variants/'.$data['id'];
+                $productsdata['operation_id'] = $batchId . '_' . $parentId;
+                try {
+                    $body = json_encode($variendata);
 
-                    } catch (Exception $e) {
-                        //json encode failed
-                        Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
-                        continue;
-                    }
-                    $productdata['body'] = $body;
-                    $operations[] = $productdata;
-
+                } catch (Exception $e) {
+                    //json encode failed
+                    Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
+                    continue;
+                }
+                $productdata['body'] = $body;
+                $operations[] = $productdata;
             }
 
         }

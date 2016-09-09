@@ -43,6 +43,15 @@
                     </mailchimp_subscribe_checkout_after>
                 </observers>
             </sales_order_place_after>
+            <customer_save_before>
+                <observers>
+                    <mailchimp_save_before_customer>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>customerSaveBefore</method>
+                    </mailchimp_save_before_customer>
+                </observers>
+            </customer_save_before>
         </events>
         <models>
             <mailchimp>
@@ -197,15 +206,6 @@
                     </mailchimp_alter_newsletter_grid>
                 </observers>
             </adminhtml_block_html_before>
-            <customer_save_before>
-                <observers>
-                    <mailchimp_save_before_customer>
-                        <type>model</type>
-                        <class>mailchimp/observer</class>
-                        <method>customerSaveBefore</method>
-                    </mailchimp_save_before_customer>
-                </observers>
-            </customer_save_before>
             <catalog_product_save_before>
                 <observers>
                     <mailchimp_save_before_product>
