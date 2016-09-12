@@ -1,0 +1,50 @@
+ul.tabs a.mandrill-section:hover {
+    background-color: #D8E6E6;
+    background-image: url(../../../images/tabs_link_over_bg.gif);
+}
+
+ul.tabs a.mandrill-section {
+    border-bottom: 1px;
+    border-bottom-style: dotted;
+}
+
+ul.tabs a.mandrill-section:hover {
+    border-bottom: 1px;
+    border-bottom-style: dotted;
+}
+
+ul.tabs a.mandrill-section span,
+ul.tabs a.mandrill-section:hover span {
+    background: url(../images/mandrill-tab.png) no-repeat 17px 3px;
+    overflow: hidden;
+    padding: 0;
+    padding-left: 43px;
+    width: 120px;
+    height: 24px;
+    line-height: 24px;
+}
+
+ul.tabs a.mandrill-section.active, ul.tabs a.mandrill-section.active:hover {
+    background-color: white;
+    border-bottom-color: #8BA5A5;
+}
+
+small {
+    font-size: 9px;
+}
+
+div.mandrill-notice {
+    background: none repeat scroll 0 0 #EAF0EE;
+    border: 1px solid #CCCCCC;
+    margin-bottom: 10px;
+    padding: 11px 0 0 10px;
+}
+
+h3.mandrill-header {
+    background: url("../images/mandrill-tab.png") no-repeat scroll 0 0 transparent;
+    height: 22px;
+    overflow: hidden;
+    padding: 0;
+    text-indent: -9999px;
+    width: 120px;
+}

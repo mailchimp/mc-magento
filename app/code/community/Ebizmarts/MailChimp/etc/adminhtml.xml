@@ -15,28 +15,6 @@
                 </mailchimp>
             </children>
         </newsletter>
-        <system>
-            <depends>
-                <module>Ebizmarts_MailChimp</module>
-            </depends>
-            <children>
-                <email_template>
-                    <children>
-                        <mailchimp translate="title" module="mailchimp">
-                            <title>MailChimp</title>
-                            <sort_order>10</sort_order>
-                            <children>
-                                <mailchimp_syncronization translate="title" module="mailchimp">
-                                    <title>Ecommerce Data Syncronization</title>
-                                    <sort_order>10</sort_order>
-                                    <action>adminhtml/mailchimpEcommerceSyncronization</action>
-                                </mailchimp_syncronization>
-                            </children>
-                        </mailchimp>
-                    </children>
-                </email_template>
-            </children>
-        </system>
     </menu>
     <acl>
         <resources>
@@ -61,6 +39,9 @@
                                     <mailchimp translate="title" module="mailchimp">
                                         <title>MailChimp Configuration</title>
                                     </mailchimp>
+                                    <mandrill transtale="title" module="mailchimp">
+                                        <title>Mandrill Configuration</title>
+                                    </mandrill>
                                 </children>
                             </config>
                             <email_template>

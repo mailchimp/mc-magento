@@ -297,4 +297,76 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
     }
+
+    public function createMergeFields()
+    {
+        $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $maps = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MAP_FIELDS));
+        $customFieldTypes = unserialize(
+            Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS)
+        );
+
+        if ($apiKey != null && $apiKey != "") {
+            $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+            try {
+                $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
+            } catch (Mailchimp_Error $e) {
+                Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
+            }
+            if(count($mailchimpFields) > 0) {
+                foreach ($maps as $map) {
+                    $customAtt = $map['magento'];
+                    $chimpTag = $map['mailchimp'];
+                    $alreadyExists = false;
+                    $created = false;
+                    foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
+                        if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
+                            $alreadyExists = true;
+                        }
+                    }
+                    if (!$alreadyExists) {
+                        foreach ($customFieldTypes as $customFieldType) {
+                            if($customFieldType['value'] == $chimpTag) {
+                                try {
+                                    $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
+                                } catch (Mailchimp_Error $e) {
+                                    Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
+                                }
+                                $created = true;
+                            }
+                        }
+                        if (!$created) {
+                            $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
+                                ->setEntityTypeFilter(1)
+                                ->addSetInfo()
+                                ->getData();
+                            $label = null;
+                            foreach ($attrSetId as $option) {
+                                if ($option['attribute_id'] == $customAtt && $option['frontend_label']) {
+                                    $label = $option['frontend_label'];
+                                }
+                            }
+                            try {
+                                if($label) {
+                                    //Shipping and Billing Address
+                                    if ($customAtt == 13 || $customAtt == 14) {
+                                        $api->lists->mergeFields->add($listId, $label, 'address', null, $chimpTag);
+                                    //Birthday
+                                    } elseif ($customAtt == 11) {
+                                        $api->lists->mergeFields->add($listId, $label, 'date', null, $chimpTag);
+                                    } else {
+                                        $response = $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
+                                    }
+                                }
+                            } catch (Mailchimp_Error $e) {
+                                Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 }

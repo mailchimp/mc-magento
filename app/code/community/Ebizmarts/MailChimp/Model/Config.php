@@ -24,7 +24,8 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
     const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
     const GENERAL_LOG                   = 'mailchimp/general/enable_log';
-//    const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
+    const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
+    const GENERAL_CUSTOM_MAP_FIELDS     = 'mailchimp/general/customer_map_fields';
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
 
@@ -46,6 +47,10 @@ class Ebizmarts_MailChimp_Model_Config
 
     const WARNING_MESSAGE           = 'mailchimp/warning_message';
     const POPUP_MESSAGE             = 'mailchimp/popup_message';
+
+    const MANDRILL_APIKEY           = 'mandrill/general/apikey';
+    const MANDRILL_ACTIVE           = 'mandrill/general/active';
+    const MANDRILL_LOG              = 'mandrill/general/enable_log';
 
     const IS_CUSTOMER   = "CUS";
     const IS_PRODUCT    = "PRO";

@@ -10,13 +10,13 @@
  * @date: 7/7/16 1:31 PM
  * @file: Abandoned.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Abandoned extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Mailchimp extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
     public function render(Varien_Object $row)
     {
         $order = Mage::getModel('sales/order')->load($row->getData('entity_id'));
-        if ($order->getMailchimpAbandonedcartFlag()) {
-            $result = '<img src="' . $this->getSkinUrl("mailchimp/images/logo-freddie-monocolor-200.png") . '" width="40" title="recovered cart by Mailchimp" />';
+        if ($order->getMailchimpAbandonedcartFlag() || $order->getMailchimpCampaignId()) {
+            $result = '<img src="' . $this->getSkinUrl("ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png") . '" width="40" title="hep hep thanks MailChimp" />';
         } else {
             $result = '';
         }

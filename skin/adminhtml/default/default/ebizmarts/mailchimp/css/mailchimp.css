@@ -1,0 +1,103 @@
+ul.tabs a.mailchimp-section:hover {
+    background-color: #D8E6E6;
+    background-image: url(../images/tabs_link_over_bg.gif);
+}
+
+ul.tabs a.mailchimp-section {
+    border-bottom: 1px;
+    border-bottom-style: dotted;
+    text-indent: -9999px;
+}
+
+ul.tabs a.mailchimp-section:hover {
+    border-bottom: 1px;
+    border-bottom-style: dotted;
+    text-indent: -9999px;
+}
+
+ul.tabs a.mailchimp-section span,
+ul.tabs a.mailchimp-section:hover span {
+    background: url(../images/mailchimp-tab.png) no-repeat 18px 3px;
+    overflow: hidden;
+    padding-left: 20px;
+    width: 120px;
+    height: 18px;
+}
+
+ul.tabs a.mailchimp-section.active, ul.tabs a.mailchimp-section.active:hover {
+    background: white;
+    border-bottom-color: #8BA5A5;
+}
+
+h3.mailchimp-header {
+    background: url(../images/mailchimp-tab.png) no-repeat 0 0;
+    height: 22px;
+    overflow: hidden;
+    padding-left: 20px;;
+    width: 120px;
+    text-indent: -9999px;
+}
+
+fieldset#mailchimp_general p.note a {
+    background: url(../images/mailchimp-ico.png) no-repeat left top;
+    padding-left: 18px;
+    padding-bottom: 4px;
+}
+
+.mailchimp-nowarp {
+    white-space: nowrap;
+}
+
+button.add span span, button.cancel span span, button.delete span span {
+    background-image: none;
+    padding-left: 0;
+}
+
+tr#row_mailchimp_general_account_details ul {
+    padding: 5px;
+    color: #444;
+    background-color: #fdfdfd;
+    border: 1px solid #ccc;
+}
+
+/**
+* Progress Bar
+*/
+.bar-all-rounded {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.bar-spacer {
+    display: block;
+}
+
+#bar-progress-bar {
+    width: 100px;
+    margin: 0 auto;
+    background: #CCC;
+}
+
+#bar-progress-bar-percentage {
+    background: #3063A5;
+    padding: 2px 0px;
+    color: #FFF;
+    font-weight: bold;
+    text-align: center;
+}
+
+/**
+* Progress Bar
+*/
+
+div.mailchimp-notice {
+    background: #EAF0EE;
+    border: 1px solid #CCCCCC;
+    margin-bottom: 10px;
+    padding: 11px 0 0 10px;
+}
+
+.mailchimp-image {
+    margin: 0 0 4px 10px;
+}

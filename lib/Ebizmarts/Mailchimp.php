@@ -256,7 +256,7 @@ class Ebizmarts_Mailchimp
         $info = curl_getinfo($ch);
 
         $result = json_decode($responseBody, true);
-        
+
 
         if (curl_error($ch)) {
             throw new Mailchimp_Error("API call to $url failed: " . curl_error($ch));

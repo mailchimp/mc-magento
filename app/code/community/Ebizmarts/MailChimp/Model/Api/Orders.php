@@ -27,15 +27,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $collection = Mage::getModel('sales/order')->getCollection()
             ->addAttributeToSelect('status')
             ->addAttributeToSelect('mailchimp_sync_delta')
+            ->addAttributeToSelect('mailchimp_sync_error')
             ->addAttributeToSelect('entity_id')
             ->addFieldToFilter('state', 'complete')
-            ->addFieldToFilter(
-                'mailchimp_sync_delta', array(
+            ->addFieldToFilter('mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
                 array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
-                )
-            );
+            ));
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
@@ -49,13 +48,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
                 $batchArray[$counter]['body'] = $orderJson;
 
-                //update order delta
-                $order->setData("mailchimp_sync_delta", Varien_Date::now());
-                $order->save();
+            } else {
+                $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
+                $order->setData("mailchimp_sync_error", $error);
             }
-            $counter++;
+            //update order delta
+            $order->setData("mailchimp_sync_delta", Varien_Date::now());
+            $order->save();
+            $counter ++;
         }
-
         return $batchArray;
     }
 
@@ -130,6 +131,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
                 $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
+                if(!$variant){
+                    $variant = $options['simple_sku'];
+                }
             } else {
                 $variant = $item->getProductId();
             }
@@ -161,11 +165,17 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             );
         } else {
             if ((bool)$order->getCustomerIsGuest()) {
+                $guestId = "GUEST-" . date('Y-m-d-H-i-s');
                 $data["customer"] = array(
-                    "id" => "GUEST-" . date('Y-m-d-H-i-s'),
+                    "id" => $guestId,
                     "email_address" => $order->getCustomerEmail(),
                     "opt_in_status" => false
                 );
+                $guestCustomer = Mage::getModel('mailchimp/api_customers')->createGuestCustomer($guestId, $order);
+                $mergeFields = Mage::getModel('mailchimp/api_customers')->getMergeVars($guestCustomer);
+                if (is_array($mergeFields)) {
+                    $data['customer'] = array_merge($mergeFields, $data['customer']);
+                }
             } else {
                 $data["customer"] = array(
                     "id" => $order->getCustomerId(),
@@ -173,8 +183,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
                 );
             }
-            $data["customer"]["first_name"] = $order->getCustomerFirstname();
-            $data["customer"]["last_name"] = $order->getCustomerLastname();
+            if($order->getCustomerFirstname()) {
+                $data["customer"]["first_name"] = $order->getCustomerFirstname();
+            }
+            if($order->getCustomerLastname()) {
+                $data["customer"]["last_name"] = $order->getCustomerLastname();
+            }
         }
         $billingAddress = $order->getBillingAddress();
         $street = $billingAddress->getStreet();
@@ -192,7 +206,22 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($billingAddress->getCompany()) {
             $data["customer"]["company"] = $billingAddress->getCompany();
         }
-
+        //customer orders data
+        $orderCollection = Mage::getModel('sales/order')->getCollection()
+            ->addFieldToFilter('state', array('eq' => 'complete'))
+            ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()))
+            ->addFieldToFilter('mailchimp_sync_delta', array('notnull' => true))
+            ->addFieldToFilter('mailchimp_sync_delta', array('neq' => ''))
+            ->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()))
+            ->addFieldToFilter('mailchimp_sync_error', array('eq' => ""));
+        $totalOrders = 1;
+        $totalAmountSpent = (int)$order->getGrandTotal();
+        foreach ($orderCollection as $orderAlreadySent) {
+            $totalOrders++;
+            $totalAmountSpent += (int)$orderAlreadySent->getGrandTotal();
+        }
+        $data["customer"]["orders_count"] = $totalOrders;
+        $data["customer"]["total_spent"] = $totalAmountSpent;
         $jsonData = "";
 
         //enconde to JSON

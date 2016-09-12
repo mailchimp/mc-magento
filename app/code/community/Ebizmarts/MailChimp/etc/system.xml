@@ -19,7 +19,7 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <hint>
-                    <frontend_model>mailchimp/adminhtml_system_config_fieldset_hint</frontend_model>
+                    <frontend_model>mailchimp/adminhtml_system_config_fieldset_mailchimp_hint</frontend_model>
                     <sort_order>0</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -107,16 +107,29 @@
                                 <active>1</active>
                             </depends>
                         </reset_list>
-                        <!--<map_fields translate="label comment">-->
-                            <!--<label>Customer Fields Mapping</label>-->
-                            <!--<frontend_model>mailchimp/adminhtml_system_config_form_field_mapfields</frontend_model>-->
-                            <!--<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>-->
-                            <!--<sort_order>55</sort_order>-->
-                            <!--<show_in_default>1</show_in_default>-->
-                            <!--<show_in_website>0</show_in_website>-->
-                            <!--<show_in_store>0</show_in_store>-->
-                            <!--<comment><![CDATA[<a target="_blank" href="http://kb.mailchimp.com/article/all-the-merge-tags-cheatsheet">All The Merge Tags (Cheatsheet)</a>]]></comment>-->
-                        <!--</map_fields>-->
+                        <map_fields translate="label comment">
+                            <label>Customer Fields Mapping</label>
+                            <frontend_model>mailchimp/adminhtml_system_config_form_field_mapfields</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>55</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[<a target="_blank" href="http://kb.mailchimp.com/article/all-the-merge-tags-cheatsheet">All The Merge Tags (Cheatsheet)</a>]]></comment>
+                        </map_fields>
+                        <create_fields translate="label comment">
+                            <label>Create Merge Fields on MailChimp</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>mailchimp/adminhtml_system_config_createMergeFields</frontend_model>
+                            <sort_order>57</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </create_fields>
                         <webhook_active>
                             <label>Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
@@ -398,8 +411,83 @@
                         </page>
                     </fields>
                 </abandonedcart>
-
             </groups>
         </mailchimp>
+        <mandrill translate="label" module="mailchimp">
+            <class>mandrill-section</class>
+            <label>Mandrill Configuration</label>
+            <header_css>mandrill-header</header_css>
+            <tab>mailchimp</tab>
+            <sort_order>110</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <hint>
+                    <frontend_model>mailchimp/adminhtml_system_config_fieldset_mandrill_hint</frontend_model>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </hint>
+                <general translate="label comment">
+                    <label>Mandrill integration by ebizmarts</label>
+                    <frontend_type>text</frontend_type>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <sort_order>1</sort_order>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <apikey translate="label comment">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Your API Key]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </apikey>
+                        <enable_log translate="label comment">
+                            <label>Enable Log</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>File is {{base_dir}}/var/log/Ebizmarts_Mandrill.log</comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </enable_log>
+                        <user_info translate="label comment">
+                            <label>Account Info</label>
+                            <frontend_model>mailchimp/adminhtml_system_config_userinfo</frontend_model>
+                            <source_model>mailchimp/system_config_source_userinfo</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </user_info>
+                    </fields>
+                </general>
+            </groups>
+        </mandrill>
     </sections>
 </config>
