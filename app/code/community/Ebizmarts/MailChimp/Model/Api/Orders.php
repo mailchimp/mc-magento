@@ -25,9 +25,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         //create missing products first
         $collection = Mage::getModel('sales/order')->getCollection()
-            ->addAttributeToSelect('status')
-            ->addAttributeToSelect('mailchimp_sync_delta')
-            ->addAttributeToSelect('mailchimp_sync_error')
             ->addAttributeToSelect('entity_id')
             ->addFieldToFilter('state', 'complete')
             ->addFieldToFilter('mailchimp_sync_delta', array(
@@ -40,7 +37,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $batchArray = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
         $counter = 0;
-        foreach ($collection as $order) {
+        foreach ($collection as $item) {
+            $order = Mage::getModel('sales/order')->load($item->getEntityId());
             $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
             if (!empty($orderJson)) {
                 $batchArray[$counter]['method'] = "POST";
@@ -160,9 +158,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $api = $this->_getApi();
         $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
         if ($customers['total_items']>0) {
+            $id = $customers['customers'][0]['id'];
             $data['customer'] = array(
-                'id' => $customers['customers'][0]['id']
+                'id' => $id
             );
+            $guestCustomer = Mage::getModel('mailchimp/api_customers')->createGuestCustomer($id, $order);
+            $mergeFields = Mage::getModel('mailchimp/api_customers')->getMergeVars($guestCustomer);
+            if (is_array($mergeFields)) {
+                $data['customer'] = array_merge($mergeFields, $data['customer']);
+            }
         } else {
             if ((bool)$order->getCustomerIsGuest()) {
                 $guestId = "GUEST-" . date('Y-m-d-H-i-s');

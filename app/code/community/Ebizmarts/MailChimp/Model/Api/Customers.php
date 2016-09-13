@@ -315,13 +315,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     public function createGuestCustomer($guestId, $order) {
-        $guestCustomer = Mage::getModel('customer/customer')
-            ->setId($guestId)
-            ->setEmail($order->getCustomerEmail())
-            ->setFirstName($order->getCustomerFirstname())
-            ->setLastName($order->getCustomerLastname())
-            ->setPrimaryBillingAddress($order->getBillingAddress())
-            ->setPrimaryShippingAddress($order->getShippingAddress());
+        $guestCustomer = Mage::getModel('customer/customer')->setId($guestId);
+        foreach ($order->getData() as $key => $value) {
+            $keyArray = explode('_', $key);
+            if ($value && isset($keyArray[0]) && $keyArray[0] == 'customer') {
+                $guestCustomer->{'set' . ucfirst($keyArray[1])}($value);
+            }
+        }
         return $guestCustomer;
     }
 }

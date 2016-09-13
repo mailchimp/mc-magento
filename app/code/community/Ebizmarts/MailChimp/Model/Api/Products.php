@@ -40,7 +40,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
             //define variants and root products
             if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId), $batchArray);
-                $counter = (count($batchArray) - 1);
+                $counter = (count($batchArray));
+                $product->setData("mailchimp_sync_delta", Varien_Date::now());
+                $product->setData("mailchimp_sync_error", "");
+                $product->setData('mailchimp_sync_modified', 0);
+                $product->setMailchimpUpdateObserverRan(true);
+                $product->save();
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
             }
