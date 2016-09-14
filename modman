@@ -22,4 +22,4 @@ skin/adminhtml/default/default/ebizmarts/mandrill/
 
 
 # Module
-etc/modules/Ebizmarts_MailChimp.xml
+app/etc/modules/Ebizmarts_MailChimp.xml
