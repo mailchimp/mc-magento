@@ -1,0 +1,16 @@
+{
+    "name": "ebizmarts/mailchimp4magento",
+    "type": "magento-module",
+    "license": "OSL-3.0",
+    "homepage": "https://store.ebizmarts.com/mailchimp4magento.html",
+    "description": "FULL, FREE and SUPPORTED integration with MailChimp Email Marketing and Mandrill Transactional Emails for Magento.",
+    "authors": [
+        {
+            "name": "Ebizmarts",
+            "email": "info@ebizmarts.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
