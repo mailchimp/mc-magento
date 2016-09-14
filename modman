@@ -1,0 +1,25 @@
+# Code
+app/code/community/Ebizmarts/MailChimp
+
+# Design
+app/design/adminhtml/default/default/layout/ebizmarts/mailchimp.xml
+app/design/adminhtml/default/default/template/ebizmarts/mailchimp/
+app/design/adminhtml/default/default/template/ebizmarts/mandrill/
+
+app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml
+app/design/frontend/base/default/template/ebizmarts/mailchimp/
+
+# Js
+js/ebizmarts/mailchimp
+
+# Lib
+lib/Ebizmarts/
+lib/Mandrill/
+
+# Skin
+skin/adminhtml/default/default/ebizmarts/mailchimp/
+skin/adminhtml/default/default/ebizmarts/mandrill/
+
+
+# Module
+app/etc/modules/Ebizmarts_MailChimp.xml
