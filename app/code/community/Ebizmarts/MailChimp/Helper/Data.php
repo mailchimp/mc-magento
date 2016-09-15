@@ -176,10 +176,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * 
      * @param $message
      */
-    public function logRequest($message)
+    public function logRequest($message, $batchId=null)
     {
         if ($this->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG)) {
-            Mage::log($message, null, 'MailChimp_Requests.log', true);
+            if (!$batchId) {
+                Mage::log($message, null, 'MailChimp_Requests.log', true);
+            } else {
+                $logDir  = Mage::getBaseDir('var') . DS . 'log';
+                $fileName = $logDir.DS.$batchId.'.Request.log';
+                file_put_contents($fileName,$message);
+            }
         }
     }
 
