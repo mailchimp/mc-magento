@@ -42,6 +42,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'.date('Y-m-d-H-i-s');
         $counter = 0;
         foreach ($collection as $order) {
+            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId);
+            if (count($productData)) {
+                foreach($productData as $p) {
+                    $batchArray[$counter] = $p;
+                    $counter++;
+                }
+            }
             $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
             if (!empty($orderJson)) {
                 $batchArray[$counter]['method'] = "POST";
@@ -58,7 +65,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         return $batchArray;
     }
-
     /**
      * Set the orders to be removed from MailChimp because they were canceled
      * 
@@ -85,6 +91,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $batchArray = array();
         $counter = 0;
         foreach ($collection as $order) {
+            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId);
+            if (count($productData)) {
+                foreach($productData as $p) {
+                    $batchArray[$counter] = $p;
+                    $counter++;
+                }
+            }
             if (!empty($orderJson)) {
                 $batchArray[$counter]['method'] = "DELETE";
                 $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getEntityId();

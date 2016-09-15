@@ -42,7 +42,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
 
         $counter = 0;
-        foreach ($collection as $product) {
+        foreach ($collection as $item) {
+            $product = Mage::getModel('catalog/product')->load($item->getId());
+
             //define variants and root products
             if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
                 $data = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
@@ -211,4 +213,43 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $product->setData('mailchimp_sync_modified', 1);
         }
     }
+    public function sendModifiedProduct($order, $mailchimpStoreId)
+    {
+        Mage::log(__METHOD__);
+        $data = array();
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
+        $items = $order->getAllItems();
+        foreach ($items as $item)
+        {
+            Mage::log($item->getProductId());
+            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            if ($product->getId()!=$item->getProductId()) {
+                continue;
+            }
+            Mage::log($product);
+            if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
+                $data[] = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
+                Mage::log('if');
+                Mage::log($data);
+                $this->_updateProduct($product);
+            } elseif (!$product->getMailchimpSyncDelta()) {
+                $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
+                Mage::log('else');
+                Mage::log($data);
+                $this->_updateProduct($product);
+            }
+        }
+        return $data;
+    }
+    protected function _updateProduct($product)
+    {
+//        Mage::log(__METHOD__);
+//        Mage::log($product);
+        $product->setData("mailchimp_sync_delta", Varien_Date::now());
+        $product->setData("mailchimp_sync_error", "");
+        $product->setData('mailchimp_sync_modified', 0);
+        $product->setMailchimpUpdateObserverRan(true);
+        $product->save();
+    }
+
 }
