@@ -26,7 +26,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function createBatchJson($mailchimpStoreId)
     {
         $allCarts = array();
-        if (!Mage::getConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE)) {
+        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE)) {
             return $allCarts;
         }
         $this->_firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_FIRSTDATE);
@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $convertedCarts->addFieldToFilter(
             'mailchimp_sync_delta', array(
             array('neq' => '0000-00-00 00:00:00'),
-            array('null',false)
+            array('null' => false)
             )
         );
         // and not deleted
@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->addFieldToFilter(
             'mailchimp_sync_delta', array(
             array('neq' => '0000-00-00 00:00:00'),
-            array('null',false)
+            array('null' => false)
             )
         );
         $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('lt'=>new Zend_Db_Expr('updated_at')));
@@ -218,7 +218,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCartsForEmail->addFieldToFilter(
             'mailchimp_sync_delta', array(
             array('neq' => '0000-00-00 00:00:00'),
-            array('null',false)
+            array('null' => false)
             )
         );
         $allCartsForEmail->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
