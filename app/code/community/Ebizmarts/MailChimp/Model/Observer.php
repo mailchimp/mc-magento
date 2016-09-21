@@ -205,7 +205,7 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function _getCampaignCookie()
     {
         $cookie = Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
-        if ($cookie&&Mage::getModel('core/cookie')->getLifetime('mailchimp_campaign_id')==3600) {
+        if ($cookie) {
             return $cookie;
         } else {
             return null;
