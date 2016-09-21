@@ -16,6 +16,9 @@
     }
 
     function createCookie(name, value, expirationInSec) {
+        // remove old cookie of the campaign (cookie created by old versions of the module)
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/';
+
         var now = new Date();
         var expire = new Date(now.getTime() + (expirationInSec * 1000));//[(1 * 365 * 24 * 60) * 60000] == 1 year  -- (Years * Days * Hours * Minutes) * 60000
         Mage.Cookies.expires = expire;
