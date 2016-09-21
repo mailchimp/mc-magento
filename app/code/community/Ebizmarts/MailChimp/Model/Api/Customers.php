@@ -49,14 +49,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
 
             if (!empty($customerJson)) {
-                $patchPath = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/" . $customer->getId();
-                if ($customer->getMailchimpSyncModified()) {
-                    $customerArray[$counter]['method'] = "PATCH";
-                    $customerArray[$counter]['path'] = $patchPath;
-                } else {
-                    $customerArray[$counter]['method'] = "POST";
-                    $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
-                }
+                $customerArray[$counter]['method'] = "POST";
+                $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
                 $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer->getId();
                 $customerArray[$counter]['body'] = $customerJson;
 
@@ -169,13 +163,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                             }
                                         }
                                         if ($address) {
+                                            $street = $address->getStreet();
                                             $mergeVars[$key] = array(
-                                                'addr1' => $address->getStreet(1),
-                                                'addr2' => $address->getStreet(2),
-                                                'city' => $address->getCity(),
-                                                'state' => (!$address->getRegion() ? $address->getCity() : $address->getRegion()),
-                                                'zip' => $address->getPostcode(),
-                                                'country' => $address->getCountryId()
+                                                "address1" => $street ? $street[0] : "",
+                                                "address2" => count($street)>1 ? $street[1] : "",
+                                                "city" => $address->getCity() ? $address->getCity() : "",
+                                                "province" => $address->getRegion() ? $address->getRegion() : "",
+                                                "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
+                                                "postal_code" => $address->getPostcode() ? $address->getPostcode() : "",
+                                                "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName() : "",
+                                                "country_code" => $address->getCountry() ? $address->getCountry() : ""
                                             );
                                         }
                                         break;
@@ -285,9 +282,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                             }
                         }
                         if ($address) {
-                            $country = $address->getCountryId();
-                            if ($country) {
-                                $countryName = Mage::getModel('directory/country')->load($country)->getName();
+                            $countryCode = $address->getCountry();
+                            if ($countryCode) {
+                                $countryName = Mage::getModel('directory/country')->loadByCode($countryCode)->getName();
                                 $mergeVars[$key] = $countryName;
                             }
                         }
