@@ -282,4 +282,77 @@ class Ebizmarts_MailChimp_Model_Observer
         }
         return $observer;
     }
+
+//    public function stockItemSaveBefore(Varien_Event_Observer $observer)
+//    {
+//        Mage::log(__METHOD__);
+//        $event = $observer->getEvent();
+//        $_item = $event->getItem();
+//        $productId = $_item->getProductId();
+//        Mage::log("Modify stock for product [$productId]");
+//        return $observer;
+//    }
+
+    public function newOrder(Varien_Event_Observer $observer)
+    {
+        if ($this->_getCampaignCookie()) {
+            Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
+        }
+        $order = $observer->getEvent()->getOrder();
+        $items = $order->getAllItems();
+        foreach ($items as $item)
+        {
+            if ($item->getProductType()=='bundle' || $item->getProductType()=='configurable') {
+                continue;
+            }
+            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            $product->setData('mailchimp_sync_modified', 1);
+            $product->setMailchimpUpdateObserverRan(true);
+            $product->save();
+        }
+        return $observer;
+    }
+    public function newCreditMemo(Varien_Event_Observer $observer)
+    {
+        $creditMemo = $observer->getEvent()->getCreditmemo();
+        $items = $creditMemo->getAllItems();
+        foreach ($items as $item)
+        {
+            if ($item->getProductType()=='bundle' || $item->getProductType()=='configurable') {
+                continue;
+            }
+            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            $product->setData('mailchimp_sync_modified', 1);
+            $product->setMailchimpUpdateObserverRan(true);
+            $product->save();
+        }
+        return $observer;
+    }
+    public function cancelCreditMemo(Varien_Event_Observer $observer)
+    {
+        $creditMemo = $observer->getEvent()->getCreditmemo();
+        $items = $creditMemo->getAllItems();
+        foreach ($items as $item)
+        {
+            if ($item->getProductType()=='bundle' || $item->getProductType()=='configurable') {
+                continue;
+            }
+            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            $product->setData('mailchimp_sync_modified', 1);
+            $product->setMailchimpUpdateObserverRan(true);
+            $product->save();
+        }
+        return $observer;
+    }
+    public function itemCancel(Varien_Event_Observer$observer)
+    {
+        $item = $observer->getEvent()->getItem();
+        if ($item->getProductType()!='bundle' && $item->getProductType()!='configurable') {
+            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            $product->setData('mailchimp_sync_modified', 1);
+            $product->setMailchimpUpdateObserverRan(true);
+            $product->save();
+        }
+        return $observer;
+    }
 }

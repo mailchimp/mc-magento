@@ -215,27 +215,20 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
     public function sendModifiedProduct($order, $mailchimpStoreId)
     {
-        Mage::log(__METHOD__);
         $data = array();
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
-        $items = $order->getAllItems();
+        $items = $order->getAllVisibleItems();
         foreach ($items as $item)
         {
-            Mage::log($item->getProductId());
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
-            if ($product->getId()!=$item->getProductId()) {
+            if ($product->getId()!=$item->getProductId()||$product->getTypeId()=='bundle'||$product->getTypeId()=='grouped') {
                 continue;
             }
-            Mage::log($product);
             if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
                 $data[] = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
-                Mage::log('if');
-                Mage::log($data);
                 $this->_updateProduct($product);
             } elseif (!$product->getMailchimpSyncDelta()) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
-                Mage::log('else');
-                Mage::log($data);
                 $this->_updateProduct($product);
             }
         }
@@ -243,8 +236,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
     protected function _updateProduct($product)
     {
-//        Mage::log(__METHOD__);
-//        Mage::log($product);
         $product->setData("mailchimp_sync_delta", Varien_Date::now());
         $product->setData("mailchimp_sync_error", "");
         $product->setData('mailchimp_sync_modified', 0);

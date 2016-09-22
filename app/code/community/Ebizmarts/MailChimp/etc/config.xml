@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.0.6</version>
+            <version>1.1.2</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.0.6</version>
+            <version>1.1.2</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -27,22 +27,48 @@
                     </mailchimp_subscribe_delete_observer>
                 </observers>
             </newsletter_subscriber_delete_after>
-            <sales_order_place_before>
-                <observers>
-                    <mailchimp_subscribe_checkout_before>
-                        <class>mailchimp/observer</class>
-                        <method>saveCampaignData</method>
-                    </mailchimp_subscribe_checkout_before>
-                </observers>
-            </sales_order_place_before>
+            <!--<sales_order_place_before>-->
+                <!--<observers>-->
+                    <!--<mailchimp_subscribe_checkout_before>-->
+                        <!--<class>mailchimp/observer</class>-->
+                        <!--<method>saveCampaignData</method>-->
+                    <!--</mailchimp_subscribe_checkout_before>-->
+                <!--</observers>-->
+            <!--</sales_order_place_before>-->
+
             <sales_order_place_after>
                 <observers>
-                    <mailchimp_subscribe_checkout_after>
+                    <warehouse_new_order>
                         <class>mailchimp/observer</class>
-                        <method>removeCampaignData</method>
-                    </mailchimp_subscribe_checkout_after>
+                        <method>newOrder</method>
+                    </warehouse_new_order>
                 </observers>
             </sales_order_place_after>
+            <sales_order_creditmemo_refund>
+                <observers>
+                    <warehouse_creditmemo_refund>
+                        <class>mailchimp/observer</class>
+                        <method>newCreditMemo</method>
+                    </warehouse_creditmemo_refund>
+                </observers>
+            </sales_order_creditmemo_refund>
+            <sales_order_creditmemo_cancel>
+                <observers>
+                    <warehouse_creditmemo_cancel>
+                        <class>mailchimp/observer</class>
+                        <method>cancelCreditMemo</method>
+                    </warehouse_creditmemo_cancel>
+                </observers>
+            </sales_order_creditmemo_cancel>
+            <sales_order_item_cancel>
+                <observers>
+                    <warehouse_item_cancel>
+                        <class>mailchimp/observer</class>
+                        <method>itemCancel</method>
+                    </warehouse_item_cancel>
+                </observers>
+            </sales_order_item_cancel>
+
         </events>
         <models>
             <mailchimp>
