@@ -46,14 +46,26 @@ if ($err) {
     echo "cURL Error #:" . $err;
 } else {
     $jsonResponse = json_decode($response);
-    $fileUrl = $jsonResponse->response_body_url;
-    $fd = fopen("$batchId.response.tar.gz", 'w');
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $fileUrl);
-    curl_setopt($ch, CURLOPT_FILE, $fd);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-    $r = curl_exec($ch);
-    curl_close($ch);
-    fclose($fd);
-    echo "Send us the file $batchId.response.tar.gz\n";
+    if ($jsonResponse->status == 'finished') {
+        $fileUrl = $jsonResponse->response_body_url;
+        // check if the file is not expired
+        parse_str($fileUrl,$fileParams);
+        try {
+            $fd = fopen("$batchId.response.tar.gz", 'w');
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $fileUrl);
+            curl_setopt($ch, CURLOPT_FILE, $fd);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
+            $r = curl_exec($ch);
+            curl_close($ch);
+            fclose($fd);
+            echo "Send us the file $batchId.response.tar.gz\n";
+        } catch(Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+    else {
+        echo "Error: the batch is not finished or have errors\n";
+        echo "Error ".$jsonResponse->title." Detail: ".$jsonResponse->detail."\n";
+    }
 }
