@@ -218,4 +218,34 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $product->setData('mailchimp_sync_modified', 1);
         }
     }
+    public function sendModifiedProduct($order, $mailchimpStoreId)
+    {
+        $data = array();
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
+        $items = $order->getAllVisibleItems();
+        foreach ($items as $item)
+        {
+            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            if ($product->getId()!=$item->getProductId()||$product->getTypeId()=='bundle'||$product->getTypeId()=='grouped') {
+                continue;
+            }
+            if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
+                $data[] = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
+                $this->_updateProduct($product);
+            } elseif (!$product->getMailchimpSyncDelta()) {
+                $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
+                $this->_updateProduct($product);
+            }
+        }
+        return $data;
+    }
+    protected function _updateProduct($product)
+    {
+        $product->setData("mailchimp_sync_delta", Varien_Date::now());
+        $product->setData("mailchimp_sync_error", "");
+        $product->setData('mailchimp_sync_modified', 0);
+        $product->setMailchimpUpdateObserverRan(true);
+        $product->save();
+    }
+
 }

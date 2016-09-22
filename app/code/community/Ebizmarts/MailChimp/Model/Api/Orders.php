@@ -40,6 +40,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $counter = 0;
         foreach ($collection as $item) {
             $order = Mage::getModel('sales/order')->load($item->getEntityId());
+            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId);
+            if (count($productData)) {
+                foreach($productData as $p) {
+                    $batchArray[$counter] = $p;
+                    $counter++;
+                }
+            }
             $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
             if (!empty($orderJson)) {
                 $batchArray[$counter]['method'] = "POST";
@@ -56,6 +63,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $order->save();
             $counter ++;
         }
+
         return $batchArray;
     }
 
@@ -130,9 +138,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
                 $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
-                if(!$variant){
-                    $variant = $options['simple_sku'];
-                }
             } else {
                 $variant = $item->getProductId();
             }

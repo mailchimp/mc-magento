@@ -136,7 +136,17 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCartsForEmail->clear();
             }
             if (!$cart->getCustomerId()&&$customer->getEmail()==$cart->getCustomerEmail()) {
+                $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+                $cart->save();
                 continue;
+            }
+            // send the products that not already sent
+            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId);
+            if (count($productData)) {
+                foreach($productData as $p) {
+                    $allCarts[$this->_counter] = $p;
+                    $this->_counter += 1;
+                }
             }
             if (count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
@@ -174,6 +184,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($newCarts as $cart) {
             if (!count($cart->getAllVisibleItems())) {
+                $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+                $cart->save();
                 continue;
             }
             $customer = Mage::getModel("customer/customer");
@@ -193,8 +205,19 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 }
                 $allCartsForEmail->clear();
             }
+            // don't send the carts for guest customers who are registered
             if (!$cart->getCustomerId()&&$customer->getEmail()==$cart->getCustomerEmail()) {
+                $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+                $cart->save();
                 continue;
+            }
+            // send the products that not already sent
+            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId);
+            if (count($productData)) {
+                foreach($productData as $p) {
+                    $allCarts[$this->_counter] = $p;
+                    $this->_counter += 1;
+                }
             }
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
             $allCarts[$this->_counter]['method'] = 'POST';
@@ -252,17 +275,22 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $itemCount = 0;
         foreach ($items as $item) {
             $line = array();
+            if ($item->getProductType()=='bundle'||$item->getProductType()=='grouped') {
+                continue;
+            }
             if ($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
-                $options = $item->getProductOptions();
-                $sku = $options['simple_sku'];
-                $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
+                $variant = $item->getOptionByCode('simple_product')->getProduct();
+                if (!$variant) {
+                    continue;
+                }
+                $variantId = $variant->getId();
             } else {
-                $variant = $item->getProductId();
+                $variantId = $item->getProductId();
             }
 
             $line['id'] = (string)$itemCount;
             $line['product_id'] = $item->getProductId();
-            $line['product_variant_id'] = $variant;
+            $line['product_variant_id'] = $variantId;
             $line['quantity'] = (int)$item->getQtyOrdered();
             $line['price'] = $item->getPrice();
             $lines[] = $line;

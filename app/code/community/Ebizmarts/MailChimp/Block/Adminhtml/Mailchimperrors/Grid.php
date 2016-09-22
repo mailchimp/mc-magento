@@ -76,6 +76,13 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
+            'batch_id', array(
+                'header' => Mage::helper('mailchimp')->__('Batch ID'),
+                'index'  => 'batch_id',
+                'sortable' => false
+            )
+        );
+        $this->addColumn(
             'original_id', array(
             'header' => Mage::helper('mailchimp')->__('Original'),
             'index' => 'original_id',
