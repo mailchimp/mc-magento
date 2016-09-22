@@ -32,7 +32,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $customerArray = array();
-        $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . date('Y-m-d-H-i-s');
+        
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . Mage::helper('mailchimp')->getDateMicrotime();
 
         $counter = 0;
         foreach ($collection as $item) {

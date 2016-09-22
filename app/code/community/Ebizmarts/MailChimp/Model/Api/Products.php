@@ -31,14 +31,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
-        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
-
+        
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . Mage::helper('mailchimp')->getDateMicrotime();
         $counter = 0;
         foreach ($collection as $item) {
             $product = Mage::getModel('catalog/product')->load($item->getId());
 
             //define variants and root products
-            if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
+            if ($product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId), $batchArray);
                 $counter = (count($batchArray));
                 $product->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -46,6 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->setData('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
                 $product->save();
+                continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
             }
@@ -61,6 +62,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $product->setMailchimpUpdateObserverRan(true);
                 $product->save();
             } else {
+                $product->setData("mailchimp_sync_delta", Varien_Date::now());
+                $product->setData("mailchimp_sync_error", "This product type is not supported on MailChimp.");
+                $product->setData('mailchimp_sync_modified', 0);
+                $product->setMailchimpUpdateObserverRan(true);
+                $product->save();
                 continue;
             }
         }

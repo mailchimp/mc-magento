@@ -30,7 +30,8 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
             );
         $collection->getSelect()->limit($limit);
         $subscriberArray = array();
-        $batchId = Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . date('Y-m-d-H-i-s');
+        $date = Mage::helper('mailchimp')->getDateMicrotime();
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . date('Y-m-d-H-i-s') . '-' . $date;
 
         $counter = 0;
         foreach ($collection as $subscriber) {

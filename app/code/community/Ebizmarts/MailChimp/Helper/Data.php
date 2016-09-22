@@ -369,4 +369,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
     }
+
+    public function getDateMicrotime()
+    {
+        $microtime = explode(' ', microtime());
+        $msec = $microtime[0];
+        $msecArray = explode('.', $msec);
+        $date = date('Y-m-d-H-i-s') . '-' . $msecArray[1];
+        return $date;
+    }
 }

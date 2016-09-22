@@ -31,7 +31,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
         $this->_firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_FIRSTDATE);
         $this->_counter = 0;
-        $this->_batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.date('Y-m-d-H-i-s');
+
+        $date = Mage::helper('mailchimp')->getDateMicrotime();
+        $this->_batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.$date;
         // get all the carts converted in orders (must be deleted on mailchimp)
         $allCarts = array_merge($allCarts, $this->_getConvertedQuotes($mailchimpStoreId));
         // get all the carts modified but not converted in orders
@@ -300,8 +302,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             );
         } else {
             if (!$cart->getCustomerId()) {
+                $date = Mage::helper('mailchimp')->getDateMicrotime();
+                $this->_batchId = Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.$date;
                 $customer = array(
-                    "id" => "GUEST-" . date('Y-m-d-H-i-s'),
+                    "id" => "GUEST-" . $date,
                     "email_address" => $cart->getCustomerEmail(),
                     "opt_in_status" => false
                 );
@@ -347,16 +351,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $address['country'] = $billingAddress->getCountry();
                 $address['country_code'] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
             }
-//            $customer["address"] = array(
-//                "address1" => $street[0],
-//                "address2" => count($street) > 1 ? $street[1] : "",
-//                "city" => $billingAddress->getCity(),
-//                "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-//                "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-//                "postal_code" => $billingAddress->getPostcode(),
-//                "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : '',
-//                "country_code" => $billingAddress->getCountry() ? $billingAddress->getCountry() : ''
-//            );
             if (count($address)) {
                 $customer['address'] = $address;
             }
