@@ -54,12 +54,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         // get only the converted quotes
         $convertedCarts->addFieldToFilter('is_active', array('eq'=>0));
         // be sure that the quote are already in mailchimp
-        $convertedCarts->addFieldToFilter(
-            'mailchimp_sync_delta', array(
-            array('neq' => '0000-00-00 00:00:00'),
-            array('null' => false)
-            )
-        );
+        $convertedCarts->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
         // and not deleted
         $convertedCarts->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
         $convertedCarts->addFieldToFilter('created_at', array('from'=>$this->_firstDate));
@@ -102,12 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         // select carts with no orders
         $modifiedCarts->addFieldToFilter('is_active', array('eq'=>1));
         // select carts already sent to mailchimp and moodifief after
-        $modifiedCarts->addFieldToFilter(
-            'mailchimp_sync_delta', array(
-            array('neq' => '0000-00-00 00:00:00'),
-            array('null' => false)
-            )
-        );
+        $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
         $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('lt'=>new Zend_Db_Expr('updated_at')));
         // and not deleted in mailchimp
         $modifiedCarts->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
@@ -171,13 +161,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCarts = array();
         $newCarts = Mage::getModel('sales/quote')->getCollection();
         $newCarts->addFieldToFilter('is_active', array('eq'=>1))
-            ->addFieldToFilter(
-                'mailchimp_sync_delta',
-                array(
-                    array('eq'=>'0000-00-00 00:00:00'),
-                    array('null'=>true)
-                )
-            );
+            ->addFieldToFilter('mailchimp_sync_delta', array('eq' => '0000-00-00 00:00:00'));
         $newCarts->addFieldToFilter('created_at', array('from'=>$this->_firstDate));
         $newCarts->addFieldToFilter('customer_email', array('notnull'=>true));
         $newCarts->addFieldToFilter('items_count', array('gt'=>0));
@@ -240,12 +224,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     {
         $allCartsForEmail = Mage::getModel('sales/quote')->getCollection();
         $allCartsForEmail->addFieldToFilter('is_active', array('eq'=>1));
-        $allCartsForEmail->addFieldToFilter(
-            'mailchimp_sync_delta', array(
-            array('neq' => '0000-00-00 00:00:00'),
-            array('null' => false)
-            )
-        );
+        $allCartsForEmail->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
         $allCartsForEmail->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
         $allCartsForEmail->addFieldToFilter('customer_email', array('eq'=>$email));
         return $allCartsForEmail;
