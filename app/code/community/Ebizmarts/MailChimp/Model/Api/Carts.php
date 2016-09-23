@@ -57,7 +57,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $convertedCarts->addFieldToFilter(
             'mailchimp_sync_delta', array(
             array('neq' => '0000-00-00 00:00:00'),
-            array('null' => false)
             )
         );
         // and not deleted
@@ -105,7 +104,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->addFieldToFilter(
             'mailchimp_sync_delta', array(
             array('neq' => '0000-00-00 00:00:00'),
-            array('null' => false)
             )
         );
         $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('lt'=>new Zend_Db_Expr('updated_at')));
@@ -150,11 +148,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
             if (count($cart->getAllVisibleItems())) {
                 $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
-                $allCarts[$this->_counter]['method'] = 'POST';
-                $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
-                $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
-                $allCarts[$this->_counter]['body'] = $cartJson;
-                $this->_counter += 1;
+                if ($cartJson!="") {
+                    $allCarts[$this->_counter]['method'] = 'POST';
+                    $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+                    $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
+                    $allCarts[$this->_counter]['body'] = $cartJson;
+                    $this->_counter += 1;
+                }
             }
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
             $cart->save();
@@ -175,7 +175,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 'mailchimp_sync_delta',
                 array(
                     array('eq'=>'0000-00-00 00:00:00'),
-                    array('null'=>true)
                 )
             );
         $newCarts->addFieldToFilter('created_at', array('from'=>$this->_firstDate));
@@ -220,13 +219,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 }
             }
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId);
-            $allCarts[$this->_counter]['method'] = 'POST';
-            $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
-            $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
-            $allCarts[$this->_counter]['body'] = $cartJson;
-            $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-            $cart->save();
-            $this->_counter += 1;
+            if ($cartJson!="") {
+                $allCarts[$this->_counter]['method'] = 'POST';
+                $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+                $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
+                $allCarts[$this->_counter]['body'] = $cartJson;
+                $cart->setData("mailchimp_sync_delta", Varien_Date::now());
+                $cart->save();
+                $this->_counter += 1;
+            }
         }
         return $allCarts;
     }
@@ -243,7 +244,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCartsForEmail->addFieldToFilter(
             'mailchimp_sync_delta', array(
             array('neq' => '0000-00-00 00:00:00'),
-            array('null' => false)
             )
         );
         $allCartsForEmail->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
@@ -296,20 +296,20 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $lines[] = $line;
             $itemCount++;
         }
-        $oneCart['lines'] = $lines;
 
         $jsonData = "";
+        if ($itemCount) {
+            $oneCart['lines'] = $lines;
+            //enconde to JSON
+            try {
 
-        //enconde to JSON
-        try {
+                $jsonData = json_encode($oneCart);
 
-            $jsonData = json_encode($oneCart);
-
-        } catch (Exception $e) {
-            //json encode failed
-            Mage::helper('mailchimp')->logError("Carts ".$cart->getId()." json encode failed");
+            } catch (Exception $e) {
+                //json encode failed
+                Mage::helper('mailchimp')->logError("Carts " . $cart->getId() . " json encode failed");
+            }
         }
-
         return $jsonData;
     }
     // @todo calculate the checkout url for the cart
