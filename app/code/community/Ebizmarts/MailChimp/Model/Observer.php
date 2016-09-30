@@ -26,13 +26,13 @@ class Ebizmarts_MailChimp_Model_Observer
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
 
         if ($generalEnabled && $listId) {
-            $this->_createWebhook($listId, $apiKey);
+            $this->_createWebhook($listId);
         }
 
         return $observer;
     }
 
-    protected function _createWebhook($listId, $apiKey)
+    protected function _createWebhook($listId)
     {
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
 
@@ -47,8 +47,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if (FALSE != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
         }
-        $userAgent = 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
-        $api = new Ebizmarts_Mailchimp($apiKey, null, $userAgent);
+        $api = Mage::helper('mailchimp')->getApi();
         if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_TWO_WAY_SYNC)) {
             $events = array(
                 'subscribe' => true,

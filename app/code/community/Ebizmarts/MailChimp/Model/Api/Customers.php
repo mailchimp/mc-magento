@@ -50,8 +50,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
 
             if (!empty($customerJson)) {
-                $customerArray[$counter]['method'] = "POST";
-                $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers";
+                $customerArray[$counter]['method'] = "PUT";
+                $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/" . $customer->getId();
                 $customerArray[$counter]['operation_id'] = $batchId . '_' . $customer->getId();
                 $customerArray[$counter]['body'] = $customerJson;
 
@@ -95,14 +95,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             if (!array_key_exists("address", $data)) {
                 $street = $address->getStreet();
                 $data["address"] = array(
-                    "address1" => $street[0],
+                    "address1" => $street[0] ? $street[0] : "",
                     "address2" => count($street)>1 ? $street[1] : "",
-                    "city" => $address->getCity(),
+                    "city" => $address->getCity() ? $address->getCity() : "",
                     "province" => $address->getRegion() ? $address->getRegion() : "",
                     "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
                     "postal_code" => $address->getPostcode(),
-                    "country" => Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName(),
-                    "country_code" => $address->getCountry()
+                    "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName(): "",
+                    "country_code" => $address->getCountry() ? $address->getCountry() : ""
                 );
 
                 //company
@@ -166,14 +166,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                         if ($address) {
                                             $street = $address->getStreet();
                                             $mergeVars[$key] = array(
-                                                "address1" => $street ? $street[0] : "",
-                                                "address2" => count($street)>1 ? $street[1] : "",
+                                                "addr1" => $street[0] ? $street[0] : "",
+                                                "addr2" => count($street)>1 ? $street[1] : "",
                                                 "city" => $address->getCity() ? $address->getCity() : "",
-                                                "province" => $address->getRegion() ? $address->getRegion() : "",
-                                                "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
-                                                "postal_code" => $address->getPostcode() ? $address->getPostcode() : "",
-                                                "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName() : "",
-                                                "country_code" => $address->getCountry() ? $address->getCountry() : ""
+                                                "state" => $address->getRegion() ? $address->getRegion() : "",
+                                                "zip" => $address->getPostcode() ? $address->getPostcode() : "",
+                                                "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName() : ""
                                             );
                                         }
                                         break;

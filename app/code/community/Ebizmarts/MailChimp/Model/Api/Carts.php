@@ -306,8 +306,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getCustomer($cart,$mailchimpStoreId)
     {
         $api = $this->_getApi();
-        $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
-        if ($customers['total_items']>0) {
+        $customers = array();
+        try {
+            $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
+        } catch (Mailchimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+        }
+        if (isset($customers['total_items']) && $customers['total_items'] > 0) {
             $customer = array(
               'id' => $customers['customers'][0]['id']
             );
@@ -375,8 +380,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getApi()
     {
         if (!$this->_api) {
-            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
-            $this->_api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+            $this->_api = Mage::helper('mailchimp')->getApi();
         }
         return $this->_api;
     }

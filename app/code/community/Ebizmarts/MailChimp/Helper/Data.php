@@ -124,7 +124,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             //clear store config values
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
-        if ($ecommerceEnabled&&$apikey&&$listId) {
+        if ($ecommerceEnabled && $apikey && $listId) {
             //generate store id
             $date = date('Y-m-d-His');
             $storeId = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
@@ -141,6 +141,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         //reset mailchimp minimum date to sync flag
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG, Varien_Date::now());
+        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 1);
         Mage::getConfig()->cleanCache();
     }
 
@@ -307,20 +308,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function createMergeFields()
     {
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $maps = unserialize(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MAP_FIELDS));
         $customFieldTypes = unserialize(
             Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS)
         );
 
-        if ($apiKey != null && $apiKey != "") {
-            $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        $api = Mage::helper('mailchimp')->getApi();
+        if ($api) {
             try {
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
             } catch (Mailchimp_Error $e) {
                 Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
             }
-            if(count($mailchimpFields) > 0) {
+            if (count($mailchimpFields) > 0) {
                 foreach ($maps as $map) {
                     $customAtt = $map['magento'];
                     $chimpTag = $map['mailchimp'];
@@ -333,7 +333,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                     if (!$alreadyExists) {
                         foreach ($customFieldTypes as $customFieldType) {
-                            if($customFieldType['value'] == $chimpTag) {
+                            if ($customFieldType['value'] == $chimpTag) {
                                 try {
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
                                 } catch (Mailchimp_Error $e) {
@@ -354,15 +354,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 }
                             }
                             try {
-                                if($label) {
+                                if ($label) {
                                     //Shipping and Billing Address
                                     if ($customAtt == 13 || $customAtt == 14) {
                                         $api->lists->mergeFields->add($listId, $label, 'address', null, $chimpTag);
-                                    //Birthday
+                                        //Birthday
                                     } elseif ($customAtt == 11) {
                                         $api->lists->mergeFields->add($listId, $label, 'date', null, $chimpTag);
                                     } else {
-                                        $response = $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
+                                        $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
                                     }
                                 }
                             } catch (Mailchimp_Error $e) {
@@ -373,7 +373,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
-
     }
 
     public function getDateMicrotime()
@@ -383,5 +382,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $msecArray = explode('.', $msec);
         $date = date('Y-m-d-H-i-s') . '-' . $msecArray[1];
         return $date;
+    }
+
+    public function getApi()
+    {
+        $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+        $api = null;
+        if ($apiKey != null && $apiKey != "") {
+            $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        }
+        return $api;
     }
 }

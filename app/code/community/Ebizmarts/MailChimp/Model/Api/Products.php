@@ -83,7 +83,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //add itself as variant
             $variantProducts[] = $product;
-
             if (count($childProducts[0])) {
                 foreach ($childProducts[0] as $childId) {
                     $variantProducts[] = Mage::getModel('catalog/product')->load($childId);
@@ -129,7 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             //add or update variant
             foreach ($parentIds as $parentId) {
                 $variendata = array();
-                //$variendata["id"] = $data["id"];
+                $variendata["id"] = $data["id"];
                 $variendata["title"] = $data["title"];
                 $variendata["url"] = $data["url"];
                 $variendata["sku"] = $data["sku"];
@@ -221,7 +220,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function sendModifiedProduct($order, $mailchimpStoreId)
     {
         $data = array();
-        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . date('Y-m-d-H-i-s');
+        $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . Mage::helper('mailchimp')->getDateMicrotime();
         $items = $order->getAllVisibleItems();
         foreach ($items as $item)
         {
@@ -229,10 +228,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($product->getId()!=$item->getProductId()||$product->getTypeId()=='bundle'||$product->getTypeId()=='grouped') {
                 continue;
             }
-            if ($product->getMailchimpSyncModified()&&$product->getMailchimpSyncDelta()) {
+            if ($product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
                 $data[] = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
                 $this->_updateProduct($product);
-            } elseif (!$product->getMailchimpSyncDelta()) {
+            } elseif (!$product->getMailchimpSyncDelta() || $product->getMailchimpSyncDelta() < Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
                 $this->_updateProduct($product);
             }

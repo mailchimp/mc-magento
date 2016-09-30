@@ -22,17 +22,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
 
     /**
      * Set AccountDetails on class property if not already set
-     *
-     * @return void
      */
     public function __construct()
     {
-        $configValue = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
         $mcStoreId = (Mage::helper('mailchimp')->getMCStoreId()) ? Mage::helper('mailchimp')->getMCStoreId() : null;
-        $api = null;
-        if ($configValue) {
-            $api = new Ebizmarts_Mailchimp($configValue, null, 'Mailchimp4Magento'.(string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
-        }
+        $api = Mage::helper('mailchimp')->getApi();
         if ($api) {
             try {
                 $this->_accountDetails = $api->root->info('account_name,total_subscribers');
