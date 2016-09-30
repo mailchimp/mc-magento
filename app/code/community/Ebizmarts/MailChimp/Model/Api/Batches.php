@@ -100,6 +100,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         Mage::log(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED), null, 'ebizmarts.log', true);
                         Mage::log(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED), null, 'ebizmarts.log', true);
                         if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED)) {
+                            Mage::helper('mailchimp')->resetMCEcommerceData(true);
                             Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0);
                             Mage::getConfig()->cleanCache();
                         } else {
