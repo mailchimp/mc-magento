@@ -29,6 +29,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_CUSTOM_MAP_FIELDS     = 'mailchimp/general/customer_map_fields';
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
+    const ECOMMERCE_CUSTOMERS_OPTIN     = 'mailchimp/ecommerce/customers_optin';
 
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';

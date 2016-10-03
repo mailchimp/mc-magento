@@ -14,7 +14,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 {
 
     const BATCH_LIMIT = 100;
-    const DEFAULT_OPT_IN = true;
 
     public function createBatchJson($mailchimpStoreId)
     {
@@ -74,7 +73,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["email_address"] = $customer->getEmail();
         $data["first_name"] = $customer->getFirstname();
         $data["last_name"] = $customer->getLastname();
-        $data["opt_in_status"] = self::DEFAULT_OPT_IN;
+        $data["opt_in_status"] = $this->getOptin();
 
         //customer orders data
         $orderCollection = Mage::getModel('sales/order')->getCollection()
@@ -319,5 +318,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             }
         }
         return $guestCustomer;
+    }
+
+    public function getOptin() {
+        if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMERS_OPTIN, 0)) {
+            $optin = true;
+        } else {
+            $optin = false;
+        }
+        return $optin;
     }
 }

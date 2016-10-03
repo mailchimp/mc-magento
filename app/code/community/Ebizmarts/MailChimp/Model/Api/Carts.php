@@ -329,7 +329,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $customer = array(
                     "id" => $cart->getCustomerId(),
                     "email_address" => $cart->getCustomerEmail(),
-                    "opt_in_status" => Ebizmarts_MailChimp_Model_Api_Customers::DEFAULT_OPT_IN
+                    "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin()
                 );
             }
         }
