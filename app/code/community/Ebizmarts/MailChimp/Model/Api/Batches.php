@@ -322,6 +322,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 Mage::helper('mailchimp')->logError("Error: quote ".$id." not found");
                             }
                             break;
+                        case Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER:
+                            $s = Mage::getModel('newsletter/subscriber')->load($id);
+                            if ($s->getId() == $id) {
+                                $s->setData("mailchimp_sync_error", $error);
+                                $s->save();
+                            } else {
+                                Mage::helper('mailchimp')->logError("Error: subscriber ".$id." not found");
+                            }
+                            break;
                         default:
                             Mage::helper('mailchimp')->logError("Error: no identification ".$type." found");
                             break;
