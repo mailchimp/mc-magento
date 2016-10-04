@@ -275,7 +275,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $line['id'] = (string)$itemCount;
             $line['product_id'] = $item->getProductId();
             $line['product_variant_id'] = $variantId;
-            $line['quantity'] = (int)$item->getQtyOrdered();
+            $line['quantity'] = (int)$item->getQty();
             $line['price'] = $item->getPrice();
             $lines[] = $line;
         }
