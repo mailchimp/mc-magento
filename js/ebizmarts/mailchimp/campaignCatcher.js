@@ -15,10 +15,7 @@
         }
     }
 
-    function createCookie(name, value, expirationInSec) {
-        var now = new Date();
-        var expire = new Date(now.getTime() + (expirationInSec * 1000));//[(1 * 365 * 24 * 60) * 60000] == 1 year  -- (Years * Days * Hours * Minutes) * 60000
-        Mage.Cookies.expires = expire;
+    function createCookie(name, value) {
         Mage.Cookies.set(name,value);
     }
 
