@@ -318,7 +318,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             try {
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
             } catch (Mailchimp_Error $e) {
-                Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             }
             if (count($mailchimpFields) > 0) {
                 foreach ($maps as $map) {
@@ -337,7 +337,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 try {
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
                                 } catch (Mailchimp_Error $e) {
-                                    Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
+                                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
                                 }
                                 $created = true;
                             }
@@ -366,7 +366,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                     }
                                 }
                             } catch (Mailchimp_Error $e) {
-                                Mage::helper('mailchimp')->logErrors($e->getFriendlyMessage());
+                                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
                             }
                         }
                     }
