@@ -185,7 +185,7 @@
                     <mailchimp_add_abandoned_to_grid_order>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>addAbandonedToSalesOrderGrid</method>
+                        <method>addColumnToSalesOrderGrid</method>
                     </mailchimp_add_abandoned_to_grid_order>
                 </observers>
             </core_block_abstract_to_html_before>
