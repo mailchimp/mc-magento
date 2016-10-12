@@ -1,0 +1,16 @@
+{
+    "name": "ebizmarts/mc-magento",
+    "type": "magento-module",
+    "license": "OSL-3.0",
+    "homepage": "https://connect.mailchimp.com/integrations/magento",
+    "description": "FULL SUPPORTED integration with MailChimp Email Marketing and Mandrill Transactional Emails for Magento.",
+    "authors": [
+        {
+            "name": "Ebizmarts",
+            "email": "mailchimp@ebizmarts-desk.zendesk.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
