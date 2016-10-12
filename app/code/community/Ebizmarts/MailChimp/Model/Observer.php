@@ -35,7 +35,6 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function _createWebhook($listId)
     {
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
-
         //Generating Webhooks URL
         $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
         $hookUrl = Mage::getModel('core/url')->getUrl(
@@ -219,7 +218,7 @@ class Ebizmarts_MailChimp_Model_Observer
     public function addAbandonedToSalesOrderGrid($observer)
     {
         $block = $observer->getEvent()->getBlock();
-        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid) {
+        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid && (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE) || Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE))) {
             $block->addColumnAfter(
                 'mailchimp_flag', array(
                 'header' => Mage::helper('mailchimp')->__('MailChimp'),
