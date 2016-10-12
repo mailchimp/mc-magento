@@ -348,16 +348,6 @@ class Ebizmarts_MailChimp_Model_Observer
         return $observer;
     }
 
-//    public function stockItemSaveBefore(Varien_Event_Observer $observer)
-//    {
-//        Mage::log(__METHOD__);
-//        $event = $observer->getEvent();
-//        $_item = $event->getItem();
-//        $productId = $_item->getProductId();
-//        Mage::log("Modify stock for product [$productId]");
-//        return $observer;
-//    }
-
     /**
      * Set the products included the order to be updated on MailChimp on the next cron job run.
      *
