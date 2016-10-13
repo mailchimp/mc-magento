@@ -86,8 +86,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
         $senderExists = false;
         foreach ($mandrillSenders as $sender)
         {
-            $emailAddress = $sender['domain'];
-            if($email['from_email'] == $sender['domain'])
+            $emailArray = explode('@', $email['from_email']);
+            if(count($emailArray) > 1 && $emailArray[1] == $sender['domain'])
             {
                 $senderExists = true;
             }
