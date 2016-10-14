@@ -87,11 +87,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get local store_id value of the MC store.
+     *
      * @return string
      */
     public function getMCStoreId()
     {
         return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
+    }
+
+    /**
+     * Get local is_syncing value of the MC store.
+     *
+     * @return mixed
+     */
+    public function getMCIsSyncing()
+    {
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING);
     }
 
     /**
@@ -134,6 +146,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 Mage::getModel('mailchimp/api_stores')->createMailChimpStore($storeId);
                 //save in config
                 Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1);
             } catch(Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }

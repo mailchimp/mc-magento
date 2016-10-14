@@ -15,8 +15,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Apikey extends Mage_Core_M
     protected function _beforeSave()
     {
         $groups = $this->getData('groups');
-        $active = $groups['ecommerce']['fields']['active']['value'];
-        if ($this->isValueChanged()&&$active) {
+        $active = (isset($groups['ecommerce']['fields']['active']['value'])) ? $groups['ecommerce']['fields']['active']['value'] : false;
+        if ($this->isValueChanged() && $active) {
             if ($this->getScope() == 'default') {
                 if ($this->getOldValue()) {
                     Mage::helper('mailchimp')->deleteStore();
