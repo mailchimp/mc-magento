@@ -90,6 +90,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $ordersCanceledArray = Mage::getModel('mailchimp/api_orders')->createCanceledBatchJson($mailchimpStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersCanceledArray);
             }
+            $mailchimpApi = Mage::helper('mailchimp')->getApi();
             if (!empty($batchArray['operations'])) {
                 try {
                     $batchJson = json_encode($batchArray);
@@ -101,7 +102,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0);
                             Mage::getConfig()->cleanCache();
                         } else {
-                            $mailchimpApi = Mage::helper('mailchimp')->getApi();
                             $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                             Mage::helper('mailchimp')->logRequest($batchJson, $batchResponse['id']);
                             //save batch id to db
@@ -117,6 +117,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     Mage::log("Json encode fails");
                     Mage::log($batchArray);
                 }
+            } elseif (Mage::helper('mailchimp')->getMCIsSyncing()) {
+                $isSyncing = false;
+                $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, $isSyncing);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 0);
+                Mage::getConfig()->cleanCache();
             }
         }
 

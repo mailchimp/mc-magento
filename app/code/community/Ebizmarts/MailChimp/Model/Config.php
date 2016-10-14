@@ -19,6 +19,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_OLD_LIST              = 'mailchimp/general/old_list';
     const GENERAL_LIST_CHANGED_SCOPES   = 'mailchimp/general/list_changed_scopes';
     const GENERAL_MCSTOREID             = 'mailchimp/general/storeid';
+    const GENERAL_MCISSYNCING           = 'mailchimp/general/is_syicing';
     const GENERAL_MCMINSYNCDATEFLAG     = 'mailchimp/general/mcminsyncdateflag';
     const GENERAL_MCSTORE_RESETED       = 'mailchimp/general/mcstore_reset';
     const GENERAL_SUB_MCMINSYNCDATEFLAG = 'mailchimp/general/sub_mcminsyncdateflag';

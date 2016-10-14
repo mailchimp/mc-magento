@@ -21,6 +21,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @param $domain          The store domain.
      * @param $emailAddress    The email address for the store.
      * @param $currencyCode    The three-letter ISO 4217 code for the currency that the store accepts.
+     * @param $isSyncing       The boolean value that enables Automation usage when false.
      * @param $moneyFormat     The currency format for the store. For example: $, £, etc.
      * @param $primaryLocale   The primary locale for the store. For example: en, de, etc.
      * @param $timezone        The timezone for the store.
@@ -28,15 +29,16 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @param $address         The store address.
      * @return mixed
      * @throws Mailchimp_Error
-     * @throws Mailchimp_HttpError
      */
-    public function add($id, $listId, $name, $currencyCode, $platform = null, $domain = null, $emailAddress = null,
-                        $moneyFormat = null, $primaryLocale=null, $timezone = null,$phone=null,$address=null)
+    public function add($id, $listId, $name, $currencyCode, $isSyncing, $platform = null, $domain = null,
+                        $emailAddress = null, $moneyFormat = null, $primaryLocale=null, $timezone = null,$phone=null,
+                        $address=null)
     {
         $_params = array('id'=>$id,'list_id'=>$listId,'name'=>$name,'currency_code'=>$currencyCode);
         if($platform) $_params['platform'] = $platform;
         if($domain) $_params['domain'] = $domain;
         if($emailAddress) $_params['email_address'] = $emailAddress;
+        if($isSyncing) $_params['is_syncing'] = $isSyncing;
         if($moneyFormat) $_params['money_format'] = $moneyFormat;
         if($primaryLocale) $_params['primary_locale'] = $primaryLocale;
         if($timezone) $_params['timezone'] = $timezone;
@@ -56,7 +58,6 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      *                          this parameter can be slow.
      * @return mixed
      * @throws Mailchimp_Error
-     * @throws Mailchimp_HttpError
      */
     public function get($id=null,$fields=null,$excludeFields=null,$count=null,$offset=null)
     {
@@ -78,6 +79,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @param $domain          The store domain.
      * @param $emailAddress    The email address for the store.
      * @param $currencyCode    The three-letter ISO 4217 code for the currency that the store accepts.
+     * @param $isSyncing       The boolean value that enables Automation usage when false.
      * @param $moneyFormat     The currency format for the store. For example: $, £, etc.
      * @param $primaryLocale   The primary locale for the store. For example: en, de, etc.
      * @param $timezone        The timezone for the store.
@@ -85,9 +87,8 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @param $address         The store address.
      * @return mixed
      * @throws Mailchimp_Error
-     * @throws Mailchimp_HttpError
      */
-    public function edit($storeId, $currencyCode, $platform = null, $domain = null, $emailAddress = null,
+    public function edit($storeId, $isSyncing, $currencyCode = null, $platform = null, $domain = null, $emailAddress = null,
                          $moneyFormat = null, $primaryLocale=null, $timezone = null, $phone=null, $address=null)
     {
         $_params=array();
@@ -95,6 +96,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($domain) $_params['domain'] = $domain;
         if($emailAddress) $_params['email_address'] = $emailAddress;
         if($currencyCode)  $_params['currency_code'] = $currencyCode;
+        if($isSyncing) $_params['is_syncing'] = $isSyncing;
         if($moneyFormat) $_params['money_format'] = $moneyFormat;
         if($primaryLocale) $_params['primary_locale'] = $primaryLocale;
         if($timezone) $_params['timezone'] = $timezone;
@@ -107,7 +109,6 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @param $storeId      The store id.
      * @return mixed
      * @throws Mailchimp_Error
-     * @throws Mailchimp_HttpError
      */
     public function delete($storeId)
     {

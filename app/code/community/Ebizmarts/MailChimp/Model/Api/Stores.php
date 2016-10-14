@@ -71,9 +71,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 }
 
                 $currencyCode = Mage::helper('mailchimp')->getConfigValue(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT);
-
-                $api->ecommerce->stores->add($storeId, $listId, $storeName, $currencyCode, 'Magento', null, $storeEmail);
-
+                $isSyncing = true;
+                $api->ecommerce->stores->add($storeId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', null, $storeEmail);
             } else {
                 throw new Exception('You don\'t have any lists configured in MailChimp');
             }
