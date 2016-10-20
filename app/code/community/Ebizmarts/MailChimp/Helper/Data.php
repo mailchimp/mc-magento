@@ -325,7 +325,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $customFieldTypes = unserialize(
             Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS)
         );
-
         $api = Mage::helper('mailchimp')->getApi();
         if ($api) {
             try {

@@ -96,7 +96,7 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
         if($domain) $_params['domain'] = $domain;
         if($emailAddress) $_params['email_address'] = $emailAddress;
         if($currencyCode)  $_params['currency_code'] = $currencyCode;
-        if($isSyncing) $_params['is_syncing'] = $isSyncing;
+        if($isSyncing !== null) $_params['is_syncing'] = $isSyncing;
         if($moneyFormat) $_params['money_format'] = $moneyFormat;
         if($primaryLocale) $_params['primary_locale'] = $primaryLocale;
         if($timezone) $_params['timezone'] = $timezone;

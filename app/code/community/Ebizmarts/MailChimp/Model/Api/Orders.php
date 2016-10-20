@@ -39,29 +39,33 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_ORDER.'_'. Mage::helper('mailchimp')->getDateMicrotime();
         $counter = 0;
         foreach ($collection as $item) {
-            $order = Mage::getModel('sales/order')->load($item->getEntityId());
-            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId);
-            if (count($productData)) {
-                foreach($productData as $p) {
-                    $batchArray[$counter] = $p;
-                    $counter++;
+            try {
+                $order = Mage::getModel('sales/order')->load($item->getEntityId());
+                $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId);
+                if (count($productData)) {
+                    foreach ($productData as $p) {
+                        $batchArray[$counter] = $p;
+                        $counter++;
+                    }
                 }
-            }
-            $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
-            if (!empty($orderJson)) {
-                $batchArray[$counter]['method'] = "POST";
-                $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
-                $batchArray[$counter]['body'] = $orderJson;
+                $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
+                if (!empty($orderJson)) {
+                    $batchArray[$counter]['method'] = "POST";
+                    $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                    $batchArray[$counter]['operation_id'] = $batchId . '_' . $order->getEntityId();
+                    $batchArray[$counter]['body'] = $orderJson;
 
-            } else {
-                $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
-                $order->setData("mailchimp_sync_error", $error);
+                } else {
+                    $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
+                    $order->setData("mailchimp_sync_error", $error);
+                }
+                //update order delta
+                $order->setData("mailchimp_sync_delta", Varien_Date::now());
+                $order->save();
+                $counter++;
+            } catch (Exception $e) {
+                Mage::helper('mailchimp')->logError($e->getMessage());
             }
-            //update order delta
-            $order->setData("mailchimp_sync_delta", Varien_Date::now());
-            $order->save();
-            $counter ++;
         }
 
         return $batchArray;

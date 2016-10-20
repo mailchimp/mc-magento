@@ -16,7 +16,6 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
 
     public function createBatchJson($listId, $storeId, $limit)
     {
-        $MCMinSyncDateFlagPath = Ebizmarts_MailChimp_Model_Config::GENERAL_SUB_MCMINSYNCDATEFLAG;
         //get subscribers
         $collection = Mage::getModel('newsletter/subscriber')->getCollection()
             ->addFieldToFilter('subscriber_status', array('eq' => 1))
@@ -25,7 +24,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
                 'mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
-                array('lt' => Mage::helper('mailchimp')->getConfigValue($MCMinSyncDateFlagPath, $storeId))
+                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
                 )
             );
         $collection->getSelect()->limit($limit);

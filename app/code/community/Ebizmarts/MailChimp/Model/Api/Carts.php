@@ -55,9 +55,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $convertedCarts->addFieldToFilter('is_active', array('eq'=>0));
         // be sure that the quote are already in mailchimp
         $convertedCarts->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
+        $convertedCarts->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
         // and not deleted
         $convertedCarts->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
-        $convertedCarts->addFieldToFilter('created_at', array('from'=>$this->_firstDate));
+        if ($this->_firstDate) {
+            $convertedCarts->addFieldToFilter('created_at', array('from' => $this->_firstDate));
+        }
         // limit the collection
         $convertedCarts->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($convertedCarts as $cart) {
@@ -98,6 +101,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->addFieldToFilter('is_active', array('eq'=>1));
         // select carts already sent to mailchimp and moodifief after
         $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
+        $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
         $modifiedCarts->addFieldToFilter('mailchimp_sync_delta', array('lt'=>new Zend_Db_Expr('updated_at')));
         // and not deleted in mailchimp
         $modifiedCarts->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
@@ -163,7 +167,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCarts = array();
         $newCarts = Mage::getModel('sales/quote')->getCollection();
         $newCarts->addFieldToFilter('is_active', array('eq'=>1))
-            ->addFieldToFilter('mailchimp_sync_delta', array('eq' => '0000-00-00 00:00:00'));
+            ->addFieldToFilter('mailchimp_sync_delta', array(
+                array('eq' => '0000-00-00 00:00:00'),
+                array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
+            ));
         $newCarts->addFieldToFilter('created_at', array('from'=>$this->_firstDate));
         $newCarts->addFieldToFilter('customer_email', array('notnull'=>true));
         $newCarts->addFieldToFilter('items_count', array('gt'=>0));
