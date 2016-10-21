@@ -115,7 +115,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[<a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
+                            <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected MailChimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
                         </map_fields>
                         <create_fields translate="label comment">
                             <label>Create Merge Fields on MailChimp</label>
