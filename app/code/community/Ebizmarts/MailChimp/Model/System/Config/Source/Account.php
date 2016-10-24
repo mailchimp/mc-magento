@@ -87,7 +87,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     )
                 );
             } elseif (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE)) {
-                $text = 'Warning: The MailChimp store was not created properly, please save your configuration again.';
+                $text = 'Warning: The MailChimp store was not created properly, please Reset Ecommerce Data and reload the page.';
                 $label = Mage::helper('mailchimp')->__($text);
                 $returnArray = array_merge($returnArray, array(array('value' => 7, 'label' => $label)));
             }
