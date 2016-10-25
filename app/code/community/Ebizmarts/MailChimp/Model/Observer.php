@@ -98,7 +98,7 @@ class Ebizmarts_MailChimp_Model_Observer
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
             $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
             if ($e->getMailchimpDetails() == $textToCompare) {
-                $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the site is accessible externally to allow the webhook creation.';
+                $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: '. $hookUrl .' is accessible externally to allow the webhook creation.';
                 Mage::getSingleton('adminhtml/session')->addError($errorMessage);
             }
         } catch (Exception $e) {
