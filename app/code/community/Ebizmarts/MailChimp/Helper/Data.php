@@ -137,20 +137,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
         if ($ecommerceEnabled && $apikey && $listId) {
-            //generate store id
-            $date = date('Y-m-d-His');
-            $storeId = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
-
-            //create store in mailchimp
-            try {
-                Mage::getModel('mailchimp/api_stores')->createMailChimpStore($storeId);
-                //save in config
-                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
-                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1);
-            } catch(Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-            }
-
+            $this->createStore($listId);
         }
         //reset mailchimp minimum date to sync flag
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG, Varien_Date::now());
@@ -293,12 +280,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($listId) {
             //generate store id
             $date = date('Y-m-d-His');
-            $storeId = parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date;
+            $storeId = md5(parse_url(Mage::getBaseUrl(), PHP_URL_HOST) . '_' . $date);
             //create store in mailchimp
             try {
                 Mage::getModel('mailchimp/api_stores')->createMailChimpStore($storeId, $listId);
                 //save in config
                 Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
+                Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1);
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
