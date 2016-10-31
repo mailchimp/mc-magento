@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
                 //update order delta
                 $order->setData("mailchimp_sync_delta", Varien_Date::now());
-                $order->save();
+                $order->getResource()->saveAttribute($order, 'mailchimp_sync_delta');
                 $counter++;
             } catch (Exception $e) {
                 Mage::helper('mailchimp')->logError($e->getMessage());
@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 //update order delta
                 $order->setData("mailchimp_sync_delta", Varien_Date::now());
-                $order->save();
+                $order->getResource()->saveAttribute($order, 'mailchimp_sync_delta');
             }
             $counter++;
         }
