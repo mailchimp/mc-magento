@@ -59,7 +59,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->setData("mailchimp_sync_error", "");
                 $customer->setData("mailchimp_sync_modified", 0);
                 $customer->setMailchimpUpdateObserverRan(true);
-                $customer->save();
+
+                $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_delta');
+                $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_error');
+                $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_modified');
             }
             $counter++;
         }

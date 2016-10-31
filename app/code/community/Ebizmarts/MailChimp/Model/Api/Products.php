@@ -41,11 +41,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId), $batchArray);
                 $counter = (count($batchArray));
-                $product->setData("mailchimp_sync_delta", Varien_Date::now());
-                $product->setData("mailchimp_sync_error", "");
-                $product->setData('mailchimp_sync_modified', 0);
+                $product->addAttributeUpdate("mailchimp_sync_delta", Varien_Date::now());
+                $product->addAttributeUpdate("mailchimp_sync_error", "");
+                $product->addAttributeUpdate('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
-                $product->save();
                 continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId);
@@ -56,17 +55,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $counter++;
 
                 //update product delta
-                $product->setData("mailchimp_sync_delta", Varien_Date::now());
-                $product->setData("mailchimp_sync_error", "");
-                $product->setData('mailchimp_sync_modified', 0);
+                $product->addAttributeUpdate("mailchimp_sync_delta", Varien_Date::now());
+                $product->addAttributeUpdate("mailchimp_sync_error", "");
+                $product->addAttributeUpdate('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
-                $product->save();
             } else {
-                $product->setData("mailchimp_sync_delta", Varien_Date::now());
-                $product->setData("mailchimp_sync_error", "This product type is not supported on MailChimp.");
-                $product->setData('mailchimp_sync_modified', 0);
+                $product->addAttributeUpdate("mailchimp_sync_delta", Varien_Date::now());
+                $product->addAttributeUpdate("mailchimp_sync_error", "This product type is not supported on MailChimp.");
+                $product->addAttributeUpdate('mailchimp_sync_modified', 0);
                 $product->setMailchimpUpdateObserverRan(true);
-                $product->save();
                 continue;
             }
         }
