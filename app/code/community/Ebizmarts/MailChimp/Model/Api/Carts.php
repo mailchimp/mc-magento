@@ -64,22 +64,26 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         // limit the collection
         $convertedCarts->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($convertedCarts as $cart) {
+            $cartId = $cart->getEntityId();
                 // we need to delete all the carts associated with this email
             $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail());
             foreach ($allCartsForEmail as $cartForEmail) {
-                $allCarts[$this->_counter]['method'] = 'DELETE';
-                $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartForEmail->getEntityId();
-                $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartForEmail->getEntityId();
-                $allCarts[$this->_counter]['body'] = '';
-                $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cartForEmail->setMailchimpDeleted(1);
-                $cartForEmail->save();
-                $this->_counter += 1;
+                $alreadySentCartId = $cartForEmail->getEntityId();
+                if ($alreadySentCartId != $cartId) {
+                    $allCarts[$this->_counter]['method'] = 'DELETE';
+                    $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
+                    $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
+                    $allCarts[$this->_counter]['body'] = '';
+                    $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
+                    $cartForEmail->setMailchimpDeleted(1);
+                    $cartForEmail->save();
+                    $this->_counter += 1;
+                }
             }
             $allCartsForEmail->clear();
             $allCarts[$this->_counter]['method'] = 'DELETE';
-            $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cart->getEntityId();
-            $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
+            $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
             $allCarts[$this->_counter]['body'] = '';
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
             $cart->setMailchimpDeleted(1);
@@ -107,25 +111,29 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
         $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($modifiedCarts as $cart) {
+            $cartId = $cart->getEntityId();
             $allCarts[$this->_counter]['method'] = 'DELETE';
-            $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cart->getEntityId();
-            $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
+            $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
+            $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
             $allCarts[$this->_counter]['body'] = '';
             $this->_counter += 1;
             $customer = Mage::getModel("customer/customer");
             $customer->setWebsiteId(Mage::getModel('core/store')->load($cart->getStoreId())->getWebsiteId());
             $customer->loadByEmail($cart->getCustomerEmail());
-            if ($customer->getEmail()!=$cart->getCustomerEmail()) {
+            if ($customer->getEmail() != $cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail());
                 foreach ($allCartsForEmail as $cartForEmail) {
-                    $allCarts[$this->_counter]['method'] = 'DELETE';
-                    $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartForEmail->getEntityId();
-                    $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartForEmail->getEntityId();
-                    $allCarts[$this->_counter]['body'] = '';
-                    $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $cartForEmail->setMailchimpDeleted(1);
-                    $cartForEmail->save();
-                    $this->_counter += 1;
+                    $alreadySentCartId = $cartForEmail->getEntityId();
+                    if($alreadySentCartId != $cartId) {
+                        $allCarts[$this->_counter]['method'] = 'DELETE';
+                        $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
+                        $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
+                        $allCarts[$this->_counter]['body'] = '';
+                        $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
+                        $cartForEmail->setMailchimpDeleted(1);
+                        $cartForEmail->save();
+                        $this->_counter += 1;
+                    }
                 }
                 $allCartsForEmail->clear();
             }
@@ -147,7 +155,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 if ($cartJson!="") {
                     $allCarts[$this->_counter]['method'] = 'POST';
                     $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
-                    $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
+                    $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
                     $allCarts[$this->_counter]['body'] = $cartJson;
                     $this->_counter += 1;
                 }
@@ -184,7 +192,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer = Mage::getModel("customer/customer");
             $customer->setWebsiteId(Mage::getModel('core/store')->load($cart->getStoreId())->getWebsiteId());
             $customer->loadByEmail($cart->getCustomerEmail());
-            if ($customer->getEmail()!=$cart->getCustomerEmail()) {
+            if ($customer->getEmail() != $cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail());
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $allCarts[$this->_counter]['method'] = 'DELETE';
@@ -236,6 +244,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCartsForEmail = Mage::getModel('sales/quote')->getCollection();
         $allCartsForEmail->addFieldToFilter('is_active', array('eq'=>1));
         $allCartsForEmail->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
+        $allCartsForEmail->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
         $allCartsForEmail->addFieldToFilter('mailchimp_deleted', array('eq'=>0));
         $allCartsForEmail->addFieldToFilter('customer_email', array('eq'=>$email));
         return $allCartsForEmail;
@@ -269,7 +278,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 continue;
             }
             if ($item->getProductType()==Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
-                $variant = $item->getOptionByCode('simple_product')->getProduct();
+                $variant = null;
+                if ($item->getOptionByCode('simple_product')) {
+                    $variant = $item->getOptionByCode('simple_product')->getProduct();
+                }
                 if (!$variant) {
                     continue;
                 }
