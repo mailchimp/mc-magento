@@ -59,14 +59,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     {
         $helper = Mage::helper('mailchimp');
         if (is_array($this->_accountDetails)) {
-            $username = Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_accountDetails['account_name'];
-            $title = Mage::helper('mailchimp')->__('Data uploaded to MailChimp:');
-            $totalSubscribersText = Mage::helper('mailchimp')->__('  Total Subscribers:');
+            $totalSubscribersText = Mage::helper('mailchimp')->__('Total subscribers:');
             $totalSubscribers = $totalSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
+            $username = Mage::helper('mailchimp')->__('Username:') . ' ' . $this->_accountDetails['account_name'];
+            $title = Mage::helper('mailchimp')->__('Ecommerce Data uploaded to MailChimp:');
             $returnArray = array(
                 array('value' => 0, 'label' => $username),
-                array('value' => 1, 'label' => $title),
-                array('value' => 2, 'label' => $totalSubscribers)
+                array('value' => 1, 'label' => $totalSubscribers),
+                array('value' => 2, 'label' => $title)
             );
             if ($this->_accountDetails['store_exists']) {
                 $totalCustomersText = Mage::helper('mailchimp')->__('  Total Customers:');
