@@ -254,6 +254,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * @param $files
+     * @param $batchId
      */
     protected function processEachResponseFile($files, $batchId)
     {
