@@ -118,9 +118,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param $mailchimpStoreId
      * @return string
      */
-    protected function GeneratePOSTPayload($orderFromCollection,$mailchimpStoreId)
+    protected function GeneratePOSTPayload($order,$mailchimpStoreId)
     {
-        $order = Mage::getModel('sales/order')->load($orderFromCollection->getEntityId());
+//        $order = Mage::getModel('sales/order')->load($orderFromCollection->getEntityId());
 
         $data = array();
         $data['id'] = $order->getEntityId();
