@@ -282,7 +282,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 'filter' => false,
                 'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
                 'sortable' => false,
-                'width' => 170
+                'width' => 70
             ), 'created_at'
             );
         }
