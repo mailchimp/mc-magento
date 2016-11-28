@@ -124,7 +124,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
 
             if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
+                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
             }
         }
     }

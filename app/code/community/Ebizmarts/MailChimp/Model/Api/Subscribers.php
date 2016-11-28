@@ -79,18 +79,20 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
 
     /**
      * @param $subscriber
+     * @param bool $updateStatus If set to true, it will force the status update even for those already subscribed.
      */
-    public function updateSubscriber($subscriber)
+    public function updateSubscriber($subscriber, $updateStatus = false)
     {
         $listId = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST);
-        $status = $this->_getMCStatus($subscriber->getStatus());
+        $newStatus = $this->_getMCStatus($subscriber->getStatus());
+        $forceStatus = ($updateStatus) ? $newStatus : null;
         $api = Mage::helper('mailchimp')->getApi();
         $mergeVars = Mage::getModel('mailchimp/api_customers')->getMergeVars($subscriber);
 
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->addOrUpdate(
-                $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $status, null, $status, $mergeVars,
+                $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
                 null, null, null, null
             );
             $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
