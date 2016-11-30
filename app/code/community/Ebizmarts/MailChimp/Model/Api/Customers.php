@@ -70,9 +70,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $data = array();
         $data["id"] = $customer->getId();
-        $data["email_address"] = $customer->getEmail();
-        $data["first_name"] = $customer->getFirstname();
-        $data["last_name"] = $customer->getLastname();
+        $data["email_address"] = $customer->getEmail() ? $customer->getEmail() : '';
+        $data["first_name"] = $customer->getFirstname() ? $customer->getFirstname() : '';
+        $data["last_name"] = $customer->getLastname() ? $customer->getLastname() : '';
         $data["opt_in_status"] = $this->getOptin();
 
         //customer orders data
