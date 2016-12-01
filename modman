@@ -7,3 +7,4 @@ app/etc/modules/*                               app/etc/modules/
 js/ebizmarts/mailchimp/*                        js/ebizmarts/mailchimp/
 skin/adminhtml/default/default/ebizmarts/*      skin/adminhtml/default/default/ebizmarts/
 getMailChimpResponse.php                        getMailChimpResponse.php
+m4mlogs.sh                                      m4mlogs.sh
