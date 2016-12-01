@@ -4,3 +4,6 @@ app/design/adminhtml/default/default/template/* app/design/adminhtml/default/def
 app/design/frontend/base/default/layout/*       app/design/frontend/base/default/layout/
 app/design/frontend/base/default/template/*     app/design/frontend/base/default/template/
 app/etc/modules/*                               app/etc/modules/
+js/ebizmarts/mailchimp/*                        js/ebizmarts/mailchimp/
+skin/adminhtml/default/default/ebizmarts/*      skin/adminhtml/default/default/ebizmarts/
+getMailChimpResponse.php                        getMailChimpResponse.php
