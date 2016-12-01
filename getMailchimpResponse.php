@@ -4,8 +4,6 @@ if ($argc!=3) {
     echo "You must call like:\n\t getMailchimpResponse apikey batchid\n";
     exit;
 }
-//$apiKey = '03f983511e631caec1775ee57863998a-us13';
-//$batchId = 'ad0698dd37';
 $apiKey = $argv[1];
 $batchId = $argv[2];
 
@@ -59,13 +57,13 @@ if ($err) {
             $r = curl_exec($ch);
             curl_close($ch);
             fclose($fd);
-            echo "Send us the file $batchId.response.tar.gz\n";
+            echo "$batchId.response.tar.gz\n";
         } catch(Exception $e) {
             echo $e->getMessage();
         }
     }
-    else {
-        echo "Error: the batch is not finished or have errors\n";
-        echo "Error ".$jsonResponse->title." Detail: ".$jsonResponse->detail."\n";
-    }
+//    else {
+//        echo "Error: the batch is not finished or have errors\n";
+//        echo "Error ".$jsonResponse->title." Detail: ".$jsonResponse->detail."\n";
+//    }
 }
