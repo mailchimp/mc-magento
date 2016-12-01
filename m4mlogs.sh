@@ -13,7 +13,7 @@ case "$#" in
      echo $"Usage: $0  apikey option [id]"
      exit 1
 esac
-batches=$(grep -l QUO_.*$id var/log/*.Request.log | cut -d'/' -f3 $a | cut -d'.' -f1)
+batches=$(grep -l $2_.*$id var/log/*.Request.log | cut -d'/' -f3 $a | cut -d'.' -f1)
 allresponses=""
 allrequests=""
 for a in ${batches};
