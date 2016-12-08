@@ -1,0 +1,19 @@
+dist: trusty
+language: php
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7.0
+
+script:
+  - cd ..
+  - ls -la
+  - wget https://github.com/magento/marketplace-eqp/archive/1.0.4.zip
+  - unzip -qq 1.0.4.zip
+  - wget https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.6.2/phpcs.phar && chmod +x phpcs.phar
+  - php phpcs.phar --config-set installed_paths /home/travis/build/ebizmarts/marketplace-eqp-1.0.4/
+  - php phpcs.phar -n --standard="MEQP1" ./mc-magento/
+
+notifications:
+  slack: ebizmarts:DqCqxnqWzW55zoFU069hxs1T
