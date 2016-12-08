@@ -140,7 +140,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $productdata = array();
                 $productdata['method'] = "PUT";
                 $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/".$parentId.'/variants/'.$data['id'];
-                $productsdata['operation_id'] = $batchId . '_' . $parentId;
+                $productdata['operation_id'] = $batchId . '_' . $parentId;
                 try {
                     $body = json_encode($variendata);
 
