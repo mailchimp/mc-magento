@@ -1,0 +1,22 @@
+<?php if($this->isReferred()) : ?>
+<div class="entry-edit box-right">
+    <div class="entry-edit-head">
+        <h4 class="icon-head"><?php echo $this->__('Mailchimp') ?></h4>
+    </div>
+    <fieldset>
+        <div id="mailchimp_monkey">
+            <table class="form-list" cellspacing="0">
+                <tr>
+                    <td class="label">
+                        <img src="<?php echo $this->getSkinUrl('ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png')?>" width="40" title="hep hep thanks MailChimp" />
+                    </td>
+                    <td class="value">
+                        <strong>Yaay! Recovered by MailChimp's ecommerce automation, Campaing Id: <?php echo $this->getCampaign() ?></strong>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+</div>
+<div class="clear"></div>
+<?php endif; ?>

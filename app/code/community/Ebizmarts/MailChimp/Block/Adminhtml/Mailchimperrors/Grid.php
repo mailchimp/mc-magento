@@ -82,6 +82,22 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
                 'sortable' => false
             )
         );
+        $this->addColumn('action_donwload', array(
+                'header'   => $this->helper('mailchimp')->__('Download Response'),
+                'width'    => 15,
+                'sortable' => false,
+                'filter'   => false,
+                'type'     => 'action',
+                'getter'   => 'getBatchId',
+                'actions'  => array(
+                    array(
+                        'url'     => array('base'=> '*/*/downloadresponse'),
+                        'caption' => $this->helper('mailchimp')->__('Download'),
+                        'field'   => 'batch_id'
+                    ),
+                )
+            )
+        );
         $this->addColumn(
             'original_id', array(
             'header' => Mage::helper('mailchimp')->__('Original'),

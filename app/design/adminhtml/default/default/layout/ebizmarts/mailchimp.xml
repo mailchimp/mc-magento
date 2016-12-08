@@ -43,4 +43,9 @@
             </action>
         </reference>
     </adminhtml_system_config_edit>
+    <adminhtml_sales_order_view>
+        <reference name="order_info">
+            <block type="mailchimp/adminhtml_sales_order_view_info_monkey" name="mailchimp.order.info.monkey.block" template="ebizmarts/mailchimp/sales/order/view/monkey.phtml" before="order_history" />
+        </reference>
+    </adminhtml_sales_order_view>
 </layout>
