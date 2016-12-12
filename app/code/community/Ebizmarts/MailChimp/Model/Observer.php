@@ -272,7 +272,7 @@ class Ebizmarts_MailChimp_Model_Observer
     public function addColumnToSalesOrderGrid($observer)
     {
         $block = $observer->getEvent()->getBlock();
-        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid && (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE) || Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE))) {
+        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid && Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::MONKEY_GRID) &&(Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE) || Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE))) {
             $block->addColumnAfter(
                 'mailchimp_flag', array(
                 'header' => Mage::helper('mailchimp')->__('MailChimp'),
@@ -439,5 +439,17 @@ class Ebizmarts_MailChimp_Model_Observer
             $product->save();
         }
         return $observer;
+    }
+    public function addOrderViewMonkey(Varien_Event_Observer $observer){
+        $block = $observer->getBlock();
+        if(($block->getNameInLayout() == 'order_info') && ($child = $block->getChild('mailchimp.order.info.monkey.block'))){
+            $transport = $observer->getTransport();
+            if($transport){
+                $html = $transport->getHtml();
+                $html .= $child->toHtml();
+                $transport->setHtml($html);
+            }
+        }
+
     }
 }
