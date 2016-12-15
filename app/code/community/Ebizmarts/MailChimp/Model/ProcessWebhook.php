@@ -77,19 +77,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected function _clean(array $data)
     {
-
-        if (Mage::helper('mailchimp')->isAdminNotificationEnabled()) {
-            $text = Mage::helper('mailchimp')->__(
-                'MailChimp Cleaned Emails: %s %s at %s reason: %s',
-                $data['data']['email'], $data['type'], $data['fired_at'], $data['data']['reason']
-            );
-
-            $this->_getInbox()
-                ->setTitle($text)
-                ->setDescription($text)
-                ->save();
-        }
-
         //Delete subscriber from Magento
         $s = $this->loadByEmail($data['data']['email']);
 

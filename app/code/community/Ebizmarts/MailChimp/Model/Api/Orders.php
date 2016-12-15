@@ -118,9 +118,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param $mailchimpStoreId
      * @return string
      */
-    protected function GeneratePOSTPayload($orderFromCollection,$mailchimpStoreId)
+    protected function GeneratePOSTPayload($order,$mailchimpStoreId)
     {
-        $order = Mage::getModel('sales/order')->load($orderFromCollection->getEntityId());
+//        $order = Mage::getModel('sales/order')->load($orderFromCollection->getEntityId());
 
         $data = array();
         $data['id'] = $order->getEntityId();
@@ -218,7 +218,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
             "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
             "postal_code" => $billingAddress->getPostcode(),
-            "country" => Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName(),
+            "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : "",
             "country_code" => $billingAddress->getCountry()
         );
         //company

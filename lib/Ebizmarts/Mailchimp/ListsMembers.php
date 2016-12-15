@@ -93,7 +93,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         if($sinceLastChanged) $_params['since_last_changed'] = $sinceLastChanged;
         if($beforeLastChanged) $_params['before_last_changed'] = $beforeLastChanged;
         if($uniqueEmailId) $_params['unique_email_id'] = $uniqueEmailId;
-        return $this->_master->call('list/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/members', $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
@@ -112,7 +112,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
         $_params = array();
         if($fields) $_params['fields'] = $fields;
         if($excludeFields) $_params['exclude_fields'] = $excludeFields;
-        return $this->_master->call('list/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::GET);
+        return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_Mailchimp::GET);
     }
 
     /**
