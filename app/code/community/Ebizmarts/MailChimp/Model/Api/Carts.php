@@ -383,6 +383,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $address['postal_code'] = $billingAddress->getPostcode();
             }
             if ($billingAddress->getCountry()) {
+                
                 $address['country'] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
                 $address['country_code'] = $billingAddress->getCountry();
             }
