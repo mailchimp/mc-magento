@@ -12,4 +12,4 @@ js/ebizmarts/mailchimp                                               js/ebizmart
 skin/adminhtml/default/default/ebizmarts/mailchimp                   skin/adminhtml/default/default/ebizmarts/mailchimp
 skin/adminhtml/default/default/ebizmarts/mandrill                    skin/adminhtml/default/default/ebizmarts/mandrill
 m4mlogs.sh                                                           m4mlogs.sh
-getMailChimpResponse.php                                             getMailChimpResponse.php
+getMailchimpResponse.php                                             getMailchimpResponse.php
