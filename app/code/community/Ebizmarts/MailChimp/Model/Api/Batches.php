@@ -88,6 +88,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $batchArray['operations'] = array_merge($batchArray['operations'], $ordersCanceledArray);
                 }
                 try {
+                    /**
+                     * @var $mailchimpApi \Ebizmarts_Mailchimp
+                     */
                     $mailchimpApi = Mage::helper('mailchimp')->getApi();
                     if (!empty($batchArray['operations'])) {
                         $batchJson = json_encode($batchArray);
@@ -151,6 +154,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             } else {
                 break;
             }
+        }
+        $this->_getResults(0, false);
+        if ($subscriberLimit > 0) {
+            list($batchResponses[], $subscriberLimit) = $this->sendStoreSubscriberBatch(0, $subscriberLimit);
         }
         return $batchResponses;
     }

@@ -153,6 +153,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                         if ($customer->getId()) {
 //                            if ($customer->getData($attributeCode)) {
                                 switch ($attributeCode) {
+                                    case 'email':
+                                        break;
                                     case 'default_billing':
                                     case 'default_shipping':
                                         $addr = explode('_', $attributeCode);

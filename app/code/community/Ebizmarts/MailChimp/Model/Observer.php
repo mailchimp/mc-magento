@@ -43,8 +43,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
         $hookUrl = Mage::getModel('core/url')->getUrl(
             $url, array(
-            'wkey' => $webhooksKey,
-            '_secure' => 'true'
+            'wkey' => $webhooksKey
         ));
 
         if (FALSE != strstr($hookUrl, '?', true)) {
@@ -125,7 +124,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
 
             if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber);
+                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
             }
         }
     }

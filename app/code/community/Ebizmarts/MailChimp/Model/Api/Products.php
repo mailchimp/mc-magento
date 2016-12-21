@@ -36,7 +36,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $item) {
             $product = Mage::getModel('catalog/product')->load($item->getId());
-
+            $product->getTierPrice();
             //define variants and root products
             if ($product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId), $batchArray);
@@ -140,7 +140,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $productdata = array();
                 $productdata['method'] = "PUT";
                 $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/".$parentId.'/variants/'.$data['id'];
-                $productsdata['operation_id'] = $batchId . '_' . $parentId;
+                $productdata['operation_id'] = $batchId . '_' . $parentId;
                 try {
                     $body = json_encode($variendata);
 
