@@ -60,11 +60,14 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
             if (!$subscriber->getId()) {
                 $subscriber = Mage::getModel('newsletter/subscriber')
                     ->setStoreId($storeId);
+
                 if ($fName) {
-                    $subscriber->setSubscriberFirstname($fName);
+                    $subscriberFname = filter_var($fName, FILTER_SANITIZE_STRING);
+                    $subscriber->setSubscriberFirstname($subscriberFname);
                 }
                 if ($lName) {
-                    $subscriber->setSubscriberLastname($lName);
+                    $subscriberLname = filter_var($lName, FILTER_SANITIZE_STRING);
+                    $subscriber->setSubscriberLastname($subscriberLname);
                 }
                 $subscriber->setStoreId($storeId)
                     ->subscribe($email);
