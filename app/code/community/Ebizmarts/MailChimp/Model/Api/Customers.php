@@ -59,7 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->setData("mailchimp_sync_error", "");
                 $customer->setData("mailchimp_sync_modified", 0);
                 $customer->setMailchimpUpdateObserverRan(true);
-                $customer->save();
+                $this->_saveCustomer($customer);
             }
             $counter++;
         }
@@ -121,7 +121,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function update($customer)
     {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
-//        $customer->setData("mailchimp_sync_delta", Varien_Date::now());
             $customer->setData("mailchimp_sync_error", "");
             $customer->setData("mailchimp_sync_modified", 1);
         }
@@ -329,5 +328,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $optin = false;
         }
         return $optin;
+    }
+    protected function _saveCustomer($customer)
+    {
+        if($customer->dataHasChangedFor('mailchimp_sync_delta')) {
+            $customer->getResource()->saveAttribute($customer,'mailchimp_sync_delta');
+        }
+        if($customer->dataHasChangedFor('mailchimp_sync_error')) {
+            $customer->getResource()->saveAttribute($customer,'mailchimp_sync_error');
+        }
+        if($customer->dataHasChangedFor('mailchimp_sync_modified')) {
+            $customer->getResource()->saveAttribute($customer,'mailchimp_sync_modified');
+        }
     }
 }

@@ -297,8 +297,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $p = Mage::getModel('catalog/product')->load($id);
                             if ($p->getId() == $id) {
                                 $p->setData("mailchimp_sync_error", $error);
-                                $p->setMailchimpUpdateObserverRan(true);
-                                $p->save();
+                                $p->getResource()->saveAttribute($p,'mailchimp_sync_error');
                             } else {
                                 Mage::helper('mailchimp')->logError("Error: product " . $id . " not found");
                             }
@@ -307,8 +306,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $c = Mage::getModel('customer/customer')->load($id);
                             if ($c->getId() == $id) {
                                 $c->setData("mailchimp_sync_error", $error);
-                                $c->setMailchimpUpdateObserverRan(true);
-                                $c->save();
+                                $c->getResource()->saveAttribute($c,'mailchimp_sync_error');
                             } else {
                                 Mage::helper('mailchimp')->logError("Error: customer " . $id . " not found");
                             }
