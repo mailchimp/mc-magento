@@ -23,6 +23,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      */
     public function createBatchJson($mailchimpStoreId)
     {
+        $firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_FIRSTDATE);
         //create missing products first
         $collection = Mage::getModel('sales/order')->getCollection()
             ->addAttributeToSelect('entity_id')
@@ -32,6 +33,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 array('eq' => ''),
                 array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
             ));
+        if($firstDate) {
+            $collection->addFieldToFilter('created_at',array('from' => $firstDate));
+        }
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
