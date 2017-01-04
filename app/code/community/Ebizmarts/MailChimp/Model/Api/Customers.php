@@ -92,18 +92,33 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         foreach ($customer->getAddresses() as $address) {
             //send only first address
             if (!array_key_exists("address", $data)) {
+                $customerAddress = array();
                 $street = $address->getStreet();
-                $data["address"] = array(
-                    "address1" => $street[0] ? $street[0] : "",
-                    "address2" => count($street)>1 ? $street[1] : "",
-                    "city" => $address->getCity() ? $address->getCity() : "",
-                    "province" => $address->getRegion() ? $address->getRegion() : "",
-                    "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
-                    "postal_code" => $address->getPostcode(),
-                    "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName(): "",
-                    "country_code" => $address->getCountry() ? $address->getCountry() : ""
-                );
-
+                if ($street[0]) {
+                    $customerAddress["address1"] = $street[0];
+                }
+                if (count($street) > 1) {
+                    $customerAddress["address2"] = $street[1];
+                }
+                if ($address->getCity()) {
+                    $customerAddress["city"] = $address->getCity();
+                }
+                if ($address->getRegion()) {
+                    $customerAddress["province"] = $address->getRegion();
+                }
+                if ($address->getRegionCode()) {
+                    $customerAddress["province_code"] = $address->getRegionCode();
+                }
+                if ($address->getPostcode()) {
+                    $customerAddress["postal_code"] = $address->getPostcode();
+                }
+                if ($address->getCountry()) {
+                    $customerAddress["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+                    $customerAddress["country_code"] = $address->getCountry();
+                }
+                if (count($address)) {
+                    $data["address"] = $customerAddress;
+                }
                 //company
                 if ($address->getCompany()) {
                     $data["company"] = $address->getCompany();
