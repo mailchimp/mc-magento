@@ -76,7 +76,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['body'] = '';
                     $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
                     $cartForEmail->setMailchimpDeleted(1);
-                    $cartForEmail->save();
+                    $this->_saveCart($cartForEmail);
                     $this->_counter += 1;
                 }
             }
@@ -87,7 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$this->_counter]['body'] = '';
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
             $cart->setMailchimpDeleted(1);
-            $cart->save();
+            $this->_saveCart($cart);
             $this->_counter += 1;
         }
         return $allCarts;
@@ -117,6 +117,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
             $allCarts[$this->_counter]['body'] = '';
             $this->_counter += 1;
+            /**
+             * @var $customer Mage_Customer_Model_Customer
+             */
             $customer = Mage::getModel("customer/customer");
             $customer->setWebsiteId(Mage::getModel('core/store')->load($cart->getStoreId())->getWebsiteId());
             $customer->loadByEmail($cart->getCustomerEmail());
@@ -131,7 +134,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $allCarts[$this->_counter]['body'] = '';
                         $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
                         $cartForEmail->setMailchimpDeleted(1);
-                        $cartForEmail->save();
+                        $this->_saveCart($cartForEmail);
                         $this->_counter += 1;
                     }
                 }
@@ -139,7 +142,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
             if (!$cart->getCustomerId()&&$customer->getEmail()==$cart->getCustomerEmail()) {
                 $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cart->save();
+                $this->_saveCart($cart);
                 continue;
             }
             // send the products that not already sent
@@ -161,7 +164,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 }
             }
             $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-            $cart->save();
+            $this->_saveCart($cart);
         }
         return $allCarts;
     }
@@ -186,7 +189,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         foreach ($newCarts as $cart) {
             if (!count($cart->getAllVisibleItems())) {
                 $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cart->save();
+                $this->_saveCart($cart);
                 continue;
             }
             $customer = Mage::getModel("customer/customer");
@@ -201,7 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['body'] = '';
                     $cartForEmail->setData("mailchimp_sync_delta", Varien_Date::now());
                     $cartForEmail->setMailchimpDeleted(1);
-                    $cartForEmail->save();
+                    $this->_saveCart($cartForEmail);
                     $this->_counter += 1;
                 }
                 $allCartsForEmail->clear();
@@ -209,7 +212,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // don't send the carts for guest customers who are registered
             if (!$cart->getCustomerId()&&$customer->getEmail()==$cart->getCustomerEmail()) {
                 $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cart->save();
+                $this->_saveCart($cart);
                 continue;
             }
             // send the products that not already sent
@@ -227,7 +230,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cart->getEntityId();
                 $allCarts[$this->_counter]['body'] = $cartJson;
                 $cart->setData("mailchimp_sync_delta", Varien_Date::now());
-                $cart->save();
+                $this->_saveCart($cart);
                 $this->_counter += 1;
             }
         }
@@ -403,5 +406,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $this->_api = Mage::helper('mailchimp')->getApi();
         }
         return $this->_api;
+    }
+
+    /**
+     * @param $cart Mage_Sales_Model_Quote
+     */
+    protected function _saveCart($cart)
+    {
+
+        $cart->save();
     }
 }

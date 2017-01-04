@@ -211,6 +211,19 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </customers_optin>
+                        <firstdate translate="label">
+                            <label>First date</label>
+                            <frontend_type>date</frontend_type>
+                            <frontend_model>mailchimp/adminhtml_system_config_date</frontend_model>
+                            <sort_order>209</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Orders previous than this value, will be ignored]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </firstdate>
                         <reset_errors translate="label comment">
                             <label>Reset Products</label>
                             <frontend_type>button</frontend_type>
