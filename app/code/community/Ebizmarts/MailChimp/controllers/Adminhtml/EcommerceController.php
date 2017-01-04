@@ -10,7 +10,7 @@
  * @date: 5/27/16 1:50 PM
  * @file: EcommerceController.php
  */
-class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
 {
     public function resetLocalErrorsAction()
     {
