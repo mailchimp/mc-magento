@@ -45,9 +45,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $storeId = ($isMailChimpStoreId) ? 0 : $storeId;
                 $files = $this->getBatchResponse($item->getBatchId(), $storeId);
                 if (count($files)) {
-                    $this->processEachResponseFile($files, $item->getBatchId());
-                    $item->setStatus('completed');
-                    $item->save();
+                    if (isset($files['error'])) {
+                        $item->setStatus('error');
+                        $item->save();
+                    } else {
+                        $this->processEachResponseFile($files, $item->getBatchId());
+                        $item->setStatus('completed');
+                        $item->save();
+                    }
                 }
                 $baseDir = Mage::getBaseDir();
                 if (is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $item->getBatchId())) {
@@ -214,10 +219,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * @param $batchId
-     * @param $storeId
      * @return array
      */
-    protected function getBatchResponse($batchId, $storeId = 0)
+    protected function getBatchResponse($batchId)
     {
         $files = array();
         try {
@@ -252,6 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 unlink($fileName . '.tar.gz');
             }
         } catch (Mailchimp_Error $e) {
+            $files['error'] = $e->getFriendlyMessage();
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
