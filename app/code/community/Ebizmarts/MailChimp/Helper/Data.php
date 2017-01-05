@@ -83,7 +83,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCStoreName()
     {
-        return parse_url(Mage::getBaseUrl(), PHP_URL_HOST);
+        return Mage::getStoreConfig('web/unsecure/base_url');
     }
 
     /**
