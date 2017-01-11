@@ -68,6 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     protected function _buildCustomerData($customer)
     {
+        $firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_FIRSTDATE);
         $data = array();
         $data["id"] = $customer->getId();
         $data["email_address"] = $customer->getEmail() ? $customer->getEmail() : '';
@@ -79,6 +80,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $orderCollection = Mage::getModel('sales/order')->getCollection()
             ->addFieldToFilter('state', 'complete')
             ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
+        if($firstDate) {
+            $orderCollection->addFieldToFilter('created_at',array('from' => $firstDate));
+        }
         $totalOrders = 0;
         $totalAmountSpent = 0;
         foreach ($orderCollection as $order) {
