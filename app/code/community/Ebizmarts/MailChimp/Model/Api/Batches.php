@@ -88,10 +88,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
                 $ordersArray = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-                if (empty($ordersArray)) {
-                    $ordersCanceledArray = Mage::getModel('mailchimp/api_orders')->createCanceledBatchJson($mailchimpStoreId);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersCanceledArray);
-                }
+//                if (empty($ordersArray)) {
+//                    $ordersCanceledArray = Mage::getModel('mailchimp/api_orders')->createCanceledBatchJson($mailchimpStoreId);
+//                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersCanceledArray);
+//                }
                 try {
                     /**
                      * @var $mailchimpApi \Ebizmarts_Mailchimp

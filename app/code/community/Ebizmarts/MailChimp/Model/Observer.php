@@ -227,9 +227,18 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function saveCampaignData(Varien_Event_Observer $observer)
     {
+        $order = $observer->getEvent()->getOrder();
         $campaignCookie = $this->_getCampaignCookie();
         if ($campaignCookie) {
-            $observer->getEvent()->getOrder()->setMailchimpCampaignId($campaignCookie);
+            $order->setMailchimpCampaignId($campaignCookie);
+        }
+    }
+
+    public function orderSaveBefore(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+        if ($order->getNotUpdateModified()) {
+            $order->setMailchimpSyncModified(1);
         }
     }
 
