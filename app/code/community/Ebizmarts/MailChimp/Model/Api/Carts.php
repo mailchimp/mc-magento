@@ -321,7 +321,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getCheckoutUrl($cart)
     {
         $token = md5(rand(0, 9999999));
-        $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
+        $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true,'_secure' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $cart->setMailchimpToken($token);
         return $url;
     }

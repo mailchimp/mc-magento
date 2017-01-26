@@ -12,6 +12,7 @@
 
         if (params['mc_cid']) {
             createCookie('mailchimp_campaign_id' , params['mc_cid'], 3600*3);
+            createCookie('maichimp_landing_page', location, 3600*3);
         }
     }
 

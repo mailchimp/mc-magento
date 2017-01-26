@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.3</version>
+            <version>1.1.5</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.3</version>
+            <version>1.1.5</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -120,6 +120,9 @@
                 <mailchimp_campaign_id>
                     <to_order>*</to_order>
                 </mailchimp_campaign_id>
+                <mailchimp_landing_page>
+                    <to_order>*</to_order>
+                </mailchimp_landing_page>
             </sales_convert_quote>
         </fieldsets>
     </global>
