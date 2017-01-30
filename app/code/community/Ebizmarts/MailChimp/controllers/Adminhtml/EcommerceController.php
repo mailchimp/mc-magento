@@ -28,6 +28,7 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $result = 1;
         try {
             Mage::helper('mailchimp')->resetMCEcommerceData(true);
+            Mage::helper('mailchimp')->resetErrors();
         }
         catch(Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
