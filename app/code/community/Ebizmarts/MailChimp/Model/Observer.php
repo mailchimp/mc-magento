@@ -38,14 +38,15 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function _createWebhook($listId)
     {
+        $store = Mage::app()->getDefaultStoreView();
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
         //Generating Webhooks URL
         $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
-        $hookUrl = Mage::getModel('core/url')->getUrl(
+        $hookUrl = $store->getUrl(
             $url, array(
             'wkey' => $webhooksKey,
             '_nosid' => true,
-            '_secure' => true
+            '_secure' => true,
         ));
 
         if (FALSE != strstr($hookUrl, '?', true)) {
