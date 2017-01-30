@@ -361,7 +361,11 @@ class Ebizmarts_MailChimp_Model_Observer
         }
         $campaignId = $this->_getCampaignCookie();
         if ($campaignId) {
-            $quote->setMailChimpCampaignId($campaignId);
+            $quote->setMailchimpCampaignId($campaignId);
+        }
+        $landingCookie = $this->_getLandingCookie();
+        if ($landingCookie) {
+            $quote->setMailchimpLandingPage($landingCookie);
         }
         return $observer;
     }

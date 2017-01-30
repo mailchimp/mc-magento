@@ -260,7 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _makeCart($cart,$mailchimpStoreId)
     {
-        $campaignId = $cart->getMailChimpCampaignId();
+        $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
         $oneCart['customer'] = $this->_getCustomer($cart, $mailchimpStoreId);
