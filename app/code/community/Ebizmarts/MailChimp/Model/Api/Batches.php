@@ -320,6 +320,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $o = Mage::getModel('sales/order')->load($id);
                             if ($o->getId() == $id) {
                                 $o->setData("mailchimp_sync_error", $error);
+                                $o->setMailchimpSyncModified(0);
+                                $o->setMailchimpUpdateObserverRan(true);
                                 $o->save();
                             } else {
                                 Mage::helper('mailchimp')->logError("Error: order " . $id . " not found");
