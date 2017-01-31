@@ -10,7 +10,7 @@
  * @date: 6/10/16 12:35 PM
  * @file: MailchimperrorsController.php
  */
-class Ebizmarts_Mailchimp_Adminhtml_MailchimperrorsController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Adminhtml_Controller_Action
 {
     public function indexAction()
     {

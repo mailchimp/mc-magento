@@ -230,10 +230,23 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function saveCampaignData(Varien_Event_Observer $observer)
     {
+        $order = $observer->getEvent()->getOrder();
         $campaignCookie = $this->_getCampaignCookie();
         if ($campaignCookie) {
-            $observer->getEvent()->getOrder()->setMailchimpCampaignId($campaignCookie);
+            $order->setMailchimpCampaignId($campaignCookie);
         }
+    }
+
+    public function orderSaveBefore(Varien_Event_Observer $observer)
+    {
+        $order = $observer->getEvent()->getOrder();
+        if ($order->getMailchimpUpdateObserverRan()) {
+            return $observer;
+        } else {
+            $order->setMailchimpUpdateObserverRan(true);
+        }
+        //update mailchimp ecommerce data for that product variant
+        Mage::getModel('mailchimp/api_orders')->update($order);
         $landingCookie = $this->_getLandingCookie();
         if ($landingCookie) {
             $observer->getEvent()->getOrder()->setMailchimpLandingPage($landingCookie);
@@ -379,6 +392,9 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function newOrder(Varien_Event_Observer $observer)
     {
+        if( ($this->_getLandingCookie())) {
+            Mage::getModel('core/cookie')->delete('maichimp_landing_page');
+        }
         if ($this->_getCampaignCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
         }
@@ -418,6 +434,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $product->setMailchimpUpdateObserverRan(true);
             $product->save();
         }
+        $creditMemo->getOrder()->setMailchimpSyncModified(1);
         return $observer;
     }
 
@@ -442,6 +459,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $product->setMailchimpUpdateObserverRan(true);
             $product->save();
         }
+        $creditMemo->getOrder()->setMailchimpSyncModified(1);
         return $observer;
     }
 
@@ -463,6 +481,7 @@ class Ebizmarts_MailChimp_Model_Observer
         }
         return $observer;
     }
+
     public function addOrderViewMonkey(Varien_Event_Observer $observer){
         $block = $observer->getBlock();
         if(($block->getNameInLayout() == 'order_info') && ($child = $block->getChild('mailchimp.order.info.monkey.block'))){

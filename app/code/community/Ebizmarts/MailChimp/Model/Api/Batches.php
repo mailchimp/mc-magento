@@ -45,9 +45,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $storeId = ($isMailChimpStoreId) ? 0 : $storeId;
                 $files = $this->getBatchResponse($item->getBatchId(), $storeId);
                 if (count($files)) {
-                    $this->processEachResponseFile($files, $item->getBatchId());
-                    $item->setStatus('completed');
-                    $item->save();
+                    if (isset($files['error'])) {
+                        $item->setStatus('error');
+                        $item->save();
+                    } else {
+                        $this->processEachResponseFile($files, $item->getBatchId());
+                        $item->setStatus('completed');
+                        $item->save();
+                    }
                 }
                 $baseDir = Mage::getBaseDir();
                 if (is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $item->getBatchId())) {
@@ -83,10 +88,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
                 $ordersArray = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-                if (empty($ordersArray)) {
-                    $ordersCanceledArray = Mage::getModel('mailchimp/api_orders')->createCanceledBatchJson($mailchimpStoreId);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersCanceledArray);
-                }
+//                if (empty($ordersArray)) {
+//                    $ordersCanceledArray = Mage::getModel('mailchimp/api_orders')->createCanceledBatchJson($mailchimpStoreId);
+//                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersCanceledArray);
+//                }
                 try {
                     /**
                      * @var $mailchimpApi \Ebizmarts_Mailchimp
@@ -214,10 +219,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * @param $batchId
-     * @param $storeId
      * @return array
      */
-    public function getBatchResponse($batchId, $storeId = 0)
+    public function getBatchResponse($batchId)
     {
         $files = array();
         try {
@@ -252,6 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 unlink($fileName . '.tar.gz');
             }
         } catch (Mailchimp_Error $e) {
+            $files['error'] = $e->getFriendlyMessage();
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
@@ -315,6 +320,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $o = Mage::getModel('sales/order')->load($id);
                             if ($o->getId() == $id) {
                                 $o->setData("mailchimp_sync_error", $error);
+                                $o->setMailchimpSyncModified(0);
+                                $o->setMailchimpUpdateObserverRan(true);
                                 $o->save();
                             } else {
                                 Mage::helper('mailchimp')->logError("Error: order " . $id . " not found");

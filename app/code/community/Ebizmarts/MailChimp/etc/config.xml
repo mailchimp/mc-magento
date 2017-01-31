@@ -35,14 +35,6 @@
                     </mailchimp_subscribe_checkout_before>
                 </observers>
             </sales_order_place_before>
-            <sales_order_place_after>
-                <observers>
-                    <mailchimp_subscribe_checkout_after>
-                        <class>mailchimp/observer</class>
-                        <method>removeCampaignData</method>
-                    </mailchimp_subscribe_checkout_after>
-                </observers>
-            </sales_order_place_after>
             <customer_save_before>
                 <observers>
                     <mailchimp_save_before_customer>
@@ -52,6 +44,46 @@
                     </mailchimp_save_before_customer>
                 </observers>
             </customer_save_before>
+            <sales_order_save_before>
+                <observers>
+                    <mailchimp_save_before_order>
+                        <class>mailchimp/observer</class>
+                        <method>orderSaveBefore</method>
+                    </mailchimp_save_before_order>
+                </observers>
+            </sales_order_save_before>
+            <sales_order_place_after>
+                <observers>
+                    <mailchimp_new_order>
+                        <class>mailchimp/observer</class>
+                        <method>newOrder</method>
+                    </mailchimp_new_order>
+                </observers>
+            </sales_order_place_after>
+            <sales_order_creditmemo_refund>
+                <observers>
+                    <mailchimp_creditmemo_refund>
+                        <class>mailchimp/observer</class>
+                        <method>newCreditmemo</method>
+                    </mailchimp_creditmemo_refund>
+                </observers>
+            </sales_order_creditmemo_refund>
+            <sales_order_creditmemo_cancel>
+                <observers>
+                    <mailchimp_creditmemo_cancel>
+                        <class>mailchimp/observer</class>
+                        <method>cancelCreditmemo</method>
+                    </mailchimp_creditmemo_cancel>
+                </observers>
+            </sales_order_creditmemo_cancel>
+            <sales_order_item_cancel>
+                <observers>
+                    <mailchimp_item_cancel>
+                        <class>mailchimp/observer</class>
+                        <method>itemCancel</method>
+                    </mailchimp_item_cancel>
+                </observers>
+            </sales_order_item_cancel>
         </events>
         <models>
             <mailchimp>
