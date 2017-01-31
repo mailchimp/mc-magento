@@ -217,7 +217,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $storeId
      * @return array
      */
-    protected function getBatchResponse($batchId, $storeId = 0)
+    public function getBatchResponse($batchId, $storeId = 0)
     {
         $files = array();
         try {
