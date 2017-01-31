@@ -209,6 +209,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($order->getMailchimpCampaignId()) {
             $data['campaign_id'] = $order->getMailchimpCampaignId();
         }
+        if ($order->getMailchimpLAndingPage()) {
+            $data['landing_site'] = $order->getMailchimpLandingPage();
+        }
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
         $data['tax_total'] = $order->getTaxAmount();

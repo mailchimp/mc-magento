@@ -128,6 +128,9 @@
                 <mailchimp_campaign_id>
                     <to_order>*</to_order>
                 </mailchimp_campaign_id>
+                <mailchimp_landing_page>
+                    <to_order>*</to_order>
+                </mailchimp_landing_page>
             </sales_convert_quote>
         </fieldsets>
     </global>

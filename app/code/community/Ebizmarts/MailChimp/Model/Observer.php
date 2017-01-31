@@ -38,12 +38,15 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function _createWebhook($listId)
     {
+        $store = Mage::app()->getDefaultStoreView();
         $webhooksKey = Mage::helper('mailchimp')->getWebhooksKey();
         //Generating Webhooks URL
         $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
-        $hookUrl = Mage::getModel('core/url')->getUrl(
+        $hookUrl = $store->getUrl(
             $url, array(
-            'wkey' => $webhooksKey
+            'wkey' => $webhooksKey,
+            '_nosid' => true,
+            '_secure' => true,
         ));
 
         if (FALSE != strstr($hookUrl, '?', true)) {
@@ -240,6 +243,10 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($order->getNotUpdateModified()) {
             $order->setMailchimpSyncModified(1);
         }
+        $landingCookie = $this->_getLandingCookie();
+        if ($landingCookie) {
+            $observer->getEvent()->getOrder()->setMailchimpLandingPage($landingCookie);
+        }
     }
 
     /**
@@ -254,6 +261,9 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($this->_getCampaignCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
         }
+        if( ($this->_getLandingCookie())) {
+            Mage::getModel('core/cookie')->delete('maichimp_landing_page');
+        }
         return $observer;
     }
 
@@ -266,6 +276,15 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $cookie = Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
         if ($cookie && Mage::getModel('core/cookie')->getLifetime('mailchimp_campaign_id') == Mage::getStoreConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_LIFETIME, Mage::app()->getStore()->getId())) {
+            return $cookie;
+        } else {
+            return null;
+        }
+    }
+    protected function _getLandingCookie()
+    {
+        $cookie = Mage::getModel('core/cookie')->get('maichimp_landing_page');
+        if ($cookie && Mage::getModel('core/cookie')->getLifetime('maichimp_landing_page') == Mage::getStoreConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_LIFETIME, Mage::app()->getStore()->getId())) {
             return $cookie;
         } else {
             return null;
@@ -351,7 +370,11 @@ class Ebizmarts_MailChimp_Model_Observer
         }
         $campaignId = $this->_getCampaignCookie();
         if ($campaignId) {
-            $quote->setMailChimpCampaignId($campaignId);
+            $quote->setMailchimpCampaignId($campaignId);
+        }
+        $landingCookie = $this->_getLandingCookie();
+        if ($landingCookie) {
+            $quote->setMailchimpLandingPage($landingCookie);
         }
         return $observer;
     }

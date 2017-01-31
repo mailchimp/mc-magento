@@ -15,10 +15,18 @@ $installer = $this;
 
 $installer->startSetup();
 
+
 try {
     $installer->run(
         "
-  ALTER TABLE `{$this->getTable('sales_flat_order')}` ADD COLUMN `mailchimp_sync_modified` INT(1) DEFAULT 0;
+ ALTER TABLE `{$this->getTable('sales_flat_quote')}`
+ ADD column `mailchimp_landing_page` VARCHAR (512) NOT NULL DEFAULT '';
+ ALTER TABLE `{$this->getTable('sales_flat_quote')}`
+ ADD column `mailchimp_campaign_id` VARCHAR (16) NOT NULL DEFAULT '';
+ ALTER TABLE `{$this->getTable('sales_flat_order')}`
+ ADD column `mailchimp_landing_page` VARCHAR (512) NOT NULL DEFAULT '';
+ ALTER TABLE `{$this->getTable('sales_flat_order')}`
+ ADD COLUMN `mailchimp_sync_modified` INT(1) DEFAULT 0;
 "
     );
 }
