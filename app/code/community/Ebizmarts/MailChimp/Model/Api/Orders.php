@@ -228,9 +228,39 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : "",
             "country_code" => $billingAddress->getCountry()
         );
+        $data["billing_address"] = array(
+            "name" => $billingAddress->getName(),
+            "address1" => $street[0],
+            "address2" => count($street) > 1 ? $street[1] : "",
+            "city" => $billingAddress->getCity(),
+            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
+            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
+            "postal_code" => $billingAddress->getPostcode(),
+            "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : "",
+            "country_code" => $billingAddress->getCountry()
+        );
+        $shippingAddress = $order->getShippingAddress();
+        $street = $shippingAddress->getStreet();
+        $data["shipping_address"] = array(
+            "name" => $shippingAddress->getName(),
+            "address1" => $street[0],
+            "address2" => count($street) > 1 ? $street[1] : "",
+            "city" => $shippingAddress->getCity(),
+            "province" => $shippingAddress->getRegion() ? $shippingAddress->getRegion() : "",
+            "province_code" => $shippingAddress->getRegionCode() ? $shippingAddress->getRegionCode() : "",
+            "postal_code" => $shippingAddress->getPostcode(),
+            "country" => $shippingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName() : "",
+            "country_code" => $shippingAddress->getCountry()
+        );
+
+
         //company
         if ($billingAddress->getCompany()) {
             $data["customer"]["company"] = $billingAddress->getCompany();
+            $data["billing_address"]["company"] = $billingAddress->getCompany();
+        }
+        if ($shippingAddress->getCompamy()) {
+            $data["shipping_address"]["company"] = $billingAddress->getCompany();
         }
         //customer orders data
         $orderCollection = Mage::getModel('sales/order')->getCollection()
