@@ -16,6 +16,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createBatchJson($mailchimpStoreId)
     {
+        $store = Mage::app()->getDefaultStoreView();
         //create missing products first
         $collection = Mage::getModel('catalog/product')->getCollection()
             ->addAttributeToSelect('id')
@@ -35,7 +36,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . Mage::helper('mailchimp')->getDateMicrotime();
         $counter = 0;
         foreach ($collection as $item) {
-            $product = Mage::getModel('catalog/product')->load($item->getId());
+            $product = Mage::getModel('catalog/product')->setStoreId($store->getId())->load($item->getId());
             $product->getTierPrice();
             //define variants and root products
             if ($product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
