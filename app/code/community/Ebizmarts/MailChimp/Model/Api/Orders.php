@@ -326,72 +326,75 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         if ($street[0]) {
             $address["address1"] = $street[0];
+            $data['billing_address']["address1"] = $street[0];
         }
 
         if (count($street) > 1) {
             $address["address2"] = $street[1];
+            $data['billing_address']["address2"] = $street[1];
         }
 
         if ($billingAddress->getCity()) {
             $address["city"] = $billingAddress->getCity();
+            $data['billing_address']["city"] = $billingAddress->getCity();
         }
 
         if ($billingAddress->getRegion()) {
             $address["province"] = $billingAddress->getRegion();
+            $data['billing_address']["province"] = $billingAddress->getRegion();
         }
 
         if ($billingAddress->getRegionCode()) {
             $address["province_code"] = $billingAddress->getRegionCode();
+            $data['billing_address']["province_code"] = $billingAddress->getRegionCode();
         }
 
         if ($billingAddress->getPostcode()) {
             $address["postal_code"] = $billingAddress->getPostcode();
+            $data['billing_address']["postal_code"] = $billingAddress->getPostcode();
         }
 
         if ($billingAddress->getCountry()) {
             $address["country"] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
             $address["country_code"] = $billingAddress->getCountry();
+            $data['billing_address']["country"] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+            $data['billing_address']["country_code"] = $billingAddress->getCountry();
         }
 
         if (count($address)) {
             $data["customer"]["address"] = $address;
         }
+        if ($billingAddress->getName()) {
+            $data['billing_address']['name'] = $billingAddress->getName();
+        }
 
-        $data["customer"]["address"] = array(
-            "address1" => $street[0],
-            "address2" => count($street) > 1 ? $street[1] : "",
-            "city" => $billingAddress->getCity(),
-            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-            "postal_code" => $billingAddress->getPostcode(),
-            "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : "",
-            "country_code" => $billingAddress->getCountry()
-        );
-        $data["billing_address"] = array(
-            "name" => $billingAddress->getName(),
-            "address1" => $street[0],
-            "address2" => count($street) > 1 ? $street[1] : "",
-            "city" => $billingAddress->getCity(),
-            "province" => $billingAddress->getRegion() ? $billingAddress->getRegion() : "",
-            "province_code" => $billingAddress->getRegionCode() ? $billingAddress->getRegionCode() : "",
-            "postal_code" => $billingAddress->getPostcode(),
-            "country" => $billingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName() : "",
-            "country_code" => $billingAddress->getCountry()
-        );
         $shippingAddress = $order->getShippingAddress();
         $street = $shippingAddress->getStreet();
-        $data["shipping_address"] = array(
-            "name" => $shippingAddress->getName(),
-            "address1" => $street[0],
-            "address2" => count($street) > 1 ? $street[1] : "",
-            "city" => $shippingAddress->getCity(),
-            "province" => $shippingAddress->getRegion() ? $shippingAddress->getRegion() : "",
-            "province_code" => $shippingAddress->getRegionCode() ? $shippingAddress->getRegionCode() : "",
-            "postal_code" => $shippingAddress->getPostcode(),
-            "country" => $shippingAddress->getCountry() ? Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName() : "",
-            "country_code" => $shippingAddress->getCountry()
-        );
-
+        if ($shippingAddress->getName()) {
+            $data['shipping_address']['name'] = $shippingAddress->getName()
+        }
+        if ($street[0]) {
+            $data['shipping_address']['address1'] = $street[0];
+        }
+        if ($street[1]) {
+            $data['shipping_address']['address2'] = $street[1];
+        }
+        if ($shippingAddress->getCity()) {
+            $data['shipping_address']['city'] = $shippingAddress->getCity();
+        }
+        if ($shippingAddress->getRegion()) {
+            $data['shipping_address']['province'] = $shippingAddress->getRegion();
+        }
+        if ($shippingAddress->getRegionCode()) {
+            $data['shipping_address']['province_code'] = $shippingAddress->getRegionCode();
+        }
+        if ($shippingAddress->getPostCode()) {
+            $data['shipping_address']['postal_code'] = $shippingAddress->getPostCode();
+        }
+        if ($shippingAddress->getCountry()) {
+            $data['shipping_address']['country'] = Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName();
+            $data['shipping_address']['country_code'] = $shippingAddress->getCountry();
+        }
 
         //company
         if ($billingAddress->getCompany()) {
