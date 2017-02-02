@@ -209,7 +209,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data['order_total'] = $order->getGrandTotal();
         $data['tax_total'] = $order->getTaxAmount();
         $data['shipping_total'] = $order->getShippingAmount();
-        $data['financial_status'] = $this->_getMailChimpStatus($order);
+        $statusArray = $this->_getMailChimpStatus($order);
+        if (isset($statusArray['financial_status'])) {
+            $data['financial_status'] = $statusArray['financial_status'];
+        }
+        if (isset($statusArray['fullfilment_status'])) {
+            $data['fullfilment_status'] = $statusArray['fullfilment_status'];
+        }
+
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['updated_at_foreign'] = $order->getUpdatedAt();
         if ($order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
@@ -224,7 +231,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $data['cancelled_at_foreign'] = $orderCancelDate;
             }
         }
-        $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['lines'] = array();
 
         //order lines
@@ -309,10 +315,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
         } else {
-            $id = $customers['customers'][0]['id'];
-            $data['customer'] = array(
-                'id' => $id
-            );
+            if (isset($customers['customers'][0]['id'])) {
+                $id = $customers['customers'][0]['id'];
+                $data['customer'] = array(
+                    'id' => $id
+                );
+            }
         }
         if($order->getCustomerFirstname()) {
             $data["customer"]["first_name"] = $order->getCustomerFirstname();
@@ -406,57 +414,54 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     protected function _getMailChimpStatus($order)
     {
-        switch ($order->getState()) {
-            case 'complete':
-                $status = self::COMPLETE;
-                break;
-            case 'pending':
-                $status = self::PENDING;
-                break;
-            case 'processing':
-                $status = $this->_getMailChimpPendingStatus($order);
-                break;
-            case 'canceled':
-                $status = self::CANCELED;
-                break;
-            default:
-                $status = self::PENDING;
-                break;
-        }
-        return $status;
-    }
-
-    protected function _getMailChimpPendingStatus($order)
-    {
-        $mailChimpStatus = null;
+        $mailChimpFinancialStatus = null;
+        $mailChimpFullfilmentStatus = null;
         $totalItemsOrdered = $order->getData('total_qty_ordered');
         $shippedItemAmount = 0;
         $invoicedItemAmount = 0;
+        $refundedItemAmount = 0;
+        $mailChimpStatus = array();
 
         foreach ($order->getAllVisibleItems() as $item){
             $shippedItemAmount += $item->getQtyShipped();
             $invoicedItemAmount += $item->getQtyInvoiced();
-        }
-        if ($invoicedItemAmount > 0) {
-            if ($totalItemsOrdered > $invoicedItemAmount) {
-                $mailChimpStatus = self::PARTIALLY_PAID;
-            } else {
-                $mailChimpStatus = self::PAID;
-            }
+            $refundedItemAmount += $item->getQtyRefunded();
         }
         if ($shippedItemAmount > 0) {
             if ($totalItemsOrdered > $shippedItemAmount) {
-                $mailChimpStatus = (!$mailChimpStatus) ? self::PARTIALLY_SHIPPED : $mailChimpStatus.','.self::PARTIALLY_SHIPPED;
+                $mailChimpFullfilmentStatus = self::PARTIALLY_SHIPPED;
             } else {
-                $mailChimpStatus = (!$mailChimpStatus) ? self::SHIPPED : $mailChimpStatus.','.self::SHIPPED;
+                $mailChimpFullfilmentStatus = self::SHIPPED;
             }
         }
-        if (!$mailChimpStatus) {
-            $mailChimpStatus = self::PENDING;
+        if ($refundedItemAmount > 0) {
+            if ($totalItemsOrdered > $refundedItemAmount) {
+                $mailChimpFinancialStatus = self::PARTIALLY_REFUNDED;
+            } else {
+                $mailChimpFinancialStatus = self::REFUNDED;
+            }
+        }
+        if ($invoicedItemAmount > 0) {
+            if ($refundedItemAmount == 0 || $refundedItemAmount != $invoicedItemAmount) {
+                if ($totalItemsOrdered > $invoicedItemAmount) {
+                    $mailChimpFinancialStatus = self::PARTIALLY_PAID;
+                } else {
+                    $mailChimpFinancialStatus = self::PAID;
+                }
+            }
+                
+        }
+        if (!$mailChimpFinancialStatus) {
+            $mailChimpFinancialStatus = self::PENDING;
         }
 
+        if ($mailChimpFinancialStatus) {
+            $mailChimpStatus['financial_status'] = $mailChimpFinancialStatus;
+        }
+        if ($mailChimpFullfilmentStatus) {
+            $mailChimpStatus['fullfilment_status'] = $mailChimpFullfilmentStatus;
+        }
         return $mailChimpStatus;
-
     }
 
     public function update($order)
