@@ -371,7 +371,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $shippingAddress = $order->getShippingAddress();
         $street = $shippingAddress->getStreet();
         if ($shippingAddress->getName()) {
-            $data['shipping_address']['name'] = $shippingAddress->getName()
+            $data['shipping_address']['name'] = $shippingAddress->getName();
         }
         if ($street[0]) {
             $data['shipping_address']['address1'] = $street[0];
