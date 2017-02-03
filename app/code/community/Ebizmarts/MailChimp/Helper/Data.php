@@ -216,8 +216,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($collection as $product) {
             $product->setData("mailchimp_sync_delta", null);
             $product->setData("mailchimp_sync_error", '');
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_delta');
+            $resource->saveAttribute($product, 'mailchimp_sync_error');
+//            $product->setMailchimpUpdateObserverRan(true);
+//            $product->save();
         }
 
         // reset subscribers with errors
@@ -240,8 +243,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($collection as $customer) {
             $customer->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
             $customer->setData("mailchimp_sync_error", '');
-            $customer->setMailchimpUpdateObserverRan(true);
-            $customer->save();
+            $resource = $customer->getResource();
+            $resource->saveAttribute($customer, 'mailchimp_sync_delta');
+            $resource->saveAttribute($customer, 'mailchimp_sync_error');
+//            $customer->setMailchimpUpdateObserverRan(true);
+//            $customer->save();
         }
 
         // reset orders with errors
