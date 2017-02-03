@@ -396,8 +396,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($shippingAddress->getRegionCode()) {
             $data['shipping_address']['province_code'] = $shippingAddress->getRegionCode();
         }
-        if ($shippingAddress->getPostCode()) {
-            $data['shipping_address']['postal_code'] = $shippingAddress->getPostCode();
+        if ($shippingAddress->getPostcode()) {
+            $data['shipping_address']['postal_code'] = $shippingAddress->getPostcode();
         }
         if ($shippingAddress->getCountry()) {
             $data['shipping_address']['country'] = Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName();
