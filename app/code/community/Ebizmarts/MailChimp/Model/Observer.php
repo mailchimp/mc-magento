@@ -407,8 +407,8 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $product->setData('mailchimp_sync_modified', 1);
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_modified');
         }
         return $observer;
     }
