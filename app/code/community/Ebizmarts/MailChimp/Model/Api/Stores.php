@@ -92,4 +92,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         $resource = Mage::getResourceModel('mailchimp/synchbatches');
         $connection->update($resource->getMainTable(), array('status'=>'canceled'), "status = 'pending'");
     }
+    public function modifyName($name)
+    {
+        $api = Mage::helper('mailchimp')->getApi();
+        $storeId = Mage::helper('mailchimp')->getMCStoreId();
+        $api->ecommerce->stores->edit($storeId,$name);
+    }
 }

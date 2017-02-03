@@ -88,10 +88,11 @@ class Mailchimp_EcommerceStore  extends Mailchimp_Abstract
      * @return mixed
      * @throws Mailchimp_Error
      */
-    public function edit($storeId, $isSyncing, $currencyCode = null, $platform = null, $domain = null, $emailAddress = null,
+    public function edit($storeId, $name = null, $platform = null, $domain = null, $isSyncing = null, $emailAddress = null, $currencyCode = null,
                          $moneyFormat = null, $primaryLocale=null, $timezone = null, $phone=null, $address=null)
     {
         $_params=array();
+        if($name) $_params['name'] = $name;
         if($platform) $_params['platform'] = $platform;
         if($domain) $_params['domain'] = $domain;
         if($emailAddress) $_params['email_address'] = $emailAddress;
