@@ -192,12 +192,6 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $customer = $observer->getEvent()->getCustomer();
 
-        if ($customer->getMailchimpUpdateObserverRan()) {
-            return $observer;
-        } else {
-            $customer->setMailchimpUpdateObserverRan(true);
-        }
-
         //update mailchimp ecommerce data for that customer
         Mage::getModel('mailchimp/api_customers')->update($customer);
         return $observer;
@@ -212,12 +206,6 @@ class Ebizmarts_MailChimp_Model_Observer
     public function productSaveBefore(Varien_Event_Observer $observer)
     {
         $product = $observer->getEvent()->getProduct();
-
-        if ($product->getMailchimpUpdateObserverRan()) {
-            return $observer;
-        } else {
-            $product->setMailchimpUpdateObserverRan(true);
-        }
         //update mailchimp ecommerce data for that product variant
         Mage::getModel('mailchimp/api_products')->update($product);
         return $observer;
@@ -407,8 +395,8 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $product->setData('mailchimp_sync_modified', 1);
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_modified');
         }
         return $observer;
     }
@@ -431,8 +419,8 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $product->setData('mailchimp_sync_modified', 1);
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_modified');
         }
         $creditMemo->getOrder()->setMailchimpSyncModified(1);
         return $observer;
@@ -456,8 +444,8 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $product->setData('mailchimp_sync_modified', 1);
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_modified');
         }
         $creditMemo->getOrder()->setMailchimpSyncModified(1);
         return $observer;
@@ -476,8 +464,8 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($item->getProductType()!='bundle' && $item->getProductType()!='configurable') {
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $product->setData('mailchimp_sync_modified', 1);
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_modified');
         }
         return $observer;
     }
