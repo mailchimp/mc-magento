@@ -6,7 +6,7 @@ app/design/frontend/base/default/template/*     app/design/frontend/base/default
 app/etc/modules/*                               app/etc/modules/
 js/ebizmarts/mailchimp/*                        js/ebizmarts/mailchimp/
 lib/Ebizmarts/*                                 lib/Ebizmarts/
-lib/Mandrill/                                   lib/Mandrill/
+lib/Mandrill                                    lib/Mandrill
 skin/adminhtml/default/default/ebizmarts/*      skin/adminhtml/default/default/ebizmarts/
 getMailchimpResponse.php                        getMailchimpResponse.php
 m4mlogs.sh                                      m4mlogs.sh
