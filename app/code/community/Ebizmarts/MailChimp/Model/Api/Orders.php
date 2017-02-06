@@ -74,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "PATCH";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getEntityId();
+                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getIncrementId();
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $order->getEntityId();
                     $batchArray[$this->_counter]['body'] = $orderJson;
 
@@ -213,8 +213,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
         }
-        if (isset($statusArray['fullfilment_status'])) {
-            $data['fullfilment_status'] = $statusArray['fullfilment_status'];
+        if (isset($statusArray['fulfillment_status'])) {
+            $data['fulfillment_status'] = $statusArray['fulfillment_status'];
         }
 
         $data['processed_at_foreign'] = $order->getCreatedAt();
@@ -438,7 +438,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $jsonData = json_encode($data);
         } catch (Exception $e) {
             //json encode failed
-            Mage::helper('mailchimp')->logError("Order ".$order->getId()." json encode failed");
+            Mage::helper('mailchimp')->logError("Order ".$order->getIncrementId()." json encode failed");
         }
 
         return $jsonData;
@@ -458,7 +458,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function _getMailChimpStatus($order)
     {
         $mailChimpFinancialStatus = null;
-        $mailChimpFullfilmentStatus = null;
+        $mailChimpFulfillmentStatus = null;
         $totalItemsOrdered = $order->getData('total_qty_ordered');
         $shippedItemAmount = 0;
         $invoicedItemAmount = 0;
@@ -472,9 +472,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
         if ($shippedItemAmount > 0) {
             if ($totalItemsOrdered > $shippedItemAmount) {
-                $mailChimpFullfilmentStatus = self::PARTIALLY_SHIPPED;
+                $mailChimpFulfillmentStatus = self::PARTIALLY_SHIPPED;
             } else {
-                $mailChimpFullfilmentStatus = self::SHIPPED;
+                $mailChimpFulfillmentStatus = self::SHIPPED;
             }
         }
         if ($refundedItemAmount > 0) {
@@ -501,8 +501,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($mailChimpFinancialStatus) {
             $mailChimpStatus['financial_status'] = $mailChimpFinancialStatus;
         }
-        if ($mailChimpFullfilmentStatus) {
-            $mailChimpStatus['fullfilment_status'] = $mailChimpFullfilmentStatus;
+        if ($mailChimpFulfillmentStatus) {
+            $mailChimpStatus['fulfillment_status'] = $mailChimpFulfillmentStatus;
         }
         return $mailChimpStatus;
     }
