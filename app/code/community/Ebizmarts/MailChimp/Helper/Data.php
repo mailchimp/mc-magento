@@ -400,4 +400,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $api;
     }
+    public function changeName($name)
+    {
+        if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)) {
+            try {
+                Mage::getModel('mailchimp/api_stores')->modifyName($name);
+            } catch (Mailchimp_Error $e) {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            }
+        }
+    }
 }

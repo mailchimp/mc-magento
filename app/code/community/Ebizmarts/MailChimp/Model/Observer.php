@@ -482,4 +482,12 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
     }
+    public function changeStoreName(Varien_Event_Observer $observer)
+    {
+        $group = $observer->getGroup();
+        $storeName = Mage::getStoreConfig('general/store_information/name');
+        if ($storeName == '') {
+            Mage::helper('mailchimp')->changeName($group->getName());
+        }
+    }
 }

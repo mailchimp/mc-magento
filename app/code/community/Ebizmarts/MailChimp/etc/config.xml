@@ -11,6 +11,14 @@
     </modules>
     <global>
         <events>
+            <store_group_save>
+                <observers>
+                    <mailchimp_change_store_name>
+                        <class>mailchimp/observer</class>
+                        <method>changeStoreName</method>
+                    </mailchimp_change_store_name>
+                </observers>
+            </store_group_save>
             <newsletter_subscriber_save_before>
                 <observers>
                     <mailchimp_subscribe_observer>

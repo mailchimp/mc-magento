@@ -8,6 +8,17 @@
         </mailchimp>
     </tabs>
     <sections>
+        <general>
+            <groups>
+                <store_information>
+                    <fields>
+                        <name>
+                            <backend_model>mailchimp/system_config_backend_name</backend_model>
+                        </name>
+                    </fields>
+                </store_information>
+            </groups>
+        </general>
         <mailchimp translate="label" module="mailchimp">
             <class>mailchimp-section</class>
             <label>MailChimp Configuration</label>
