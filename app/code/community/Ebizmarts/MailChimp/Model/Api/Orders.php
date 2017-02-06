@@ -202,7 +202,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($order->getMailchimpCampaignId()) {
             $data['campaign_id'] = $order->getMailchimpCampaignId();
         }
-        if ($order->getMailchimpLAndingPage()) {
+        if ($order->getMailchimpLandingPage()) {
             $data['landing_site'] = $order->getMailchimpLandingPage();
         }
         $data['currency_code'] = $order->getOrderCurrencyCode();
