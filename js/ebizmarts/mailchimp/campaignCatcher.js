@@ -2,6 +2,7 @@
         var urlparams = location.search.substr(1).split('&');
         var params = new Array();
         var mc_cid = null;
+        var isMailchimp = false;
         for (var i = 0; i < urlparams.length; i++) {
             var param = urlparams[i].split('=');
             var key = param[0];
@@ -10,14 +11,13 @@
                 params[key] = val;
             }
             if(key=='utm_source') {
-                var reg = /^mailchimp-/;
+                var reg = /^mailchimp$/;
                 if(reg.exec(val)) {
-                    var aux =val.split('-');
-                    mc_cid = aux[1];
+                    isMailchimp = true;
                 }
             }
             else {
-                if (key=='mc_cid') {
+                if (key=='mc_cid'||(isMailchimp && key=='utm_campaign')) {
                     mc_cid = val;
                 }
             }
@@ -25,7 +25,7 @@
 
         if (mc_cid) {
             createCookie('mailchimp_campaign_id' , mc_cid);
-            createCookie('maichimp_landing_page', location);
+            createCookie('mailchimp_landing_page', location);
         }
     }
 
