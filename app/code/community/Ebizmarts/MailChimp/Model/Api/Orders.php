@@ -494,6 +494,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
                 
         }
+
+        if (!$mailChimpFinancialStatus && $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
+            $mailChimpFinancialStatus = self::CANCELED;
+        }
         if (!$mailChimpFinancialStatus) {
             $mailChimpFinancialStatus = self::PENDING;
         }
