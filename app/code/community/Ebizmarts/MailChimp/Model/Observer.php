@@ -254,7 +254,7 @@ class Ebizmarts_MailChimp_Model_Observer
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
         }
         if( ($this->_getLandingCookie())) {
-            Mage::getModel('core/cookie')->delete('maichimp_landing_page');
+            Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
         }
         return $observer;
     }
@@ -275,8 +275,8 @@ class Ebizmarts_MailChimp_Model_Observer
     }
     protected function _getLandingCookie()
     {
-        $cookie = Mage::getModel('core/cookie')->get('maichimp_landing_page');
-        if ($cookie && Mage::getModel('core/cookie')->getLifetime('maichimp_landing_page') == Mage::getStoreConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_LIFETIME, Mage::app()->getStore()->getId())) {
+        $cookie = Mage::getModel('core/cookie')->get('mailchimp_landing_page');
+        if ($cookie && Mage::getModel('core/cookie')->getLifetime('mailchimp_landing_page') == Mage::getStoreConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_LIFETIME, Mage::app()->getStore()->getId())) {
             return $cookie;
         } else {
             return null;
@@ -381,7 +381,7 @@ class Ebizmarts_MailChimp_Model_Observer
     public function newOrder(Varien_Event_Observer $observer)
     {
         if( ($this->_getLandingCookie())) {
-            Mage::getModel('core/cookie')->delete('maichimp_landing_page');
+            Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
         }
         if ($this->_getCampaignCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
