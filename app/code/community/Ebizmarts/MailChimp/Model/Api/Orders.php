@@ -322,6 +322,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 );
             }
         }
+        $store = Mage::getModel('core/store')->load($order->getStoreId());
+        $data['order_URL'] = $store->getUrl('sales/order/view/',array(
+            'order_id'=>$order->getId(),
+            '_nosid' => true,
+            '_secure' => true
+        ));
         if($order->getCustomerFirstname()) {
             $data["customer"]["first_name"] = $order->getCustomerFirstname();
         }
