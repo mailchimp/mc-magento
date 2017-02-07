@@ -202,12 +202,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($order->getMailchimpCampaignId()) {
             $data['campaign_id'] = $order->getMailchimpCampaignId();
         }
-        if ($order->getMailchimpLAndingPage()) {
+        if ($order->getMailchimpLandingPage()) {
             $data['landing_site'] = $order->getMailchimpLandingPage();
         }
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
         $data['tax_total'] = $order->getTaxAmount();
+        $data['discount_total'] = abs($order->getDiscountAmount());
         $data['shipping_total'] = $order->getShippingAmount();
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
@@ -259,6 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "product_variant_id" => $variant,
                     "quantity" => (int)$item->getQtyOrdered(),
                     "price" => $item->getPrice(),
+                    "discount" => $item->getDiscountAmount()
                 );
             }
         }
@@ -500,6 +502,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
                 
         }
+
+        if (!$mailChimpFinancialStatus && $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
+            $mailChimpFinancialStatus = self::CANCELED;
+        }
+
         if (!$mailChimpFinancialStatus) {
             $mailChimpFinancialStatus = self::PENDING;
         }
