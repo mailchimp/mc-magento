@@ -29,8 +29,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     public function downloadresponseAction()
     {
         $batch_id = $this->getRequest()->getParam('batch_id');
-        $this->getResponse()->setHeader('Content-disposition','attachment; filename='.$batch_id.'.json');
-        $this->getResponse()->setHeader('Content-type','application/json');
+        $this->getResponse()->setHeader('Content-disposition', 'attachment; filename='.$batch_id.'.json');
+        $this->getResponse()->setHeader('Content-type', 'application/json');
         $files = Mage::getModel('mailchimp/api_batches')->getBatchResponse($batch_id);
         $fileContent = array();
         foreach ($files as $file) {
@@ -39,13 +39,16 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
 //                $fileContent [] = $item;
                 $fileContent [] = array('status_code'=>$item->status_code,'operation_id'=>$item->operation_id,'response'=>json_decode($item->response));
             }
+
             unlink($file);
         }
+
         $baseDir = Mage::getBaseDir();
         if (is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batch_id)) {
             rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batch_id);
         }
-        $this->getResponse()->setBody(json_encode($fileContent,JSON_PRETTY_PRINT));
+
+        $this->getResponse()->setBody(json_encode($fileContent, JSON_PRETTY_PRINT));
         return;
     }
     protected function _isAllowed()
@@ -57,6 +60,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
                 $acl = 'newsletter/mailchimp/mailchimperrors';
                 break;
         }
+
         return Mage::getSingleton('admin/session')->isAllowed($acl);
     }
 }

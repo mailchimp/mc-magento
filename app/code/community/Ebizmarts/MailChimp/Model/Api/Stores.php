@@ -43,7 +43,6 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             }
 
             return $storeExists;
-
         } else {
             throw new Exception('You must provide a MailChimp API key');
         }
@@ -96,6 +95,6 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     {
         $api = Mage::helper('mailchimp')->getApi();
         $storeId = Mage::helper('mailchimp')->getMCStoreId();
-        $api->ecommerce->stores->edit($storeId,$name);
+        $api->ecommerce->stores->edit($storeId, $name);
     }
 }

@@ -21,6 +21,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         {
             $result = 0;
         }
+
         Mage::app()->getResponse()->setBody($result);
     }
     public function resetEcommerceDataAction()
@@ -37,6 +38,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         catch(Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
+
         Mage::app()->getResponse()->setBody($result);
     }
 
@@ -53,6 +55,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         catch(Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
+
         Mage::app()->getResponse()->setBody($result);
     }
 
@@ -65,6 +68,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
                 $acl = 'system/config/mailchimp';
                 break;
         }
+
         return Mage::getSingleton('admin/session')->isAllowed($acl);
     }
 }

@@ -98,7 +98,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected function _subscribe(array $data)
     {
         try {
-
             $subscriber = Mage::getModel('newsletter/subscriber')
                 ->loadByEmail($data['data']['email']);
             if ($subscriber->getId()) {
@@ -110,12 +109,13 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     $subscriberFname = filter_var($data['data']['fname'], FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberFirstname($subscriberFname);
                 }
+
                 if (isset($data['data']['lname'])) {
                     $subscriberLname = filter_var($data['data']['lname'], FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberLastname($subscriberLname);
                 }
-                $subscriber->subscribe($data['data']['email']);
 
+                $subscriber->subscribe($data['data']['email']);
             }
         } catch (Exception $e) {
             Mage::logException($e);
@@ -139,7 +139,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
         if ($subscriber->getId()) {
             try {
-
                 switch ($data['data']['action']) {
                     case 'delete' :
                         //if config setting "Webhooks Delete action" is set as "Delete customer account"
@@ -171,6 +170,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         } else {
             $toUpdate = $subscriber;
         }
+
         $toUpdate->setFirstname($data['data']['merges']['FNAME']);
         $toUpdate->setLastname($data['data']['merges']['LNAME']);
         $toUpdate->save();

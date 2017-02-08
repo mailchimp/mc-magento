@@ -52,9 +52,11 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
         if (isset($cookieValues[1])) {
             $fName = $cookieValues[1];
         }
+
         if (isset($cookieValues[2])) {
             $lName = $cookieValues[2];
         }
+
         if ($subscribeCookie == 'true') {
             $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
             if (!$subscriber->getId()) {
@@ -65,10 +67,12 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
                     $subscriberFname = filter_var($fName, FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberFirstname($subscriberFname);
                 }
+
                 if ($lName) {
                     $subscriberLname = filter_var($lName, FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberLastname($subscriberLname);
                 }
+
                 $subscriber->setStoreId($storeId)
                     ->subscribe($email);
                 return 'location.reload';

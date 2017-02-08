@@ -41,7 +41,6 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
             //enconde to JSON
             try {
                 $subscriberJson = json_encode($data);
-
             } catch (Exception $e) {
                 //json encode failed
                 $errorMessage = "Subscriber ".$subscriber->getSubscriberId()." json encode failed";
@@ -59,8 +58,10 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->save();
             }
+
             $counter++;
         }
+
         return $subscriberArray;
     }
 
@@ -72,6 +73,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         if ($mergeVars) {
             $data["merge_fields"] = $mergeVars;
         }
+
         $data["status_if_new"] = $this->_getMCStatus($subscriber->getStatus());
 
         return $data;
@@ -116,8 +118,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         $confirmationFlagPath = Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG;
         if ($status == Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
             $status = 'unsubscribed';
-        } elseif (
-            Mage::helper('mailchimp')->getConfigValue($confirmationFlagPath) &&
+        } elseif (Mage::helper('mailchimp')->getConfigValue($confirmationFlagPath) &&
             ($status == Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE ||
                 $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED)
         ) {
@@ -125,6 +126,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
         } elseif ($status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
             $status = 'subscribed';
         }
+
         return $status;
     }
 

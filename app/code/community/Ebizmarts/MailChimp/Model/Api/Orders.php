@@ -59,6 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($this->_firstDate) {
             $collection->addFieldToFilter('created_at', array('from' => $this->_firstDate));
         }
+
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         foreach ($collection as $item) {
@@ -71,17 +72,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $this->_counter++;
                     }
                 }
+
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "PATCH";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getEntityId();
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $order->getEntityId();
                     $batchArray[$this->_counter]['body'] = $orderJson;
-
                 } else {
                     $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
                     $order->setData("mailchimp_sync_error", $error);
                 }
+
                 //update order delta
                 $order->setData("mailchimp_sync_delta", Varien_Date::now());
                 $order->setMailchimpSyncModified(0);
@@ -92,6 +94,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 Mage::helper('mailchimp')->logError($e->getMessage());
             }
         }
+
         return $batchArray;
     }
 
@@ -101,14 +104,17 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         //create missing products first
         $collection = Mage::getModel('sales/order')->getCollection()
             ->addAttributeToSelect('entity_id')
-            ->addFieldToFilter('mailchimp_sync_delta', array(
+            ->addFieldToFilter(
+                'mailchimp_sync_delta', array(
                 array('null' => true),
                 array('eq' => ''),
                 array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag())
-            ));
+                )
+            );
         if ($this->_firstDate) {
             $collection->addFieldToFilter('created_at', array('from' => $this->_firstDate));
         }
+
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         foreach ($collection as $item) {
@@ -121,17 +127,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $this->_counter++;
                     }
                 }
+
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "POST";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $order->getEntityId();
                     $batchArray[$this->_counter]['body'] = $orderJson;
-
                 } else {
                     $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
                     $order->setData("mailchimp_sync_error", $error);
                 }
+
                 //update order delta
                 $order->setData("mailchimp_sync_delta", Varien_Date::now());
                 $order->setMailchimpSyncModified(0);
@@ -142,6 +149,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 Mage::helper('mailchimp')->logError($e->getMessage());
             }
         }
+
         return $batchArray;
     }
 
@@ -201,9 +209,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($order->getMailchimpCampaignId()) {
             $data['campaign_id'] = $order->getMailchimpCampaignId();
         }
+
         if ($order->getMailchimpLandingPage()) {
             $data['landing_site'] = $order->getMailchimpLandingPage();
         }
+
         $data['currency_code'] = $order->getOrderCurrencyCode();
         $data['order_total'] = $order->getGrandTotal();
         $data['tax_total'] = $order->getTaxAmount();
@@ -213,6 +223,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
         }
+
         if (isset($statusArray['fulfillment_status'])) {
             $data['fulfillment_status'] = $statusArray['fulfillment_status'];
         }
@@ -227,10 +238,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $orderCancelDate = $comment->getCreatedAt();
                 }
             }
+
             if ($orderCancelDate) {
                 $data['cancelled_at_foreign'] = $orderCancelDate;
             }
         }
+
         $data['lines'] = array();
 
         //order lines
@@ -247,6 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             } else {
                 $variant = $item->getProductId();
             }
+
             // load the product and check if the product was already sent to mailchimp
             $syncDelta = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_delta', $order->getStoreId());
             $syncError = Mage::getResourceModel('catalog/product')->getAttributeRawValue($item->getProductId(), 'mailchimp_sync_error', $order->getStoreId());
@@ -263,10 +277,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 );
             }
         }
+
         if (!$itemCount) {
             unset($data['lines']);
             return "";
         }
+
         //customer data
         $api = $this->_getApi();
         $customers = array();
@@ -275,6 +291,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         } catch (Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
         }
+
         if (!$this->_isModifiedOrder($order)) {
             if (isset($customers['total_items']) && $customers['total_items'] > 0) {
                 $id = $customers['customers'][0]['id'];
@@ -308,6 +325,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         }
                     } catch (Mailchimp_Error $e) {
                     }
+
                     $data["customer"] = array(
                         "id" => ($order->getCustomerId()) ? $order->getCustomerId() : $guestId = "CUSTOMER-" . Mage::helper('mailchimp')->getDateMicrotime(),
                         "email_address" => ($custEmailAddr) ? $custEmailAddr : $order->getCustomerEmail(),
@@ -323,18 +341,23 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 );
             }
         }
+
         $store = Mage::getModel('core/store')->load($order->getStoreId());
-        $data['order_url'] = $store->getUrl('sales/order/view/', array(
+        $data['order_url'] = $store->getUrl(
+            'sales/order/view/', array(
             'order_id' => $order->getId(),
             '_nosid' => true,
             '_secure' => true
-        ));
+            )
+        );
         if ($order->getCustomerFirstname()) {
             $data["customer"]["first_name"] = $order->getCustomerFirstname();
         }
+
         if ($order->getCustomerLastname()) {
             $data["customer"]["last_name"] = $order->getCustomerLastname();
         }
+
         $billingAddress = $order->getBillingAddress();
         $street = $billingAddress->getStreet();
         $address = array();
@@ -379,9 +402,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (count($address)) {
             $data["customer"]["address"] = $address;
         }
+
         if ($billingAddress->getName()) {
             $data['billing_address']['name'] = $billingAddress->getName();
         }
+
         //company
         if ($billingAddress->getCompany()) {
             $data["customer"]["company"] = $billingAddress->getCompany();
@@ -394,28 +419,36 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             if ($shippingAddress->getName()) {
                 $data['shipping_address']['name'] = $shippingAddress->getName();
             }
+
             if (isset($street[0]) && $street[0]) {
                 $data['shipping_address']['address1'] = $street[0];
             }
+
             if (isset($street[1]) && $street[1]) {
                 $data['shipping_address']['address2'] = $street[1];
             }
+
             if ($shippingAddress->getCity()) {
                 $data['shipping_address']['city'] = $shippingAddress->getCity();
             }
+
             if ($shippingAddress->getRegion()) {
                 $data['shipping_address']['province'] = $shippingAddress->getRegion();
             }
+
             if ($shippingAddress->getRegionCode()) {
                 $data['shipping_address']['province_code'] = $shippingAddress->getRegionCode();
             }
+
             if ($shippingAddress->getPostcode()) {
                 $data['shipping_address']['postal_code'] = $shippingAddress->getPostcode();
             }
+
             if ($shippingAddress->getCountry()) {
                 $data['shipping_address']['country'] = Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName();
                 $data['shipping_address']['country_code'] = $shippingAddress->getCountry();
             }
+
             if ($shippingAddress->getCompamy()) {
                 $data["shipping_address"]["company"] = $shippingAddress->getCompany();
             }
@@ -432,12 +465,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($this->_firstDate) {
             $orderCollection->addFieldToFilter('created_at', array('from' => $this->_firstDate));
         }
+
         $totalOrders = 1;
         $totalAmountSpent = (int)$order->getGrandTotal();
         foreach ($orderCollection as $orderAlreadySent) {
             $totalOrders++;
             $totalAmountSpent += (int)$orderAlreadySent->getGrandTotal();
         }
+
         $data["customer"]["orders_count"] = $totalOrders;
         $data["customer"]["total_spent"] = $totalAmountSpent;
         $jsonData = "";
@@ -479,6 +514,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $invoicedItemAmount += $item->getQtyInvoiced();
             $refundedItemAmount += $item->getQtyRefunded();
         }
+
         if ($shippedItemAmount > 0) {
             if ($totalItemsOrdered > $shippedItemAmount) {
                 $mailChimpFulfillmentStatus = self::PARTIALLY_SHIPPED;
@@ -486,6 +522,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $mailChimpFulfillmentStatus = self::SHIPPED;
             }
         }
+
         if ($refundedItemAmount > 0) {
             if ($totalItemsOrdered > $refundedItemAmount) {
                 $mailChimpFinancialStatus = self::PARTIALLY_REFUNDED;
@@ -493,6 +530,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $mailChimpFinancialStatus = self::REFUNDED;
             }
         }
+
         if ($invoicedItemAmount > 0) {
             if ($refundedItemAmount == 0 || $refundedItemAmount != $invoicedItemAmount) {
                 if ($totalItemsOrdered > $invoicedItemAmount) {
@@ -501,7 +539,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $mailChimpFinancialStatus = self::PAID;
                 }
             }
-
         }
 
         if (!$mailChimpFinancialStatus && $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
@@ -515,9 +552,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($mailChimpFinancialStatus) {
             $mailChimpStatus['financial_status'] = $mailChimpFinancialStatus;
         }
+
         if ($mailChimpFulfillmentStatus) {
             $mailChimpStatus['fulfillment_status'] = $mailChimpFulfillmentStatus;
         }
+
         return $mailChimpStatus;
     }
 
@@ -539,6 +578,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (!$this->_api) {
             $this->_api = Mage::helper('mailchimp')->getApi();
         }
+
         return $this->_api;
     }
 }

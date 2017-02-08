@@ -20,6 +20,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Mailchimp ex
         } else {
             $result = '';
         }
+
         return $result;
     }
 }

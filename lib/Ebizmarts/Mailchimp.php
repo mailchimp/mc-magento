@@ -123,6 +123,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     require_once dirname(__FILE__) . '/Mailchimp/Templates.php';
     require_once dirname(__FILE__) . '/Mailchimp/TemplatesDefaultContent.php';
 }
+
 class Ebizmarts_Mailchimp
 {
     protected $_apiKey;
@@ -141,6 +142,7 @@ class Ebizmarts_Mailchimp
         if (!$apiKey) {
             throw new Mailchimp_Error('You must provide a MailChimp API key');
         }
+
         $this->_apiKey   = $apiKey;
         $dc             = 'us1';
         if (strstr($this->_apiKey, "-")) {
@@ -149,12 +151,14 @@ class Ebizmarts_Mailchimp
                 $dc = "us1";
             }
         }
+
         $this->_root = str_replace('https://api', 'https://' . $dc . '.api', $this->_root);
         $this->_root = rtrim($this->_root, '/') . '/';
 
         if (!isset($opts['timeout']) || !is_int($opts['timeout'])) {
             $opts['timeout'] = 600;
         }
+
         if (isset($opts['debug'])) {
             $this->_debug = true;
         }
@@ -165,11 +169,13 @@ class Ebizmarts_Mailchimp
         if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
             curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, true);
         }
+
         if ($userAgent) {
             curl_setopt($this->_ch, CURLOPT_USERAGENT, $userAgent);
         } else {
             curl_setopt($this->_ch, CURLOPT_USERAGENT, 'Ebizmart-MailChimp-PHP/3.0.0');
         }
+
         curl_setopt($this->_ch, CURLOPT_HEADER, false);
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT, 30);

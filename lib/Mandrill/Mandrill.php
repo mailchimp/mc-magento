@@ -33,7 +33,6 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     require_once(dirname(__FILE__) . '/Mandrill/Senders.php');
     require_once(dirname(__FILE__) . '/Mandrill/Metadata.php');
     require_once(dirname(__FILE__) . '/Mandrill/Exceptions.php');
-
 }
 
 class Mandrill_Mandrill
@@ -89,6 +88,7 @@ class Mandrill_Mandrill
         if (!ini_get('open_basedir')) {
             curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
         }
+
         curl_setopt($this->ch, CURLOPT_HEADER, false);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 30);
@@ -144,6 +144,7 @@ class Mandrill_Mandrill
             $this->log(stream_get_contents($curl_buffer));
             fclose($curl_buffer);
         }
+
         $this->log('Completed in ' . number_format($time * 1000, 2) . 'ms');
         $this->log('Got response: ' . $response_body);
 
@@ -174,6 +175,7 @@ class Mandrill_Mandrill
                 if ($apikey) return $apikey;
             }
         }
+
         return false;
     }
 

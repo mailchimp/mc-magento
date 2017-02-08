@@ -48,6 +48,7 @@ class Mailchimp_Error extends Exception
                     if (array_key_exists("field", $error) && $error['field']) {
                         $errorDetails .= $error["field"] . " : ";
                     }
+
                     $errorDetails .= $error["message"];
                 }
             }

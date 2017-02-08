@@ -34,13 +34,14 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
                         $parameters = new Varien_Object($message->getMessageParameters());
                         $mailer = $this->getMail($storeId);
-                        $mailer->setFrom($parameters->getFromEmail(),$parameters->getFromName());
+                        $mailer->setFrom($parameters->getFromEmail(), $parameters->getFromName());
                         $mailer->setSubject($parameters->getSubject());
                         if ($parameters->getIsPlain()) {
                             $mailer->setBodyText($message->getMessageBody());
                         } else {
                             $mailer->setBodyHtml($message->getMessageBody());
                         }
+
                         try {
                             foreach ($message->getRecipients() as $recipient) {
                                 list($email, $name, $type) = $recipient;
@@ -54,12 +55,15 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                                         break;
                                 }
                             }
+
                             if ($parameters->getReplyTo() !== null) {
                                 $mailer->setReplyTo($parameters->getReplyTo());
                             }
+
                             if ($parameters->getReturnTo() !== null) {
                                 $mailer->setReturnPath($parameters->getReturnTo());
                             }
+
                             try {
                                 Mage::dispatchEvent(
                                     'fooman_emailattachments_before_send_queue',
@@ -74,6 +78,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                             } catch (Exception $e) {
                                 Mage::logException($e);
                             }
+
                             unset($mailer);
                             $message->setProcessedAt(Varien_Date::formatDate(true));
                             $message->save();
@@ -113,6 +118,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                         if ($parameters->getReplyTo() !== null) {
                             $mailer->setReplyTo($parameters->getReplyTo());
                         }
+
                         if ($parameters->getReturnTo() !== null) {
                             $mailer->setReturnPath($parameters->getReturnTo());
                         }
@@ -139,6 +145,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                 }
             }
         }
+
         return $this;
     }
 
@@ -151,6 +158,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
         if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
             return null;
         }
+
         Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
         $mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
         return $mail;

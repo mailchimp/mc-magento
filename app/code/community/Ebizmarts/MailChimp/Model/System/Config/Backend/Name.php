@@ -12,13 +12,15 @@
  */
 class Ebizmarts_MailChimp_Model_System_Config_Backend_Name extends Mage_Core_Model_Config_Data
 {
-    protected function _afterSave() {
+    protected function _afterSave() 
+    {
         if ($this->isValueChanged()) {
             $name = $this->getValue();
             if ($name == '') {
                 Mage::getConfig()->cleanCache();
                 $name = Mage::app()->getDefaultStoreView()->getWebsite()->getDefaultStore()->getFrontendName();
             }
+
             Mage::helper('mailchimp')->changeName($name);
         }
     }

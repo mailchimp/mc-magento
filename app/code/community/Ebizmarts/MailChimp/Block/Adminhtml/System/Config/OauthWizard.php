@@ -21,6 +21,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_OauthWizard extends Mage
         if (!$this->getTemplate()) {
             $this->setTemplate('ebizmarts/mailchimp/system/config/oauth_wizard.phtml');
         }
+
         return $this;
     }
 

@@ -64,6 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 continue;
             }
         }
+
         return $batchArray;
     }
     protected function _buildNewProductRequest($product,$batchId,$mailchimpStoreId)
@@ -94,12 +95,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $bodyData = $this->_buildProductData($product, false, $variantProducts);
         try {
             $body = json_encode($bodyData);
-
         } catch (Exception $e) {
             //json encode failed
             Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
             return array();
         }
+
         $data = array();
         $data['method'] = "POST";
         $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products";
@@ -137,17 +138,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $productdata['operation_id'] = $batchId . '_' . $parentId;
                 try {
                     $body = json_encode($variendata);
-
                 } catch (Exception $e) {
                     //json encode failed
                     Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed");
                     continue;
                 }
+
                 $productdata['body'] = $body;
                 $operations[] = $productdata;
             }
-
         }
+
         return $operations;
     }
     protected function _buildProductData($product, $isVarient = true, $variants = null)
@@ -177,7 +178,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data["backorders"] = (string)$stock->getBackorders();
 
             $data["visibility"] = $product->getVisibility();
-
         } else {
             //this is for a root product
             if($product->getDescription()) {
@@ -222,6 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($product->getId()!=$item->getProductId()||$product->getTypeId()=='bundle'||$product->getTypeId()=='grouped') {
                 continue;
             }
+
             if ($product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag()) {
                 $data[] = $this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId);
                 $this->_setProductNoError($product);
@@ -232,6 +233,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_saveProduct($product);
             }
         }
+
         return $data;
     }
     protected function _setProductNoError($product)
@@ -244,13 +246,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function _saveProduct($product)
     {
         if($product->dataHasChangedFor('mailchimp_sync_delta')) {
-            $product->getResource()->saveAttribute($product,'mailchimp_sync_delta');
+            $product->getResource()->saveAttribute($product, 'mailchimp_sync_delta');
         }
+
         if($product->dataHasChangedFor('mailchimp_sync_error')) {
-            $product->getResource()->saveAttribute($product,'mailchimp_sync_error');
+            $product->getResource()->saveAttribute($product, 'mailchimp_sync_error');
         }
+
         if($product->dataHasChangedFor('mailchimp_sync_modified')) {
-            $product->getResource()->saveAttribute($product,'mailchimp_sync_modified');
+            $product->getResource()->saveAttribute($product, 'mailchimp_sync_modified');
         }
     }
 
