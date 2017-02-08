@@ -120,7 +120,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         }
                     } elseif (Mage::helper('mailchimp')->getMCIsSyncing()) {
                         $isSyncing = false;
-                        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, $isSyncing);
+                        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSyncing);
                         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 0);
                         Mage::getConfig()->cleanCache();
                     }
