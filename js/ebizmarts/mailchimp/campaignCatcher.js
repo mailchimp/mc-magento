@@ -17,22 +17,21 @@
                 }
             }
             else {
-                if (key=='mc_cid'||(isMailchimp && key=='utm_campaign')) {
+                if (key=='mc_cid') {
                     mc_cid = val;
                 }
             }
         }
 
         if (mc_cid) {
-            createCookie('mailchimp_campaign_id' , mc_cid);
-            createCookie('mailchimp_landing_page', location);
+            Mage.Cookies.set('mailchimp_campaign_id' , mc_cid);
+            Mage.Cookies.set('mailchimp_landing_page', location);
+        }
+        if(isMailchimp) {
+            Mage.cookie.clear('mailchimp_campaign_id');
+            Mage.Cookies.set('mailchimp_landing_page', location);
         }
     }
-
-    function createCookie(name, value) {
-        Mage.Cookies.set(name,value);
-    }
-
     if (document.loaded) {
         getCampaign;
     } else {
