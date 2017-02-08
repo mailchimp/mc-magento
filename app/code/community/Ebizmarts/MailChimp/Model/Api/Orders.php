@@ -74,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "PATCH";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getIncrementId();
+                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $order->getEntityId();
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $order->getEntityId();
                     $batchArray[$this->_counter]['body'] = $orderJson;
 
@@ -325,7 +325,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
         }
         $store = Mage::getModel('core/store')->load($order->getStoreId());
-        $data['order_URL'] = $store->getUrl('sales/order/view/',array(
+        $data['order_url'] = $store->getUrl('sales/order/view/',array(
             'order_id'=>$order->getId(),
             '_nosid' => true,
             '_secure' => true
@@ -446,7 +446,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $jsonData = json_encode($data);
         } catch (Exception $e) {
             //json encode failed
-            Mage::helper('mailchimp')->logError("Order ".$order->getIncrementId()." json encode failed");
+            Mage::helper('mailchimp')->logError("Order ".$order->getEntityId()." json encode failed");
         }
 
         return $jsonData;
