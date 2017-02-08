@@ -25,10 +25,12 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
         if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE)) {
             return parent::send($email, $name, $variables);
         }
+
         if (!$this->isValidForSend()) {
             Mage::logException(new Exception('This letter cannot be sent.')); // translation is intentionally omitted
             return false;
         }
+
         $emails = array_values((array)$email);
         $names = is_array($name) ? $name : (array)$name;
         $names = array_values($names);
@@ -58,6 +60,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
                 $returnPathEmail = null;
                 break;
         }
+
         $mail = $this->getMail();
         $max = count($emails);
         for ($i = 0; $i < $max; $i++) {
@@ -73,6 +76,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
                 );
             }
         }
+
         foreach ($mail->getBcc() as $bcc) {
             $email['to'][] = array(
                 'email' => $bcc,
@@ -92,10 +96,12 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
                 $senderExists = true;
             }
         }
+
         if(!$senderExists)
         {
             $email['from_email'] = Mage::getStoreConfig('trans_email/ident_general/email');
         }
+
         $headers = $mail->getHeaders();
         $headers[] = Mage::helper('mailchimp/mandrill')->getUserAgent();
         $email['headers'] = $headers;
@@ -126,6 +132,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
         if ($att = $mail->getAttachments()) {
             $email['attachments'] = $att;
         }
+
         if ($this->isPlain())
             $email['text'] = $message;
         else
@@ -134,24 +141,28 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
         if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
             $emailQueue = $this->getQueue();
             $emailQueue->setMessageBody($message);
-            $emailQueue->setMessageParameters(array(
+            $emailQueue->setMessageParameters(
+                array(
                 'subject'           => $subject,
                 'return_path_email' => $returnPathEmail,
                 'is_plain'          => $this->isPlain(),
                 'from_email'        => $this->getSenderEmail(),
                 'from_name'         => $this->getSenderName()
-            ))
+                )
+            )
                 ->addRecipients($emails, $names, Mage_Core_Model_Email_Queue::EMAIL_TYPE_TO)
                 ->addRecipients($this->_bccEmails, array(), Mage_Core_Model_Email_Queue::EMAIL_TYPE_BCC);
             $emailQueue->addMessageToQueue();
             return true;
         }
+
         try {
             $result = $mail->messages->send($email);
         } catch (Exception $e) {
             Mage::logException($e);
             return false;
         }
+
         return true;
 
     }
@@ -165,6 +176,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
         if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
             return parent::getMail();
         }
+
         if ($this->_mail) {
             return $this->_mail;
         } else {

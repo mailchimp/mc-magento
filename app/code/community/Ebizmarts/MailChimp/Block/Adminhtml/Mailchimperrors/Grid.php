@@ -82,7 +82,8 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
                 'sortable' => false
             )
         );
-        $this->addColumn('action_donwload', array(
+        $this->addColumn(
+            'action_donwload', array(
                 'header'   => $this->helper('mailchimp')->__('Download Response'),
                 'width'    => 15,
                 'sortable' => false,

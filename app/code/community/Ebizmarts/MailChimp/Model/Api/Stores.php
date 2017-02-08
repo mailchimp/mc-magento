@@ -43,7 +43,6 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             }
 
             return $storeExists;
-
         } else {
             throw new Exception('You must provide a MailChimp API key');
         }
@@ -91,5 +90,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
         $resource = Mage::getResourceModel('mailchimp/synchbatches');
         $connection->update($resource->getMainTable(), array('status'=>'canceled'), "status = 'pending'");
+    }
+    public function modifyName($name)
+    {
+        $api = Mage::helper('mailchimp')->getApi();
+        $storeId = Mage::helper('mailchimp')->getMCStoreId();
+        $api->ecommerce->stores->edit($storeId, $name);
     }
 }

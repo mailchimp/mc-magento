@@ -58,16 +58,18 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $customer->setData("mailchimp_sync_delta", Varien_Date::now());
                 $customer->setData("mailchimp_sync_error", "");
                 $customer->setData("mailchimp_sync_modified", 0);
-                $customer->setMailchimpUpdateObserverRan(true);
-                $customer->save();
+                $this->_saveCustomer($customer);
             }
+
             $counter++;
         }
+
         return $customerArray;
     }
 
     protected function _buildCustomerData($customer)
     {
+        $firstDate = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_FIRSTDATE);
         $data = array();
         $data["id"] = $customer->getId();
         $data["email_address"] = $customer->getEmail() ? $customer->getEmail() : '';
@@ -79,12 +81,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $orderCollection = Mage::getModel('sales/order')->getCollection()
             ->addFieldToFilter('state', 'complete')
             ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
+        if($firstDate) {
+            $orderCollection->addFieldToFilter('created_at', array('from' => $firstDate));
+        }
+
         $totalOrders = 0;
         $totalAmountSpent = 0;
         foreach ($orderCollection as $order) {
             $totalOrders++;
             $totalAmountSpent += (int)$order->getGrandTotal();
         }
+
         $data["orders_count"] = $totalOrders;
         $data["total_spent"] = $totalAmountSpent;
 
@@ -92,25 +99,50 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         foreach ($customer->getAddresses() as $address) {
             //send only first address
             if (!array_key_exists("address", $data)) {
+                $customerAddress = array();
                 $street = $address->getStreet();
-                $data["address"] = array(
-                    "address1" => $street[0] ? $street[0] : "",
-                    "address2" => count($street)>1 ? $street[1] : "",
-                    "city" => $address->getCity() ? $address->getCity() : "",
-                    "province" => $address->getRegion() ? $address->getRegion() : "",
-                    "province_code" => $address->getRegionCode() ? $address->getRegionCode() : "",
-                    "postal_code" => $address->getPostcode(),
-                    "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName(): "",
-                    "country_code" => $address->getCountry() ? $address->getCountry() : ""
-                );
+                if ($street[0]) {
+                    $customerAddress["address1"] = $street[0];
+                }
+
+                if (count($street) > 1) {
+                    $customerAddress["address2"] = $street[1];
+                }
+
+                if ($address->getCity()) {
+                    $customerAddress["city"] = $address->getCity();
+                }
+
+                if ($address->getRegion()) {
+                    $customerAddress["province"] = $address->getRegion();
+                }
+
+                if ($address->getRegionCode()) {
+                    $customerAddress["province_code"] = $address->getRegionCode();
+                }
+
+                if ($address->getPostcode()) {
+                    $customerAddress["postal_code"] = $address->getPostcode();
+                }
+
+                if ($address->getCountry()) {
+                    $customerAddress["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+                    $customerAddress["country_code"] = $address->getCountry();
+                }
+
+                if (count($address)) {
+                    $data["address"] = $customerAddress;
+                }
 
                 //company
                 if ($address->getCompany()) {
                     $data["company"] = $address->getCompany();
                 }
+
                 break;
             }
         }
+
         $mergeFields = $this->getMergeVars($customer);
         if (is_array($mergeFields)) {
             $data = array_merge($mergeFields, $data);
@@ -121,7 +153,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function update($customer)
     {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled()) {
-//        $customer->setData("mailchimp_sync_delta", Varien_Date::now());
             $customer->setData("mailchimp_sync_error", "");
             $customer->setData("mailchimp_sync_modified", 1);
         }
@@ -142,6 +173,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         } else {
             $customer = $object;
         }
+
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
             $chimpTag = $map['mailchimp'];
@@ -164,6 +196,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                                 $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[1])}());
                                             }
                                         }
+
                                         if ($address) {
                                             $street = $address->getStreet();
                                             $mergeVars[$key] = array(
@@ -199,6 +232,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                         }
                                         break;
                                 }
+
 //                            }
                         } else {
                             switch ($attributeCode) {
@@ -222,6 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                     } else {
                                         $firstName = $customer->getFirstname();
                                     }
+
                                     if ($firstName) {
                                         $mergeVars[$key] = $firstName;
                                     }
@@ -232,6 +267,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                     } else {
                                         $lastName = $customer->getLastname();
                                     }
+
                                     if ($lastName) {
                                         $mergeVars[$key] = $lastName;
                                     }
@@ -239,6 +275,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                         }
                     }
                 }
+
                 switch ($customAtt) {
                     case 'billing_company':
                     case 'shipping_company':
@@ -249,6 +286,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                 $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
                             }
                         }
+
                         if ($address) {
                             $company = $address->getCompany();
                             if ($company) {
@@ -265,6 +303,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                 $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
                             }
                         }
+
                         if ($address) {
                             $telephone = $address->getTelephone();
                             if ($telephone) {
@@ -281,6 +320,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                 $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
                             }
                         }
+
                         if ($address) {
                             $countryCode = $address->getCountry();
                             if ($countryCode) {
@@ -298,6 +338,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                 $address = Mage::getModel('customer/address')->load($customer->{'getDefault' . ucfirst($addr[0])}());
                             }
                         }
+
                         if ($address) {
                             $zipCode = $address->getPostcode();
                             if ($zipCode) {
@@ -308,10 +349,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 }
             }
         }
+
         return (!empty($mergeVars)) ? $mergeVars : null;
     }
 
-    public function createGuestCustomer($guestId, $order) {
+    public function createGuestCustomer($guestId, $order) 
+    {
         $guestCustomer = Mage::getModel('customer/customer')->setId($guestId);
         foreach ($order->getData() as $key => $value) {
             $keyArray = explode('_', $key);
@@ -319,15 +362,32 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $guestCustomer->{'set' . ucfirst($keyArray[1])}($value);
             }
         }
+
         return $guestCustomer;
     }
 
-    public function getOptin() {
+    public function getOptin() 
+    {
         if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMERS_OPTIN, 0)) {
             $optin = true;
         } else {
             $optin = false;
         }
+
         return $optin;
+    }
+    protected function _saveCustomer($customer)
+    {
+        if($customer->dataHasChangedFor('mailchimp_sync_delta')) {
+            $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_delta');
+        }
+
+        if($customer->dataHasChangedFor('mailchimp_sync_error')) {
+            $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_error');
+        }
+
+        if($customer->dataHasChangedFor('mailchimp_sync_modified')) {
+            $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_modified');
+        }
     }
 }

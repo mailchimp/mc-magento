@@ -10,7 +10,7 @@
  * @date: 5/27/16 1:50 PM
  * @file: EcommerceController.php
  */
-class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
+class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
 {
     public function resetLocalErrorsAction()
     {
@@ -21,6 +21,7 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         {
             $result = 0;
         }
+
         Mage::app()->getResponse()->setBody($result);
     }
     public function resetEcommerceDataAction()
@@ -28,6 +29,7 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $result = 1;
         try {
             Mage::helper('mailchimp')->resetMCEcommerceData(true);
+            Mage::helper('mailchimp')->resetErrors();
         }
         catch(Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
@@ -36,6 +38,7 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         catch(Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
+
         Mage::app()->getResponse()->setBody($result);
     }
 
@@ -52,6 +55,7 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         catch(Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
         }
+
         Mage::app()->getResponse()->setBody($result);
     }
 
@@ -64,6 +68,7 @@ class Ebizmarts_Mailchimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
                 $acl = 'system/config/mailchimp';
                 break;
         }
+
         return Mage::getSingleton('admin/session')->isAllowed($acl);
     }
 }

@@ -165,7 +165,7 @@ class Mailchimp_ListsMembers extends Mailchimp_Abstract
     public function addOrUpdate($listId, $subscriberHash, $emailAddress, $statusIfNew, $emailType=null, $status=null,
                                 $mergeFields=null, $interests=null, $language=null, $vip=null, $location=null)
     {
-        $_params = array('status'=>$statusIfNew,'email_address'=>$emailAddress);
+        $_params = array('status_if_new'=>$statusIfNew,'email_address'=>$emailAddress);
         if($emailType) $_params['email_type'] = $emailType;
         if($status) $_params['status'] = $status;
         if($mergeFields) $_params['merge_fields'] = $mergeFields;

@@ -38,6 +38,7 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Admi
                 $displayText = $this->__('Something went wrong when retrieving original item.');
                 break;
         }
+
         return $displayText;
     }
 }

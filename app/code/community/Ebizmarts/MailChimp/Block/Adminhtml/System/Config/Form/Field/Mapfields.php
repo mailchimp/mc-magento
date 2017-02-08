@@ -43,6 +43,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
                 $this->_customerAttributes[$option['attribute_id']] = $option['frontend_label'];
             }
         }
+
         $customFieldTypes = unserialize(
             Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS)
         );
@@ -53,6 +54,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
                 $this->_customerAttributes[$value] = $label;
             }
         }
+
         ksort($this->_customerAttributes);
     }
 
@@ -61,6 +63,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
         if (empty($this->_columns[$columnName])) {
             throw new Exception('Wrong column name specified.');
         }
+
         $column = $this->_columns[$columnName];
         $inputName = $this->getElement()->getName() . '[#{_id}][' . $columnName . ']';
 
@@ -69,18 +72,22 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
             foreach ($this->_customerAttributes as $att => $name) {
                 $rendered .= '<option value="' . $att . '">' . $name . '</option>';
             }
+
             $rendered .= '</select>';
         } else {
             return '<input type="text" name="' . $inputName . '" value="#{' . $columnName . '}" ' . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';
         }
+
         return $rendered;
     }
     
-    protected function _getMailChimpValue(){
+    protected function _getMailChimpValue()
+    {
         return Mage::getSingleton('core/session')->getMailchimpValue();
     }
 
-    protected function _getMailChimpLabel(){
+    protected function _getMailChimpLabel()
+    {
         return Mage::getSingleton('core/session')->getMailchimpLabel();
     }
 }

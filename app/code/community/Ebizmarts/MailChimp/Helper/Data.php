@@ -30,6 +30,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $websiteId = Mage::getModel('core/website')->load($code)->getId();
             $storeId = Mage::app()->getWebsite($websiteId)->getDefaultStore()->getId();
         }
+
         $scopeArray['websiteId'] = $websiteId;
         $scopeArray['storeId'] = $storeId;
         return $scopeArray;
@@ -55,6 +56,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $scopeArray['storeId'] = $storeId;
         }
+
         if (!$returnParentValueIfNull) {
             if (isset($scopeArray['websiteId']) && $scopeArray['websiteId']) {
                 //Website scope
@@ -73,6 +75,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
         return $configValue;
     }
 
@@ -83,7 +86,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCStoreName()
     {
-        return parse_url(Mage::getBaseUrl(), PHP_URL_HOST);
+        $storeView = Mage::app()->getDefaultStoreView();
+        return $storeView->getWebsite()->getDefaultStore()->getFrontendName();
     }
 
     /**
@@ -133,12 +137,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } catch(Mailchimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             }
+
             //clear store config values
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
+
         if ($ecommerceEnabled && $apikey && $listId) {
             $this->createStore($listId);
         }
+
         //reset mailchimp minimum date to sync flag
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG, Varien_Date::now());
         Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 1);
@@ -185,7 +192,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } else {
                 $logDir  = Mage::getBaseDir('var') . DS . 'log';
                 $fileName = $logDir.DS.$batchId.'.Request.log';
-                file_put_contents($fileName,$message);
+                file_put_contents($fileName, $message);
             }
         }
     }
@@ -216,8 +223,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($collection as $product) {
             $product->setData("mailchimp_sync_delta", null);
             $product->setData("mailchimp_sync_error", '');
-            $product->setMailchimpUpdateObserverRan(true);
-            $product->save();
+            $resource = $product->getResource();
+            $resource->saveAttribute($product, 'mailchimp_sync_delta');
+            $resource->saveAttribute($product, 'mailchimp_sync_error');
+//            $product->setMailchimpUpdateObserverRan(true);
+//            $product->save();
         }
 
         // reset subscribers with errors
@@ -240,8 +250,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($collection as $customer) {
             $customer->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
             $customer->setData("mailchimp_sync_error", '');
-            $customer->setMailchimpUpdateObserverRan(true);
-            $customer->save();
+            $resource = $customer->getResource();
+            $resource->saveAttribute($customer, 'mailchimp_sync_delta');
+            $resource->saveAttribute($customer, 'mailchimp_sync_error');
+//            $customer->setMailchimpUpdateObserverRan(true);
+//            $customer->save();
         }
 
         // reset orders with errors
@@ -301,6 +314,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } catch (Mailchimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             }
+
             //clear store config values
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID);
         }
@@ -320,6 +334,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } catch (Mailchimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
             }
+
             if (count($mailchimpFields) > 0) {
                 foreach ($maps as $map) {
                     $customAtt = $map['magento'];
@@ -331,6 +346,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $alreadyExists = true;
                         }
                     }
+
                     if (!$alreadyExists) {
                         foreach ($customFieldTypes as $customFieldType) {
                             if ($customFieldType['value'] == $chimpTag) {
@@ -339,9 +355,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 } catch (Mailchimp_Error $e) {
                                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
                                 }
+
                                 $created = true;
                             }
                         }
+
                         if (!$created) {
                             $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
                                 ->setEntityTypeFilter(1)
@@ -353,6 +371,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                     $label = $option['frontend_label'];
                                 }
                             }
+
                             try {
                                 if ($label) {
                                     //Shipping and Billing Address
@@ -391,6 +410,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($apiKey != null && $apiKey != "") {
             $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         }
+
         return $api;
+    }
+    public function changeName($name)
+    {
+        if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)) {
+            try {
+                Mage::getModel('mailchimp/api_stores')->modifyName($name);
+            } catch (Mailchimp_Error $e) {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            }
+        }
     }
 }

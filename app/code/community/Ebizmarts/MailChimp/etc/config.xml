@@ -3,14 +3,22 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.3</version>
+            <version>1.1.5</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.3</version>
+            <version>1.1.5</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
         <events>
+            <store_group_save>
+                <observers>
+                    <mailchimp_change_store_name>
+                        <class>mailchimp/observer</class>
+                        <method>changeStoreName</method>
+                    </mailchimp_change_store_name>
+                </observers>
+            </store_group_save>
             <newsletter_subscriber_save_before>
                 <observers>
                     <mailchimp_subscribe_observer>
@@ -35,14 +43,6 @@
                     </mailchimp_subscribe_checkout_before>
                 </observers>
             </sales_order_place_before>
-            <sales_order_place_after>
-                <observers>
-                    <mailchimp_subscribe_checkout_after>
-                        <class>mailchimp/observer</class>
-                        <method>removeCampaignData</method>
-                    </mailchimp_subscribe_checkout_after>
-                </observers>
-            </sales_order_place_after>
             <customer_save_before>
                 <observers>
                     <mailchimp_save_before_customer>
@@ -52,6 +52,46 @@
                     </mailchimp_save_before_customer>
                 </observers>
             </customer_save_before>
+            <sales_order_save_before>
+                <observers>
+                    <mailchimp_save_before_order>
+                        <class>mailchimp/observer</class>
+                        <method>orderSaveBefore</method>
+                    </mailchimp_save_before_order>
+                </observers>
+            </sales_order_save_before>
+            <sales_order_place_after>
+                <observers>
+                    <mailchimp_new_order>
+                        <class>mailchimp/observer</class>
+                        <method>newOrder</method>
+                    </mailchimp_new_order>
+                </observers>
+            </sales_order_place_after>
+            <sales_order_creditmemo_refund>
+                <observers>
+                    <mailchimp_creditmemo_refund>
+                        <class>mailchimp/observer</class>
+                        <method>newCreditmemo</method>
+                    </mailchimp_creditmemo_refund>
+                </observers>
+            </sales_order_creditmemo_refund>
+            <sales_order_creditmemo_cancel>
+                <observers>
+                    <mailchimp_creditmemo_cancel>
+                        <class>mailchimp/observer</class>
+                        <method>cancelCreditmemo</method>
+                    </mailchimp_creditmemo_cancel>
+                </observers>
+            </sales_order_creditmemo_cancel>
+            <sales_order_item_cancel>
+                <observers>
+                    <mailchimp_item_cancel>
+                        <class>mailchimp/observer</class>
+                        <method>itemCancel</method>
+                    </mailchimp_item_cancel>
+                </observers>
+            </sales_order_item_cancel>
         </events>
         <models>
             <mailchimp>
@@ -120,6 +160,9 @@
                 <mailchimp_campaign_id>
                     <to_order>*</to_order>
                 </mailchimp_campaign_id>
+                <mailchimp_landing_page>
+                    <to_order>*</to_order>
+                </mailchimp_landing_page>
             </sales_convert_quote>
         </fieldsets>
     </global>
