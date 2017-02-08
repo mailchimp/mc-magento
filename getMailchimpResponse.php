@@ -1,8 +1,8 @@
 <?php
 
 if ($argc!=3) {
-    echo "You must call like:\n\t getMailchimpResponse apikey batchid\n";
-    exit;
+    printf("You must call like:\n\t getMailchimpResponse apikey batchid\n");
+    return;
 }
 $apiKey = $argv[1];
 $batchId = $argv[2];
@@ -41,7 +41,7 @@ $err = curl_error($curl);
 curl_close($curl);
 
 if ($err) {
-    echo "cURL Error #:" . $err;
+    printf("cURL Error #:" . $err);
 } else {
     $jsonResponse = json_decode($response);
     if ($jsonResponse->status == 'finished') {
@@ -57,9 +57,9 @@ if ($err) {
             $r = curl_exec($ch);
             curl_close($ch);
             fclose($fd);
-            echo "$batchId.response.tar.gz\n";
+            printf("$batchId.response.tar.gz\n");
         } catch(Exception $e) {
-            echo $e->getMessage();
+            printf($e->getMessage());
         }
     }
 //    else {
