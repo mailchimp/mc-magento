@@ -23,12 +23,12 @@
             }
         }
 
-        if (mc_cid) {
+        if (mc_cid&&!isMailchimp) {
             Mage.Cookies.set('mailchimp_campaign_id' , mc_cid);
             Mage.Cookies.set('mailchimp_landing_page', location);
         }
         if(isMailchimp) {
-            Mage.cookie.clear('mailchimp_campaign_id');
+            Mage.Cookies.clear('mailchimp_campaign_id');
             Mage.Cookies.set('mailchimp_landing_page', location);
         }
     }
