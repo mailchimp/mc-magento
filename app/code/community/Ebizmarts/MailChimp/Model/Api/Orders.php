@@ -92,7 +92,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 Mage::helper('mailchimp')->logError($e->getMessage());
             }
         }
-
         return $batchArray;
     }
 
