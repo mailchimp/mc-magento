@@ -18,6 +18,11 @@ Magento Community Edition (1.7 or above) or Magento Enterprise (1.11 or above)
 
 To get a copy of the project up and running on your local machine for development and testing purposes, just clone this repository on your Magento’s root directory and flush the Magento’s cache.
 
+Alternatively, use modman to install this module. 
+
+``modman clone https://github.com/mailchimp/mc-magento.git -b 'master'``
+
+
 ## Module Configuriation
 
 To enable MailChimp For Magento:
