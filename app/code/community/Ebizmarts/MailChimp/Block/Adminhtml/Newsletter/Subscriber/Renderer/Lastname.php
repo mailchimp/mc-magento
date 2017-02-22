@@ -13,9 +13,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Newsletter_Subscriber_Renderer_Lastnam
         $subscriberLastName = $row->getData('subscriber_lastname');
         $customerLastName = $row->getData('customer_lastname');
         if ($customerLastName) {
-            return $customerLastName;
+            return $this->escapeHtml($customerLastName);
         } elseif ($subscriberLastName) {
-            return $subscriberLastName;
+            return $this->escapeHtml($subscriberLastName);
         } else {
             return '----';
         }
