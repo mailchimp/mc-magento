@@ -1,6 +1,5 @@
 <?php
-// This is an external library.
-// @codingStandardsIgnoreStart
+
 class Mandrill_Error extends Exception
 {
 }
@@ -211,5 +210,4 @@ class Mandrill_Metadata_FieldLimit extends Mandrill_Error
 class Mandrill_Unknown_MetadataField extends Mandrill_Error
 {
 }
-// @codingStandardsIgnoreEnd
 
