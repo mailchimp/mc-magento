@@ -10,7 +10,7 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Ebizmarts_MailChimp_Model_Api_subscribers
+class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
