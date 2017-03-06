@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Helper_Oauth2 extends Mage_Core_Helper_Abstract
 
     protected $_authorizeUri = "https://login.mailchimp.com/oauth2/authorize";
     protected $_accessTokenUri = "https://login.mailchimp.com/oauth2/token";
-    protected $_redirectUri = "http://ebizmarts.com/magento/mc-magento/oauth2/complete.php";
+    protected $_redirectUri = "https://ebizmarts.com/magento/mc-magento/oauth2/complete.php";
     protected $_clientId = 200573319150;
 
     public function authorizeRequestUrl()
