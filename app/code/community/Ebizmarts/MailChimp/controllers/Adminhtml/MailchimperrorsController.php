@@ -21,17 +21,20 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         $this->_setActiveMenu('newsletter/mailchimp');
         $this->renderLayout();
     }
+
     public function gridAction()
     {
         $this->loadLayout(false);
         $this->renderLayout();
     }
+
     public function downloadresponseAction()
     {
         $batch_id = $this->getRequest()->getParam('batch_id');
         $this->getResponse()->setHeader('Content-disposition', 'attachment; filename='.$batch_id.'.json');
         $this->getResponse()->setHeader('Content-type', 'application/json');
-        $files = Mage::getModel('mailchimp/api_batches')->getBatchResponse($batch_id);
+//        $files = Mage::getModel('mailchimp/api_batches')->getBatchResponse($batch_id);
+        $files = array();
         $fileContent = array();
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));

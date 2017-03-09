@@ -15,25 +15,29 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
     protected function _beforeSave()
     {
         $groups = $this->getData('groups');
-        $active = $groups['ecommerce']['fields']['active']['value'];
-
-        if ($this->isValueChanged()&&$active) {
-            if ($this->getScope()=='default') {
-                if ($this->getOldValue()) {
-                    Mage::helper('mailchimp')->deleteStore();
-                    Mage::helper('mailchimp')->resetErrors();
-                    Mage::helper('mailchimp')->resetCampaign();
-                }
+        $active = (isset($groups['ecommerce']['fields']['active']['value'])) ? $groups['ecommerce']['fields']['active']['value'] : null;
+        if ($active === null) {
+            $active = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
+        }
+        
+        if ($this->isValueChanged() && $active) {
+            if ($this->getOldValue()) {
+                Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
+                Mage::helper('mailchimp')->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
+                Mage::helper('mailchimp')->resetCampaign($this->getScopeId(), $this->getScope());
+                Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
             }
         }
     }
     protected function _afterSave()
     {
         $groups = $this->getData('groups');
-        $active = $groups['ecommerce']['fields']['active']['value'];
-
+        $active = (isset($groups['ecommerce']['fields']['active']['value'])) ? $groups['ecommerce']['fields']['active']['value'] : null;
+        if ($active === null) {
+            $active = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
+        }
         if ($this->isValueChanged() && $active) {
-            Mage::helper('mailchimp')->createStore($this->getValue());
+            Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }
     }
 }

@@ -16,11 +16,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
     protected function _afterSave()
     {
         $groups = $this->getData('groups');
-        $active = $groups['general']['fields']['active']['value'];
-        $storeId = Mage::helper('mailchimp')->getMCStoreId();
+        $active = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : null;
+        $storeId = Mage::helper('mailchimp')->getMCStoreId($this->getScopeId(), $this->getScope());
+        if ($active === null) {
+            $active = Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
+        }
 
-        if ($this->isValueChanged()&&$active&&!$storeId&&$this->getValue()) {
-            Mage::helper('mailchimp')->createStore($this->getValue());
+        if ($this->isValueChanged() && $active && !$storeId && $this->getValue()) {
+            Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }
     }
 }

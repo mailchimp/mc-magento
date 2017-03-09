@@ -69,6 +69,13 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
+            'store_id', array(
+                'header' => Mage::helper('mailchimp')->__('Store Id'),
+                'index' => 'store_id',
+                'sortable' => false
+            )
+        );
+        $this->addColumn(
             'errors', array(
                 'header' => Mage::helper('mailchimp')->__('Error'),
                 'index'  => 'errors',

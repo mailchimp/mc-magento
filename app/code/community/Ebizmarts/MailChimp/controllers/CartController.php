@@ -21,12 +21,15 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
         if (isset($params['id'])) {
             //restore the quote
             $quote = Mage::getModel('sales/quote')->load($params['id']);
-            $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $quote->getStoreId()));
+            $storeId = $quote->getStoreId();
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
+            $quoteSyncData = Mage::helper('mailchimp')->getEcommerceSyncData($params['id'], Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId);
+            $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $storeId));
             if (isset($params['mc_cid'])) {
                 $url .= '?mc_cid='.$params['mc_cid'];
             }
 
-            if ((!isset($params['token']) || (isset($params['token']) && $params['token'] != $quote->getMailchimpToken()))) {
+            if ((!isset($params['token']) || (isset($params['token']) && $params['token'] != $quoteSyncData->getMailchimpToken()))) {
                 Mage::getSingleton('customer/session')->addNotice("Your token cart is incorrect");
                 $this->_redirect($url);
             } else {

@@ -39,7 +39,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
     }
     public function getAjaxCheckUrl()
     {
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetEcommerceData');
+        $scopeString = Mage::helper('mailchimp')->getScopeString();
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetEcommerceData', array('scope' => $scopeString));
     }
 
 }

@@ -159,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
             return null;
         }
 
-        Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
+        Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId), $storeId);
         $mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
         return $mail;
     }

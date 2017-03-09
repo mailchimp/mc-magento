@@ -25,17 +25,16 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
         $label = $postData['label'];
         $value = $postData['value'];
         $fieldType = $postData['fieldtype'];
-        $customFieldTypes = unserialize(
-            Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS)
-        );
+        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
+        $customFieldTypes = unserialize(Mage::helper('mailchimp')->getCustomMapFields($scopeArray[1], $scopeArray[0]));
 
         if(!$customFieldTypes){
             $customFieldTypes = array();
         }
 
         $customFieldTypes[] = array('label' => $label, 'value' => $value, 'field_type' => $fieldType);
-        Mage::getConfig()->saveConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS, serialize($customFieldTypes));
-        Mage::getConfig()->cleanCache();
+        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS, serialize($customFieldTypes)));
+        Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeArray[1], $scopeArray[0]);
         Mage::getSingleton('core/session')->setMailChimpValue($value);
         Mage::getSingleton('core/session')->setMailChimpLabel($label);
         Mage::getSingleton('adminhtml/session')->addSuccess($this->__('The custom value was added successfully.'));

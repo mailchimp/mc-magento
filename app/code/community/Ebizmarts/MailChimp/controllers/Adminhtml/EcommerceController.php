@@ -14,9 +14,11 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 {
     public function resetLocalErrorsAction()
     {
+        $param = Mage::app()->getRequest()->getParam('scope');
+        $scopeArray = explode('-', $param);
         $result = 1;
         try {
-            Mage::helper('mailchimp')->resetErrors();
+            Mage::helper('mailchimp')->resetErrors($scopeArray[1], $scopeArray[0]);
         } catch(Exception $e)
         {
             $result = 0;
@@ -26,17 +28,19 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     }
     public function resetEcommerceDataAction()
     {
+        $param = Mage::app()->getRequest()->getParam('scope');
+        $scopeArray = explode('-', $param);
         $result = 1;
         try {
-            Mage::helper('mailchimp')->resetMCEcommerceData(true);
-            Mage::helper('mailchimp')->resetErrors();
+            Mage::helper('mailchimp')->resetMCEcommerceData($scopeArray[1], $scopeArray[0], true);
+            Mage::helper('mailchimp')->resetErrors($scopeArray[1], $scopeArray[0]);
         }
         catch(Mailchimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
             $result = 0;
         }
         catch(Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
         }
 
         Mage::app()->getResponse()->setBody($result);
@@ -44,16 +48,18 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 
     public function createMergeFieldsAction()
     {
+        $param = Mage::app()->getRequest()->getParam('scope');
+        $scopeArray = explode('-', $param);
         $result = 1;
         try {
-            Mage::helper('mailchimp')->createMergeFields();
+            Mage::helper('mailchimp')->createMergeFields($scopeArray[1], $scopeArray[0]);
         }
         catch(Mailchimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
             $result = 0;
         }
         catch(Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage());
+            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
         }
 
         Mage::app()->getResponse()->setBody($result);

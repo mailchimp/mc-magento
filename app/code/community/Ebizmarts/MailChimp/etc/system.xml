@@ -61,9 +61,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                             <comment><![CDATA[Please click the button below to get your API key.]]></comment>
                         </apikey>
                         <oauth_wizard translate="button_label">
@@ -74,9 +71,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </oauth_wizard>
                         <account_details translate="label comment">
                             <label>Account details</label>
@@ -86,9 +80,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </account_details>
                         <list translate="label comment">
                             <label>General Subscription</label>
@@ -99,9 +90,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list.]]></comment>
                         </list>
@@ -111,22 +99,22 @@
                             <frontend_model>mailchimp/adminhtml_system_config_resetList</frontend_model>
                             <sort_order>52</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
+                            <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Warning, read the manual before change the list.]]></comment>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </reset_list>
                         <map_fields translate="label comment">
                             <label>Customer Fields Mapping</label>
                             <frontend_model>mailchimp/adminhtml_system_config_form_field_mapfields</frontend_model>
-                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <backend_model>mailchimp/system_config_backend_mapfield</backend_model>
                             <sort_order>55</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                             <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected MailChimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
                         </map_fields>
                         <create_fields translate="label comment">
                             <label>Create Merge Fields on MailChimp</label>
@@ -134,8 +122,8 @@
                             <frontend_model>mailchimp/adminhtml_system_config_createMergeFields</frontend_model>
                             <sort_order>57</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                             <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
                             <depends>
                                 <active>1</active>
@@ -149,11 +137,11 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only]]></comment>
                             <depends>
                                 <active>1</active>
                             </depends>
-                            <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only]]></comment>
                         </webhook_active>
                         <webhook_delete translate="label comment">
                             <label>Webhooks Delete action</label>
@@ -163,10 +151,10 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment></comment>
                             <depends>
                                 <active>1</active>
                             </depends>
-                            <comment></comment>
                         </webhook_delete>
                         <enable_log translate="label comment">
                             <label>Enable Log</label>
@@ -174,12 +162,12 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>80</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>File is {{base_dir}}/var/log/MailChimp_ApiCall.log</comment>
                             <depends>
                                 <active>1</active>
                             </depends>
-                            <comment>File is {{base_dir}}/var/log/MailChimp_ApiCall.log</comment>
                         </enable_log>
                         <monkey_grid translate="label comment">
                             <label>Display icon for MailChimp orders grid</label>
@@ -200,8 +188,8 @@
                     <sort_order>200</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label">
                             <label>Enabled</label>
@@ -209,8 +197,8 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>205</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                             <comment><![CDATA[Available only for MailChimp paid accounts.]]></comment>
                         </active>
                         <customers_optin translate="label">
@@ -219,8 +207,11 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>208</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
                         </customers_optin>
                         <firstdate translate="label">
                             <label>First date</label>
@@ -236,13 +227,13 @@
                             </depends>
                         </firstdate>
                         <reset_errors translate="label comment">
-                            <label>Reset Products</label>
+                            <label>Reset Errors</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
                             <sort_order>210</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                             <depends>
                                 <active>1</active>
                             </depends>
@@ -253,8 +244,8 @@
                             <frontend_model>mailchimp/adminhtml_system_config_resetEcommerceData</frontend_model>
                             <sort_order>220</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
                             <depends>
                                 <active>1</active>
                             </depends>
@@ -416,8 +407,8 @@
                     <sort_order>500</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
                     <fields>
                         <active translate="label">
                             <label>Enabled</label>
@@ -510,7 +501,7 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
+                            <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>File is {{base_dir}}/var/log/Ebizmarts_Mandrill.log</comment>
                             <depends>

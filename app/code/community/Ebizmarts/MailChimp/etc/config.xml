@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.5</version>
+            <version>1.1.6</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.5</version>
+            <version>1.1.6</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -92,6 +92,22 @@
                     </mailchimp_item_cancel>
                 </observers>
             </sales_order_item_cancel>
+            <catalog_product_attribute_update_before>
+                <observers>
+                    <mailchimp_product_attribute_update_after>
+                        <class>mailchimp/observer</class>
+                        <method>productAttributeUpdate</method>
+                    </mailchimp_product_attribute_update_after>
+                </observers>
+            </catalog_product_attribute_update_before>
+            <catalog_product_website_update>
+                <observers>
+                    <mailchimp_product_website_update>
+                        <class>mailchimp/observer</class>
+                        <method>productWebsiteUpdate</method>
+                    </mailchimp_product_website_update>
+                </observers>
+            </catalog_product_website_update>
         </events>
         <models>
             <mailchimp>
@@ -107,6 +123,9 @@
                     <mailchimperrors>
                         <table>mailchimp_errors</table>
                     </mailchimperrors>
+                    <ecommercesyncdata>
+                        <table>mailchimp_ecommerce_sync_data</table>
+                    </ecommercesyncdata>
                 </entities>
             </mailchimp_mysql4>
             <newsletter>

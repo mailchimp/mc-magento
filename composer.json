@@ -12,5 +12,11 @@
     ],
     "require": {
         "magento-hackathon/magento-composer-installer": "*"
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.firegento.com"
+        }
+    ]
 }
