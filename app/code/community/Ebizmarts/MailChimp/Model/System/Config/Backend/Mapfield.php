@@ -24,8 +24,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield extends Mage_Admi
             $unserializedValue = false;
             if (!empty($serializedValue)) {
                 try {
-                    $unserializedValue = Mage::helper('core/unserializeArray')
-                        ->unserialize($serializedValue);
+                    $unserializedValue = unserialize($serializedValue);
                 } catch (Exception $e) {
                     Mage::logException($e);
                 }
