@@ -48,8 +48,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
      */
     public function getMessage()
     {
-        return __(Mage::getStoreConfig(Mage::helper('mailchimp')->__('Are you sure you want to delete the current MailChimp store and create a new one?
-                                                                    \nAutomations created for this store will need to be re-created.')));
+        return __(Mage::getStoreConfig(Mage::helper('mailchimp')->__("Are you sure you want to delete the current MailChimp store and create a new one?
+                                                                    \nAutomations created for this store will need to be re-created.")));
     }
 
     public function getAjaxCheckUrl()
