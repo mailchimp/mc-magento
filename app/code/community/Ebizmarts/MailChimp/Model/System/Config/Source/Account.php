@@ -103,11 +103,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     )
                 );
             } elseif (Mage::helper('mailchimp')->isEcomSyncDataEnabled($scopeArray[1], $scopeArray[0], true)) {
-                $title = Mage::helper('mailchimp')->__('No MailChimp store was created for this scope, parent scopes might be sending data for this store anyways.');
+                $noStoreText = Mage::helper('mailchimp')->__('No MailChimp store was created for this scope, parent scopes might be sending data for this store anyways.');
+                $newStoreText = Mage::helper('mailchimp')->__('You can create a new MailChimp store for this scope by configuring a new list for this scope.');
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 7, 'label' => $title)
+                        array('value' => 7, 'label' => $noStoreText),
+                        array('value' => 8, 'label' => $newStoreText)
                     )
                 );
             }
