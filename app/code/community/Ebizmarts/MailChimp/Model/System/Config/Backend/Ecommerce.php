@@ -12,17 +12,25 @@
  */
 class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Core_Model_Config_Data
 {
-
     protected function _afterSave()
     {
         $groups = $this->getData('groups');
-        $active = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : null;
-        $storeId = Mage::helper('mailchimp')->getMCStoreId($this->getScopeId(), $this->getScope());
-        if ($active === null) {
-            $active = Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
+        //If settings are inherited get from config.
+        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
+        if (isset($groups['general']['fields']['list']) && isset($groups['general']['fields']['list']['value'])) {
+            $listId = $groups['general']['fields']['list']['value'];
+        } else {
+            $listId = Mage::helper('mailchimp')->getGeneralList($this->getScopeId(), $this->getScope());
         }
+        $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($this->getScopeId(), $this->getScope());
 
-        if ($this->isValueChanged() && $active && !$storeId && $this->getValue()) {
+        if ($thisScopeHasMCStoreId && (!$this->getValue() || !$moduleIsActive || !$listId)) {
+            Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->resetCampaign($this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
+        }
+        if ($moduleIsActive && $listId && $this->getValue() && !$thisScopeHasMCStoreId) {
             Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }
     }

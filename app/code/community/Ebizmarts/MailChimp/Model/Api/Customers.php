@@ -93,52 +93,49 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["total_spent"] = $totalAmountSpent;
 
         //addresses data
-        foreach ($customer->getAddresses() as $address) {
-            //send only first address
-            if (!array_key_exists("address", $data)) {
-                $customerAddress = array();
-                $street = $address->getStreet();
-                if ($street[0]) {
-                    $customerAddress["address1"] = $street[0];
-                }
+        $address = $customer->getDefaultBillingAddresses();
+        if ($address) {
+            $customerAddress = array();
+            $street = $address->getStreet();
+            if ($street[0]) {
+                $customerAddress["address1"] = $street[0];
+            }
 
-                if (count($street) > 1 && $street[1]) {
-                    $customerAddress["address2"] = $street[1];
-                }
+            if (count($street) > 1 && $street[1]) {
+                $customerAddress["address2"] = $street[1];
+            }
 
-                if ($address->getCity()) {
-                    $customerAddress["city"] = $address->getCity();
-                }
+            if ($address->getCity()) {
+                $customerAddress["city"] = $address->getCity();
+            }
 
-                if ($address->getRegion()) {
-                    $customerAddress["province"] = $address->getRegion();
-                }
+            if ($address->getRegion()) {
+                $customerAddress["province"] = $address->getRegion();
+            }
 
-                if ($address->getRegionCode()) {
-                    $customerAddress["province_code"] = $address->getRegionCode();
-                }
+            if ($address->getRegionCode()) {
+                $customerAddress["province_code"] = $address->getRegionCode();
+            }
 
-                if ($address->getPostcode()) {
-                    $customerAddress["postal_code"] = $address->getPostcode();
-                }
+            if ($address->getPostcode()) {
+                $customerAddress["postal_code"] = $address->getPostcode();
+            }
 
-                if ($address->getCountry()) {
-                    $customerAddress["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
-                    $customerAddress["country_code"] = $address->getCountry();
-                }
+            if ($address->getCountry()) {
+                $customerAddress["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+                $customerAddress["country_code"] = $address->getCountry();
+            }
 
-                if (count($customerAddress)) {
-                    $data["address"] = $customerAddress;
-                }
+            if (count($customerAddress)) {
+                $data["address"] = $customerAddress;
+            }
 
-                //company
-                if ($address->getCompany()) {
-                    $data["company"] = $address->getCompany();
-                }
-
-                break;
+            //company
+            if ($address->getCompany()) {
+                $data["company"] = $address->getCompany();
             }
         }
+
         $mergeFields = $this->getMergeVars($customer);
         if (is_array($mergeFields)) {
             $data = array_merge($mergeFields, $data);

@@ -180,6 +180,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Remove local store_id value of the MC store for given scope.
+     *
+     * @param $scopeId
+     * @param null $scope
+     * @return mixed
+     */
+    public function deleteLocalMCStoreData($scopeId, $scope = null)
+    {
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
+        Mage::getConfig()->cleanCache();
+    }
+
+    /**
      * Return if Ecommerce configuration is enabled for given scope.
      *
      * @param $scopeId
@@ -436,6 +450,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 Mage::log($message, null, 'MailChimp_Requests.log', true);
             } else {
                 $logDir  = Mage::getBaseDir('var') . DS . 'log';
+                if (!file_exists($logDir)) {
+                    mkdir($logDir, 0750);
+                }
+                $logDir  .= DS . 'MailChimp_Requests';
+                if (!file_exists($logDir)) {
+                    mkdir($logDir, 0750);
+                }
                 $fileName = $logDir.DS.$batchId.'.Request.log';
                 $oldPermission = umask(0046);
                 file_put_contents($fileName, $message);
@@ -533,7 +554,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $listId
      * @param $scopeId
      * @param $scope
-     * @param bool $clearConfig
      */
     public function createStore($listId, $scopeId, $scope)
     {
@@ -575,8 +595,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             //clear store config values
-            Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
-            Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1, $scope, $scopeId);
+            $this->deleteLocalMCStoreData($scopeId, $scope);
         }
     }
 
@@ -820,21 +839,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get actual scope where the MailChimp store was created if exists.
      *
-     * @param $storeId
+     * @param $scopeId
+     * @param null $scope
      * @return array|null
      */
-    public function getMailChimpScopeByStoreId($storeId)
+    public function getMailChimpScopeByStoreId($scopeId, $scope = null)
     {
-        $scope = null;
-        $mailChimpStoreId = $this->getMCStoreId($storeId);
+        $mailchimpScope = null;
+        $mailChimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $collection = Mage::getModel('core/config_data')->getCollection()
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('value', array('eq' => $mailChimpStoreId));
         if (count($collection)) {
             $configEntry = $collection->getFirstItem();
-            $scope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
+            $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
-        return $scope;
+        return $mailchimpScope;
     }
 
     /**

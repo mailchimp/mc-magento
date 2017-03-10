@@ -12,31 +12,23 @@
  */
 class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Model_Config_Data
 {
-    protected function _beforeSave()
-    {
-        $groups = $this->getData('groups');
-        $active = (isset($groups['ecommerce']['fields']['active']['value'])) ? $groups['ecommerce']['fields']['active']['value'] : null;
-        if ($active === null) {
-            $active = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
-        }
-        
-        if ($this->isValueChanged() && $active) {
-            if ($this->getOldValue()) {
-                Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
-                Mage::helper('mailchimp')->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
-                Mage::helper('mailchimp')->resetCampaign($this->getScopeId(), $this->getScope());
-                Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
-            }
-        }
-    }
     protected function _afterSave()
     {
-        $groups = $this->getData('groups');
-        $active = (isset($groups['ecommerce']['fields']['active']['value'])) ? $groups['ecommerce']['fields']['active']['value'] : null;
-        if ($active === null) {
-            $active = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
+        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
+        if (isset($groups['ecommerce']['fields']['active']) && isset($groups['ecommerce']['fields']['active']['value'])) {
+            $ecommerceActive = $groups['ecommerce']['fields']['active']['value'];
+        } else {
+            $ecommerceActive = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
         }
-        if ($this->isValueChanged() && $active) {
+        $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($this->getScopeId(), $this->getScope());
+
+        if ($thisScopeHasMCStoreId && (!$ecommerceActive || !$moduleIsActive || !$this->getValue())) {
+            Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->resetCampaign($this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
+        }
+        if ($moduleIsActive && $ecommerceActive && $this->getValue() && !$thisScopeHasMCStoreId) {
             Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }
     }
