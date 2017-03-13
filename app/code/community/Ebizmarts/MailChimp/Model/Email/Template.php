@@ -140,6 +140,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Tem
 
         if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
             $emailQueue = $this->getQueue();
+            $emailQueue->clearRecipients();
             $emailQueue->setMessageBody($message);
             $emailQueue->setMessageParameters(
                 array(
