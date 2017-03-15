@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
                 $url .= '?mc_cid='.$params['mc_cid'];
             }
 
-            if ((!isset($params['token']) || (isset($params['token']) && $params['token'] != $quoteSyncData->getMailchimpToken()))) {
+            if (!isset($params['token']) || $params['token'] != $quoteSyncData->getMailchimpToken()) {
                 Mage::getSingleton('customer/session')->addNotice("Your token cart is incorrect");
                 $this->_redirect($url);
             } else {

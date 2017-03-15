@@ -51,13 +51,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     protected function _getModifiedOrders($mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
         $modifiedOrders = Mage::getModel('sales/order')->getCollection();
         // select orders for the current Magento store id
         $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $modifiedOrders->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_ORDER . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -105,6 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     protected function _getNewOrders($mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
         $newOrders = Mage::getModel('sales/order')->getCollection();
         // select carts for the current Magento store id
@@ -114,7 +116,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
         }
         $newOrders->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_ORDER . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -497,10 +499,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
-     * @param null $syncModified
+     * @param int $syncModified
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
     {
         Mage::helper('mailchimp')->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
     }

@@ -16,13 +16,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         //if MailChimp store configured on website or default config send website, default config respectively
         $magentoStoreId = Mage::helper('mailchimp')->getDefaultStoreIdForMailChimpScope($magentoStoreId);
         //create missing products first
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->setStoreId($magentoStoreId);
         $collection->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = e.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_PRODUCT."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -173,7 +174,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data["inventory_quantity"] = (int)$stock->getQty();
             $data["backorders"] = (string)$stock->getBackorders();
 
-            $data["visibility"] = $product->getVisibility();
+            if ($product->getVisibility() != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
+                $data["visibility"] = 'true';
+            } else {
+                $data["visibility"] = 'false';
+            }
         } else {
             //this is for a root product
             if($product->getDescription()) {
@@ -258,11 +263,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
-     * @param null $syncModified
+     * @param int $syncModified
      * @param null $syncDeleted
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = null, $syncDeleted = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $saveOnlyIfexists = false)
     {
         Mage::helper('mailchimp')->saveEcommerceSyncData($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, null, $saveOnlyIfexists);
     }

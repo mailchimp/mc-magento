@@ -54,6 +54,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getConvertedQuotes($mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCarts = array();
         $convertedCarts = Mage::getModel('sales/quote')->getCollection();
         // get only the converted quotes
@@ -61,7 +62,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $convertedCarts->addFieldToFilter('is_active', array('eq' => 0));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $convertedCarts->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = main_table.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_QUOTE."' 
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -105,6 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getModifiedQuotes($mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCarts = array();
         $modifiedCarts = Mage::getModel('sales/quote')->getCollection();
         // select carts with no orders
@@ -113,7 +115,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $modifiedCarts->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = main_table.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_QUOTE."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -191,6 +193,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getNewQuotes($mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCarts = array();
         $newCarts = Mage::getModel('sales/quote')->getCollection();
         $newCarts->addFieldToFilter('is_active', array('eq'=>1));
@@ -204,7 +207,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $newCarts->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -285,12 +288,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getAllCartsByEmail($email, $mailchimpStoreId, $magentoStoreId)
     {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCartsForEmail = Mage::getModel('sales/quote')->getCollection();
         $allCartsForEmail->addFieldToFilter('is_active', array('eq' => 1));
         $allCartsForEmail->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $allCartsForEmail->addFieldToFilter('customer_email', array('eq' => $email));
         $allCartsForEmail->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = main_table.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_QUOTE."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -486,10 +490,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
-     * @param null $syncModified
+     * @param int $syncModified
      * @param null $syncDeleted
+     * @param null $token
      */
-    protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = null, $syncDeleted = null, $token = null)
+    protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null)
     {
         Mage::helper('mailchimp')->saveEcommerceSyncData($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token);
     }

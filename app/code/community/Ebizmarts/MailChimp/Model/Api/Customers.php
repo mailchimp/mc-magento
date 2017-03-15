@@ -18,10 +18,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         //get customers
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $collection = Mage::getModel('customer/customer')->getCollection();
         $collection->addFieldToFilter('store_id',array('eq' => $magentoStoreId));
         $collection->getSelect()->joinLeft(
-            ['m4m' => 'mailchimp_ecommerce_sync_data'],
+            ['m4m' => $mailchimpTableName],
             "m4m.related_id = e.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             ['m4m.*']
@@ -364,10 +365,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
-     * @param null $syncModified
+     * @param int $syncModified
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
     {
         Mage::helper('mailchimp')->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
     }

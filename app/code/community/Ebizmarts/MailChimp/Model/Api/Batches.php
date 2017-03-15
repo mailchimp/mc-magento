@@ -308,7 +308,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     $error = $response->title . " : " . $response->detail;
 
-                    Mage::helper('mailchimp')->saveEcommerceSyncData($id, $type, $mailchimpStoreId, null, $error, null, null, null, true);
+                    Mage::helper('mailchimp')->saveEcommerceSyncData($id, $type, $mailchimpStoreId, null, $error, 0, null, null, true);
 //                    switch ($type) {
 //                        case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
 //                            $p = Mage::getModel('catalog/product')->load($id);

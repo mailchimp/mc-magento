@@ -513,6 +513,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false)
     {
         $storesForScope = $this->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
+        if ($scopeId == 0) {
+            $storesForScope[] = 0;
+        }
         foreach ($storesForScope as $storeId) {
             $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
                 ->addFieldToFilter('store_id', array('eq' => $storeId));
@@ -737,13 +740,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
-     * @param null $syncModified
+     * @param int $syncModified
      * @param null $syncDeleted
      * @param null $token
      * @param bool $saveOnlyIfexists
      */
     public function saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
-                                          $syncModified = null, $syncDeleted = null, $token = null, $saveOnlyIfexists = false)
+                                          $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false)
     {
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
@@ -753,9 +756,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($syncError) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
             }
-            if ($syncModified) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
-            }
+            //Always set modified value to 0 when saving sync delta or errors.
+            $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
             if ($syncDeleted) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
             }
