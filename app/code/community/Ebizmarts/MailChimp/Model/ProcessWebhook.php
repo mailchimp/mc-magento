@@ -40,6 +40,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             case 'upemail':
                 $this->_updateEmail($data);
                 break;
+            case 'profile':
+                $this->_profile($data);
+                break;
         }
     }
 
@@ -167,12 +170,14 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             ->addFieldToFilter('email', array('eq' => $email));
         if (count($customerCollection) > 0) {
             $toUpdate = $customerCollection->getFirstItem();
+            $toUpdate->setFirstname($data['data']['merges']['FNAME']);
+            $toUpdate->setLastname($data['data']['merges']['LNAME']);
         } else {
             $toUpdate = $subscriber;
+            $toUpdate->setSubscriberFirstname($data['data']['merges']['FNAME']);
+            $toUpdate->setSubscriberLastname($data['data']['merges']['LNAME']);
         }
 
-        $toUpdate->setFirstname($data['data']['merges']['FNAME']);
-        $toUpdate->setLastname($data['data']['merges']['LNAME']);
         $toUpdate->save();
 
 
