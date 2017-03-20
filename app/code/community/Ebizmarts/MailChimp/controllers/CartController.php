@@ -13,7 +13,7 @@
 
 require_once Mage::getModuleDir('controllers', 'Mage_Checkout') . DS . 'CartController.php';
 
-class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
+class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
 {
     public function loadquoteAction()
     {
@@ -23,7 +23,7 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
             $quote = Mage::getModel('sales/quote')->load($params['id']);
             $storeId = $quote->getStoreId();
             $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
-            $quoteSyncData = Mage::helper('mailchimp')->getEcommerceSyncData($params['id'], Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId);
+            $quoteSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($params['id'], Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId);
             $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $storeId));
             if (isset($params['mc_cid'])) {
                 $url .= '?mc_cid='.$params['mc_cid'];
