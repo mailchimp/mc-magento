@@ -667,7 +667,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                         $api->lists->mergeFields->add($listId, $label, 'address', null, $chimpTag);
                                         //Birthday
                                     } elseif ($customAtt == 11) {
-                                        $api->lists->mergeFields->add($listId, $label, 'date', null, $chimpTag);
+                                        $api->lists->mergeFields->add($listId, $label, 'birthday', null, $chimpTag);
                                     } else {
                                         $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
                                     }
