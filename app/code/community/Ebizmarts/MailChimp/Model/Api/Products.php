@@ -13,6 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 {
 
     const BATCH_LIMIT = 100;
+    private $_parentImageUrl = null;
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
@@ -126,7 +127,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $variendata["sku"] = $data["sku"];
                 $variendata["price"] = $data["price"];
                 $variendata["inventory_quantity"] = $data["inventory_quantity"];
-                $variendata["image_url"] = $data["image_url"];
+                $this->_parentImageUrl = Mage::helper('mailchimp')->getImageUrlById($parentId);
+                $variendata["image_url"] = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $data["image_url"]);
+                $this->_parentImageUrl = null;
                 $variendata["backorders"] = $data["backorders"];
                 $variendata["visibility"] = $data["visibility"];
                 $productdata = array();
@@ -158,8 +161,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["url"] = $product->getProductUrl();
 
         //image
-        $productMediaConfig = Mage::getModel('catalog/product_media_config');
-        $data["image_url"] = $productMediaConfig->getMediaUrl($product->getImage());
+        
+        $data["image_url"] = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, Mage::helper('mailchimp')->getImageUrlById($product->getId()));
 
         //missing data
         $data["published_at_foreign"] = "";
@@ -174,12 +177,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data["inventory_quantity"] = (int)$stock->getQty();
             $data["backorders"] = (string)$stock->getBackorders();
 
-            if ($product->getVisibility() != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
-                $data["visibility"] = 'true';
-            } else {
-                $data["visibility"] = 'false';
-            }
-        } else {
+            $visibilityOptions = Mage::getModel('catalog/product_visibility')->getOptionArray();
+            $data["visibility"] = $visibilityOptions[$product->getVisibility()];
             //this is for a root product
             if($product->getDescription()) {
                 $data["description"] = $product->getDescription();
@@ -198,9 +197,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //variants
             $data["variants"] = array();
+            $this->_parentImageUrl = $data["image_url"];
             foreach ($variants as $variant) {
                 $data["variants"][] = $this->_buildProductData($variant);
             }
+            $this->_parentImageUrl = null;
         }
 
         return $data;

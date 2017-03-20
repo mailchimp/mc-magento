@@ -428,10 +428,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Save error response from MailChimp's API in "MailChimp_Error.log" file.
      * 
      * @param $message
-     * @param $scopeId
-     * @param null $scope
+     * @param int $scopeId
+     * @param string $scope
      */
-    public function logError($message, $scopeId, $scope = null)
+    public function logError($message, $scopeId = 0, $scope = 'default')
     {
         if ($this->getLogsEnabled($scopeId, $scope)) {
             Mage::log($message, null, 'MailChimp_Errors.log', true);
@@ -902,5 +902,34 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getConfig()->saveConfig($configValue[0], $configValue[1], $scope, $scopeId);
         }
         Mage::getConfig()->cleanCache();
+    }
+
+    /**
+     * If $productImageUrl not null returns it, else return $parentImageUrl.
+     * Both parameters could be null.
+     * 
+     * @param $parentImageUrl
+     * @param $productImageUrl
+     * @return mixed
+     */
+    public function getMailChimpProductImageUrl($parentImageUrl, $productImageUrl) {
+        return ($productImageUrl) ? $productImageUrl : $parentImageUrl;
+    }
+
+    /**
+     * Returns product image url by id, if it does not have one returns null.
+     *
+     * @param $productId
+     * @return null
+     */
+    public function getImageUrlById($productId) {
+        $productMediaConfig = Mage::getModel('catalog/product_media_config');
+        $product = Mage::getModel('catalog/product')->load($productId);
+        if ($product->getImage() == 'no_selection') {
+            $imageUrl = null;
+        } else {
+            $imageUrl = $productMediaConfig->getMediaUrl($product->getImage());
+        }
+        return $imageUrl;
     }
 }
