@@ -45,7 +45,8 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                             ->setRedirect($url, 301);
                     } else {
                         Mage::getSingleton('customer/session')->addNotice("Login to complete your order");
-                        $url = '/customer/account/login';
+                        Mage::getSingleton('customer/session')->setAfterAuthUrl($url, $storeId);
+                        $url = Mage::getUrl('customer/account/login');
                         if (isset($params['mc_cid'])) {
                             $url .= '?mc_cid='.$params['mc_cid'];
                         }
