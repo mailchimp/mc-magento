@@ -290,6 +290,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 //            $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parentId . '/variants/' . $data['id'];
 //            $productdata['operation_id'] = $batchId . '_' . $parentId;
 //        }
-
+        return $productdata;
     }
 }

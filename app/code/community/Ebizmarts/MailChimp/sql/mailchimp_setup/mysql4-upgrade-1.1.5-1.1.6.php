@@ -15,7 +15,6 @@ $installer = $this;
 
 $installer->startSetup();
 
-
 $installer->run(
     "
 	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_ecommerce_sync_data')}` (
@@ -43,7 +42,7 @@ try {
 }
 catch (Exception $e)
 {
-    Mage::log($e->getMessage());
+    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
 try {
@@ -130,7 +129,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    Mage::log($e->getMessage());
+    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
 try {
@@ -153,7 +152,7 @@ try {
     $installer->getConnection()->dropColumn($orderTable, 'mailchimp_sync_error');
     $installer->getConnection()->dropColumn($orderTable, 'mailchimp_sync_modified');
 } catch (Exception $e) {
-    Mage::log($e->getMessage());
+    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
 $installer->endSetup();
