@@ -58,10 +58,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $modifiedOrders->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_ORDER . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         // be sure that the order are already in mailchimp and not deleted
         $modifiedOrders->getSelect()->where("m4m.mailchimp_sync_modified = 1");
@@ -116,10 +116,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
         }
         $newOrders->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_ORDER . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         // be sure that the orders are not in mailchimp
         $newOrders->getSelect()->where("m4m.mailchimp_sync_delta IS NULL");

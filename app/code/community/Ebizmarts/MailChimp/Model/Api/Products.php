@@ -24,10 +24,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $collection = Mage::getModel('catalog/product')->getCollection();
         $collection->setStoreId($magentoStoreId);
         $collection->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = e.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_PRODUCT."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null ".
             "OR m4m.mailchimp_sync_modified = 1");

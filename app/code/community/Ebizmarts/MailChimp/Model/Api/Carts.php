@@ -62,10 +62,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $convertedCarts->addFieldToFilter('is_active', array('eq' => 0));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $convertedCarts->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_QUOTE."' 
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $convertedCarts->getSelect()->where("m4m.mailchimp_sync_deleted = 0");
@@ -115,10 +115,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $modifiedCarts->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_QUOTE."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where("m4m.mailchimp_sync_modified = 1 AND m4m.mailchimp_sync_deleted = 0 
@@ -207,10 +207,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $newCarts->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $newCarts->getSelect()->where("m4m.mailchimp_sync_delta IS NULL");
@@ -294,10 +294,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCartsForEmail->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $allCartsForEmail->addFieldToFilter('customer_email', array('eq' => $email));
         $allCartsForEmail->getSelect()->joinLeft(
-            ['m4m' => $mailchimpTableName],
+            array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_QUOTE."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            ['m4m.*']
+            array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $allCartsForEmail->getSelect()->where("m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_store_id = '".$mailchimpStoreId."'");
