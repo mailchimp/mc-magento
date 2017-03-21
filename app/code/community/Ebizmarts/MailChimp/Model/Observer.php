@@ -29,10 +29,10 @@ class Ebizmarts_MailChimp_Model_Observer
             $this->_createWebhook($listId, $scopeArray[1], $scopeArray[0]);
         }
         if (isset($post['groups']['general']['fields']['list']['inherit']) && Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0])) {
-            Mage::helper('mailchimp')->deleteStore($scopeArray[1], $scopeArray[0]);
             Mage::helper('mailchimp')->removeEcommerceSyncData($scopeArray[1], $scopeArray[0]);
             Mage::helper('mailchimp')->resetCampaign($scopeArray[1], $scopeArray[0]);
             Mage::helper('mailchimp')->clearErrorGrid($scopeArray[1], $scopeArray[0], true);
+            Mage::helper('mailchimp')->deleteStore($scopeArray[1], $scopeArray[0]);
         }
         if (isset($post['groups']['general']['fields']['list']['value']) && !Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0]) && Mage::helper('mailchimp')->isEcomSyncDataEnabled($scopeArray[1], $scopeArray[0], true)) {
             Mage::helper('mailchimp')->createStore($post['groups']['general']['fields']['list']['value'], $scopeArray[1], $scopeArray[0]);

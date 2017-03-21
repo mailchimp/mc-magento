@@ -377,9 +377,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         //delete store id and data from mailchimp
         if ($deleteDataInMailchimp && $this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
             $this->removeEcommerceSyncData($scopeId, $scope);
+            $this->resetCampaign($scopeId, $scope);
+            $this->clearErrorGrid($scopeId, $scope, true);
             $this->deleteStore($scopeId, $scope);
         }
-        $this->clearErrorGrid($scopeId, $scope, true);
 
         if ($this->isEcomSyncDataEnabled($scopeId, $scope, true)) {
             $this->createStore($listId, $scopeId, $scope);
@@ -512,18 +513,36 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false)
     {
+        //Make sure there are no errors without MailChimp store id due to older versions.
+        $this->handleOldErrors();
+
+        $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
         $storesForScope = $this->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
         if ($scopeId == 0) {
             $storesForScope[] = 0;
         }
-        foreach ($storesForScope as $storeId) {
-            $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
-                ->addFieldToFilter('store_id', array('eq' => $storeId));
-            if ($excludeSubscribers) {
-                $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
-            }
-            foreach ($errorCollection as $item) {
-                $item->delete();
+        $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
+        if ($excludeSubscribers) {
+            $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
+        }
+        foreach ($errorCollection as $item) {
+            $item->delete();
+        }
+    }
+
+    /**
+     * Set the correspondent MailChimp store id to each error.
+     */
+    public function handleOldErrors() {
+        $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => ''));
+        foreach ($errorCollection as $error) {
+            $storeId = $error->getStoreId();
+            $mailchimpStoreId = $this->getMCStoreId($storeId);
+            if ($mailchimpStoreId) {
+                $error->setMailchimpStoreId($mailchimpStoreId)
+                    ->save();
             }
         }
     }

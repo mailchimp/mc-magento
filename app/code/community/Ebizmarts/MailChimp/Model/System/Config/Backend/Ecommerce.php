@@ -25,10 +25,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
         $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($this->getScopeId(), $this->getScope());
 
         if ($thisScopeHasMCStoreId && (!$this->getValue() || !$moduleIsActive || !$listId)) {
-            Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
             Mage::helper('mailchimp')->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
             Mage::helper('mailchimp')->resetCampaign($this->getScopeId(), $this->getScope());
             Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
+            Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
         }
         if ($moduleIsActive && $listId && $this->getValue() && !$thisScopeHasMCStoreId) {
             Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
