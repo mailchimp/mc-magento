@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     //If email is not an order confirmation email, it will check if Mandrill enable in default config
                     $storeId = Mage::app()->getStore()->getId();
                 }
-                if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
+                if (Mage::helper('mailchimp/mandrill')->isMandrillEnabled($storeId)) {
                     $parameters = new Varien_Object($message->getMessageParameters());
                     $mailer = $this->getMail($storeId);
                     $mailer->setFrom($parameters->getFromEmail(), $parameters->getFromName());
@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     } catch (Exception $e) {
                         Mage::logException($e);
                     }
-                }else{
+                } else {
                     $parameters = new Varien_Object($message->getMessageParameters());
                     if ($parameters->getReturnPathEmail() !== null) {
                         $mailTransport = new Zend_Mail_Transport_Sendmail("-f" . $parameters->getReturnPathEmail());
@@ -158,12 +158,13 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
      */
     public function getMail($storeId)
     {
-        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
+        if (!Mage::helper('mailchimp/mandrill')->isMandrillEnabled($storeId)) {
             return null;
         }
 
-        Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId), $storeId);
-        $mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
+        $apiKey = Mage::helper('mailchimp/mandrill')->getMandrillApiKey($storeId);
+        Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . $apiKey, $storeId);
+        $mail = new Mandrill_Message($apiKey);
         return $mail;
     }
 }

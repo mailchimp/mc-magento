@@ -47,6 +47,30 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
      */
     public function isMandrillLogEnabled($scopeId = 0, $scope = null)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG, $scopeId, $scope);
+        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG, $scopeId, $scope);
+    }
+
+    /**
+     * Get if Mandrill module is enabled for given scope.
+     *
+     * @param int $scopeId
+     * @param null $scope
+     * @return mixed
+     */
+    public function isMandrillEnabled($scopeId = 0, $scope = null)
+    {
+        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $scopeId, $scope);
+    }
+
+    /**
+     * Get if Mandrill Api Key for given scope.
+     * 
+     * @param int $scopeId
+     * @param null $scope
+     * @return mixed
+     */
+    public function getMandrillApiKey($scopeId = 0, $scope = null)
+    {
+        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $scopeId, $scope);
     }
 }
