@@ -36,4 +36,25 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
         $version = strpos(Mage::getVersion(), '-') ? substr(Mage::getVersion(), 0, strpos(Mage::getVersion(), '-')) : Mage::getVersion();
         return (string)'Ebizmarts_Mandrill' . $v . '/Mage' . $aux . $version;
     }
+
+    /**
+     * Returns a boolean value to represent if Mandrill is enabled or not.
+     *
+     * @param  null|string|integer  $storeId
+     * @return boolean
+     */
+    public function isEnabled($storeId = null)
+    {
+        return (bool) Mage::getStoreConfigFlag(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId);
+    }
+
+    /**
+     * Returns the Mandrill API Key
+     * @param  null|string|integer$storeId [description]
+     * @return [type]          [description]
+     */
+    public function getMandrillApiKey($storeId = null)
+    {
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId);
+    }
 }
