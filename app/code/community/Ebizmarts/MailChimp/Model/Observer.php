@@ -210,6 +210,9 @@ class Ebizmarts_MailChimp_Model_Observer
 
         //update mailchimp ecommerce data for that customer
         Mage::getModel('mailchimp/api_customers')->update($customer->getId(), $storeId);
+        
+        //update subscriber data if a subscriber with the same email address exists
+        Mage::getModel('mailchimp/api_subscribers')->update($customer->getEmail(), $storeId);
         return $observer;
     }
 

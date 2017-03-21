@@ -19,6 +19,6 @@ class Ebizmarts_MailChimp_Model_Cron
     public function syncBatchData($cron)
     {
         Mage::getModel('mailchimp/api_batches')->handleEcommerceBatches();
-//        Mage::getModel('mailchimp/api_batches')->handleSubscriberBatches();
+        Mage::getModel('mailchimp/api_batches')->handleSubscriberBatches();
     }
 }
