@@ -151,7 +151,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         return $operations;
     }
-    protected function _buildProductData($product, $isVarient = true, $variants = null)
+    
+    protected function _buildProductData($product, $isVarient = true, $variants = array())
     {
         $data = array();
 

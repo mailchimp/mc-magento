@@ -232,13 +232,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get custom map fields configured for the given scope.
+     * Get custom merge fields configured for the given scope.
      * 
      * @param $scopeId
      * @param null $scope
      * @return mixed
      */
-    public function getCustomMapFields($scopeId, $scope = null)
+    public function getCustomMergeFieldsSerialized($scopeId, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS, $scopeId, $scope);
     }
@@ -633,7 +633,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $listId = $this->getGeneralList($scopeId, $scope);
         $maps = unserialize($this->getMapFields($scopeId, $scope));
-        $customFieldTypes = unserialize($this->getCustomMapFields($scopeId, $scope));
+        $customFieldTypes = unserialize($this->getCustomMergeFieldsSerialized($scopeId, $scope));
         $api = $this->getApi($scopeId, $scope);
         $mailchimpFields = array();
         if ($api) {
@@ -950,5 +950,60 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $imageUrl = $productMediaConfig->getMediaUrl($product->getImage());
         }
         return $imageUrl;
+    }
+
+    /**
+     * If orders with the given email exists, returns the date of the last order made.
+     * 
+     * @param $subscriberEmail
+     * @return null
+     */
+    public function getLastDateOfPurchase($subscriberEmail)
+    {
+        $orderCollection = Mage::getModel('sales/order')->getCollection()
+            ->addFieldToFilter('customer_email', array('eq' => $subscriberEmail));
+        $lastDateOfPurchase = null;
+        foreach ($orderCollection as $order) {
+            $dateOfPurchase = $order->getCreatedAt();
+            if (!$lastDateOfPurchase || $lastDateOfPurchase < $dateOfPurchase) {
+                $lastDateOfPurchase = $dateOfPurchase;
+            }
+        }
+        return $lastDateOfPurchase;
+    }
+
+    /**
+     * Return true if there is a custom entry with the value given.
+     * 
+     * @param $value
+     * @param $scopeId
+     * @param $scope
+     * @return bool
+     */
+    public function customMergeFieldAlreadyExists($value, $scopeId, $scope)
+    {
+        $customMergeFields = $this->getCustomMergeFields($scopeId, $scope);
+        foreach ($customMergeFields as $customMergeField) {
+            if ($customMergeField['value'] == $value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get custom merge fields for given scope as an array.
+     * 
+     * @param $scopeId
+     * @param null $scope
+     * @return array|mixed
+     */
+    public function getCustomMergeFields($scopeId, $scope = null)
+    {
+        $customMergeFields = unserialize($this->getCustomMergeFieldsSerialized($scopeId, $scope));
+        if (!$customMergeFields) {
+            $customMergeFields = array();
+        }
+        return $customMergeFields;
     }
 }

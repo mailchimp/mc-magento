@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
         }
 
         $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        $mapFields = Mage::helper('mailchimp')->getCustomMapFields($scopeArray[1], $scopeArray[0]);
+        $mapFields = Mage::helper('mailchimp')->getCustomMergeFieldsSerialized($scopeArray[1], $scopeArray[0]);
         $customFieldTypes = unserialize($mapFields);
         if(is_array($customFieldTypes)) {
             foreach ($customFieldTypes as $customFieldType) {
