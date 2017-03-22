@@ -92,14 +92,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $batchArray = array();
                 //customer operations
                 $customersArray = Mage::getModel('mailchimp/api_customers')->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $customerAmount = count($customersArray);
                 $batchArray['operations'] = $customersArray;
                 //product operations
                 $productsArray = Mage::getModel('mailchimp/api_products')->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
                 //order operations
                 $cartsArray = Mage::getModel('mailchimp/api_carts')->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
                 $ordersArray = Mage::getModel('mailchimp/api_orders')->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
                 try {
                     /**
@@ -122,7 +125,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 $batch->save();
                             }
                         }
-                    } elseif (Mage::helper('mailchimp')->getMCIsSyncing($magentoStoreId)) {
+                    }
+                    if (Mage::helper('mailchimp')->getMCIsSyncing($magentoStoreId) && !$customerAmount && !$productAmount && !$orderAmount) {
                         $isSyncing = false;
                         $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSyncing);
                         $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
