@@ -242,7 +242,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data = array();
         $batchId = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . Mage::helper('mailchimp')->getDateMicrotime();
         $items = $order->getAllVisibleItems();
-//        $magentoStoreId = Mage::helper('mailchimp')->getDefaultStoreIdForMailChimpScope($magentoStoreId);
         foreach ($items as $item)
         {
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
