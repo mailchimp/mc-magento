@@ -30,11 +30,13 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
 
     public function downloadresponseAction()
     {
-        $batch_id = $this->getRequest()->getParam('batch_id');
-        $this->getResponse()->setHeader('Content-disposition', 'attachment; filename='.$batch_id.'.json');
+        $errorId = $this->getRequest()->getParam('id');
+        $error = Mage::getModel('mailchimp/mailchimperrors')->load($errorId);
+        $batchId = $error->getBatchId();
+        $storeId = $error->getStoreId();
+        $this->getResponse()->setHeader('Content-disposition', 'attachment; filename='.$batchId.'.json');
         $this->getResponse()->setHeader('Content-type', 'application/json');
-//        $files = Mage::getModel('mailchimp/api_batches')->getBatchResponse($batch_id);
-        $files = array();
+        $files = Mage::getModel('mailchimp/api_batches')->getBatchResponse($batchId, $storeId);
         $fileContent = array();
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
@@ -47,8 +49,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         }
 
         $baseDir = Mage::getBaseDir();
-        if (is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batch_id)) {
-            rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batch_id);
+        if (is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId)) {
+            rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
         }
 
         $this->getResponse()->setBody(json_encode($fileContent, JSON_PRETTY_PRINT));

@@ -128,7 +128,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $variendata["price"] = $data["price"];
                 $variendata["inventory_quantity"] = $data["inventory_quantity"];
                 $this->_parentImageUrl = Mage::helper('mailchimp')->getImageUrlById($parentId);
-                $variendata["image_url"] = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $data["image_url"]);
+                $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $data["image_url"]);
+                if ($imageUrl) {
+                    $variendata["image_url"] = $imageUrl;
+                }
                 $this->_parentImageUrl = null;
                 $variendata["backorders"] = $data["backorders"];
                 $variendata["visibility"] = $data["visibility"];
@@ -162,9 +165,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["url"] = $product->getProductUrl();
 
         //image
-        
-        $data["image_url"] = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, Mage::helper('mailchimp')->getImageUrlById($product->getId()));
-
+        $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, Mage::helper('mailchimp')->getImageUrlById($product->getId()));
+        if ($imageUrl) {
+            $data["image_url"] = $imageUrl;
+        }
         //missing data
         $data["published_at_foreign"] = "";
 
@@ -199,7 +203,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //variants
             $data["variants"] = array();
-            $this->_parentImageUrl = $data["image_url"];
+            if (isset($data["image_url"])) {
+                $this->_parentImageUrl = $data["image_url"];
+            }
             foreach ($variants as $variant) {
                 $data["variants"][] = $this->_buildProductData($variant);
             }

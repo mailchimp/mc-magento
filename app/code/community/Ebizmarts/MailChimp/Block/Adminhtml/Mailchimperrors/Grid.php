@@ -94,12 +94,12 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
                 'sortable' => false,
                 'filter'   => false,
                 'type'     => 'action',
-                'getter'   => 'getBatchId',
+                'getter'   => 'getId',
                 'actions'  => array(
                     array(
                         'url'     => array('base'=> '*/*/downloadresponse'),
                         'caption' => $this->helper('mailchimp')->__('Download'),
-                        'field'   => 'batch_id'
+                        'field'   => 'id'
                     ),
                 )
             )

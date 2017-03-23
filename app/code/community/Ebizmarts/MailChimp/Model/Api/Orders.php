@@ -225,6 +225,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 if (!$variant) {
                     continue;
                 }
+            } elseif ($item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE || $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_GROUPED) {
+                continue;
             } else {
                 $variant = $productId;
             }

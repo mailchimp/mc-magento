@@ -931,7 +931,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $productImageUrl
      * @return mixed
      */
-    public function getMailChimpProductImageUrl($parentImageUrl, $productImageUrl) {
+    public function getMailChimpProductImageUrl($parentImageUrl, $productImageUrl)
+    {
         return ($productImageUrl) ? $productImageUrl : $parentImageUrl;
     }
 
@@ -941,7 +942,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $productId
      * @return null
      */
-    public function getImageUrlById($productId) {
+    public function getImageUrlById($productId)
+    {
         $productMediaConfig = Mage::getModel('catalog/product_media_config');
         $product = Mage::getModel('catalog/product')->load($productId);
         if ($product->getImage() == 'no_selection') {
