@@ -129,9 +129,16 @@ class Ebizmarts_MailChimp_Model_Observer
                 );
             }
 
-
             if (TRUE === $subscriber->getIsStatusChanged()) {
                 Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+            } else {
+                $origData = $subscriber->getOrigData();
+
+                if (is_array($origData) && isset($origData['subscriber_status']) &&
+                    $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
+                ) {
+                    Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                }
             }
         }
     }
@@ -146,9 +153,8 @@ class Ebizmarts_MailChimp_Model_Observer
         $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         if ($isEnabled) {
             $subscriber = $observer->getEvent()->getSubscriber();
-            if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
-            }
+
+            Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
         }
     }
 
