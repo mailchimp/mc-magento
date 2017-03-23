@@ -139,7 +139,7 @@ class Ebizmarts_MailChimp_Model_Observer
                     'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
                 );
             }
-            
+
             if (TRUE === $subscriber->getIsStatusChanged()) {
                 Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
             }
@@ -545,13 +545,9 @@ class Ebizmarts_MailChimp_Model_Observer
     }
     public function productWebsiteUpdate(Varien_Event_Observer $observer)
     {
-        Mage::log(__METHOD__, null, 'observer.log', true);
         $productIds = $observer->getEvent()->getProductIds();
         $websiteIds = $observer->getEvent()->getWebsiteIds();
         $action = $observer->getEvent()->getAction();
-        Mage::log($productIds, null, 'observer.log', true);
-        Mage::log($websiteIds, null, 'observer.log', true);
-        Mage::log($action, null, 'observer.log', true);
 //        foreach ($websiteIds as $websiteId) {
 //            $stores = Mage::app()->getWebsite($websiteId)->getStores();
 //            foreach ($stores as $storeId => $store) {

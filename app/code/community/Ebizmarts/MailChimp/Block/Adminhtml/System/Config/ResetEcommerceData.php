@@ -48,7 +48,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
      */
     public function getMessage()
     {
-        $message = 'Are you sure you want to delete the current MailChimp store and create a new one?\nAutomations created for this store will need to be re-created.';
+        $message = 'Are you sure you want to delete the current MailChimp store for this scope and create a new one?\nAutomations created for this store will need to be re-created.';
         return $this->helper('mailchimp')->__($message);
     }
 

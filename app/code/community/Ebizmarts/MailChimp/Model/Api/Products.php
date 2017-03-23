@@ -180,6 +180,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             $visibilityOptions = Mage::getModel('catalog/product_visibility')->getOptionArray();
             $data["visibility"] = $visibilityOptions[$product->getVisibility()];
+        } else {
             //this is for a root product
             if($product->getDescription()) {
                 $data["description"] = $product->getDescription();
