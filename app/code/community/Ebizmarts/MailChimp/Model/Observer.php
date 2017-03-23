@@ -142,6 +142,14 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if (TRUE === $subscriber->getIsStatusChanged()) {
                 Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+            } else {
+                $origData = $subscriber->getOrigData();
+
+                if (is_array($origData) && isset($origData['subscriber_status']) &&
+                    $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
+                ) {
+                    Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                }
             }
         }
     }
@@ -153,12 +161,11 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function handleSubscriberDeletion(Varien_Event_Observer $observer)
     {
-        $subscriber = $observer->getEvent()->getSubscriber();
-        $isEnabled = Mage::helper('mailchimp')->isMailChimpEnabled($subscriber->getStoreId());
+        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
         if ($isEnabled) {
-            if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
-            }
+            $subscriber = $observer->getEvent()->getSubscriber();
+
+            Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
         }
     }
 
@@ -277,7 +284,7 @@ class Ebizmarts_MailChimp_Model_Observer
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
         }
 
-        if(($this->_getLandingCookie())) {
+        if ($this->_getLandingCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
         }
 
@@ -285,23 +292,18 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
-     * Get campaign cooke if available.
+     * Get campaign cookie if available.
      *
-     * @return null
+     * @return mixed
      */
     protected function _getCampaignCookie()
     {
         $landingCookie = $this->_getLandingCookie();
         if (preg_match("/utm_source=mailchimp/", $landingCookie)) {
-            return null;
+            return false;
         }
 
-        $cookie = Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
-        if ($cookie && Mage::getModel('core/cookie')->getLifetime('mailchimp_campaign_id') == Mage::getStoreConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_LIFETIME, Mage::app()->getStore()->getId())) {
-            return $cookie;
-        } else {
-            return null;
-        }
+        return Mage::getModel('core/cookie')->get('mailchimp_campaign_id');
     }
 
     /**
@@ -311,12 +313,7 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function _getLandingCookie()
     {
-        $cookie = Mage::getModel('core/cookie')->get('mailchimp_landing_page');
-        if ($cookie && Mage::getModel('core/cookie')->getLifetime('mailchimp_landing_page') == Mage::getStoreConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_LIFETIME, Mage::app()->getStore()->getId())) {
-            return $cookie;
-        } else {
-            return null;
-        }
+        return Mage::getModel('core/cookie')->get('mailchimp_landing_page');
     }
 
     /**

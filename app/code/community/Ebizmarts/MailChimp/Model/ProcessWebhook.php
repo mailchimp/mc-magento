@@ -107,13 +107,13 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     ->save();
             } else {
                 $subscriber = Mage::getModel('newsletter/subscriber')->setImportMode(TRUE);
-                if (isset($data['data']['fname'])) {
-                    $subscriberFname = filter_var($data['data']['fname'], FILTER_SANITIZE_STRING);
+                if (isset($data['data']['merges']['FNAME'])) {
+                    $subscriberFname = filter_var($data['data']['merges']['FNAME'], FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberFirstname($subscriberFname);
                 }
 
-                if (isset($data['data']['lname'])) {
-                    $subscriberLname = filter_var($data['data']['lname'], FILTER_SANITIZE_STRING);
+                if (isset($data['data']['merges']['LNAME'])) {
+                    $subscriberLname = filter_var($data['data']['merges']['LNAME'], FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberLastname($subscriberLname);
                 }
 
