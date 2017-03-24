@@ -166,7 +166,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $email = $data['data']['email'];
         $subscriber = $this->loadByEmail($email);
 
-        $customer = Mage::getModel('customer/customer')->loadByEmail($email);
+        $customer = Mage::getModel('customer/customer')
+            ->setWebsiteId(Mage::app()->getStore()->getWebsiteId())
+            ->loadByEmail($email);
+
         if ($customer->getId()) {
             $toUpdate = $customer;
             $toUpdate->setFirstname($data['data']['merges']['FNAME']);
