@@ -18,11 +18,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-        //if MailChimp store configured on website or default config send website, default config respectively
-        $magentoStoreId = Mage::helper('mailchimp')->getDefaultStoreIdForMailChimpScope($magentoStoreId);
         //create missing products first
         $collection = Mage::getModel('catalog/product')->getCollection();
-        $collection->setStoreId($magentoStoreId);
+        $collection->addStoreFilter($magentoStoreId);
         $collection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = e.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_PRODUCT."'
