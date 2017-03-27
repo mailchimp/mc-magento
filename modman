@@ -11,5 +11,5 @@ lib/Ebizmarts/Mailchimp                                              lib/Ebizmar
 lib/Mandrill                                                         lib/Mandrill
 skin/adminhtml/default/default/ebizmarts/mailchimp                   skin/adminhtml/default/default/ebizmarts/mailchimp
 skin/adminhtml/default/default/ebizmarts/mandrill                    skin/adminhtml/default/default/ebizmarts/mandrill
-m4mlogs.sh                                                           m4mlogs.sh
-getMailchimpResponse.php                                             getMailchimpResponse.php
+m4mlogs.sh                                                           shell/m4mlogs.sh
+getMailchimpResponse.php                                             shell/getMailchimpResponse.php
