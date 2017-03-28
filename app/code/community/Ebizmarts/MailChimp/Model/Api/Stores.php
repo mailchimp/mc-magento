@@ -97,8 +97,12 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope)
     {
-        $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
-        $api->ecommerce->stores->delete($mailchimpStoreId);
+        try {
+            $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
+            $api->ecommerce->stores->delete($mailchimpStoreId);
+        } catch (Mailchimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+        }
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
         $resource = Mage::getResourceModel('mailchimp/synchbatches');
         $connection->update($resource->getMainTable(), array('status'=>'canceled'), "status = 'pending'");
@@ -113,8 +117,12 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function modifyName($name, $scopeId, $scope)
     {
-        $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
-        $storeId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-        $api->ecommerce->stores->edit($storeId, $name);
+        try {
+            $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
+            $storeId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
+            $api->ecommerce->stores->edit($storeId, $name);
+        } catch (Mailchimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+        }
     }
 }

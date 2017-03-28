@@ -147,6 +147,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 } else {
                     $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
                     $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    continue;
                 }
 
                 //update order delta
