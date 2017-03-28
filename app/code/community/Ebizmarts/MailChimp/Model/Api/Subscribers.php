@@ -17,7 +17,7 @@ class Ebizmarts_MailChimp_Model_Api_subscribers
     public function createBatchJson($listId, $storeId, $limit)
     {
         //get subscribers
-        $collection = Mage::getModel('newsletter/subscriber')->getCollection()
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_status', array('eq' => 1))
             ->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter(
