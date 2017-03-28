@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function createBatchJson($mailchimpStoreId)
     {
         //get customers
-        $collection = Mage::getModel('customer/customer')->getCollection()
+        $collection = Mage::getResourceModel('customer/customer_collection')
             ->addAttributeToSelect('id')
             ->addAttributeToFilter(
                 array(
@@ -78,7 +78,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["opt_in_status"] = $this->getOptin();
 
         //customer orders data
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('state', 'complete')
             ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
         if($firstDate) {
