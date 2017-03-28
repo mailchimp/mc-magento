@@ -37,7 +37,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _getResults($storeId, $isMailChimpStoreId = false)
     {
-        $collection = Mage::getModel('mailchimp/synchbatches')->getCollection()
+        $collection = Mage::getResourceModel('mailchimp/synchbatches_collection')
             ->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter('status', array('eq' => 'pending'));
         foreach ($collection as $item) {
