@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $store = Mage::app()->getDefaultStoreView();
         //create missing products first
-        $collection = Mage::getModel('catalog/product')->getCollection()
+        $collection = Mage::getResourceModel('catalog/product_collection')
             ->addAttributeToSelect('id')
             ->addAttributeToFilter('status', Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
             ->addAttributeToFilter(
