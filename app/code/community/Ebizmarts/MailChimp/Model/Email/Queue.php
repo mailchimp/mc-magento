@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
     public function send()
     {
         /** @var $collection Mage_Core_Model_Resource_Email_Queue_Collection */
-        $collection = Mage::getModel('core/email_queue')->getCollection()
+        $collection = Mage::getResourceModel('core/email_queue_collection')
             ->addOnlyForSendingFilter()
             ->setPageSize(self::MESSAGES_LIMIT_PER_CRON_RUN)
             ->setCurPage(1)
