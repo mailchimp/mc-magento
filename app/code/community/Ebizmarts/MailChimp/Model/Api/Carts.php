@@ -51,7 +51,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getConvertedQuotes($mailchimpStoreId)
     {
         $allCarts = array();
-        $convertedCarts = Mage::getModel('sales/quote')->getCollection();
+        $convertedCarts = Mage::getResourceModel('sales/quote_collection');
         // get only the converted quotes
         $convertedCarts->addFieldToFilter('is_active', array('eq'=>0));
         // be sure that the quote are already in mailchimp
@@ -104,7 +104,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getModifiedQuotes($mailchimpStoreId)
     {
         $allCarts = array();
-        $modifiedCarts = Mage::getModel('sales/quote')->getCollection();
+        $modifiedCarts = Mage::getResourceModel('sales/quote_collection');
         // select carts with no orders
         $modifiedCarts->addFieldToFilter('is_active', array('eq'=>1));
         // select carts already sent to mailchimp and moodifief after
@@ -186,7 +186,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getNewQuotes($mailchimpStoreId)
     {
         $allCarts = array();
-        $newCarts = Mage::getModel('sales/quote')->getCollection();
+        $newCarts = Mage::getResourceModel('sales/quote_collection');
         $newCarts->addFieldToFilter('is_active', array('eq'=>1))
             ->addFieldToFilter(
                 'mailchimp_sync_delta', array(
@@ -262,7 +262,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getAllCartsByEmail($email)
     {
-        $allCartsForEmail = Mage::getModel('sales/quote')->getCollection();
+        $allCartsForEmail = Mage::getResourceModel('sales/quote_collection');
         $allCartsForEmail->addFieldToFilter('is_active', array('eq'=>1));
         $allCartsForEmail->addFieldToFilter('mailchimp_sync_delta', array('neq' => '0000-00-00 00:00:00'));
         $allCartsForEmail->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()));
