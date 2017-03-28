@@ -52,7 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $batchArray = array();
         //create missing products first
-        $collection = Mage::getModel('sales/order')->getCollection()
+        $collection = Mage::getResourceModel('sales/order_collection')
             ->addAttributeToSelect('entity_id')
             ->addFieldToFilter('mailchimp_sync_delta', array('gt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag()))
             ->addFieldToFilter('mailchimp_sync_modified', array('eq' => 1));
@@ -102,7 +102,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $batchArray = array();
         //create missing products first
-        $collection = Mage::getModel('sales/order')->getCollection()
+        $collection = Mage::getResourceModel('sales/order_collection')
             ->addAttributeToSelect('entity_id')
             ->addFieldToFilter(
                 'mailchimp_sync_delta', array(
@@ -455,7 +455,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer orders data
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getModel('sales/order_collection')
             ->addFieldToFilter('state', array('eq' => 'complete'))
             ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()))
             ->addFieldToFilter('mailchimp_sync_delta', array('notnull' => true))
