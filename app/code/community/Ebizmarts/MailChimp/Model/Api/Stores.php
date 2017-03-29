@@ -102,6 +102,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api->ecommerce->stores->delete($mailchimpStoreId);
         } catch (Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+        } catch (Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
         }
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
         $resource = Mage::getResourceModel('mailchimp/synchbatches');
@@ -123,6 +125,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api->ecommerce->stores->edit($storeId, $name);
         } catch (Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+        } catch (Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
         }
     }
 }
