@@ -5,11 +5,11 @@ app/design/adminhtml/default/default/template/ebizmarts/mailchimp    app/design/
 app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml      app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml
 app/design/frontend/base/default/template/ebizmarts/mailchimp        app/design/frontend/base/default/template/ebizmarts/mailchimp
 app/etc/modules/Ebizmarts_MailChimp.xml                              app/etc/modules/Ebizmarts_MailChimp.xml
+js/ebizmarts/mailchimp                                               js/ebizmarts/mailchimp
 lib/Ebizmarts/Mailchimp.php                                          lib/Ebizmarts/Mailchimp.php
 lib/Ebizmarts/Mailchimp                                              lib/Ebizmarts/Mailchimp
 lib/Mandrill                                                         lib/Mandrill
-js/ebizmarts/mailchimp                                               js/ebizmarts/mailchimp
 skin/adminhtml/default/default/ebizmarts/mailchimp                   skin/adminhtml/default/default/ebizmarts/mailchimp
 skin/adminhtml/default/default/ebizmarts/mandrill                    skin/adminhtml/default/default/ebizmarts/mandrill
-m4mlogs.sh                                                           m4mlogs.sh
-getMailchimpResponse.php                                             getMailChimpResponse.php
+shell/m4mlogs.sh                                                     shell/m4mlogs.sh
+shell/getMailchimpResponse.php                                       shell/getMailchimpResponse.php

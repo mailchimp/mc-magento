@@ -25,11 +25,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
      */
     public function __construct()
     {
+        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
         if ($this->_lists == null) {
-            $apiKey = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY);
+            $apiKey = Mage::helper('mailchimp')->getApiKey($scopeArray[1], $scopeArray[0]);
             if ($apiKey) {
                 try {
-                    $api = Mage::helper('mailchimp')->getApi();
+                    $api = Mage::helper('mailchimp')->getApi($scopeArray[1], $scopeArray[0]);
                     $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
                     if (isset($this->_lists['lists']) && count($this->_lists['lists']) == 0) {
                         $apiKeyArray = explode('-', $apiKey);

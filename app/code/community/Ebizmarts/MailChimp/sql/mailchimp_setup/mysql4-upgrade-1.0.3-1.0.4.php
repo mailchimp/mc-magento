@@ -15,33 +15,6 @@ $installer = $this;
 
 $installer->startSetup();
 
-
-$eav = new Mage_Eav_Model_Entity_Setup('core_setup');
-
-$eav->addAttribute(
-    'catalog_product', 'mailchimp_sync_modified', array(
-    'label'     => 'MailChimp Modified',
-    'type'      => 'int',
-    'visible'   => false,
-    'required'  => false,
-    'position'  => 1,
-    'default'   => 0
-    )
-);
-
-// create mailchimp_sync_modified to the customer
-
-$eav->addAttribute(
-    'customer', 'mailchimp_sync_modified', array(
-    'label'     => 'MailChimp Modified',
-    'type'      => 'int',
-    'visible'   => false,
-    'required'  => false,
-    'position'  => 1,
-    'default'   => 0
-    )
-);
-
 try {
     $installer->run(
         "

@@ -1,21 +1,23 @@
 <script type="text/javascript">
     //<![CDATA[
     function resetecommerce() {
-        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
-            method: 'get',
-            onSuccess: function (transport) {
+        if (confirm('<?php echo $this->getMessage() ?>')) {
+            new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+                method: 'get',
+                onSuccess: function (transport) {
 
-                if (transport.responseText == 1) {
-                    alert('All remote ecommerce data was deleted.')
+                    if (transport.responseText == 1) {
+                        alert('All remote ecommerce data was deleted.')
+                    }
+                    else {
+                        alert('An error happened deleting remote ecommerce data.')
+                    }
+                },
+                onFailure: function () {
+                    alert('Something went wrong.')
                 }
-                else {
-                    alert('An error happened deleting remote ecommerce data.')
-                }
-            },
-            onFailure: function () {
-                alert('Something went wrong.')
-            }
-        });
+            });
+        }
     }
     //]]>
 </script>

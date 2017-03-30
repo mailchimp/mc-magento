@@ -31,90 +31,36 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                 if ($message->getEntityType() == 'order') {
                     $order = Mage::getModel('sales/order')->load($message->getEntityId());
                     $storeId = $order->getStoreId();
-                    if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
-                        $parameters = new Varien_Object($message->getMessageParameters());
-                        $mailer = $this->getMail($storeId);
-                        $mailer->setFrom($parameters->getFromEmail(), $parameters->getFromName());
-                        $mailer->setSubject($parameters->getSubject());
-                        if ($parameters->getIsPlain()) {
-                            $mailer->setBodyText($message->getMessageBody());
-                        } else {
-                            $mailer->setBodyHtml($message->getMessageBody());
-                        }
+                } else {
+                    //If email is not an order confirmation email, it will check if Mandrill enable in default config
+                    $storeId = Mage::app()->getStore()->getId();
+                }
 
-                        try {
-                            foreach ($message->getRecipients() as $recipient) {
-                                list($email, $name, $type) = $recipient;
-                                switch ($type) {
-                                    case self::EMAIL_TYPE_TO:
-                                    case self::EMAIL_TYPE_CC:
-                                        $mailer->addTo($email, $name);
-                                        break;
-                                    case self::EMAIL_TYPE_BCC:
-                                        $mailer->addBcc($email);
-                                        break;
-                                }
-                            }
+                if (Mage::helper('mailchimp/mandrill')->isMandrillEnabled($storeId)) {
+                    $parameters = new Varien_Object($message->getMessageParameters());
+                    $mailer = $this->getMail($storeId);
+                    $mailer->setFrom($parameters->getFromEmail(), $parameters->getFromName());
+                    $mailer->setSubject($parameters->getSubject());
+                    if ($parameters->getIsPlain()) {
+                        $mailer->setBodyText($message->getMessageBody());
+                    } else {
+                        $mailer->setBodyHtml($message->getMessageBody());
+                    }
 
-                            if ($parameters->getReplyTo() !== null) {
-                                $mailer->setReplyTo($parameters->getReplyTo());
-                            }
-
-                            if ($parameters->getReturnTo() !== null) {
-                                $mailer->setReturnPath($parameters->getReturnTo());
-                            }
-
-                            try {
-                                Mage::dispatchEvent(
-                                    'fooman_emailattachments_before_send_queue',
-                                    array(
-                                        'mailer' => $mailer,
-                                        'message' => $message,
-                                        'mail_transport' => false
-
-                                    )
-                                );
-                                $mailer->send();
-                            } catch (Exception $e) {
-                                Mage::logException($e);
-                            }
-
-                            unset($mailer);
-                            $message->setProcessedAt(Varien_Date::formatDate(true));
-                            $message->save();
-                        } catch (Exception $e) {
-                            Mage::logException($e);
-                        }
-                    }else{
-                        $parameters = new Varien_Object($message->getMessageParameters());
-                        if ($parameters->getReturnPathEmail() !== null) {
-                            $mailTransport = new Zend_Mail_Transport_Sendmail("-f" . $parameters->getReturnPathEmail());
-                            Zend_Mail::setDefaultTransport($mailTransport);
-                        }
-
-                        $mailer = new Zend_Mail('utf-8');
+                    try {
                         foreach ($message->getRecipients() as $recipient) {
                             list($email, $name, $type) = $recipient;
                             switch ($type) {
-                                case self::EMAIL_TYPE_BCC:
-                                    $mailer->addBcc($email, '=?utf-8?B?' . base64_encode($name) . '?=');
-                                    break;
                                 case self::EMAIL_TYPE_TO:
                                 case self::EMAIL_TYPE_CC:
-                                default:
-                                    $mailer->addTo($email, '=?utf-8?B?' . base64_encode($name) . '?=');
+                                    $mailer->addTo($email, $name);
+                                    break;
+                                case self::EMAIL_TYPE_BCC:
+                                    $mailer->addBcc($email);
                                     break;
                             }
                         }
 
-                        if ($parameters->getIsPlain()) {
-                            $mailer->setBodyText($message->getMessageBody());
-                        } else {
-                            $mailer->setBodyHTML($message->getMessageBody());
-                        }
-
-                        $mailer->setSubject('=?utf-8?B?' . base64_encode($parameters->getSubject()) . '?=');
-                        $mailer->setFrom($parameters->getFromEmail(), $parameters->getFromName());
                         if ($parameters->getReplyTo() !== null) {
                             $mailer->setReplyTo($parameters->getReplyTo());
                         }
@@ -127,8 +73,8 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                             Mage::dispatchEvent(
                                 'fooman_emailattachments_before_send_queue',
                                 array(
-                                    'mailer'         => $mailer,
-                                    'message'        => $message,
+                                    'mailer' => $mailer,
+                                    'message' => $message,
                                     'mail_transport' => false
 
                                 )
@@ -141,7 +87,65 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                         unset($mailer);
                         $message->setProcessedAt(Varien_Date::formatDate(true));
                         $message->save();
+                    } catch (Exception $e) {
+                        Mage::logException($e);
                     }
+                } else {
+                    $parameters = new Varien_Object($message->getMessageParameters());
+                    if ($parameters->getReturnPathEmail() !== null) {
+                        $mailTransport = new Zend_Mail_Transport_Sendmail("-f" . $parameters->getReturnPathEmail());
+                        Zend_Mail::setDefaultTransport($mailTransport);
+                    }
+
+                    $mailer = new Zend_Mail('utf-8');
+                    foreach ($message->getRecipients() as $recipient) {
+                        list($email, $name, $type) = $recipient;
+                        switch ($type) {
+                            case self::EMAIL_TYPE_BCC:
+                                $mailer->addBcc($email, '=?utf-8?B?' . base64_encode($name) . '?=');
+                                break;
+                            case self::EMAIL_TYPE_TO:
+                            case self::EMAIL_TYPE_CC:
+                            default:
+                                $mailer->addTo($email, '=?utf-8?B?' . base64_encode($name) . '?=');
+                                break;
+                        }
+                    }
+
+                    if ($parameters->getIsPlain()) {
+                        $mailer->setBodyText($message->getMessageBody());
+                    } else {
+                        $mailer->setBodyHTML($message->getMessageBody());
+                    }
+
+                    $mailer->setSubject('=?utf-8?B?' . base64_encode($parameters->getSubject()) . '?=');
+                    $mailer->setFrom($parameters->getFromEmail(), $parameters->getFromName());
+                    if ($parameters->getReplyTo() !== null) {
+                        $mailer->setReplyTo($parameters->getReplyTo());
+                    }
+
+                    if ($parameters->getReturnTo() !== null) {
+                        $mailer->setReturnPath($parameters->getReturnTo());
+                    }
+
+                    try {
+                        Mage::dispatchEvent(
+                            'fooman_emailattachments_before_send_queue',
+                            array(
+                                'mailer'         => $mailer,
+                                'message'        => $message,
+                                'mail_transport' => false
+
+                            )
+                        );
+                        $mailer->send();
+                    } catch (Exception $e) {
+                        Mage::logException($e);
+                    }
+
+                    unset($mailer);
+                    $message->setProcessedAt(Varien_Date::formatDate(true));
+                    $message->save();
                 }
             }
         }
@@ -155,12 +159,13 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
      */
     public function getMail($storeId)
     {
-        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
+        if (!Mage::helper('mailchimp/mandrill')->isMandrillEnabled($storeId)) {
             return null;
         }
 
-        Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
-        $mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
+        $apiKey = Mage::helper('mailchimp/mandrill')->getMandrillApiKey($storeId);
+        Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . $apiKey, $storeId);
+        $mail = new Mandrill_Message($apiKey);
         return $mail;
     }
 }

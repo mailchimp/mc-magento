@@ -25,8 +25,6 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
 
     protected function _prepareCollection()
     {
-
-
         $collection = Mage::getModel('mailchimp/mailchimperrors')->getCollection();
         $this->setCollection($collection);
         return parent::_prepareCollection();
@@ -69,6 +67,13 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
+            'store_id', array(
+                'header' => Mage::helper('mailchimp')->__('Store Id'),
+                'index' => 'store_id',
+                'sortable' => false
+            )
+        );
+        $this->addColumn(
             'errors', array(
                 'header' => Mage::helper('mailchimp')->__('Error'),
                 'index'  => 'errors',
@@ -89,12 +94,12 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
                 'sortable' => false,
                 'filter'   => false,
                 'type'     => 'action',
-                'getter'   => 'getBatchId',
+                'getter'   => 'getId',
                 'actions'  => array(
                     array(
                         'url'     => array('base'=> '*/*/downloadresponse'),
                         'caption' => $this->helper('mailchimp')->__('Download'),
-                        'field'   => 'batch_id'
+                        'field'   => 'id'
                     ),
                 )
             )

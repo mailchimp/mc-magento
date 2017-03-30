@@ -26,20 +26,25 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
 
     public function getButtonHtml()
     {
-        $button = $this->getLayout()->createBlock('adminhtml/widget_button')
-            ->setData(
-                array(
-                'id' => 'reseterrors_button',
-                'label' => $this->helper('mailchimp')->__('Reset Local Errors'),
-                'onclick' => 'javascript:reseterrors(); return false;'
-                )
-            );
+        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
+        if (Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0])) {
+            $button = $this->getLayout()->createBlock('adminhtml/widget_button')
+                ->setData(
+                    array(
+                        'id' => 'reseterrors_button',
+                        'label' => $this->helper('mailchimp')->__('Reset Local Errors'),
+                        'onclick' => 'javascript:reseterrors(); return false;',
+                        'title' => $this->helper('mailchimp')->__('Reset Local Errors only for current scope')
+                    )
+                );
 
-        return $button->toHtml();
+            return $button->toHtml();
+        }
     }
     public function getAjaxCheckUrl()
     {
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetLocalErrors');
+        $scopeString = Mage::helper('mailchimp')->getScopeString();
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetLocalErrors', array('scope' => $scopeString));
     }
 
 }

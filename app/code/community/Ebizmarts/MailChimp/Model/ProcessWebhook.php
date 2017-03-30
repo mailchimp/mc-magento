@@ -40,6 +40,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             case 'upemail':
                 $this->_updateEmail($data);
                 break;
+            case 'profile':
+                $this->_profile($data);
         }
     }
 
@@ -105,13 +107,13 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     ->save();
             } else {
                 $subscriber = Mage::getModel('newsletter/subscriber')->setImportMode(TRUE);
-                if (isset($data['data']['fname'])) {
-                    $subscriberFname = filter_var($data['data']['fname'], FILTER_SANITIZE_STRING);
+                if (isset($data['data']['merges']['FNAME'])) {
+                    $subscriberFname = filter_var($data['data']['merges']['FNAME'], FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberFirstname($subscriberFname);
                 }
 
-                if (isset($data['data']['lname'])) {
-                    $subscriberLname = filter_var($data['data']['lname'], FILTER_SANITIZE_STRING);
+                if (isset($data['data']['merges']['LNAME'])) {
+                    $subscriberLname = filter_var($data['data']['merges']['LNAME'], FILTER_SANITIZE_STRING);
                     $subscriber->setSubscriberLastname($subscriberLname);
                 }
 
@@ -166,13 +168,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $customerCollection = Mage::getModel('customer/customer')->getCollection()
             ->addFieldToFilter('email', array('eq' => $email));
         if (count($customerCollection) > 0) {
-            $toUpdate = $customerCollection->getFirstItem();
-        } else {
-            $toUpdate = $subscriber;
+            $customerId = $customerCollection->getFirstItem()->getEntityId();
         }
 
-        $toUpdate->setFirstname($data['data']['merges']['FNAME']);
-        $toUpdate->setLastname($data['data']['merges']['LNAME']);
+        if ($customerId) {
+            $toUpdate = Mage::getModel('customer/customer')->load($customerId);
+            $toUpdate->setFirstname($data['data']['merges']['FNAME']);
+            $toUpdate->setLastname($data['data']['merges']['LNAME']);
+        } else {
+            $toUpdate = $subscriber;
+            $toUpdate->setSubscriberFirstname($data['data']['merges']['FNAME']);
+            $toUpdate->setSubscriberLastname($data['data']['merges']['LNAME']);
+        }
+
         $toUpdate->save();
 
 
@@ -201,7 +209,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         return Mage::getModel('newsletter/subscriber')
             ->getCollection()
             ->addFieldToFilter('subscriber_email', $email)
-            ->addFieldToFilter('store_id', Mage::app()->getStore()->getId())
             ->getFirstItem();
     }
 

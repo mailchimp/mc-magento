@@ -14,10 +14,11 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
 {
     /**
      * @param $message
+     * @param $storeId
      */
-    public function log($message)
+    public function log($message, $storeId)
     {
-        if (Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG)) {
+        if (Mage::helper('mailchimp/mandrill')->isMandrillLogEnabled($storeId)) {
             Mage::log($message, null, 'Mandrill_Request.log', true);
         }
     }
@@ -35,5 +36,41 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
         $v = (string)Mage::getConfig()->getNode('modules/Ebizmarts_Mandrill/version');
         $version = strpos(Mage::getVersion(), '-') ? substr(Mage::getVersion(), 0, strpos(Mage::getVersion(), '-')) : Mage::getVersion();
         return (string)'Ebizmarts_Mandrill' . $v . '/Mage' . $aux . $version;
+    }
+
+    /**
+     * Get if Mandrill logs are enabled for given scope.
+     *
+     * @param int $scopeId
+     * @param null $scope
+     * @return mixed
+     */
+    public function isMandrillLogEnabled($scopeId = 0, $scope = null)
+    {
+        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG, $scopeId, $scope);
+    }
+
+    /**
+     * Get if Mandrill module is enabled for given scope.
+     *
+     * @param int $scopeId
+     * @param null $scope
+     * @return mixed
+     */
+    public function isMandrillEnabled($scopeId = 0, $scope = null)
+    {
+        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $scopeId, $scope);
+    }
+
+    /**
+     * Get if Mandrill Api Key for given scope.
+     * 
+     * @param int $scopeId
+     * @param null $scope
+     * @return mixed
+     */
+    public function getMandrillApiKey($scopeId = 0, $scope = null)
+    {
+        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $scopeId, $scope);
     }
 }

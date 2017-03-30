@@ -21,7 +21,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Name extends Mage_Core_Mod
                 $name = Mage::app()->getDefaultStoreView()->getWebsite()->getDefaultStore()->getFrontendName();
             }
 
-            Mage::helper('mailchimp')->changeName($name);
+            Mage::helper('mailchimp')->changeName($name, $this->getScopeId(), $this->getScope());
         }
     }
 }
