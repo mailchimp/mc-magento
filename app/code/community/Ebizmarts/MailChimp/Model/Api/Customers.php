@@ -20,15 +20,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         //get customers
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $collection = Mage::getModel('customer/customer')->getCollection();
-        $collection->addFieldToFilter('store_id',array('eq' => $magentoStoreId));
+        $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $collection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = e.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER."'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
-        $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null ".
-            "OR m4m.mailchimp_sync_modified = 1");
+        $collection->getSelect()->where(
+            "m4m.mailchimp_sync_delta IS null ".
+            "OR m4m.mailchimp_sync_modified = 1"
+        );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
         $customerArray = array();
         
@@ -76,11 +78,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         //customer orders data
         $orderCollection = Mage::getModel('sales/order')->getCollection()
-            ->addFieldToFilter('state',
+            ->addFieldToFilter(
+                'state',
                 array(
                     array('neq' => Mage_Sales_Model_Order::STATE_CANCELED),
                     array('neq' => Mage_Sales_Model_Order::STATE_CLOSED)
-                ))
+                )
+            )
             ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
 
         $totalOrders = 0;

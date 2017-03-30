@@ -156,6 +156,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     if (!$firstName) {
                                         $firstName = $subscriber->getSubscriberFirstname();
                                     }
+
                                     if ($firstName) {
                                         $eventValue = $mergeVars[$key] = $firstName;
                                     }
@@ -166,6 +167,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     if (!$lastName) {
                                         $lastName = $subscriber->getSubscriberLastname();
                                     }
+
                                     if ($lastName) {
                                         $eventValue = $mergeVars[$key] = $lastName;
                                     }
@@ -196,11 +198,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     }
                                     break;
                             }
-                            Mage::dispatchEvent('mailchimp_merge_field_send_before', array(
+
+                            Mage::dispatchEvent(
+                                'mailchimp_merge_field_send_before', array(
                                 'subscriber_email' => $subscriberEmail,
                                 'merge_field_tag' => $attributeCode,
                                 'merge_field_value' => &$eventValue
-                            ));
+                                )
+                            );
                         }
                     }
                 } else {
@@ -261,12 +266,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             }
                             break;
                     }
-                    Mage::dispatchEvent('mailchimp_merge_field_send_before', array(
+
+                    Mage::dispatchEvent(
+                        'mailchimp_merge_field_send_before', array(
                         'subscriber_email' => $subscriberEmail,
                         'merge_field_tag' => $customAtt,
                         'merge_field_value' => &$eventValue
-                    ));
+                        )
+                    );
                 }
+
                 if ($eventValue) {
                     $mergeVars[$key] = $eventValue;
                 }

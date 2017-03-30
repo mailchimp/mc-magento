@@ -27,8 +27,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
-        $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null ".
-            "OR m4m.mailchimp_sync_modified = 1");
+        $collection->getSelect()->where(
+            "m4m.mailchimp_sync_delta IS null ".
+            "OR m4m.mailchimp_sync_modified = 1"
+        );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
@@ -40,6 +42,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($item->getMailchimpSyncDeleted()) {
                 $batchArray = array_merge($this->buildProductDataRemoval($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
             }
+
             //define variants and root products
             if ($item->getMailchimpSyncModified() && $item->getMailchimpSyncDelta() && $item->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId)) {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
@@ -130,6 +133,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($imageUrl) {
                     $variendata["image_url"] = $imageUrl;
                 }
+
                 $this->_parentImageUrl = null;
                 $variendata["backorders"] = $data["backorders"];
                 $variendata["visibility"] = $data["visibility"];
@@ -167,6 +171,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($imageUrl) {
             $data["image_url"] = $imageUrl;
         }
+
         //missing data
         $data["published_at_foreign"] = "";
 
@@ -204,9 +209,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if (isset($data["image_url"])) {
                 $this->_parentImageUrl = $data["image_url"];
             }
+
             foreach ($variants as $variant) {
                 $data["variants"][] = $this->_buildProductData($variant);
             }
+
             $this->_parentImageUrl = null;
         }
 
@@ -248,6 +255,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($product->getId()) {
                     $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now(), "This product type is not supported on MailChimp.");
                 }
+
                 continue;
             }
 
@@ -259,6 +267,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
             }
         }
+
         return $data;
     }
 

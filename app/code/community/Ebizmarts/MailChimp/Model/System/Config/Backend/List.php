@@ -20,6 +20,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         } else {
             $ecommerceActive = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
         }
+
         $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($this->getScopeId(), $this->getScope());
 
         if ($thisScopeHasMCStoreId && (!$ecommerceActive || !$moduleIsActive || !$this->getValue())) {
@@ -28,6 +29,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
             Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
             Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
         }
+
         if ($moduleIsActive && $ecommerceActive && $this->getValue() && !$thisScopeHasMCStoreId) {
             Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }

@@ -54,6 +54,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                             $message = Mage::helper('mailchimp')->__('Looks like your MailChimp store was deleted. A new one has been created.');
                             Mage::getSingleton('adminhtml/session')->addWarning($message);
                         }
+
                         $this->_accountDetails['store_exists'] = false;
                     }
                 } else {

@@ -35,6 +35,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     //If email is not an order confirmation email, it will check if Mandrill enable in default config
                     $storeId = Mage::app()->getStore()->getId();
                 }
+
                 if (Mage::helper('mailchimp/mandrill')->isMandrillEnabled($storeId)) {
                     $parameters = new Varien_Object($message->getMessageParameters());
                     $mailer = $this->getMail($storeId);

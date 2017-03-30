@@ -29,6 +29,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield extends Mage_Admi
                     Mage::logException($e);
                 }
             }
+
             $this->setValue($unserializedValue);
         }
     }

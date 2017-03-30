@@ -43,6 +43,7 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
             Mage::getSingleton('core/session')->setMailChimpLabel($label);
             Mage::getSingleton('adminhtml/session')->addSuccess($this->__('The custom value was added successfully.'));
         }
+
         $this->_redirect("*/*/addmergevar");
 
     }

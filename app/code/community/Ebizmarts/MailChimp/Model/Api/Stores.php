@@ -105,6 +105,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
         }
+
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
         $resource = Mage::getResourceModel('mailchimp/synchbatches');
         $connection->update($resource->getMainTable(), array('status'=>'canceled'), "status = 'pending'");

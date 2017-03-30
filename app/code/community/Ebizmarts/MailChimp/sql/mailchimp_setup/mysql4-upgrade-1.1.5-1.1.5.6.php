@@ -65,12 +65,15 @@ try {
                     if ($customer->getMailchimpSyncError()) {
                         $syncError = $customer->getMailchimpSyncError();
                     }
+
                     if ($customer->getMailchimpSyncModified()) {
                         $syncModified = $customer->getMailchimpSyncModified();
                     }
+
                     Mage::helper('mailchimp')->saveEcommerceSyncData($customer->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
             }
+
             //migrate products
             $productCollection = Mage::getModel('catalog/product')->getCollection();
             foreach ($productCollection as $product) {
@@ -82,12 +85,15 @@ try {
                     if ($product->getMailchimpSyncError()) {
                         $syncError = $product->getMailchimpSyncError();
                     }
+
                     if ($product->getMailchimpSyncModified()) {
                         $syncModified = $product->getMailchimpSyncModified();
                     }
+
                     Mage::helper('mailchimp')->saveEcommerceSyncData($product->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
             }
+
             //migrate orders
             $orderCollection = Mage::getModel('sales/order')->getCollection();
             foreach ($orderCollection as $order) {
@@ -99,12 +105,15 @@ try {
                     if ($order->getMailchimpSyncError()) {
                         $syncError = $order->getMailchimpSyncError();
                     }
+
                     if ($order->getMailchimpSyncModified()) {
                         $syncModified = $order->getMailchimpSyncModified();
                     }
+
                     Mage::helper('mailchimp')->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
             }
+
             //migrate carts
             $quoteCollection = Mage::getModel('sales/quote')->getCollection();
             foreach ($quoteCollection as $quote) {
@@ -117,12 +126,15 @@ try {
                     if ($quote->getMailchimpSyncError()) {
                         $syncError = $quote->getMailchimpSyncError();
                     }
+
                     if ($quote->getMailchimpSyncDeleted()) {
                         $syncDeleted = $quote->getMailchimpSyncDeleted();
                     }
+
                     if ($quote->getMailchimpToken()) {
                         $token = $quote->getMailchimpToken();
                     }
+
                     Mage::helper('mailchimp')->saveEcommerceSyncData($quote->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, null, $syncDeleted, $token);
                 }
             }

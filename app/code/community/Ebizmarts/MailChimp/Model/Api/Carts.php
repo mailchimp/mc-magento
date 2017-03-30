@@ -121,8 +121,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
-        $modifiedCarts->getSelect()->where("m4m.mailchimp_sync_modified = 1 AND m4m.mailchimp_sync_deleted = 0 
-        AND m4m.mailchimp_sync_delta < '" . new Zend_Db_Expr('updated_at') . "'");
+        $modifiedCarts->getSelect()->where(
+            "m4m.mailchimp_sync_modified = 1 AND m4m.mailchimp_sync_deleted = 0 
+        AND m4m.mailchimp_sync_delta < '" . new Zend_Db_Expr('updated_at') . "'"
+        );
         // limit the collection
         $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($modifiedCarts as $cart) {
@@ -154,6 +156,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
                 $allCartsForEmail->clear();
             }
+
             // avoid carts abandoned as guests when customer email associated to a registered customer.
             if (!$cart->getCustomerId() && $customer->getEmail()==$cart->getCustomerEmail()) {
                 $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
@@ -180,8 +183,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             } else {
                 $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
             }
-            $this->_token = null;
 
+            $this->_token = null;
         }
 
         return $allCarts;
@@ -205,6 +208,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if ($this->_firstDate) {
             $newCarts->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
         }
+
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $newCarts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
@@ -272,6 +276,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             } else {
                 $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
             }
+
             $this->_token = null;
         }
 

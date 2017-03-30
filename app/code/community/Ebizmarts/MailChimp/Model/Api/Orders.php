@@ -115,6 +115,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($this->_firstDate) {
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
         }
+
         $newOrders->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_ORDER . "'
@@ -138,6 +139,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $this->_counter++;
                     }
                 }
+
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "POST";
@@ -231,6 +233,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             } else {
                 $variant = $productId;
             }
+
             if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == 0) {
                 $itemCount++;
                 $data["lines"][] = array(
@@ -243,10 +246,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 );
             }
         }
+
         if (!$itemCount) {
             unset($data['lines']);
             return "";
         }
+
         //customer data
         $api = Mage::helper('mailchimp')->getApi($magentoStoreId);
         $customers = array();
@@ -255,6 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         } catch (Mailchimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
         }
+
         if (!$isModifiedOrder) {
             if (isset($customers['total_items']) && $customers['total_items'] > 0) {
                 $id = $customers['customers'][0]['id'];
@@ -310,6 +316,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($order->getCustomerLastname()) {
             $data["customer"]["last_name"] = $order->getCustomerLastname();
         }
+
         $billingAddress = $order->getBillingAddress();
         $street = $billingAddress->getStreet();
         $address = array();
@@ -342,6 +349,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $address["country"] = $data['billing_address']["country"] = $countryName;
             $address["country_code"] = $data['billing_address']["country_code"] = $billingAddress->getCountry();
         }
+
         if (count($address)) {
             $data["customer"]["address"] = $address;
         }
@@ -354,6 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($billingAddress->getCompany()) {
             $data["customer"]["company"] = $data["billing_address"]["company"] = $billingAddress->getCompany();
         }
+
         $shippingAddress = $order->getShippingAddress();
         if ($shippingAddress) {
             $street = $shippingAddress->getStreet();
@@ -394,13 +403,16 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $data["shipping_address"]["company"] = $shippingAddress->getCompany();
             }
         }
+
         //customer orders data
         $orderCollection = Mage::getModel('sales/order')->getCollection()
-            ->addFieldToFilter('state',
+            ->addFieldToFilter(
+                'state',
                 array(
                     array('neq' => Mage_Sales_Model_Order::STATE_CANCELED),
                     array('neq' => Mage_Sales_Model_Order::STATE_CLOSED)
-                ))
+                )
+            )
             ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()));
         $totalOrders = 1;
         $totalAmountSpent = (int)$order->getGrandTotal();
@@ -419,6 +431,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             //json encode failed
             Mage::helper('mailchimp')->logError("Order " . $order->getEntityId() . " json encode failed", $magentoStoreId);
         }
+
         return $jsonData;
     }
 

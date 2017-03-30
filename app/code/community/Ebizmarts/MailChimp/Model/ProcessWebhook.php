@@ -170,6 +170,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         if (count($customerCollection) > 0) {
             $customerId = $customerCollection->getFirstItem()->getEntityId();
         }
+
         if ($customerId) {
             $toUpdate = Mage::getModel('customer/customer')->load($customerId);
             $toUpdate->setFirstname($data['data']['merges']['FNAME']);
@@ -179,6 +180,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $toUpdate->setSubscriberFirstname($data['data']['merges']['FNAME']);
             $toUpdate->setSubscriberLastname($data['data']['merges']['LNAME']);
         }
+
         $toUpdate->save();
 
 

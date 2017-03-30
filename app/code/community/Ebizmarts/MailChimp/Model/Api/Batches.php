@@ -21,6 +21,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $this->_getResults($store->getId());
             $this->_sendEcommerceBatch($store->getId());
         }
+
         foreach ($stores as $store) {
             if (Mage::helper('mailchimp')->getIsReseted($store->getId())) {
                 $scopeToReset = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($store->getId());
@@ -54,7 +55,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             ->addFieldToFilter('status', array('eq' => 'pending'));
         foreach ($collection as $item) {
             try {
-
                 $files = $this->getBatchResponse($item->getBatchId(), $magentoStoreId);
                 if (count($files)) {
                     if (isset($files['error'])) {
@@ -126,6 +126,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             }
                         }
                     }
+
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     if (Mage::helper('mailchimp')->getMCIsSyncing($magentoStoreId) && $itemAmount == 0) {
                         $isSyncing = false;
