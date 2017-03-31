@@ -83,6 +83,11 @@ class Mandrill_Message extends Mandrill_Mandrill
         return $this->_to;
     }
 
+    public function getRecipients()
+    {
+        return $this->getTo();
+    }
+
     public function setBodyHtml($html, $charset = null, $encoding = Zend_Mime::ENCODING_QUOTEDPRINTABLE)
     {
         $this->_bodyHtml = $html;

@@ -17,7 +17,6 @@ $installer->startSetup();
 
 $installer->run(
     "
-
 	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_errors')}` (
 	  `id`     INT(10) unsigned NOT NULL auto_increment,
 	  `type`   VARCHAR(256) DEFAULT '',
@@ -29,7 +28,6 @@ $installer->run(
       `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	  PRIMARY KEY  (`id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 "
 );
 

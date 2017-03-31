@@ -13,7 +13,7 @@
 
 require_once Mage::getModuleDir('controllers', 'Mage_Checkout') . DS . 'CartController.php';
 
-class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
+class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
 {
     public function loadquoteAction()
     {
@@ -21,14 +21,18 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
         if (isset($params['id'])) {
             //restore the quote
             $quote = Mage::getModel('sales/quote')->load($params['id']);
-            $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $quote->getStoreId()));
+            $storeId = $quote->getStoreId();
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
+            $quoteSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($params['id'], Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId);
+            $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $storeId));
             if (isset($params['mc_cid'])) {
                 $url .= '?mc_cid='.$params['mc_cid'];
             }
 
-            if ((!isset($params['token']) || (isset($params['token']) && $params['token'] != $quote->getMailchimpToken()))) {
+            if (!isset($params['token']) || $params['token'] != $quoteSyncData->getMailchimpToken()) {
                 Mage::getSingleton('customer/session')->addNotice("Your token cart is incorrect");
-                $this->_redirect($url);
+                $this->getResponse()
+                    ->setRedirect($url);
             } else {
                 $quote->setMailchimpAbandonedcartFlag(1);
                 $quote->save();
@@ -42,7 +46,8 @@ class Ebizmarts_MailChimp_CartController  extends Mage_Checkout_CartController
                             ->setRedirect($url, 301);
                     } else {
                         Mage::getSingleton('customer/session')->addNotice("Login to complete your order");
-                        $url = '/customer/account/login';
+                        Mage::getSingleton('customer/session')->setAfterAuthUrl($url, $storeId);
+                        $url = Mage::getUrl('customer/account/login');
                         if (isset($params['mc_cid'])) {
                             $url .= '?mc_cid='.$params['mc_cid'];
                         }

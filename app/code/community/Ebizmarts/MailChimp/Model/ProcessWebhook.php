@@ -40,6 +40,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             case 'upemail':
                 $this->_updateEmail($data);
                 break;
+            case 'profile':
+                $this->_profile($data);
         }
     }
 
@@ -166,13 +168,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $customerCollection = Mage::getResourceModel('customer/customer_collection')
             ->addFieldToFilter('email', array('eq' => $email));
         if (count($customerCollection) > 0) {
-            $toUpdate = $customerCollection->getFirstItem();
-        } else {
-            $toUpdate = $subscriber;
+            $customerId = $customerCollection->getFirstItem()->getEntityId();
         }
 
-        $toUpdate->setFirstname($data['data']['merges']['FNAME']);
-        $toUpdate->setLastname($data['data']['merges']['LNAME']);
+        if ($customerId) {
+            $toUpdate = Mage::getModel('customer/customer')->load($customerId);
+            $toUpdate->setFirstname($data['data']['merges']['FNAME']);
+            $toUpdate->setLastname($data['data']['merges']['LNAME']);
+        } else {
+            $toUpdate = $subscriber;
+            $toUpdate->setSubscriberFirstname($data['data']['merges']['FNAME']);
+            $toUpdate->setSubscriberLastname($data['data']['merges']['LNAME']);
+        }
+
         $toUpdate->save();
 
 
@@ -200,7 +208,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         return Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_email', $email)
-            ->addFieldToFilter('store_id', Mage::app()->getStore()->getId())
             ->getFirstItem();
     }
 
