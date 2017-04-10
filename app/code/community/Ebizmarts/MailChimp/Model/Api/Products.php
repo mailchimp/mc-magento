@@ -226,10 +226,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $productId
      * @param $storeId
      */
-    public function update($productId, $storeId)
+    public function update($productId, $storeId, $scope = null)
     {
-        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled($storeId)) {
-            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
+        if (Mage::helper('mailchimp')->isEcomSyncDataEnabled($storeId, $scope)) {
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId, $scope);
             $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, true);
         }
     }
