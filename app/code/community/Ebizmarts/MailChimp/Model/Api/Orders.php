@@ -405,7 +405,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer orders data
-        $orderCollection = Mage::getModel('sales/order_collection')
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter(
                 'state',
                 array(
