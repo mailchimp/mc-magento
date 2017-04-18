@@ -244,18 +244,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if (isset($response['status']) && $response['status'] == 'finished') {
                 // get the tar.gz file with the results
                 $fileUrl = urldecode($response['response_body_url']);
-                $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId;
-                $fd = fopen($fileName . '.tar.gz', 'w');
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $fileUrl);
-                curl_setopt($ch, CURLOPT_FILE, $fd);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-                $r = curl_exec($ch);
-                curl_close($ch);
-                fclose($fd);
+                $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
+                if (file_exists($fileName)) {
+                    $fd = fopen($fileName, 'w');
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $fileUrl);
+                    curl_setopt($ch, CURLOPT_FILE, $fd);
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
+                    $r = curl_exec($ch);
+                    curl_close($ch);
+                    fclose($fd);
+                }
                 mkdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
                 $archive = new Mage_Archive();
-                $archive->unpack($fileName . '.tar.gz', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
                 $archive->unpack($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
                 $dir = scandir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
                 foreach ($dir as $d) {
@@ -266,7 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
 
                 unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
-                unlink($fileName . '.tar.gz');
+                unlink($fileName);
             }
         } catch (Mailchimp_Error $e) {
             $files['error'] = $e->getFriendlyMessage();
