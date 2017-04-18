@@ -253,7 +253,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $r = curl_exec($ch);
                 curl_close($ch);
                 fclose($fd);
-                mkdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750);
+                mkdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
                 $archive = new Mage_Archive();
                 $archive->unpack($fileName . '.tar.gz', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
                 $archive->unpack($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
