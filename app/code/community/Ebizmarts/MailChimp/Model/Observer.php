@@ -164,10 +164,10 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function handleSubscriberDeletion(Varien_Event_Observer $observer)
     {
-        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        $subscriber = $observer->getEvent()->getSubscriber();
+        $isEnabled = Mage::helper('mailchimp')->isMailChimpEnabled($subscriber->getStoreId());
+        
         if ($isEnabled) {
-            $subscriber = $observer->getEvent()->getSubscriber();
-
             Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
         }
     }
