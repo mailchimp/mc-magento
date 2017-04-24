@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 //                    $storeExists = $store;
 //                }
 //            }
-//            catch (Mailchimp_Error $e) {
+//            catch (MailChimp_Error $e) {
 //                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
 //            }
 //            catch (Exception $e) {
@@ -100,7 +100,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
             $api->ecommerce->stores->delete($mailchimpStoreId);
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
@@ -124,7 +124,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
             $storeId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
             $api->ecommerce->stores->edit($storeId, $name);
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);

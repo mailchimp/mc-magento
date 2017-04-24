@@ -6,7 +6,7 @@
  * File   : Form.php
  * Module : Ebizmarts_MailChimp
  */
-class Ebizmarts_Mailchimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminhtml_Block_Widget_Form
+class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminhtml_Block_Widget_Form
 {
     protected function _prepareForm() 
     {

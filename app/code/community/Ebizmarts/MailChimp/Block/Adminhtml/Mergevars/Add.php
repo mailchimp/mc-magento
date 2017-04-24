@@ -6,7 +6,7 @@
  * File   : Add.php
  * Module : Ebizmarts_MailChimp
  */
-class Ebizmarts_Mailchimp_Block_Adminhtml_Mergevars_Add extends Mage_Adminhtml_Block_Widget_Form_Container
+class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add extends Mage_Adminhtml_Block_Widget_Form_Container
 {
     protected $_mode = 'add';
     public function __construct() 

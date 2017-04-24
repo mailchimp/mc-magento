@@ -10,7 +10,7 @@
  * @date: 5/16/16 6:37 PM
  * @file: SychBatches.php
  */
-class Ebizmarts_Mailchimp_Model_Mysql4_Ecommercesyncdata extends Mage_Core_Model_Mysql4_Abstract
+class Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata extends Mage_Core_Model_Mysql4_Abstract
 {
 
     /**
