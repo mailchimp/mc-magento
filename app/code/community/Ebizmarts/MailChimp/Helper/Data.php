@@ -100,6 +100,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get store unsecure URL for given scope.
+     *
+     * @param $scopeId
+     * @param $scope
+     * @return mixed
+     */
+    public function getStoreDomain($scopeId, $scope)
+    {
+        return $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_UNSECURE_BASE_URL, $scopeId, $scope);
+    }
+
+    /**
      * Get local store_id value of the MC store.
      *
      * @return string

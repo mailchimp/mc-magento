@@ -13,45 +13,6 @@
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
 
-//    /**
-//     * Return MailChimp store for given scope if exists, else return null.
-//     *
-//     * @param $scope
-//     * @param $scopeId
-//     * @return array|null
-//     * @throws Exception
-//     */
-//    public function getMailChimpStore($scope, $scopeId)
-//    {
-//        $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
-//
-//        if ($api) {
-//            $storeExists = null;
-//            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-//
-//            if ($mailchimpStoreId == null || $mailchimpStoreId == "") {
-//                return null;
-//            }
-//
-//            try {
-//                $store = $api->ecommerce->stores->get($mailchimpStoreId);
-//                if (is_array($store) && isset($store['id'])) {
-//                    $storeExists = $store;
-//                }
-//            }
-//            catch (MailChimp_Error $e) {
-//                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-//            }
-//            catch (Exception $e) {
-//                Mage::helper('mailchimp')->logError($e->getMessage());
-//            }
-//
-//            return $storeExists;
-//        } else {
-//            throw new Exception('You must provide a MailChimp API key');
-//        }
-//    }
-
     /**
      * Create MailChimp store.
      * 
@@ -72,6 +33,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             if ($listId != null && $listId != "") {
                 $storeName = Mage::helper('mailchimp')->getMCStoreName($scopeId, $scope);
                 $storeEmail = Mage::helper('mailchimp')->getConfigValueForScope('trans_email/ident_general/email', $scopeId, $scope);
+                $storeDomain = Mage::helper('mailchimp')->getStoreDomain($scopeId, $scope);
                 if (strpos($storeEmail, 'example.com') !== false) {
                     $storeEmail = null;
                     throw new Exception('Please, change the general email in Store Email Addresses/General Contact');
@@ -79,7 +41,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
                 $currencyCode = Mage::helper('mailchimp')->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
                 $isSyncing = true;
-                $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', null, $storeEmail);
+                $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail);
             } else {
                 throw new Exception('You don\'t have any lists configured in MailChimp');
             }
