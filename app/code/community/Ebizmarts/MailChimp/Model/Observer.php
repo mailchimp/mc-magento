@@ -530,18 +530,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function productAttributeUpdate(Varien_Event_Observer $observer)
     {
-        Mage::log(__METHOD__, null, 'observer.log', true);
         $productIds = $observer->getEvent()->getProductIds();
         $storeId = $observer->getEvent()->getStoreId();
-        $scope = 'stores';
-        if ($storeId === 0) {
-            $scope = 'default';
-        }
 
-        $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId, $scope);
-        Mage::log($storeId, null, 'observer.log', true);
         foreach ($productIds as $productId) {
-            Mage::getModel('mailchimp/api_products')->update($productId, $mailchimpStoreId, null, null, 1, null, true);
+            Mage::getModel('mailchimp/api_products')->update($productId, $storeId);
         }
     }
     public function productWebsiteUpdate(Varien_Event_Observer $observer)
