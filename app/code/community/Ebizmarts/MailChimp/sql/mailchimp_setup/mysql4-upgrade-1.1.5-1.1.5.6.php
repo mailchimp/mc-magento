@@ -56,7 +56,7 @@ try {
             $mailchimpStoreId = $mailchimpStoreIdCollection->getFirstItem()->getValue();
             //migrate customers
             $customerCollection = Mage::getModel('customer/customer')->getCollection();
-            foreach ($customerCollection as $customer) {
+            makeForCollectionItem($customerCollection, function ($customer) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncModified = null;
@@ -72,11 +72,11 @@ try {
 
                     Mage::helper('mailchimp')->saveEcommerceSyncData($customer->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
-            }
+            });
 
             //migrate products
             $productCollection = Mage::getModel('catalog/product')->getCollection();
-            foreach ($productCollection as $product) {
+            makeForCollectionItem($productCollection, function ($product) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncModified = null;
@@ -92,11 +92,11 @@ try {
 
                     Mage::helper('mailchimp')->saveEcommerceSyncData($product->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
-            }
+            });
 
             //migrate orders
             $orderCollection = Mage::getModel('sales/order')->getCollection();
-            foreach ($orderCollection as $order) {
+            makeForCollectionItem($orderCollection, function ($order) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncModified = null;
@@ -112,11 +112,11 @@ try {
 
                     Mage::helper('mailchimp')->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
-            }
+            });
 
             //migrate carts
             $quoteCollection = Mage::getModel('sales/quote')->getCollection();
-            foreach ($quoteCollection as $quote) {
+            makeForCollectionItem($quoteCollection, function ($quote) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncDeleted = null;
@@ -137,7 +137,7 @@ try {
 
                     Mage::helper('mailchimp')->saveEcommerceSyncData($quote->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, null, $syncDeleted, $token);
                 }
-            }
+            });
         }
     }
 } catch (Exception $e) {
@@ -168,3 +168,23 @@ try {
 }
 
 $installer->endSetup();
+
+function makeForCollectionItem($collection, Closure $callback) {
+    $collection->setPageSize(100);
+
+    $pages = $collection->getLastPageNumber();
+    $currentPage = 1;
+
+    do {
+        $collection->setCurPage($currentPage);
+        $collection->load();
+
+        foreach ($collection as $collectionItem) {
+            $callback($collectionItem);
+        }
+
+        $currentPage++;
+        // clear collection (if not done, the same page will be loaded each loop) - will also free memory
+        $collection->clear();
+    } while ($currentPage <= $pages);
+}
