@@ -241,7 +241,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * Update product sync data if Ecommerce Data is enabled.
+     * Update product sync data if
      *
      * @param $productId
      * @param $storeId

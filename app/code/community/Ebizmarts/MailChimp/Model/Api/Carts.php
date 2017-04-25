@@ -206,7 +206,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         // filter by first date if exists.
         if ($this->_firstDate) {
-            $newCarts->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
+            $newCarts->addFieldToFilter('updated_at', array('gt' => $this->_firstDate));
         }
 
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
