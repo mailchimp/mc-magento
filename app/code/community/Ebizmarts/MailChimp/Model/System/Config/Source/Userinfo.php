@@ -37,7 +37,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
         }
 
         if ((!is_array($this->_account_details) || isset($this->_account_details['status'])) && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId)) {
-            $api = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_Mailchimp_Model_Config::MANDRILL_APIKEY, $storeId));
+            $api = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
             try {
                 $this->_account_details = $api->users->info();
             } catch (Exception $e) {

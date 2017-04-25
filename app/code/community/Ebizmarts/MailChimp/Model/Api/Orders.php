@@ -257,7 +257,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $customers = array();
         try {
             $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
         }
 
@@ -282,7 +282,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         if (isset($customer['email_address'])) {
                             $custEmailAddr = $customer['email_address'];
                         }
-                    } catch (Mailchimp_Error $e) {
+                    } catch (MailChimp_Error $e) {
                     }
 
                     $data["customer"] = array(

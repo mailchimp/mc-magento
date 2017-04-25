@@ -10,7 +10,7 @@
  * @date: 6/9/16 4:44 PM
  * @file: Mailchimperrors.php
  */
-class Ebizmarts_Mailchimp_Model_Mailchimperrors extends Mage_Core_Model_Abstract
+class Ebizmarts_MailChimp_Model_Mailchimperrors extends Mage_Core_Model_Abstract
 {
     /**
      * Initialize model

@@ -113,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Observer
             if ($createWebhook) {
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
             }
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
             $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';

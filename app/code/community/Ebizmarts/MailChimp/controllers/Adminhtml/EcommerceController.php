@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             Mage::helper('mailchimp')->resetMCEcommerceData($scopeArray[1], $scopeArray[0], true);
             Mage::helper('mailchimp')->resetErrors($scopeArray[1], $scopeArray[0]);
         }
-        catch(Mailchimp_Error $e) {
+        catch(MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
             $result = 0;
         }
@@ -54,7 +54,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         try {
             Mage::helper('mailchimp')->createMergeFields($scopeArray[1], $scopeArray[0]);
         }
-        catch(Mailchimp_Error $e) {
+        catch(MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
             $result = 0;
         }

@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
                         $message = 'Please create a list at '. $htmlAnchor;
                         Mage::getSingleton('adminhtml/session')->addWarning($message);
                     }
-                } catch(Mailchimp_Error $e) {
+                } catch(MailChimp_Error $e) {
                     Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
                 }
             }

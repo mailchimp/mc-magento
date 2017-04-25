@@ -106,7 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
                 try {
                     /**
-                     * @var $mailchimpApi \Ebizmarts_Mailchimp
+                     * @var $mailchimpApi \Ebizmarts_MailChimp
                      */
                     $mailchimpApi = Mage::helper('mailchimp')->getApi($magentoStoreId);
                     if (!empty($batchArray['operations'])) {
@@ -135,7 +135,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 0));
                         Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
                     }
-                } catch (Mailchimp_Error $e) {
+                } catch (MailChimp_Error $e) {
                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
                 } catch (Exception $e) {
                     Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
@@ -143,7 +143,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     Mage::helper('mailchimp')->logError($batchArray, $magentoStoreId);
                 }
             }
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
@@ -219,7 +219,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     return array($batchResponse, $limit);
                 }
             }
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
@@ -268,7 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
                 unlink($fileName . '.tar.gz');
             }
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             $files['error'] = $e->getFriendlyMessage();
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
         } catch (Exception $e) {
