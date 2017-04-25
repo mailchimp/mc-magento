@@ -396,7 +396,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
-        $collection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $this->getMCStoreId($scopeId, $scope)));
         if ($deleteErrorsOnly) {
             $collection->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
@@ -796,7 +796,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId)
     {
-        $collection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('related_id', array('eq' => $itemId))
             ->addFieldToFilter('type', array('eq' => $itemType))
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
@@ -847,7 +847,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getIfMCStoreIdExistsForScope($scopeId, $scope)
     {
         $mcStoreAssociatedToScope = false;
-        $collection = Mage::getModel('core/config_data')->getCollection()
+        $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('scope', array('eq' => $scope))
             ->addFieldToFilter('scope_id', array('eq' => $scopeId));
@@ -869,7 +869,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpScope = null;
         $mailChimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        $collection = Mage::getModel('core/config_data')->getCollection()
+        $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('value', array('eq' => $mailChimpStoreId));
         if (count($collection)) {
@@ -961,7 +961,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getLastDateOfPurchase($subscriberEmail)
     {
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('customer_email', array('eq' => $subscriberEmail));
         $lastDateOfPurchase = null;
         foreach ($orderCollection as $order) {

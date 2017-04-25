@@ -47,16 +47,16 @@ catch (Exception $e)
 
 try {
 //migrate data from older version to the new schemma
-    $mailchimpSyncDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
+    $mailchimpSyncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
     if (!count($mailchimpSyncDataCollection)) {
-        $mailchimpStoreIdCollection = Mage::getModel('core/config_data')->getCollection()
+        $mailchimpStoreIdCollection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('scope_id', array('eq' => 0));
         if (count($mailchimpStoreIdCollection)) {
             $mailchimpStoreId = $mailchimpStoreIdCollection->getFirstItem()->getValue();
             //migrate customers
-            $customerCollection = Mage::getModel('customer/customer')->getCollection();
-            makeForCollectionItem($customerCollection, function ($customer) {
+            $customerCollection = Mage::getResourceModel('customer/customer_collection');
+            makeForCollectionItem($customerCollection, $mailchimpStoreId, function ($customer, $mailchimpStoreId) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncModified = null;
@@ -75,8 +75,8 @@ try {
             });
 
             //migrate products
-            $productCollection = Mage::getModel('catalog/product')->getCollection();
-            makeForCollectionItem($productCollection, function ($product) {
+            $productCollection = Mage::getResourceModel('catalog/product_collection');
+            makeForCollectionItem($productCollection, $mailchimpStoreId, function ($product, $mailchimpStoreId) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncModified = null;
@@ -95,8 +95,8 @@ try {
             });
 
             //migrate orders
-            $orderCollection = Mage::getModel('sales/order')->getCollection();
-            makeForCollectionItem($orderCollection, function ($order) {
+            $orderCollection = Mage::getResourceModel('sales/order_collection');
+            makeForCollectionItem($orderCollection, $mailchimpStoreId, function ($order, $mailchimpStoreId) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncModified = null;
@@ -115,8 +115,8 @@ try {
             });
 
             //migrate carts
-            $quoteCollection = Mage::getModel('sales/quote')->getCollection();
-            makeForCollectionItem($quoteCollection, function ($quote) {
+            $quoteCollection = Mage::getResourceModel('sales/quote_collection');
+            makeForCollectionItem($quoteCollection, $mailchimpStoreId, function ($quote, $mailchimpStoreId) {
                 $syncDelta = null;
                 $syncError = null;
                 $syncDeleted = null;
@@ -169,7 +169,7 @@ try {
 
 $installer->endSetup();
 
-function makeForCollectionItem($collection, Closure $callback) {
+function makeForCollectionItem($collection, $mailchimpStoreId, Closure $callback) {
     $collection->setPageSize(100);
 
     $pages = $collection->getLastPageNumber();
@@ -180,7 +180,7 @@ function makeForCollectionItem($collection, Closure $callback) {
         $collection->load();
 
         foreach ($collection as $collectionItem) {
-            $callback($collectionItem);
+            $callback($collectionItem, $mailchimpStoreId);
         }
 
         $currentPage++;

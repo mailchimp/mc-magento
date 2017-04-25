@@ -223,7 +223,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         foreach ($newCarts as $cart) {
             $cartId = $cart->getEntityId();
-            $orderCollection = Mage::getModel('sales/order')->getCollection();
+            $orderCollection = Mage::getResourceModel('sales/order_collection');
             $orderCollection->addFieldToFilter('main_table.customer_email', array('eq' => $cart->getCustomerEmail()))
                 ->addFieldToFilter('main_table.updated_at', array('from' => $cart->getUpdatedAt()));
             //if cart is empty or customer has an order made after the abandonment skip current cart.
