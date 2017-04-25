@@ -53,7 +53,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
-        $modifiedOrders = Mage::getModel('sales/order')->getCollection();
+        $modifiedOrders = Mage::getResourceModel('sales/order_collection');
         // select orders for the current Magento store id
         $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
@@ -108,7 +108,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
-        $newOrders = Mage::getModel('sales/order')->getCollection();
+        $newOrders = Mage::getResourceModel('sales/order_collection');
         // select carts for the current Magento store id
         $newOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         // filter by first date if exists.
@@ -257,7 +257,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $customers = array();
         try {
             $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
         }
 
@@ -282,7 +282,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         if (isset($customer['email_address'])) {
                             $custEmailAddr = $customer['email_address'];
                         }
-                    } catch (Mailchimp_Error $e) {
+                    } catch (MailChimp_Error $e) {
                     }
 
                     $data["customer"] = array(
@@ -407,7 +407,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer orders data
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter(
                 'state',
                 array(

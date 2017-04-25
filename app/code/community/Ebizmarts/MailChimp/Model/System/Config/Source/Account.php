@@ -47,7 +47,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $this->_accountDetails['total_orders'] = $totalOrders['total_items'];
                         $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
                         $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
-                    } catch (Mailchimp_Error $e) {
+                    } catch (MailChimp_Error $e) {
                         Mage::helper('mailchimp')->deleteLocalMCStoreData($scopeArray[1], $scopeArray[0]);
                         if ($listId) {
                             Mage::helper('mailchimp')->createStore($listId, $scopeArray[1], $scopeArray[0]);

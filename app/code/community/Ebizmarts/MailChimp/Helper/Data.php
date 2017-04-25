@@ -487,9 +487,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetErrors($scopeId, $scope)
     {
-
         // reset subscribers with errors
-        $collection = Mage::getModel('newsletter/subscriber')->getCollection()
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
         $collection = $this->addStoresToFilter($collection, $scopeId, $scope);
         foreach ($collection as $subscriber) {
@@ -497,7 +496,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $subscriber->setData("mailchimp_sync_error", '');
             $subscriber->save();
         }
-
         // reset ecommerce data with errors
         $this->removeEcommerceSyncData($scopeId, $scope, true);
         $this->clearErrorGrid($scopeId, $scope);
@@ -521,11 +519,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($scopeId == 0) {
             $storesForScope[] = 0;
         }
-        $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
+        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
         if ($excludeSubscribers) {
             $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
         }
+
         foreach ($errorCollection as $item) {
             $item->delete();
         }
@@ -535,7 +534,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Set the correspondent MailChimp store id to each error.
      */
     public function handleOldErrors() {
-        $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
+        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => ''));
         foreach ($errorCollection as $error) {
             $storeId = $error->getStoreId();
@@ -555,7 +554,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetCampaign($scopeId, $scope)
     {
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter(
                 'mailchimp_campaign_id', array(
                 array('neq'=>0))
@@ -614,7 +613,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!empty($mailchimpStoreId)) {
             try {
                 Mage::getModel('mailchimp/api_stores')->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
-            } catch (Mailchimp_Error $e) {
+            } catch (MailChimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
 
@@ -639,7 +638,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($api) {
             try {
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
-            } catch (Mailchimp_Error $e) {
+            } catch (MailChimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
 
@@ -660,7 +659,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             if ($customFieldType['value'] == $chimpTag) {
                                 try {
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
-                                } catch (Mailchimp_Error $e) {
+                                } catch (MailChimp_Error $e) {
                                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
                                 }
                                 $created = true;
@@ -691,7 +690,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                         $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
                                     }
                                 }
-                            } catch (Mailchimp_Error $e) {
+                            } catch (MailChimp_Error $e) {
                                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
                             }
                         }
@@ -720,14 +719,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param $scopeId
      * @param null $scope
-     * @return Ebizmarts_Mailchimp|null
+     * @return Ebizmarts_MailChimp|null
      */
     public function getApi($scopeId, $scope = null)
     {
         $apiKey = $this->getApiKey($scopeId, $scope);
         $api = null;
         if ($apiKey != null && $apiKey != "") {
-            $api = new Ebizmarts_Mailchimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+            $api = new Ebizmarts_MailChimp($apiKey, null, 'Mailchimp4Magento' . (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         }
 
         return $api;
@@ -745,7 +744,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->getMCStoreId($scopeId, $scope) && $this->getIfMCStoreIdExistsForScope($scopeId, $scope)) {
             try {
                 Mage::getModel('mailchimp/api_stores')->modifyName($name, $scopeId, $scope);
-            } catch (Mailchimp_Error $e) {
+            } catch (MailChimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
         }

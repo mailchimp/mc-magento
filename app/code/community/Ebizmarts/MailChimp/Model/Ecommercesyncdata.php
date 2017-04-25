@@ -11,7 +11,7 @@
  * @file: MailchimpSychBatches.php
  */
 
-class Ebizmarts_Mailchimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstract
+class Ebizmarts_MailChimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstract
 {
     /**
      * Initialize model
