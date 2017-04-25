@@ -25,7 +25,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
 
     protected function _prepareCollection()
     {
-        $collection = Mage::getModel('mailchimp/mailchimperrors')->getCollection();
+        $collection = Mage::getResourceModel('mailchimp/mailchimperrors_collection');
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }

@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         //create missing products first
-        $collection = Mage::getModel('catalog/product')->getCollection();
+        $collection = Mage::getResourceModel('catalog/product_collection');
         $collection->addStoreFilter($magentoStoreId);
         $collection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
@@ -297,7 +297,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (empty($parentIds)) {
             $parentIds = array($product->getId());
         }
-
         //add or update variant
 //        foreach ($parentIds as $parentId) {
 //            $productdata['method'] = "DELETE";

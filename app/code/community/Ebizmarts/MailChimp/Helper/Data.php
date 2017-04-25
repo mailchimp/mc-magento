@@ -487,9 +487,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetErrors($scopeId, $scope)
     {
-
         // reset subscribers with errors
-        $collection = Mage::getModel('newsletter/subscriber')->getCollection()
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
         $collection = $this->addStoresToFilter($collection, $scopeId, $scope);
         foreach ($collection as $subscriber) {
@@ -497,7 +496,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $subscriber->setData("mailchimp_sync_error", '');
             $subscriber->save();
         }
-
         // reset ecommerce data with errors
         $this->removeEcommerceSyncData($scopeId, $scope, true);
         $this->clearErrorGrid($scopeId, $scope);
@@ -521,11 +519,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($scopeId == 0) {
             $storesForScope[] = 0;
         }
-        $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
+        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
         if ($excludeSubscribers) {
             $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
         }
+
         foreach ($errorCollection as $item) {
             $item->delete();
         }
@@ -535,7 +534,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Set the correspondent MailChimp store id to each error.
      */
     public function handleOldErrors() {
-        $errorCollection = Mage::getModel('mailchimp/mailchimperrors')->getCollection()
+        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => ''));
         foreach ($errorCollection as $error) {
             $storeId = $error->getStoreId();
@@ -555,7 +554,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetCampaign($scopeId, $scope)
     {
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter(
                 'mailchimp_campaign_id', array(
                 array('neq'=>0))
