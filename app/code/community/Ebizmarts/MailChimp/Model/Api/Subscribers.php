@@ -322,6 +322,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
                     }
                 } else {
+                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+                    Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
                     $subscriber->unsubscribe();
                 }
             } else {
