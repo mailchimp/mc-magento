@@ -307,21 +307,24 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setData("mailchimp_sync_error", "");
             $subscriber->setData("mailchimp_sync_modified", 0);
         } catch(MailChimp_Error $e) {
-            if ($newStatus === 'subscribed' && strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
-                try {
-                    $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
-                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
-                    $message = Mage::helper('mailchimp')->__('To begin receiving the newsletter, you must first confirm your subscription');
-                    Mage::getSingleton('core/session')->addWarning($message);
-                } catch(MailChimp_Error $e) {
-                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
-                    Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+            if ($newStatus === 'subscribed') {
+                if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
+                    try {
+                        $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
+                        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
+                        $message = Mage::helper('mailchimp')->__('To begin receiving the newsletter, you must first confirm your subscription');
+                        Mage::getSingleton('core/session')->addWarning($message);
+                    } catch (MailChimp_Error $e) {
+                        Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+                        Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                        $subscriber->unsubscribe();
+                    } catch (Exception $e) {
+                        Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
+                    }
+                } else {
                     $subscriber->unsubscribe();
-                } catch (Exception $e) {
-                    Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
                 }
             } else {
-                $subscriber->unsubscribe();
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
                 Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
             }
