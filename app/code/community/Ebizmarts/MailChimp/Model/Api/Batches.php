@@ -46,13 +46,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * Get results of batch operations sent to MailChimp.
      *
      * @param $magentoStoreId
+     * @param bool $isEcommerceData
      */
-    protected function _getResults($magentoStoreId)
+    protected function _getResults($magentoStoreId, $isEcommerceData = true)
     {
         $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($magentoStoreId);
         $collection = Mage::getResourceModel('mailchimp/synchbatches_collection')
-            ->addFieldToFilter('store_id', array('eq' => $mailchimpStoreId))
             ->addFieldToFilter('status', array('eq' => 'pending'));
+        if ($isEcommerceData) {
+            $collection->addFieldToFilter('store_id', array('eq' => $mailchimpStoreId));
+        } else {
+            $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
+        }
         foreach ($collection as $item) {
             try {
                 $files = $this->getBatchResponse($item->getBatchId(), $magentoStoreId);
@@ -245,30 +250,30 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 // get the tar.gz file with the results
                 $fileUrl = urldecode($response['response_body_url']);
                 $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
-                if (file_exists($fileName)) {
-                    $fd = fopen($fileName, 'w');
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $fileUrl);
-                    curl_setopt($ch, CURLOPT_FILE, $fd);
-                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-                    $r = curl_exec($ch);
-                    curl_close($ch);
-                    fclose($fd);
-                }
+                $fd = fopen($fileName, 'w');
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $fileUrl);
+                curl_setopt($ch, CURLOPT_FILE, $fd);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
+                $r = curl_exec($ch);
+                curl_close($ch);
+                fclose($fd);
                 mkdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
                 $archive = new Mage_Archive();
-                $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-                $archive->unpack($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-                $dir = scandir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-                foreach ($dir as $d) {
-                    $name = pathinfo($d);
-                    if ($name['extension'] == 'json') {
-                        $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $d;
+                if (file_exists($fileName)) {
+                    $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                    $archive->unpack($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                    $dir = scandir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                    foreach ($dir as $d) {
+                        $name = pathinfo($d);
+                        if ($name['extension'] == 'json') {
+                            $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $d;
+                        }
                     }
-                }
 
-                unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
-                unlink($fileName);
+                    unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
+                    unlink($fileName);
+                }
             }
         } catch (MailChimp_Error $e) {
             $files['error'] = $e->getFriendlyMessage();
