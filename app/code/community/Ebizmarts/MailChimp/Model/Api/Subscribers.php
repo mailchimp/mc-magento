@@ -213,7 +213,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_company':
                         case 'shipping_company':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $company = $address->getCompany();
@@ -225,7 +225,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_telephone':
                         case 'shipping_telephone':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $telephone = $address->getTelephone();
@@ -237,7 +237,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_country':
                         case 'shipping_country':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $countryCode = $address->getCountry();
@@ -250,7 +250,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_zipcode':
                         case 'shipping_zipcode':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $zipCode = $address->getPostcode();
