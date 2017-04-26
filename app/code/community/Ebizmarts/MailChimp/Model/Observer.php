@@ -216,14 +216,25 @@ class Ebizmarts_MailChimp_Model_Observer
     public function customerSaveBefore(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
-        $storeId = Mage::app()->getStore()->getStoreId();
+        $storeId = $customer->getStoreId();
 
         //update mailchimp ecommerce data for that customer
         Mage::getModel('mailchimp/api_customers')->update($customer->getId(), $storeId);
-        
         //update subscriber data if a subscriber with the same email address exists
         Mage::getModel('mailchimp/api_subscribers')->update($customer->getEmail(), $storeId);
         return $observer;
+    }
+
+    public function customerAddressSaveBefore(Varien_Event_Observer $observer)
+    {
+        $customerId = $observer->getEvent()->getCustomerAddress()->getCustomerId();
+        $customer = Mage::getModel('customer/customer')->load($customerId);
+        $storeId = $customer->getStoreId();
+
+        //update mailchimp ecommerce data for that customer
+        Mage::getModel('mailchimp/api_customers')->update($customerId, $storeId);
+        //update subscriber data if a subscriber with the same email address exists
+        Mage::getModel('mailchimp/api_subscribers')->update($customer->getEmail(), $storeId);
     }
 
     /**
