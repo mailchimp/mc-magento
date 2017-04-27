@@ -10,6 +10,7 @@ before_script:
   - sleep 30
 
 script:
+  - cd ..
   - wget https://github.com/magento/marketplace-eqp/archive/1.0.5.zip
   - unzip -qq 1.0.5.zip
   - wget https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.6.2/phpcs.phar && chmod +x phpcs.phar
