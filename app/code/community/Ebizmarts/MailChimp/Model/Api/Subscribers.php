@@ -307,7 +307,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setData("mailchimp_sync_error", "");
             $subscriber->setData("mailchimp_sync_modified", 0);
         } catch(MailChimp_Error $e) {
-            if ($newStatus === 'subscribed') {
+            if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
                 if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                     try {
                         $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
