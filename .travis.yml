@@ -6,19 +6,17 @@ php:
   #- 5.6
   - 7.0
 
+env:
+  - TEST_SUITE=ecg_coding_standards
+  - TEST_SUITE=marketplate_eqp
+
 before_script:
   - sleep 30
 
 script:
   - cd ..
-  - wget https://github.com/magento/marketplace-eqp/archive/1.0.5.zip
-  - unzip -qq 1.0.5.zip
-  - wget https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.6.2/phpcs.phar && chmod +x phpcs.phar
-  - php phpcs.phar --config-set installed_paths /home/travis/build/mailchimp/marketplace-eqp-1.0.5/
-  - php phpcs.phar -n --standard="MEQP1" ./mc-magento/
-  - composer require magento-ecg/coding-standard
-  - php phpcs.phar --config-set installed_paths /home/travis/build/mailchimp/vendor/magento-ecg/coding-standard
-  - php phpcs.phar -n --standard="EcgM2" ./mc-magento/
+  - sh -c "if [ '$TEST_SUITE' = 'marketplate_eqp' ]; then composer require magento/marketplace-eqp && vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths /home/travis/build/mailchimp/vendor/magento/marketplace-eqp-1.0.5/ && vendor/squizlabs/php_codesniffer/scripts/phpcs -n --standard="MEQP1" ./mc-magento/; fi"
+  - sh -c "if [ '$TEST_SUITE' = 'ecg_coding_standards' ]; then composer require magento-ecg/coding-standard && composer require squizlabs/php_codesniffer && vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths /home/travis/build/mailchimp/vendor/magento-ecg/coding-standard && vendor/squizlabs/php_codesniffer/scripts/phpcs -n --standard="EcgM2" ./mc-magento/; fi"
 
 #notifications:
 #  slack: ebizmarts:DqCqxnqWzW55zoFU069hxs1T
