@@ -1,23 +1,19 @@
 dist: trusty
 language: php
 php:
-  - 5.4
-  - 5.5
-  - 5.6
+  #- 5.4
+  #- 5.5
+  #- 5.6
   - 7.0
 
-env:
-  - MEQP_VERSION=1.0.5
-  - PHPCS_VERSION=2.6.2
-
 before_script:
-  - sleep 60
+  - sleep 30
 
 script:
-  - wget https://github.com/magento/marketplace-eqp/archive/$MEQP_VERSION.zip
-  - unzip -qq $MEQP_VERSION.zip
-  - wget https://github.com/squizlabs/PHP_CodeSniffer/releases/download/$PHPCS_VERSION/phpcs.phar && chmod +x phpcs.phar
-  - php phpcs.phar --config-set installed_paths /home/travis/build/ebizmarts/marketplace-eqp-$MEQP_VERSION/
+  - wget https://github.com/magento/marketplace-eqp/archive/1.0.5.zip
+  - unzip -qq 1.0.5.zip
+  - wget https://github.com/squizlabs/PHP_CodeSniffer/releases/download/2.6.2/phpcs.phar && chmod +x phpcs.phar
+  - php phpcs.phar --config-set installed_paths /home/travis/build/ebizmarts/marketplace-eqp-1.0.5/
   - php phpcs.phar -n --standard="MEQP1" ./mc-magento/
 
 #notifications:
