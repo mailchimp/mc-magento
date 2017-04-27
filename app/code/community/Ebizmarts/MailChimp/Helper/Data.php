@@ -812,7 +812,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('related_id', array('eq' => $itemId))
             ->addFieldToFilter('type', array('eq' => $itemType))
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
-        if (count($collection)) {
+        if ($collection->getSize()) {
             $ecommerceSyndDataItem = $collection->getFirstItem();
         } else {
             $ecommerceSyndDataItem = Mage::getModel('mailchimp/ecommercesyncdata')
@@ -858,13 +858,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getIfMCStoreIdExistsForScope($scopeId, $scope)
     {
-        $mcStoreAssociatedToScope = false;
-        $collection = Mage::getResourceModel('core/config_data_collection')
-            ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
-            ->addFieldToFilter('scope', array('eq' => $scope))
-            ->addFieldToFilter('scope_id', array('eq' => $scopeId));
-        if (count($collection)) {
-            $mcStoreAssociatedToScope = true;
+        $mcStoreAssociatedToScope = Mage::registry('mailchimp_store_exists_for_scope_'.$scope.'_'.$scopeId);
+        if ($mcStoreAssociatedToScope === null) {
+            $mcStoreAssociatedToScope = false;
+            $numEntries = Mage::getResourceModel('core/config_data_collection')
+                ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
+                ->addFieldToFilter('scope', array('eq' => $scope))
+                ->addFieldToFilter('scope_id', array('eq' => $scopeId))
+                ->getSize();
+            if ($numEntries) {
+                $mcStoreAssociatedToScope = true;
+            }
+            Mage::register('mailchimp_store_exists_for_scope_'.$scope.'_'.$scopeId, $mcStoreAssociatedToScope);
         }
 
         return $mcStoreAssociatedToScope;
@@ -884,7 +889,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('value', array('eq' => $mailChimpStoreId));
-        if (count($collection)) {
+        if ($collection->getSize()) {
             $configEntry = $collection->getFirstItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }

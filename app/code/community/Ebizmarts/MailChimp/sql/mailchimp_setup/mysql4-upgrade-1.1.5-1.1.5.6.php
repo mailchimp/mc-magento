@@ -48,11 +48,11 @@ catch (Exception $e)
 try {
 //migrate data from older version to the new schemma
     $mailchimpSyncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
-    if (!count($mailchimpSyncDataCollection)) {
+    if (!$mailchimpSyncDataCollection->getSize()) {
         $mailchimpStoreIdCollection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('scope_id', array('eq' => 0));
-        if (count($mailchimpStoreIdCollection)) {
+        if ($mailchimpStoreIdCollection->getSize()) {
             $mailchimpStoreId = $mailchimpStoreIdCollection->getFirstItem()->getValue();
             //migrate customers
             $customerCollection = Mage::getResourceModel('customer/customer_collection');
