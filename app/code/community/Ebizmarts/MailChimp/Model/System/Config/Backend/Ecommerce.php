@@ -33,7 +33,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
         }
 
         if ($moduleIsActive && $listId && $this->getValue() && !$thisScopeHasMCStoreId) {
-            Mage::helper('mailchimp')->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
+            Mage::helper('mailchimp')->createStore($listId, $this->getScopeId(), $this->getScope());
         }
     }
 }
