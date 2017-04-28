@@ -314,16 +314,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $message = Mage::helper('mailchimp')->__('To begin receiving the newsletter, you must first confirm your subscription');
                     Mage::getSingleton('core/session')->addWarning($message);
                 } catch(Mailchimp_Error $e) {
-                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
-                    Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                    $this->_processUpdateSubscriberError($e, $storeId);
                     $subscriber->unsubscribe();
                 } catch (Exception $e) {
                     Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
                 }
             } else {
                 $subscriber->unsubscribe();
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
-                Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                $this->_processUpdateSubscriberError($e, $storeId);
             }
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
@@ -396,5 +394,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         }
+    }
+
+    /**
+     * @param $e
+     * @param $storeId
+     */
+    protected function _processUpdateSubscriberError($e, $storeId)
+    {
+        $message = $e->getFriendlyMessage();
+        Mage::helper('mailchimp')->logError($message, $storeId);
+        if (Mage::getDesign()->getArea() === 'frontend') {
+            $message = Mage::helper('mailchimp')->__('Please, try again later');
+        }
+        Mage::getSingleton('core/session')->addError($message);
     }
 }
