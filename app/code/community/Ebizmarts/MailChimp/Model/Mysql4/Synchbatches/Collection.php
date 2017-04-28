@@ -11,7 +11,7 @@
  * @file: Collection.php
  */
 
-class Ebizmarts_Mailchimp_Model_Mysql4_Synchbatches_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
+class Ebizmarts_MailChimp_Model_Mysql4_Synchbatches_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
 {
 
     /**

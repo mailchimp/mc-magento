@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         //get customers
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-        $collection = Mage::getModel('customer/customer')->getCollection();
+        $collection = Mage::getResourceModel('customer/customer_collection');
         $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $collection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
@@ -77,7 +77,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["opt_in_status"] = $this->getOptin($magentoStoreId);
 
         //customer orders data
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter(
                 'state',
                 array(

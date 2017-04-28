@@ -10,7 +10,7 @@
  * @date: 6/10/16 1:42 PM
  * @file: Mailchimperrors.php
  */
-class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors extends Mage_Adminhtml_Block_Widget_Grid_Container
 {
     public function __construct()
     {

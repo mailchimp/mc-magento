@@ -10,7 +10,7 @@
  * @date: 8/30/16 2:46 PM
  * @file: Template.php
  */
-class Ebizmarts_MailChimp_Model_Email_Template extends Mage_Core_Model_Email_Template
+class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model_Email_TemplateBase
 {
     protected $_mail = null;
 

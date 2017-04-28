@@ -10,7 +10,7 @@
  * @date: 6/10/16 2:23 PM
  * @file: Link.php
  */
-class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
     public function render(Varien_Object $row)
     {

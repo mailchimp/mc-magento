@@ -113,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Observer
             if ($createWebhook) {
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
             }
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
             $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
@@ -164,10 +164,10 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function handleSubscriberDeletion(Varien_Event_Observer $observer)
     {
-        $isEnabled = Mage::helper('mailchimp')->getConfigValue(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE);
+        $subscriber = $observer->getEvent()->getSubscriber();
+        $isEnabled = Mage::helper('mailchimp')->isMailChimpEnabled($subscriber->getStoreId());
+        
         if ($isEnabled) {
-            $subscriber = $observer->getEvent()->getSubscriber();
-
             Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
         }
     }

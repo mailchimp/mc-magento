@@ -17,7 +17,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function createBatchJson($listId, $storeId, $limit)
     {
         //get subscribers
-        $collection = Mage::getModel('newsletter/subscriber')->getCollection()
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_status', array('eq' => 1))
             ->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter(
@@ -306,7 +306,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
             $subscriber->setData("mailchimp_sync_error", "");
             $subscriber->setData("mailchimp_sync_modified", 0);
-        } catch(Mailchimp_Error $e) {
+        } catch(MailChimp_Error $e) {
             if ($newStatus === 'subscribed' && strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                 try {
                     $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
@@ -360,7 +360,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
-        } catch(Mailchimp_Error $e) {
+        } catch(MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
@@ -379,7 +379,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->update($listId, $md5HashEmail, null, 'cleaned');
-        } catch(Mailchimp_Error $e) {
+        } catch(MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
