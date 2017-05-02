@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $allCarts = array();
-        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE)) {
+        if (!Mage::helper('mailchimp')->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
         }
 
