@@ -122,8 +122,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where(
-            "m4m.mailchimp_sync_modified = 1 AND m4m.mailchimp_sync_deleted = 0 
-        AND m4m.mailchimp_sync_delta < '" . new Zend_Db_Expr('updated_at') . "'"
+            "m4m.mailchimp_sync_deleted = 0 
+        AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
         $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
