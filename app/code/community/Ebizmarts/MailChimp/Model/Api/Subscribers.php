@@ -201,6 +201,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                             Mage::dispatchEvent(
                                 'mailchimp_merge_field_send_before', array(
+                                'customer_id' => $customer->getId(),
                                 'subscriber_email' => $subscriberEmail,
                                 'merge_field_tag' => $attributeCode,
                                 'merge_field_value' => &$eventValue
@@ -269,6 +270,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                     Mage::dispatchEvent(
                         'mailchimp_merge_field_send_before', array(
+                        'customer_id' => null,
                         'subscriber_email' => $subscriberEmail,
                         'merge_field_tag' => $customAtt,
                         'merge_field_value' => &$eventValue
