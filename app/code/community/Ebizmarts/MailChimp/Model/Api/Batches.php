@@ -164,7 +164,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $storeId = $store->getId();
             $this->_getResults($storeId, false);
             if ($subscriberLimit > 0) {
-                list($batchResponses[], $subscriberLimit) = $this->sendStoreSubscriberBatch($storeId, $subscriberLimit);
+                $batchResult = $this->sendStoreSubscriberBatch($storeId, $subscriberLimit);
+                if ($batchResult === null) {
+                    continue;
+                }
+                list($batchResponses[], $subscriberLimit) = $batchResult;
             } else {
                 break;
             }
@@ -172,7 +176,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         $this->_getResults(0, false);
         if ($subscriberLimit > 0) {
-            list($batchResponses[], $subscriberLimit) = $this->sendStoreSubscriberBatch(0, $subscriberLimit);
+            $batchResult = $this->sendStoreSubscriberBatch(0, $subscriberLimit);
+            if ($batchResult !== null) {
+                list($batchResponses[], $subscriberLimit) = $batchResult;
+            }
         }
 
         return $batchResponses;
