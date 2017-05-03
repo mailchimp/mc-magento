@@ -169,7 +169,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $storeId = $store->getId();
             $this->_getResults($storeId, false);
             if ($subscriberLimit > 0) {
-                list($batchResponses[], $subscriberLimit) = $this->sendStoreSubscriberBatch($storeId, $subscriberLimit);
+                list($batchResponse, $subscriberLimit) = $this->sendStoreSubscriberBatch($storeId, $subscriberLimit);
+                if ($batchResponse) {
+                    $batchResponses[] = $batchResponse;
+                }
             } else {
                 break;
             }
@@ -177,7 +180,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         $this->_getResults(0, false);
         if ($subscriberLimit > 0) {
-            list($batchResponses[], $subscriberLimit) = $this->sendStoreSubscriberBatch(0, $subscriberLimit);
+            list($batchResponse, $subscriberLimit) = $this->sendStoreSubscriberBatch(0, $subscriberLimit);
+            if ($batchResponse) {
+                $batchResponses[] = $batchResponse;
+            }
         }
 
         return $batchResponses;
@@ -230,7 +236,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
         }
 
-        return null;
+        return array(null, $limit);
     }
 
     /**
