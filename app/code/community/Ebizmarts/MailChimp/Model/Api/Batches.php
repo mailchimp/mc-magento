@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $scopeToReset = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($store->getId());
                 if ($scopeToReset) {
                     Mage::helper('mailchimp')->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
-                    $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0, $scopeToReset['scope'], $scopeToReset['scope_id']));
+                    $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
                     Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
                 }
             }
