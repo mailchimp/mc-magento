@@ -32,6 +32,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
     const ECOMMERCE_CUSTOMERS_OPTIN     = 'mailchimp/ecommerce/customers_optin';
     const ECOMMERCE_FIRSTDATE           = 'mailchimp/ecommerce/firstdate';
+    const ECOMMERCE_MC_JS_URL           = 'mailchimp/ecommerce/mc_js_url';
 
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';

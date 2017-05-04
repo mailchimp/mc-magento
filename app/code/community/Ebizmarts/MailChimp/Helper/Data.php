@@ -598,7 +598,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $mailchimpStoreId = md5($this->getMCStoreName($scopeId, $scope). '_' . $date);
             //create store in mailchimp
             try {
-                Mage::getModel('mailchimp/api_stores')->createMailChimpStore($mailchimpStoreId, $listId, $scopeId, $scope);
+                $response = Mage::getModel('mailchimp/api_stores')->createMailChimpStore($mailchimpStoreId, $listId, $scopeId, $scope);
                 //save in config
                 $configValues = array(
                     array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $mailchimpStoreId),
@@ -606,6 +606,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCMINSYNCDATEFLAG, Varien_Date::now()),
                     array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 1)
                     );
+                if (isset($response['connected_site']['site_script']['url'])) {
+                    $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $response['site_script']['url']);
+                    Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeId, $scope);
+                }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
@@ -1023,5 +1027,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $customMergeFields = array();
         }
         return $customMergeFields;
+    }
+
+    public function getMCJs()
+    {
+        $storeId = Mage::app()->getStore()->getId();
+        $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+        if (!$url) {
+            $url = Mage::getModel('mailchimp/api_stores')->getMCJsUrl($storeId, 'stores');
+        }
+        return $this->__('<script type="text/javascript" src="'. $url .'"></script>');;
     }
 }
