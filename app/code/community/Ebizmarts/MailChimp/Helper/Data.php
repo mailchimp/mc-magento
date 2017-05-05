@@ -1131,7 +1131,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             "m4m.mailchimp_sync_delta IS null AND e.mailchimp_sync_delta > '0000-00-00 00:00:00'"
         );
 
-        makeForCollectionItem($customerCollection, $mailchimpStoreId, $initialTime, function ($customer, $mailchimpStoreId) {
+        $this->_makeForCollectionItem($customerCollection, $mailchimpStoreId, $initialTime, function ($customer, $mailchimpStoreId) {
             $syncDelta = null;
             $syncError = null;
             $syncModified = null;
@@ -1145,13 +1145,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             Mage::helper('mailchimp')->saveEcommerceSyncData($customer->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
-            try {
-                $customer->setMailchimpSyncDelta('0000-00-00 00:00:00');
-                $customer->getResource()->saveAttribute($customer, 'mailchimp_sync_delta');
-            } catch (Exception $e) {
-
-            }
-
         });
     }
 
@@ -1168,7 +1161,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $productCollection->getSelect()->where(
             "m4m.mailchimp_sync_delta IS null AND e.mailchimp_sync_delta > '0000-00-00 00:00:00'"
         );
-        makeForCollectionItem($productCollection, $mailchimpStoreId, $initialTime, function ($product, $mailchimpStoreId) {
+        $this->_makeForCollectionItem($productCollection, $mailchimpStoreId, $initialTime, function ($product, $mailchimpStoreId) {
             $syncDelta = null;
             $syncError = null;
             $syncModified = null;
@@ -1197,7 +1190,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             array('m4m.*')
         );
         $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NULL AND e.mailchimp_sync_delta > '0000-00-00 00:00:00'");
-        makeForCollectionItem($orderCollection, $mailchimpStoreId, $initialTime, function ($order, $mailchimpStoreId) {
+        $this->_makeForCollectionItem($orderCollection, $mailchimpStoreId, $initialTime, function ($order, $mailchimpStoreId) {
             $syncDelta = null;
             $syncError = null;
             $syncModified = null;
@@ -1226,7 +1219,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $quoteCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NULL AND e.mailchimp_sync_delta > '0000-00-00 00:00:00'");
-        makeForCollectionItem($quoteCollection, $mailchimpStoreId, $initialTime, function ($quote, $mailchimpStoreId) {
+        $this->_makeForCollectionItem($quoteCollection, $mailchimpStoreId, $initialTime, function ($quote, $mailchimpStoreId) {
             $syncDelta = null;
             $syncError = null;
             $syncDeleted = null;
@@ -1248,7 +1241,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         });
     }
 
-    function makeForCollectionItem($collection, $mailchimpStoreId, $initialTime, Closure $callback)
+    protected function _makeForCollectionItem($collection, $mailchimpStoreId, $initialTime, Closure $callback)
     {
 //        $collection->addFieldToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
         $collection->setPageSize(100);
