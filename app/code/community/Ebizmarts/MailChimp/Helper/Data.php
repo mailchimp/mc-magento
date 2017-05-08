@@ -1040,7 +1040,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$url) {
             $url = Mage::getModel('mailchimp/api_stores')->getMCJsUrl($storeId, 'stores');
         }
-        return $this->__('<script type="text/javascript" src="' . $url . '"></script>');
+        return '<script type="text/javascript" src="' . $url . '"></script>';
     }
 
     public function handleMigrationUpdates()
