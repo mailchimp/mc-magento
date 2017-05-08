@@ -134,11 +134,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     if (Mage::helper('mailchimp')->getMCIsSyncing($magentoStoreId) && $itemAmount == 0) {
-                        $isSyncing = false;
-                        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSyncing);
-                        $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
-                        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 0));
-                        Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
+                        Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, false);
                     }
                 } catch (MailChimp_Error $e) {
                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
