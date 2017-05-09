@@ -93,6 +93,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         }
     }
 
+    /**
+     * Returns URL from MailChimp store data
+     *
+     * @param $scopeId
+     * @param $scope
+     * @return mixed
+     */
     public function getMCJsUrl($scopeId, $scope)
     {
         try {
@@ -112,6 +119,14 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         }
     }
 
+    /**
+     * Set is_syncing value for the given scope.
+     *
+     * @param $mailchimpApi
+     * @param $isSincingValue
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     */
     public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId, $magentoStoreId)
     {
         $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);

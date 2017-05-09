@@ -134,7 +134,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     if (Mage::helper('mailchimp')->getMCIsSyncing($magentoStoreId) && $itemAmount == 0) {
-                        Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, false);
+                        Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, false, $mailchimpStoreId, $magentoStoreId);
                     }
                 } catch (MailChimp_Error $e) {
                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
@@ -302,6 +302,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $store = explode('-', $line[0]);
                     $type = $line[1];
                     $id = $line[3];
+                    if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
+                        $order = Mage::getModel('sales/order')->loadByIncrementId($id);
+                        $id = $order->getEntityId();
+                    }
 
                     $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
@@ -324,58 +328,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $error = $response->title . " : " . $response->detail;
 
                     Mage::helper('mailchimp')->saveEcommerceSyncData($id, $type, $mailchimpStoreId, null, $error, 0, null, null, true);
-//                    switch ($type) {
-//                        case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
-//                            $p = Mage::getModel('catalog/product')->load($id);
-//                            if ($p->getId() == $id) {
-//                                $p->setData("mailchimp_sync_error", $error);
-//                                $p->getResource()->saveAttribute($p, 'mailchimp_sync_error');
-//                            } else {
-//                                Mage::helper('mailchimp')->logError("Error: product " . $id . " not found");
-//                            }
-//                            break;
-//                        case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
-//                            $c = Mage::getModel('customer/customer')->load($id);
-//                            if ($c->getId() == $id) {
-//                                $c->setData("mailchimp_sync_error", $error);
-//                                $c->getResource()->saveAttribute($c, 'mailchimp_sync_error');
-//                            } else {
-//                                Mage::helper('mailchimp')->logError("Error: customer " . $id . " not found");
-//                            }
-//                            break;
-//                        case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
-//                            $o = Mage::getModel('sales/order')->load($id);
-//                            if ($o->getId() == $id) {
-//                                $o->setData("mailchimp_sync_error", $error);
-//                                $o->setMailchimpSyncModified(0);
-//                                $o->setMailchimpUpdateObserverRan(true);
-//                                $o->save();
-//                            } else {
-//                                Mage::helper('mailchimp')->logError("Error: order " . $id . " not found");
-//                            }
-//                            break;
-//                        case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
-//                            $q = Mage::getModel('sales/quote')->load($id);
-//                            if ($q->getId() == $id) {
-//                                $q->setData("mailchimp_sync_error", $error);
-//                                $q->save();
-//                            } else {
-//                                Mage::helper('mailchimp')->logError("Error: quote " . $id . " not found");
-//                            }
-//                            break;
-//                        case Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER:
-//                            $s = Mage::getModel('newsletter/subscriber')->load($id);
-//                            if ($s->getId() == $id) {
-//                                $s->setData("mailchimp_sync_error", $error);
-//                                $s->save();
-//                            } else {
-//                                Mage::helper('mailchimp')->logError("Error: subscriber " . $id . " not found");
-//                            }
-//                            break;
-//                        default:
-//                            Mage::helper('mailchimp')->logError("Error: no identification " . $type . " found");
-//                            break;
-//                    }
 
                     $mailchimpErrors->setType($response->type);
                     $mailchimpErrors->setTitle($response->title);
@@ -391,6 +343,62 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             }
 
             unlink($file);
+        }
+    }
+
+    /**
+     * Handle batch for order id replacement with the increment id in MailChimp.
+     *
+     * @param $initialTime
+     * @param $magentoStoreId
+     */
+    public function replaceAllOrders($initialTime, $magentoStoreId)
+    {
+        try {
+            $this->_getResults($magentoStoreId);
+
+            //handle order replacement
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($magentoStoreId);
+
+            $batchArray['operations'] = Mage::getModel('mailchimp/api_orders')->replaceAllOrdersBatch($initialTime, $mailchimpStoreId, $magentoStoreId);
+            $itemAmount = count($batchArray['operations']);
+            try {
+                /**
+                 * @var $mailchimpApi \Ebizmarts_MailChimp
+                 */
+                $mailchimpApi = Mage::helper('mailchimp')->getApi($magentoStoreId);
+                if (!empty($batchArray['operations'])) {
+                    $batchJson = json_encode($batchArray);
+                    if (!$batchJson || $batchJson == '') {
+                        Mage::helper('mailchimp')->logRequest('An empty operation was detected', $magentoStoreId);
+                    } else {
+                        if (!Mage::helper('mailchimp')->getIsReseted($magentoStoreId)) {
+                            $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                            Mage::helper('mailchimp')->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
+                            //save batch id to db
+                            $batch = Mage::getModel('mailchimp/synchbatches');
+                            $batch->setStoreId($mailchimpStoreId)
+                                ->setBatchId($batchResponse['id'])
+                                ->setStatus($batchResponse['status']);
+                            $batch->save();
+                        }
+                    }
+                }
+
+                if (Mage::helper('mailchimp')->getMCIsSyncing($magentoStoreId) && $itemAmount == 0) {
+                    Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, false, $mailchimpStoreId, $magentoStoreId);
+                }
+            } catch (MailChimp_Error $e) {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
+            } catch (Exception $e) {
+                Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
+                Mage::helper('mailchimp')->logError("Json encode fails", $magentoStoreId);
+                Mage::helper('mailchimp')->logError($batchArray, $magentoStoreId);
+            }
+        } catch (MailChimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
+        } catch (Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
         }
     }
 }

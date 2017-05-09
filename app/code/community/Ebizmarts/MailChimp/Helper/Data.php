@@ -1033,6 +1033,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $customMergeFields;
     }
 
+    /**
+     * Return html code for adding the MailChimp javascript.
+     *
+     * @return string
+     */
     public function getMCJs()
     {
         $storeId = Mage::app()->getStore()->getId();
@@ -1043,6 +1048,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return '<script type="text/javascript" src="' . $url . '"></script>';
     }
 
+    /**
+     * Handle data migration for versions that require it.
+     */
     public function handleMigrationUpdates()
     {
         $initialTime = time();
@@ -1051,11 +1059,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($migrateFrom115) {
             $this->_migrateFrom115($initialTime);
-        } elseif ($migrateFrom116 && !$this->_timePassed($initialTime)) {
+        } elseif ($migrateFrom116 && !$this->timePassed($initialTime)) {
             $this->_migrateFrom116($initialTime);
         }
     }
 
+    /**
+     * Migrate data from version 1.1.5 to the mailchimp_ecommerce_sync_data table.
+     *
+     * @param $initialTime
+     */
     protected function _migrateFrom115($initialTime)
     {
         //migrate data from older version to the new schemma
@@ -1064,13 +1077,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         //migrate customers
         $this->_migrateCustomersFrom115($mailchimpStoreId, $initialTime);
 
-        if (!$this->_timePassed($initialTime)) {
+        if (!$this->timePassed($initialTime)) {
             //migrate products
             $this->_migrateProductsFrom115($mailchimpStoreId, $initialTime);
-            if (!$this->_timePassed($initialTime)) {
+            if (!$this->timePassed($initialTime)) {
                 //migrate orders
                 $this->_migrateOrdersFrom115($mailchimpStoreId, $initialTime);
-                if (!$this->_timePassed($initialTime)) {
+                if (!$this->timePassed($initialTime)) {
                     //migrate carts
                     $finished = $this->_migrateCartsFrom115($mailchimpStoreId, $initialTime);
                     if ($finished) {
@@ -1117,6 +1130,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     }
 
+    /**
+     * Migrate Customers from version 1.1.5 to the mailchimp_ecommerce_sync_data table.
+     *
+     * @param $mailchimpStoreId
+     * @param $initialTime
+     */
     protected function _migrateCustomersFrom115($mailchimpStoreId, $initialTime)
     {
         try {
@@ -1153,6 +1172,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Migrate Products from version 1.1.5 to the mailchimp_ecommerce_sync_data table.
+     *
+     * @param $mailchimpStoreId
+     * @param $initialTime
+     */
     protected function _migrateProductsFrom115($mailchimpStoreId, $initialTime)
     {
         try {
@@ -1189,6 +1214,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Migrate Orders from version 1.1.5 to the mailchimp_ecommerce_sync_data table.
+     *
+     * @param $mailchimpStoreId
+     * @param $initialTime
+     */
     protected function _migrateOrdersFrom115($mailchimpStoreId, $initialTime)
     {
         try {
@@ -1223,6 +1254,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Migrate Carts from version 1.1.5 to the mailchimp_ecommerce_sync_data table.
+     *
+     * @param $mailchimpStoreId
+     * @param $initialTime
+     * @return bool
+     */
     protected function _migrateCartsFrom115($mailchimpStoreId, $initialTime)
     {
         try {
@@ -1266,6 +1304,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Helper function for data migration from version 1.1.5.
+     *
+     * @param $collection
+     * @param $mailchimpStoreId
+     * @param $initialTime
+     * @param Closure $callback
+     * @return bool
+     */
     protected function _makeForCollectionItem($collection, $mailchimpStoreId, $initialTime, Closure $callback)
     {
         $finished = false;
@@ -1289,7 +1336,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $currentPage++;
             // clear collection (if not done, the same page will be loaded each loop) - will also free memory
             $collection->clear();
-            if ($this->_timePassed($initialTime)) {
+            if ($this->timePassed($initialTime)) {
                 break;
             }
             if ($currentPage == $pages) {
@@ -1300,7 +1347,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     }
 
-    protected function _timePassed($initialTime)
+    /**
+     * Check if more than 270 seconds passed since the migration started to prevent the job to take too long.
+     *
+     * @param $initialTime
+     * @return bool
+     */
+    public function timePassed($initialTime)
     {
         $timePassed = false;
         $finalTime = time();
@@ -1311,17 +1364,65 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $timePassed;
     }
 
-    protected function _migrateFrom116()
+    /**
+     * Migrate data from version 1.1.6.
+     *
+     * @param $initialTime
+     */
+    protected function _migrateFrom116($initialTime)
     {
         //poner isSyncing en true y mostrar cartel en la configuracion que diga que la store esta sincronizando due to first time installation or migration of data due to module update.
-//        Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, true, $mailchimpStoreId, $magentoStoreId);
-//        $stores = Mage::app()->getStores();
-//        foreach($stores as $store) {}
-        //borrar ordenes y crearlas nuevamente con id nuevo una a una via batch con limit 400.
-
-        //cuando termine setear la store en is_syncing false y continuar con la sincronizacion.
+        $this->_setIsSyncingInAllStores(true);
+        $finished = $this->_migrateOrdersFrom116($initialTime);
+        if ($finished) {
+            $this->_setIsSyncingInAllStores(false);
+            $this->delete116MigrationConfigData();
+        }
     }
 
+    /**
+     * Modify is_syncing value for all stores.
+     *
+     * @param $syncValue
+     */
+    protected function _setIsSyncingInAllStores($syncValue)
+    {
+        $stores = Mage::app()->getStores();
+        foreach($stores as $storeId => $store) {
+            $mailchimpApi = $this->getApi($storeId);
+            $mailchimpStoreId = $this->getMCStoreId($storeId);
+            Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
+        }
+    }
+
+    /**
+     * Update Order ids to the Increment id in MailChimp.
+     *
+     * @param $initialTime
+     * @return bool
+     */
+    protected function _migrateOrdersFrom116($initialTime)
+    {
+        $finished = false;
+        if (!$this->timePassed($initialTime)) {
+            $finished = true;
+            $stores = Mage::app()->getStores();
+            foreach ($stores as $storeId => $store) {
+                Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
+                if ($this->timePassed($initialTime)) {
+                    $finished = false;
+                    break;
+                }
+            }
+        }
+        return $finished;
+    }
+
+    /**
+     * Return if migration has finished checking the config values.
+     *
+     * @return bool
+     */
     public function migrationFinished()
     {
         $migrationFinished = false;
@@ -1333,5 +1434,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $migrationFinished = true;
         }
         return $migrationFinished;
+    }
+
+    /**
+     * Delete config data for migration from 1.1.6.
+     */
+    public function delete116MigrationConfigData()
+    {
+        $stores = Mage::app()->getStores();
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 'default', 0);
+        foreach ($stores as $storeId => $store) {
+            Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID, 'stores', $storeId);
+        }
+        Mage::getConfig()->cleanCache();
     }
 }
