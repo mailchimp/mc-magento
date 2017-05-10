@@ -10,13 +10,17 @@
             "email": "mailchimp@ebizmarts-desk.zendesk.com"
         }
     ],
-    "require": {
-        "magento-hackathon/magento-composer-installer": "*"
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "Map/copy module files with your Magento installation"
+    },
+    "require-dev": {
+        "magento-ecg/coding-standard": "^2.0",
+        "magento/marketplace-eqp": "^1.0"
     },
     "repositories": [
         {
-            "type": "composer",
-            "url": "https://packages.firegento.com"
+            "type": "vcs",
+            "url": "https://github.com/magento/marketplace-eqp.git"
         }
     ]
 }

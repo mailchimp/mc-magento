@@ -1,4 +1,5 @@
 # MailChimp For Magento 1
+[![Build Status](https://travis-ci.org/mailchimp/mc-magento.svg?branch=develop)](https://travis-ci.org/mailchimp/mc-magento)
 
 Integration to sync all the Magento data (Newsletter subscriber, Customers, Orders, Products) with MailChimp. It allows to use all the MailChimp potential for email Marketing such as sending Campaigns, Automations and more.
 

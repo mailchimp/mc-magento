@@ -1,2 +1,4 @@
 .idea
 app/code/community/Ebizmarts/MailChimp/controllers/TestController.php
+composer.lock
+/vendor/

@@ -7,16 +7,23 @@ php:
   - 7.0
 
 env:
-  - TEST_SUITE=marketplate_eqp
-  - TEST_SUITE=ecg_coding_standards
+  global:
+    - COMPOSER_BIN_DIR=~/bin
+  matrix:
+    - CODING_STANDARD=Ecg SEVERITY=5
+    - CODING_STANDARD=MEQP1 SEVERITY=5
+    - CODING_STANDARD=MEQP1 SEVERITY=9
 
-before_script:
-  - sleep 30
+matrix:
+  allow_failures:
+    - env: CODING_STANDARD=Ecg SEVERITY=5
+    - env: CODING_STANDARD=MEQP1 SEVERITY=5
 
-script:
-  - cd ..
-  - sh -c "if [ '$TEST_SUITE' = 'marketplate_eqp' ]; then composer config --global repositories.magento-eqp git https://github.com/magento/marketplace-eqp && composer require magento/marketplace-eqp && vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths /home/travis/build/mailchimp/vendor/magento/marketplace-eqp/ && vendor/squizlabs/php_codesniffer/scripts/phpcs -n --standard="MEQP1" ./mc-magento/; fi"
-  - sh -c "if [ '$TEST_SUITE' = 'ecg_coding_standards' ]; then composer require magento-ecg/coding-standard && composer require squizlabs/php_codesniffer && vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths /home/travis/build/mailchimp/vendor/magento-ecg/coding-standard && vendor/squizlabs/php_codesniffer/scripts/phpcs -n --standard="Ecg" ./mc-magento/; fi"
+before_install: test -n "$GITHUB_TOKEN" && composer config github-oauth.github.com "$GITHUB_TOKEN" || true
+install: composer install --no-interaction --prefer-dist
+
+before_script: phpcs --config-set installed_paths vendor/magento-ecg/coding-standard,vendor/magento/marketplace-eqp
+script: phpcs ./ --ignore=./vendor --standard="$CODING_STANDARD" --severity="$SEVERITY" --extensions=phtml,php,js,css
 
 #notifications:
 #  slack: ebizmarts:DqCqxnqWzW55zoFU069hxs1T
