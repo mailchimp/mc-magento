@@ -234,7 +234,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             } else {
                 $variant = $productId;
             }
-
             if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == 0) {
                 $itemCount++;
                 $data["lines"][] = array(
@@ -556,7 +555,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             array('m4m.*')
         );
         // be sure that the orders are not in mailchimp
-        $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NOT NULL");
+        $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''");
         foreach ($orderCollection as $order) {
             //Delete order
             $orderId = $order->getEntityId();
