@@ -131,7 +131,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $variendata["price"] = $data["price"];
                 $variendata["inventory_quantity"] = $data["inventory_quantity"];
                 $this->_parentImageUrl = Mage::helper('mailchimp')->getImageUrlById($parentId);
-                $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $data["image_url"]);
+                $dataImageUrl = (isset($data["image_url"])) ? $data["image_url"] : null;
+                $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $dataImageUrl);
                 if ($imageUrl) {
                     $variendata["image_url"] = $imageUrl;
                 }
