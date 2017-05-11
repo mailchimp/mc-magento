@@ -611,7 +611,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 1)
                 );
                 if (isset($response['connected_site']['site_script']['url'])) {
-                    $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $response['site_script']['url']);
+                    $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $response['connected_site']['site_script']['url']);
                     Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeId, $scope);
                 }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
@@ -1040,12 +1040,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getMCJs()
     {
+        $script = '';
         $storeId = Mage::app()->getStore()->getId();
-        $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
-        if (!$url) {
-            $url = Mage::getModel('mailchimp/api_stores')->getMCJsUrl($storeId, 'stores');
+        if ($this->isEcommerceEnabled($storeId)) {
+            $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+            if (!$url) {
+                $url = Mage::getModel('mailchimp/api_stores')->getMCJsUrl($storeId, 'stores');
+            }
+            $script = '<script type="text/javascript" src="' . $url . '"></script>';
         }
-        return '<script type="text/javascript" src="' . $url . '"></script>';
+        return $script;
     }
 
     /**

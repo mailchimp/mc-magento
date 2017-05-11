@@ -15,6 +15,4 @@ catch (Exception $e)
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
-Mage::helper('mailchimp')->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 1)), 0, 'default');
-
 $installer->endSetup();
