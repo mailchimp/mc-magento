@@ -54,11 +54,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected function _updateEmail(array $data)
     {
 
+        $listId = $data['data']['list_id'];
         $old = $data['data']['old_email'];
         $new = $data['data']['new_email'];
 
-        $oldSubscriber = $this->loadByEmail($old);
-        $newSubscriber = $this->loadByEmail($new);
+        $oldSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $old);
+        $newSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $new);
 
         if (!$newSubscriber->getId() && $oldSubscriber->getId()) {
             $oldSubscriber->setSubscriberEmail($new)
@@ -80,7 +81,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected function _clean(array $data)
     {
         //Delete subscriber from Magento
-        $s = $this->loadByEmail($data['data']['email']);
+        $s = Mage::helper('mailchimp')->loadListSubscriber($data['data']['list_id'], $data['data']['email']);
 
         if ($s->getId()) {
             try {
@@ -100,8 +101,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected function _subscribe(array $data)
     {
         try {
-            $subscriber = Mage::getModel('newsletter/subscriber')
-                ->loadByEmail($data['data']['email']);
+            $subscriber = Mage::helper('mailchimp')->loadListSubscriber($data['data']['list_id'], $data['data']['email']);
             if ($subscriber->getId()) {
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED)
                     ->save();
@@ -132,13 +132,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected function _unsubscribe(array $data)
     {
-        $subscriber = $this->loadByEmail($data['data']['email']);
-
-        if (!$subscriber->getId()) {
-            $subscriber = Mage::getModel('newsletter/subscriber')
-                ->loadByEmail($data['data']['email']);
-        }
-
+        $subscriber = Mage::helper('mailchimp')->loadListSubscriber($data['data']['list_id'], $data['data']['email']);
         if ($subscriber->getId()) {
             try {
                 switch ($data['data']['action']) {
@@ -162,28 +156,21 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     protected function _profile(array $data)
     {
+        $listId = $data['data']['list_id'];
         $email = $data['data']['email'];
-        $subscriber = $this->loadByEmail($email);
-
-        $customerCollection = Mage::getResourceModel('customer/customer_collection')
-            ->addFieldToFilter('email', array('eq' => $email));
-        if (count($customerCollection) > 0) {
-            $customerId = $customerCollection->getFirstItem()->getEntityId();
-        }
-
-        if ($customerId) {
-            $toUpdate = Mage::getModel('customer/customer')->load($customerId);
+        $customer = Mage::helper('mailchimp')->loadListCustomer($listId, $email);
+        if ($customer) {
+            $toUpdate = $customer;
             $toUpdate->setFirstname($data['data']['merges']['FNAME']);
             $toUpdate->setLastname($data['data']['merges']['LNAME']);
         } else {
+            $subscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $email);
             $toUpdate = $subscriber;
             $toUpdate->setSubscriberFirstname($data['data']['merges']['FNAME']);
             $toUpdate->setSubscriberLastname($data['data']['merges']['LNAME']);
         }
 
         $toUpdate->save();
-
-
     }
 
     /**
@@ -196,19 +183,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         return Mage::getModel('adminnotification/inbox')
             ->setSeverity(4)//Notice
             ->setDateAdded(Mage::getModel('core/date')->gmtDate());
-    }
-
-    /**
-     * Load newsletter_subscriber by email
-     *
-     * @param string $email
-     * @return Mage_Newsletter_Model_Subscriber
-     */
-    public function loadByEmail($email)
-    {
-        return Mage::getResourceModel('newsletter/subscriber_collection')
-            ->addFieldToFilter('subscriber_email', $email)
-            ->getFirstItem();
     }
 
 }
