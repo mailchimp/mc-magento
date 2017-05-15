@@ -181,7 +181,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($isVarient) {
             //this is for a varient product
             $data["sku"] = $product->getSku();
-            $data["price"] = $product->getPrice();
+            $data["price"] = (int)$product->getPrice();
 
             //stock
             $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product);
