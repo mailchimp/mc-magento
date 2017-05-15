@@ -53,7 +53,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected function _updateEmail(array $data)
     {
-
         $listId = $data['data']['list_id'];
         $old = $data['data']['old_email'];
         $new = $data['data']['new_email'];
@@ -125,6 +124,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     protected function _subscribeMember($subscriber)
     {
+        $subscriber->setImportMode(true);
         $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
         $subscriber->setSubscriberConfirmCode($subscriber->randomSequence());
         $subscriber->setSubscriberSource('Mailchimp');
@@ -196,8 +196,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     $md5HashEmail = md5(strtolower($email));
                     $member = $api->lists->members->get($listId, $md5HashEmail, null, null);
                     if ($member['status'] == 'subscribed') {
-                        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
-                        $subscriber->save();
+                        $this->_subscribeMember($subscriber);
                     } elseif ($member['status'] == 'unsubscribed') {
                         if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
