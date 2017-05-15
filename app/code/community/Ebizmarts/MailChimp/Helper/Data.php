@@ -1051,9 +1051,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 ->addFieldToFilter('subscriber_email', $email)
                 ->getFirstItem();
 
-        if (!$subscriber)
-            $subscriber = Mage::getModel('newsletter/subscriber')
-                ->loadByEmail($email);
+        if (!$subscriber->getId()) {
+            /**
+             * No subscriber exists. Try to find a customer based
+             * on email address for the given stores instead.
+             */
+            $subscriber = Mage::getModel('newsletter/subscriber');
+            $subscriber->setEmail($email);
+            $customer = $this->loadListCustomer($listId, $email);
+            if ($customer) {
+                $subscriber->setStoreId($customer->getStoreId());
+            } else {
+                /**
+                 * No customer with that address. Just assume the first
+                 * store ID is the correct one as there is no other way
+                 * to tell which store this mailchimp list guest subscriber
+                 * belongs to. */
+                $subscriber->setStoreId($storeIds[0]);
+            }
+        }
 
         return $subscriber;
     }
@@ -1075,8 +1091,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 ->addFieldToFilter('store_id', array('in' => $storeIds))
                 ->addFieldToFilter('email', array('eq' => $email))
                 ->getFirstItem();
-            if ($customer !== null) {
+            if ($customer->getId()) {
                 $customer = Mage::getModel('customer/customer')->load($customer->getId());;
+            } else {
+                $customer = null;
             }
         }
 
