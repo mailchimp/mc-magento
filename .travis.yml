@@ -23,6 +23,10 @@ matrix:
     - env: TEST_SUITE=ecg_coding_standards
     - env: TEST_SUITE=meqp1_coding_standards
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 before_install: test -n "$GITHUB_TOKEN" && composer config github-oauth.github.com "$GITHUB_TOKEN" || true
 install:
   - composer install --no-interaction --prefer-dist
