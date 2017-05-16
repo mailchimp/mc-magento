@@ -10,9 +10,10 @@ env:
   global:
     - COMPOSER_BIN_DIR=~/bin
     - CODE_EXTENSIONS=phtml,php,js,css
+    - MAGENTO_ARCHIVE=magento-1.9.2.4-2016-02-23-06-07-06.tar.bz2
   matrix:
     - TEST_SUITE=marketplace_review
-    - TEST_SUITE=unit
+    - TEST_SUITE=phpunit
     - TEST_SUITE=ecg_coding_standards
     - TEST_SUITE=meqp1_coding_standards
 
@@ -22,7 +23,17 @@ matrix:
     - env: TEST_SUITE=meqp1_coding_standards
 
 before_install: test -n "$GITHUB_TOKEN" && composer config github-oauth.github.com "$GITHUB_TOKEN" || true
-install: composer install --no-interaction --prefer-dist
+install:
+  - composer install --no-interaction --prefer-dist
+  - |
+    if [ "$TEST_SUITE" = "phpunit" ]; then
+      wget http://ebizmartsbackup.s3.amazonaws.com/$MAGENTO_ARCHIVE &&
+      tar xjf $MAGENTO_ARCHIVE &&
+      cd magento &&
+      modman init &&
+      modman link $TRAVIS_BUILD_DIR &&
+      cd $TRAVIS_BUILD_DIR
+    fi
 
 before_script: phpcs --config-set installed_paths vendor/magento-ecg/coding-standard,vendor/magento/marketplace-eqp
 script:
@@ -38,7 +49,10 @@ script:
     if [ "$TEST_SUITE" = "meqp1_coding_standards" ]; then
       phpcs ./ --ignore=./vendor --extensions="$CODE_EXTENSIONS" --standard="MEQP1"
     fi
-  - sh -c "if [ '$TEST_SUITE' = 'unit' ]; then wget http://ebizmartsbackup.s3.amazonaws.com/magento-1.9.2.4-2016-02-23-06-07-06.tar.bz2 && tar xjf magento-1.9.2.4-2016-02-23-06-07-06.tar.bz2 && cd magento && /bin/cp -r ../mc-magento/* . && cd tests/unit && wget https://phar.phpunit.de/phpunit-4.8.phar && php phpunit-4.8.phar; fi"
+  - |
+    if [ "$TEST_SUITE" = "phpunit" ]; then
+      cd magento/tests/unit && phpunit && cd $TRAVIS_BUILD_DIR
+    fi
 
 #notifications:
 #  slack: ebizmarts:DqCqxnqWzW55zoFU069hxs1T
