@@ -12,7 +12,7 @@ env:
   #- TEST_SUITE=ecg_coding_standards
 
 before_script:
-  - sleep 30
+  - sleep 10
 
 script:
   - cd ..
