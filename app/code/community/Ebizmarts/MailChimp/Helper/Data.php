@@ -1060,11 +1060,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $initialTime = time();
         $migrateFrom115 = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 0, 'default');
         $migrateFrom116 = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 0, 'default');
+        $migrateFrom1164 = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 0, 'default');
 
         if ($migrateFrom115) {
             $this->_migrateFrom115($initialTime);
         } elseif ($migrateFrom116 && !$this->timePassed($initialTime)) {
             $this->_migrateFrom116($initialTime);
+        } elseif ($migrateFrom1164 && !$this->timePassed($initialTime)) {
+            $this->_migrateFrom1164($initialTime);
         }
     }
 
@@ -1457,8 +1460,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         $migrateFrom115 = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 0, 'default');
         $migrateFrom116 = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 0, 'default');
+        $migrateFrom1164 = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 0, 'default');
 
-        if (!$migrateFrom115 && !$migrateFrom116) {
+        if (!$migrateFrom115 && !$migrateFrom116 && !$migrateFrom1164) {
             $migrationFinished = true;
         }
         return $migrationFinished;
@@ -1475,5 +1479,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID, 'stores', $storeId);
         }
         Mage::getConfig()->cleanCache();
+    }
+
+    /**
+     * Migrate data from version 1.1.6.4.
+     *
+     * @param $initialTime
+     */
+    protected function _migrateFrom1164($initialTime)
+    {
+        if (!$this->timePassed($initialTime)) {
+            $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+            $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
+            $write_connection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
+            Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 'default', 0);
+            Mage::getConfig()->cleanCache();
+        }
     }
 }

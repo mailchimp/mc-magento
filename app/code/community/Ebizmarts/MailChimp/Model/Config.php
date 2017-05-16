@@ -30,6 +30,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_CUSTOM_MAP_FIELDS     = 'mailchimp/general/customer_map_fields';
     const GENERAL_MIGRATE_FROM_115      = 'mailchimp/general/migrate_from_115';
     const GENERAL_MIGRATE_FROM_116      = 'mailchimp/general/migrate_from_116';
+    const GENERAL_MIGRATE_FROM_1164     = 'mailchimp/general/migrate_from_1164';
     const GENERAL_MIGRATE_LAST_ORDER_ID = 'mailchimp/general/migrate_last_order_id';
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
