@@ -3,13 +3,13 @@ language: php
 php:
   #- 5.4
   #- 5.5
-  #- 5.6
+  - 5.6
   - 7.0
 
 env:
-  #- TEST_SUITE=marketplate_eqp
+  - TEST_SUITE=marketplate_eqp
   - TEST_SUITE=unit
-  #- TEST_SUITE=ecg_coding_standards
+  - TEST_SUITE=ecg_coding_standards
 
 before_script:
   - sleep 10
