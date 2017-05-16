@@ -11,6 +11,7 @@ env:
     - COMPOSER_BIN_DIR=~/bin
     - CODE_EXTENSIONS=phtml,php,js,css
     - MAGENTO_ARCHIVE=magento-1.9.2.4-2016-02-23-06-07-06.tar.bz2
+    - MAGENTO_ROOT=$TRAVIS_BUILD_DIR/magento
   matrix:
     - TEST_SUITE=marketplace_review
     - TEST_SUITE=phpunit
@@ -51,7 +52,7 @@ script:
     fi
   - |
     if [ "$TEST_SUITE" = "phpunit" ]; then
-      cd magento/tests/unit && phpunit && cd $TRAVIS_BUILD_DIR
+      cd magento/dev/tests/ebizmarts_mailchimp && phpunit && cd $TRAVIS_BUILD_DIR
     fi
 
 #notifications:
