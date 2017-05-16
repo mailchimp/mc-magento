@@ -9,21 +9,34 @@ php:
 env:
   global:
     - COMPOSER_BIN_DIR=~/bin
+    - CODE_EXTENSIONS=phtml,php,js,css
   matrix:
-    - CODING_STANDARD=Ecg SEVERITY=5
-    - CODING_STANDARD=MEQP1 SEVERITY=5
-    - CODING_STANDARD=MEQP1 SEVERITY=9
+    - TEST_SUITE=marketplace_review
+    - TEST_SUITE=ecg_coding_standards
+    - TEST_SUITE=meqp1_coding_standards
 
 matrix:
   allow_failures:
-    - env: CODING_STANDARD=Ecg SEVERITY=5
-    - env: CODING_STANDARD=MEQP1 SEVERITY=5
+    - env: TEST_SUITE=ecg_coding_standards
+    - env: TEST_SUITE=meqp1_coding_standards
 
 before_install: test -n "$GITHUB_TOKEN" && composer config github-oauth.github.com "$GITHUB_TOKEN" || true
 install: composer install --no-interaction --prefer-dist
 
 before_script: phpcs --config-set installed_paths vendor/magento-ecg/coding-standard,vendor/magento/marketplace-eqp
-script: phpcs ./ --ignore=./vendor --standard="$CODING_STANDARD" --severity="$SEVERITY" --extensions=phtml,php,js,css
+script:
+  - |
+    if [ "$TEST_SUITE" = "marketplace_review" ]; then
+      phpcs ./ --ignore=./vendor --extensions="$CODE_EXTENSIONS" --standard="MEQP1" --severity="10"
+    fi
+  - |
+    if [ "$TEST_SUITE" = "ecg_coding_standards" ]; then
+      phpcs ./ --ignore=./vendor --extensions="$CODE_EXTENSIONS" --standard="Ecg"
+    fi
+  - |
+    if [ "$TEST_SUITE" = "meqp1_coding_standards" ]; then
+      phpcs ./ --ignore=./vendor --extensions="$CODE_EXTENSIONS" --standard="MEQP1"
+    fi
 
 #notifications:
 #  slack: ebizmarts:DqCqxnqWzW55zoFU069hxs1T
