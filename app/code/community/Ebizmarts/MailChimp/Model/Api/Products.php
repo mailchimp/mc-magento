@@ -44,7 +44,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
             //define variants and root products
-            if ($item->getMailchimpSyncModified() && $item->getMailchimpSyncDelta() && $item->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId)) {
+            if ($item->getMailchimpSyncModified() && $item->getMailchimpSyncDelta() && $item->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId) && $item->getMailchimpSyncError() == '') {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = (count($batchArray));
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
