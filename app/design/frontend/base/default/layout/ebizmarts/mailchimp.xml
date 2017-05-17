@@ -20,6 +20,9 @@
                 <type>js_css</type>
                 <script>ebizmarts/mailchimp/popup.css</script>
             </action>
+            <block type="core/text" name="addMCJs">
+                <action method="setText"><text helper="mailchimp/getMCJs"></text></action>
+            </block>
         </reference>
         <reference name="content">
             <block type="mailchimp/popup_emailcatcher" name="emailcatcher"

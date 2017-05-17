@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $allCarts = array();
-        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE)) {
+        if (!Mage::helper('mailchimp')->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
         }
 
@@ -122,8 +122,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where(
-            "m4m.mailchimp_sync_modified = 1 AND m4m.mailchimp_sync_deleted = 0 
-        AND m4m.mailchimp_sync_delta < '" . new Zend_Db_Expr('updated_at') . "'"
+            "m4m.mailchimp_sync_deleted = 0 
+        AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
         $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
@@ -206,7 +206,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         // filter by first date if exists.
         if ($this->_firstDate) {
-            $newCarts->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
+            $newCarts->addFieldToFilter('updated_at', array('gt' => $this->_firstDate));
         }
 
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
@@ -223,7 +223,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         foreach ($newCarts as $cart) {
             $cartId = $cart->getEntityId();
-            $orderCollection = Mage::getModel('sales/order')->getCollection();
+            $orderCollection = Mage::getResourceModel('sales/order_collection');
             $orderCollection->addFieldToFilter('main_table.customer_email', array('eq' => $cart->getCustomerEmail()))
                 ->addFieldToFilter('main_table.updated_at', array('from' => $cart->getUpdatedAt()));
             //if cart is empty or customer has an order made after the abandonment skip current cart.
