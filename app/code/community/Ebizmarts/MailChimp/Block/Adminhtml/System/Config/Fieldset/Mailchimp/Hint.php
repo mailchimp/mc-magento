@@ -30,5 +30,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
     {
         return (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
     }
+
+    public function getMigrationFinishedStatus()
+    {
+        return Mage::helper('mailchimp')->migrationFinished();
+    }
 }
 

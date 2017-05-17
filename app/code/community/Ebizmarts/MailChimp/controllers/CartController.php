@@ -38,6 +38,13 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                 $quote->save();
                 if (!$quote->getCustomerId()) {
                     $this->_getSession()->setQuoteId($quote->getId());
+                    $newQuote = $this->_getSession()->getQuote();
+                    if ($newQuote->getId() != $quote->getId()) {
+                        $newQuote = $this->_getSession()->getQuote();
+                        $newQuote->delete();
+                        $newQuote->merge($quote)
+                            ->save();
+                    }
                     $this->getResponse()
                         ->setRedirect($url, 301);
                 } else {

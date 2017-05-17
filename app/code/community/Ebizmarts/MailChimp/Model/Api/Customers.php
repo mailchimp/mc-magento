@@ -98,7 +98,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["total_spent"] = $totalAmountSpent;
 
         //addresses data
-        $address = $customer->getDefaultBillingAddresses();
+        $address = $customer->getDefaultBillingAddress();
         if ($address) {
             $customerAddress = array();
             $street = $address->getStreet();

@@ -23,18 +23,18 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $collection->addStoreFilter($magentoStoreId);
         $collection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = e.entity_id and m4m.type = '".Ebizmarts_MailChimp_Model_Config::IS_PRODUCT."'
+            "m4m.related_id = e.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
         $collection->getSelect()->where(
-            "m4m.mailchimp_sync_delta IS null ".
+            "m4m.mailchimp_sync_delta IS null " .
             "OR m4m.mailchimp_sync_modified = 1"
         );
         $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         $batchArray = array();
-        
+
         $batchId = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . Mage::helper('mailchimp')->getDateMicrotime();
         $counter = 0;
         foreach ($collection as $item) {
@@ -44,7 +44,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
             //define variants and root products
-            if ($item->getMailchimpSyncModified() && $item->getMailchimpSyncDelta() && $item->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId)) {
+            if ($item->getMailchimpSyncModified() && $item->getMailchimpSyncDelta() && $item->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId) && $item->getMailchimpSyncError() == '') {
                 $batchArray = array_merge($this->_buildOldProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = (count($batchArray));
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
@@ -66,6 +66,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         return $batchArray;
     }
+
     protected function _buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $variantProducts = array();
@@ -74,7 +75,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
             //get children
             $childProducts = Mage::getModel('catalog/product_type_configurable')->getChildrenIds($product->getId());
-            
+
             //add itself as variant
             $variantProducts[] = $product;
             if (count($childProducts[0])) {
@@ -107,7 +108,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data['body'] = $body;
         return $data;
     }
-    protected  function _buildOldProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
+
+    protected function _buildOldProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $operations = array();
         if ($product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE || $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL || $product->getTypeId() == "downloadable") {
@@ -129,7 +131,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $variendata["price"] = $data["price"];
                 $variendata["inventory_quantity"] = $data["inventory_quantity"];
                 $this->_parentImageUrl = Mage::helper('mailchimp')->getImageUrlById($parentId);
-                $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $data["image_url"]);
+                $dataImageUrl = (isset($data["image_url"])) ? $data["image_url"] : null;
+                $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $dataImageUrl);
                 if ($imageUrl) {
                     $variendata["image_url"] = $imageUrl;
                 }
@@ -139,7 +142,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $variendata["visibility"] = $data["visibility"];
                 $productdata = array();
                 $productdata['method'] = "PUT";
-                $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/".$parentId.'/variants/'.$data['id'];
+                $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parentId . '/variants/' . $data['id'];
                 $productdata['operation_id'] = $batchId . '_' . $parentId;
                 try {
                     $body = json_encode($variendata);
@@ -156,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         return $operations;
     }
-    
+
     protected function _buildProductData($product, $isVarient = true, $variants = array())
     {
         $data = array();
@@ -178,7 +181,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($isVarient) {
             //this is for a varient product
             $data["sku"] = $product->getSku();
-            $data["price"] = $product->getPrice();
+            $data["price"] = (int)$product->getPrice();
 
             //stock
             $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($product);
@@ -189,7 +192,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data["visibility"] = $visibilityOptions[$product->getVisibility()];
         } else {
             //this is for a root product
-            if($product->getDescription()) {
+            if ($product->getDescription()) {
                 $data["description"] = $product->getDescription();
             }
 
@@ -221,13 +224,30 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * Update product sync data after modification.
+     * Get stores to update and call update function after modification.
      *
      * @param $productId
      * @param $storeId
      */
     public function update($productId, $storeId)
     {
+        if ($storeId == 0) {
+            $stores = Mage::app()->getStores();
+            foreach ($stores as $curStoreId => $curStore) {
+                $this->_updateIfEnabled($productId, $curStoreId);
+            }
+        } else {
+            $this->_updateIfEnabled($productId, $storeId);
+        }
+    }
+
+    /**
+     * Update product sync data if
+     *
+     * @param $productId
+     * @param $storeId
+     */
+    protected function _updateIfEnabled($productId, $storeId) {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
             $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, true);
@@ -236,7 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * Return products belonging to an order or a cart in a valid format to be sent to MailChimp.
-     * 
+     *
      * @param $order
      * @param $mailchimpStoreId
      * @param $magentoStoreId
@@ -247,11 +267,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data = array();
         $batchId = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . '_' . Mage::helper('mailchimp')->getDateMicrotime();
         $items = $order->getAllVisibleItems();
-        foreach ($items as $item)
-        {
+        foreach ($items as $item) {
             $product = Mage::getModel('catalog/product')->load($item->getProductId());
             $productSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-            if ($product->getId()!=$item->getProductId()||$product->getTypeId()=='bundle'||$product->getTypeId()=='grouped') {
+            if ($product->getId() != $item->getProductId() || $product->getTypeId() == 'bundle' || $product->getTypeId() == 'grouped') {
                 if ($product->getId()) {
                     $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now(), "This product type is not supported on MailChimp.");
                 }

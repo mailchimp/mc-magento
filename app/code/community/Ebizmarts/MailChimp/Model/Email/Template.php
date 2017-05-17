@@ -90,10 +90,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $senderExists = false;
         foreach ($mandrillSenders as $sender)
         {
-            $emailArray = explode('@', $email['from_email']);
-            if(count($emailArray) > 1 && $emailArray[1] == $sender['domain'])
-            {
-                $senderExists = true;
+            if (isset($sender['domain'])) {
+                $emailArray = explode('@', $email['from_email']);
+                if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
+                    $senderExists = true;
+                }
             }
         }
 
