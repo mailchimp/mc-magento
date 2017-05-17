@@ -27,7 +27,7 @@ cache:
   directories:
     - $HOME/.composer/cache
 
-before_install: test -n "$GITHUB_TOKEN" && composer config github-oauth.github.com "$GITHUB_TOKEN" || true
+before_install: test -n "$GITHUB_TOKEN" && echo "Found GitHub token" && composer config github-oauth.github.com "$GITHUB_TOKEN" || echo "No GitHub token found"
 install:
   - composer install --no-interaction --prefer-dist
   - |
