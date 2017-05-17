@@ -56,7 +56,7 @@ script:
     fi
   - |
     if [ "$TEST_SUITE" = "phpunit" ]; then
-      cd magento/dev/tests/ebizmarts_mailchimp && phpunit && cd $TRAVIS_BUILD_DIR
+      cd magento/dev/tests/mailchimp && phpunit && cd $TRAVIS_BUILD_DIR
     fi
 
 #notifications:
