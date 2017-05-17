@@ -961,8 +961,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getLastDateOfPurchase($subscriberEmail)
     {
-        $orderCollection = Mage::getModel('sales/order')->getCollection()
-            ->addFieldToFilter('customer_email', array('eq' => $subscriberEmail));
+        $orderCollection = $this->getOrderCollectionByCustomerEmail($subscriberEmail);
         $lastDateOfPurchase = null;
         foreach ($orderCollection as $order) {
             $dateOfPurchase = $order->getCreatedAt();
@@ -1006,5 +1005,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $customMergeFields = array();
         }
         return $customMergeFields;
+    }
+
+    /**
+     * @param $subscriberEmail
+     * @return mixed
+     */
+    protected function getOrderCollectionByCustomerEmail($subscriberEmail)
+    {
+        return Mage::getModel('sales/order')->getCollection()->addFieldToFilter('customer_email',
+                array('eq' => $subscriberEmail));
     }
 }
