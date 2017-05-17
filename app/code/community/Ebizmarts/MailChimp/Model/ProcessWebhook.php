@@ -164,10 +164,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         $email = $data['data']['email'];
         $subscriber = $this->loadByEmail($email);
+        $customerId = null;
 
         $customerCollection = Mage::getResourceModel('customer/customer_collection')
             ->addFieldToFilter('email', array('eq' => $email));
-        if (count($customerCollection) > 0) {
+        if ($customerCollection->getSize() > 0) {
             $customerId = $customerCollection->getFirstItem()->getEntityId();
         }
 

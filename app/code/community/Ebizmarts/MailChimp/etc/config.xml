@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.6</version>
+            <version>1.1.6.6</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.6</version>
+            <version>1.1.6.6</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -52,6 +52,15 @@
                     </mailchimp_save_before_customer>
                 </observers>
             </customer_save_before>
+            <customer_address_save_before>
+                <observers>
+                    <mailchimp_save_before_address>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>customerAddressSaveBefore</method>
+                    </mailchimp_save_before_address>
+                </observers>
+            </customer_address_save_before>
             <sales_order_save_before>
                 <observers>
                     <mailchimp_save_before_order>
@@ -300,7 +309,9 @@
                 <popup_cancel>1</popup_cancel>
                 <popup_subscription>1</popup_subscription>
                 <popup_heading>Welcome to our store!</popup_heading>
-                <popup_text>Please enter your email address to get the most out of our store and improve your shopping experience.</popup_text>
+                <popup_text>Please enter your email address to get the most out of our store and improve your shopping
+                    experience.
+                </popup_text>
                 <popup_width>50</popup_width>
                 <popup_height>20</popup_height>
                 <popup_cookie_time>1</popup_cookie_time>

@@ -201,6 +201,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                             Mage::dispatchEvent(
                                 'mailchimp_merge_field_send_before', array(
+                                'customer_id' => $customer->getId(),
                                 'subscriber_email' => $subscriberEmail,
                                 'merge_field_tag' => $attributeCode,
                                 'merge_field_value' => &$eventValue
@@ -213,7 +214,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_company':
                         case 'shipping_company':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $company = $address->getCompany();
@@ -225,7 +226,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_telephone':
                         case 'shipping_telephone':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $telephone = $address->getTelephone();
@@ -237,7 +238,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_country':
                         case 'shipping_country':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $countryCode = $address->getCountry();
@@ -250,7 +251,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'billing_zipcode':
                         case 'shipping_zipcode':
                             $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . ucfirst($addr[0]));
+                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
                             if ($address) {
                                 $zipCode = $address->getPostcode();
@@ -269,6 +270,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                     Mage::dispatchEvent(
                         'mailchimp_merge_field_send_before', array(
+                        'customer_id' => $customer->getId(),
                         'subscriber_email' => $subscriberEmail,
                         'merge_field_tag' => $customAtt,
                         'merge_field_value' => &$eventValue
@@ -307,21 +309,26 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setData("mailchimp_sync_error", "");
             $subscriber->setData("mailchimp_sync_modified", 0);
         } catch(MailChimp_Error $e) {
-            if ($newStatus === 'subscribed' && strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
-                try {
-                    $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
-                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
-                    $message = Mage::helper('mailchimp')->__('To begin receiving the newsletter, you must first confirm your subscription');
-                    Mage::getSingleton('core/session')->addWarning($message);
-                } catch(MailChimp_Error $e) {
+            if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
+                if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
+                    try {
+                        $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
+                        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
+                        $message = Mage::helper('mailchimp')->__('To begin receiving the newsletter, you must first confirm your subscription');
+                        Mage::getSingleton('core/session')->addWarning($message);
+                    } catch (MailChimp_Error $e) {
+                        Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+                        Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                        $subscriber->unsubscribe();
+                    } catch (Exception $e) {
+                        Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
+                    }
+                } else {
                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
                     Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
                     $subscriber->unsubscribe();
-                } catch (Exception $e) {
-                    Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
                 }
             } else {
-                $subscriber->unsubscribe();
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
                 Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
             }
