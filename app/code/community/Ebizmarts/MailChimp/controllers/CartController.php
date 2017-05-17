@@ -45,6 +45,7 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                         $newQuote->merge($quote)
                             ->save();
                     }
+
                     $this->getResponse()
                         ->setRedirect($url, 301);
                 } else {
