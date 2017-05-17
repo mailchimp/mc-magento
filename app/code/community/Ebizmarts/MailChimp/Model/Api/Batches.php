@@ -96,7 +96,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             //@Todo Place warning if there is any entry with batch_id 0
             $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-            $write_connection->delete($resource->getMainTable(), "batch_id = '0'");
+            $write_connection->delete($resource->getMainTable(), "batch_id IS NULL");
             if (Mage::helper('mailchimp')->isMailChimpEnabled($magentoStoreId) && Mage::helper('mailchimp')->isEcomSyncDataEnabled($magentoStoreId)) {
                 $batchArray = array();
                 //customer operations
@@ -134,7 +134,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 $batch->save();
                                 $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
                                 $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-                                $write_connection->update($resource->getMainTable(), array('batch_id' => $batchResponse['id']), "batch_id = 0");
+                                $write_connection->update($resource->getMainTable(), array('batch_id' => $batchResponse['id']), "batch_id IS NULL AND mailchimp_store_id = '" . $mailchimpStoreId . "'");
                             }
                         }
                     }

@@ -6,7 +6,7 @@ try {
     $installer->run(
         "
  ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}`
- ADD column `batch_id` VARCHAR (10) NOT NULL DEFAULT 0;
+ ADD column `batch_id` VARCHAR (10) DEFAULT NULL;
 "
     );
 
