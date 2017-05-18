@@ -58,6 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         } else {
             $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         }
+
         foreach ($collection as $item) {
             try {
                 $files = $this->getBatchResponse($item->getBatchId(), $magentoStoreId);
