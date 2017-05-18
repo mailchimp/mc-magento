@@ -5,6 +5,7 @@ app/design/adminhtml/default/default/template/ebizmarts/mailchimp    app/design/
 app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml      app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml
 app/design/frontend/base/default/template/ebizmarts/mailchimp        app/design/frontend/base/default/template/ebizmarts/mailchimp
 app/etc/modules/Ebizmarts_MailChimp.xml                              app/etc/modules/Ebizmarts_MailChimp.xml
+dev/tests/mailchimp/                                                 dev/tests/mailchimp/
 js/ebizmarts/mailchimp                                               js/ebizmarts/mailchimp
 lib/Ebizmarts/MailChimp.php                                          lib/Ebizmarts/MailChimp.php
 lib/Ebizmarts/MailChimp                                              lib/Ebizmarts/MailChimp
@@ -13,6 +14,3 @@ skin/adminhtml/default/default/ebizmarts/mailchimp                   skin/adminh
 skin/adminhtml/default/default/ebizmarts/mandrill                    skin/adminhtml/default/default/ebizmarts/mandrill
 shell/m4mlogs.sh                                                     shell/m4mlogs.sh
 shell/getMailchimpResponse.php                                       shell/getMailchimpResponse.php
-tests/unit/autoload.php                                              tests/unit/testsuite/
-tests/unit/phpunit.xml                                               tests/unit/testsuite/
-tests/unit/testsuite/Ebizmarts/MailChimp/*                           tests/unit/testsuite/Ebizmarts/MailChimp/
