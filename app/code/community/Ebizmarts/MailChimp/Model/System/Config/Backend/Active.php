@@ -10,13 +10,17 @@
  * @date: 8/4/16 8:28 PM
  * @file: List.php
  */
-class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Core_Model_Config_Data
+class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_Model_Config_Data
 {
     protected function _afterSave()
     {
         $groups = $this->getData('groups');
         //If settings are inherited get from config.
-        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
+        if (isset($groups['ecommerce']['fields']['active']) && isset($groups['ecommerce']['fields']['active']['value'])) {
+            $ecommerceActive = $groups['ecommerce']['fields']['active']['value'];
+        } else {
+            $ecommerceActive = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
+        }
         if (isset($groups['general']['fields']['list']) && isset($groups['general']['fields']['list']['value'])) {
             $listId = $groups['general']['fields']['list']['value'];
         } else {
@@ -25,7 +29,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
 
         $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($this->getScopeId(), $this->getScope());
 
-        if ($this->isValueChanged() && $moduleIsActive && $listId && $this->getValue() && !$thisScopeHasMCStoreId) {
+        if ($this->isValueChanged() && $this->getValue() && $listId && $ecommerceActive && !$thisScopeHasMCStoreId) {
             Mage::helper('mailchimp')->createStore($listId, $this->getScopeId(), $this->getScope());
         }
     }
