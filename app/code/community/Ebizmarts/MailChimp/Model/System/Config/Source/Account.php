@@ -124,6 +124,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     )
                 );
             }
+
             return $returnArray;
         } elseif (!$this->_accountDetails) {
             return array(array('value' => '', 'label' => Mage::helper('mailchimp')->__('--- Enter your API KEY first ---')));

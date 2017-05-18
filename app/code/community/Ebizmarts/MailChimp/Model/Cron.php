@@ -23,6 +23,7 @@ class Ebizmarts_MailChimp_Model_Cron
         } else {
             Mage::helper('mailchimp')->handleMigrationUpdates();
         }
+
         Mage::getModel('mailchimp/api_batches')->handleSubscriberBatches();
     }
 }

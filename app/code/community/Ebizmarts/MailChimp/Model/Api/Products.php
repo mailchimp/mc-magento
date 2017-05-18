@@ -247,7 +247,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $productId
      * @param $storeId
      */
-    protected function _updateIfEnabled($productId, $storeId) {
+    protected function _updateIfEnabled($productId, $storeId) 
+    {
         if (Mage::helper('mailchimp')->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
             $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, true);
@@ -316,6 +317,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (empty($parentIds)) {
             $parentIds = array($product->getId());
         }
+
         //add or update variant
 //        foreach ($parentIds as $parentId) {
 //            $productdata['method'] = "DELETE";
