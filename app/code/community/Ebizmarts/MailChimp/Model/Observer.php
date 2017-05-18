@@ -36,10 +36,6 @@ class Ebizmarts_MailChimp_Model_Observer
             $this->makeHelper()->deleteStore($scopeArray[1], $scopeArray[0]);
         }
 
-        if (isset($post['groups']['general']['fields']['list']['value']) && !$this->makeHelper()->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0]) && $this->makeHelper()->isEcomSyncDataEnabled($scopeArray[1], $scopeArray[0], true)) {
-            $this->makeHelper()->createStore($post['groups']['general']['fields']['list']['value'], $scopeArray[1], $scopeArray[0]);
-        }
-
         return $observer;
     }
 
