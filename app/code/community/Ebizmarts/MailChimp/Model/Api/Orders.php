@@ -234,7 +234,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             } else {
                 $variant = $productId;
             }
-            if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == 0) {
+
+            if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == '') {
                 $itemCount++;
                 $data["lines"][] = array(
                     "id" => (string)$itemCount,
@@ -443,6 +444,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($value === null) {
             $returnValue = 0;
         }
+
         return $returnValue;
     }
     
@@ -594,10 +596,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 if (!count($batchArray)) {
                     $batchArray[] = Mage::helper('mailchimp')->__('Time passed.');
                 }
+
                 Mage::helper('mailchimp')->saveMailchimpConfig($config, $magentoStoreId, 'stores');
                 break;
             }
         }
+
         Mage::helper('mailchimp')->saveMailchimpConfig($config, $magentoStoreId, 'stores');
         return $batchArray;
     }
