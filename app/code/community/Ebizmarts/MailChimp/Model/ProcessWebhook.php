@@ -141,19 +141,21 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
         if ($subscriber->getId()) {
             try {
-                switch ($data['data']['action']) {
-                    case 'delete' :
-                        //if config setting "Webhooks Delete action" is set as "Delete customer account"
-                        if (Mage::getStoreConfig("mailchimp/general/webhook_delete") == 1) {
-                            $subscriber->delete();
-                        } else {
+		if (isset $data['data']['action']){
+                   switch ($data['data']['action']) {
+                      case 'delete' :
+                          //if config setting "Webhooks Delete action" is set as "Delete customer account"
+                          if (Mage::getStoreConfig("mailchimp/general/webhook_delete") == 1) {
+                              $subscriber->delete();
+                          } else {
                             $subscriber->setImportMode(TRUE)->unsubscribe();
-                        }
-                        break;
-                    case 'unsub':
-                        $subscriber->setImportMode(TRUE)->unsubscribe();
-                        break;
-                }
+                          }
+                          break;
+                      case 'unsub':
+                          $subscriber->setImportMode(TRUE)->unsubscribe();
+                          break;
+                      }
+		}
             } catch (Exception $e) {
                 Mage::logException($e);
             }
