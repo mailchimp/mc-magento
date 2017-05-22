@@ -141,7 +141,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
         if ($subscriber->getId()) {
             try {
-		if (isset $data['data']['action']){
+		if (isset ($data['data']['action'])){
                    switch ($data['data']['action']) {
                       case 'delete' :
                           //if config setting "Webhooks Delete action" is set as "Delete customer account"
