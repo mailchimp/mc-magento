@@ -212,7 +212,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     //save batch id to db
                     $batch = Mage::getModel('mailchimp/synchbatches');
-                    $batch->setStoreId($storeId)
+                    $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
+                    $batch->setStoreId($mailchimpStoreId)
                         ->setBatchId($batchResponse['id'])
                         ->setStatus($batchResponse['status']);
                     $batch->save();
