@@ -15,7 +15,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Cmspage
 
     public function toOptionArray()
     {
-        $collection = Mage::getModel('cms/page')->getCollection()->addOrder('title', 'asc');
+        $collection = Mage::getResourceModel('cms/page_collection')->addOrder('title', 'asc');
         return array('checkout/cart' => "Shopping Cart (default page)") + $collection->toOptionIdArray();
     }
 

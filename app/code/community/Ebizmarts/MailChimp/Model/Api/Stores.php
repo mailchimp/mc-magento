@@ -9,59 +9,19 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
 
-//    /**
-//     * Return MailChimp store for given scope if exists, else return null.
-//     *
-//     * @param $scope
-//     * @param $scopeId
-//     * @return array|null
-//     * @throws Exception
-//     */
-//    public function getMailChimpStore($scope, $scopeId)
-//    {
-//        $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
-//
-//        if ($api) {
-//            $storeExists = null;
-//            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-//
-//            if ($mailchimpStoreId == null || $mailchimpStoreId == "") {
-//                return null;
-//            }
-//
-//            try {
-//                $store = $api->ecommerce->stores->get($mailchimpStoreId);
-//                if (is_array($store) && isset($store['id'])) {
-//                    $storeExists = $store;
-//                }
-//            }
-//            catch (Mailchimp_Error $e) {
-//                Mage::helper('mailchimp')->logError($e->getFriendlyMessage());
-//            }
-//            catch (Exception $e) {
-//                Mage::helper('mailchimp')->logError($e->getMessage());
-//            }
-//
-//            return $storeExists;
-//        } else {
-//            throw new Exception('You must provide a MailChimp API key');
-//        }
-//    }
-
     /**
      * Create MailChimp store.
-     * 
+     *
      * @param $mailChimpStoreId
      * @param null $listId
      * @param $scope
      * @param $scopeId
      * @throws Exception
      */
-    public function createMailChimpStore($mailChimpStoreId, $listId=null, $scopeId, $scope)
+    public function createMailChimpStore($mailChimpStoreId, $listId = null, $scopeId, $scope)
     {
         $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
         if ($api) {
@@ -72,6 +32,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             if ($listId != null && $listId != "") {
                 $storeName = Mage::helper('mailchimp')->getMCStoreName($scopeId, $scope);
                 $storeEmail = Mage::helper('mailchimp')->getConfigValueForScope('trans_email/ident_general/email', $scopeId, $scope);
+                $storeDomain = Mage::helper('mailchimp')->getStoreDomain($scopeId, $scope);
                 if (strpos($storeEmail, 'example.com') !== false) {
                     $storeEmail = null;
                     throw new Exception('Please, change the general email in Store Email Addresses/General Contact');
@@ -79,7 +40,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
                 $currencyCode = Mage::helper('mailchimp')->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
                 $isSyncing = true;
-                $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', null, $storeEmail);
+                $response = $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail);
+                return $response;
             } else {
                 throw new Exception('You don\'t have any lists configured in MailChimp');
             }
@@ -100,7 +62,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
             $api->ecommerce->stores->delete($mailchimpStoreId);
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
@@ -108,7 +70,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
         $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
         $resource = Mage::getResourceModel('mailchimp/synchbatches');
-        $connection->update($resource->getMainTable(), array('status'=>'canceled'), "status = 'pending'");
+        $connection->update($resource->getMainTable(), array('status' => 'canceled'), "status = 'pending'");
     }
 
     /**
@@ -122,12 +84,54 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     {
         try {
             $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
-            $storeId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-            $api->ecommerce->stores->edit($storeId, $name);
-        } catch (Mailchimp_Error $e) {
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
+            $api->ecommerce->stores->edit($mailchimpStoreId, $name);
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
         }
+    }
+
+    /**
+     * Returns URL from MailChimp store data
+     *
+     * @param $scopeId
+     * @param $scope
+     * @return mixed
+     */
+    public function getMCJsUrl($scopeId, $scope)
+    {
+        try {
+            $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
+            $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
+            if (isset($response['connected_site']['site_script']['url'])) {
+                $url = $response['connected_site']['site_script']['url'];
+                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
+                Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeId, $scope);
+                return $url;
+            }
+        } catch (MailChimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+        } catch (Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeId, $scope);
+        }
+    }
+
+    /**
+     * Set is_syncing value for the given scope.
+     *
+     * @param $mailchimpApi
+     * @param $isSincingValue
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     */
+    public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId, $magentoStoreId)
+    {
+        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
+        $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
+        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, (int)$isSincingValue));
+        Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
     }
 }

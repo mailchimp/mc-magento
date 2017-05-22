@@ -47,7 +47,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $this->_accountDetails['total_orders'] = $totalOrders['total_items'];
                         $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
                         $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
-                    } catch (Mailchimp_Error $e) {
+                    } catch (MailChimp_Error $e) {
                         Mage::helper('mailchimp')->deleteLocalMCStoreData($scopeArray[1], $scopeArray[0]);
                         if ($listId) {
                             Mage::helper('mailchimp')->createStore($listId, $scopeArray[1], $scopeArray[0]);
@@ -111,6 +111,16 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     array(
                         array('value' => 7, 'label' => $noStoreText),
                         array('value' => 8, 'label' => $newStoreText)
+                    )
+                );
+            }
+
+            if (!Mage::helper('mailchimp')->migrationFinished() && Mage::helper('mailchimp')->isEcommerceEnabled($scopeArray[1], $scopeArray[0])) {
+                $storeMigrationText = Mage::helper('mailchimp')->__('The store data is currently being migrated to the new version. This process might take a while depending on the amount of data in Magento.');
+                $returnArray = array_merge(
+                    $returnArray,
+                    array(
+                        array('value' => 9, 'label' => $storeMigrationText)
                     )
                 );
             }

@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $allCarts = array();
-        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_ACTIVE)) {
+        if (!Mage::helper('mailchimp')->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
         }
 
@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCarts = array();
-        $convertedCarts = Mage::getModel('sales/quote')->getCollection();
+        $convertedCarts = Mage::getResourceModel('sales/quote_collection');
         // get only the converted quotes
         $convertedCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $convertedCarts->addFieldToFilter('is_active', array('eq' => 0));
@@ -108,7 +108,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCarts = array();
-        $modifiedCarts = Mage::getModel('sales/quote')->getCollection();
+        $modifiedCarts = Mage::getResourceModel('sales/quote_collection');
         // select carts with no orders
         $modifiedCarts->addFieldToFilter('is_active', array('eq'=>1));
         // select carts for the current Magento store id
@@ -122,8 +122,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where(
-            "m4m.mailchimp_sync_modified = 1 AND m4m.mailchimp_sync_deleted = 0 
-        AND m4m.mailchimp_sync_delta < '" . new Zend_Db_Expr('updated_at') . "'"
+            "m4m.mailchimp_sync_deleted = 0 
+        AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
         $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
@@ -198,7 +198,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $allCarts = array();
-        $newCarts = Mage::getModel('sales/quote')->getCollection();
+        $newCarts = Mage::getResourceModel('sales/quote_collection');
         $newCarts->addFieldToFilter('is_active', array('eq'=>1));
         $newCarts->addFieldToFilter('customer_email', array('notnull'=>true));
         $newCarts->addFieldToFilter('items_count', array('gt'=>0));
@@ -206,7 +206,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         // filter by first date if exists.
         if ($this->_firstDate) {
-            $newCarts->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
+            $newCarts->addFieldToFilter('updated_at', array('gt' => $this->_firstDate));
         }
 
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
@@ -223,7 +223,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         foreach ($newCarts as $cart) {
             $cartId = $cart->getEntityId();
-            $orderCollection = Mage::getModel('sales/order')->getCollection();
+            $orderCollection = Mage::getResourceModel('sales/order_collection');
             $orderCollection->addFieldToFilter('main_table.customer_email', array('eq' => $cart->getCustomerEmail()))
                 ->addFieldToFilter('main_table.updated_at', array('from' => $cart->getUpdatedAt()));
             //if cart is empty or customer has an order made after the abandonment skip current cart.
@@ -294,7 +294,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getAllCartsByEmail($email, $mailchimpStoreId, $magentoStoreId)
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-        $allCartsForEmail = Mage::getModel('sales/quote')->getCollection();
+        $allCartsForEmail = Mage::getResourceModel('sales/quote_collection');
         $allCartsForEmail->addFieldToFilter('is_active', array('eq' => 1));
         $allCartsForEmail->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $allCartsForEmail->addFieldToFilter('customer_email', array('eq' => $email));
@@ -407,7 +407,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $customers = array();
         try {
             $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
-        } catch (Mailchimp_Error $e) {
+        } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
         }
 

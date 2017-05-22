@@ -10,7 +10,7 @@
  * @date: 6/10/16 12:38 AM
  * @file: Grid.php
  */
-class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Adminhtml_Block_Widget_Grid
+class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
 
     public function __construct()
@@ -25,7 +25,7 @@ class Ebizmarts_Mailchimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
 
     protected function _prepareCollection()
     {
-        $collection = Mage::getModel('mailchimp/mailchimperrors')->getCollection();
+        $collection = Mage::getResourceModel('mailchimp/mailchimperrors_collection');
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }
