@@ -186,10 +186,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //mailchimp product type (magento category)
             $categoryId = $product->getCategoryId();
-            var_dump($categoryId);
             if ($categoryId) {
                 $category = Mage::getResourceModel('catalog/category')->checkId($categoryId);
-                var_dump($category, "===");die;
                 $data["type"] = $category->getName();
             }
 
