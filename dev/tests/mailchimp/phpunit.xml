@@ -10,11 +10,11 @@
          syntaxCheck="true"
          bootstrap="./autoload.php">
     <testsuite name="MailChimp Unit Test">
-        <directory suffix="Test.php">testsuite/Ebizmarts</directory>
+        <directory suffix="Test.php">tests</directory>
     </testsuite>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">../../app/code/community/Ebizmarts/</directory>
+            <directory suffix=".php">../../../app/code/community/Ebizmarts/</directory>
         </whitelist>
     </filter>
 </phpunit>

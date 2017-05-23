@@ -31,13 +31,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock->expects($this->once())->method('getCustomMergeFields')->with(0, "store")
-        ->willReturn(
-            array(
+        ->willReturn(array(
             array(
                 "value" => "FNAME"
             )
-            )
-        );
+        ));
 
         $this->assertTrue($helperMock->customMergeFieldAlreadyExists("FNAME", 0, "store"));
     }
