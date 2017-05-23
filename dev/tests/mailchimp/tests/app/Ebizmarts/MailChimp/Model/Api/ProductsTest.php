@@ -14,10 +14,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
     public function testCreateBatchJson()
     {
-        $this->productsApiMock = $this->productsApiMock->setMethods(array('generateBatchId'))
+        $this->productsApiMock = $this->productsApiMock->setMethods(array('makeBatchId'))
             ->getMock();
 
-        $this->productsApiMock->expects($this->once())->method('generateBatchId')->with(0)
+        $this->productsApiMock->expects($this->once())->method('makeBatchId')->with(0)
             ->willReturn('storeid-0_PRO_2017-05-18-14-45-54-38849500');
         $this->productsApiMock->expects($this->never())->method('buildProductDataRemoval');
 
