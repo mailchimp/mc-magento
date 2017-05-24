@@ -383,7 +383,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function shouldSendProductUpdate($magentoStoreId, $product): bool
+    protected function shouldSendProductUpdate($magentoStoreId, $product)
     {
         return $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId) && $product->getMailchimpSyncError() == '';
     }
@@ -392,7 +392,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function isSimpleProduct($product): bool
+    protected function isSimpleProduct($product)
     {
         return $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_SIMPLE;
     }
@@ -401,7 +401,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function isVirtualProduct($product): bool
+    protected function isVirtualProduct($product)
     {
         return $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL;
     }
@@ -410,7 +410,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function isDownloadableProduct($product): bool
+    protected function isDownloadableProduct($product)
     {
         return $product->getTypeId() == "downloadable";
     }
@@ -419,7 +419,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function isBundleProduct($product): bool
+    protected function isBundleProduct($product)
     {
         return $product->getTypeId() == 'bundle';
     }
@@ -428,7 +428,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function isGroupedProduct($product): bool
+    protected function isGroupedProduct($product)
     {
         return $product->getTypeId() == 'grouped';
     }
@@ -437,7 +437,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @return bool
      */
-    protected function isConfigurableProduct($product): bool
+    protected function isConfigurableProduct($product)
     {
         return $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
     }
