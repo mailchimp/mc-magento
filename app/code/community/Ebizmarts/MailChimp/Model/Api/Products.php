@@ -347,7 +347,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function makeProductsNotSentCollection($mailchimpStoreId, $magentoStoreId)
     {
         /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
-        $collection = Mage::getResourceModel('catalog/product_collection');
+        $collection = $this->getProductResourceCollection();
 
         $collection->addStoreFilter($magentoStoreId);
 
@@ -517,5 +517,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["visibility"] = $this->visibilityOptions[$product->getVisibility()];
 
         return $data;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    protected function getProductResourceCollection()
+    {
+        return Mage::getResourceModel('catalog/product_collection');
     }
 }
