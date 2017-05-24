@@ -121,37 +121,40 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //add or update variant
             foreach ($parentIds as $parentId) {
-                $variendata = array();
-                $variendata["id"] = $data["id"];
-                $variendata["title"] = $data["title"];
-                $variendata["url"] = $data["url"];
-                $variendata["sku"] = $data["sku"];
-                $variendata["price"] = $data["price"];
-                $variendata["inventory_quantity"] = $data["inventory_quantity"];
-                $this->_parentImageUrl = $this->mailchimpHelper->getImageUrlById($parentId);
-                $dataImageUrl = (isset($data["image_url"])) ? $data["image_url"] : null;
-                $imageUrl = $this->mailchimpHelper->getMailChimpProductImageUrl($this->_parentImageUrl, $dataImageUrl);
-                if ($imageUrl) {
-                    $variendata["image_url"] = $imageUrl;
-                }
+                $productSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($magentoStoreId) && $productSyncData->getMailchimpSyncError() == '') {
+                    $variendata = array();
+                    $variendata["id"] = $data["id"];
+                    $variendata["title"] = $data["title"];
+                    $variendata["url"] = $data["url"];
+                    $variendata["sku"] = $data["sku"];
+                    $variendata["price"] = $data["price"];
+                    $variendata["inventory_quantity"] = $data["inventory_quantity"];
+                    $this->_parentImageUrl = Mage::helper('mailchimp')->getImageUrlById($parentId);
+                    $dataImageUrl = (isset($data["image_url"])) ? $data["image_url"] : null;
+                    $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $dataImageUrl);
+                    if ($imageUrl) {
+                        $variendata["image_url"] = $imageUrl;
+                    }
 
-                $this->_parentImageUrl = null;
-                $variendata["backorders"] = $data["backorders"];
-                $variendata["visibility"] = $data["visibility"];
-                $productdata = array();
-                $productdata['method'] = "PUT";
-                $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parentId . '/variants/' . $data['id'];
-                $productdata['operation_id'] = $batchId . '_' . $parentId;
-                try {
-                    $body = json_encode($variendata);
-                } catch (Exception $e) {
-                    //json encode failed
-                    $this->mailchimpHelper->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
-                    continue;
-                }
+                    $this->_parentImageUrl = null;
+                    $variendata["backorders"] = $data["backorders"];
+                    $variendata["visibility"] = $data["visibility"];
+                    $productdata = array();
+                    $productdata['method'] = "PUT";
+                    $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parentId . '/variants/' . $data['id'];
+                    $productdata['operation_id'] = $batchId . '_' . $parentId;
+                    try {
+                        $body = json_encode($variendata);
+                    } catch (Exception $e) {
+                        //json encode failed
+                        Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+                        continue;
+                    }
 
-                $productdata['body'] = $body;
-                $operations[] = $productdata;
+                    $productdata['body'] = $body;
+                    $operations[] = $productdata;
+                }
             }
         }
 
@@ -235,7 +238,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $productId
      * @param $storeId
      */
-    protected function _updateIfEnabled($productId, $storeId) 
+    protected function _updateIfEnabled($productId, $storeId)
     {
         if ($this->mailchimpHelper->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
