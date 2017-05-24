@@ -1505,4 +1505,97 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::getConfig()->cleanCache();
         }
     }
+
+    /**
+     * Return the list of magento store IDs configured to synchronise to
+     * the given mailchimp list ID.
+     * @param string $listId Mailchimp List ID
+     * @returns int[] $magentoStoreIds Magento store IDs that sync to this list.
+     */
+    public function getMagentoStoreIdsByListId($listId)
+    {
+        $storeIds = Mage::registry('mailchimp_store_ids_for_list_'.$listId);
+        if ($storeIds === null) {
+            $stores = Mage::app()->getStores();
+            $storeIds = array();
+            foreach ($stores as $storeId => $store) {
+                if ($this->isMailChimpEnabled($storeId)) {
+                    $storeListId = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+                    if ($storeListId == $listId)
+                        $storeIds[] = $storeId;
+                }
+            }
+            Mage::register('mailchimp_store_ids_for_list_'.$listId, $storeIds);
+        }
+
+        return $storeIds;
+    }
+
+    /**
+     * Return the newsletter subscriber model for the given subscriber email
+     * address for magento stores subscribed to the given Mailchimp List ID.
+     * @param string $listId Mailchimp list ID
+     * @param string $email Subscriber email address.
+     * @returns Mage_Newsletter_Model_Subscriber $subscriber
+     */
+    public function loadListSubscriber($listId, $email)
+    {
+        $subscriber = null;
+
+        $storeIds = $this->getMagentoStoreIdsByListId($listId);
+        if (count($storeIds) > 0)
+            $subscriber = Mage::getModel('newsletter/subscriber')->getCollection()
+                ->addFieldToFilter('store_id', array('in' => $storeIds))
+                ->addFieldToFilter('subscriber_email', $email)
+                ->getFirstItem();
+
+        if (!$subscriber->getId()) {
+            /**
+             * No subscriber exists. Try to find a customer based
+             * on email address for the given stores instead.
+             */
+            $subscriber = Mage::getModel('newsletter/subscriber');
+            $subscriber->setEmail($email);
+            $customer = $this->loadListCustomer($listId, $email);
+            if ($customer) {
+                $subscriber->setStoreId($customer->getStoreId());
+            } else {
+                /**
+                 * No customer with that address. Just assume the first
+                 * store ID is the correct one as there is no other way
+                 * to tell which store this mailchimp list guest subscriber
+                 * belongs to. */
+                $subscriber->setStoreId($storeIds[0]);
+            }
+        }
+
+        return $subscriber;
+    }
+
+    /**
+     * Return the customer model for the given subscriber email
+     * address for magento stores subscribed to the given Mailchimp List ID.
+     * @param string $listId Mailchimp list ID
+     * @param string $email Subscriber email address.
+     * @returns Mage_Customer_Model_Customer|null $customer
+     */
+    public function loadListCustomer($listId, $email)
+    {
+        $customer = null;
+
+        $storeIds = $this->getMagentoStoreIdsByListId($listId);
+        if (count($storeIds) > 0) {
+            $customer = Mage::getResourceModel('customer/customer_collection')
+                ->addFieldToFilter('store_id', array('in' => $storeIds))
+                ->addFieldToFilter('email', array('eq' => $email))
+                ->getFirstItem();
+            if ($customer->getId()) {
+                $customer = Mage::getModel('customer/customer')->load($customer->getId());;
+            } else {
+                $customer = null;
+            }
+        }
+
+        return $customer;
+    }
 }
