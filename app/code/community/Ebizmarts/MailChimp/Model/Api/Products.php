@@ -30,7 +30,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $collection = $this->makeProductsNotSentCollection($mailchimpStoreId, $magentoStoreId);
         $this->joinMailchimpSyncData($mailchimpStoreId, $collection);
-
         $batchArray = array();
 
         $batchId = $this->makeBatchId($magentoStoreId);
@@ -354,7 +353,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $collection->addStoreFilter($magentoStoreId);
 
-        $collection->addPriceData();
+        $collection->addPriceData(null, $this->getWebsiteIdForStoreId($magentoStoreId));
 
         $this->joinQtyAndBackorders($collection);
 
@@ -528,5 +527,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductResourceCollection()
     {
         return Mage::getResourceModel('catalog/product_collection');
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @return int|null|string
+     */
+    protected function getWebsiteIdForStoreId($magentoStoreId)
+    {
+        return Mage::app()->getStore($magentoStoreId)->getWebsiteId();
     }
 }

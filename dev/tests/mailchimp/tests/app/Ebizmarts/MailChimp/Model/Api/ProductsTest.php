@@ -41,7 +41,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                 'joinQtyAndBackorders',
                 'joinCategoryId',
                 'joinProductAttributes',
-                'getProductResourceCollection'
+                'getProductResourceCollection',
+                'getWebsiteIdForStoreId'
             )
         )
             ->getMock();
@@ -57,7 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
         $productResourceCollectionMock->expects($this->exactly(2))->method('getSelect')->willReturn($dbSelectMock);
         $productResourceCollectionMock->expects($this->once())->method('addStoreFilter');
-        $productResourceCollectionMock->expects($this->once())->method('addPriceData');
+        $productResourceCollectionMock->expects($this->once())->method('addPriceData')->with(null, 1);
 
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection')
             ->willReturn($productResourceCollectionMock);
@@ -65,6 +66,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $this->productsApiMock->expects($this->once())->method('joinCategoryId');
         $this->productsApiMock->expects($this->once())->method('joinProductAttributes');
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection');
+        $this->productsApiMock->expects($this->once())->method('getWebsiteIdForStoreId')->with(0)->willReturn(1);
 
         $collection = $this->productsApiMock->makeProductsNotSentCollection('dasds123321', 0);
 
