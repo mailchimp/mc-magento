@@ -51,29 +51,38 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
     public function testCreateBatchJson()
     {
-        $this->customersApiMock = $this->customersApiMock->setMethods(array('makeBatchId', 'joinMailchimpSyncData'))
+        $this->customersApiMock = $this->customersApiMock->setMethods(
+            array(
+                'makeBatchId',
+                'joinMailchimpSyncData',
+                'makeCustomersNotSentCollection',
+                'getOptin'
+            ))
             ->getMock();
 
         $this->customersApiMock->expects($this->once())->method('makeBatchId')->willReturn('storeid-0_CUS_2017-05-18-14-45-54-38849500');
         $this->customersApiMock->expects($this->never())->method('buildProductDataRemoval');
         $this->customersApiMock->expects($this->once())->method('joinMailchimpSyncData');
+        $this->customersApiMock->expects($this->once())->method('makeBatchId');
+        $this->customersApiMock->expects($this->once())->method('getOptin')->with(1);
 
-        //$this->customersApiMock->expects($this->once())->method('makeCustomersNotSentCollection')->with(0)
-        //->willReturn(new Varien_Object());
+        $this->customersApiMock->expects($this->once())->method('makeCustomersNotSentCollection')
+        ->willReturn(new Varien_Object());
 
-        $this->customersApiMock->createBatchJson('dasds231231312', 1);
+        $batchArray = $this->customersApiMock->createBatchJson('dasds231231312', 1);
+        $this->assertEquals(array(), $batchArray);
     }
 
-    public function testMakeProductsNotSentCollection()
+    public function testMakeCustomersNotSentCollection()
     {
-        $this->markTestSkipped();
         $this->customersApiMock = $this->customersApiMock->setMethods(
             array(
-                'joinQtyAndBackorders',
-                'joinCategoryId',
-                'joinProductAttributes',
-                'getProductResourceCollection',
-                'getWebsiteIdForStoreId'
+                'joinDefaultBillingAddress',
+                'joinSalesData',
+                'getBatchLimitFromConfig',
+                'getWebsiteIdForStoreId',
+                'getBatchMagentoStoreId',
+                'getCustomerResourceCollection'
             )
         )
             ->getMock();
@@ -84,23 +93,22 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $dbSelectMock->expects($this->once())->method('group')->with('e.entity_id');
         $dbSelectMock->expects($this->once())->method('limit')->with(100);
 
-        $productResourceCollectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+        $customersResourceCollectionMock = $this->getMockBuilder(Mage_Customer_Model_Resource_Customer_Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $productResourceCollectionMock->expects($this->exactly(2))->method('getSelect')->willReturn($dbSelectMock);
-        $productResourceCollectionMock->expects($this->once())->method('addStoreFilter');
-        $productResourceCollectionMock->expects($this->once())->method('addPriceData')->with(null, 1);
+        $customersResourceCollectionMock->expects($this->exactly(2))->method('getSelect')->willReturn($dbSelectMock);
+        $customersResourceCollectionMock->expects($this->once())->method('addNameToSelect');
 
-        $this->customersApiMock->expects($this->once())->method('getProductResourceCollection')
-            ->willReturn($productResourceCollectionMock);
-        $this->customersApiMock->expects($this->once())->method('joinQtyAndBackorders');
-        $this->customersApiMock->expects($this->once())->method('joinCategoryId');
-        $this->customersApiMock->expects($this->once())->method('joinProductAttributes');
-        $this->customersApiMock->expects($this->once())->method('getProductResourceCollection');
-        $this->customersApiMock->expects($this->once())->method('getWebsiteIdForStoreId')->with(0)->willReturn(1);
+        $this->customersApiMock->expects($this->once())->method('getCustomerResourceCollection')
+            ->willReturn($customersResourceCollectionMock);
+        $this->customersApiMock->expects($this->once())->method('getBatchMagentoStoreId')->willReturn(1);
+        $this->customersApiMock->expects($this->once())->method('joinDefaultBillingAddress');
+        $this->customersApiMock->expects($this->once())->method('joinSalesData');
+        $this->customersApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
+        $this->customersApiMock->expects($this->once())->method('getWebsiteIdForStoreId')->with(1)->willReturn(1);
 
-        $collection = $this->customersApiMock->makeProductsNotSentCollection('dasds123321', 0);
+        $collection = $this->customersApiMock->makeCustomersNotSentCollection();
 
-        $this->assertInstanceOf("Mage_Catalog_Model_Resource_Product_Collection", $collection);
+        $this->assertInstanceOf("Mage_Customer_Model_Resource_Customer_Collection", $collection);
     }
 }
