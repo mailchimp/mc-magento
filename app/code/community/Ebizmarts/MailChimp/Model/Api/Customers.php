@@ -19,17 +19,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     private $optInConfiguration;
     private $optInStatusForStore;
     private $locale;
-    private $directoryCountryModel;
+    private $directoryRegionModel;
     private $magentoStoreId;
     private $mailchimpStoreId;
     private $batchId;
 
     public function __construct()
     {
-        $this->mailchimpHelper = Mage::helper('mailchimp');
-        $this->optInConfiguration = array();
-        $this->locale = Mage::app()->getLocale();
-        $this->directoryCountryModel = Mage::getModel('directory/country');
+        $this->mailchimpHelper      = Mage::helper('mailchimp');
+        $this->optInConfiguration   = array();
+        $this->locale               = Mage::app()->getLocale();
+        $this->directoryRegionModel = Mage::getModel('directory/region');
     }
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
@@ -59,7 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             $counter++;
         }
-        Mage::log($customerArray, null, 'customers.log', true);
+
         return $customerArray;
     }
 
@@ -127,7 +127,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
 
         if ($customer->getRegionId()) {
-            $customerAddress["province_code"] = $this->directoryCountryModel->loadByCode($customer->getRegionId())->getName();
+            $customerAddress["province_code"] = $this->directoryRegionModel->load($customer->getRegionId())->getCode();
         }
 
         if ($customer->getPostcode()) {
