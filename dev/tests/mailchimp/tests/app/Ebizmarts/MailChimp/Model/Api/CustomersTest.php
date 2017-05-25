@@ -51,7 +51,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
     public function testCreateBatchJson()
     {
-        $this->customersApiMock = $this->customersApiMock->setMethods(array('makeBatchId', 'makeCustomersNotSentCollection', 'joinMailchimpSyncData'))
+        $this->customersApiMock = $this->customersApiMock->setMethods(array('makeBatchId', 'joinMailchimpSyncData'))
             ->getMock();
 
         $this->customersApiMock->expects($this->once())->method('makeBatchId')->with(0)
@@ -59,10 +59,10 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock->expects($this->never())->method('buildProductDataRemoval');
         $this->customersApiMock->expects($this->once())->method('joinMailchimpSyncData');
 
-        $this->customersApiMock->expects($this->once())->method('makeCustomersNotSentCollection')->with(0)
-        ->willReturn(new Varien_Object());
+        //$this->customersApiMock->expects($this->once())->method('makeCustomersNotSentCollection')->with(0)
+        //->willReturn(new Varien_Object());
 
-        $this->customersApiMock->createBatchJson('dasds231231312', 0);
+        $this->customersApiMock->createBatchJson('dasds231231312', 1);
     }
 
     public function testMakeProductsNotSentCollection()
