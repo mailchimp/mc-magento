@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         
         $this->makeBatchId();
 
-        $this->optInStatusForStore = $this->getOptin($this->magentoStoreId);
+        $this->optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
 
         $counter = 0;
         foreach ($collection as $customer) {
@@ -215,7 +215,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function makeBatchId()
     {
-        $this->batchId = "storeid-{$this->magentoStoreId}_";
+        $this->batchId = "storeid-{$this->getBatchMagentoStoreId()}_";
         $this->batchId .= Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_';
         $this->batchId .= $this->mailchimpHelper->getDateMicrotime();
     }
@@ -228,8 +228,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function makeCustomersNotSentCollection()
     {
         /** @var Mage_Customer_Model_Resource_Customer_Collection $collection */
-        $collection = Mage::getResourceModel('customer/customer_collection');
-        $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($this->magentoStoreId)));
+        $collection = $this->getCustomerResourceCollection();
+        $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($this->getBatchMagentoStoreId())));
 
         $collection->addNameToSelect();
 
@@ -375,8 +375,23 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function logCouldNotEncodeCustomerError($customer)
     {
         $this->mailchimpHelper->logError(
-            "Customer " . $customer->getId() . " json encode failed on store " . $this->magentoStoreId,
-            $this->magentoStoreId
+            "Customer " . $customer->getId() . " json encode failed on store " . $this->getBatchMagentoStoreId(), $this->getBatchMagentoStoreId()
         );
+    }
+
+    /**
+     * @return Object
+     */
+    protected function getCustomerResourceCollection()
+    {
+        return Mage::getResourceModel('customer/customer_collection');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getBatchMagentoStoreId()
+    {
+        return $this->magentoStoreId;
     }
 }
