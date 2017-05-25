@@ -59,7 +59,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             $counter++;
         }
-
         return $customerArray;
     }
 
@@ -89,8 +88,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["last_name"] = $this->getCustomerLastname($customer);
         $data["opt_in_status"] = $this->optInStatusForStore;
 
-        $data["orders_count"] = $customer->getOrdersCount();
-        $data["total_spent"] = $customer->getTotalSpent();
+        $data["orders_count"] = (int)$customer->getOrdersCount();
+        $data["total_spent"] = (float)$customer->getTotalSpent();
 
         $data += $this->getCustomerAddressData($customer);
 
@@ -135,8 +134,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
 
         if ($customer->getCountryId()) {
+            $customerAddress["country"]      = $this->getCountryNameByCode($customer->getCountryId());
             $customerAddress["country_code"] = $customer->getCountryId();
-            $customerAddress["country"] = $this->getCountryNameByCode($customer->getCountryId());
         }
 
         if (!empty($customerAddress)) {
