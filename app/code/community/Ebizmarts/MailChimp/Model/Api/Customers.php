@@ -114,7 +114,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerAddress["address1"] = $street[0];
             $customerAddress["address2"] = $street[1];
         } else {
-            $customerAddress["address1"] = $street[0];
+            if (!empty($street[0])) {
+                $customerAddress["address1"] = $street[0];
+            }
         }
 
         if ($customer->getCity()) {
