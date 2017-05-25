@@ -18,9 +18,9 @@ allresponses=""
 allrequests=""
 for a in ${batches};
 do
-	echo $"Downloading response for batch $a"
-	allresponses="$allresponses $(php getMailchimpResponse.php $apikey $a)"
-	allrequests="$allrequests ../var/log/$a.Request.log"
+    echo $"Downloading response for batch $a"
+    allresponses="$allresponses $(php getMailchimpResponse.php $apikey $a)"
+    allrequests="$allrequests ../var/log/$a.Request.log"
 done;
 resp=$(tar cvzf responses.tgz $allresponses)
 req=$(tar cvzf requests.tgz $allrequests)

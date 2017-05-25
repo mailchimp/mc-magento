@@ -192,5 +192,3 @@ class Mandrill_Mandrill
         if ($this->debug) error_log($msg);
     }
 }
-
-

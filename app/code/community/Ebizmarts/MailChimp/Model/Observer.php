@@ -41,7 +41,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Create MailChimp webhook based on the Two Way Sync field. If disabled the webhook is created only for subsciption confirmation when opt-in enabled.
-     * 
+     *
      * @param $listId
      * @param $scopeId
      * @param $scope
@@ -124,7 +124,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle subscription change (subscribe/unsubscribe)
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function handleSubscriber(Varien_Event_Observer $observer)
@@ -155,14 +155,14 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle subscriber deletion from back end.
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function handleSubscriberDeletion(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
         $isEnabled = $this->makeHelper()->isMailChimpEnabled($subscriber->getStoreId());
-        
+
         if ($isEnabled) {
             Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
         }
@@ -170,7 +170,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add Subscriber first name and last name to Newsletter Grid.
-     * 
+     *
      * @param Varien_Event_Observer $observer
      * @return $this|Varien_Event_Observer
      */
@@ -205,7 +205,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Customer object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
-     * 
+     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -235,7 +235,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Product object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
-     * 
+     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -250,7 +250,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Order object is saved add the campaign id if available in the cookies.
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function saveCampaignData(Varien_Event_Observer $observer)
@@ -264,7 +264,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Catch order save before event, mark it as modified and associate the landing page to the order data.
-     * 
+     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -313,7 +313,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Get landing_page cookie if exists.
-     * 
+     *
      * @return null
      */
     protected function _getLandingCookie()

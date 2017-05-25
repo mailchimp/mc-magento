@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected $_counter;
     protected $_batchId;
     protected $_api = null;
-    
+
     protected $_token = null;
 
     /**
@@ -381,7 +381,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
     /**
      * Get URL for the cart.
-     * 
+     *
      * @param $cart
      * @return string
      */
@@ -395,7 +395,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
     /**
      * Get Customer data for the cart.
-     * 
+     *
      * @param $cart
      * @param $mailchimpStoreId
      * @param $magentoStoreId

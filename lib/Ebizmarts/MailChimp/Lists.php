@@ -84,7 +84,7 @@ class MailChimp_Lists extends MailChimp_Abstract
             'email_type_option'=>$emailTypeOption, 'visibility'=>$visibility);
         return $this->_master->call('lists', $_params, Ebizmarts_MailChimp::POST);
     }
-    
+
     public function getLists($id=null, $fields=null, $excludeFields=null, $count=null, $offset=null,
                              $beforeDateCreated=null, $sinceDateCreated=null, $beforeCampaignLastSent=null,
                              $sinceCampaignLastSent=null,$email=null)

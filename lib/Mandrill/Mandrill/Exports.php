@@ -115,5 +115,3 @@ class Mandrill_Exports
     }
 
 }
-
-

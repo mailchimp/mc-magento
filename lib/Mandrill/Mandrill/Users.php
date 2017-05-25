@@ -134,5 +134,3 @@ class Mandrill_Users
     }
 
 }
-
-
