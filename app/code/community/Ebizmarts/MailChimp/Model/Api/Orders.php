@@ -447,7 +447,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         return $returnValue;
     }
-    
+
     protected function _getMailChimpStatus($order)
     {
         $mailChimpFinancialStatus = null;

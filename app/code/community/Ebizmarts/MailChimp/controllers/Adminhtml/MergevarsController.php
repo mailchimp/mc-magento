@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
         $fieldType = $postData['fieldtype'];
         $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
         $blankSpacesAmount = (count(explode(' ', $value)) - 1);
-        
+
         if (is_numeric($value)) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value can not be numeric.'));
         } elseif (Mage::helper('mailchimp')->customMergeFieldAlreadyExists($value, $scopeArray[1], $scopeArray[0])) {

@@ -66,5 +66,3 @@ class Mandrill_Metadata
     }
 
 }
-
-

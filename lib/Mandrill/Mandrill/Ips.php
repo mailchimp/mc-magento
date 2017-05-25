@@ -290,5 +290,3 @@ class Mandrill_Ips
     }
 
 }
-
-

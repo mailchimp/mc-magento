@@ -112,5 +112,3 @@ class Mandrill_Urls
     }
 
 }
-
-

@@ -53,5 +53,3 @@ class Mandrill_Whitelists
     }
 
 }
-
-

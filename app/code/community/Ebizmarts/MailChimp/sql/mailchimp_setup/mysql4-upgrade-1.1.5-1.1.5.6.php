@@ -17,18 +17,18 @@ $installer->startSetup();
 
 $installer->run(
     "
-	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_ecommerce_sync_data')}` (
-	  `id`     INT(10) unsigned NOT NULL auto_increment,
-	  `related_id` INT(10) DEFAULT 0,
-	  `type` VARCHAR(3) NOT NULL,
-	  `mailchimp_store_id`  VARCHAR(50) NOT NULL DEFAULT '',
-	  `mailchimp_sync_error` VARCHAR(255) NOT NULL DEFAULT '',
-	  `mailchimp_sync_delta` DATETIME NOT NULL,
-	  `mailchimp_sync_modified` INT(1) NOT NULL DEFAULT 0,
-	  `mailchimp_sync_deleted` INT(1) NOT NULL DEFAULT 0,
-	  `mailchimp_token` VARCHAR(32) NOT NULL DEFAULT '',
-	  PRIMARY KEY  (`id`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_ecommerce_sync_data')}` (
+        `id`     INT(10) unsigned NOT NULL auto_increment,
+        `related_id` INT(10) DEFAULT 0,
+        `type` VARCHAR(3) NOT NULL,
+        `mailchimp_store_id`  VARCHAR(50) NOT NULL DEFAULT '',
+        `mailchimp_sync_error` VARCHAR(255) NOT NULL DEFAULT '',
+        `mailchimp_sync_delta` DATETIME NOT NULL,
+        `mailchimp_sync_modified` INT(1) NOT NULL DEFAULT 0,
+        `mailchimp_sync_deleted` INT(1) NOT NULL DEFAULT 0,
+        `mailchimp_token` VARCHAR(32) NOT NULL DEFAULT '',
+        PRIMARY KEY  (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 "
 );
 

@@ -80,7 +80,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
 
         return $rendered;
     }
-    
+
     protected function _getMailChimpValue()
     {
         return Mage::getSingleton('core/session')->getMailchimpValue();

@@ -177,5 +177,3 @@ class Mandrill_Tags
     }
 
 }
-
-

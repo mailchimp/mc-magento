@@ -417,5 +417,3 @@ class Mandrill_Messages
     }
 
 }
-
-

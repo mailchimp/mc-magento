@@ -125,5 +125,3 @@ class Mandrill_Webhooks
     }
 
 }
-
-
