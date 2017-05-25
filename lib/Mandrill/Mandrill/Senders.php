@@ -230,5 +230,3 @@ class Mandrill_Senders
     }
 
 }
-
-

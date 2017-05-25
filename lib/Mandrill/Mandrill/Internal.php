@@ -8,5 +8,3 @@ class Mandrill_Internal
     }
 
 }
-
-
