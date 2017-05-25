@@ -14,51 +14,47 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 {
     const BATCH_LIMIT = 100;
 
+    /** @var Ebizmarts_MailChimp_Helper_Data */
     private $mailchimpHelper;
     private $optInConfiguration;
+    private $optInStatusForStore;
+    private $locale;
+    private $directoryCountryModel;
+    private $magentoStoreId;
+    private $mailchimpStoreId;
+    private $batchId;
 
     public function __construct()
     {
         $this->mailchimpHelper = Mage::helper('mailchimp');
         $this->optInConfiguration = array();
+        $this->locale = Mage::app()->getLocale();
+        $this->directoryCountryModel = Mage::getModel('directory/country');
     }
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $collection = $this->makeCustomersNotSentCollection($magentoStoreId);
-        $this->joinMailchimpSyncData($mailchimpStoreId, $collection);
+        $this->mailchimpStoreId = $mailchimpStoreId;
+        $this->magentoStoreId   = $magentoStoreId;
 
-        Mage::log((string)$collection->getSelect(), null, 'customers.log', true);
-
+        $collection = $this->makeCustomersNotSentCollection();
+        $this->joinMailchimpSyncData($collection);
         $customerArray = array();
         
-        $batchId = $this->makeBatchId($magentoStoreId);
+        $this->makeBatchId();
+
+        $this->optInStatusForStore = $this->getOptin($this->magentoStoreId);
 
         $counter = 0;
-        foreach ($collection as $item) {
-            Mage::log($item->toArray(), null, 'customers.log', true);
-            die;
-            $customerId = $item->getId();
-            $customer = Mage::getModel('customer/customer')->load($customerId);
-            $data = $this->_buildCustomerData($customer, $magentoStoreId);
-            $customerJson = "";
+        foreach ($collection as $customer) {
+            $data = $this->_buildCustomerData($customer);
 
-            //enconde to JSON
-            try {
-                $customerJson = json_encode($data);
-            } catch (Exception $e) {
-                //json encode failed
-                $this->mailchimpHelper->logError("Customer ".$customer->getId()." json encode failed on store ".$magentoStoreId, $magentoStoreId);
-            }
-
-            if (!empty($customerJson)) {
-                $customerArray[$counter]['method'] = "PUT";
-                $customerArray[$counter]['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/customers/" . $customerId;
-                $customerArray[$counter]['operation_id'] = $batchId . '_' . $customerId;
-                $customerArray[$counter]['body'] = $customerJson;
-
-                //update customers delta
-                $this->_updateSyncData($customerId, $mailchimpStoreId, Varien_Date::now());
+            $customerJson = json_encode($data);
+            if (false !== $customerJson) {
+                $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
+                $this->_updateSyncData($customer->getId(), $mailchimpStoreId, Varien_Date::now());
+            } else {
+                $this->logCouldNotEncodeCustomerError($customer);
             }
 
             $counter++;
@@ -67,81 +63,92 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $customerArray;
     }
 
-    protected function _buildCustomerData($customer, $magentoStoreId)
+    /**
+     * @param $customerJson
+     * @return array
+     */
+    protected function makePutBatchStructure(
+        $customerJson
+    ) {
+        $customerId = json_decode($customerJson)->id;
+
+        $batchData = array();
+        $batchData['method'] = "PUT";
+        $batchData['path'] = "/ecommerce/stores/{$this->mailchimpStoreId}/customers/{$customerId}";
+        $batchData['operation_id'] = "{$this->batchId}_{$customerId}";
+        $batchData['body'] = $customerJson;
+        return $batchData;
+    }
+
+    protected function _buildCustomerData($customer)
     {
         $data = array();
         $data["id"] = $customer->getId();
-        $data["email_address"] = $customer->getEmail() ? $customer->getEmail() : '';
-        $data["first_name"] = $customer->getFirstname() ? $customer->getFirstname() : '';
-        $data["last_name"] = $customer->getLastname() ? $customer->getLastname() : '';
-        $data["opt_in_status"] = $this->getOptin($magentoStoreId);
+        $data["email_address"] = $this->getCustomerEmail($customer);
+        $data["first_name"] = $this->getCustomerFirstname($customer);
+        $data["last_name"] = $this->getCustomerLastname($customer);
+        $data["opt_in_status"] = $this->optInStatusForStore;
 
-        //customer orders data
-        $orderCollection = Mage::getResourceModel('sales/order_collection')
-            ->addFieldToFilter(
-                'state',
-                array(
-                    array('neq' => Mage_Sales_Model_Order::STATE_CANCELED),
-                    array('neq' => Mage_Sales_Model_Order::STATE_CLOSED)
-                )
-            )
-            ->addAttributeToFilter('customer_id', array('eq' => $customer->getId()));
+        $data["orders_count"] = $customer->getOrdersCount();
+        $data["total_spent"] = $customer->getTotalSpent();
 
-        $totalOrders = 0;
-        $totalAmountSpent = 0;
-        foreach ($orderCollection as $customerOrder) {
-            $totalOrders++;
-            $totalAmountSpent += ($customerOrder->getGrandTotal() - $customerOrder->getTotalRefunded() - $customerOrder->getTotalCanceled());
-        }
+        $data += $this->getCustomerAddressData($customer);
 
-        $data["orders_count"] = $totalOrders;
-        $data["total_spent"] = $totalAmountSpent;
-
-        //addresses data
-        $address = $customer->getDefaultBillingAddress();
-        if ($address) {
-            $customerAddress = array();
-            $street = $address->getStreet();
-            if ($street[0]) {
-                $customerAddress["address1"] = $street[0];
-            }
-
-            if (count($street) > 1 && $street[1]) {
-                $customerAddress["address2"] = $street[1];
-            }
-
-            if ($address->getCity()) {
-                $customerAddress["city"] = $address->getCity();
-            }
-
-            if ($address->getRegion()) {
-                $customerAddress["province"] = $address->getRegion();
-            }
-
-            if ($address->getRegionCode()) {
-                $customerAddress["province_code"] = $address->getRegionCode();
-            }
-
-            if ($address->getPostcode()) {
-                $customerAddress["postal_code"] = $address->getPostcode();
-            }
-
-            if ($address->getCountry()) {
-                $customerAddress["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
-                $customerAddress["country_code"] = $address->getCountry();
-            }
-
-            if (count($customerAddress)) {
-                $data["address"] = $customerAddress;
-            }
-
-            //company
-            if ($address->getCompany()) {
-                $data["company"] = $address->getCompany();
-            }
+        if ($customer->getCompany()) {
+            $data["company"] = $customer->getCompany();
         }
 
         return $data;
+    }
+
+    /**
+     * @param $customer
+     * @return array
+     */
+    protected function getCustomerAddressData($customer)
+    {
+        $data = array();
+        $customerAddress = array();
+
+        $street = explode("\n", $customer->getStreet());
+        if (count($street) > 1) {
+            $customerAddress["address1"] = $street[0];
+            $customerAddress["address2"] = $street[1];
+        } else {
+            $customerAddress["address1"] = $street[0];
+        }
+
+        if ($customer->getCity()) {
+            $customerAddress["city"] = $customer->getCity();
+        }
+
+        if ($customer->getRegion()) {
+            $customerAddress["province"] = $customer->getRegion();
+        }
+
+        if ($customer->getRegionId()) {
+            $customerAddress["province_code"] = $this->directoryCountryModel->loadByCode($customer->getRegionId())->getName();
+        }
+
+        if ($customer->getPostcode()) {
+            $customerAddress["postal_code"] = $customer->getPostcode();
+        }
+
+        if ($customer->getCountryId()) {
+            $customerAddress["country_code"] = $customer->getCountryId();
+            $customerAddress["country"] = $this->getCountryNameByCode($customer->getCountryId());
+        }
+
+        if (!empty($customerAddress)) {
+            $data["address"] = $customerAddress;
+        }
+
+        return $data;
+    }
+
+    protected function getCountryNameByCode($countryCode)
+    {
+        return $this->locale->getCountryTranslation($countryCode);
     }
 
     /**
@@ -203,12 +210,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $magentoStoreId
-     * @return string
+     * @return void
      */
-    protected function makeBatchId($magentoStoreId)
+    protected function makeBatchId()
     {
-        return 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_' . $this->mailchimpHelper->getDateMicrotime();
+        $this->batchId = "storeid-{$this->magentoStoreId}_";
+        $this->batchId .= Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_';
+        $this->batchId .= $this->mailchimpHelper->getDateMicrotime();
     }
 
     /**
@@ -216,11 +224,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $magentoStoreId
      * @return Mage_Customer_Model_Resource_Customer_Collection
      */
-    public function makeCustomersNotSentCollection($magentoStoreId) {
-
+    public function makeCustomersNotSentCollection()
+    {
         /** @var Mage_Customer_Model_Resource_Customer_Collection $collection */
         $collection = Mage::getResourceModel('customer/customer_collection');
-        $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($magentoStoreId)));
+        $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($this->magentoStoreId)));
 
         $collection->addNameToSelect();
 
@@ -230,9 +238,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $collection->getSelect()->group("e.entity_id");
 
-        print_r((string)$collection->getSelect());die;
         $collection->getSelect()->limit($this->getBatchLimitFromConfig());
-
 
         return $collection;
     }
@@ -242,12 +248,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function joinDefaultBillingAddress($collection)
     {
-            /*$customerAddress["province_code"] = $address->getRegionCode();
-            $customerAddress["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();*/
-
         $collection->joinAttribute('postcode', 'customer_address/postcode', 'default_billing', null, 'left');
         $collection->joinAttribute('city', 'customer_address/city', 'default_billing', null, 'left');
         $collection->joinAttribute('region', 'customer_address/region', 'default_billing', null, 'left');
+        $collection->joinAttribute('region_id', 'customer_address/region_id', 'default_billing', null, 'left');
         $collection->joinAttribute('country_id', 'customer_address/country_id', 'default_billing', null, 'left');
         $collection->joinAttribute('street', 'customer_address/street', 'default_billing', null, 'left');
         $collection->joinAttribute('company', 'customer_address/company', 'default_billing', null, 'left');
@@ -269,13 +273,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $mailchimpStoreId
      * @param $collection
      */
-    protected function joinMailchimpSyncData($mailchimpStoreId, $collection)
+    protected function joinMailchimpSyncData($collection)
     {
         $joinCondition      = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getSyncdataTableName();
 
         $collection->getSelect()->joinLeft(array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId), array(
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->mailchimpStoreId), array(
                 "m4m.related_id",
                 "m4m.type",
                 "m4m.mailchimp_store_id",
@@ -334,5 +338,44 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function getBatchLimitFromConfig()
     {
         return self::BATCH_LIMIT;
+    }
+
+    /**
+     * @param $customer
+     * @return string
+     */
+    protected function getCustomerEmail($customer)
+    {
+        return $customer->getEmail() ? $customer->getEmail() : '';
+    }
+
+    /**
+     * @param $customer
+     * @return string
+     */
+    protected function getCustomerFirstname($customer)
+    {
+        return $customer->getFirstname() ? $customer->getFirstname() : '';
+    }
+
+    /**
+     * @param $customer
+     * @return string
+     */
+    protected function getCustomerLastname($customer)
+    {
+        return $customer->getLastname() ? $customer->getLastname() : '';
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @param $customer
+     */
+    protected function logCouldNotEncodeCustomerError($customer)
+    {
+        $this->mailchimpHelper->logError(
+            "Customer " . $customer->getId() . " json encode failed on store " . $this->magentoStoreId,
+            $this->magentoStoreId
+        );
     }
 }
