@@ -34,7 +34,7 @@ before_install:
   - test -n "$NODE_JS_VERSION" && . $HOME/.nvm/nvm.sh && nvm install "$NODE_JS_VERSION" && nvm use "$NODE_JS_VERSION" || true
 install:
   - composer install --no-interaction --prefer-dist
-  - test -n "$NODE_JS_VERSION" &&  npm install || true
+  - test -n "$NODE_JS_VERSION" && npm install || true
   - |
     if [ "$TEST_SUITE" = "phpunit" ]; then
       wget http://ebizmartsbackup.s3.amazonaws.com/$MAGENTO_ARCHIVE &&
