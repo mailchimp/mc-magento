@@ -338,35 +338,21 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     }
 
     /**
-     * Get status to send confirmation if Need to Confirm enabled on Magento
-     *
-     * @param int $status
-     * @param int $storeId
+     * @param $status
+     * @param $storeId
      * @return string
      */
     public function translateMagentoStatusToMailchimpStatus($status, $storeId)
     {
         if ($this->statusEqualsUnsubscribed($status)) {
             $status = 'unsubscribed';
-        } elseif ($this->magentoConfigNeedsConfirmation($storeId) &&
-            ($this->statusEqualsNotActive($status) || $this->statusEqualsUnconfirmed($status))
-        ) {
+        } elseif ($this->statusEqualsNotActive($status) || $this->statusEqualsUnconfirmed($status)) {
             $status = 'pending';
         } elseif ($this->statusEqualsSubscribed($status)) {
             $status = 'subscribed';
         }
 
         return $status;
-    }
-
-    /**
-     * @param int $storeId
-     * @return mixed
-     */
-    protected function magentoConfigNeedsConfirmation($storeId)
-    {
-        $confirmationFlagPath = Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG;
-        return (1 === (int)Mage::helper('mailchimp')->getConfigValueForScope($confirmationFlagPath, $storeId));
     }
 
     /**

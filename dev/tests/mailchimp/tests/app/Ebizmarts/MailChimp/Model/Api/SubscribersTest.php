@@ -16,20 +16,13 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
      * @param $configConfirmation
      * @dataProvider magentoSubscriberStatus
      */
-    public function testMailchimpStatus($magentoStatus, $storeId, $expected, $configConfirmation)
+    public function testMailchimpStatus($magentoStatus, $storeId, $expected)
     {
         $subscribersApiMock =
             $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
             ->setMethods(array('magentoConfigNeedsConfirmation'))
             ->getMock();
-
-        if ($magentoStatus === Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE ||
-            $magentoStatus === Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED) {
-            $subscribersApiMock->expects($this->once())->method('magentoConfigNeedsConfirmation')
-                ->with($storeId)
-                ->willReturn($configConfirmation);
-        }
 
         $return = $subscribersApiMock->translateMagentoStatusToMailchimpStatus($magentoStatus, $storeId);
 
@@ -43,11 +36,9 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
     {
         return array(
             array(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED, self::DEFAULT_STORE_ID, "subscribed"),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE, self::DEFAULT_STORE_ID, "pending", true),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE, self::DEFAULT_STORE_ID, "pending", false),
+            array(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE, self::DEFAULT_STORE_ID, "pending"),
             array(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED, self::DEFAULT_STORE_ID, "unsubscribed"),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED, self::DEFAULT_STORE_ID, "pending", true),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED, self::DEFAULT_STORE_ID, "pending", false),
+            array(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED, self::DEFAULT_STORE_ID, "pending"),
         );
     }
 }
