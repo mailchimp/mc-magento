@@ -83,7 +83,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $data["merge_fields"] = $mergeVars;
         }
 
-        $data["status_if_new"] = $this->_getMCStatus($subscriber->getStatus(), $storeId);
+        $data["status_if_new"] = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
 
         return $data;
     }
@@ -295,7 +295,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         $storeId = $subscriber->getStoreId();
         $listId = Mage::helper('mailchimp')->getGeneralList($storeId);
-        $newStatus = $this->_getMCStatus($subscriber->getStatus(), $storeId);
+        $newStatus = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
         $forceStatus = ($updateStatus) ? $newStatus : null;
         $api = Mage::helper('mailchimp')->getApi($storeId);
         $mergeVars = $this->getMergeVars($subscriber);
@@ -340,25 +340,69 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * Get status to send confirmation if Need to Confirm enabled on Magento
      *
-     * @param $status
-     * @param $storeId
+     * @param int $status
+     * @param int $storeId
      * @return string
      */
-    protected function _getMCStatus($status, $storeId)
+    public function translateMagentoStatusToMailchimpStatus($status, $storeId)
     {
-        $confirmationFlagPath = Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG;
-        if ($status == Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+        if ($this->statusEqualsUnsubscribed($status)) {
             $status = 'unsubscribed';
-        } elseif (Mage::helper('mailchimp')->getConfigValueForScope($confirmationFlagPath, $storeId) &&
-            ($status == Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE ||
-                $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED)
+        } elseif ($this->magentoConfigNeedsConfirmation($storeId) &&
+            ($this->statusEqualsNotActive($status) || $this->statusEqualsUnconfirmed($status))
         ) {
             $status = 'pending';
-        } elseif ($status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+        } elseif ($this->statusEqualsSubscribed($status)) {
             $status = 'subscribed';
         }
 
         return $status;
+    }
+
+    /**
+     * @param int $storeId
+     * @return mixed
+     */
+    protected function magentoConfigNeedsConfirmation($storeId)
+    {
+        $confirmationFlagPath = Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG;
+        return (1 === (int)Mage::helper('mailchimp')->getConfigValueForScope($confirmationFlagPath, $storeId));
+    }
+
+    /**
+     * @param $status
+     * @return bool
+     */
+    protected function statusEqualsUnsubscribed($status)
+    {
+        return $status == Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED;
+    }
+
+    /**
+     * @param $status
+     * @return bool
+     */
+    protected function statusEqualsSubscribed($status)
+    {
+        return $status == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED;
+    }
+
+    /**
+     * @param $status
+     * @return bool
+     */
+    protected function statusEqualsNotActive($status)
+    {
+        return $status == Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE;
+    }
+
+    /**
+     * @param $status
+     * @return bool
+     */
+    protected function statusEqualsUnconfirmed($status)
+    {
+        return $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED;
     }
 
     public function removeSubscriber($subscriber)
