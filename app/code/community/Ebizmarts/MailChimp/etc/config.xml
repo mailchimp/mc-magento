@@ -35,14 +35,6 @@
                     </mailchimp_subscribe_delete_observer>
                 </observers>
             </newsletter_subscriber_delete_after>
-            <sales_order_place_before>
-                <observers>
-                    <mailchimp_subscribe_checkout_before>
-                        <class>mailchimp/observer</class>
-                        <method>saveCampaignData</method>
-                    </mailchimp_subscribe_checkout_before>
-                </observers>
-            </sales_order_place_before>
             <customer_save_before>
                 <observers>
                     <mailchimp_save_before_customer>
@@ -196,6 +188,14 @@
     </global>
     <frontend>
         <events>
+            <sales_order_place_before>
+                <observers>
+                    <mailchimp_subscribe_checkout_before>
+                        <class>mailchimp/observer</class>
+                        <method>saveCampaignData</method>
+                    </mailchimp_subscribe_checkout_before>
+                </observers>
+            </sales_order_place_before>
             <sales_quote_save_before>
                 <observers>
                     <ebizmarts_mailchimp_quote_save>
