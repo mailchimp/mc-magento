@@ -323,14 +323,22 @@
     </default>
     <crontab>
         <jobs>
-            <mailchimp_bulksync_data>
+            <mailchimp_bulksync_ecommerce_data>
                 <schedule>
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>mailchimp/cron::syncBatchData</model>
+                    <model>mailchimp/cron::syncEcommerceBatchData</model>
                 </run>
-            </mailchimp_bulksync_data>
+            </mailchimp_bulksync_ecommerce_data>
+            <mailchimp_bulksync_subscriber_data>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>mailchimp/cron::syncSubscriberBatchData</model>
+                </run>
+            </mailchimp_bulksync_subscriber_data>
         </jobs>
     </crontab>
 </config>
