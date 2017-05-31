@@ -130,24 +130,27 @@ class Ebizmarts_MailChimp_Model_Observer
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
-        $isEnabled = $this->makeHelper()->isMailChimpEnabled($subscriber->getStoreId());
-        if ($isEnabled) {
-            $subscriber->setImportMode(true);
-            if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
-                Mage::getModel('core/cookie')->set(
-                    'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
-                );
-            }
+        Mage::log('observer subscriber source '.$subscriber->getSubscriberSource(), null, 'ebizmarts.log', true);
+        if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+            $isEnabled = $this->makeHelper()->isMailChimpEnabled($subscriber->getStoreId());
+            if ($isEnabled) {
+                $subscriber->setImportMode(true);
+                if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
+                    Mage::getModel('core/cookie')->set(
+                        'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
+                    );
+                }
 
-            if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
-            } else {
-                $origData = $subscriber->getOrigData();
-
-                if (is_array($origData) && isset($origData['subscriber_status']) &&
-                    $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
-                ) {
+                if (TRUE === $subscriber->getIsStatusChanged()) {
                     Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                } else {
+                    $origData = $subscriber->getOrigData();
+
+                    if (is_array($origData) && isset($origData['subscriber_status']) &&
+                        $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
+                    ) {
+                        Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                    }
                 }
             }
         }

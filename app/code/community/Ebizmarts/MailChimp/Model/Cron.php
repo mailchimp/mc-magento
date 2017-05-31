@@ -26,4 +26,9 @@ class Ebizmarts_MailChimp_Model_Cron
 
         Mage::getModel('mailchimp/api_batches')->handleSubscriberBatches();
     }
+
+    public function processWebhookData($cron)
+    {
+        Mage::getModel('mailchimp/processWebhook')->processWebhookData();
+    }
 }
