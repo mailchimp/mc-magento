@@ -263,6 +263,11 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($campaignCookie) {
             $order->setMailchimpCampaignId($campaignCookie);
         }
+
+        $landingCookie = $this->_getLandingCookie();
+        if ($landingCookie && !$order->getMailchimpLandingPage()) {
+            $order->setMailchimpLandingPage($landingCookie);
+        }
     }
 
     /**
@@ -278,10 +283,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
         //update mailchimp ecommerce data for that product variant
         Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
-        $landingCookie = $this->_getLandingCookie();
-        if ($landingCookie && !$order->getMailchimpLandingPage()) {
-            $order->setMailchimpLandingPage($landingCookie);
-        }
     }
 
     /**

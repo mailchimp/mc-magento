@@ -1431,7 +1431,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($stores as $storeId => $store) {
             $mailchimpApi = $this->getApi($storeId);
             $mailchimpStoreId = $this->getMCStoreId($storeId);
-            Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
+            if ($mailchimpStoreId) {
+                Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
+            }
         }
     }
 
