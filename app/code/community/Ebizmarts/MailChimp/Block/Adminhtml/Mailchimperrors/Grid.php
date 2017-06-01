@@ -2,13 +2,13 @@
 /**
  * mc-magento Magento Component
  *
- * @category Ebizmarts
- * @package mc-magento
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mc-magento
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 6/10/16 12:38 AM
- * @file: Grid.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     6/10/16 12:38 AM
+ * @file:     Grid.php
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
@@ -33,16 +33,16 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
     protected function _prepareColumns()
     {
 
-//        $this->addColumn('action', array(
-//            'header' => Mage::helper('mailchimp')->__('Action'),
-//            'index' => 'action',
-//            'sortable' => false
-//        ));
-//        $this->addColumn('type', array(
-//            'header' => Mage::helper('mailchimp')->__('Type'),
-//            'index' => 'type',
-//            'sortable' => true
-//        ));
+        //        $this->addColumn('action', array(
+        //            'header' => Mage::helper('mailchimp')->__('Action'),
+        //            'index' => 'action',
+        //            'sortable' => false
+        //        ));
+        //        $this->addColumn('type', array(
+        //            'header' => Mage::helper('mailchimp')->__('Type'),
+        //            'index' => 'type',
+        //            'sortable' => true
+        //        ));
         $this->addColumn(
             'title', array(
             'header' => Mage::helper('mailchimp')->__('Title'),

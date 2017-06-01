@@ -3,12 +3,12 @@
 /**
  * MailChimp For Magento
  *
- * @category Ebizmarts_MailChimp
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts_MailChimp
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 5/19/16 3:55 PM
- * @file: WebhookController.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     5/19/16 3:55 PM
+ * @file:     WebhookController.php
  */
 class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_Action
 {
@@ -30,7 +30,6 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
     public function indexAction()
     {
         $request = $this->getRequest();
-        Mage::log($request->getPost(), null, 'ebizmarts.log', true);
         $requestKey = $request->getParam('wkey');
         $moduleName = $request->getModuleName();
         $data = $request->getPost();
@@ -43,7 +42,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                     $api = $helper->getApi($storeIds[0]);
                     $webhooks = $api->lists->webhooks->getAll($listId);
                     foreach ($webhooks['webhooks'] as $webhook) {
-                        if (strpos($webhook['url'], 'monkey/webhook')) {
+                        if (strpos($webhook['url'], 'monkey/webhook') !== false) {
                             $api->lists->webhooks->delete($listId, $webhook['id']);
                         }
                     }

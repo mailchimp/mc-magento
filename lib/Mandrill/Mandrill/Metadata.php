@@ -9,6 +9,7 @@ class Mandrill_Metadata
 
     /**
      * Get the list of custom metadata fields indexed for the account.
+     *
      * @return array the custom metadata fields for the account
      *     - return[] struct the individual custom metadata field info
      *         - name string the unique identifier of the metadata field to update
@@ -23,8 +24,9 @@ class Mandrill_Metadata
 
     /**
      * Add a new custom metadata field to be indexed for the account.
-     * @param string $name a unique identifier for the metadata field
-     * @param string $view_template optional Mustache template to control how the metadata is rendered in your activity log
+     *
+     * @param  string $name          a unique identifier for the metadata field
+     * @param  string $view_template optional Mustache template to control how the metadata is rendered in your activity log
      * @return struct the information saved about the new metadata field
      *     - name string the unique identifier of the metadata field to update
      *     - state string the current state of the metadata field, one of "active", "delete", or "index"
@@ -38,8 +40,9 @@ class Mandrill_Metadata
 
     /**
      * Update an existing custom metadata field.
-     * @param string $name the unique identifier of the metadata field to update
-     * @param string $view_template optional Mustache template to control how the metadata is rendered in your activity log
+     *
+     * @param  string $name          the unique identifier of the metadata field to update
+     * @param  string $view_template optional Mustache template to control how the metadata is rendered in your activity log
      * @return struct the information for the updated metadata field
      *     - name string the unique identifier of the metadata field to update
      *     - state string the current state of the metadata field, one of "active", "delete", or "index"
@@ -53,7 +56,8 @@ class Mandrill_Metadata
 
     /**
      * Delete an existing custom metadata field. Deletion isn't instataneous, and /metadata/list will continue to return the field until the asynchronous deletion process is complete.
-     * @param string $name the unique identifier of the metadata field to update
+     *
+     * @param  string $name the unique identifier of the metadata field to update
      * @return struct the information for the deleted metadata field
      *     - name string the unique identifier of the metadata field to update
      *     - state string the current state of the metadata field, one of "active", "delete", or "index"

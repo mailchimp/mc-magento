@@ -3,11 +3,11 @@
 /**
  * mailchimp-lib Magento Component
  *
- * @category Ebizmarts
- * @package mailchimp-lib
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mailchimp-lib
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Ebizmarts_MailChimp_Model_Api_Orders
 {
@@ -30,8 +30,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * Set the request for orders to be created on MailChimp
      *
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
+     * @param  $mailchimpStoreId
+     * @param  $magentoStoreId
      * @return array
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
@@ -167,10 +167,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * Set all the data for each order to be sent
      *
-     * @param $order
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
-     * @param $isModifiedOrder
+     * @param  $order
+     * @param  $mailchimpStoreId
+     * @param  $magentoStoreId
+     * @param  $isModifiedOrder
      * @return string
      */
     protected function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, $isModifiedOrder = false)
@@ -526,10 +526,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      *
      * @param $orderId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param bool $saveOnlyIfexists
+     * @param null             $syncDelta
+     * @param null             $syncError
+     * @param int              $syncModified
+     * @param bool             $saveOnlyIfexists
      */
     protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
     {
@@ -539,9 +539,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * Replace all orders with old id with the increment id on MailChimp.
      *
-     * @param $initialTime
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
+     * @param  $initialTime
+     * @param  $mailchimpStoreId
+     * @param  $magentoStoreId
      * @return array
      */
     public function replaceAllOrdersBatch($initialTime, $mailchimpStoreId, $magentoStoreId)

@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
      * Account details storage
      *
      * @access protected
-     * @var bool|array
+     * @var    bool|array
      */
     protected $_account_details = "--- Enter your API KEY first ---";
 

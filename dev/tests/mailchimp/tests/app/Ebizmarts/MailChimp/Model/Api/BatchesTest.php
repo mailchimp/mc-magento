@@ -20,8 +20,10 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
     public function testSendEcommerceBatch()
     {
-        $apiBatchesMock = $this->apiBatchesMock->setMethods(array('getHelper', 'isMailChimpEnabled', 'isEcomSyncDataEnabled',
-            'getApiCustomers', 'getApiProducts', 'getApiCarts', 'getApiOrders'))
+        $apiBatchesMock = $this->apiBatchesMock->setMethods(
+            array('getHelper', 'isMailChimpEnabled', 'isEcomSyncDataEnabled',
+            'getApiCustomers', 'getApiProducts', 'getApiCarts', 'getApiOrders')
+        )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -54,7 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
             ->disableOriginalConstructor()
-//            ->setMethods(array(''))
+        //            ->setMethods(array(''))
             ->getMock();
 
         $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);

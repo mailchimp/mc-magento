@@ -20,9 +20,9 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
     {
         $subscribersApiMock =
             $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('magentoConfigNeedsConfirmation'))
-            ->getMock();
+                ->disableOriginalConstructor()
+                ->setMethods(array('magentoConfigNeedsConfirmation'))
+                ->getMock();
 
         $return = $subscribersApiMock->translateMagentoStatusToMailchimpStatus($magentoStatus, $storeId);
 

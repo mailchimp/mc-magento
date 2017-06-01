@@ -2,12 +2,12 @@
 /**
  * MailChimp For Magento
  *
- * @category Ebizmarts_MailChimp
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts_MailChimp
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 5/19/16 3:55 PM
- * @file: ProdcessWebhook.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     5/19/16 3:55 PM
+ * @file:     ProdcessWebhook.php
  */
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
@@ -40,20 +40,20 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $data = unserialize($webhookRequest->getDataRequest());
 
             switch ($webhookRequest->getType()) {
-                case 'subscribe':
-                    $this->_subscribe($data);
-                    break;
-                case 'unsubscribe':
-                    $this->_unsubscribe($data);
-                    break;
-                case 'cleaned':
-                    $this->_clean($data);
-                    break;
-                case 'upemail':
-                    $this->_updateEmail($data);
-                    break;
-                case 'profile':
-                    $this->_profile($data);
+            case 'subscribe':
+                $this->_subscribe($data);
+                break;
+            case 'unsubscribe':
+                $this->_unsubscribe($data);
+                break;
+            case 'cleaned':
+                $this->_clean($data);
+                break;
+            case 'upemail':
+                $this->_updateEmail($data);
+                break;
+            case 'profile':
+                $this->_profile($data);
             }
             $webhookRequest->setProcessed(1)
                 ->save();
@@ -63,7 +63,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * Update customer email <upemail>
      *
-     * @param array $data
+     * @param  array $data
      * @return void
      */
     protected function _updateEmail(array $data)
@@ -75,18 +75,20 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $oldSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $old);
         $newSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $new);
 
-        if (!$newSubscriber->getId() && $oldSubscriber->getId()) {
-            $oldSubscriber->setSubscriberEmail($new)
-                ->save();
-        } elseif (!$newSubscriber->getId() && !$oldSubscriber->getId()) {
-            $this->subscribeMember($newSubscriber);
+        if (!$newSubscriber->getId()) {
+            if ($oldSubscriber->getId()) {
+                $oldSubscriber->setSubscriberEmail($new)
+                    ->save();
+            } else {
+                $this->subscribeMember($newSubscriber);
+            }
         }
     }
 
     /**
      * Add "Cleaned Emails" notification to Adminnotification Inbox <cleaned>
      *
-     * @param array $data
+     * @param  array $data
      * @return void
      */
     protected function _clean(array $data)
@@ -106,7 +108,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * Subscribe email to Magento list, store aware
      *
-     * @param array $data
+     * @param  array $data
      * @return void
      */
     protected function _subscribe(array $data)
@@ -155,13 +157,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
         $subscriber->setIsStatusChanged(true);
         $subscriber->save();
-        Mage::log('process webhook subscriber source '.$subscriber->getSubscriberSource(), null, 'ebizmarts.log', true);
     }
 
     /**
      * Unsubscribe or delete email from Magento list, store aware
      *
-     * @param array $data
+     * @param  array $data
      * @return void
      */
     protected function _unsubscribe(array $data)
@@ -171,19 +172,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             try {
                 $action = isset($data['action']) ? $data['action'] : 'delete';
                 switch ($action) {
-                    case 'delete' :
-                        //if config setting "Webhooks Delete action" is set as "Delete customer account"
-                        if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
-                            $subscriber->delete();
-                        } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                            $this->unsubscribeMember($subscriber);
-                        }
-                        break;
-                    case 'unsub':
-                        if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                            $this->unsubscribeMember($subscriber);
-                        }
-                        break;
+                case 'delete' :
+                    //if config setting "Webhooks Delete action" is set as "Delete customer account"
+                    if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
+                        $subscriber->delete();
+                    } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                        $this->unsubscribeMember($subscriber);
+                    }
+                    break;
+                case 'unsub':
+                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                        $this->unsubscribeMember($subscriber);
+                    }
+                    break;
                 }
             } catch (Exception $e) {
                 Mage::logException($e);

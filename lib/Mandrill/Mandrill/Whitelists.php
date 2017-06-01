@@ -11,8 +11,9 @@ class Mandrill_Whitelists
      * Adds an email to your email rejection whitelist. If the address is
      * currently on your blacklist, that blacklist entry will be removed
      * automatically.
-     * @param string $email an email address to add to the whitelist
-     * @param string $comment an optional description of why the email was whitelisted
+     *
+     * @param  string $email   an email address to add to the whitelist
+     * @param  string $comment an optional description of why the email was whitelisted
      * @return struct a status object containing the address and the result of the operation
      *     - email string the email address you provided
      *     - added boolean whether the operation succeeded
@@ -26,7 +27,8 @@ class Mandrill_Whitelists
     /**
      * Retrieves your email rejection whitelist. You can provide an email
      * address or search prefix to limit the results. Returns up to 1000 results.
-     * @param string $email an optional email address or prefix to search by
+     *
+     * @param  string $email an optional email address or prefix to search by
      * @return array up to 1000 whitelist entries
      *     - return[] struct the information for each whitelist entry
      *         - email string the email that is whitelisted
@@ -41,7 +43,8 @@ class Mandrill_Whitelists
 
     /**
      * Removes an email address from the whitelist.
-     * @param string $email the email address to remove from the whitelist
+     *
+     * @param  string $email the email address to remove from the whitelist
      * @return struct a status object containing the address and whether the deletion succeeded
      *     - email string the email address that was removed from the blacklist
      *     - deleted boolean whether the address was deleted successfully

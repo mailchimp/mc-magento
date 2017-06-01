@@ -8,7 +8,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         Mage::app('default');
 
-        /** @var Ebizmarts_MailChimp_Model_Api_Products $apiProductsMock */
+        /**
+ * @var Ebizmarts_MailChimp_Model_Api_Products $apiProductsMock 
+*/
         $this->productsApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class);
     }
 
@@ -29,7 +31,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $this->productsApiMock->expects($this->once())->method('joinMailchimpSyncData');
 
         $this->productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')->with('dasds231231312', 0)
-        ->willReturn(new Varien_Object());
+            ->willReturn(new Varien_Object());
 
         $this->productsApiMock->createBatchJson('dasds231231312', 0);
     }

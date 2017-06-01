@@ -9,6 +9,7 @@ class Mandrill_Senders
 
     /**
      * Return the senders that have tried to use this account.
+     *
      * @return array an array of sender data, one for each sending addresses used by the account
      *     - return[] struct the information on each sending address in the account
      *         - address string the sender's email address
@@ -32,6 +33,7 @@ class Mandrill_Senders
 
     /**
      * Returns the sender domains that have been added to this account.
+     *
      * @return array an array of sender domain data, one for each sending domain used by the account
      *     - return[] struct the information on each sending domain for the account
      *         - domain string the sender domain name
@@ -57,7 +59,8 @@ class Mandrill_Senders
     /**
      * Adds a sender domain to your account. Sender domains are added automatically as you
      * send, but you can use this call to add them ahead of time.
-     * @param string $domain a domain name
+     *
+     * @param  string $domain a domain name
      * @return struct information about the domain
      *     - domain string the sender domain name
      *     - created_at string the date and time that the sending domain was first seen as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -82,7 +85,8 @@ class Mandrill_Senders
     /**
      * Checks the SPF and DKIM settings for a domain. If you haven't already added this domain to your
      * account, it will be added automatically.
-     * @param string $domain a domain name
+     *
+     * @param  string $domain a domain name
      * @return struct information about the sender domain
      *     - domain string the sender domain name
      *     - created_at string the date and time that the sending domain was first seen as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -110,8 +114,9 @@ class Mandrill_Senders
      * domain has been verified in a Mandrill account, other accounts may not have their
      * messages signed by that domain unless they also verify the domain. This prevents
      * other Mandrill accounts from sending mail signed by your domain.
-     * @param string $domain a domain name at which you can receive email
-     * @param string $mailbox a mailbox at the domain where the verification email should be sent
+     *
+     * @param  string $domain  a domain name at which you can receive email
+     * @param  string $mailbox a mailbox at the domain where the verification email should be sent
      * @return struct information about the verification that was sent
      *     - status string "sent" indicates that the verification has been sent, "already_verified" indicates that the domain has already been verified with your account
      *     - domain string the domain name you provided
@@ -125,7 +130,8 @@ class Mandrill_Senders
 
     /**
      * Return more detailed information about a single sender, including aggregates of recent stats
-     * @param string $address the email address of the sender
+     *
+     * @param  string $address the email address of the sender
      * @return struct the detailed information on the sender
      *     - address string the sender's email address
      *     - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string in YYYY-MM-DD HH:MM:SS format
@@ -202,7 +208,8 @@ class Mandrill_Senders
 
     /**
      * Return the recent history (hourly stats for the last 30 days) for a sender
-     * @param string $address the email address of the sender
+     *
+     * @param  string $address the email address of the sender
      * @return array the array of history information
      *     - return[] struct the stats for a single hour
      *         - time string the hour as a UTC date string in YYYY-MM-DD HH:MM:SS format

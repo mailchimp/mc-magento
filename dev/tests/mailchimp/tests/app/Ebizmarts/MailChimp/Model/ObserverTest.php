@@ -9,7 +9,9 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
     public function testProductAttributeUpdateIsUsingCorrectStoreId()
     {
-        /** @var \Ebizmarts_MailChimp_Model_Observer $modelMock */
+        /**
+ * @var \Ebizmarts_MailChimp_Model_Observer $modelMock 
+*/
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
             ->setMethods(array('changeStoreName', 'makeHelper', 'makeApiProducts'))
@@ -20,8 +22,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('update'))
             ->getMock();
         $apiProductsMock->expects($this->exactly(2))->method('update')->withConsecutive(
-                array(12, 0),
-                array(34, 0)
+            array(12, 0),
+            array(34, 0)
         );
 
         $eventMock = $this->getMockBuilder(Varien_Event::class)
@@ -42,7 +44,9 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
     public function testSaveCampaignDataCallsCorrectFunctions()
     {
-        /** @var \Ebizmarts_MailChimp_Model_Observer $modelMock */
+        /**
+ * @var \Ebizmarts_MailChimp_Model_Observer $modelMock 
+*/
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
             ->setMethods(array("_getCampaignCookie", "_getLandingCookie"))

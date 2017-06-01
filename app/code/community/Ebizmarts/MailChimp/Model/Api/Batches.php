@@ -3,11 +3,11 @@
 /**
  * mailchimp-lib Magento Component
  *
- * @category Ebizmarts
- * @package mailchimp-lib
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mailchimp-lib
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Ebizmarts_MailChimp_Model_Api_Batches
 {
@@ -120,7 +120,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * Get results of batch operations sent to MailChimp.
      *
      * @param $magentoStoreId
-     * @param bool $isEcommerceData
+     * @param bool           $isEcommerceData
      */
     protected function _getResults($magentoStoreId, $isEcommerceData = true)
     {
@@ -161,7 +161,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * Send Customers, Products, Orders, Carts to MailChimp store for given scope.
      * Return true if MailChimp store is reseted in the process.
      *
-     * @param $magentoStoreId
+     * @param  $magentoStoreId
      * @return null
      */
     public function _sendEcommerceBatch($magentoStoreId)
@@ -280,8 +280,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     /**
      * Send Subscribers batch on particular store view, return batch response.
      *
-     * @param $storeId
-     * @param $limit
+     * @param  $storeId
+     * @param  $limit
      * @return array|null
      */
     public function sendStoreSubscriberBatch($storeId, $limit)

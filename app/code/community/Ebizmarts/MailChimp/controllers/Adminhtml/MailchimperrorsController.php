@@ -3,13 +3,13 @@
 /**
  * mc-magento Magento Component
  *
- * @category Ebizmarts
- * @package mc-magento
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mc-magento
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 6/10/16 12:35 PM
- * @file: MailchimperrorsController.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     6/10/16 12:35 PM
+ * @file:     MailchimperrorsController.php
  */
 class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Adminhtml_Controller_Action
 {
@@ -66,11 +66,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
-            case 'index':
-            case 'grid':
-            case 'downloadresponse':
-                $acl = 'newsletter/mailchimp/mailchimperrors';
-                break;
+        case 'index':
+        case 'grid':
+        case 'downloadresponse':
+            $acl = 'newsletter/mailchimp/mailchimperrors';
+            break;
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);

@@ -2,12 +2,12 @@
 /**
  * MailChimp For Magento
  *
- * @category Ebizmarts_MailChimp
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts_MailChimp
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 4/29/16 3:55 PM
- * @file: Account.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     4/29/16 3:55 PM
+ * @file:     Account.php
  */
 class Ebizmarts_MailChimp_Model_System_Config_Source_List
 {
@@ -16,7 +16,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
      * Lists for API key will be stored here
      *
      * @access protected
-     * @var array Email lists for given API key
+     * @var    array Email lists for given API key
      */
     protected $_lists = null;
 

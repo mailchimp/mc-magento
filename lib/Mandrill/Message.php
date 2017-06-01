@@ -26,11 +26,12 @@ class Mandrill_Message extends Mandrill_Mandrill
     }
 
     public function createAttachment($body,
-                                     $mimeType = Zend_Mime::TYPE_OCTETSTREAM,
-                                     $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
-                                     $encoding = Zend_Mime::ENCODING_BASE64,
-                                     $filename = null)
-    {
+        $mimeType = Zend_Mime::TYPE_OCTETSTREAM,
+        $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
+        $encoding = Zend_Mime::ENCODING_BASE64,
+        $filename = null
+    ) {
+    
         $att = array('type' => $mimeType, 'name' => $filename, 'content' => base64_encode($body));
         array_push($this->_attachments, $att);
     }
@@ -126,10 +127,10 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
 
         $email = $this->_filterEmail($email);
-//        $name  = $this->_filterName($name);
+        //        $name  = $this->_filterName($name);
         $this->_from = $email;
         $this->_fromName = $name;
-//        $this->_storeHeader('From', $this->_formatAddress($email, $name), true);
+        //        $this->_storeHeader('From', $this->_formatAddress($email, $name), true);
 
         return $this;
     }
@@ -156,7 +157,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     /**
      * Filter of name data
      *
-     * @param string $name
+     * @param  string $name
      * @return string
      */
     protected function _filterName($name)
@@ -200,7 +201,7 @@ class Mandrill_Message extends Mandrill_Mandrill
             /**
              * @see Zend_Mail_Exception
              */
-            #require_once 'Zend/Mail/Exception.php';
+            // require_once 'Zend/Mail/Exception.php';
             throw new Zend_Mail_Exception('Cannot set standard header from addHeader()');
         }
 

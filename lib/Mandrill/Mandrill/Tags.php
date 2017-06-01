@@ -9,6 +9,7 @@ class Mandrill_Tags
 
     /**
      * Return all of the user-defined tag information
+     *
      * @return array a list of user-defined tags
      *     - return[] struct a user-defined tag
      *         - tag string the actual tag as a string
@@ -34,7 +35,8 @@ class Mandrill_Tags
      * Deletes a tag permanently. Deleting a tag removes the tag from any messages
      * that have been sent, and also deletes the tag's stats. There is no way to
      * undo this operation, so use it carefully.
-     * @param string $tag a tag name
+     *
+     * @param  string $tag a tag name
      * @return struct the tag that was deleted
      *     - tag string the actual tag as a string
      *     - reputation integer the tag's current reputation on a scale from 0 to 100.
@@ -57,7 +59,8 @@ class Mandrill_Tags
 
     /**
      * Return more detailed information about a single tag, including aggregates of recent stats
-     * @param string $tag an existing tag name
+     *
+     * @param  string $tag an existing tag name
      * @return struct the detailed information on the tag
      *     - tag string the actual tag as a string
      *     - sent integer the total number of messages sent with this tag
@@ -133,7 +136,8 @@ class Mandrill_Tags
 
     /**
      * Return the recent history (hourly stats for the last 30 days) for a tag
-     * @param string $tag an existing tag name
+     *
+     * @param  string $tag an existing tag name
      * @return array the array of history information
      *     - return[] struct the stats for a single hour
      *         - time string the hour as a UTC date string in YYYY-MM-DD HH:MM:SS format
@@ -156,6 +160,7 @@ class Mandrill_Tags
 
     /**
      * Return the recent history (hourly stats for the last 30 days) for all tags
+     *
      * @return array the array of history information
      *     - return[] struct the stats for a single hour
      *         - time string the hour as a UTC date string in YYYY-MM-DD HH:MM:SS format

@@ -3,18 +3,20 @@
 /**
  * mailchimp-lib Magento Component
  *
- * @category Ebizmarts
- * @package mailchimp-lib
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mailchimp-lib
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Ebizmarts_MailChimp_Model_Api_Customers
 {
     const BATCH_LIMIT = 100;
 
-    /** @var Ebizmarts_MailChimp_Helper_Data */
+    /**
+ * @var Ebizmarts_MailChimp_Helper_Data 
+*/
     private $mailchimpHelper;
     private $optInConfiguration;
     private $optInStatusForStore;
@@ -200,10 +202,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * 
      * @param $customerId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param bool $saveOnlyIfexists
+     * @param null             $syncDelta
+     * @param null             $syncError
+     * @param int              $syncModified
+     * @param bool             $saveOnlyIfexists
      */
     protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
     {
@@ -227,7 +229,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     public function makeCustomersNotSentCollection()
     {
-        /** @var Mage_Customer_Model_Resource_Customer_Collection $collection */
+        /**
+ * @var Mage_Customer_Model_Resource_Customer_Collection $collection 
+*/
         $collection = $this->getCustomerResourceCollection();
         $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($this->getBatchMagentoStoreId())));
 
@@ -279,14 +283,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $joinCondition      = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getSyncdataTableName();
 
-        $collection->getSelect()->joinLeft(array("m4m" => $mailchimpTableName),
+        $collection->getSelect()->joinLeft(
+            array("m4m" => $mailchimpTableName),
             sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->mailchimpStoreId), array(
                 "m4m.related_id",
                 "m4m.type",
                 "m4m.mailchimp_store_id",
                 "m4m.mailchimp_sync_delta",
                 "m4m.mailchimp_sync_modified"
-            ));
+            )
+        );
 
         $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
     }
@@ -316,8 +322,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function isEcommerceCustomerOptInConfigEnabled($magentoStoreId)
     {
-        $configValue = $this->mailchimpHelper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMERS_OPTIN,
-            $magentoStoreId);
+        $configValue = $this->mailchimpHelper->getConfigValueForScope(
+            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMERS_OPTIN,
+            $magentoStoreId
+        );
         return (1 === (int)$configValue);
     }
 
