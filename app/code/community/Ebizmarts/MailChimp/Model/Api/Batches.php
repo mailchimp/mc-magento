@@ -169,10 +169,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         try {
-            //@Todo Place warning if there is any entry with batch_id 0
-            $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-            $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-            $write_connection->delete($resource->getMainTable(), "batch_id IS NULL");
+            $this->deleteUnsentItems();
             if ($helper->isMailChimpEnabled($magentoStoreId) && $helper->isEcomSyncDataEnabled($magentoStoreId)) {
                 $batchArray = array();
                 //customer operations
@@ -214,9 +211,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                     ->setBatchId($batchResponse['id'])
                                     ->setStatus($batchResponse['status']);
                                 $batch->save();
-                                $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-                                $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-                                $write_connection->update($resource->getMainTable(), array('batch_id' => $batchResponse['id']), "batch_id IS NULL AND mailchimp_store_id = '" . $mailchimpStoreId . "'");
+                                $this->markItemsAsSent($batchResponse['id'], $mailchimpStoreId);
                             }
                         }
                     }
@@ -241,6 +236,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         } catch (Exception $e) {
             $helper->logError($e->getMessage(), $magentoStoreId);
         }
+    }
+
+    protected function deleteUnsentItems()
+    {
+        $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
+        $write_connection->delete($resource->getMainTable(), "batch_id IS NULL");
+    }
+
+    protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
+    {
+        $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
+        $write_connection->update($resource->getMainTable(), array('batch_id' => $batchResponseId), "batch_id IS NULL AND mailchimp_store_id = '" . $mailchimpStoreId . "'");
     }
 
     /**
