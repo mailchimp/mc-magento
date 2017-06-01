@@ -130,7 +130,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         foreach ($newOrders as $item) {
             try {
                 $orderId = $item->getEntityId();
-                $incrementId = $item->getIncrementId();
                 $order = Mage::getModel('sales/order')->load($orderId);
                 //create missing products first
                 $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
@@ -145,7 +144,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "POST";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $incrementId;
+                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                 } else {
                     $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
@@ -579,12 +578,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $this->_counter += 1;
 
                 //Create order
-                $incrementId = $order->getIncrementId();
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "POST";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $incrementId;
+                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                     $this->_counter += 1;
                 } else {
