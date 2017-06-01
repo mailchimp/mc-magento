@@ -10,7 +10,7 @@
  * @date:     6/9/16 4:44 PM
  * @file:     ProcessWebhookData.php
  */
-class Ebizmarts_MailChimp_Model_WebhookRequest extends Mage_Core_Model_Abstract
+class Ebizmarts_MailChimp_Model_Webhookrequest extends Mage_Core_Model_Abstract
 {
     /**
      * Initialize model
