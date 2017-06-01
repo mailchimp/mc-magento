@@ -40,9 +40,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $this->mailchimpHelper = Mage::helper('mailchimp');
         $this->apiCustomers = Mage::getModel('mailchimp/api_customers');
-        $this->apiProducts = Mage::getModel('mailchimp/api_customers');
-        $this->apiCarts = Mage::getModel('mailchimp/api_customers');
-        $this->apiOrders = Mage::getModel('mailchimp/api_customers');
+        $this->apiProducts = Mage::getModel('mailchimp/api_products');
+        $this->apiCarts = Mage::getModel('mailchimp/api_carts');
+        $this->apiOrders = Mage::getModel('mailchimp/api_orders');
     }
 
     /**
@@ -192,6 +192,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
                 $batchJson = null;
                 $batchResponse = null;
+
                 try {
                     /**
                      * @var $mailchimpApi \Ebizmarts_MailChimp

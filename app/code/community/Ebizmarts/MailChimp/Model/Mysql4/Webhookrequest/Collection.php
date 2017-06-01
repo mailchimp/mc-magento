@@ -10,7 +10,7 @@
  * @date:     6/9/16 4:48 PM
  * @file:     Collection.php
  */
-class Ebizmarts_MailChimp_Model_Mysql4_WebhookRequest_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
+class Ebizmarts_MailChimp_Model_Mysql4_Webhookrequest_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
 {
 
     /**

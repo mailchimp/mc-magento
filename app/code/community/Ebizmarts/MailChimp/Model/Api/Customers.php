@@ -41,6 +41,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $collection = $this->makeCustomersNotSentCollection();
         $this->joinMailchimpSyncData($collection);
+
         $customerArray = array();
         
         $this->makeBatchId();

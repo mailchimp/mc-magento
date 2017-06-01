@@ -10,7 +10,7 @@
  * @date:     6/9/16 4:46 PM
  * @file:     Mailchimperrors.php
  */
-class Ebizmarts_MailChimp_Model_Mysql4_WebhookRequest extends Mage_Core_Model_Mysql4_Abstract
+class Ebizmarts_MailChimp_Model_Mysql4_Webhookrequest extends Mage_Core_Model_Mysql4_Abstract
 {
 
     /**
