@@ -9,6 +9,7 @@ class Mandrill_Ips
 
     /**
      * Lists your dedicated IPs.
+     *
      * @return array an array of structs for each dedicated IP
      *     - return[] struct information about a single dedicated IP
      *         - ip string the ip address
@@ -32,7 +33,8 @@ class Mandrill_Ips
 
     /**
      * Retrieves information about a single dedicated ip.
-     * @param string $ip a dedicated IP address
+     *
+     * @param  string $ip a dedicated IP address
      * @return struct Information about the dedicated ip
      *     - ip string the ip address
      *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -57,8 +59,9 @@ class Mandrill_Ips
      * Requests an additional dedicated IP for your account. Accounts may
      * have one outstanding request at any time, and provisioning requests
      * are processed within 24 hours.
-     * @param boolean $warmup whether to enable warmup mode for the ip
-     * @param string $pool the id of the pool to add the dedicated ip to, or null to use your account's default pool
+     *
+     * @param  boolean $warmup whether to enable warmup mode for the ip
+     * @param  string  $pool   the id of the pool to add the dedicated ip to, or null to use your account's default pool
      * @return struct a description of the provisioning request that was created
      *     - requested_at string the date and time that the request was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
      */
@@ -73,7 +76,8 @@ class Mandrill_Ips
      * Mandrill will gradually increase the percentage of your mail that is sent over
      * the warming-up IP, over a period of roughly 30 days. The rest of your mail
      * will be sent over shared IPs or other dedicated IPs in the same pool.
-     * @param string $ip a dedicated ip address
+     *
+     * @param  string $ip a dedicated ip address
      * @return struct Information about the dedicated IP
      *     - ip string the ip address
      *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -96,7 +100,8 @@ class Mandrill_Ips
 
     /**
      * Cancels the warmup process for a dedicated IP.
-     * @param string $ip a dedicated ip address
+     *
+     * @param  string $ip a dedicated ip address
      * @return struct Information about the dedicated IP
      *     - ip string the ip address
      *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -119,9 +124,10 @@ class Mandrill_Ips
 
     /**
      * Moves a dedicated IP to a different pool.
-     * @param string $ip a dedicated ip address
-     * @param string $pool the name of the new pool to add the dedicated ip to
-     * @param boolean $create_pool whether to create the pool if it does not exist; if false and the pool does not exist, an Unknown_Pool will be thrown.
+     *
+     * @param  string  $ip          a dedicated ip address
+     * @param  string  $pool        the name of the new pool to add the dedicated ip to
+     * @param  boolean $create_pool whether to create the pool if it does not exist; if false and the pool does not exist, an Unknown_Pool will be thrown.
      * @return struct Information about the updated state of the dedicated IP
      *     - ip string the ip address
      *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -144,7 +150,8 @@ class Mandrill_Ips
 
     /**
      * Deletes a dedicated IP. This is permanent and cannot be undone.
-     * @param string $ip the dedicated ip to remove from your account
+     *
+     * @param  string $ip the dedicated ip to remove from your account
      * @return struct a description of the ip that was removed from your account.
      *     - ip string the ip address
      *     - deleted string a boolean indicating whether the ip was successfully deleted
@@ -157,6 +164,7 @@ class Mandrill_Ips
 
     /**
      * Lists your dedicated IP pools.
+     *
      * @return array the dedicated IP pools for your account, up to a maximum of 1,000
      *     - return[] struct information about each dedicated IP pool
      *         - name string this pool's name
@@ -184,7 +192,8 @@ class Mandrill_Ips
 
     /**
      * Describes a single dedicated IP pool.
-     * @param string $pool a pool name
+     *
+     * @param  string $pool a pool name
      * @return struct Information about the dedicated ip pool
      *     - name string this pool's name
      *     - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
@@ -212,7 +221,8 @@ class Mandrill_Ips
     /**
      * Creates a pool and returns it. If a pool already exists with this
      * name, no action will be performed.
-     * @param string $pool the name of a pool to create
+     *
+     * @param  string $pool the name of a pool to create
      * @return struct Information about the dedicated ip pool
      *     - name string this pool's name
      *     - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
@@ -239,7 +249,8 @@ class Mandrill_Ips
 
     /**
      * Deletes a pool. A pool must be empty before you can delete it, and you cannot delete your default pool.
-     * @param string $pool the name of the pool to delete
+     *
+     * @param  string $pool the name of the pool to delete
      * @return struct information about the status of the pool that was deleted
      *     - pool string the name of the pool
      *     - deleted boolean whether the pool was deleted
@@ -253,8 +264,9 @@ class Mandrill_Ips
     /**
      * Tests whether a domain name is valid for use as the custom reverse
      * DNS for a dedicated IP.
-     * @param string $ip a dedicated ip address
-     * @param string $domain the domain name to test
+     *
+     * @param  string $ip     a dedicated ip address
+     * @param  string $domain the domain name to test
      * @return struct validation results for the domain
      *     - valid string whether the domain name has a correctly-configured A record pointing to the ip address
      *     - error string if valid is false, this will contain details about why the domain's A record is incorrect
@@ -267,8 +279,9 @@ class Mandrill_Ips
 
     /**
      * Configures the custom DNS name for a dedicated IP.
-     * @param string $ip a dedicated ip address
-     * @param string $domain a domain name to set as the dedicated IP's custom dns name.
+     *
+     * @param  string $ip     a dedicated ip address
+     * @param  string $domain a domain name to set as the dedicated IP's custom dns name.
      * @return struct information about the dedicated IP's new configuration
      *     - ip string the ip address
      *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format

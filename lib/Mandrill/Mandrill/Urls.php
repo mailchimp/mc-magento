@@ -9,6 +9,7 @@ class Mandrill_Urls
 
     /**
      * Get the 100 most clicked URLs
+     *
      * @return array the 100 most clicked URLs and their stats
      *     - return[] struct the individual URL stats
      *         - url string the URL to be tracked
@@ -24,7 +25,8 @@ class Mandrill_Urls
 
     /**
      * Return the 100 most clicked URLs that match the search query given
-     * @param string $q a search query
+     *
+     * @param  string $q a search query
      * @return array the 100 most clicked URLs matching the search query
      *     - return[] struct the URL matching the query
      *         - url string the URL to be tracked
@@ -40,7 +42,8 @@ class Mandrill_Urls
 
     /**
      * Return the recent history (hourly stats for the last 30 days) for a url
-     * @param string $url an existing URL
+     *
+     * @param  string $url an existing URL
      * @return array the array of history information
      *     - return[] struct the information for a single hour
      *         - time string the hour as a UTC date string in YYYY-MM-DD HH:MM:SS format
@@ -56,6 +59,7 @@ class Mandrill_Urls
 
     /**
      * Get the list of tracking domains set up for this account
+     *
      * @return array the tracking domains and their status
      *     - return[] struct the individual tracking domain
      *         - domain string the tracking domain name
@@ -75,7 +79,8 @@ class Mandrill_Urls
 
     /**
      * Add a tracking domain to your account
-     * @param string $domain a domain name
+     *
+     * @param  string $domain a domain name
      * @return struct information about the domain
      *     - domain string the tracking domain name
      *     - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -94,7 +99,8 @@ class Mandrill_Urls
 
     /**
      * Checks the CNAME settings for a tracking domain. The domain must have been added already with the add-tracking-domain call
-     * @param string $domain an existing tracking domain name
+     *
+     * @param  string $domain an existing tracking domain name
      * @return struct information about the tracking domain
      *     - domain string the tracking domain name
      *     - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format

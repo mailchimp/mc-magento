@@ -10,7 +10,7 @@
  * @date:     6/9/16 4:46 PM
  * @file:     Mailchimperrors.php
  */
-class Ebizmarts_MailChimp_Model_Mysql4_Mailchimperrors extends Mage_Core_Model_Mysql4_Abstract
+class Ebizmarts_MailChimp_Model_Mysql4_WebhookRequest extends Mage_Core_Model_Mysql4_Abstract
 {
 
     /**
@@ -20,6 +20,6 @@ class Ebizmarts_MailChimp_Model_Mysql4_Mailchimperrors extends Mage_Core_Model_M
      */
     public function _construct()
     {
-        $this->_init('mailchimp/mailchimperrors', 'id');
+        $this->_init('mailchimp/webhookrequest', 'id');
     }
 }

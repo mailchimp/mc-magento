@@ -9,6 +9,7 @@ class Mandrill_Inbound
 
     /**
      * List the domains that have been configured for inbound delivery
+     *
      * @return array the inbound domains associated with the account
      *     - return[] struct the individual domain info
      *         - domain string the domain name that is accepting mail
@@ -23,7 +24,8 @@ class Mandrill_Inbound
 
     /**
      * Add an inbound domain to your account
-     * @param string $domain a domain name
+     *
+     * @param  string $domain a domain name
      * @return struct information about the domain
      *     - domain string the domain name that is accepting mail
      *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -37,7 +39,8 @@ class Mandrill_Inbound
 
     /**
      * Check the MX settings for an inbound domain. The domain must have already been added with the add-domain call
-     * @param string $domain an existing inbound domain
+     *
+     * @param  string $domain an existing inbound domain
      * @return struct information about the inbound domain
      *     - domain string the domain name that is accepting mail
      *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -51,7 +54,8 @@ class Mandrill_Inbound
 
     /**
      * Delete an inbound domain from the account. All mail will stop routing for this domain immediately.
-     * @param string $domain an existing inbound domain
+     *
+     * @param  string $domain an existing inbound domain
      * @return struct information about the deleted domain
      *     - domain string the domain name that is accepting mail
      *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -65,7 +69,8 @@ class Mandrill_Inbound
 
     /**
      * List the mailbox routes defined for an inbound domain
-     * @param string $domain the domain to check
+     *
+     * @param  string $domain the domain to check
      * @return array the routes associated with the domain
      *     - return[] struct the individual mailbox route
      *         - id string the unique identifier of the route
@@ -80,9 +85,10 @@ class Mandrill_Inbound
 
     /**
      * Add a new mailbox route to an inbound domain
-     * @param string $domain an existing inbound domain
-     * @param string $pattern the search pattern that the mailbox name should match
-     * @param string $url the webhook URL where the inbound messages will be published
+     *
+     * @param  string $domain  an existing inbound domain
+     * @param  string $pattern the search pattern that the mailbox name should match
+     * @param  string $url     the webhook URL where the inbound messages will be published
      * @return struct the added mailbox route information
      *     - id string the unique identifier of the route
      *     - pattern string the search pattern that the mailbox name should match
@@ -96,9 +102,10 @@ class Mandrill_Inbound
 
     /**
      * Update the pattern or webhook of an existing inbound mailbox route. If null is provided for any fields, the values will remain unchanged.
-     * @param string $id the unique identifier of an existing mailbox route
-     * @param string $pattern the search pattern that the mailbox name should match
-     * @param string $url the webhook URL where the inbound messages will be published
+     *
+     * @param  string $id      the unique identifier of an existing mailbox route
+     * @param  string $pattern the search pattern that the mailbox name should match
+     * @param  string $url     the webhook URL where the inbound messages will be published
      * @return struct the updated mailbox route information
      *     - id string the unique identifier of the route
      *     - pattern string the search pattern that the mailbox name should match
@@ -112,7 +119,8 @@ class Mandrill_Inbound
 
     /**
      * Delete an existing inbound mailbox route
-     * @param string $id the unique identifier of an existing route
+     *
+     * @param  string $id the unique identifier of an existing route
      * @return struct the deleted mailbox route information
      *     - id string the unique identifier of the route
      *     - pattern string the search pattern that the mailbox name should match
@@ -126,12 +134,13 @@ class Mandrill_Inbound
 
     /**
      * Take a raw MIME document destined for a domain with inbound domains set up, and send it to the inbound hook exactly as if it had been sent over SMTP
-     * @param string $raw_message the full MIME document of an email message
-     * @param array|null $to optionally define the recipients to receive the message - otherwise we'll use the To, Cc, and Bcc headers provided in the document
-     *     - to[] string the email address of the recipient
-     * @param string $mail_from the address specified in the MAIL FROM stage of the SMTP conversation. Required for the SPF check.
-     * @param string $helo the identification provided by the client mta in the MTA state of the SMTP conversation. Required for the SPF check.
-     * @param string $client_address the remote MTA's ip address. Optional; required for the SPF check.
+     *
+     * @param  string     $raw_message    the full MIME document of an email message
+     * @param  array|null $to             optionally define the recipients to receive the message - otherwise we'll use the To, Cc, and Bcc headers provided in the document
+     *                                   - to[] string the email address of the recipient
+     * @param  string     $mail_from      the address specified in the MAIL FROM stage of the SMTP conversation. Required for the SPF check.
+     * @param  string     $helo           the identification provided by the client mta in the MTA state of the SMTP conversation. Required for the SPF check.
+     * @param  string     $client_address the remote MTA's ip address. Optional; required for the SPF check.
      * @return array an array of the information for each recipient in the message (usually one) that matched an inbound route
      *     - return[] struct the individual recipient information
      *         - email string the email address of the matching recipient

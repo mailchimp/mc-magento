@@ -2,13 +2,13 @@
 /**
  * mc-magento Magento Component
  *
- * @category Ebizmarts
- * @package mc-magento
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mc-magento
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 8/30/16 2:46 PM
- * @file: Template.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     8/30/16 2:46 PM
+ * @file:     Template.php
  */
 class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model_Email_TemplateBase
 {
@@ -16,8 +16,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
 
     /**
      * @param array|string $email
-     * @param null $name
-     * @param array $variables
+     * @param null         $name
+     * @param array        $variables
      * @return bool
      */
     public function send($email, $name = null, array $variables = array())
@@ -50,15 +50,15 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $email = array('subject' => $subject, 'to' => array());
         $setReturnPath = Mage::getStoreConfig(self::XML_PATH_SENDING_SET_RETURN_PATH);
         switch ($setReturnPath) {
-            case 1:
-                $returnPathEmail = $this->getSenderEmail();
-                break;
-            case 2:
-                $returnPathEmail = Mage::getStoreConfig(self::XML_PATH_SENDING_RETURN_PATH_EMAIL);
-                break;
-            default:
-                $returnPathEmail = null;
-                break;
+        case 1:
+            $returnPathEmail = $this->getSenderEmail();
+            break;
+        case 2:
+            $returnPathEmail = Mage::getStoreConfig(self::XML_PATH_SENDING_RETURN_PATH_EMAIL);
+            break;
+        default:
+            $returnPathEmail = null;
+            break;
         }
 
         $mail = $this->getMail();
@@ -98,8 +98,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             }
         }
 
-        if(!$senderExists)
-        {
+        if(!$senderExists) {
             $email['from_email'] = Mage::getStoreConfig('trans_email/ident_general/email');
         }
 
@@ -134,10 +133,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             $email['attachments'] = $att;
         }
 
-        if ($this->isPlain())
+        if ($this->isPlain()) {
             $email['text'] = $message;
-        else
+        } else {
             $email['html'] = $message;
+        }
 
         if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
             $emailQueue = $this->getQueue();

@@ -2,13 +2,13 @@
 /**
  * mc-magento Magento Component
  *
- * @category Ebizmarts
- * @package mc-magento
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mc-magento
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 7/5/16 2:19 PM
- * @file: Date.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     7/5/16 2:19 PM
+ * @file:     Date.php
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Date extends Mage_Adminhtml_Block_System_Config_Form_Field
 {

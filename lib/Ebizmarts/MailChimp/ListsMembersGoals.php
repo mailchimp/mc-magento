@@ -2,13 +2,13 @@
 /**
  * mailchimp-lib Magento Component
  *
- * @category Ebizmarts
- * @package mailchimp-lib
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mailchimp-lib
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 5/2/16 4:32 PM
- * @file: ListsMembersGoals.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     5/2/16 4:32 PM
+ * @file:     ListsMembersGoals.php
  */
 class MailChimp_ListsMembersGoals extends MailChimp_Abstract
 {
@@ -26,8 +26,10 @@ class MailChimp_ListsMembersGoals extends MailChimp_Abstract
     public function get($listId,$subscriberHash,$fields,$excludeFields)
     {
         $_params = array();
-        if($fields) $_params['fields'] = $fields;
-        if($excludeFields) $_params['exclude_fields'] = $excludeFields;
+        if($fields) { $_params['fields'] = $fields;
+        }
+        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        }
         $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/goals';
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }

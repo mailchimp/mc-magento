@@ -12,9 +12,10 @@ class Mandrill_Rejects
      * add manually will never expire and there is no reputation penalty
      * for removing them from your blacklist. Attempting to blacklist an
      * address that has been whitelisted will have no effect.
-     * @param string $email an email address to block
-     * @param string $comment an optional comment describing the rejection
-     * @param string $subaccount an optional unique identifier for the subaccount to limit the blacklist entry
+     *
+     * @param  string $email      an email address to block
+     * @param  string $comment    an optional comment describing the rejection
+     * @param  string $subaccount an optional unique identifier for the subaccount to limit the blacklist entry
      * @return struct a status object containing the address and the result of the operation
      *     - email string the email address you provided
      *     - added boolean whether the operation succeeded
@@ -30,9 +31,10 @@ class Mandrill_Rejects
      * address to limit the results. Returns up to 1000 results. By default,
      * entries that have expired are excluded from the results; set
      * include_expired to true to include them.
-     * @param string $email an optional email address to search by
-     * @param boolean $include_expired whether to include rejections that have already expired.
-     * @param string $subaccount an optional unique identifier for the subaccount to limit the blacklist
+     *
+     * @param  string  $email           an optional email address to search by
+     * @param  boolean $include_expired whether to include rejections that have already expired.
+     * @param  string  $subaccount      an optional unique identifier for the subaccount to limit the blacklist
      * @return array Up to 1000 rejection entries
      *     - return[] struct the information for each rejection blacklist entry
      *         - email string the email that is blocked
@@ -67,8 +69,9 @@ class Mandrill_Rejects
      * Deletes an email rejection. There is no limit to how many rejections
      * you can remove from your blacklist, but keep in mind that each deletion
      * has an affect on your reputation.
-     * @param string $email an email address
-     * @param string $subaccount an optional unique identifier for the subaccount to limit the blacklist deletion
+     *
+     * @param  string $email      an email address
+     * @param  string $subaccount an optional unique identifier for the subaccount to limit the blacklist deletion
      * @return struct a status object containing the address and whether the deletion succeeded.
      *     - email string the email address that was removed from the blacklist
      *     - deleted boolean whether the address was deleted successfully.

@@ -2,7 +2,9 @@
 
 class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_TestCase
 {
-    /** @var Ebizmarts_MailChimp_Model_Api_Customers */
+    /**
+ * @var Ebizmarts_MailChimp_Model_Api_Customers 
+*/
     private $customersApiMock;
 
     public function setUp()
@@ -57,7 +59,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 'joinMailchimpSyncData',
                 'makeCustomersNotSentCollection',
                 'getOptin'
-            ))
+            )
+        )
             ->getMock();
 
         $this->customersApiMock->expects($this->once())->method('makeBatchId')->willReturn('storeid-0_CUS_2017-05-18-14-45-54-38849500');
@@ -67,7 +70,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock->expects($this->once())->method('getOptin')->with(1);
 
         $this->customersApiMock->expects($this->once())->method('makeCustomersNotSentCollection')
-        ->willReturn(new Varien_Object());
+            ->willReturn(new Varien_Object());
 
         $batchArray = $this->customersApiMock->createBatchJson('dasds231231312', 1);
         $this->assertEquals(array(), $batchArray);

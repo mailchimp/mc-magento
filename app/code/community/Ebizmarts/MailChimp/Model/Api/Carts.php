@@ -3,11 +3,11 @@
 /**
  * mailchimp-lib Magento Component
  *
- * @category Ebizmarts
- * @package mailchimp-lib
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mailchimp-lib
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Ebizmarts_MailChimp_Model_Api_Carts
 {
@@ -286,9 +286,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     /**
      * Get all existing carts in the current store view for a given email address.
      *
-     * @param $email
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
+     * @param  $email
+     * @param  $mailchimpStoreId
+     * @param  $magentoStoreId
      * @return object
      */
     protected function _getAllCartsByEmail($email, $mailchimpStoreId, $magentoStoreId)
@@ -382,7 +382,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     /**
      * Get URL for the cart.
      * 
-     * @param $cart
+     * @param  $cart
      * @return string
      */
     protected function _getCheckoutUrl($cart)
@@ -396,9 +396,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     /**
      * Get Customer data for the cart.
      * 
-     * @param $cart
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
+     * @param  $cart
+     * @param  $mailchimpStoreId
+     * @param  $magentoStoreId
      * @return array
      */
     protected function _getCustomer($cart, $mailchimpStoreId, $magentoStoreId)
@@ -493,11 +493,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      *
      * @param $cartId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
-     * @param null $token
+     * @param null             $syncDelta
+     * @param null             $syncError
+     * @param int              $syncModified
+     * @param null             $syncDeleted
+     * @param null             $token
      */
     protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null)
     {

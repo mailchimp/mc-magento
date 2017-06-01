@@ -3,19 +3,19 @@
 /**
  * MailChimp For Magento
  *
- * @category Ebizmarts_MailChimp
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts_MailChimp
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 4/29/16 3:55 PM
- * @file: Observer.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     4/29/16 3:55 PM
+ * @file:     Observer.php
  */
 class Ebizmarts_MailChimp_Model_Observer
 {
     /**
      * Handle save of System -> Configuration, section <mailchimp>
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return void|Varien_Event_Observer
      */
     public function saveConfig(Varien_Event_Observer $observer)
@@ -60,7 +60,7 @@ class Ebizmarts_MailChimp_Model_Observer
             )
         );
 
-        if (FALSE != strstr($hookUrl, '?', true)) {
+        if (false != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
         }
 
@@ -130,24 +130,26 @@ class Ebizmarts_MailChimp_Model_Observer
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
-        $isEnabled = $this->makeHelper()->isMailChimpEnabled($subscriber->getStoreId());
-        if ($isEnabled) {
-            $subscriber->setImportMode(true);
-            if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
-                Mage::getModel('core/cookie')->set(
-                    'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
-                );
-            }
+        if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+            $isEnabled = $this->makeHelper()->isMailChimpEnabled($subscriber->getStoreId());
+            if ($isEnabled) {
+                $subscriber->setImportMode(true);
+                if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
+                    Mage::getModel('core/cookie')->set(
+                        'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
+                    );
+                }
 
-            if (TRUE === $subscriber->getIsStatusChanged()) {
-                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
-            } else {
-                $origData = $subscriber->getOrigData();
-
-                if (is_array($origData) && isset($origData['subscriber_status']) &&
-                    $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
-                ) {
+                if (true === $subscriber->getIsStatusChanged()) {
                     Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                } else {
+                    $origData = $subscriber->getOrigData();
+
+                    if (is_array($origData) && isset($origData['subscriber_status']) 
+                        && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
+                    ) {
+                        Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                    }
                 }
             }
         }
@@ -171,7 +173,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Add Subscriber first name and last name to Newsletter Grid.
      * 
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return $this|Varien_Event_Observer
      */
     public function alterNewsletterGrid(Varien_Event_Observer $observer)
@@ -206,7 +208,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * When Customer object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
      * 
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function customerSaveBefore(Varien_Event_Observer $observer)
@@ -236,7 +238,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * When Product object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
      * 
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function productSaveBefore(Varien_Event_Observer $observer)
@@ -270,7 +272,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Catch order save before event, mark it as modified and associate the landing page to the order data.
      * 
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function orderSaveBefore(Varien_Event_Observer $observer)
@@ -285,7 +287,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Delete campaign cookie after it was added to the order object.
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -325,7 +327,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Add column to associate orders gained from MailChimp campaigns and automations.
      *
-     * @param $observer
+     * @param  $observer
      * @return mixed
      */
     public function addColumnToSalesOrderGrid($observer)
@@ -334,10 +336,9 @@ class Ebizmarts_MailChimp_Model_Observer
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
             && $this->makeHelper()->getMonkeyInGrid($scopeArray[1], $scopeArray[0])
-            && (
-                $this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
-                || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0])
-            )) {
+            && (            $this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
+            || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
+        ) {
             $block->addColumnAfter(
                 'mailchimp_flag', array(
                 'header' => $this->makeHelper()->__('MailChimp'),
@@ -357,20 +358,20 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Add customer to the cart if it placed the email address in the popup or footer subscription form.
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function loadCustomerToQuote(Varien_Event_Observer $observer)
     {
         $quote = $observer->getEvent()->getQuote();
-        if (!Mage::getSingleton('customer/session')->isLoggedIn() &&
-            $this->makeHelper()->isEmailCatcherEnabled($quote->getStoreId())
+        if (!Mage::getSingleton('customer/session')->isLoggedIn() 
+            && $this->makeHelper()->isEmailCatcherEnabled($quote->getStoreId())
         ) {
             $action = Mage::app()->getRequest()->getActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
-            if (Mage::getModel('core/cookie')->get('email') &&
-                Mage::getModel('core/cookie')->get('email') != 'none' && !$onCheckout
+            if (Mage::getModel('core/cookie')->get('email') 
+                && Mage::getModel('core/cookie')->get('email') != 'none' && !$onCheckout
             ) {
                 $emailCookie = Mage::getModel('core/cookie')->get('email');
                 $emailCookieArr = explode('/', $emailCookie);
@@ -398,7 +399,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Set the products included the order to be updated on MailChimp on the next cron job run.
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -430,7 +431,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -456,7 +457,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -482,7 +483,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Set the products canceled to be updated on MailChimp on the next cron job run.
      *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -505,9 +506,9 @@ class Ebizmarts_MailChimp_Model_Observer
     public function addOrderViewMonkey(Varien_Event_Observer $observer)
     {
         $block = $observer->getBlock();
-        if(($block->getNameInLayout() == 'order_info') && ($child = $block->getChild('mailchimp.order.info.monkey.block'))){
+        if(($block->getNameInLayout() == 'order_info') && ($child = $block->getChild('mailchimp.order.info.monkey.block'))) {
             $transport = $observer->getTransport();
-            if($transport){
+            if($transport) {
                 $html = $transport->getHtml();
                 $html .= $child->toHtml();
                 $transport->setHtml($html);
@@ -545,26 +546,26 @@ class Ebizmarts_MailChimp_Model_Observer
         $productIds = $observer->getEvent()->getProductIds();
         $websiteIds = $observer->getEvent()->getWebsiteIds();
         $action = $observer->getEvent()->getAction();
-//        foreach ($websiteIds as $websiteId) {
-//            $stores = Mage::app()->getWebsite($websiteId)->getStores();
-//            foreach ($stores as $storeId => $store) {
-//                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
-//                foreach ($productIds as $productId) {
-//                    $productSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-//                    if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($storeId)) {
-//                        if ($action == 'remove' && !$productSyncData->getMailchimpSyncDeleted()) {
-//                            $productSyncData->setData("mailchimp_sync_modified", 0)
-//                                ->setData("mailchimp_sync_deleted", 1)
-//                                ->save();
-//                        } elseif (!$productSyncData->getMailchimpSyncModified()) {
-//                            $productSyncData->setData("mailchimp_sync_modified", 1)
-//                                ->setData("mailchimp_sync_deleted", 0)
-//                                ->save();
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        //        foreach ($websiteIds as $websiteId) {
+        //            $stores = Mage::app()->getWebsite($websiteId)->getStores();
+        //            foreach ($stores as $storeId => $store) {
+        //                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
+        //                foreach ($productIds as $productId) {
+        //                    $productSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+        //                    if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($storeId)) {
+        //                        if ($action == 'remove' && !$productSyncData->getMailchimpSyncDeleted()) {
+        //                            $productSyncData->setData("mailchimp_sync_modified", 0)
+        //                                ->setData("mailchimp_sync_deleted", 1)
+        //                                ->save();
+        //                        } elseif (!$productSyncData->getMailchimpSyncModified()) {
+        //                            $productSyncData->setData("mailchimp_sync_modified", 1)
+        //                                ->setData("mailchimp_sync_deleted", 0)
+        //                                ->save();
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
     }
 
     /**

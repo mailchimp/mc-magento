@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.6.6</version>
+            <version>1.1.6.8</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.6.6</version>
+            <version>1.1.6.8</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -124,6 +124,9 @@
                     <mailchimperrors>
                         <table>mailchimp_errors</table>
                     </mailchimperrors>
+                    <webhookrequest>
+                        <table>mailchimp_webhook_request</table>
+                    </webhookrequest>
                     <ecommercesyncdata>
                         <table>mailchimp_ecommerce_sync_data</table>
                     </ecommercesyncdata>
@@ -215,6 +218,13 @@
             </modules>
         </translate>
         <routers>
+            <monkey>
+                <use>standard</use>
+                <args>
+                    <module>Ebizmarts_MailChimp</module>
+                    <frontName>monkey</frontName>
+                </args>
+            </monkey>
             <mailchimp>
                 <use>standard</use>
                 <args>
@@ -339,6 +349,14 @@
                     <model>mailchimp/cron::syncSubscriberBatchData</model>
                 </run>
             </mailchimp_bulksync_subscriber_data>
+            <mailchimp_process_webhook_data>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>mailchimp/cron::processWebhookData</model>
+                </run>
+            </mailchimp_process_webhook_data>
         </jobs>
     </crontab>
 </config>

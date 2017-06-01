@@ -2,13 +2,13 @@
 /**
  * mc-magento Magento Component
  *
- * @category Ebizmarts
- * @package mc-magento
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mc-magento
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date: 5/27/16 1:50 PM
- * @file: EcommerceController.php
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @date:     5/27/16 1:50 PM
+ * @file:     EcommerceController.php
  */
 class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
 {
@@ -68,11 +68,11 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
-            case 'resetLocalErrors':
-            case 'resetEcommerceData':
-            case 'createMergeFields':
-                $acl = 'system/config/mailchimp';
-                break;
+        case 'resetLocalErrors':
+        case 'resetEcommerceData':
+        case 'createMergeFields':
+            $acl = 'system/config/mailchimp';
+            break;
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);

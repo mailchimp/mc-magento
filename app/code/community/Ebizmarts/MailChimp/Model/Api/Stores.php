@@ -3,11 +3,11 @@
 /**
  * mailchimp-lib Magento Component
  *
- * @category Ebizmarts
- * @package mailchimp-lib
- * @author Ebizmarts Team <info@ebizmarts.com>
+ * @category  Ebizmarts
+ * @package   mailchimp-lib
+ * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
@@ -15,10 +15,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * Create MailChimp store.
      *
-     * @param $mailChimpStoreId
-     * @param null $listId
-     * @param $scope
-     * @param $scopeId
+     * @param  $mailChimpStoreId
+     * @param  null             $listId
+     * @param  $scope
+     * @param  $scopeId
      * @throws Exception
      */
     public function createMailChimpStore($mailChimpStoreId, $listId = null, $scopeId, $scope)
@@ -96,8 +96,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * Returns URL from MailChimp store data
      *
-     * @param $scopeId
-     * @param $scope
+     * @param  $scopeId
+     * @param  $scope
      * @return mixed
      */
     public function getMCJsUrl($scopeId, $scope)

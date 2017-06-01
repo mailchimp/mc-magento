@@ -9,11 +9,12 @@
 
 /**
  * Cron processor class
- *
  */
 class Ebizmarts_MailChimp_Model_Cron
 {
-    /** @var Ebizmarts_MailChimp_Helper_Data */
+    /**
+ * @var Ebizmarts_MailChimp_Helper_Data 
+*/
     private $mailChimpHelper;
 
     public function __construct()
@@ -33,6 +34,11 @@ class Ebizmarts_MailChimp_Model_Cron
     public function syncSubscriberBatchData(Mage_Cron_Model_Schedule $schedule)
     {
         Mage::getModel('mailchimp/api_batches')->handleSubscriberBatches();
+    }
+
+    public function processWebhookData($cron)
+    {
+        Mage::getModel('mailchimp/processWebhook')->processWebhookData();
     }
 
     private function getHelper()

@@ -9,6 +9,7 @@ class Mandrill_Users
 
     /**
      * Return the information about the API-connected user
+     *
      * @return struct the user information including username, key, reputation, quota, and historical sending stats
      *     - username string the username of the user (used for SMTP authentication)
      *     - created_at string the date and time that the user's Mandrill account was created as a UTC string in YYYY-MM-DD HH:MM:SS format
@@ -92,6 +93,7 @@ class Mandrill_Users
 
     /**
      * Validate an API key and respond to a ping
+     *
      * @return string the string "PONG!"
      */
     public function ping()
@@ -102,6 +104,7 @@ class Mandrill_Users
 
     /**
      * Validate an API key and respond to a ping (anal JSON parser version)
+     *
      * @return struct a struct with one key "PING" with a static value "PONG!"
      */
     public function ping2()
@@ -112,6 +115,7 @@ class Mandrill_Users
 
     /**
      * Return the senders that have tried to use this account, both verified and unverified
+     *
      * @return array an array of sender data, one for each sending addresses used by the account
      *     - return[] struct the information on each sending address in the account
      *         - address string the sender's email address

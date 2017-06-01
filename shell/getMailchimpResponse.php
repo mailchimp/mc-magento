@@ -66,8 +66,8 @@ if ($err) {
         }
     }
 
-//    else {
-//        echo "Error: the batch is not finished or have errors\n";
-//        echo "Error ".$jsonResponse->title." Detail: ".$jsonResponse->detail."\n";
-//    }
+    //    else {
+    //        echo "Error: the batch is not finished or have errors\n";
+    //        echo "Error ".$jsonResponse->title." Detail: ".$jsonResponse->detail."\n";
+    //    }
 }
