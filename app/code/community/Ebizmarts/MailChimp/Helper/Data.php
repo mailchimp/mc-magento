@@ -969,14 +969,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getImageUrlById($productId)
     {
-        $productMediaConfig = Mage::getModel('catalog/product_media_config');
-        $product = Mage::getModel('catalog/product')->load($productId);
-        if ($product->getImage() == 'no_selection') {
+        $productMediaConfig = $this->getProductMediaConfig();
+        $product = $this->loadProductById($productId);
+        $productImage = $product->getImage();
+        if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
-            $imageUrl = $productMediaConfig->getMediaUrl($product->getImage());
+            $imageUrl = $productMediaConfig->getMediaUrl($productImage);
         }
         return $imageUrl;
+    }
+
+    private function getProductMediaConfig()
+    {
+        return Mage::getModel('catalog/product_media_config');
+    }
+
+    private function loadProductById($productId)
+    {
+        return Mage::getModel('catalog/product')->load($productId);
     }
 
     /**
