@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
     public function send()
     {
         /**
- * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection 
+ * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection
 */
         $collection = Mage::getResourceModel('core/email_queue_collection')
             ->addOnlyForSendingFilter()
@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
             ->setCurPage(1)
             ->load();
         /**
- * @var $message Mage_Core_Model_Email_Queue 
+ * @var $message Mage_Core_Model_Email_Queue
 */
         foreach ($collection as $message) {
             if ($message->getId()) {
@@ -83,7 +83,31 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
 
                                 )
                             );
-                            $mailer->send();
+
+                            if (Mage::helper('core')->isModuleOutputEnabled('Aschroder_Email')) {
+                                $transport = new Varien_Object();
+                                Mage::dispatchEvent('aschroder_email_queue_before_send', array(
+                                    'mail'      => $mailer,
+                                    'transport' => $transport
+                                ));
+                                if ($transport->getTransport()) {
+                                    $mailer->send($transport->getTransport());
+                                } else {
+                                    $mailer->send();
+                                }
+                                foreach ($message->getRecipients() as $recipient) {
+                                    list($email, $name, $type) = $recipient;
+                                    Mage::dispatchEvent('aschroder_email_after_send', array(
+                                        'to'         => $email,
+                                        'template'   => "queued email",
+                                        'subject'    => $parameters->getSubject(),
+                                        'html'       => !$parameters->getIsPlain(),
+                                        'email_body' => $message->getMessageBody()
+                                    ));
+                                }
+                            } else {
+                                $mailer->send();
+                            }
                         } catch (Exception $e) {
                             Mage::logException($e);
                         }
