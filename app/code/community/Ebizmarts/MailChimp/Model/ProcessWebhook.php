@@ -151,6 +151,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: changing subscriber ID {$subscriber->getId()} member status to subscribed");
                     $this->subscribeMember($subscriber);
                     $this->_helper->logInfo("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: changed subscriber ID {$subscriber->getId()} member status to subscribed");
+                } else {
+                    $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: subscriber ID {$subscriber->getId()} already subscribed");
                 }
             } else {
                 if (isset($data['merges']['FNAME'])) {
