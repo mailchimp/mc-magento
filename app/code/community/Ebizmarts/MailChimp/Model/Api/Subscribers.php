@@ -14,6 +14,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
+    private $_helper;
+
+
+    public function __construct()
+    {
+        $this->_helper = Mage::helper('mailchimp');
+    }
+
     public function createBatchJson($listId, $storeId, $limit)
     {
         //get subscribers
@@ -30,13 +38,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 array(
                     array('null' => true),
                     array('eq' => ''),
-                    array('lt' => Mage::helper('mailchimp')->getMCMinSyncDateFlag($storeId)),
+                    array('lt' => $this->_helper->getMCMinSyncDateFlag($storeId)),
                     array('eq' => 1)
                 )
             );
         $collection->getSelect()->limit($limit);
         $subscriberArray = array();
-        $date = Mage::helper('mailchimp')->getDateMicrotime();
+        $date = $this->_helper->getDateMicrotime();
         $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
 
         $counter = 0;
@@ -45,13 +53,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
-            //enconde to JSON
+            //encode to JSON
             try {
                 $subscriberJson = json_encode($data);
             } catch (Exception $e) {
                 //json encode failed
                 $errorMessage = "Subscriber ".$subscriber->getSubscriberId()." json encode failed";
-                Mage::helper('mailchimp')->logError($errorMessage, $storeId);
+                $this->_helper->logError($errorMessage, $storeId);
             }
 
             if (!empty($subscriberJson)) {
@@ -91,7 +99,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function getMergeVars($subscriber)
     {
         $storeId = $subscriber->getStoreId();
-        $mapFields = Mage::helper('mailchimp')->getMapFields($storeId);
+        $mapFields = $this->_helper->getMapFields($storeId);
         $maps = unserialize($mapFields);
         $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
         $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
@@ -147,7 +155,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
                                     $eventValue = $mergeVars[$key] = $customerGroup[$group_id];
                                 } else {
-                                    $eventValue = $mergeVars[$key] = Mage::helper('mailchimp')->__('NOT LOGGED IN');
+                                    $eventValue = $mergeVars[$key] = $this->_helper->__('NOT LOGGED IN');
                                 }
                                 break;
                             case 'firstname':
@@ -261,7 +269,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         }
                         break;
                     case 'dop':
-                        $dop = Mage::helper('mailchimp')->getLastDateOfPurchase($subscriberEmail);
+                        $dop = $this->_helper->getLastDateOfPurchase($subscriberEmail);
                         if ($dop) {
                             $eventValue = $mergeVars[$key] = $dop;
                         }
@@ -294,46 +302,55 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
         $storeId = $subscriber->getStoreId();
-        $listId = Mage::helper('mailchimp')->getGeneralList($storeId);
+        $listId = $this->_helper->getGeneralList($storeId);
         $newStatus = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
         $forceStatus = ($updateStatus) ? $newStatus : null;
-        $api = Mage::helper('mailchimp')->getApi($storeId);
+        $api = $this->_helper->getApi($storeId);
         $mergeVars = $this->getMergeVars($subscriber);
-        $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+        $email = $subscriber->getSubscriberEmail();
+        $md5HashEmail = md5(strtolower($email));
+        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID '.$subscriber->getId() : 'new subscriber');
         try {
+            $this->_helper->logDebug("Adding/updating MailChimp member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
             $api->lists->members->addOrUpdate(
                 $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
                 null, null, null, null
             );
+            $this->_helper->logInfo("Added/updated MailChimp member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
             $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
             $subscriber->setData("mailchimp_sync_error", "");
             $subscriber->setData("mailchimp_sync_modified", 0);
         } catch(MailChimp_Error $e) {
+            $this->_helper->logWarning("MailChimp error updating $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: ".$e->getMessage(), $storeId);
             if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
                 if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                     try {
                         $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
                         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
-                        $message = Mage::helper('mailchimp')->__('To begin receiving the newsletter, you must first confirm your subscription');
+                        $message = $this->_helper->__('To begin receiving the newsletter, you must first confirm your subscription');
                         Mage::getSingleton('core/session')->addWarning($message);
                     } catch (MailChimp_Error $e) {
-                        Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+                        $this->_helper->logError($e->getFriendlyMessage(), $storeId);
                         Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                        $this->_helper->logDebug("Un-subscribing $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                         $subscriber->unsubscribe();
+                        $this->_helper->logInfo("Un-subscribed $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                     } catch (Exception $e) {
-                        Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
+                        $this->_helper->logError($e->getMessage(), $storeId);
                     }
                 } else {
-                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+                    $this->_helper->logError($e->getFriendlyMessage(), $storeId);
                     Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                    $this->_helper->logDebug("Un-subscribing $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                     $subscriber->unsubscribe();
+                    $this->_helper->logInfo("Un-subscribed $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                 }
             } else {
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+                $this->_helper->logError($e->getFriendlyMessage(), $storeId);
                 Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
             }
         } catch (Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
+            $this->_helper->logError("Failed to update $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: ".$e->getMessage(), $storeId);
         }
     }
 
@@ -394,16 +411,18 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function removeSubscriber($subscriber)
     {
         $storeId = $subscriber->getStoreId();
-        $listId = Mage::helper('mailchimp')->getGeneralList($storeId);
-        $api = Mage::helper('mailchimp')->getApi($storeId);
+        $listId = $this->_helper->getGeneralList($storeId);
+        $api = $this->_helper->getApi($storeId);
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            $this->_helper->logDebug("Removing MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
             $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
+            $this->_helper->logNotice("Removed MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
         } catch(MailChimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+            $this->_helper->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
+            $this->_helper->logError("Failed to remove MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId: ".$e->getMessage(), $storeId);
         }
     }
 
@@ -413,25 +432,30 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function deleteSubscriber($subscriber)
     {
         $storeId = $subscriber->getStoreId();
-        $listId = Mage::helper('mailchimp')->getGeneralList($storeId);
-        $api = Mage::helper('mailchimp')->getApi($storeId);
+        $listId = $this->_helper->getGeneralList($storeId);
+        $api = $this->_helper->getApi($storeId);
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            $this->_helper->logDebug("Deleting MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
             $api->lists->members->update($listId, $md5HashEmail, null, 'cleaned');
+            $this->_helper->logNotice("Deleted MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
         } catch(MailChimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
+            $this->_helper->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
+            $this->_helper->logError("Failed to delete MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId: ".$e->getMessage(), $storeId);
         }
     }
 
     public function update($emailAddress, $storeId)
     {
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
-        if ($subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $subscriber->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($storeId)) {
+        if ($subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $subscriber->getMailchimpSyncDelta() > $this->_helper->getMCMinSyncDateFlag($storeId)) {
+            $subscriberDescription = ($subscriber->getId() ? 'subscriber ID '.$subscriber->getId() : 'new subscriber');
+            $this->_helper->logDebug("Marking $subscriberDescription email {$subscriber->getSubscriberEmail()} for store {$subscriber->getStoreId()} as modified for syncing", $subscriber->getStoreId());
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
+            $this->_helper->logInfo("Marked subscriber ID {$subscriber->getId()} email {$subscriber->getSubscriberEmail()} for store {$subscriber->getStoreId()} as modified for syncing", $subscriber->getStoreId());
         }
     }
 }

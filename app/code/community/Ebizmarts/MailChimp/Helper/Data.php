@@ -12,10 +12,11 @@
  */
 class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    const REQUESTS_LOG_DIR = 'MailChimp_Requests';
 
     /**
      * Get Config value for certain scope.
-     * 
+     *
      * @param  $path
      * @param  $scopeId
      * @param  null    $scope
@@ -71,6 +72,24 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $scopeString = 'default-0';
         }
         return $scopeString;
+    }
+
+    /**
+     * Create string for current scope with format scope-scopeId.
+     *
+     * @param  int    $scopeId Scope ID (website or store ID depending on scope).
+     * @param  string $scope   Scope (websites, stores, default).
+     * @return string Description fo those scope suitable for logging.
+     */
+    public function getScopeDescription($scopeId, $scope)
+    {
+        if ($scope !== null) {
+            $scope = 'default';
+        }
+        if (empty($scopeID)) {
+            $scopeID = 0;
+        }
+        return "$scope scope ID $scopeId";
     }
 
     /**
@@ -331,15 +350,49 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get if logs are enabled for given scope.
+     * Get log level for given given scope.
+     *
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     * @return int|null    Maximum log level for the given scope.
+     */
+    public function getLogLevel($scopeId = null, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_LEVEL, $scopeId, $scope);
+    }
+
+    /**
+     * Get log file for given given scope.
+     *
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     * @return string|false The log file for the given scope or false.
+     */
+    public function getLogFile($scopeId = null, $scope = null)
+    {
+        $file = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_FILE, $scopeId, $scope);
+        if (!empty($file)) {
+            if (!preg_match('/\.log$/i', $file)) {
+                $file .= '.log';
+            }
+        } else {
+            $file = false;
+        }
+        return $file;
+    }
+
+    /**
+     * Check whether logging batch requests is enabled.
      *
      * @param  int  $scopeId
      * @param  null $scope
      * @return mixed
      */
-    public function getLogsEnabled($scopeId = 0, $scope = null)
+    public function isLogRequestsEnabled($scopeId = 0, $scope = null)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG, $scopeId, $scope);
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_REQUESTS, $scopeId, $scope);
     }
 
     /**
@@ -441,17 +494,106 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Save error response from MailChimp's API in "MailChimp_Error.log" file.
+     * Determine if a message can be logged at the given level for the given
+     * scope.
      *
-     * @param $message
-     * @param int     $scopeId
-     * @param string  $scope
+     * @param  int         $level   Level of message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     * @return bool        Returns true if can log at the given level,
+     *                     false otherwise.
+     */
+    public function canLogMessage($level, $scopeId = null, $scope = null)
+    {
+        $logLevel = $this->getLogLevel($scopeId, $scope);
+        return ($level <= $logLevel);
+    }
+
+
+    /**
+     * Log message at given log level to the log file if enabled
+     *
+     * @param int|false    $level   Logging level to log message at.
+     * @param string       $message Message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     */
+    public function logMessage($level, $message, $scopeId = null, $scope = null)
+    {
+        if ($scope === null) {
+
+        }
+        $logFile = $this->getLogFile($scopeId, $scope);
+        if ($logFile !== false && $this->canLogMessage($level, $scopeId, $scope)) {
+            Mage::log($message, $level, $logFile, true);
+        }
+    }
+
+    /**
+     * Log error message to the log file if enabled.
+     *
+     * @param string       $message Message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
      */
     public function logError($message, $scopeId = 0, $scope = 'default')
     {
-        if ($this->getLogsEnabled($scopeId, $scope)) {
-            Mage::log($message, null, 'MailChimp_Errors.log', true);
-        }
+        $this->logMessage(Zend_Log::ERR, $message, $scopeId, $scope);
+    }
+
+    /**
+     * Log warning message to the log file if enabled.
+     *
+     * @param string       $message Message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     */
+    public function logWarning($message, $scopeId = 0, $scope = 'default')
+    {
+        $this->logMessage(Zend_Log::WARN, $message, $scopeId, $scope);
+    }
+
+    /**
+     * Log notice to the log file if enabled.
+     *
+     * @param string       $message Message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     */
+    public function logNotice($message, $scopeId = 0, $scope = 'default')
+    {
+        $this->logMessage(Zend_Log::NOTICE, $message, $scopeId, $scope);
+    }
+
+    /**
+     * Log informational message to the log file if enabled.
+     *
+     * @param string       $message Message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     */
+    public function logInfo($message, $scopeId = 0, $scope = 'default')
+    {
+        $this->logMessage(Zend_Log::INFO, $message, $scopeId, $scope);
+    }
+
+    /**
+     * Log debug message to the log file if enabled.
+     *
+     * @param string       $message Message to log.
+     * @param  int|null    $scopeId Website ID for websites scope, store ID
+     *                              for stores scope. Use current store if null.
+     * @param  string|null $scope   Use websites, stores, default.
+     */
+    public function logDebug($message, $scopeId = 0, $scope = 'default')
+    {
+        $this->logMessage(Zend_Log::DEBUG, $message, $scopeId, $scope);
     }
 
     /**
@@ -463,15 +605,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function logRequest($message, $scopeId, $batchId = null)
     {
-        if ($this->getLogsEnabled($scopeId)) {
+        if ($this->isLogRequestsEnabled($scopeId)) {
             if (!$batchId) {
-                Mage::log($message, null, 'MailChimp_Requests.log', true);
+                Mage::log($message, null, static::REQUESTS_LOG_DIR.'.log', true);
             } else {
                 $logDir = Mage::getBaseDir('var') . DS . 'log';
                 if (!file_exists($logDir)) {
                     mkdir($logDir, 0750);
                 }
-                $logDir .= DS . 'MailChimp_Requests';
+                $logDir .= DS . static::REQUESTS_LOG_DIR;
                 if (!file_exists($logDir)) {
                     mkdir($logDir, 0750);
                 }
@@ -615,6 +757,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeId, $scope);
                 }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
+                $this->logNotice("Created mailchimp store $mailchimpStoreId for list ID $listId for ".$this->getScopeDescription($scopeId, $scope));
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
@@ -633,8 +776,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!empty($mailchimpStoreId)) {
             try {
                 Mage::getModel('mailchimp/api_stores')->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
+                $this->logNotice("Deleted mailchimp store $mailchimpStoreId for ".$this->getScopeDescription($scopeId, $scope));
             } catch (MailChimp_Error $e) {
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
 
             //clear store config values
@@ -658,8 +802,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($api) {
             try {
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
+                $this->logDebug("Current merge fields for list $listId: ".json_encode($mailchimpFields), $scopeId, $scope);
             } catch (MailChimp_Error $e) {
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
 
             if (count($mailchimpFields) > 0) {
@@ -680,7 +825,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 try {
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
                                 } catch (MailChimp_Error $e) {
-                                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
                                 }
                                 $created = true;
                             }
@@ -711,7 +856,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                     }
                                 }
                             } catch (MailChimp_Error $e) {
-                                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
                             }
                         }
                     }
@@ -764,6 +909,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->getMCStoreId($scopeId, $scope) && $this->getIfMCStoreIdExistsForScope($scopeId, $scope)) {
             try {
                 Mage::getModel('mailchimp/api_stores')->modifyName($name, $scopeId, $scope);
+
             } catch (MailChimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
