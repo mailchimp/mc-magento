@@ -259,11 +259,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             if ($customer) {
                 $fn = $this->_getLogString($customer->getFirstname());
                 $ln = $this->_getLogString($customer->getLastname());
-                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating customer ID {$customer->getId()} first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
+                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating customer ID {$customer->getId()} first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
                 $customer->setFirstname($fname);
                 $customer->setLastname($lname);
                 $customer->save();
-                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated customer ID {$customer->getId()} first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
+                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated customer ID {$customer->getId()} first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
             } else {
                 $subscriber = $this->_helper->loadListSubscriber($listId, $email);
                 if ($subscriber) {
@@ -275,7 +275,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                             $subscriber->setSubscriberFirstname($fname);
                             $subscriber->setSubscriberLastname($lname);
                             $subscriber->save();
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated subscriber ID {$subscriber->getId()} first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
+                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated subscriber ID {$subscriber->getId()} first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
                         } else {
                             $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: no change to subscriber ID {$subscriber->getId()} with first name $fnameDisplay and last name $lnameDisplay");
                         }
