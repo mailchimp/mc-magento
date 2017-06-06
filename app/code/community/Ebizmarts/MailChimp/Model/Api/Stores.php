@@ -144,7 +144,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId, $magentoStoreId)
     {
-        $this->_helper->logDebug("MC-API Request: Updating store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for  " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
+        $this->_helper->logDebug("MC-API Request: Updating store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
         $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
         $this->_helper->logNotice("MC-API Request: Updated store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
         $scopeToEdit = $this->_helper->getMailChimpScopeByStoreId($magentoStoreId);

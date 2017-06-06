@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 "Creating e-commerce batch for store " . $this->getBatchMagentoStoreId() .
                 ": Adding customer {$data['id']} email {$data['email_address']} " .
                 "fname {$data['first_name']} lname {$data['last_name']} " .
-                "opt-in {$data['opt_in_status']} num_orders {$data['orders_count']} " .
+                "opt-in " . ($data['opt_in_status'] ? 'YES' : 'NO') . " num_orders {$data['orders_count']} " .
                 "total_spent {$data['total_spent']}",
                 $this->getBatchMagentoStoreId()
             );
