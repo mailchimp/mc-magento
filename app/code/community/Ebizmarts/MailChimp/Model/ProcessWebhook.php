@@ -36,9 +36,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 ->setFiredAt($data['fired_at'])
                 ->setDataRequest(serialize($data['data']))
                 ->save();
-            $this->_helper->logInfo("Queued web hook request ID {$request->getId()}: type {$data['type']} list_id {$data['data']['list_id']}");
+            $this->_helper->logInfo("Queued web hook request ID " . $request->getId() . ": type {$data['type']} list_id {$data['data']['list_id']}");
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to queue web hook request: ".$request->getDataRequest());
+            $this->_helper->logError("Failed to queue web hook request: " . $request->getDataRequest());
         }
     }
 
@@ -52,7 +52,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $collection = Mage::getResourceModel('mailchimp/webhookrequest_collection');
         foreach ($collection as $webhookRequest) {
             $data = unserialize($webhookRequest->getDataRequest());
-            $this->_helper->logInfo("Processing web hook request {$webhookRequest->getId()}: type {$webhookRequest->getType()} list_id {$data['list_id']}");
+            $this->_helper->logInfo("Processing web hook request " . $webhookRequest->getId() . ": type " . $webhookRequest->getType() . " list_id {$data['list_id']}");
             switch ($webhookRequest->getType()) {
             case 'subscribe':
                 $this->_subscribe($data);
@@ -90,23 +90,27 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $oldSubscriber = $this->_helper->loadListSubscriber($listId, $old);
             $newSubscriber = $this->_helper->loadListSubscriber($listId, $new);
 
-            if (!$newSubscriber->getId()) {
-                if ($oldSubscriber->getId()) {
-                    $this->_helper->logDebug("Update email web hook request for list ID $listId for $old to $new: replacing email address for subscriber ID ".$oldSubscriber->getId());
-                    $oldSubscriber->setSubscriberEmail($new)
-                        ->save();
-                    $this->_helper->logInfo("Update email web hook request for list ID $listId for $old to $new: replaced email address for subscriber ID ".$oldSubscriber->getId());
+            if ($oldSubscriber && $newSubscriber) {
+                if (!$newSubscriber->getId()) {
+                    if ($oldSubscriber->getId()) {
+                        $this->_helper->logDebug("Update email web hook request for list ID $listId for $old to $new: replacing email address for subscriber ID " . $oldSubscriber->getId());
+                        $oldSubscriber->setSubscriberEmail($new)
+                            ->save();
+                        $this->_helper->logInfo("Update email web hook request for list ID $listId for $old to $new: replaced email address for subscriber ID " . $oldSubscriber->getId());
+                    } else {
+                        $this->_helper->logDebug("Update email web hook request for list ID $listId for $old to $new: adding new subscriber");
+                        $this->subscribeMember($newSubscriber);
+                        $this->_helper->logInfo("Update email web hook request for list ID $listId for $old to $new: added new subscriber " . $newSubscriber->getId());
+                    }
                 } else {
-                    $this->_helper->logDebug("Update email web hook request for list ID $listId for $old to $new: adding new subscriber");
-                    $this->subscribeMember($newSubscriber);
-                    $this->_helper->logInfo("Update email web hook request for list ID $listId for $old to $new: added new subscriber ".$newSubscriber->getId());
+                    $oldId = $oldSubscriber->getId() ? $oldSubscriber->getId() : 'NULL';
+                    $this->_helper->logWarning("Unable to update email web hook request for list ID $listId for $old (ID $oldId) to $new (ID " . $newSubscriber->getId() . ": subscriber already exists");
                 }
             } else {
-                $oldId = $oldSubscriber->getId() ? $oldSubscriber->getId() : 'NULL';
-                $this->_helper->logWarning("Unable to update email web hook request for list ID $listId for $old (ID $oldId) to $new (ID {$newSubscriber->getId()}: subscriber already exists");
+                $this->_helper->logWarning("Ignoring update email web hook request for list ID $listId from old $old to $new: no magento store is synchronised to that MailChimp list!");
             }
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to process update email web hook request for list ID $listId from old $old to $new: ".$e->getMessage());
+            $this->_helper->logError("Failed to process update email web hook request for list ID $listId from old $old to $new: " . $e->getMessage());
             Mage::logException($e);
         }
     }
@@ -122,15 +126,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         //Delete subscriber from Magento
         try {
             $s = $this->_helper->loadListSubscriber($data['list_id'], $data['email']);
-            if ($s->getId()) {
-                $this->_helper->logDebug("Clean subscriber web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: removing subscriber ID ".$s->getId());
-                $s->delete();
-                $this->_helper->logInfo("Clean subscriber web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: removed subscriber ID ".$s->getId());
+            if ($s) {
+                if ($s->getId()) {
+                    $this->_helper->logDebug("Clean subscriber web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: removing subscriber ID " . $s->getId());
+                    $s->delete();
+                    $this->_helper->logInfo("Clean subscriber web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: removed subscriber ID " . $s->getId());
+                } else {
+                    $this->_helper->logWarning("Clean subscriber web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: no such subscriber exists");
+                }
             } else {
-                $this->_helper->logWarning("Clean subscriber web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: no such subscriber exists");
+                $this->_helper->logWarning("Ignoring clean web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: no magento store is synchronised to that MailChimp list!");
             }
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to process clean web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: ".$e->getMessage());
+            $this->_helper->logError("Failed to process clean web hook request for subscriber {$data['email']} on list ID {$data['list_id']}: " . $e->getMessage());
             Mage::logException($e);
         }
     }
@@ -147,30 +155,34 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $listId = $data['list_id'];
             $email = $data['email'];
             $subscriber = $this->_helper->loadListSubscriber($listId, $email);
-            if ($subscriber->getId()) {
-                if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
-                    $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: changing subscriber ID {$subscriber->getId()} member status to subscribed");
-                    $this->subscribeMember($subscriber);
-                    $this->_helper->logInfo("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: changed subscriber ID {$subscriber->getId()} member status to subscribed");
+            if ($subscriber) {
+                if ($subscriber->getId()) {
+                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+                        $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: changing subscriber ID " . $subscriber->getId() . " member status to subscribed");
+                        $this->subscribeMember($subscriber);
+                        $this->_helper->logInfo("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: changed subscriber ID " . $subscriber->getId() . " member status to subscribed");
+                    } else {
+                        $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: subscriber ID " . $subscriber->getId() . " already subscribed");
+                    }
                 } else {
-                    $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: subscriber ID {$subscriber->getId()} already subscribed");
+                    if (isset($data['merges']['FNAME'])) {
+                        $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
+                        $subscriber->setSubscriberFirstname($subscriberFname);
+                    }
+
+                    if (isset($data['merges']['LNAME'])) {
+                        $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
+                        $subscriber->setSubscriberLastname($subscriberLname);
+                    }
+                    $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: adding new subscriber");
+                    $this->subscribeMember($subscriber);
+                    $this->_helper->logInfo("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: added new subscriber ID " . $subscriber->getId());
                 }
             } else {
-                if (isset($data['merges']['FNAME'])) {
-                    $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
-                    $subscriber->setSubscriberFirstname($subscriberFname);
-                }
-
-                if (isset($data['merges']['LNAME'])) {
-                    $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
-                    $subscriber->setSubscriberLastname($subscriberLname);
-                }
-                $this->_helper->logDebug("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: adding new subscriber");
-                $this->subscribeMember($subscriber);
-                $this->_helper->logInfo("Subscribe web hook request for {$data['email']} on list ID {$data['list_id']}: added new subscriber ID {$subscriber->getId()}");
+                $this->_helper->logWarning("Ignoring subscribe web hook request for member $email on list ID $listId: no magento store is synchronised to that MailChimp list!");
             }
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to process subscribe web hook request for member $email on list ID $listId: ".$e->getMessage());
+            $this->_helper->logError("Failed to process subscribe web hook request for member $email on list ID $listId: " . $e->getMessage());
             Mage::logException($e);
         }
     }
@@ -206,36 +218,40 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         try {
             $subscriber = $this->_helper->loadListSubscriber($data['list_id'], $data['email']);
-            if ($subscriber->getId()) {
-                $action = isset($data['action']) ? $data['action'] : 'delete';
-                switch ($action) {
-                case 'delete' :
-                    //if config setting "Webhooks Delete action" is set as "Delete customer account"
-                    if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
-                        $this->_helper->logDebug("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: deleting subscriber ID {$subscriber->getId()}");
-                        $subscriber->delete();
-                        $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: deleted subscriber ID {$subscriber->getId()}");
-                    } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                        $this->_helper->logDebug("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribing subscriber ID {$subscriber->getId()}");
-                        $this->unsubscribeMember($subscriber);
-                        $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribed subscriber ID {$subscriber->getId()}");
+            if ($subscriber) {
+                if ($subscriber->getId()) {
+                    $action = isset($data['action']) ? $data['action'] : 'delete';
+                    switch ($action) {
+                        case 'delete' :
+                            //if config setting "Webhooks Delete action" is set as "Delete customer account"
+                            if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
+                                $this->_helper->logDebug("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: deleting subscriber ID " . $subscriber->getId());
+                                $subscriber->delete();
+                                $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: deleted subscriber ID " . $subscriber->getId());
+                            } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                                $this->_helper->logDebug("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribing subscriber ID " . $subscriber->getId());
+                                $this->unsubscribeMember($subscriber);
+                                $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribed subscriber ID " . $subscriber->getId());
+                            }
+                            break;
+                        case 'unsub':
+                            if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                                $this->_helper->logDebug("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribing subscriber ID " . $subscriber->getId());
+                                $this->unsubscribeMember($subscriber);
+                                $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribed subscriber ID " . $subscriber->getId());
+                            } else {
+                                $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: subscriber ID " . $subscriber->getId() . " is already un-subscribed");
+                            }
+                            break;
                     }
-                    break;
-                case 'unsub':
-                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                        $this->_helper->logDebug("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribing subscriber ID {$subscriber->getId()}");
-                        $this->unsubscribeMember($subscriber);
-                        $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: un-subscribed subscriber ID {$subscriber->getId()}");
-                    } else {
-                        $this->_helper->logInfo("Un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: subscriber ID {$subscriber->getId()} is already un-subscribed");
-                    }
-                    break;
+                } else {
+                    $this->_helper->logWarning("Ignoring un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: no such subscriber exists!");
                 }
             } else {
-                $this->_helper->logWarning("Ignoring un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: no such subscriber exists!");
+                $this->_helper->logWarning("Ignoring un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: no magento store is synchronised to that MailChimp list!");
             }
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to process un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: ".$e->getMessage());
+            $this->_helper->logError("Failed to process un-subscribe web hook request for member {$data['email']} on list ID {$data['list_id']}: " . $e->getMessage());
             Mage::logException($e);
         }
     }
@@ -260,11 +276,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             if ($customer) {
                 $fn = $this->_getLogString($customer->getFirstname());
                 $ln = $this->_getLogString($customer->getLastname());
-                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating customer ID {$customer->getId()} first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
+                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating customer ID " . $customer->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
                 $customer->setFirstname($fname);
                 $customer->setLastname($lname);
                 $customer->save();
-                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated customer ID {$customer->getId()} first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
+                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated customer ID " . $customer->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
             } else {
                 $subscriber = $this->_helper->loadListSubscriber($listId, $email);
                 if ($subscriber) {
@@ -272,13 +288,13 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         if ($fname !== $subscriber->getSubscriberFirstname() || $lname !== $subscriber->getSubscriberLastname()) {
                             $fn = $this->_getLogString($subscriber->getFirstname());
                             $ln = $this->_getLogString($subscriber->getLastname());
-                            $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating subscriber ID {$subscriber->getId()} first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
+                            $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating subscriber ID " . $subscriber->getId() . " first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
                             $subscriber->setSubscriberFirstname($fname);
                             $subscriber->setSubscriberLastname($lname);
                             $subscriber->save();
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated subscriber ID {$subscriber->getId()} first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
+                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated subscriber ID " . $subscriber->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
                         } else {
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: no change to subscriber ID {$subscriber->getId()} with first name $fnameDisplay and last name $lnameDisplay");
+                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: no change to subscriber ID " . $subscriber->getId() . " with first name $fnameDisplay and last name $lnameDisplay");
                         }
                     } else {
                         /**
@@ -293,23 +309,23 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         if ($member['status'] == 'subscribed') {
                             $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: adding new subscribed member");
                             $this->subscribeMember($subscriber);
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new subscribed member as ID ".$subscriber->getId());
+                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new subscribed member as ID " . $subscriber->getId());
                         } elseif ($member['status'] == 'unsubscribed') {
                             if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
                                 $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: adding new un-subscribed member");
                                 $this->unsubscribeMember($subscriber);
-                                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new un-subscribed member as ID ".$subscriber->getId());
+                                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new un-subscribed member as ID " . $subscriber->getId());
                             }
                         }
                     }
                 } else {
-                    $this->_helper->logWarning("Ignoring profile web hook request for member $email on list ID $listId: no magento store is synchronised to that MailChimp list!");
+                    $this->_helper->logWarning("Ignoring profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: no magento store is synchronised to that MailChimp list!");
                 }
             }
         } catch (MailChimp_Error $e) {
-            $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID {$data['list_id']}: ".$e->getFriendlyMessage());
+            $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: " . $e->getFriendlyMessage());
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID {$data['list_id']}: ".$e->getMessage());
+            $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: " . $e->getMessage());
             Mage::logException($e);
         }
     }
