@@ -11,8 +11,11 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Products
 {
+    const NO_CHILDREN_IDS = array(0 => array());
     const BATCH_LIMIT = 100;
     private $_parentImageUrl = null;
+
+    /** @var Mage_Catalog_Model_Product_Type_Configurable */
     private $productTypeConfigurable;
     private $mailchimpHelper;
     private $visibilityOptions;
@@ -71,10 +74,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else if ($this->isConfigurableProduct($product)) {
             $variantProducts[] = $product;
 
-            $childProducts = $this->productTypeConfigurable->getChildrenIds($product->getId());
-
             //@TODO: No manda los children que no tienen stock.
-            $collection = $this->makeProductsNotSentCollection($mailchimpStoreId, $magentoStoreId);
+            $collection = $this->makeProductChildrenCollection($mailchimpStoreId, $magentoStoreId);
+
+            $childProducts = $this->getConfigurableChildrenIds($product);
             $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
 
             foreach($collection as $childProduct) {
@@ -550,5 +553,39 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getWebsiteIdForStoreId($magentoStoreId)
     {
         return Mage::app()->getStore($magentoStoreId)->getWebsiteId();
+    }
+
+    /**
+     * @param $product
+     * @return array
+     */
+    protected function getConfigurableChildrenIds($product)
+    {
+        $childrenIds = $this->getChildrenIdsForConfigurable($product);
+
+        if ($childrenIds === self::NO_CHILDREN_IDS) {
+            return array();
+        }
+
+        return $childrenIds;
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return Mage_Catalog_Model_Resource_Product_Collection
+     */
+    protected function makeProductChildrenCollection($mailchimpStoreId, $magentoStoreId)
+    {
+        return $this->makeProductsNotSentCollection($mailchimpStoreId, $magentoStoreId);
+    }
+
+    /**
+     * @param $product
+     * @return array
+     */
+    protected function getChildrenIdsForConfigurable($product)
+    {
+        return $this->productTypeConfigurable->getChildrenIds($product->getId());
     }
 }
