@@ -30,7 +30,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                 'joinMailchimpSyncData',
                 'shouldSendProductUpdate',
                 'getChildrenIdsForConfigurable',
-                'makeProductChildrenCollection'
+                'makeProductChildrenCollection',
+                "getMailChimpHelper"
             )
         )
         ->getMock();
