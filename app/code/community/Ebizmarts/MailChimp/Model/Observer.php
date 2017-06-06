@@ -115,7 +115,9 @@ class Ebizmarts_MailChimp_Model_Observer
             }
 
             if ($createWebhook) {
+                $this->_helper->logDebug("MC-API Request: Adding web hook url $hookUrl for list ID $listId");
                 $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                $this->_helper->logNotice("MC-API Request: Added web hook url $hookUrl for list ID $listId");
             }
         } catch (MailChimp_Error $e) {
             $this->_helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
@@ -139,7 +141,7 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         /** @var Mage_Newsletter_Model_Subscriber $subscriber */
         $subscriber = $observer->getEvent()->getSubscriber();
-        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID '.$subscriber->getId() : 'new subscriber');
+        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
         $this->_helper->logDebug("Handle subscriber event for $subscriberDescription email {$subscriber->getSubscriberEmail()} status {$subscriber->getSubscriberStatus()}", $subscriber->getStoreId());
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $isEnabled = $this->_helper->isMailChimpEnabled($subscriber->getStoreId());
@@ -175,7 +177,7 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         /** @var Mage_Newsletter_Model_Subscriber $subscriber */
         $subscriber = $observer->getEvent()->getSubscriber();
-        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID '.$subscriber->getId() : 'new subscriber');
+        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
         $this->_helper->logDebug("Handle subscriber deletion event for $subscriberDescription email {$subscriber->getSubscriberEmail()} status {$subscriber->getSubscriberStatus()}", $subscriber->getStoreId());
         $isEnabled = $this->_helper->isMailChimpEnabled($subscriber->getStoreId());
         
@@ -230,7 +232,7 @@ class Ebizmarts_MailChimp_Model_Observer
         /** @var Mage_Customer_Model_Customer $customer */
         $customer = $observer->getEvent()->getCustomer();
         $storeId = $customer->getStoreId();
-        $customerDescription = ($customer->getId() ? 'customer ID '.$customer->getId() : 'guest customer');
+        $customerDescription = ($customer->getId() ? 'customer ID ' . $customer->getId() : 'guest customer');
         $this->_helper->logDebug("Handle customer save event for $customerDescription email {$customer->getEmail()}", $storeId);
 
         //update mailchimp ecommerce data for that customer
@@ -245,7 +247,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $customerId = $observer->getEvent()->getCustomerAddress()->getCustomerId();
         $customer = Mage::getModel('customer/customer')->load($customerId);
         $storeId = $customer->getStoreId();
-        $customerDescription = ($customer->getId() ? 'customer ID '.$customer->getId() : 'guest customer');
+        $customerDescription = ($customer->getId() ? 'customer ID ' . $customer->getId() : 'guest customer');
         $this->_helper->logDebug("Handle customer address save event for $customerDescription email {$customer->getEmail()}", $storeId);
 
         //update mailchimp ecommerce data for that customer
