@@ -35,6 +35,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         )
         ->getMock();
 
+        $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailChimpHelperMock->method("getMailChimpProductImageUrl")->willReturn("product_image_url");
+        $this->productsApiMock->expects($this->any())->method("getMailChimpHelper")
+            ->willReturn($mailChimpHelperMock);
         $this->productsApiMock->expects($this->once())->method('makeBatchId')->with(0)
             ->willReturn(self::BATCH_ID);
         $this->productsApiMock->expects($this->never())->method('buildProductDataRemoval');
