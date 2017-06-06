@@ -152,7 +152,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $item->getBatchId());
                 }
             } catch (Exception $e) {
-                Mage::log("Error with a response: " . $e->getMessage());
+                $this->getHelper()->logError("Error processing response for batch ID " . $item->getBatchId() . ": " . $e->getMessage(), $magentoStoreId);
             }
         }
     }
@@ -204,7 +204,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $helper->logRequest('An empty operation was detected', $magentoStoreId);
                         } else {
                             if (!$helper->getIsReseted($magentoStoreId)) {
+                                $this->getHelper()->logDebug("MC-API Request: Sending e-commerce batch");
                                 $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                                $this->getHelper()->logInfo("MC-API Request: Sent e-commerce batch as ID {$batchResponse['id']}");
                                 $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                                 //save batch id to db
                                 $batch = Mage::getModel('mailchimp/synchbatches');
@@ -228,8 +230,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                 } catch (Exception $e) {
                     $helper->logError($e->getMessage(), $magentoStoreId);
-                    $helper->logError("Json encode fails", $magentoStoreId);
-                    $helper->logError($batchArray, $magentoStoreId);
+                    $helper->logError("Json encode fails for the following batch data:", $magentoStoreId);
+                    $helper->logError(print_r($batchArray, true), $magentoStoreId);
                 }
             }
         } catch (MailChimp_Error $e) {
@@ -316,7 +318,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $this->getHelper()->logRequest('An empty operation was detected', $storeId);
                 } else {
                     $mailchimpApi = $this->getHelper()->getApi($storeId);
+                    $this->getHelper()->logDebug("MC-API Request: Sending subscriber batch");
                     $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                    $this->getHelper()->logInfo("MC-API Request: Sent subscriber batch as ID {$batchResponse['id']}");
                     $this->getHelper()->logRequest($batchJson, $storeId, $batchResponse['id']);
 
                     //save batch id to db
@@ -494,8 +498,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $this->getHelper()->logError($e->getFriendlyMessage(), $magentoStoreId);
             } catch (Exception $e) {
                 $this->getHelper()->logError($e->getMessage(), $magentoStoreId);
-                $this->getHelper()->logError("Json encode fails", $magentoStoreId);
-                $this->getHelper()->logError($batchArray, $magentoStoreId);
+                $this->getHelper()->logError("Json encode fails for the following batch data:", $magentoStoreId);
+                $this->getHelper()->logError(print_r($batchArray, true), $magentoStoreId);
             }
         } catch (MailChimp_Error $e) {
             $this->getHelper()->logError($e->getFriendlyMessage(), $magentoStoreId);

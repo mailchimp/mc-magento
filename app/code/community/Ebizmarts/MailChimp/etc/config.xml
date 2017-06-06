@@ -315,7 +315,7 @@
                 <customer_map_fields><![CDATA[a:10:{i:0;a:3:{s:5:"label";s:18:"Shipping Telephone";s:5:"value";s:18:"shipping_telephone";s:10:"field_type";s:4:"text";}i:1;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:2;a:3:{s:5:"label";s:15:"Billing Company";s:5:"value";s:15:"billing_company";s:10:"field_type";s:4:"text";}i:3;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:4;a:3:{s:5:"label";s:17:"Billing Telephone";s:5:"value";s:17:"billing_telephone";s:10:"field_type";s:4:"text";}i:5;a:3:{s:5:"label";s:15:"Billing Country";s:5:"value";s:15:"billing_country";s:10:"field_type";s:4:"text";}i:6;a:3:{s:5:"label";s:16:"Shipping Country";s:5:"value";s:16:"shipping_country";s:10:"field_type";s:4:"text";}i:7;a:3:{s:5:"label";s:15:"Billing ZipCode";s:5:"value";s:15:"billing_zipcode";s:10:"field_type";s:4:"text";}i:8;a:3:{s:5:"label";s:16:"Shipping ZipCode";s:5:"value";s:16:"shipping_zipcode";s:10:"field_type";s:4:"text";}i:9;a:3:{s:5:"label";s:21:"Last Date Of Purchase";s:5:"value";s:3:"dop";s:10:"field_type";s:4:"date";}}]]></customer_map_fields>
                 <log_level>-1</log_level>
                 <log_file>MailChimp.log</log_file>
-                <log_batches>no</log_batches>
+                <log_requests>no</log_requests>
                 <monkey_grid>1</monkey_grid>
             </general>
             <emailcatcher>

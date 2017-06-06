@@ -75,7 +75,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Create string for current scope with format scope-scopeId.
+     * Create description for given scope.
      *
      * @param  int    $scopeId Scope ID (website or store ID depending on scope).
      * @param  string $scope   Scope (websites, stores, default).
@@ -514,8 +514,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log message at given log level to the log file if enabled
      *
-     * @param int|false    $level   Logging level to log message at.
-     * @param string       $message Message to log.
+     * @param  int|false   $level   Logging level to log message at.
+     * @param  string      $message Message to log.
      * @param  int|null    $scopeId Website ID for websites scope, store ID
      *                              for stores scope. Use current store if null.
      * @param  string|null $scope   Use websites, stores, default.
@@ -534,7 +534,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log error message to the log file if enabled.
      *
-     * @param string       $message Message to log.
+     * @param  string      $message Message to log.
      * @param  int|null    $scopeId Website ID for websites scope, store ID
      *                              for stores scope. Use current store if null.
      * @param  string|null $scope   Use websites, stores, default.
@@ -547,7 +547,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log warning message to the log file if enabled.
      *
-     * @param string       $message Message to log.
+     * @param  string      $message Message to log.
      * @param  int|null    $scopeId Website ID for websites scope, store ID
      *                              for stores scope. Use current store if null.
      * @param  string|null $scope   Use websites, stores, default.
@@ -560,7 +560,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log notice to the log file if enabled.
      *
-     * @param string       $message Message to log.
+     * @param  string      $message Message to log.
      * @param  int|null    $scopeId Website ID for websites scope, store ID
      *                              for stores scope. Use current store if null.
      * @param  string|null $scope   Use websites, stores, default.
@@ -573,7 +573,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log informational message to the log file if enabled.
      *
-     * @param string       $message Message to log.
+     * @param  string      $message Message to log.
      * @param  int|null    $scopeId Website ID for websites scope, store ID
      *                              for stores scope. Use current store if null.
      * @param  string|null $scope   Use websites, stores, default.
@@ -586,7 +586,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log debug message to the log file if enabled.
      *
-     * @param string       $message Message to log.
+     * @param  string      $message Message to log.
      * @param  int|null    $scopeId Website ID for websites scope, store ID
      *                              for stores scope. Use current store if null.
      * @param  string|null $scope   Use websites, stores, default.
@@ -597,17 +597,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Save request made to MailChimp's API in "MailChimp_Requests.log" file.
+     * Save request made to MailChimp's API in "MailChimp_Requests"
+     * directory. If batch request couldn't be JSON encoded it is
+     * logged to"MailChimp_Requests.log" file.
      *
-     * @param $message
-     * @param $scopeId
-     * @param null    $batchId
+     * @param string       $message Batch data or message to log.
+     * @param int $scopeId Magento store ID.
+     * @param string|null  $batchId Batch ID if logging batch request
+     *                              or NULL to log batch data/message
+     *                              to MailChimp_Requests.log file.
      */
     public function logRequest($message, $scopeId, $batchId = null)
     {
         if ($this->isLogRequestsEnabled($scopeId)) {
             if (!$batchId) {
-                Mage::log($message, null, static::REQUESTS_LOG_DIR.'.log', true);
+                Mage::log($message, null, static::REQUESTS_LOG_DIR . '.log', true);
             } else {
                 $logDir = Mage::getBaseDir('var') . DS . 'log';
                 if (!file_exists($logDir)) {
@@ -757,7 +761,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeId, $scope);
                 }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
-                $this->logNotice("Created mailchimp store $mailchimpStoreId for list ID $listId for ".$this->getScopeDescription($scopeId, $scope));
+                $this->logNotice("Created mailchimp store $mailchimpStoreId for list ID $listId for " . $this->getScopeDescription($scopeId, $scope));
             } catch (Exception $e) {
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
@@ -776,7 +780,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!empty($mailchimpStoreId)) {
             try {
                 Mage::getModel('mailchimp/api_stores')->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
-                $this->logNotice("Deleted mailchimp store $mailchimpStoreId for ".$this->getScopeDescription($scopeId, $scope));
+                $this->logNotice("Deleted mailchimp store $mailchimpStoreId for " . $this->getScopeDescription($scopeId, $scope));
             } catch (MailChimp_Error $e) {
                 $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
@@ -801,8 +805,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $mailchimpFields = array();
         if ($api) {
             try {
+                $this->logDebug("MC-API Request: Getting current merge fields for list $listId: " . json_encode($mailchimpFields), $scopeId, $scope);
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
-                $this->logDebug("Current merge fields for list $listId: ".json_encode($mailchimpFields), $scopeId, $scope);
+                $this->logDebug("MC-API Request: Current merge fields for list $listId: " . json_encode($mailchimpFields), $scopeId, $scope);
             } catch (MailChimp_Error $e) {
                 $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
@@ -823,7 +828,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         foreach ($customFieldTypes as $customFieldType) {
                             if ($customFieldType['value'] == $chimpTag) {
                                 try {
+                                    $this->logDebug("MC-API Request: Adding merge field {$customFieldType['label']} type {$customFieldType['field_type']} as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
+                                    $this->logNotice("MC-API Request: Adding merge field {$customFieldType['label']} type {$customFieldType['field_type']} as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                 } catch (MailChimp_Error $e) {
                                     $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
                                 }
@@ -847,12 +854,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 if ($label) {
                                     //Shipping and Billing Address
                                     if ($customAtt == 13 || $customAtt == 14) {
+                                        $this->logDebug("MC-API Request: Adding merge field $label type address as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                         $api->lists->mergeFields->add($listId, $label, 'address', null, $chimpTag);
+                                        $this->logNotice("MC-API Request: Added merge field $label type address as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                         //Birthday
                                     } elseif ($customAtt == 11) {
+                                        $this->logDebug("MC-API Request: Adding merge field $label type birthday as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                         $api->lists->mergeFields->add($listId, $label, 'birthday', null, $chimpTag);
+                                        $this->logNotice("MC-API Request: Adding merge field $label type birthday as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                     } else {
+                                        $this->logDebug("MC-API Request: Adding merge field $label type text as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                         $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
+                                        $this->logNotice("MC-API Request: Added merge field $label type text as tag $chimpTag to list $listId: ", $scopeId, $scope);
                                     }
                                 }
                             } catch (MailChimp_Error $e) {

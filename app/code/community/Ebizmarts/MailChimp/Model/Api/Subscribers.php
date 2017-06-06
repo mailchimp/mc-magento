@@ -14,6 +14,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
+    /** @var Ebizmarts_MailChimp_Helper_Data $_helper */
     private $_helper;
 
 
@@ -53,12 +54,24 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
+            $subscriberDescription = "subscriber " . $subscriber->getId() . " email " . $data['email_address'];
+            if (!isset($data['merge_fields'])) {
+                if (!empty($data['merge_fields']['firstname'])) {
+                    $subscriberDescription .= ' fname ' . $data['merge_fields']['firstname'];
+                }
+                if (!empty($data['merge_fields']['lastname'])) {
+                    $subscriberDescription .= ' lname ' . $data['merge_fields']['lastname'];
+                }
+            }
+            $subscriberDescription .= ' status ' . $data['status_if_new'];
+            $this->_helper->logDebug("Creating subscriber batch for store ID $storeId: Adding $subscriberDescription");
+
             //encode to JSON
             try {
                 $subscriberJson = json_encode($data);
             } catch (Exception $e) {
                 //json encode failed
-                $errorMessage = "Subscriber ".$subscriber->getSubscriberId()." json encode failed";
+                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed";
                 $this->_helper->logError($errorMessage, $storeId);
             }
 
@@ -309,23 +322,25 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $mergeVars = $this->getMergeVars($subscriber);
         $email = $subscriber->getSubscriberEmail();
         $md5HashEmail = md5(strtolower($email));
-        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID '.$subscriber->getId() : 'new subscriber');
+        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
         try {
-            $this->_helper->logDebug("Adding/updating MailChimp member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
+            $this->_helper->logDebug("MC-API request: Adding/updating member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
             $api->lists->members->addOrUpdate(
                 $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
                 null, null, null, null
             );
-            $this->_helper->logInfo("Added/updated MailChimp member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
+            $this->_helper->logInfo("MC-API request: Added/updated member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
             $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
             $subscriber->setData("mailchimp_sync_error", "");
             $subscriber->setData("mailchimp_sync_modified", 0);
         } catch(MailChimp_Error $e) {
-            $this->_helper->logWarning("MailChimp error updating $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: ".$e->getMessage(), $storeId);
+            $this->_helper->logWarning("MC-API Request:  Error updating $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: " . $e->getMessage(), $storeId);
             if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
                 if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                     try {
+                        $this->_helper->logDebug("MC-API request: Updating member status to pending for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                         $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
+                        $this->_helper->logInfo("MC-API request: Updated member status to pending for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
                         $message = $this->_helper->__('To begin receiving the newsletter, you must first confirm your subscription');
                         Mage::getSingleton('core/session')->addWarning($message);
@@ -350,7 +365,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
             }
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to update $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: ".$e->getMessage(), $storeId);
+            $this->_helper->logError("Failed to update $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: " . $e->getMessage(), $storeId);
         }
     }
 
@@ -413,16 +428,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $storeId = $subscriber->getStoreId();
         $listId = $this->_helper->getGeneralList($storeId);
         $api = $this->_helper->getApi($storeId);
+        $email = $subscriber->getSubscriberEmail();
+        $md5HashEmail = md5(strtolower($email));
         try {
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $this->_helper->logDebug("Removing MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
+            $this->_helper->logDebug("MC-API Request: Un-subscribing member $md5HashEmail ($email) from list ID $listId for store ID $storeId", $storeId);
             $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
-            $this->_helper->logNotice("Removed MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
+            $this->_helper->logNotice("MC-API Request: Un-subscribed member $md5HashEmail ($email) from list ID $listId for store ID $storeId", $storeId);
         } catch(MailChimp_Error $e) {
             $this->_helper->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to remove MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId: ".$e->getMessage(), $storeId);
+            $this->_helper->logError("MC-API Request: Failed to un-subscribe member $md5HashEmail ($email) from list ID $listId for store ID $storeId: " . $e->getMessage(), $storeId);
         }
     }
 
@@ -434,16 +450,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $storeId = $subscriber->getStoreId();
         $listId = $this->_helper->getGeneralList($storeId);
         $api = $this->_helper->getApi($storeId);
+        $email = $subscriber->getSubscriberEmail();
+        $md5HashEmail = md5(strtolower($email));
         try {
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $this->_helper->logDebug("Deleting MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
+            $this->_helper->logDebug("MC-API Request: Cleaning member $md5HashEmail (" . $subscriber->getSubscriberEmail() . ") from list ID $listId for store ID $storeId", $storeId);
             $api->lists->members->update($listId, $md5HashEmail, null, 'cleaned');
-            $this->_helper->logNotice("Deleted MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId", $storeId);
+            $this->_helper->logNotice("MC-API Request: Cleaned member $md5HashEmail ($email) from list ID $listId for store ID $storeId", $storeId);
         } catch(MailChimp_Error $e) {
             $this->_helper->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $this->_helper->logError("Failed to delete MailChimp list member $md5HashEmail ({$subscriber->getSubscriberEmail()}) from list ID $listId for store ID $storeId: ".$e->getMessage(), $storeId);
+            $this->_helper->logError("MC-API Request: Failed to clean member $md5HashEmail ($email) from list ID $listId for store ID $storeId: " . $e->getMessage(), $storeId);
         }
     }
 
@@ -451,11 +468,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
         if ($subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $subscriber->getMailchimpSyncDelta() > $this->_helper->getMCMinSyncDateFlag($storeId)) {
-            $subscriberDescription = ($subscriber->getId() ? 'subscriber ID '.$subscriber->getId() : 'new subscriber');
-            $this->_helper->logDebug("Marking $subscriberDescription email {$subscriber->getSubscriberEmail()} for store {$subscriber->getStoreId()} as modified for syncing", $subscriber->getStoreId());
+            $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
+            $this->_helper->logDebug("Marking $subscriberDescription email " . $subscriber->getSubscriberEmail() . " for store " . $subscriber->getStoreId() . " as modified for syncing", $subscriber->getStoreId());
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
-            $this->_helper->logInfo("Marked subscriber ID {$subscriber->getId()} email {$subscriber->getSubscriberEmail()} for store {$subscriber->getStoreId()} as modified for syncing", $subscriber->getStoreId());
+            $this->_helper->logInfo("Marked subscriber ID " . $subscriber->getId() . " email " . $subscriber->getSubscriberEmail() . " for store " . $subscriber->getStoreId() . " as modified for syncing", $subscriber->getStoreId());
         }
     }
 }

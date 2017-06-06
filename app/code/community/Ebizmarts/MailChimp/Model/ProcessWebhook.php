@@ -19,6 +19,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     const WEBHOOKS_PATH = 'mailchimp/webhook/index/';
 
+    /** @var Ebizmarts_MailChimp_Helper_Data $_helper */
     private $_helper;
 
 

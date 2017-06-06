@@ -11,6 +11,7 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
+    /** @var Ebizmarts_MailChimp_Helper_Data $_helper */
     private $_helper;
 
 
@@ -47,8 +48,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
                 $currencyCode = $this->_helper->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
                 $isSyncing = true;
-                $this->_helper->logDebug("Creating mailchimp store $mailChimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId for scope ".$this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
+                $this->_helper->logDebug("MC-API Request: Creating store $mailChimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
                 $response = $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail);
+                $this->_helper->logNotice("MC-API Request: Created store $mailChimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
                 return $response;
             } else {
                 throw new Exception('You don\'t have any lists configured in MailChimp');
@@ -68,9 +70,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     public function deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope)
     {
         try {
-            $this->_helper->logDebug("Deleting mailchimp store $mailchimpStoreId for ", $scopeId, $scope);
             $api = $this->_helper->getApi($scopeId, $scope);
+            $this->_helper->logDebug("MC-API Request: Deleting store $mailchimpStoreId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
             $api->ecommerce->stores->delete($mailchimpStoreId);
+            $this->_helper->logNotice("MC-API Request: Deleted store $mailchimpStoreId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
         } catch (MailChimp_Error $e) {
             $this->_helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
         } catch (Exception $e) {
@@ -94,8 +97,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = $this->_helper->getApi($scopeId, $scope);
             $mailchimpStoreId = $this->_helper->getMCStoreId($scopeId, $scope);
-            $this->_helper->logDebug("Setting mailchimp store $mailchimpStoreId name to $name for scope ".$this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
+            $this->_helper->logDebug("MC-API Request: Setting store $mailchimpStoreId name to $name for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
             $api->ecommerce->stores->edit($mailchimpStoreId, $name);
+            $this->_helper->logNotice("MC-API Request: Set store $mailchimpStoreId name to $name for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
         } catch (MailChimp_Error $e) {
             $this->_helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
         } catch (Exception $e) {
@@ -115,7 +119,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = $this->_helper->getApi($scopeId, $scope);
             $mailchimpStoreId = $this->_helper->getMCStoreId($scopeId, $scope);
-            $this->_helper->logDebug("Getting mailchimp store $mailchimpStoreId connected sitre URL for scope ".$this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
+            $this->_helper->logDebug("MC-API Request: Getting store $mailchimpStoreId connected site URL for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
             $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
             if (isset($response['connected_site']['site_script']['url'])) {
                 $url = $response['connected_site']['site_script']['url'];
@@ -140,7 +144,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId, $magentoStoreId)
     {
+        $this->_helper->logDebug("MC-API Request: Updating store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for  " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
         $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
+        $this->_helper->logNotice("MC-API Request: Updated store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
         $scopeToEdit = $this->_helper->getMailChimpScopeByStoreId($magentoStoreId);
         $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, (int)$isSincingValue));
         $this->_helper->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);

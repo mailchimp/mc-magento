@@ -90,6 +90,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         $bodyData = $this->_buildProductData($product, false, $variantProducts);
+        if (isset($bodyData) && isset($bodyData['variants'])) {
+            foreach ($bodyData['variants'] as $data) {
+                $this->mailchimpHelper->logDebug(
+                    "Creating e-commerce batch for store $magentoStoreId: " .
+                    "Adding updated product ID {$data['id']} title {$data['title']} " .
+                    "sku {$data['sku']} price {$data['price']}",
+                    $magentoStoreId
+                );
+            }
+        }
+
         try {
             $body = json_encode($bodyData);
         } catch (Exception $e) {
@@ -135,6 +146,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     if ($imageUrl) {
                         $variendata["image_url"] = $imageUrl;
                     }
+
+                    $this->mailchimpHelper->logDebug(
+                        "Creating e-commerce batch for store $magentoStoreId: " .
+                        "Adding updated product ID {$variendata['id']} title {$variendata['title']} " .
+                        "sku {$variendata['sku']} price {$variendata['price']}",
+                        $magentoStoreId
+                    );
 
                     $this->_parentImageUrl = null;
                     $variendata["backorders"] = $data["backorders"];

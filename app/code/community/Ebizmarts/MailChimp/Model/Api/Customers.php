@@ -51,6 +51,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $counter = 0;
         foreach ($collection as $customer) {
             $data = $this->_buildCustomerData($customer);
+            $this->mailchimpHelper->logDebug(
+                "Creating e-commerce batch for store " . $this->getBatchMagentoStoreId() .
+                ": Adding customer {$data['id']} email {$data['email_address']} " .
+                "fname {$data['first_name']} lname {$data['last_name']} " .
+                "opt-in {$data['opt_in_status']} num_orders {$data['orders_count']} " .
+                "total_spent {$data['total_spent']}",
+                $this->getBatchMagentoStoreId()
+            );
 
             $customerJson = json_encode($data);
             if (false !== $customerJson) {

@@ -176,7 +176,7 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Log to this file in {{base_dir}}/var/log/]]></comment>
                         </log_file>
-                        <log_batches translate="label comment">
+                        <log_requests translate="label comment">
                             <label>Log Batch Requests</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -185,7 +185,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Logged batch requests will be in {{base_dir}}/var/log/Mailchimp_Requests/]]></comment>
-                        </log_batches>
+                        </log_requests>
                         <monkey_grid translate="label comment">
                             <label>Display icon for MailChimp orders grid</label>
                             <frontend_type>select</frontend_type>
