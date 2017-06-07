@@ -1,7 +1,6 @@
 <?php
 
 /**
-/**
  * MailChimp For Magento
  *
  * @category  Ebizmarts_MailChimp
