@@ -11,6 +11,7 @@
  */
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
+    const BATCH_LIMIT   = 50;
     /**
      * Webhooks request url path
      *
@@ -36,6 +37,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     public function processWebhookData()
     {
         $collection = Mage::getResourceModel('mailchimp/webhookrequest_collection');
+        $collection->addFieldToFilter('processed',array('eq'=>0));
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($collection as $webhookRequest) {
             $data = unserialize($webhookRequest->getDataRequest());
 
