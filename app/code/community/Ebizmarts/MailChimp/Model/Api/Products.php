@@ -11,15 +11,15 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Products
 {
-    const NO_CHILDREN_IDS = array(0 => array());
     const BATCH_LIMIT = 100;
     private $_parentImageUrl = null;
-
     /** @var Mage_Catalog_Model_Product_Type_Configurable */
     private $productTypeConfigurable;
+
     private $mailchimpHelper;
     private $visibilityOptions;
     private $productTypeConfigurableResource;
+    public static $noChildrenIds = array(0 => array());
 
     public function __construct()
     {
@@ -581,7 +581,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $childrenIds = $this->getChildrenIdsForConfigurable($product);
 
-        if ($childrenIds === self::NO_CHILDREN_IDS) {
+        if ($childrenIds === self::$noChildrenIds) {
             return array();
         }
 

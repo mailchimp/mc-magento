@@ -163,6 +163,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
      */
     private function configurableNoChildren()
     {
-        return \Ebizmarts_MailChimp_Model_Api_Products::NO_CHILDREN_IDS;
+        return \Ebizmarts_MailChimp_Model_Api_Products::$noChildrenIds;
     }
 }
