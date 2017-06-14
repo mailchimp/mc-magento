@@ -1,0 +1,34 @@
+# Remove new M4M with capitals, from 1.1.7 onwards
+rm -rf app/code/community/Ebizmarts/MailChimp
+rm -rf app/design/adminhtml/default/default/template/ebizmarts/mandrill
+rm -rf app/design/adminhtml/default/default/template/ebizmarts/mailchimp
+rm -rf app/design/frontend/base/default/template/ebizmarts/mailchimp
+rm -rf dev/tests/mailchimp/
+rm -rf js/ebizmarts/mailchimp
+rm -rf lib/Ebizmarts/MailChimp
+rm -rf lib/Mandrill
+rm -rf skin/adminhtml/default/default/ebizmarts/mailchimp
+rm -rf skin/adminhtml/default/default/ebizmarts/mandrill
+rm -f app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml
+rm -f app/design/adminhtml/default/default/layout/ebizmarts/mailchimp.xml
+rm -f app/etc/modules/Ebizmarts_MailChimp.xml
+rm -f lib/Ebizmarts/MailChimp.php
+rm -f shell/m4mlogs.sh
+rm -f shell/getMailchimpResponse.php
+# Remove old M4M without capitals, prior to 1.1.7
+rm -rf app/code/community/Ebizmarts/Mailchimp
+rm -rf app/design/adminhtml/default/default/template/ebizmarts/mandrill
+rm -rf app/design/adminhtml/default/default/template/ebizmarts/mailchimp
+rm -rf app/design/frontend/base/default/template/ebizmarts/mailchimp
+rm -rf dev/tests/mailchimp/
+rm -rf js/ebizmarts/mailchimp
+rm -rf lib/Ebizmarts/Mailchimp
+rm -rf lib/Mandrill
+rm -rf skin/adminhtml/default/default/ebizmarts/mailchimp
+rm -rf skin/adminhtml/default/default/ebizmarts/mandrill
+rm -f app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml
+rm -f app/design/adminhtml/default/default/layout/ebizmarts/mailchimp.xml
+rm -f app/etc/modules/Ebizmarts_Mailchimp.xml
+rm -f lib/Ebizmarts/Mailchimp.php
+rm -f shell/m4mlogs.sh
+rm -f shell/getMailchimpResponse.php
