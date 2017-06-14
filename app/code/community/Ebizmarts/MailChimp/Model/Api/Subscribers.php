@@ -147,7 +147,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
                                     $eventValue = $mergeVars[$key] = $customerGroup[$group_id];
                                 } else {
-                                    $eventValue = $mergeVars[$key] = Mage::helper('mailchimp')->__('NOT LOGGED IN');
+                                    $eventValue = $mergeVars[$key] = 'NOT LOGGED IN';
                                 }
                                 break;
                             case 'firstname':
