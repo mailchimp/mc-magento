@@ -120,21 +120,23 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $listId = $data['list_id'];
             $email = $data['email'];
             $subscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $email);
-            if ($subscriber->getId()) {
-                if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+            if($subscriber){
+                if ($subscriber->getId()) {
+                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+                        $this->subscribeMember($subscriber);
+                    }
+                } else {
+                    if (isset($data['merges']['FNAME'])) {
+                        $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
+                        $subscriber->setSubscriberFirstname($subscriberFname);
+                    }
+
+                    if (isset($data['merges']['LNAME'])) {
+                        $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
+                        $subscriber->setSubscriberLastname($subscriberLname);
+                    }
                     $this->subscribeMember($subscriber);
                 }
-            } else {
-                if (isset($data['merges']['FNAME'])) {
-                    $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
-                    $subscriber->setSubscriberFirstname($subscriberFname);
-                }
-
-                if (isset($data['merges']['LNAME'])) {
-                    $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
-                    $subscriber->setSubscriberLastname($subscriberLname);
-                }
-                $this->subscribeMember($subscriber);
             }
         } catch (Exception $e) {
             Mage::logException($e);
