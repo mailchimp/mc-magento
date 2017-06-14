@@ -199,14 +199,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 break;
                             }
 
+                            $transport = (new Varien_Object())->setValue($eventValue);
                             Mage::dispatchEvent(
                                 'mailchimp_merge_field_send_before', array(
                                 'customer_id' => $customer->getId(),
                                 'subscriber_email' => $subscriberEmail,
                                 'merge_field_tag' => $attributeCode,
-                                'merge_field_value' => &$eventValue
+                                'merge_field_value' => $transport
                                 )
                             );
+                            $eventValue = $transport->getValue();
                         }
                     }
                 } else {
@@ -268,14 +270,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         break;
                     }
 
+                    $transport = (new Varien_Object())->setValue($eventValue);
                     Mage::dispatchEvent(
                         'mailchimp_merge_field_send_before', array(
                         'customer_id' => $customer->getId(),
                         'subscriber_email' => $subscriberEmail,
                         'merge_field_tag' => $customAtt,
-                        'merge_field_value' => &$eventValue
+                        'merge_field_value' => $transport
                         )
                     );
+                    $eventValue = $transport->getValue();
                 }
 
                 if ($eventValue) {
