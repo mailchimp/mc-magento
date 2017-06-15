@@ -27,6 +27,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected $_batchId;
     protected $_api = null;
 
+    /** @var Ebizmarts_MailChimp_Helper_Data $mailchimpHelper */
+    private $mailchimpHelper;
+
+    public function __construct()
+    {
+        $this->mailchimpHelper = Mage::helper('mailchimp');
+    }
+
     /**
      * Set the request for orders to be created on MailChimp
      *
@@ -214,6 +222,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
         }
 
+        $this->mailchimpHelper->logDebug(
+            "Creating e-commerce batch for store $magentoStoreId: " .
+            "Adding order ID {$data['id']} " . (isset($data['campaign_id']) ? "campaign ID " . $data['campaign_id'].' ' : '') .
+            "currency {$data['currency_code']} total {$data['order_total']} tax {$data['tax_total']} " .
+            "discount {$data['discount_total']} shipping {$data['shipping_total']}",
+            $magentoStoreId
+        );
+
         $data['lines'] = array();
         //order lines
         $items = $order->getAllVisibleItems();
@@ -243,6 +259,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "quantity" => (int)$item->getQtyOrdered(),
                     "price" => $item->getPrice(),
                     "discount" => abs($item->getDiscountAmount())
+                );
+
+                $this->mailchimpHelper->logDebug(
+                    " => Store $magentoStoreId batch for order ID  {$data['id']} " .
+                    "item $itemCount product ID $productId variant $variant quantity ".(int)$item->getQtyOrdered() . ' ' .
+                    "price " . $item->getPrice() . " discount " . abs($item->getDiscountAmount()),
+                    $magentoStoreId
                 );
             }
         }
