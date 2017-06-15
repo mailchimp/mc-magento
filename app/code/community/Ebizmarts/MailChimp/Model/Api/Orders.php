@@ -137,8 +137,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
                 if (count($productData)) {
                     foreach ($productData as $p) {
-                        $batchArray[$this->_counter] = $p;
-                        $this->_counter++;
+                        if (!empty($p)) {
+                            $batchArray[$this->_counter] = $p;
+                            $this->_counter++;
+                        }
                     }
                 }
 
