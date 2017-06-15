@@ -298,7 +298,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                             if ($fname !== $subscriber->getSubscriberFirstname() || $lname !== $subscriber->getSubscriberLastname()) {
                                 $fn = $this->_getLogString($subscriber->getFirstname());
                                 $ln = $this->_getLogString($subscriber->getLastname());
-                                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating subscriber ID " . $subscriber->getId() . " first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
+                                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating subscriber ID " . $subscriber->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
                                 $subscriber->setSubscriberFirstname($fname);
                                 $subscriber->setSubscriberLastname($lname);
                                 $subscriber->save();
