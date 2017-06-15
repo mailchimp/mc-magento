@@ -273,67 +273,71 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $fnameDisplay = $this->_getLogString($fname);
         $lnameDisplay = $this->_getLogString($lname);
 
-        try {
-            /** @var Mage_Customer_Model_Customer $customer */
-            $customer = $this->_helper->loadListCustomer($listId, $email);
-            if ($customer) {
-                if ($fname !== $customer->getFirstname() || $lname !== $customer->getLastname()) {
-                    $fn = $this->_getLogString($customer->getFirstname());
-                    $ln = $this->_getLogString($customer->getLastname());
-                    $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating customer ID " . $customer->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
-                    $customer->setFirstname($fname);
-                    $customer->setLastname($lname);
-                    $customer->save();
-                    $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated customer ID " . $customer->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
-                } else {
-                    $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: customer ID " . $customer->getId() . " first name $fnameDisplay and last name $lnameDisplay unchanged");
-                }
-            } else {
-                $subscriber = $this->_helper->loadListSubscriber($listId, $email);
-                if ($subscriber) {
-                    if ($subscriber->getId()) {
-                        if ($fname !== $subscriber->getSubscriberFirstname() || $lname !== $subscriber->getSubscriberLastname()) {
-                            $fn = $this->_getLogString($subscriber->getFirstname());
-                            $ln = $this->_getLogString($subscriber->getLastname());
-                            $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating subscriber ID " . $subscriber->getId() . " first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
-                            $subscriber->setSubscriberFirstname($fname);
-                            $subscriber->setSubscriberLastname($lname);
-                            $subscriber->save();
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated subscriber ID " . $subscriber->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
-                        } else {
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: no change to subscriber ID " . $subscriber->getId() . " with first name $fnameDisplay and last name $lnameDisplay unchanged");
-                        }
+        if (empty($fname) && empty($lname)) {
+            $this->_helper->logWarning("Profile web hook request for member $email on list ID $listId: first name and last name are missing or empty: ignoring!");
+        } else {
+            try {
+                /** @var Mage_Customer_Model_Customer $customer */
+                $customer = $this->_helper->loadListCustomer($listId, $email);
+                if ($customer) {
+                    if ($fname !== $customer->getFirstname() || $lname !== $customer->getLastname()) {
+                        $fn = $this->_getLogString($customer->getFirstname());
+                        $ln = $this->_getLogString($customer->getLastname());
+                        $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating customer ID " . $customer->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
+                        $customer->setFirstname($fname);
+                        $customer->setLastname($lname);
+                        $customer->save();
+                        $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated customer ID " . $customer->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
                     } else {
-                        /**
-                         * Mailchimp subscriber not currently in magento newsletter subscribers.
-                         * Get mailchimp subscriber status and add missing newsletter subscriber.
-                         */
-                        $api = $this->_helper->getApi($subscriber->getStoreId());
-                        $subscriber->setSubscriberFirstname($fname);
-                        $subscriber->setSubscriberLastname($lname);
-                        $md5HashEmail = md5(strtolower($email));
-                        $member = $api->lists->members->get($listId, $md5HashEmail, null, null);
-                        if ($member['status'] == 'subscribed') {
-                            $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: adding new subscribed member");
-                            $this->subscribeMember($subscriber);
-                            $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new subscribed member as ID " . $subscriber->getId());
-                        } elseif ($member['status'] == 'unsubscribed') {
-                            if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
-                                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: adding new un-subscribed member");
-                                $this->unsubscribeMember($subscriber);
-                                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new un-subscribed member as ID " . $subscriber->getId());
-                            }
-                        }
+                        $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: customer ID " . $customer->getId() . " first name $fnameDisplay and last name $lnameDisplay unchanged");
                     }
                 } else {
-                    $this->_helper->logWarning("Ignoring profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: no magento store is synchronised to that MailChimp list!");
+                    $subscriber = $this->_helper->loadListSubscriber($listId, $email);
+                    if ($subscriber) {
+                        if ($subscriber->getId()) {
+                            if ($fname !== $subscriber->getSubscriberFirstname() || $lname !== $subscriber->getSubscriberLastname()) {
+                                $fn = $this->_getLogString($subscriber->getFirstname());
+                                $ln = $this->_getLogString($subscriber->getLastname());
+                                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: updating subscriber ID " . $subscriber->getId() . " first name from $fnameDisplay to $fn and last name from $lnameDisplay to $ln");
+                                $subscriber->setSubscriberFirstname($fname);
+                                $subscriber->setSubscriberLastname($lname);
+                                $subscriber->save();
+                                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: updated subscriber ID " . $subscriber->getId() . " first name from $fn to $fnameDisplay and last name from $ln to $lnameDisplay");
+                            } else {
+                                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: no change to subscriber ID " . $subscriber->getId() . " with first name $fnameDisplay and last name $lnameDisplay unchanged");
+                            }
+                        } else {
+                            /**
+                             * Mailchimp subscriber not currently in magento newsletter subscribers.
+                             * Get mailchimp subscriber status and add missing newsletter subscriber.
+                             */
+                            $api = $this->_helper->getApi($subscriber->getStoreId());
+                            $subscriber->setSubscriberFirstname($fname);
+                            $subscriber->setSubscriberLastname($lname);
+                            $md5HashEmail = md5(strtolower($email));
+                            $member = $api->lists->members->get($listId, $md5HashEmail, null, null);
+                            if ($member['status'] == 'subscribed') {
+                                $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: adding new subscribed member");
+                                $this->subscribeMember($subscriber);
+                                $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new subscribed member as ID " . $subscriber->getId());
+                            } elseif ($member['status'] == 'unsubscribed') {
+                                if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
+                                    $this->_helper->logDebug("Profile web hook request for member $email on list ID $listId: adding new un-subscribed member");
+                                    $this->unsubscribeMember($subscriber);
+                                    $this->_helper->logInfo("Profile web hook request for member $email on list ID $listId: added new un-subscribed member as ID " . $subscriber->getId());
+                                }
+                            }
+                        }
+                    } else {
+                        $this->_helper->logWarning("Ignoring profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: no magento store is synchronised to that MailChimp list!");
+                    }
                 }
+            } catch (MailChimp_Error $e) {
+                $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: " . $e->getFriendlyMessage());
+            } catch (Exception $e) {
+                $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: " . $e->getMessage());
+                Mage::logException($e);
             }
-        } catch (MailChimp_Error $e) {
-            $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: " . $e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $this->_helper->logError("Failed to process profile web hook request for member $email fname $fnameDisplay lname $lnameDisplay on list ID $listId: " . $e->getMessage());
-            Mage::logException($e);
         }
     }
 }
