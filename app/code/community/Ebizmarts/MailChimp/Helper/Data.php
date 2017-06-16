@@ -1737,8 +1737,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                      * No customer with that address. Just assume the first
                      * store ID is the correct one as there is no other way
                      * to tell which store this mailchimp list guest subscriber
-                     * belongs to. 
-*/
+                     * belongs to.
+                     */
                     $subscriber->setStoreId($storeIds[0]);
                 }
             }

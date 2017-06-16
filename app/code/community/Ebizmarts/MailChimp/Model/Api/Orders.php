@@ -262,7 +262,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 );
 
                 $this->mailchimpHelper->logDebug(
-                    " => Store $magentoStoreId batch for order ID  {$data['id']} " .
+                    " => Store $magentoStoreId batch for order ID {$data['id']} " .
                     "item $itemCount product ID $productId variant $variant quantity ".(int)$item->getQtyOrdered() . ' ' .
                     "price " . $item->getPrice() . " discount " . abs($item->getDiscountAmount()),
                     $magentoStoreId
