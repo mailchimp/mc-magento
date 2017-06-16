@@ -234,7 +234,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
  * @var Mage_Customer_Model_Resource_Customer_Collection $collection 
 */
         $collection = $this->getCustomerResourceCollection();
-        $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($this->getBatchMagentoStoreId())));
+        $collection->addFieldToFilter('store_id', array('eq' => $this->getBatchMagentoStoreId()));
 
         $collection->addNameToSelect();
 
