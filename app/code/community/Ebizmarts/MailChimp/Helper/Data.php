@@ -820,7 +820,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('related_id', array('eq' => $itemId))
             ->addFieldToFilter('type', array('eq' => $itemType))
-            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId))
+            ->setCurPage(1)
+            ->setPageSize(1);
+
         if ($collection->getSize()) {
             $ecommerceSyndDataItem = $collection->getFirstItem();
         } else {
