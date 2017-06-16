@@ -78,14 +78,17 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $oldSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $old);
         $newSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $new);
 
-        if ($oldSubscriber) {
-            if (!$newSubscriber->getId()) {
-                if ($oldSubscriber->getId()) {
-                    $oldSubscriber->setSubscriberEmail($new)
-                        ->save();
-                } else {
-                    $this->subscribeMember($newSubscriber);
-                }
+        // Update only if there is no existing subscriber with this new email
+        if (!$newSubscriber || !$newSubscriber->getId()) {
+            // Update if subscriber exists with old email.
+            if ($oldSubscriber && $oldSubscriber->getId()) {
+                $oldSubscriber->setSubscriberEmail($new)
+                    ->save();
+            }
+
+            // Else, save as new subscriber
+            else if ($newSubscriber) {
+                $this->subscribeMember($newSubscriber);
             }
         }
     }
