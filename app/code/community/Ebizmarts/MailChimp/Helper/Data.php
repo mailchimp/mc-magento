@@ -1560,6 +1560,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $subscriber = null;
 
         $storeIds = $this->getMagentoStoreIdsByListId($listId);
+        //add store id 0 for those created from the back end.
+        $storeIds[] = 0;
         if (count($storeIds) > 0) {
             $subscriber = Mage::getModel('newsletter/subscriber')->getCollection()
                 ->addFieldToFilter('store_id', array('in' => $storeIds))
