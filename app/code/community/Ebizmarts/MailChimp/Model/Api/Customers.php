@@ -15,8 +15,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     const BATCH_LIMIT = 100;
 
     /**
- * @var Ebizmarts_MailChimp_Helper_Data 
-*/
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     private $mailchimpHelper;
     private $optInConfiguration;
     private $optInStatusForStore;
@@ -224,15 +224,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @return Mage_Customer_Model_Resource_Customer_Collection
      */
     public function makeCustomersNotSentCollection()
     {
         /**
- * @var Mage_Customer_Model_Resource_Customer_Collection $collection 
-*/
+         * @var Mage_Customer_Model_Resource_Customer_Collection $collection
+         */
         $collection = $this->getCustomerResourceCollection();
         $collection->addFieldToFilter('store_id', array('eq' => $this->getBatchMagentoStoreId()));
 
@@ -276,7 +274,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $mailchimpStoreId
      * @param $collection
      */
     protected function joinMailchimpSyncData($collection)
@@ -378,7 +375,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $magentoStoreId
      * @param $customer
      */
     protected function logCouldNotEncodeCustomerError($customer)
