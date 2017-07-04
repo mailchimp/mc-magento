@@ -464,6 +464,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if ($errorDetails == "") {
                         $errorDetails = $response->detail;
                     }
+                    if (strstr($errorDetails, 'already exists in the account')) {
+                        continue;
+                    }
 
                     $error = $response->title . " : " . $response->detail;
 
