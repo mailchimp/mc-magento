@@ -526,7 +526,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $data = array();
         $data["sku"]   = $product->getSku();
-        $data["price"] = (int)$product->getPrice();
+        $data["price"] = (float)$product->getPrice();
 
         //stock
         $data["inventory_quantity"] = (int)$product->getQty();
