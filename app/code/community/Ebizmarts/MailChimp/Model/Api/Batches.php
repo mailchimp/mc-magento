@@ -549,10 +549,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function saveSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
                                     $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false)
     {
+        $helper = $this->getHelper();
         if ($itemType == 'SUB') {
-            $this->getHelper()->updateSubscriberSyndData($itemId,$syncDelta, $syncError, 0, null);
+            $helper->updateSubscriberSyndData($itemId,$syncDelta, $syncError, 0, null);
         } else {
-            $this->getHelper()->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $saveOnlyIfexists);
+            $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $saveOnlyIfexists);
         }
     }
 }
