@@ -31,7 +31,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $collection = $this->makeProductsNotSentCollection($mailchimpStoreId, $magentoStoreId);
+        if (Mage::helper('catalog/category_flat')->isEnabled()) {
+            Mage::app()->getStore($magentoStoreId)
+                ->setConfig(Mage_Catalog_Helper_Category_Flat::XML_PATH_IS_ENABLED_FLAT_CATALOG_CATEGORY, 0)
+                ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
+        }
+        $collection = $this->makeProductsNotSentCollection($magentoStoreId);
         $this->joinMailchimpSyncData($mailchimpStoreId, $collection);
         $batchArray = array();
 
@@ -62,7 +67,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now(), "This product type is not supported on MailChimp.");
             }
         }
-
         return $batchArray;
     }
 
@@ -74,7 +78,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else if ($this->isConfigurableProduct($product)) {
             $variantProducts[] = $product;
 
-            $collection = $this->makeProductChildrenCollection($mailchimpStoreId, $magentoStoreId);
+            $collection = $this->makeProductChildrenCollection($magentoStoreId);
 
             $childProducts = $this->getConfigurableChildrenIds($product);
             $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
@@ -278,7 +282,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
             }
         }
-
         return $data;
     }
 
@@ -570,9 +573,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
-    protected function makeProductChildrenCollection($mailchimpStoreId, $magentoStoreId)
+    protected function makeProductChildrenCollection($magentoStoreId)
     {
-        return $this->makeProductsNotSentCollection($mailchimpStoreId, $magentoStoreId);
+        return $this->makeProductsNotSentCollection($magentoStoreId);
     }
 
     /**
