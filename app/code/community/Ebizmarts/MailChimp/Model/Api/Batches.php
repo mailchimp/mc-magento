@@ -465,9 +465,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $errorDetails = $response->detail;
                     }
 
+                    if (strstr($errorDetails, 'already exists in the account')) {
+                        $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, null, null, true);
+                        continue;
+                    }
                     $error = $response->title . " : " . $response->detail;
 
-                    $this->getHelper()->saveEcommerceSyncData($id, $type, $mailchimpStoreId, null, $error, 0, null, null, true);
+                    $this->saveSyncData($id, $type, $mailchimpStoreId, null, $error, 0, null, null, true);
 
                     $mailchimpErrors->setType($response->type);
                     $mailchimpErrors->setTitle($response->title);
@@ -539,6 +543,16 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $this->getHelper()->logError($e->getFriendlyMessage(), $magentoStoreId);
         } catch (Exception $e) {
             $this->getHelper()->logError($e->getMessage(), $magentoStoreId);
+        }
+    }
+
+    protected function saveSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
+                                    $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false)
+    {
+        if ($itemType == 'SUB') {
+            $this->getHelper()->updateSubscriberSyndData($itemId,$syncDelta, $syncError, 0, null);
+        } else {
+            $this->getHelper()->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $saveOnlyIfexists);
         }
     }
 }
