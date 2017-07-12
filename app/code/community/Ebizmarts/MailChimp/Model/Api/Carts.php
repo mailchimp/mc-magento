@@ -164,15 +164,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
 
             // send the products that not already sent
-            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId, $magentoStoreId);
-            if (count($productData)) {
-                foreach($productData as $p) {
-                    if (!empty($p)) {
-                        $allCarts[$this->_counter] = $p;
-                        $this->_counter += 1;
-                    }
-                }
-            }
+            $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
             if ($cartJson!="") {
@@ -259,15 +251,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
 
             // send the products that not already sent
-            $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId, $magentoStoreId);
-            if (count($productData)) {
-                foreach($productData as $p) {
-                    if (!empty($p)) {
-                        $allCarts[$this->_counter] = $p;
-                        $this->_counter += 1;
-                    }
-                }
-            }
+            $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
             if ($cartJson!="") {
@@ -506,5 +490,21 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null)
     {
         Mage::helper('mailchimp')->saveEcommerceSyncData($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token);
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @param $cart
+     * @param $allCarts
+     * @return mixed
+     */
+    public function addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts)
+    {
+        $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId, $magentoStoreId);
+        $productDataArray = Mage::helper('mailchimp')->addEntriesToArray($allCarts, $productData, $this->_counter);
+        $allCarts = $productDataArray[0];
+        $this->_counter = $productDataArray[1];
+        return $allCarts;
     }
 }

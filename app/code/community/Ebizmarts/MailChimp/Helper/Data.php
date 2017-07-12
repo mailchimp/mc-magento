@@ -1625,4 +1625,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $customer;
     }
+
+    /**
+     * @param $batchArray
+     * @param $productData
+     * @param $counter
+     * @return mixed
+     */
+    public function addEntriesToArray($batchArray, $productData, $counter)
+    {
+        if (count($productData)) {
+            foreach ($productData as $p) {
+                if (!empty($p)) {
+                    $batchArray[$counter] = $p;
+                    $counter++;
+                }
+            }
+        }
+        return array($batchArray, $counter);
+    }
 }
