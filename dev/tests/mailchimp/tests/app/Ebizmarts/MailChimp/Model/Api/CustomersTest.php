@@ -83,7 +83,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 'joinDefaultBillingAddress',
                 'joinSalesData',
                 'getBatchLimitFromConfig',
-                'getWebsiteIdForStoreId',
                 'getBatchMagentoStoreId',
                 'getCustomerResourceCollection'
             )
@@ -108,7 +107,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock->expects($this->once())->method('joinDefaultBillingAddress');
         $this->customersApiMock->expects($this->once())->method('joinSalesData');
         $this->customersApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
-        $this->customersApiMock->expects($this->once())->method('getWebsiteIdForStoreId')->with(1)->willReturn(1);
 
         $collection = $this->customersApiMock->makeCustomersNotSentCollection();
 
