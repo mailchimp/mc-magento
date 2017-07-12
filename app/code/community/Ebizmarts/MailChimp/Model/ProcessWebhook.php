@@ -11,6 +11,7 @@
  */
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
+    const BATCH_LIMIT   = 50;
     /**
      * Webhooks request url path
      *
@@ -36,6 +37,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     public function processWebhookData()
     {
         $collection = Mage::getResourceModel('mailchimp/webhookrequest_collection');
+        $collection->addFieldToFilter('processed',array('eq'=>0));
+        $collection->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($collection as $webhookRequest) {
             $data = unserialize($webhookRequest->getDataRequest());
 
@@ -75,12 +78,14 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $oldSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $old);
         $newSubscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $new);
 
-        if (!$newSubscriber->getId()) {
-            if ($oldSubscriber->getId()) {
-                $oldSubscriber->setSubscriberEmail($new)
-                    ->save();
-            } else {
-                $this->subscribeMember($newSubscriber);
+        if ($oldSubscriber) {
+            if (!$newSubscriber->getId()) {
+                if ($oldSubscriber->getId()) {
+                    $oldSubscriber->setSubscriberEmail($new)
+                        ->save();
+                } else {
+                    $this->subscribeMember($newSubscriber);
+                }
             }
         }
     }
@@ -96,7 +101,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         //Delete subscriber from Magento
         $s = Mage::helper('mailchimp')->loadListSubscriber($data['list_id'], $data['email']);
 
-        if ($s->getId()) {
+        if ($s && $s->getId()) {
             try {
                 $s->delete();
             } catch (Exception $e) {
@@ -117,21 +122,23 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $listId = $data['list_id'];
             $email = $data['email'];
             $subscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $email);
-            if ($subscriber->getId()) {
-                if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+            if ($subscriber) {
+                if ($subscriber->getId()) {
+                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+                        $this->subscribeMember($subscriber);
+                    }
+                } else {
+                    if (isset($data['merges']['FNAME'])) {
+                        $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
+                        $subscriber->setSubscriberFirstname($subscriberFname);
+                    }
+
+                    if (isset($data['merges']['LNAME'])) {
+                        $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
+                        $subscriber->setSubscriberLastname($subscriberLname);
+                    }
                     $this->subscribeMember($subscriber);
                 }
-            } else {
-                if (isset($data['merges']['FNAME'])) {
-                    $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
-                    $subscriber->setSubscriberFirstname($subscriberFname);
-                }
-
-                if (isset($data['merges']['LNAME'])) {
-                    $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
-                    $subscriber->setSubscriberLastname($subscriberLname);
-                }
-                $this->subscribeMember($subscriber);
             }
         } catch (Exception $e) {
             Mage::logException($e);
@@ -168,7 +175,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected function _unsubscribe(array $data)
     {
         $subscriber = Mage::helper('mailchimp')->loadListSubscriber($data['list_id'], $data['email']);
-        if ($subscriber->getId()) {
+        if ($subscriber && $subscriber->getId()) {
             try {
                 $action = isset($data['action']) ? $data['action'] : 'delete';
                 switch ($action) {
