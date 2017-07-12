@@ -72,6 +72,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             try {
                 $orderId = $item->getEntityId();
                 $order = Mage::getModel('sales/order')->load($orderId);
+                $incrementId = $order->getIncrementId();
                 //create missing products first
                 $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
                 if (count($productData)) {
@@ -84,7 +85,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "PATCH";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $orderId;
+                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $incrementId;
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                 } else {
