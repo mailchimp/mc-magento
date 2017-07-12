@@ -320,6 +320,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
                         Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
                         $subscriber->unsubscribe();
+                        $this->_processUpdateSubscriberError($e, $storeId);
                     } catch (Exception $e) {
                         Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
                     }
@@ -327,6 +328,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
                     Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
                     $subscriber->unsubscribe();
+                    $this->_processUpdateSubscriberError($e, $storeId);
                 }
             } else {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $storeId);
@@ -335,6 +337,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $storeId);
         }
+    }
+
+    /**
+    * @param $e
+    * @param $storeId
+    */
+    protected function _processUpdateSubscriberError($e, $storeId)
+    {
+        $message = $e->getFriendlyMessage();
+        Mage::helper('mailchimp')->logError($message, $storeId);
+        if (Mage::getDesign()->getArea() === 'frontend') {
+            $message = Mage::helper('mailchimp')->__('Please, try again later');
+        }
+        Mage::getSingleton('core/session')->addError($message);
     }
 
     /**
