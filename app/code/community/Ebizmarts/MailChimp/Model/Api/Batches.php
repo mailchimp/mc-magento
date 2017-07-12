@@ -120,7 +120,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * Get results of batch operations sent to MailChimp.
      *
      * @param $magentoStoreId
-     * @param bool           $isEcommerceData
+     * @param bool $isEcommerceData
      */
     protected function _getResults($magentoStoreId, $isEcommerceData = true)
     {
@@ -241,16 +241,53 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function deleteUnsentItems()
     {
-        $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-        $write_connection->delete($resource->getMainTable(), "batch_id IS NULL");
+        $ecommerceDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('batch_id', array('null' => true));
+        Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceDeleteCallback')));
+    }
+
+    public function ecommerceDeleteCallback($args)
+    {
+        $ecommerceData = Mage::getModel('mailchimp/ecommercesyncdata');
+        $ecommerceData->setData($args['row']);
+        $ecommerceData->delete();
     }
 
     protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
     {
-        $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $ecommerceDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('batch_id', array('null' => true))
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
+        Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceSentCallback')));
+        foreach ($ecommerceDataCollection as $ecommerceData) {
+            $ecommerceData->setBatchId($batchResponseId)
+                ->save();
+        }
+    }
+
+    public function ecommerceSentCallback($args)
+    {
+        $ecommerceData = Mage::getModel('mailchimp/ecommercesyncdata');
+        $ecommerceData->setData($args['row']); // map data to customer model
+        $writeAdapter = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $insertData = array(
+            'id' => $ecommerceData->getId(),
+            'related_id' => $ecommerceData->getRelatedId(),
+            'type' => $ecommerceData->getType(),
+            'mailchimp_store_id' => $ecommerceData->getMailchimpStoreId(),
+            'mailchimp_sync_error' => $ecommerceData->getMailchimpSyncError(),
+            'mailchimp_sync_delta' => $ecommerceData->getMailchimpSyncDelta(),
+            'mailchimp_sync_modified' => $ecommerceData->getMailchimpSyncModified(),
+            'mailchimp_sync_deleted' => $ecommerceData->getMailchimpSyncDeleted(),
+            'mailchimp_token' => $ecommerceData->getMailchimpToken(),
+            'batch_id' => $ecommerceData->getBatchId()
+        );
         $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-        $write_connection->update($resource->getMainTable(), array('batch_id' => $batchResponseId), "batch_id IS NULL AND mailchimp_store_id = '" . $mailchimpStoreId . "'");
+        $writeAdapter->insertOnDuplicate(
+            $resource->getMainTable(),
+            $insertData,
+            array('id', 'related_id', 'type', 'mailchimp_store_id', 'mailchimp_sync_error', 'mailchimp_sync_delta', 'mailchimp_sync_modified', 'mailchimp_sync_deleted', 'mailchimp_token', 'batch_id')
+        );
     }
 
     /**
