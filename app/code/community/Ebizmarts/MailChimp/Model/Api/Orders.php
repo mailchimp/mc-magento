@@ -74,13 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $order = Mage::getModel('sales/order')->load($orderId);
                 $incrementId = $order->getIncrementId();
                 //create missing products first
-                $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
-                if (count($productData)) {
-                    foreach ($productData as $p) {
-                        $batchArray[$this->_counter] = $p;
-                        $this->_counter++;
-                    }
-                }
+                $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
                 if (!empty($orderJson)) {
@@ -133,13 +127,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderId = $item->getEntityId();
                 $order = Mage::getModel('sales/order')->load($orderId);
                 //create missing products first
-                $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
-                if (count($productData)) {
-                    foreach ($productData as $p) {
-                        $batchArray[$this->_counter] = $p;
-                        $this->_counter++;
-                    }
-                }
+                $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
@@ -602,6 +590,23 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         Mage::helper('mailchimp')->saveMailchimpConfig($config, $magentoStoreId, 'stores');
+        return $batchArray;
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @param $order
+     * @param $batchArray
+     * @return mixed
+     */
+    public function addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray)
+    {
+        $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
+        $productDataArray = Mage::helper('mailchimp')->addEntriesToArray($batchArray, $productData, $this->_counter);
+        $batchArray = $productDataArray[0];
+        $this->_counter = $productDataArray[1];
+
         return $batchArray;
     }
 }

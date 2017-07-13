@@ -522,8 +522,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductVariantData($product)
     {
         $data = array();
-        $data["sku"] = $product->getSku();
-        $data["price"] = (int)$product->getPrice();
+        $data["sku"]   = $product->getSku();
+        $data["price"] = (float)$product->getPrice();
 
         //stock
         $data["inventory_quantity"] = (int)$product->getQty();
@@ -544,15 +544,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $magentoStoreId
-     * @return int|null|string
-     */
-    protected function getWebsiteIdForStoreId($magentoStoreId)
-    {
-        return Mage::app()->getStore($magentoStoreId)->getWebsiteId();
-    }
-
-    /**
      * @param $product
      * @return array
      */
@@ -568,7 +559,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
