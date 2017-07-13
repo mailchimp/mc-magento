@@ -559,7 +559,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */

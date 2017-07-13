@@ -49,7 +49,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $this->productsApiMock->expects($this->once())->method('joinMailchimpSyncData');
         $this->productsApiMock->expects($this->once())->method('shouldSendProductUpdate')->willReturn(false);
 
-        $this->productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')->with('dasds231231312', 0)
+        $this->productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')->with(0)
             ->willReturn($this->productCollection());
 
         $this->productsApiMock->expects($this->once())->method("makeProductChildrenCollection")
@@ -149,7 +149,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $this->productsApiMock->expects($this->once())->method('joinProductAttributes');
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection');
 
-        $collection = $this->productsApiMock->makeProductsNotSentCollection('dasds123321', 0);
+        $collection = $this->productsApiMock->makeProductsNotSentCollection(0);
 
         $this->assertInstanceOf("Mage_Catalog_Model_Resource_Product_Collection", $collection);
     }
