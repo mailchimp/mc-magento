@@ -298,7 +298,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _sendSubscriberBatches()
     {
-        $subscriberLimit = Ebizmarts_MailChimp_Model_Api_subscribers::BATCH_LIMIT;
+        $subscriberLimit = Ebizmarts_MailChimp_Model_Api_Subscribers::BATCH_LIMIT;
         $stores = Mage::app()->getStores();
         $batchResponses = array();
         foreach ($stores as $store) {
@@ -463,6 +463,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     if ($errorDetails == "") {
                         $errorDetails = $response->detail;
+                    }
+                    if (strstr($errorDetails, 'already exists in the account')) {
+                        continue;
                     }
 
                     if (strstr($errorDetails, 'already exists in the account')) {
