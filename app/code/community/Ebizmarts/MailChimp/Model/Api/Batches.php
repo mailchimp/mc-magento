@@ -220,6 +220,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     if ($helper->getMCIsSyncing($magentoStoreId) && $itemAmount == 0) {
                         Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, false, $mailchimpStoreId, $magentoStoreId);
+                        $helper->handleWebhookChange($magentoStoreId);
                     }
                 } catch (MailChimp_Error $e) {
                     $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
@@ -462,6 +463,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     if ($errorDetails == "") {
                         $errorDetails = $response->detail;
+                    }
+                    if (strstr($errorDetails, 'already exists in the account')) {
+                        continue;
                     }
 
                     $error = $response->title . " : " . $response->detail;
