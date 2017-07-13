@@ -991,14 +991,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getImageUrlById($productId)
     {
-        $productMediaConfig = Mage::getModel('catalog/product_media_config');
-        $product = Mage::getModel('catalog/product')->load($productId);
-        if ($product->getImage() == 'no_selection') {
+        $productMediaConfig = $this->getProductMediaConfig();
+        $product = $this->loadProductById($productId);
+        $productImage = $product->getImage();
+        if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
-            $imageUrl = $productMediaConfig->getMediaUrl($product->getImage());
+            $imageUrl = $productMediaConfig->getMediaUrl($productImage);
         }
         return $imageUrl;
+    }
+
+    private function getProductMediaConfig()
+    {
+        return Mage::getModel('catalog/product_media_config');
+    }
+
+    private function loadProductById($productId)
+    {
+        return Mage::getModel('catalog/product')->load($productId);
     }
 
     /**
@@ -1791,7 +1802,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Return true if
+     * Return true if the config entry does not belong to the store required or website that contains that store.
      *
      * @param $config
      * @param $scope
@@ -1819,5 +1830,24 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
             $subscriber->save();
         }
+    }
+  
+    /**
+     * @param $batchArray
+     * @param $productData
+     * @param $counter
+     * @return mixed
+     */
+    public function addEntriesToArray($batchArray, $productData, $counter)
+    {
+        if (count($productData)) {
+            foreach ($productData as $p) {
+                if (!empty($p)) {
+                    $batchArray[$counter] = $p;
+                    $counter++;
+                }
+            }
+        }
+        return array($batchArray, $counter);
     }
 }
