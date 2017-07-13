@@ -141,7 +141,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
         $productResourceCollectionMock->expects($this->exactly(2))->method('getSelect')->willReturn($dbSelectMock);
         $productResourceCollectionMock->expects($this->once())->method('addStoreFilter');
-        $productResourceCollectionMock->expects($this->once())->method('addPriceData')->with(null, 1);
 
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection')
             ->willReturn($productResourceCollectionMock);

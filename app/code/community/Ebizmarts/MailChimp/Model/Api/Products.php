@@ -514,7 +514,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * @param $product
-     * @param $data
      * @return mixed
      */
     protected function getProductVariantData($product)
