@@ -542,15 +542,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $magentoStoreId
-     * @return int|null|string
-     */
-    protected function getWebsiteIdForStoreId($magentoStoreId)
-    {
-        return Mage::app()->getStore($magentoStoreId)->getWebsiteId();
-    }
-
-    /**
      * @param $product
      * @return array
      */
