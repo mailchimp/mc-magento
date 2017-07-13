@@ -13,7 +13,6 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
      * @param $magentoStatus
      * @param $storeId
      * @param $expected
-     * @param $configConfirmation
      * @dataProvider magentoSubscriberStatus
      */
     public function testMailchimpStatus($magentoStatus, $storeId, $expected)

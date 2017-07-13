@@ -23,7 +23,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $post = Mage::app()->getRequest()->getPost();
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
 
-        if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0])) {
+        if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
             $this->makeHelper()->removeEcommerceSyncData($scopeArray[1], $scopeArray[0]);
             $this->makeHelper()->resetCampaign($scopeArray[1], $scopeArray[0]);
             $this->makeHelper()->clearErrorGrid($scopeArray[1], $scopeArray[0], true);
@@ -463,7 +463,7 @@ class Ebizmarts_MailChimp_Model_Observer
         //                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
         //                foreach ($productIds as $productId) {
         //                    $productSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-        //                    if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getMCMinSyncDateFlag($storeId)) {
+        //                    if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($storeId)) {
         //                        if ($action == 'remove' && !$productSyncData->getMailchimpSyncDeleted()) {
         //                            $productSyncData->setData("mailchimp_sync_modified", 0)
         //                                ->setData("mailchimp_sync_deleted", 1)
