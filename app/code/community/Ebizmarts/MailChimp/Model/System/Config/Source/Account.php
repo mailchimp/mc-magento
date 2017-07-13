@@ -36,9 +36,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $this->_accountDetails = $api->root->info('account_name,total_subscribers');
                 if ($mcStoreId && Mage::helper('mailchimp')->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0])) {
                     try {
-                        $storeName = $api->ecommerce->stores->get($mcStoreId, 'name');
+                        $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
+                        Mage::log($storeData, null, 'ebizmarts.log', true);
                         $this->_accountDetails['store_exists'] = true;
-                        $this->_accountDetails['store_name'] = $storeName['name'];
+                        $this->_accountDetails['store_name'] = $storeData['name'];
+                        $this->_accountDetails['store_sync_flag'] = $storeData['is_syncing'];
                         $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
                         $this->_accountDetails['total_customers'] = $totalCustomers['total_items'];
                         $totalProducts = $api->ecommerce->products->getAll($mcStoreId, 'total_items');
@@ -93,14 +95,21 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $totalCartsText = Mage::helper('mailchimp')->__('  Total Carts:');
                 $totalCarts = $totalCartsText . ' ' . $this->_accountDetails['total_carts'];
                 $title = Mage::helper('mailchimp')->__('Ecommerce Data uploaded to MailChimp store ' . $this->_accountDetails['store_name'] . ':');
+                if ($this->_accountDetails['store_sync_flag']) {
+                    $syncValue = 'In Progress';
+                } else {
+                    $syncValue = 'Finished';
+                }
+                $syncLabel = Mage::helper('mailchimp')->__('Initial sync: ' . $syncValue);
                 $returnArray = array_merge(
                     $returnArray,
                     array(
                         array('value' => 2, 'label' => $title),
-                        array('value' => 3, 'label' => $totalCustomers),
-                        array('value' => 4, 'label' => $totalProducts),
-                        array('value' => 5, 'label' => $totalOrders),
-                        array('value' => 6, 'label' => $totalCarts)
+                        array('value' => 3, 'label' => $syncLabel),
+                        array('value' => 4, 'label' => $totalCustomers),
+                        array('value' => 5, 'label' => $totalProducts),
+                        array('value' => 6, 'label' => $totalOrders),
+                        array('value' => 7, 'label' => $totalCarts)
                     )
                 );
             } elseif (Mage::helper('mailchimp')->isEcomSyncDataEnabled($scopeArray[1], $scopeArray[0], true)) {
@@ -109,8 +118,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 7, 'label' => $noStoreText),
-                        array('value' => 8, 'label' => $newStoreText)
+                        array('value' => 8, 'label' => $noStoreText),
+                        array('value' => 9, 'label' => $newStoreText)
                     )
                 );
             }
@@ -120,7 +129,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 9, 'label' => $storeMigrationText)
+                        array('value' => 10, 'label' => $storeMigrationText)
                     )
                 );
             }
