@@ -423,9 +423,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
-            ->addFieldToFilter('mailchimp_store_id', array('eq' => $this->getMCStoreId($scopeId, $scope)));
-        if ($deleteErrorsOnly) {
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
+        if (!$deleteErrorsOnly || $scopeId != 0) {
+            $collection->addFieldToFilter('mailchimp_store_id', array('eq' => $this->getMCStoreId($scopeId, $scope)));
+        } else {
             $collection->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
         }
         foreach ($collection as $item) {
@@ -517,7 +518,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         // reset subscribers with errors
         $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
-        $collection = $this->addStoresToFilter($collection, $scopeId, $scope);
+        if ($scopeId != 0) {
+            $collection = $this->addStoresToFilter($collection, $scopeId, $scope);
+        }
         foreach ($collection as $subscriber) {
             $subscriber->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
             $subscriber->setData("mailchimp_sync_error", '');
@@ -538,18 +541,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false)
     {
-        //Make sure there are no errors without MailChimp store id due to older versions.
+        //Make sure there are no errors without no MailChimp store id due to older versions.
         $this->handleOldErrors();
 
         $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-        $storesForScope = $this->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
-        if ($scopeId == 0) {
-            $storesForScope[] = 0;
-        }
-        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection')
-            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
+        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection');
         if ($excludeSubscribers) {
-            $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
+//            $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
+            $errorCollection->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
+        } else {
+            if ($scopeId != 0) {
+                $errorCollection->addFieldToFilter('store_id', array('eq' => $scopeId));
+            }
         }
 
         foreach ($errorCollection as $item) {
@@ -563,6 +566,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function handleOldErrors()
     {
         $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection')
+            ->addFieldToFilter('type', array('neq' => 'SUB'))
             ->addFieldToFilter('mailchimp_store_id', array('eq' => ''));
         foreach ($errorCollection as $error) {
             $storeId = $error->getStoreId();
@@ -1809,6 +1813,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return $config->getScopeId() != 0 && (($config->getScope() == 'stores' && $scope != 'stores') || ($config->getScope() == 'websites' && $scope == 'stores' && $config->getScopeId() != $websiteId));
     }
+
+    public function updateSubscriberSyndData($itemId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null)
+    {
+        $subscriber = Mage::getModel('newsletter/subscriber')->load($itemId);
+        if ($subscriber->getId()) {
+            if ($syncDelta) {
+                $subscriber->setData("mailchimp_sync_delta", $syncDelta);
+            }
+            if ($syncError) {
+                $subscriber->setData("mailchimp_sync_error", $syncError);
+            }
+            $subscriber->setData("mailchimp_sync_modified", $syncModified);
+            if ($syncDeleted) {
+                $subscriber->setData("mailchimp_sync_deleted", $syncDeleted);
+            }
+            $subscriber->save();
+        }
+    }
+  
     /**
      * @param $batchArray
      * @param $productData

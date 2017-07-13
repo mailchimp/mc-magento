@@ -22,12 +22,6 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $post = Mage::app()->getRequest()->getPost();
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
-        $generalEnabled = $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]);
-        $listId = $this->makeHelper()->getGeneralList($scopeArray[1], $scopeArray[0]);
-
-        if ($generalEnabled && $listId) {
-            $this->_createWebhook($listId, $scopeArray[1], $scopeArray[0]);
-        }
 
         if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfMCStoreIdExistsForScope($scopeArray[1], $scopeArray[0])) {
             $this->makeHelper()->removeEcommerceSyncData($scopeArray[1], $scopeArray[0]);
@@ -37,89 +31,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
-    }
-
-    /**
-     * Create MailChimp webhook based on the Two Way Sync field. If disabled the webhook is created only for subsciption confirmation when opt-in enabled.
-     * 
-     * @param $listId
-     * @param $scopeId
-     * @param $scope
-     */
-    protected function _createWebhook($listId, $scopeId, $scope)
-    {
-        $store = Mage::app()->getDefaultStoreView();
-        $webhooksKey = $this->makeHelper()->getWebhooksKey();
-        //Generating Webhooks URL
-        $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
-        $hookUrl = $store->getUrl(
-            $url, array(
-            'wkey' => $webhooksKey,
-            '_nosid' => true,
-            '_secure' => true,
-            )
-        );
-
-        if (false != strstr($hookUrl, '?', true)) {
-            $hookUrl = strstr($hookUrl, '?', true);
-        }
-
-        $api = $this->makeHelper()->getApi($scopeId, $scope);
-        if ($this->makeHelper()->getTwoWaySyncEnabled($scopeId, $scope)) {
-            $events = array(
-                'subscribe' => true,
-                'unsubscribe' => true,
-                'profile' => true,
-                'cleaned' => true,
-                'upemail' => true,
-                'campaign' => false
-            );
-            $sources = array(
-                'user' => true,
-                'admin' => true,
-                'api' => true
-            );
-        } else {
-            $events = array(
-                'subscribe' => true,
-                'unsubscribe' => false,
-                'profile' => false,
-                'cleaned' => false,
-                'upemail' => false,
-                'campaign' => false
-            );
-            $sources = array(
-                'user' => false,
-                'admin' => false,
-                'api' => true
-            );
-        }
-
-        try {
-            $response = $api->lists->webhooks->getAll($listId);
-            $createWebhook = true;
-            if (isset($response['total_items']) && $response['total_items'] > 0) {
-                foreach ($response['webhooks'] as $webhook) {
-                    if ($webhook['url'] == $hookUrl) {
-                        $createWebhook = false;
-                    }
-                }
-            }
-
-            if ($createWebhook) {
-                $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
-            }
-        } catch (MailChimp_Error $e) {
-            $this->makeHelper()->logError($e->getFriendlyMessage(), $scopeId, $scope);
-            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-            $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
-            if ($e->getMailchimpDetails() == $textToCompare) {
-                $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: '. $hookUrl .' is accessible externally to allow the webhook creation.';
-                Mage::getSingleton('adminhtml/session')->addError($errorMessage);
-            }
-        } catch (Exception $e) {
-            $this->makeHelper()->logError($e->getMessage(), $scopeId, $scope);
-        }
     }
 
     /**
