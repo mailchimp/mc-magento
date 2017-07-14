@@ -16,7 +16,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * Create MailChimp store.
      *
      * @param  $mailChimpStoreId
-     * @param  null             $listId
+     * @param  null $listId
      * @param  $scope
      * @param  $scopeId
      * @throws Exception
