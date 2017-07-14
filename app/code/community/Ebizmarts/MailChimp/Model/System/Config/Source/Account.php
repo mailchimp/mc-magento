@@ -76,6 +76,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      */
     public function toOptionArray()
     {
+        Mage::getSingleton('adminhtml/session')->addWarning('Hola');
         $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
         if (is_array($this->_accountDetails)) {
             $totalSubscribersText = Mage::helper('mailchimp')->__('Total subscribers:');
