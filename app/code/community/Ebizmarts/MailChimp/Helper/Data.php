@@ -544,7 +544,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         //Make sure there are no errors without no MailChimp store id due to older versions.
         $this->handleOldErrors();
 
-        $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
+        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection');
         if ($excludeSubscribers) {
 //            $errorCollection->addFieldToFilter('regtype', array('neq' => Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER));
@@ -1629,7 +1629,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $webhookScope = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scopeId, $scope);
         $listId = $this->getGeneralList($scopeId, $scope);
         $this->deleteCurrentWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
-        $this->createNewWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
+        if ($this->isMailChimpEnabled($scopeId, $scope)) {
+            $this->createNewWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
+        }
     }
 
     protected function deleteCurrentWebhook($scopeId, $scope, $listId)
@@ -1655,7 +1657,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $hookUrl = $this->getWebhookUrl();
 
         $api = $this->getApi($scopeId, $scope);
-        Mage::log($this->getTwoWaySyncEnabled($scopeId, $scope), null, 'ebizmarts.log', true);
         if ($this->getTwoWaySyncEnabled($scopeId, $scope)) {
             $events = array(
                 'subscribe' => true,
