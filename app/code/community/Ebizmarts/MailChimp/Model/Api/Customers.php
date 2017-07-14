@@ -132,6 +132,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         if ($customer->getRegionId()) {
             $customerAddress["province_code"] = $this->directoryRegionModel->load($customer->getRegionId())->getCode();
+            if (!$customerAddress["province_code"]) {
+                unset($customerAddress["province_code"]);
+            }
         }
 
         if ($customer->getPostcode()) {
