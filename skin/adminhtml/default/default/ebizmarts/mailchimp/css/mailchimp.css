@@ -17,11 +17,11 @@ ul.tabs a.mailchimp-section:hover {
 
 ul.tabs a.mailchimp-section span,
 ul.tabs a.mailchimp-section:hover span {
-    background: url(../images/mailchimp-tab.png) no-repeat 18px 3px;
+    background: url(../images/mailchimp-tab.png) no-repeat 18px;
     overflow: hidden;
     padding-left: 20px;
-    width: 120px;
-    height: 18px;
+    background-size: contain;
+
 }
 
 ul.tabs a.mailchimp-section.active, ul.tabs a.mailchimp-section.active:hover {
@@ -36,6 +36,7 @@ h3.mailchimp-header {
     padding-left: 20px;;
     width: 120px;
     text-indent: -9999px;
+    background-size: contain;
 }
 
 fieldset#mailchimp_general p.note a {
