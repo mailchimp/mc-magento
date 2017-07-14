@@ -206,17 +206,32 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $fname = isset($data['merges']['FNAME']) ? $data['merges']['FNAME'] : null;
         $lname = isset($data['merges']['LNAME']) ? $data['merges']['LNAME'] : null;
         $customer = Mage::helper('mailchimp')->loadListCustomer($listId, $email);
+        $saveRequired = false;
         if ($customer) {
-            $customer->setFirstname($fname);
-            $customer->setLastname($lname);
-            $customer->save();
+            if ($fname && $fname !== $customer->getFirstname()) {
+                $customer->setFirstname($fname);
+                $saveRequired = true;
+            }
+            if ($fname && $fname !== $customer->getFirstname()) {
+                $customer->setLastname($lname);
+                $saveRequired = true;
+            }
+            if ($saveRequired) {
+                $customer->save();
+            }
         } else {
             $subscriber = Mage::helper('mailchimp')->loadListSubscriber($listId, $email);
             if ($subscriber) {
                 if ($subscriber->getId()) {
-                    if ($fname !== $subscriber->getSubscriberFirstname() || $lname !== $subscriber->getSubscriberLastname()) {
+                    if ($fname && $fname !== $subscriber->getSubscriberFirstname()) {
                         $subscriber->setSubscriberFirstname($fname);
+                        $saveRequired = true;
+                    }
+                    if ($lname && $lname !== $subscriber->getSubscriberLastname()) {
                         $subscriber->setSubscriberLastname($lname);
+                        $saveRequired = true;
+                    }
+                    if ($saveRequired) {
                         $subscriber->save();
                     }
                 } else {
