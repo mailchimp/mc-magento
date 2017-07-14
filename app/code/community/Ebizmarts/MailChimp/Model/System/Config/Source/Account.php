@@ -37,7 +37,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 if ($mcStoreId && Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
                     try {
                         $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
-                        Mage::log($storeData, null, 'ebizmarts.log', true);
                         $this->_accountDetails['store_exists'] = true;
                         $this->_accountDetails['store_name'] = $storeData['name'];
                         $this->_accountDetails['store_sync_flag'] = $storeData['is_syncing'];
