@@ -386,35 +386,37 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         try {
             $baseDir = Mage::getBaseDir();
             $api = $this->getHelper()->getApi($magentoStoreId);
-            // check the status of the job
-            $response = $api->batchOperation->status($batchId);
-            if (isset($response['status']) && $response['status'] == 'finished') {
-                // get the tar.gz file with the results
-                $fileUrl = urldecode($response['response_body_url']);
-                $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
-                $fd = fopen($fileName, 'w');
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $fileUrl);
-                curl_setopt($ch, CURLOPT_FILE, $fd);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-                $r = curl_exec($ch);
-                curl_close($ch);
-                fclose($fd);
-                mkdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
-                $archive = new Mage_Archive();
-                if (file_exists($fileName)) {
-                    $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-                    $archive->unpack($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-                    $dir = scandir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-                    foreach ($dir as $d) {
-                        $name = pathinfo($d);
-                        if ($name['extension'] == 'json') {
-                            $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $d;
+            if ($api) {
+                // check the status of the job
+                $response = $api->batchOperation->status($batchId);
+                if (isset($response['status']) && $response['status'] == 'finished') {
+                    // get the tar.gz file with the results
+                    $fileUrl = urldecode($response['response_body_url']);
+                    $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
+                    $fd = fopen($fileName, 'w');
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, $fileUrl);
+                    curl_setopt($ch, CURLOPT_FILE, $fd);
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
+                    $r = curl_exec($ch);
+                    curl_close($ch);
+                    fclose($fd);
+                    mkdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
+                    $archive = new Mage_Archive();
+                    if (file_exists($fileName)) {
+                        $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                        $archive->unpack($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar', $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                        $dir = scandir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                        foreach ($dir as $d) {
+                            $name = pathinfo($d);
+                            if ($name['extension'] == 'json') {
+                                $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $d;
+                            }
                         }
-                    }
 
-                    unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
-                    unlink($fileName);
+                        unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
+                        unlink($fileName);
+                    }
                 }
             }
         } catch (MailChimp_Error $e) {
