@@ -16,7 +16,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * Create MailChimp store.
      *
      * @param  $mailChimpStoreId
-     * @param  null             $listId
+     * @param  null $listId
      * @param  $scope
      * @param  $scopeId
      * @throws Exception
@@ -103,17 +103,15 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     public function getMCJsUrl($scopeId, $scope)
     {
         try {
-            if (Mage::helper('mailchimp')->isEcomSyncDataEnabled($scopeId, $scope)) {
-                $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
-                $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-                $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
-                if (isset($response['connected_site']['site_script']['url'])) {
-                    $url = $response['connected_site']['site_script']['url'];
-                    $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
-                    $realScope = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scopeId, $scope);
-                    Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
-                    return $url;
-                }
+            $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
+            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
+            $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
+            if (isset($response['connected_site']['site_script']['url'])) {
+                $url = $response['connected_site']['site_script']['url'];
+                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
+                $realScope = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scopeId, $scope);
+                Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
+                return $url;
             }
         } catch (MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);

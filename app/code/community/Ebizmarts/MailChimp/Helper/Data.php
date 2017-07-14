@@ -1059,7 +1059,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $script = '';
         $storeId = Mage::app()->getStore()->getId();
-        if ($this->isEcommerceEnabled($storeId)) {
+        if ($this->isEcomSyncDataEnabled($storeId)) {
             $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
             if (!$url) {
                 $url = Mage::getModel('mailchimp/api_stores')->getMCJsUrl($storeId, 'stores');
