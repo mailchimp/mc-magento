@@ -556,7 +556,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         );
         // be sure that the orders are not in mailchimp
         $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''");
-        $orderCollection->getSelect()->getLimit(self::BATCH_LIMIT_ONLY_ORDERS);
+        $orderCollection->getSelect()->limit(self::BATCH_LIMIT_ONLY_ORDERS);
         foreach ($orderCollection as $order) {
             //Delete order
             $orderId = $order->getEntityId();
