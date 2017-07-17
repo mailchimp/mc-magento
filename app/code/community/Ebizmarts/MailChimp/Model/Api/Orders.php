@@ -13,6 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 {
 
     const BATCH_LIMIT = 50;
+    const BATCH_LIMIT_ONLY_ORDERS = 500;
     const PAID = 'paid';
     const PARTIALLY_PAID = 'parially_paid';
     const SHIPPED = 'shipped';
@@ -435,7 +436,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         return $returnValue;
     }
-    
+
     protected function _getMailChimpStatus($order)
     {
         $mailChimpFinancialStatus = null;
@@ -555,6 +556,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         );
         // be sure that the orders are not in mailchimp
         $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''");
+        $orderCollection->getSelect()->getLimit(self::BATCH_LIMIT_ONLY_ORDERS);
         foreach ($orderCollection as $order) {
             //Delete order
             $orderId = $order->getEntityId();
