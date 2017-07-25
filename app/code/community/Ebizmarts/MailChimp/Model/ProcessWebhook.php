@@ -212,7 +212,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 $customer->setFirstname($fname);
                 $saveRequired = true;
             }
-            if ($fname && $fname !== $customer->getFirstname()) {
+            if ($lname && $lname !== $customer->getLastname()) {
                 $customer->setLastname($lname);
                 $saveRequired = true;
             }
