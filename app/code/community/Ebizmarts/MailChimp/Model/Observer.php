@@ -316,6 +316,16 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function newOrder(Varien_Event_Observer $observer)
     {
+        $post = Mage::app()->getRequest()->getPost('mailchimp_subscribe');
+        $helper = $this->makeHelper();
+        if (isset($post)) {
+            $order = $observer->getEvent()->getOrder();
+            $email = $order->getCustomerEmail();
+            $subscriber = $helper->loadListSubscriber($post, $email);
+            if ($subscriber) {
+                Mage::getModel('mailchimp/processWebhook')->subscribeMember($subscriber);
+            }
+        }
         if(($this->_getLandingCookie())) {
             Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
         }
