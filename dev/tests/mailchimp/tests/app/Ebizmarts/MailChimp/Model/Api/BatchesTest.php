@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'isMailChimpEnabled', 'isEcomSyncDataEnabled', 'getApi', 'getIsReseted'))
+            ->setMethods(array('getMCStoreId', 'isMailChimpEnabled', 'isEcomSyncDataEnabled', 'getApi', 'getIsReseted', 'getMCIsSyncing'))
             ->getMock();
 
         $apiCustomersMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Customers::class)
@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
             ->disableOriginalConstructor()
-        //            ->setMethods(array(''))
+//                    ->setMethods(array('edit'))
             ->getMock();
 
         $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
@@ -69,6 +69,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $helperMock->expects($this->once())->method('getMCStoreId')->with(1)->willReturn('b81c3085c51fa593e1d6b0cf59884f3e');
         $helperMock->expects($this->once())->method('isMailChimpEnabled')->with(1)->willReturn(1);
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with(1)->willReturn(1);
+        $helperMock->expects($this->once())->method('getMCIsSyncing')->with(1)->willReturn(0);
 
         $apiCustomersMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
         $apiProductsMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
