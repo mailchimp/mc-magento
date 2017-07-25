@@ -618,7 +618,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $mailchimpStoreId = md5($this->getMCStoreName($scopeId, $scope) . '_' . $date);
             //create store in mailchimp
             try {
-                $response = Mage::getModel('mailchimp/api_stores')->createMailChimpStore($mailchimpStoreId, $listId, $scopeId, $scope);
+                $response = $this->getApiStores()->createMailChimpStore($mailchimpStoreId, $listId, $scopeId, $scope);
                 //save in config
                 $configValues = array(
                     array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $mailchimpStoreId),
@@ -648,13 +648,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         if (!empty($mailchimpStoreId)) {
             try {
-                Mage::getModel('mailchimp/api_stores')->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
+                $this->getApiStores()->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
             } catch (MailChimp_Error $e) {
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
 
             //delete configured webhook
-            $this->deleteCurrentWebhook($scopeId, $scope);
+            $listId = $this->getGeneralList($scopeId, $scope);
+            $this->deleteCurrentWebhook($scopeId, $scope, $listId);
             //clear store config values
             $this->deleteLocalMCStoreData($scopeId, $scope);
         }
@@ -781,7 +782,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         if ($this->getMCStoreId($scopeId, $scope) && $this->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope)) {
             try {
-                Mage::getModel('mailchimp/api_stores')->modifyName($name, $scopeId, $scope);
+                $this->getApiStores()->modifyName($name, $scopeId, $scope);
             } catch (MailChimp_Error $e) {
                 Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
@@ -1062,7 +1063,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->isEcomSyncDataEnabled($storeId)) {
             $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
             if (!$url) {
-                $url = Mage::getModel('mailchimp/api_stores')->getMCJsUrl($storeId, 'stores');
+                $url = $this->getApiStores()->getMCJsUrl($storeId, 'stores');
             }
             $script = '<script type="text/javascript" src="' . $url . '"></script>';
         }
@@ -1448,7 +1449,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $mailchimpApi = $this->getApi($storeId);
             $mailchimpStoreId = $this->getMCStoreId($storeId);
             if ($mailchimpStoreId) {
-                Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
+                $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
             }
         }
     }
@@ -1865,5 +1866,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
         return array($batchArray, $counter);
+    }
+
+    protected function getApiStores()
+    {
+        return Mage::getModel('mailchimp/api_stores');
     }
 }
