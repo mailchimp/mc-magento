@@ -1872,4 +1872,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getModel('mailchimp/api_stores');
     }
+
+    public function getCheckoutSubscribeValue($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_CHECKOUT_SUBSCRIBE, $scopeId, $scope);
+    }
+
+    public function isCheckoutSubscribeEnabled($scopeId, $scope = 'stores')
+    {
+        return ($this->isMailChimpEnabled($scopeId, $scope) && $this->getCheckoutSubscribeValue($scopeId, $scope) != Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::DISABLED);
+    }
 }

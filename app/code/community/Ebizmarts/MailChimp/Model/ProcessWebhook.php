@@ -145,7 +145,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-    protected function subscribeMember($subscriber)
+    public function subscribeMember($subscriber)
     {
         $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
         $subscriber->setSubscriberConfirmCode($subscriber->randomSequence());
