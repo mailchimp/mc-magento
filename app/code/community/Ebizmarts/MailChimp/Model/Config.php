@@ -18,13 +18,15 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_LIST                  = 'mailchimp/general/list';
     const GENERAL_OLD_LIST              = 'mailchimp/general/old_list';
     const GENERAL_LIST_CHANGED_SCOPES   = 'mailchimp/general/list_changed_scopes';
+    const GENERAL_CHECKOUT_SUBSCRIBE    = 'mailchimp/general/checkout_subscribe';
     const GENERAL_MCSTOREID             = 'mailchimp/general/storeid';
     const GENERAL_MCISSYNCING           = 'mailchimp/general/is_syicing';
-    const GENERAL_MCMINSYNCDATEFLAG     = 'mailchimp/general/mcminsyncdateflag';
+    const GENERAL_ECOMMMINSYNCDATEFLAG  = 'mailchimp/general/mcminsyncdateflag';
+    const GENERAL_SUBMINSYNCDATEFLAG    = 'mailchimp/general/subminsyncdateflag';
     const GENERAL_MCSTORE_RESETED       = 'mailchimp/general/mcstore_reset';
-    const GENERAL_SUB_MCMINSYNCDATEFLAG = 'mailchimp/general/sub_mcminsyncdateflag';
     const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
     const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
+    const GENERAL_WEBHOOK_ID            = 'mailchimp/general/webhook_id';
     const GENERAL_LOG                   = 'mailchimp/general/enable_log';
     const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
     const GENERAL_CUSTOM_MAP_FIELDS     = 'mailchimp/general/customer_map_fields';

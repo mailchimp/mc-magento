@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <layout version="0.1.0">
+    <!-- Everywhere -->
     <default>
         <reference name="head">
             <action method="addJs" ifconfig="mailchimp/general/active">
@@ -21,7 +22,9 @@
                 <script>ebizmarts/mailchimp/popup.css</script>
             </action>
             <block type="core/text" name="addMCJs">
-                <action method="setText"><text helper="mailchimp/getMCJs"></text></action>
+                <action method="setText">
+                    <text helper="mailchimp/getMCJs"></text>
+                </action>
             </block>
         </reference>
         <reference name="content">
@@ -29,4 +32,13 @@
                    template="ebizmarts/mailchimp/popup/emailcatcher.phtml"></block>
         </reference>
     </default>
+    <!-- Everywhere -->
+
+    <!-- Checkout -->
+    <checkout_onepage_review>
+        <reference name="checkout.onepage.review.info.items.after">
+            <block type="mailchimp/checkout_subscribe" name="mailchimp.subscribe" template="ebizmarts/mailchimp/checkout/subscribe.phtml"/>
+        </reference>
+    </checkout_onepage_review>
+    <!-- Checkout -->
 </layout>

@@ -82,6 +82,14 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </account_details>
+                        <reset_errors translate="label comment">
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reset_errors>
                         <list translate="label comment">
                             <label>General Subscription</label>
                             <frontend_type>select</frontend_type>
@@ -104,6 +112,16 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Warning, read the manual before change the list.]]></comment>
                         </reset_list>
+                        <checkout_subscribe translate="label comment">
+                            <label>Subscribe On Checkout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailchimp/system_config_source_checkoutsubscribe</source_model>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Show Newsletter Subscribe checkbox in the last Checkout Step (Order Review).]]></comment>
+                        </checkout_subscribe>
                         <map_fields translate="label comment">
                             <label>Customer Fields Mapping</label>
                             <frontend_model>mailchimp/adminhtml_system_config_form_field_mapfields</frontend_model>
@@ -113,9 +131,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected MailChimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </map_fields>
                         <create_fields translate="label comment">
                             <label>Create Merge Fields on MailChimp</label>
@@ -126,23 +141,18 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </create_fields>
                         <webhook_active>
                             <label>Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <backend_model>mailchimp/system_config_backend_twowaysync</backend_model>
                             <sort_order>60</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only]]></comment>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </webhook_active>
                         <webhook_delete translate="label comment">
                             <label>Webhooks Delete action</label>
@@ -153,9 +163,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment></comment>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </webhook_delete>
                         <enable_log translate="label comment">
                             <label>Enable Log</label>
@@ -166,9 +173,6 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[File is {{base_dir}}/var/log/MailChimp_Errors.log]]></comment>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </enable_log>
                         <monkey_grid translate="label comment">
                             <label>Display icon for MailChimp orders grid</label>
@@ -178,9 +182,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <depends>
-                                <active>1</active>
-                            </depends>
                         </monkey_grid>
                     </fields>
                 </general>
@@ -227,17 +228,6 @@
                                 <active>1</active>
                             </depends>
                         </firstdate>
-                        <reset_errors translate="label comment">
-                            <frontend_type>button</frontend_type>
-                            <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
-                            <sort_order>210</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends>
-                                <active>1</active>
-                            </depends>
-                        </reset_errors>
                         <reset_ecommerce_data translate="label comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetEcommerceData</frontend_model>

@@ -13,6 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 {
 
     const BATCH_LIMIT = 50;
+    const BATCH_LIMIT_ONLY_ORDERS = 500;
     const PAID = 'paid';
     const PARTIALLY_PAID = 'parially_paid';
     const SHIPPED = 'shipped';
@@ -72,19 +73,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             try {
                 $orderId = $item->getEntityId();
                 $order = Mage::getModel('sales/order')->load($orderId);
+                $incrementId = $order->getIncrementId();
                 //create missing products first
-                $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
-                if (count($productData)) {
-                    foreach ($productData as $p) {
-                        $batchArray[$this->_counter] = $p;
-                        $this->_counter++;
-                    }
-                }
+                $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "PATCH";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $orderId;
+                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $incrementId;
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                 } else {
@@ -132,13 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderId = $item->getEntityId();
                 $order = Mage::getModel('sales/order')->load($orderId);
                 //create missing products first
-                $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
-                if (count($productData)) {
-                    foreach ($productData as $p) {
-                        $batchArray[$this->_counter] = $p;
-                        $this->_counter++;
-                    }
-                }
+                $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
@@ -446,7 +436,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         return $returnValue;
     }
-    
+
     protected function _getMailChimpStatus($order)
     {
         $mailChimpFinancialStatus = null;
@@ -566,6 +556,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         );
         // be sure that the orders are not in mailchimp
         $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''");
+        $orderCollection->getSelect()->limit(self::BATCH_LIMIT_ONLY_ORDERS);
         foreach ($orderCollection as $order) {
             //Delete order
             $orderId = $order->getEntityId();
@@ -601,6 +592,23 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         Mage::helper('mailchimp')->saveMailchimpConfig($config, $magentoStoreId, 'stores');
+        return $batchArray;
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @param $order
+     * @param $batchArray
+     * @return mixed
+     */
+    public function addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray)
+    {
+        $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
+        $productDataArray = Mage::helper('mailchimp')->addEntriesToArray($batchArray, $productData, $this->_counter);
+        $batchArray = $productDataArray[0];
+        $this->_counter = $productDataArray[1];
+
         return $batchArray;
     }
 }

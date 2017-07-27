@@ -15,8 +15,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     const BATCH_LIMIT = 100;
 
     /**
- * @var Ebizmarts_MailChimp_Helper_Data 
-*/
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     private $mailchimpHelper;
     private $optInConfiguration;
     private $optInStatusForStore;
@@ -132,6 +132,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         if ($customer->getRegionId()) {
             $customerAddress["province_code"] = $this->directoryRegionModel->load($customer->getRegionId())->getCode();
+            if (!$customerAddress["province_code"]) {
+                unset($customerAddress["province_code"]);
+            }
         }
 
         if ($customer->getPostcode()) {
@@ -224,17 +227,15 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @return Mage_Customer_Model_Resource_Customer_Collection
      */
     public function makeCustomersNotSentCollection()
     {
         /**
- * @var Mage_Customer_Model_Resource_Customer_Collection $collection 
-*/
+         * @var Mage_Customer_Model_Resource_Customer_Collection $collection
+         */
         $collection = $this->getCustomerResourceCollection();
-        $collection->addFieldToFilter('website_id', array('eq' => $this->getWebsiteIdForStoreId($this->getBatchMagentoStoreId())));
+        $collection->addFieldToFilter('store_id', array('eq' => $this->getBatchMagentoStoreId()));
 
         $collection->addNameToSelect();
 
@@ -276,7 +277,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $mailchimpStoreId
      * @param $collection
      */
     protected function joinMailchimpSyncData($collection)
@@ -296,15 +296,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         );
 
         $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
-    }
-
-    /**
-     * @param $magentoStoreId
-     * @return int|null|string
-     */
-    protected function getWebsiteIdForStoreId($magentoStoreId)
-    {
-        return Mage::app()->getStore($magentoStoreId)->getWebsiteId();
     }
 
     /**
@@ -378,7 +369,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $magentoStoreId
      * @param $customer
      */
     protected function logCouldNotEncodeCustomerError($customer)

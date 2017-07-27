@@ -18,6 +18,12 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scopeArray = explode('-', $param);
         $result = 1;
         try {
+            $stores = Mage::app()->getStores();
+            if ($scopeArray[1] == 0) {
+                foreach ($stores as $store) {
+                    Mage::helper('mailchimp')->resetErrors($store->getId());
+                }
+            }
             Mage::helper('mailchimp')->resetErrors($scopeArray[1], $scopeArray[0]);
         } catch(Exception $e)
         {
