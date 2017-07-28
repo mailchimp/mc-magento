@@ -2087,14 +2087,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $customerId = $this->getCustomerResendLastId($storeId);
         if ($customerId) {
             $isMissingCustomer = $this->isMissingItemLowerThanId($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $storeId);
+        } else {
+            $isMissingCustomer = false;
         }
         $productId = $this->getProductResendLastId($storeId);
         if ($productId) {
             $isMissingProduct = $this->isMissingItemLowerThanId($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $storeId);
+        } else {
+            $isMissingProduct = false;
         }
         $orderId = $this->getOrderResendLastId($storeId);
         if ($orderId) {
             $isMissingOrder = $this->isMissingItemLowerThanId($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $storeId);
+        } else {
+            $isMissingOrder = false;
         }
         $cartId = $this->getCartResendLastId($storeId);
         if ($cartId) {
