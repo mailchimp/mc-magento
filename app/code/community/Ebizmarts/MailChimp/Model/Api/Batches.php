@@ -90,19 +90,23 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function handleEcommerceBatches()
     {
+        $helper = $this->getHelper();
         $stores = Mage::app()->getStores();
         foreach ($stores as $store) {
-            $this->_getResults($store->getId());
-            $this->_sendEcommerceBatch($store->getId());
+            $storeId = $store->getId();
+            $this->_getResults($storeId);
+            $helper->handleResendDataBefore($storeId);
+            $this->_sendEcommerceBatch($storeId);
+            $helper->handleResendDataAfter($storeId);
         }
 
         foreach ($stores as $store) {
-            if ($this->getHelper()->getIsReseted($store->getId())) {
-                $scopeToReset = $this->getHelper()->getMailChimpScopeByStoreId($store->getId());
+            if ($helper->getIsReseted($store->getId())) {
+                $scopeToReset = $helper->getMailChimpScopeByStoreId($store->getId());
                 if ($scopeToReset) {
-                    $this->getHelper()->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
+                    $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
                     $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
-                    $this->getHelper()->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
+                    $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
                 }
             }
         }
@@ -556,7 +560,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         if ($itemType == 'SUB') {
-            $helper->updateSubscriberSyndData($itemId,$syncDelta, $syncError, 0, null);
+            $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
             $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $saveOnlyIfexists);
         }
