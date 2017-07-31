@@ -1479,10 +1479,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function timePassed($initialTime)
     {
+        $storeCount = count(Mage::app()->getStores());
         $timePassed = false;
         $finalTime = time();
         $difference = $finalTime - $initialTime;
-        if ($difference > 270) {
+        //Set minimum of 30 seconds per store view.
+        $timeForAllStores = (30 * $storeCount);
+        //Set total time in 4:30 minutes if it is lower.
+        $timeAmount = ($timeForAllStores < 270) ? 270 : $timeForAllStores;
+        if ($difference > $timeAmount) {
             $timePassed = true;
         }
         return $timePassed;
@@ -1495,27 +1500,27 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom116($initialTime)
     {
-        //poner isSyncing en true y mostrar cartel en la configuracion que diga que la store esta sincronizando due to first time installation or migration of data due to module update.
-        $this->_setIsSyncingInAllStores(true);
+        $this->_setIsSyncingIfFinishedInAllStores(true);
         $finished = $this->_migrateOrdersFrom116($initialTime);
         if ($finished) {
-            $this->_setIsSyncingInAllStores(false);
+            $this->_setIsSyncingIfFinishedInAllStores(false);
             $this->delete116MigrationConfigData();
         }
     }
 
     /**
-     * Modify is_syncing value for all stores.
+     * Modify is_syncing value if initial sync finished for all stores.
      *
      * @param $syncValue
      */
-    protected function _setIsSyncingInAllStores($syncValue)
+    protected function _setIsSyncingIfFinishedInAllStores($syncValue)
     {
         $stores = Mage::app()->getStores();
         foreach ($stores as $storeId => $store) {
-            $this->setIsSyncingPerStore($syncValue, $storeId);
+            $this->setIsSyncingIfFinishedPerStore($syncValue, $storeId);
         }
     }
+
 
     /**
      * Update Order ids to the Increment id in MailChimp.
@@ -1947,14 +1952,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Modify is_syncing value if initial sync finished in given store.
+     *
      * @param $syncValue
      * @param $storeId
      */
-    public function setIsSyncingPerStore($syncValue, $storeId)
+    public function setIsSyncingIfFinishedPerStore($syncValue, $storeId)
     {
+        $isSyncing = $this->getMCIsSyncing($storeId);
         $mailchimpApi = $this->getApi($storeId);
         $mailchimpStoreId = $this->getMCStoreId($storeId);
-        if ($mailchimpStoreId) {
+        if ($mailchimpStoreId && !$isSyncing) {
             $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
         }
     }
@@ -2055,7 +2063,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $resendEnabled = $this->getResendEnabled($storeId);
         $resendTurn = $this->getResendTurn($storeId);
         if ($resendEnabled && $resendTurn) {
-            $this->setIsSyncingPerStore(true, $storeId);
+            $this->setIsSyncingIfFinishedPerStore(true, $storeId);
         }
     }
 
@@ -2069,7 +2077,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($resendEnabled) {
             $configScope = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $storeId);
             if ($resendTurn) {
-                $this->setIsSyncingPerStore(false, $storeId);
+                $this->setIsSyncingIfFinishedPerStore(false, $storeId);
                 $this->setResendTurn(0, $configScope['scope_id'], $configScope['scope']);
             } else {
                 $this->setResendTurn(1, $configScope['scope_id'], $configScope['scope']);
@@ -2223,9 +2231,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $quoteCollection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter('entity_id', array('lteq' => $itemId))
-            ->addFieldToFilter('is_active', array('eq'=>1))
-            ->addFieldToFilter('customer_email', array('notnull'=>true))
-            ->addFieldToFilter('items_count', array('gt'=>0));
+            ->addFieldToFilter('is_active', array('eq' => 1))
+            ->addFieldToFilter('customer_email', array('notnull' => true))
+            ->addFieldToFilter('items_count', array('gt' => 0));
         $firstDate = $this->getAbandonedCartFirstDate($storeId);
         if ($firstDate) {
             $quoteCollection->addFieldToFilter('updated_at', array('gt' => $firstDate));
