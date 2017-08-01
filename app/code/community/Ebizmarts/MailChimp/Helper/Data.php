@@ -486,7 +486,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         if ($this->getLogsEnabled($scopeId)) {
             if (!$batchId) {
-                Mage::log($message, null, 'MailChimp_Requests.log', true);
+                Mage::log($message, null, 'MailChimp_Failing_Requests.log', true);
             } else {
                 $logDir = Mage::getBaseDir('var') . DS . 'log';
                 if (!file_exists($logDir)) {

@@ -339,9 +339,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function sendStoreSubscriberBatch($storeId, $limit)
     {
         try {
+            $helper = $this->getHelper();
             $subscribersArray = array();
-            if ($this->getHelper()->isMailChimpEnabled($storeId)) {
-                $listId = $this->getHelper()->getGeneralList($storeId);
+            if ($helper->isMailChimpEnabled($storeId)) {
+                $listId = $helper->getGeneralList($storeId);
 
                 $batchArray = array();
 
@@ -355,11 +356,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if (!empty($batchArray['operations'])) {
                 $batchJson = json_encode($batchArray);
                 if (!$batchJson || $batchJson == '') {
-                    $this->getHelper()->logRequest('An empty operation was detected', $storeId);
+                    $helper->logRequest('An empty operation was detected', $storeId);
                 } else {
-                    $mailchimpApi = $this->getHelper()->getApi($storeId);
-                    $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-                    $this->getHelper()->logRequest($batchJson, $storeId, $batchResponse['id']);
+                    try {
+                        $mailchimpApi = $helper->getApi($storeId);
+                        $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                        $helper->logRequest($batchJson, $storeId, $batchResponse['id']);
+                    } catch (MailChimp_Error $e) {
+                        $helper->logRequest($batchJson, $storeId);
+                    }
 
                     //save batch id to db
                     $batch = Mage::getModel('mailchimp/synchbatches');
@@ -371,9 +376,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
         } catch (MailChimp_Error $e) {
-            $this->getHelper()->logError($e->getFriendlyMessage(), $storeId);
+            $helper->logError($e->getFriendlyMessage(), $storeId);
         } catch (Exception $e) {
-            $this->getHelper()->logError($e->getMessage(), $storeId);
+            $helper->logError($e->getMessage(), $storeId);
         }
 
         return array(null, $limit);
