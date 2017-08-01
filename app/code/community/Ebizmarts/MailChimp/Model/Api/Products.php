@@ -196,10 +196,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($categoryId) {
                 $category = Mage::getResourceModel('catalog/category')->checkId($categoryId);
                 $data["type"] = $category->getName();
+                $data["vendor"] = $data["type"];
             }
 
             //missing data
-            $data["vendor"] = "";
             $data["handle"] = "";
 
             //variants
