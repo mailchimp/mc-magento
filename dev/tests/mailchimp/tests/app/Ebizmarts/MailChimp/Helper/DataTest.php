@@ -85,7 +85,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->deleteStore($scopeId, $scope);
     }
 
-    public function testaddResendFilter()
+    public function testAddResendFilter()
     {
         $storeId = 1;
         /**
@@ -96,12 +96,15 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getResendEnabled', 'getResendTurn', 'getOrderResendLastId'))
             ->getMock();
 
+        $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $helperMock->expects($this->once())->method('getResendEnabled')->with($storeId)->willReturn(1);
         $helperMock->expects($this->once())->method('getResendTurn')->with($storeId)->willReturn(1);
         $helperMock->expects($this->once())->method('getOrderResendLastId')->with($storeId);
 
-        $collection = Mage::getResourceModel('sales/order_collection');
-        $helperMock->addResendFilter($collection, $storeId);
+        $helperMock->addResendFilter($orderCollectionMock, $storeId);
     }
 
     public function testHandleResendFinish()
