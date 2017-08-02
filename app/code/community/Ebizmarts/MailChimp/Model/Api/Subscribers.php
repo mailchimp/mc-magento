@@ -23,7 +23,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function createBatchJson($listId, $storeId, $limit)
     {
         $helper = $this->mcHelper;
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);;
+        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
         $moduleIsActive = $helper->isMailChimpEnabled($storeId);
         $subscriberArray = array();
 

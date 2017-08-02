@@ -152,7 +152,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only]]></comment>
+                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only.]]></comment>
                         </webhook_active>
                         <webhook_delete translate="label comment">
                             <label>Webhooks Delete action</label>
@@ -223,7 +223,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Orders previous than this value, will be ignored]]></comment>
+                            <comment><![CDATA[Orders previous than this value, will be ignored.]]></comment>
                             <depends>
                                 <active>1</active>
                             </depends>
@@ -239,6 +239,18 @@
                                 <active>1</active>
                             </depends>
                         </reset_ecommerce_data>
+                        <resend_ecommerce_data translate="label comment">
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>mailchimp/adminhtml_system_config_resendEcommerceData</frontend_model>
+                            <sort_order>230</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[This will not affect the behaviour of Automations.]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </resend_ecommerce_data>
                     </fields>
                 </ecommerce>
                 <emailcatcher>
