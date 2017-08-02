@@ -402,15 +402,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $listId = $this->getGeneralList($scopeId, $scope);
         //delete store id and data from mailchimp
-        if ($deleteDataInMailchimp && $this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
-            $this->removeEcommerceSyncData($scopeId, $scope);
-            $this->resetCampaign($scopeId, $scope);
-            $this->clearErrorGrid($scopeId, $scope, true);
-            $this->deleteStore($scopeId, $scope);
-        }
+        if ($deleteDataInMailchimp) {
+            if ($this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
+                $this->removeEcommerceSyncData($scopeId, $scope);
+                $this->resetCampaign($scopeId, $scope);
+                $this->clearErrorGrid($scopeId, $scope, true);
+                $this->deleteStore($scopeId, $scope);
+            }
 
-        if ($this->isEcomSyncDataEnabled($scopeId, $scope, true)) {
-            $this->createStore($listId, $scopeId, $scope);
+            if ($this->isEcomSyncDataEnabled($scopeId, $scope, true)) {
+                $this->createStore($listId, $scopeId, $scope);
+            }
+        } else {
+            if ($this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
+                $this->saveLastItemsSent($scopeId, $scope);
+                $this->removeEcommerceSyncData($scopeId, $scope);
+                $this->clearErrorGrid($scopeId, $scope, true);
+            }
         }
     }
 
@@ -659,6 +667,65 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             //clear store config values
             $this->deleteLocalMCStoreData($scopeId, $scope);
         }
+    }
+
+    protected function saveLastItemsSent($scopeId, $scope)
+    {
+        $isSyncing = $this->getMCIsSyncing($scopeId, $scope);
+        if (!$isSyncing) {
+            $customerLastId = $this->getLastCustomerSent($scopeId, $scope);
+            $productLastId = $this->getLastProductSent($scopeId, $scope);
+            $orderLastId = $this->getLastOrderSent($scopeId, $scope);
+            $cartLastId = $this->getLastCartSent($scopeId, $scope);
+
+            $configValues = array();
+            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId);
+            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId);
+            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId);
+            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId);
+            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, 1);
+            $this->saveMailchimpConfig($configValues, $scopeId, $scope);
+        }
+    }
+
+    protected function getLastCustomerSent($scopeId, $scope)
+    {
+        $mcStoreId = $this->getMCStoreId($scopeId, $scope);
+        $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
+            ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER));
+        $customerSyncData = $syncDataCollection->getLastItem();
+        return $customerSyncData->getRelatedId();
+    }
+
+    protected function getLastProductSent($scopeId, $scope)
+    {
+        $mcStoreId = $this->getMCStoreId($scopeId, $scope);
+        $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
+            ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PRODUCT));
+        $productSyncData = $syncDataCollection->getLastItem();
+        return $productSyncData->getRelatedId();
+    }
+
+    protected function getLastOrderSent($scopeId, $scope)
+    {
+        $mcStoreId = $this->getMCStoreId($scopeId, $scope);
+        $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
+            ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_ORDER));
+        $orderSyncData = $syncDataCollection->getLastItem();
+        return $orderSyncData->getRelatedId();
+    }
+
+    protected function getLastCartSent($scopeId, $scope)
+    {
+        $mcStoreId = $this->getMCStoreId($scopeId, $scope);
+        $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
+            ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_QUOTE));
+        $cartSyncData = $syncDataCollection->getLastItem();
+        return $cartSyncData->getRelatedId();
     }
 
     /**
@@ -1412,10 +1479,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function timePassed($initialTime)
     {
+        $storeCount = count(Mage::app()->getStores());
         $timePassed = false;
         $finalTime = time();
         $difference = $finalTime - $initialTime;
-        if ($difference > 270) {
+        //Set minimum of 30 seconds per store view.
+        $timeForAllStores = (30 * $storeCount);
+        //Set total time in 4:30 minutes if it is lower.
+        $timeAmount = ($timeForAllStores < 270) ? 270 : $timeForAllStores;
+        if ($difference > $timeAmount) {
             $timePassed = true;
         }
         return $timePassed;
@@ -1428,31 +1500,27 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom116($initialTime)
     {
-        //poner isSyncing en true y mostrar cartel en la configuracion que diga que la store esta sincronizando due to first time installation or migration of data due to module update.
-        $this->_setIsSyncingInAllStores(true);
+        $this->_setIsSyncingIfFinishedInAllStores(true);
         $finished = $this->_migrateOrdersFrom116($initialTime);
         if ($finished) {
-            $this->_setIsSyncingInAllStores(false);
+            $this->_setIsSyncingIfFinishedInAllStores(false);
             $this->delete116MigrationConfigData();
         }
     }
 
     /**
-     * Modify is_syncing value for all stores.
+     * Modify is_syncing value if initial sync finished for all stores.
      *
      * @param $syncValue
      */
-    protected function _setIsSyncingInAllStores($syncValue)
+    protected function _setIsSyncingIfFinishedInAllStores($syncValue)
     {
         $stores = Mage::app()->getStores();
         foreach ($stores as $storeId => $store) {
-            $mailchimpApi = $this->getApi($storeId);
-            $mailchimpStoreId = $this->getMCStoreId($storeId);
-            if ($mailchimpStoreId) {
-                $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
-            }
+            $this->setIsSyncingIfFinishedPerStore($syncValue, $storeId);
         }
     }
+
 
     /**
      * Update Order ids to the Increment id in MailChimp.
@@ -1848,7 +1916,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $configAssociatedToScope;
     }
-  
+
     /**
      * @param $batchArray
      * @param $productData
@@ -1881,5 +1949,302 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function isCheckoutSubscribeEnabled($scopeId, $scope = 'stores')
     {
         return ($this->isMailChimpEnabled($scopeId, $scope) && $this->getCheckoutSubscribeValue($scopeId, $scope) != Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::DISABLED);
+    }
+
+    /**
+     * Modify is_syncing value if initial sync finished in given store.
+     *
+     * @param $syncValue
+     * @param $storeId
+     */
+    public function setIsSyncingIfFinishedPerStore($syncValue, $storeId)
+    {
+        $isSyncing = $this->getMCIsSyncing($storeId);
+        $mailchimpApi = $this->getApi($storeId);
+        $mailchimpStoreId = $this->getMCStoreId($storeId);
+        if ($mailchimpStoreId && !$isSyncing) {
+            $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId, $storeId);
+        }
+    }
+
+    public function setResendTurn($value, $scopeId, $scope = 'stores')
+    {
+        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $value));
+        $this->saveMailchimpConfig($configValue, $scopeId, $scope);
+    }
+
+    public function getResendTurn($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scopeId, $scope);
+    }
+
+    public function getResendEnabled($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scopeId, $scope);
+    }
+
+    public function getCustomerResendLastId($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scopeId, $scope);
+    }
+
+    public function getProductResendLastId($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scopeId, $scope);
+    }
+
+    public function getOrderResendLastId($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scopeId, $scope);
+    }
+
+    public function getCartResendLastId($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scopeId, $scope);
+    }
+
+    public function addResendFilter($collection, $magentoStoreId)
+    {
+        $resendEnabled = $this->getResendEnabled($magentoStoreId);
+        if ($resendEnabled) {
+            $resendTurn = $this->getResendTurn($magentoStoreId);
+            $lastOrderSent = $this->getOrderResendLastId($magentoStoreId);
+            if ($resendTurn) {
+                $collection->addFieldToFilter('entity_id', array('lteq' => $lastOrderSent));
+            } else {
+                $collection->addFieldToFilter('entity_id', array('gt' => $lastOrderSent));
+            }
+        }
+    }
+
+    public function handleResendFinish($scopeId, $scope = 'stores')
+    {
+        $allItemsSent = $this->allResendItemsSent($scopeId, $scope);
+        if ($allItemsSent) {
+            $this->deleteResendConfigValues($scopeId, $scope);
+        }
+    }
+
+    protected function deleteResendConfigValues($scopeId, $scope = 'stores')
+    {
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
+        Mage::getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
+        Mage::getConfig()->cleanCache();
+    }
+
+    protected function allResendItemsSent($scopeId, $scope = 'stores')
+    {
+        if ($scope == 'stores') {
+            $allItemsSent = $this->allResendItemsSentPerStoreView($scopeId);
+        } else {
+            if ($scope == 'websites') {
+                $website = Mage::getModel('core/website')->load($scopeId);
+                $storeIds = $website->getStoreIds();
+                $allItemsSent = $this->allResendItemsSentPerScope($storeIds);
+            } else {
+                $stores = Mage::app()->getStores();
+                $allItemsSent = $this->allResendItemsSentPerScope($stores);
+            }
+        }
+
+        return $allItemsSent;
+    }
+
+    /**
+     * @param $storeId
+     * @return array
+     */
+    public function handleResendDataBefore($storeId)
+    {
+        $resendEnabled = $this->getResendEnabled($storeId);
+        $resendTurn = $this->getResendTurn($storeId);
+        if ($resendEnabled && $resendTurn) {
+            $this->setIsSyncingIfFinishedPerStore(true, $storeId);
+        }
+    }
+
+    /**
+     * @param $storeId
+     */
+    public function handleResendDataAfter($storeId)
+    {
+        $resendEnabled = $this->getResendEnabled($storeId);
+        $resendTurn = $this->getResendTurn($storeId);
+        if ($resendEnabled) {
+            $configScope = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $storeId);
+            if ($resendTurn) {
+                $this->setIsSyncingIfFinishedPerStore(false, $storeId);
+                $this->setResendTurn(0, $configScope['scope_id'], $configScope['scope']);
+            } else {
+                $this->setResendTurn(1, $configScope['scope_id'], $configScope['scope']);
+            }
+            $this->handleResendFinish($configScope['scope_id'], $configScope['scope']);
+        }
+    }
+
+    /**
+     * @param $storeId
+     * @return bool
+     */
+    protected function allResendItemsSentPerStoreView($storeId)
+    {
+        $customerId = $this->getCustomerResendLastId($storeId);
+        if ($customerId) {
+            $isMissingCustomer = $this->isMissingItemLowerThanId($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $storeId);
+        } else {
+            $isMissingCustomer = false;
+        }
+        $productId = $this->getProductResendLastId($storeId);
+        if ($productId) {
+            $isMissingProduct = $this->isMissingItemLowerThanId($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $storeId);
+        } else {
+            $isMissingProduct = false;
+        }
+        $orderId = $this->getOrderResendLastId($storeId);
+        if ($orderId) {
+            $isMissingOrder = $this->isMissingItemLowerThanId($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $storeId);
+        } else {
+            $isMissingOrder = false;
+        }
+        $cartId = $this->getCartResendLastId($storeId);
+        if ($cartId) {
+            $isMissingCart = $this->isMissingItemLowerThanId($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $storeId);
+        } else {
+            $isMissingCart = false;
+        }
+
+        if (!$isMissingCustomer && !$isMissingProduct && !$isMissingOrder && !$isMissingCart) {
+            $allItemsSent = true;
+        } else {
+            $allItemsSent = false;
+        }
+        return $allItemsSent;
+    }
+
+    /**
+     * @param $stores
+     * @return bool
+     */
+    protected function allResendItemsSentPerScope($stores)
+    {
+        $allItemsSent = true;
+        foreach ($stores as $store) {
+            if ($store instanceof Mage_Core_Model_Store) {
+                $storeId = $store->getId();
+            } else {
+                $storeId = $store;
+            }
+            $allItemsSentInCurrentStore = $this->allResendItemsSentPerStoreView($storeId);
+            if (!$allItemsSentInCurrentStore) {
+                $allItemsSent = false;
+            }
+        }
+        return $allItemsSent;
+    }
+
+    protected function isMissingItemLowerThanId($itemId, $itemType, $mailchimpStoreId)
+    {
+        switch ($itemType) {
+            case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
+                $isMissing = $this->isMissingCustomerLowerThanId($itemId, $mailchimpStoreId);
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
+                $isMissing = $this->isMissingProductLowerThanId($itemId, $mailchimpStoreId);
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
+                $isMissing = $this->isMissingOrderLowerThanId($itemId, $mailchimpStoreId);
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
+                $isMissing = $this->isMissingQuoteLowerThanId($itemId, $mailchimpStoreId);
+                break;
+            default:
+                $isMissing = false;
+                break;
+        }
+        return $isMissing;
+    }
+
+    protected function isMissingCustomerLowerThanId($itemId, $storeId)
+    {
+        $mailchimpStoreId = $this->getMCStoreId($storeId);
+        $customerCollection = Mage::getResourceModel('customer/customer_collection')
+            ->addFieldToFilter('store_id', array('eq' => $storeId))
+            ->addFieldToFilter('entity_id', array('lteq' => $itemId));
+        Mage::getModel('mailchimp/api_customers')->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
+        $customerCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
+        if ($customerCollection->getSize()) {
+            $isMissing = true;
+        } else {
+            $isMissing = false;
+        }
+        return $isMissing;
+    }
+
+    protected function isMissingProductLowerThanId($itemId, $storeId)
+    {
+        $apiProducts = Mage::getModel('mailchimp/api_products');
+        $mailchimpStoreId = $this->getMCStoreId($storeId);
+        $productCollection = Mage::getResourceModel('catalog/product_collection')
+            ->addStoreFilter($storeId)
+            ->addFieldToFilter('entity_id', array('lteq' => $itemId));
+        $apiProducts->joinQtyAndBackorders($productCollection);
+        $apiProducts->joinCategoryId($productCollection);
+        $apiProducts->joinProductAttributes($productCollection);
+        $productCollection->getSelect()->group("e.entity_id");
+        $apiProducts->joinMailchimpSyncDataWithoutWhere($productCollection, $mailchimpStoreId);
+        $productCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
+        if ($productCollection->getSize()) {
+            $isMissing = true;
+        } else {
+            $isMissing = false;
+        }
+        return $isMissing;
+    }
+
+    protected function isMissingOrderLowerThanId($itemId, $storeId)
+    {
+        $mailchimpStoreId = $this->getMCStoreId($storeId);
+        $orderCollection = Mage::getResourceModel('sales/order_collection')
+            ->addFieldToFilter('store_id', array('eq' => $storeId))
+            ->addFieldToFilter('entity_id', array('lteq' => $itemId));
+        $firstDate = $this->getEcommerceFirstDate($storeId);
+        if ($firstDate) {
+            $orderCollection->addFieldToFilter('created_at', array('gt' => $firstDate));
+        }
+        Mage::getModel('mailchimp/api_orders')->joinMailchimpSyncDataWithoutWhere($orderCollection, $mailchimpStoreId);
+        $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
+        if ($orderCollection->getSize()) {
+            $isMissing = true;
+        } else {
+            $isMissing = false;
+        }
+        return $isMissing;
+    }
+
+    protected function isMissingQuoteLowerThanId($itemId, $storeId)
+    {
+        $mailchimpStoreId = $this->getMCStoreId($storeId);
+        $quoteCollection = Mage::getResourceModel('sales/order_collection')
+            ->addFieldToFilter('store_id', array('eq' => $storeId))
+            ->addFieldToFilter('entity_id', array('lteq' => $itemId))
+            ->addFieldToFilter('is_active', array('eq' => 1))
+            ->addFieldToFilter('customer_email', array('notnull' => true))
+            ->addFieldToFilter('items_count', array('gt' => 0));
+        $firstDate = $this->getAbandonedCartFirstDate($storeId);
+        if ($firstDate) {
+            $quoteCollection->addFieldToFilter('updated_at', array('gt' => $firstDate));
+        }
+        Mage::getModel('mailchimp/api_carts')->joinMailchimpSyncDataWithoutWhere($quoteCollection, $mailchimpStoreId);
+        $quoteCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
+        if ($quoteCollection->getSize()) {
+            $isMissing = true;
+        } else {
+            $isMissing = false;
+        }
+        return $isMissing;
     }
 }
