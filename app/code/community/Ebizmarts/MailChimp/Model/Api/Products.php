@@ -37,13 +37,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
         }
         $collection = $this->makeProductsNotSentCollection($magentoStoreId);
-        $this->joinMailchimpSyncData($mailchimpStoreId, $collection);
+        $this->joinMailchimpSyncData($collection, $mailchimpStoreId);
         $batchArray = array();
 
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
         foreach ($collection as $product) {
-
             if ($product->getMailchimpSyncDeleted()) {
                 $batchArray = array_merge($this->buildProductDataRemoval($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
             }
@@ -356,6 +355,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
          */
         $collection = $this->getProductResourceCollection();
         $collection->addStoreFilter($magentoStoreId);
+        $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId);
 
         $this->joinQtyAndBackorders($collection);
 
@@ -386,7 +386,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function shouldSendProductUpdate($magentoStoreId, $product)
     {
-        return $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $product->getMailchimpSyncError() == '';
+        $helper = $this->getMailChimpHelper();
+        $resendTurn = $helper->getResendTurn($magentoStoreId);
+        return !$resendTurn && $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $product->getMailchimpSyncError() == '';
     }
 
     /**
@@ -471,7 +473,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * @param $collection
      */
-    protected function joinQtyAndBackorders($collection)
+    public function joinQtyAndBackorders($collection)
     {
         $collection->joinField(
             'qty', 'cataloginventory/stock_item', 'qty', 'product_id=entity_id',
@@ -485,30 +487,19 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $mailchimpStoreId
      * @param $collection
+     * @param $mailchimpStoreId
      */
-    protected function joinMailchimpSyncData($mailchimpStoreId, $collection)
+    protected function joinMailchimpSyncData($collection, $mailchimpStoreId)
     {
-        $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getSyncdataTableName();
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId), array(
-                "m4m.related_id",
-                "m4m.type",
-                "m4m.mailchimp_store_id",
-                "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified"
-            )
-        );
+        $this->joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId);
         $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
     }
 
     /**
      * @param $collection
      */
-    protected function joinCategoryId($collection)
+    public function joinCategoryId($collection)
     {
         $collection->joinField(
             'category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null,
@@ -584,5 +575,25 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getMailChimpHelper()
     {
         return $this->mailchimpHelper;
+    }
+
+    /**
+     * @param $collection
+     * @param $mailchimpStoreId
+     */
+    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId)
+    {
+        $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
+        $mailchimpTableName = $this->getSyncdataTableName();
+        $collection->getSelect()->joinLeft(
+            array("m4m" => $mailchimpTableName),
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId), array(
+                "m4m.related_id",
+                "m4m.type",
+                "m4m.mailchimp_store_id",
+                "m4m.mailchimp_sync_delta",
+                "m4m.mailchimp_sync_modified"
+            )
+        );
     }
 }
