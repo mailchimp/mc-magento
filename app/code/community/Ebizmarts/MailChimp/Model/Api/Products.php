@@ -126,8 +126,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //add or update variant
             foreach ($parentIds as $parentId) {
-                $productSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-                if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $productSyncData->getMailchimpSyncError() == '') {
+                $parentSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                if ($parentSyncData->getMailchimpSyncDelta() && $parentSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $parentSyncData->getMailchimpSyncError() == '') {
                     $variendata = array();
                     $variendata["id"] = $data["id"];
                     $variendata["title"] = $data["title"];
@@ -172,7 +172,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         //data applied for both root and varient products
         $data["id"] = $product->getId();
-        $data["title"] = $product->getName();
+        $data["title"] = ($product->getName()) ? $product->getName() : $product->getDefaultName();
         $data["url"] = $product->getProductUrl();
 
         //image
@@ -188,8 +188,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data += $this->getProductVariantData($product);
         } else {
             //this is for a root product
-            if ($product->getDescription()) {
-                $data["description"] = $product->getDescription();
+            if ($product->getDescription() || $product->getDefaultDescription()) {
+                $data["description"] = ($product->getDescription()) ? $product->getDescription() : $product->getDefaultDescription();
             }
 
             //mailchimp product type (magento category)
@@ -355,14 +355,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
-
         $collection->addStoreFilter($magentoStoreId);
 
         $this->joinQtyAndBackorders($collection);
 
         $this->joinCategoryId($collection);
 
-        $this->joinProductAttributes($collection);
+        $this->joinProductAttributes($collection, $magentoStoreId);
 
         $collection->getSelect()->group("e.entity_id");
         $collection->getSelect()->limit(self::BATCH_LIMIT);
@@ -446,23 +445,25 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * @param $collection
+     * @param $magentoStoreId
      */
-    protected function joinProductAttributes($collection)
+    protected function joinProductAttributes($collection, $magentoStoreId)
     {
         $attributeCodes = array("name", "visibility", "description", "price");
         $config = Mage::getSingleton("eav/config");
         foreach ($attributeCodes as $_code) {
             $attributeName = $config->getAttribute("catalog_product", $_code);
 
-            $attribteTableName = "product_attribute_" . $_code;
+            if ($_code != 'price') {
+                $collection->joinField(
+                    $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
+                    '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
+                );
+            }
 
-            $collection->getSelect()->join(
-                array($attribteTableName => $attributeName->getBackendTable()),
-                'e.entity_id = ' . $attribteTableName . '.entity_id',
-                array('value AS ' . $_code)
-            )->where(
-                $attribteTableName . ".attribute_id = ?",
-                $attributeName->getId()
+            $collection->joinField(
+                'default_' . $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
+                '{{table}}.store_id = 0 AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
             );
         }
     }
@@ -522,15 +523,16 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductVariantData($product)
     {
         $data = array();
-        $data["sku"]   = $product->getSku();
-        $data["price"] = (float)$product->getPrice();
+        $data["sku"] = $product->getSku();
+        $data["price"] = $product->getDefaultPrice();
 
         //stock
         $data["inventory_quantity"] = (int)$product->getQty();
         $data["backorders"] = (string)$product->getBackorders();
 
 
-        $data["visibility"] = $this->visibilityOptions[$product->getVisibility()];
+        $visibility = ($product->getVisibility()) ? $product->getVisibility() : $product->getDefaultVisibility();
+        $data["visibility"] = $this->visibilityOptions[$visibility];
 
         return $data;
     }
