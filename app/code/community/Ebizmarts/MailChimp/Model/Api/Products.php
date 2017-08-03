@@ -13,6 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 {
     const BATCH_LIMIT = 100;
     private $_parentImageUrl = null;
+    private $_parentPrice = null;
     /** @var Mage_Catalog_Model_Product_Type_Configurable */
     private $productTypeConfigurable;
 
@@ -45,6 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $product) {
             if ($product->getMailchimpSyncDeleted()) {
                 $batchArray = array_merge($this->buildProductDataRemoval($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
+                $counter = count($batchArray);
             }
 
             if ($this->shouldSendProductUpdate($magentoStoreId, $product)) {
@@ -87,7 +89,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
         } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
-            $variantProducts = array();
             $variantProducts[] = $product;
         } else {
             //@TODO bundle
@@ -113,56 +114,88 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     protected function _buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
-        $operations = array();
+        $variantProducts = array();
         if ($this->isSimpleProduct($product) || $this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
-            $data = $this->_buildProductData($product);
-
+            $variantProducts[] = $product;
             $parentIds = $this->productTypeConfigurableResource->getParentIdsByChild($product->getId());
+            foreach ($parentIds as $parentId) {
+                $parent = Mage::getModel('catalog/product')->load($parentId);
+                $variantProducts[] = $parent;
 
-            if (empty($parentIds)) {
-                $parentIds = array($product->getId());
+                $collection = $this->makeProductChildrenCollection($magentoStoreId);
+
+                $childProducts = $this->getConfigurableChildrenIds($parent);
+                $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
+
+                foreach ($collection as $childProduct) {
+                    if ($childProduct->getId() != $product->getId()) {
+                        $variantProducts[] = $childProduct;
+                    }
+                }
+                $bodyData = $this->_buildProductData($parent, false, $variantProducts);
+                try {
+                    $body = json_encode($bodyData);
+                } catch (Exception $e) {
+                    //json encode failed
+                    $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+                    return array();
+                }
+
+                $data = array();
+                $data['method'] = "PATCH";
+                $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parent->getId();
+                $data['operation_id'] = $batchId . '_' . $parent->getId();
+                $data['body'] = $body;
+                $operations[] = $data;
             }
 
-            //add or update variant
-            foreach ($parentIds as $parentId) {
-                $parentSyncData = Mage::helper('mailchimp')->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-                if ($parentSyncData->getMailchimpSyncDelta() && $parentSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $parentSyncData->getMailchimpSyncError() == '') {
-                    $variendata = array();
-                    $variendata["id"] = $data["id"];
-                    $variendata["title"] = $data["title"];
-                    $variendata["url"] = $data["url"];
-                    $variendata["sku"] = $data["sku"];
-                    $variendata["price"] = $data["price"];
-                    $variendata["inventory_quantity"] = $data["inventory_quantity"];
-                    $this->_parentImageUrl = Mage::helper('mailchimp')->getImageUrlById($parentId);
-                    $dataImageUrl = (isset($data["image_url"])) ? $data["image_url"] : null;
-                    $imageUrl = Mage::helper('mailchimp')->getMailChimpProductImageUrl($this->_parentImageUrl, $dataImageUrl);
-                    if ($imageUrl) {
-                        $variendata["image_url"] = $imageUrl;
-                    }
+        } else if ($this->isConfigurableProduct($product)) {
+            $variantProducts[] = $product;
 
-                    $this->_parentImageUrl = null;
-                    $variendata["backorders"] = $data["backorders"];
-                    $variendata["visibility"] = $data["visibility"];
-                    $productdata = array();
-                    $productdata['method'] = "PUT";
-                    $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parentId . '/variants/' . $data['id'];
-                    $productdata['operation_id'] = $batchId . '_' . $parentId;
-                    try {
-                        $body = json_encode($variendata);
-                    } catch (Exception $e) {
-                        //json encode failed
-                        Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
-                        continue;
-                    }
+            $collection = $this->makeProductChildrenCollection($magentoStoreId);
 
-                    $productdata['body'] = $body;
-                    $operations[] = $productdata;
+            $childProducts = $this->getConfigurableChildrenIds($product);
+            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
+
+            foreach ($collection as $childProduct) {
+                if ($childProduct->getId() != $product->getId()) {
+                    $variantProducts[] = $childProduct;
                 }
             }
+        } else {
+            //@TODO bundle
+            return array();
+        }
+        $bodyData = $this->_buildProductData($product, false, $variantProducts);
+        try {
+            $body = json_encode($bodyData);
+        } catch (Exception $e) {
+            //json encode failed
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+            return array();
         }
 
+        $data = array();
+        $data['method'] = "PATCH";
+        $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $product->getId();
+        $data['operation_id'] = $batchId . '_' . $product->getId();
+        $data['body'] = $body;
+        $operations[] = $data;
         return $operations;
+    }
+
+    protected function getParentData($productId, $magentoStoreId)
+    {
+        $product = Mage::getModel('catalog/product')->load($productId);
+        $data = $this->_buildProductData($product, false);
+        $data['variants'][] = array('id' => $productId);
+        try {
+            $body = json_encode($data);
+        } catch (Exception $e) {
+            //json encode failed
+            Mage::helper('mailchimp')->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+        }
+        return $body;
     }
 
     protected function _buildProductData($product, $isVariant = true, $variants = array())
@@ -203,16 +236,23 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data["handle"] = "";
 
             //variants
-            $data["variants"] = array();
-            if (isset($data["image_url"])) {
-                $this->_parentImageUrl = $data["image_url"];
-            }
+            if (count($variants)) {
+                $data["variants"] = array();
+                if (isset($data["image_url"])) {
+                    $this->_parentImageUrl = $data["image_url"];
+                }
+                $price = (float)$product->getDefaultPrice();
+                if ($price) {
+                    $this->_parentPrice = $price;
+                }
 
-            foreach ($variants as $variant) {
-                $data["variants"][] = $this->_buildProductData($variant);
-            }
+                foreach ($variants as $variant) {
+                    $data["variants"][] = $this->_buildProductData($variant);
+                }
 
-            $this->_parentImageUrl = null;
+                $this->_parentImageUrl = null;
+                $this->_parentPrice = null;
+            }
         }
         return $data;
     }
@@ -515,7 +555,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $data = array();
         $data["sku"] = $product->getSku();
-        $data["price"] = $product->getDefaultPrice();
+
+        $data["price"] = (float)$this->_parentPrice;
 
         //stock
         $data["inventory_quantity"] = (int)$product->getQty();
