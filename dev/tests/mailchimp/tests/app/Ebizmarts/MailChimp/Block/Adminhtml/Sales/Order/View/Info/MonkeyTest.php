@@ -40,10 +40,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $orderMock = $this->_orderMock;
 
         $monkeyBlockMock->expects($this->once())->method('getCurrentOrder')->willReturn($orderMock);
-        $orderMock->expects($this->exactly(2))->method('getMailchimpAbandonedcartFlag')->willReturn(false);
-        $orderMock->expects($this->exactly(2))->method('getMailchimpCampaignId')->willReturn(true);
+        $orderMock->expects($this->exactly(1))->method('getMailchimpAbandonedcartFlag')->willReturn(false);
+        $orderMock->expects($this->exactly(1))->method('getMailchimpCampaignId')->willReturn(true);
 
-        $this->assertEquals($this->_block->isReferred(), $monkeyBlockMock->isReferred());
+        $monkeyBlockMock->isReferred();
     }
 
 
@@ -75,6 +75,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $helperMock->expects($this->once())->method('getMailChimpCampaignNameById')->with($campaignId, $storeId);
 
 
-        $this->assertEquals($this->_block->addCampaignName(), $monkeyBlockMock->addCampaignName());
+        $monkeyBlockMock->addCampaignName();
     }
 }
