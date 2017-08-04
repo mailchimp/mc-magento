@@ -2247,4 +2247,24 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $isMissing;
     }
+
+    public function getMailChimpCampaignNameById($campaignId, $scopeId, $scope = 'stores')
+    {
+        $campaignName = null;
+        try {
+            $api = $this->getApi($scopeId, $scope);
+            $campaignData = $api->campaigns->get($campaignId);
+            if (isset($campaignData['settings'])) {
+                if (isset($campaignData['settings']['title'])) {
+                    $campaignName = $campaignData['settings']['title'];
+                }
+                if ($campaignName == '' && isset($campaignData['settings']['subject_line'])) {
+                    $campaignName = $campaignData['settings']['subject_line'];
+                }
+            }
+        } catch (MailChimp_Error $e) {
+            $this->logError($e->getFriendlyMessage());
+        }
+        return $campaignName;
+    }
 }
