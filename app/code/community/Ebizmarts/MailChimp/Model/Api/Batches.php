@@ -338,8 +338,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function sendStoreSubscriberBatch($storeId, $limit)
     {
+        $helper = $this->getHelper();
         try {
-            $helper = $this->getHelper();
             $subscribersArray = array();
             if ($helper->isMailChimpEnabled($storeId)) {
                 $listId = $helper->getGeneralList($storeId);
