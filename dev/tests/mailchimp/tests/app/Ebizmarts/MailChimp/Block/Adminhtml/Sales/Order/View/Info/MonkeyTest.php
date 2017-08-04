@@ -74,7 +74,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
         $helperMock->expects($this->once())->method('getMailChimpCampaignNameById')->with($campaignId, $storeId);
 
-
         $monkeyBlockMock->addCampaignName();
     }
 }
