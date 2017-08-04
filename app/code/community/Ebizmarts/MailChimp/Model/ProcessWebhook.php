@@ -41,25 +41,26 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $collection->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($collection as $webhookRequest) {
             $data = unserialize($webhookRequest->getDataRequest());
-
-            switch ($webhookRequest->getType()) {
-            case 'subscribe':
-                $this->_subscribe($data);
-                break;
-            case 'unsubscribe':
-                $this->_unsubscribe($data);
-                break;
-            case 'cleaned':
-                $this->_clean($data);
-                break;
-            case 'upemail':
-                $this->_updateEmail($data);
-                break;
-            case 'profile':
-                $this->_profile($data);
+            if ($data) {
+                switch ($webhookRequest->getType()) {
+                    case 'subscribe':
+                        $this->_subscribe($data);
+                        break;
+                    case 'unsubscribe':
+                        $this->_unsubscribe($data);
+                        break;
+                    case 'cleaned':
+                        $this->_clean($data);
+                        break;
+                    case 'upemail':
+                        $this->_updateEmail($data);
+                        break;
+                    case 'profile':
+                        $this->_profile($data);
+                }
+                $webhookRequest->setProcessed(1)
+                    ->save();
             }
-            $webhookRequest->setProcessed(1)
-                ->save();
         }
     }
 
