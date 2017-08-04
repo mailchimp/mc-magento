@@ -362,17 +362,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $mailchimpApi = $helper->getApi($storeId);
                         $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                         $helper->logRequest($batchJson, $storeId, $batchResponse['id']);
+
+                        //save batch id to db
+                        $batch = Mage::getModel('mailchimp/synchbatches');
+                        $batch->setStoreId($storeId)
+                            ->setBatchId($batchResponse['id'])
+                            ->setStatus($batchResponse['status']);
+                        $batch->save();
+                        return array($batchResponse, $limit);
                     } catch (MailChimp_Error $e) {
                         $helper->logRequest($batchJson, $storeId);
                     }
-
-                    //save batch id to db
-                    $batch = Mage::getModel('mailchimp/synchbatches');
-                    $batch->setStoreId($storeId)
-                        ->setBatchId($batchResponse['id'])
-                        ->setStatus($batchResponse['status']);
-                    $batch->save();
-                    return array($batchResponse, $limit);
                 }
             }
         } catch (MailChimp_Error $e) {
