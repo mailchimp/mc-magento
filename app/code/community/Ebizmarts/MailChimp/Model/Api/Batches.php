@@ -475,9 +475,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if ($errorDetails == "") {
                         $errorDetails = $response->detail;
                     }
-                    if (strstr($errorDetails, 'already exists in the account')) {
-                        continue;
-                    }
 
                     if (strstr($errorDetails, 'already exists in the account')) {
                         $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, null, null, true);
@@ -564,7 +561,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                     $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false)
     {
         $helper = $this->getHelper();
-        if ($itemType == 'SUB') {
+        if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
             $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $saveOnlyIfexists);
