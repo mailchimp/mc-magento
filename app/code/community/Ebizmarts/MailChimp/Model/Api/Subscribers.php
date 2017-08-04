@@ -137,17 +137,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 case 'default_billing':
                                 case 'default_shipping':
                                     $address = $customer->getPrimaryAddress($attributeCode);
-
-                                    if ($address) {
-                                        $street = $address->getStreet();
-                                        $eventValue = $mergeVars[$key] = array(
-                                            "addr1" => $street[0] ? $street[0] : "",
-                                            "addr2" => count($street) > 1 ? $street[1] : "",
-                                            "city" => $address->getCity() ? $address->getCity() : "",
-                                            "state" => $address->getRegion() ? $address->getRegion() : "",
-                                            "zip" => $address->getPostcode() ? $address->getPostcode() : "",
-                                            "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName() : ""
-                                        );
+                                    $addressData = $this->getAddressData($address);
+                                    if (count($addressData)) {
+                                        $eventValue = $mergeVars[$key] = $addressData;
                                     }
                                     break;
                                 case 'gender':
@@ -472,5 +464,42 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         }
+    }
+
+    /**
+     * @param $address
+     * @return array
+     */
+    protected function getAddressData($address)
+    {
+        $addressData = array();
+        if ($address) {
+            $street = $address->getStreet();
+            if (count($street) > 1) {
+                $addressData["address1"] = $street[0];
+                $addressData["address2"] = $street[1];
+            } else {
+                if (!empty($street[0])) {
+                    $addressData["address1"] = $street[0];
+                }
+            }
+
+            if ($address->getCity()) {
+                $addressData["city"] = $address->getCity();
+            }
+
+            if ($address->getRegion()) {
+                $addressData["state"] = $address->getRegion();
+            }
+
+            if ($address->getPostcode()) {
+                $addressData["zip"] = $address->getPostcode();
+            }
+
+            if ($address->getCountry()) {
+                $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+            }
+        }
+        return $addressData;
     }
 }
