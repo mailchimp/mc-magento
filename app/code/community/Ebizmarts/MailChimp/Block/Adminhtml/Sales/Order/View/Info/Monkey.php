@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
 {
     public function isReferred()
     {
-        $order = Mage::registry('current_order');
+        $order = $this->getCurrentOrder();
         $ret = false;
         if ($order->getMailchimpAbandonedcartFlag() || $order->getMailchimpCampaignId()) {
             $ret = true;
@@ -22,9 +22,32 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
 
         return $ret;
     }
-    public function getCampaign()
+
+    public function getCampaignId()
     {
-        $order = Mage::registry('current_order');
+        $order = $this->getCurrentOrder();
         return $order->getMailchimpCampaignId();
+    }
+
+    public function addCampaignName()
+    {
+        $helper = $this->getMailChimpHelper();
+        $campaignId = $this->getCampaignId();
+        $order = $this->getCurrentOrder();
+        $campaignName = $helper->getMailChimpCampaignNameById($campaignId, $order->getStoreId());
+        return $campaignName;
+    }
+
+    protected function getMailChimpHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCurrentOrder()
+    {
+        return Mage::registry('current_order');
     }
 }

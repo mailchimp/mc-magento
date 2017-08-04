@@ -11,7 +11,7 @@
                         <img src="<?php echo $this->getSkinUrl('ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png')?>" width="40" title="hep hep thanks MailChimp" />
                     </td>
                     <td class="value">
-                        <strong>Yaay! Recovered by MailChimp's e-commerce automation, Campaign Id: <?php echo $this->getCampaign() ?></strong>
+                        <strong><?php echo $this->__("Yaay! Recovered by MailChimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->addCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId() ?></strong>
                     </td>
                 </tr>
             </table>
