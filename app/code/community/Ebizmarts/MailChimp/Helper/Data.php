@@ -2264,6 +2264,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } catch (MailChimp_Error $e) {
             $this->logError($e->getFriendlyMessage());
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
         }
         return $campaignName;
     }
