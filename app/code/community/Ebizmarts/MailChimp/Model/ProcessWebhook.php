@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MailChimp For Magento
  *
@@ -11,7 +12,7 @@
  */
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
-    const BATCH_LIMIT   = 50;
+    const BATCH_LIMIT = 50;
     /**
      * Webhooks request url path
      *
@@ -37,7 +38,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     public function processWebhookData()
     {
         $collection = Mage::getResourceModel('mailchimp/webhookrequest_collection');
-        $collection->addFieldToFilter('processed',array('eq'=>0));
+        $collection->addFieldToFilter('processed', array('eq' => 0));
         $collection->getSelect()->limit(self::BATCH_LIMIT);
         foreach ($collection as $webhookRequest) {
             $data = unserialize($webhookRequest->getDataRequest());
@@ -58,9 +59,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     case 'profile':
                         $this->_profile($data);
                 }
-                $webhookRequest->setProcessed(1)
-                    ->save();
             }
+            $webhookRequest->setProcessed(1)
+                ->save();
         }
     }
 
@@ -180,19 +181,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             try {
                 $action = isset($data['action']) ? $data['action'] : 'delete';
                 switch ($action) {
-                case 'delete' :
-                    //if config setting "Webhooks Delete action" is set as "Delete customer account"
-                    if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
-                        $subscriber->delete();
-                    } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                        $this->unsubscribeMember($subscriber);
-                    }
-                    break;
-                case 'unsub':
-                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                        $this->unsubscribeMember($subscriber);
-                    }
-                    break;
+                    case 'delete' :
+                        //if config setting "Webhooks Delete action" is set as "Delete customer account"
+                        if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
+                            $subscriber->delete();
+                        } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                            $this->unsubscribeMember($subscriber);
+                        }
+                        break;
+                    case 'unsub':
+                        if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                            $this->unsubscribeMember($subscriber);
+                        }
+                        break;
                 }
             } catch (Exception $e) {
                 Mage::logException($e);
