@@ -1872,6 +1872,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($syncDeleted) {
                 $subscriber->setData("mailchimp_sync_deleted", $syncDeleted);
             }
+            $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
             $subscriber->save();
         }
     }
@@ -2228,7 +2229,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function isMissingQuoteLowerThanId($itemId, $storeId)
     {
         $mailchimpStoreId = $this->getMCStoreId($storeId);
-        $quoteCollection = Mage::getResourceModel('sales/order_collection')
+        $quoteCollection = Mage::getResourceModel('sales/quote_collection')
             ->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter('entity_id', array('lteq' => $itemId))
             ->addFieldToFilter('is_active', array('eq' => 1))
