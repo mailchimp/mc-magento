@@ -174,11 +174,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data['landing_site'] = $order->getMailchimpLandingPage();
         }
 
-        $data['currency_code'] = $order->getOrderCurrencyCode();
-        $data['order_total'] = $order->getGrandTotal();
-        $data['tax_total'] = $this->returnZeroIfNull($order->getTaxAmount());
-        $data['discount_total'] = abs($order->getDiscountAmount());
-        $data['shipping_total'] = $this->returnZeroIfNull($order->getShippingAmount());
+        $data['currency_code'] = $order->getStoreCurrencyCode();
+        $data['order_total'] = $order->getBaseGrandTotal();
+        $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
+        $data['discount_total'] = abs($order->getBaseDiscountAmount());
+        $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
