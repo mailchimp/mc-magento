@@ -52,6 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         array('eq' => 1)
                     )
                 );
+            $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
             $collection->getSelect()->limit($limit);
             $date = $helper->getDateMicrotime();
             $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
