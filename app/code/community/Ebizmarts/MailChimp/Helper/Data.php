@@ -2270,4 +2270,29 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $campaignName;
     }
+
+    public function getCustomerAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_AMOUNT, 0, 'default');
+    }
+
+    public function getProductAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_AMOUNT, 0, 'default');
+    }
+
+    public function getOrderAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_AMOUNT, 0, 'default');
+    }
+
+    public function getCartAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::CART_AMOUNT, 0, 'default');
+    }
+
+    public function getSubscriberAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBSCRIBER_AMOUNT, 0, 'default');
+    }
 }

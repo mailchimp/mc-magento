@@ -74,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         // be sure that the quotes are already in mailchimp and not deleted
         $convertedCarts->getSelect()->where("m4m.mailchimp_sync_deleted = 0");
         // limit the collection
-        $convertedCarts->getSelect()->limit(self::BATCH_LIMIT);
+        $convertedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
         foreach ($convertedCarts as $cart) {
             $cartId = $cart->getEntityId();
                 // we need to delete all the carts associated with this email
@@ -130,7 +130,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
-        $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
+        $modifiedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
         foreach ($modifiedCarts as $cart) {
             $cartId = $cart->getEntityId();
             $allCarts[$this->_counter]['method'] = 'DELETE';
@@ -213,7 +213,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         // be sure that the quotes are already in mailchimp and not deleted
         $newCarts->getSelect()->where("m4m.mailchimp_sync_delta IS NULL");
         // limit the collection
-        $newCarts->getSelect()->limit(self::BATCH_LIMIT);
+        $newCarts->getSelect()->limit($this->getBatchLimitFromConfig());
 
         foreach ($newCarts as $cart) {
             $cartId = $cart->getEntityId();
@@ -379,6 +379,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true,'_secure' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->_token = $token;
         return $url;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getBatchLimitFromConfig()
+    {
+        $helper = $this->getHelper();
+        return $helper->getCustomerAmountLimit();
     }
 
     /**

@@ -326,11 +326,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @return int
+     * @return mixed
      */
     protected function getBatchLimitFromConfig()
     {
-        return self::BATCH_LIMIT;
+        $helper = $this->mailchimpHelper;
+        return $helper->getCustomerAmountLimit();
     }
 
     /**

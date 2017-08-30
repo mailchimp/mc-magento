@@ -302,7 +302,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _sendSubscriberBatches()
     {
-        $subscriberLimit = Ebizmarts_MailChimp_Model_Api_Subscribers::BATCH_LIMIT;
+        $helper = $this->getHelper();
+        $subscriberLimit = $helper->getSubscriberAmountLimit();
         $stores = Mage::app()->getStores();
         $batchResponses = array();
         foreach ($stores as $store) {
