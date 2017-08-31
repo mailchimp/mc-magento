@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      * @access protected
      * @var    bool|array
      */
-    protected $accountDetails = false;
+    protected $_accountDetails = false;
     protected $helper;
 
     /**
