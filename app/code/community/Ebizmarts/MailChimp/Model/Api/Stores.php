@@ -40,7 +40,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
                 $currencyCode = Mage::helper('mailchimp')->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
                 $isSyncing = true;
-                $response = $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail);
+                $primaryLocale = Mage::helper('mailchimp')->getStoreLanguageCode($scopeId, $scope);
+                $timeZone = Mage::helper('mailchimp')->getStoreTimeZone($scopeId, $scope);
+                $storePhone = Mage::helper('mailchimp')->getStorePhone($scopeId, $scope);
+                $currencySymbol = Mage::app()->getLocale()->currency($currencyCode)->getSymbol();
+                $response = $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone);
                 return $response;
             } else {
                 throw new Exception('You don\'t have any lists configured in MailChimp');
