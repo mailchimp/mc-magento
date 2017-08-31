@@ -129,7 +129,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                 'joinQtyAndBackorders',
                 'joinCategoryId',
                 'joinProductAttributes',
-                'getProductResourceCollection'
+                'getProductResourceCollection',
+                'getBatchLimitFromConfig'
             )
         )
             ->getMock();
@@ -152,6 +153,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $this->productsApiMock->expects($this->once())->method('joinCategoryId');
         $this->productsApiMock->expects($this->once())->method('joinProductAttributes');
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection');
+        $this->productsApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
 
         $collection = $this->productsApiMock->makeProductsNotSentCollection(0);
 
