@@ -112,11 +112,21 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Warning, read the manual before change the list.]]></comment>
                         </reset_list>
+                        <subscriber_batch_amount>
+                            <label>Subscriber amount to be sent per run</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailchimp/system_config_source_batchLimit</source_model>
+                            <sort_order>53</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment></comment>
+                        </subscriber_batch_amount>
                         <checkout_subscribe translate="label comment">
                             <label>Subscribe On Checkout</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_checkoutsubscribe</source_model>
-                            <sort_order>53</sort_order>
+                            <sort_order>54</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -251,6 +261,36 @@
                                 <active>1</active>
                             </depends>
                         </resend_ecommerce_data>
+                        <customer_batch_amount>
+                            <label>Customer amount to be sent per run</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailchimp/system_config_source_batchLimit</source_model>
+                            <sort_order>240</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment></comment>
+                        </customer_batch_amount>
+                        <product_batch_amount>
+                            <label>Product amount to be sent per run</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailchimp/system_config_source_batchLimit</source_model>
+                            <sort_order>250</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment></comment>
+                        </product_batch_amount>
+                        <order_batch_amount>
+                            <label>Order amount to be sent per run</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailchimp/system_config_source_batchLimit</source_model>
+                            <sort_order>260</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment></comment>
+                        </order_batch_amount>
                     </fields>
                 </ecommerce>
                 <emailcatcher>
@@ -446,6 +486,16 @@
                                 <active>1</active>
                             </depends>
                         </page>
+                        <cart_batch_amount translate="label">
+                                <label>Cart amount to be sent per run</label>
+                                <frontend_type>select</frontend_type>
+                                <source_model>mailchimp/system_config_source_batchLimit</source_model>
+                                <sort_order>30</sort_order>
+                                <show_in_default>1</show_in_default>
+                                <show_in_website>0</show_in_website>
+                                <show_in_store>0</show_in_store>
+                                <comment></comment>
+                        </cart_batch_amount>
                     </fields>
                 </abandonedcart>
             </groups>

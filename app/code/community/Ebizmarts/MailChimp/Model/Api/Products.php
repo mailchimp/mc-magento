@@ -404,9 +404,18 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $this->joinProductAttributes($collection, $magentoStoreId);
 
         $collection->getSelect()->group("e.entity_id");
-        $collection->getSelect()->limit(self::BATCH_LIMIT);
+        $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
         return $collection;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getBatchLimitFromConfig()
+    {
+        $helper = $this->mailchimpHelper;
+        return $helper->getProductAmountLimit();
     }
 
     /**

@@ -71,7 +71,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         // be sure that the order are already in mailchimp and not deleted
         $modifiedOrders->getSelect()->where("m4m.mailchimp_sync_modified = 1");
         // limit the collection
-        $modifiedOrders->getSelect()->limit(self::BATCH_LIMIT);
+        $modifiedOrders->getSelect()->limit($this->getBatchLimitFromConfig());
 
         foreach ($modifiedOrders as $item) {
             try {
@@ -121,7 +121,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         // be sure that the orders are not in mailchimp
         $newOrders->getSelect()->where("m4m.mailchimp_sync_delta IS NULL");
         // limit the collection
-        $newOrders->getSelect()->limit(self::BATCH_LIMIT);
+        $newOrders->getSelect()->limit($this->getBatchLimitFromConfig());
 
         foreach ($newOrders as $item) {
             try {
@@ -425,6 +425,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         return $jsonData;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getBatchLimitFromConfig()
+    {
+        $helper = $this->getHelper();
+        return $helper->getOrderAmountLimit();
     }
 
     protected function returnZeroIfNull($value)
