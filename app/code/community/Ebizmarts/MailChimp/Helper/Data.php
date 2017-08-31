@@ -2295,4 +2295,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBSCRIBER_AMOUNT, 0, 'default');
     }
+
+    public function getStoreLanguageCode($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $scopeId, $scope);
+    }
+
+    public function getStoreTimeZone($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_TIMEZONE, $scopeId, $scope);
+    }
+
+    public function getStorePhone($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope('general/store_information/phone', $scopeId, $scope);
+    }
 }
