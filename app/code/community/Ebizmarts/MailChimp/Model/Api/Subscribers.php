@@ -448,7 +448,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $api = $helper->getApi($storeId);
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->update($listId, $md5HashEmail, null, 'cleaned');
+            $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
         } catch (MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
