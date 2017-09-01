@@ -498,7 +498,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $collection
      * @param $magentoStoreId
      */
-    protected function joinProductAttributes($collection, $magentoStoreId)
+    public function joinProductAttributes($collection, $magentoStoreId)
     {
         $attributeCodes = array("name", "visibility", "description", "price");
         $config = Mage::getSingleton("eav/config");
