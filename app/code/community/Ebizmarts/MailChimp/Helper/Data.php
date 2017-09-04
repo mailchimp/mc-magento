@@ -2194,7 +2194,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('entity_id', array('lteq' => $itemId));
         $apiProducts->joinQtyAndBackorders($productCollection);
         $apiProducts->joinCategoryId($productCollection);
-        $apiProducts->joinProductAttributes($productCollection);
+        $apiProducts->joinProductAttributes($productCollection, $storeId);
         $productCollection->getSelect()->group("e.entity_id");
         $apiProducts->joinMailchimpSyncDataWithoutWhere($productCollection, $mailchimpStoreId);
         $productCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
