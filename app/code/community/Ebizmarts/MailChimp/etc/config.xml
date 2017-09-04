@@ -19,14 +19,14 @@
                     </mailchimp_change_store_name>
                 </observers>
             </store_group_save>
-            <newsletter_subscriber_save_before>
+            <newsletter_subscriber_save_after>
                 <observers>
                     <mailchimp_subscribe_observer>
                         <class>mailchimp/observer</class>
                         <method>handleSubscriber</method>
                     </mailchimp_subscribe_observer>
                 </observers>
-            </newsletter_subscriber_save_before>
+            </newsletter_subscriber_save_after>
             <newsletter_subscriber_delete_after>
                 <observers>
                     <mailchimp_subscribe_delete_observer>
