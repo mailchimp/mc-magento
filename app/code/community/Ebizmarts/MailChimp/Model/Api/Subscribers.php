@@ -94,6 +94,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     protected function _buildSubscriberData($subscriber)
     {
+        $helper = $this->mcHelper;
         $storeId = $subscriber->getStoreId();
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
@@ -103,6 +104,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
 
         $data["status_if_new"] = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $data["language"] = $helper->getStoreLanguageCode($storeId);
 
         return $data;
     }

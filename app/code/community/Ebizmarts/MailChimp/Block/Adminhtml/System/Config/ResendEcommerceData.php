@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
                         'id' => 'resendecommercedata_button',
                         'label' => $label,
                         'onclick' => 'javascript:resendecommerce(); return false;',
-                        'title' => $this->helper('mailchimp')->__('Re-create MailChimp store for current scope')
+                        'title' => $this->helper('mailchimp')->__('Resend Ecommerce Data current scope')
                     )
                 );
 
