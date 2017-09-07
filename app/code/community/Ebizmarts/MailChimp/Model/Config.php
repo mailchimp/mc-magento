@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_MIGRATE_FROM_116      = 'mailchimp/general/migrate_from_116';
     const GENERAL_MIGRATE_FROM_1164     = 'mailchimp/general/migrate_from_1164';
     const GENERAL_MIGRATE_LAST_ORDER_ID = 'mailchimp/general/migrate_last_order_id';
-    const GENERAL_SUBSCRIBER_AMOUNT     = 'mailchimp/ecommerce/order_amount';
+    const GENERAL_SUBSCRIBER_AMOUNT     = 'mailchimp/general/subscriber_batch_amount';
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
     const ECOMMERCE_CUSTOMERS_OPTIN     = 'mailchimp/ecommerce/customers_optin';
@@ -46,9 +46,9 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_CART_LAST_ID        = 'mailchimp/ecommerce/cart_last_id';
     const ECOMMERCE_RESEND_ENABLED      = 'mailchimp/ecommerce/resend_enabled';
     const ECOMMERCE_RESEND_TURN         = 'mailchimp/ecommerce/resend_turn';
-    const ECOMMERCE_CUSTOMER_AMOUNT     = 'mailchimp/ecommerce/customer_amount';
-    const ECOMMERCE_PRODUCT_AMOUNT      = 'mailchimp/ecommerce/product_amount';
-    const ECOMMERCE_ORDER_AMOUNT        = 'mailchimp/ecommerce/order_amount';
+    const ECOMMERCE_CUSTOMER_AMOUNT     = 'mailchimp/ecommerce/customer_batch_amount';
+    const ECOMMERCE_PRODUCT_AMOUNT      = 'mailchimp/ecommerce/product_batch_amount';
+    const ECOMMERCE_ORDER_AMOUNT        = 'mailchimp/ecommerce/order_batch_amount';
 
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';
@@ -66,7 +66,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
     const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
     const MONKEY_GRID               = 'mailchimp/general/monkey_grid';
-    const CART_AMOUNT               = 'mailchimp/abandonedcart/cart_amount';
+    const CART_AMOUNT               = 'mailchimp/abandonedcart/cart_batch_amount';
 
     const WARNING_MESSAGE           = 'mailchimp/warning_message';
     const POPUP_MESSAGE             = 'mailchimp/popup_message';
