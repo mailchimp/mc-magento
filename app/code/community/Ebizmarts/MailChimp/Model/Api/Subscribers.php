@@ -24,12 +24,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         $helper = $this->mcHelper;
         $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
+        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
         $moduleIsActive = $helper->isMailChimpEnabled($storeId);
         $subscriberArray = array();
 
         if ($moduleIsActive) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
-            if ($helper->getGeneralList($realScope['scope_id'], $realScope['scope']) && !$thisScopeHasSubMinSyncDateFlag) {
+            if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
+                $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
                 $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
             }
@@ -82,6 +83,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
                     $subscriber->setData("mailchimp_sync_error", "");
                     $subscriber->setData("mailchimp_sync_modified", 0);
+                    $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
                     $subscriber->save();
                 }
 
