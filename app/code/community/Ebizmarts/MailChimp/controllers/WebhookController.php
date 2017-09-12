@@ -72,7 +72,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                     Mage::getModel('mailchimp/processWebhook')->saveWebhookRequest($data);
                 } else {
                     $helper->logError($this->__('Something went wrong with the Webhook Data'));
-                    $helper->logError($this->__($data));
+                    $helper->logError($data);
                 }
             } else {
                 $helper->logError($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey));

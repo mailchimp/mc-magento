@@ -12,7 +12,7 @@
  */
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
-    const BATCH_LIMIT = 50;
+    const BATCH_LIMIT = 200;
     /**
      * Webhooks request url path
      *

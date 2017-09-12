@@ -1941,7 +1941,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getModel('mailchimp/api_stores');
     }
-  
+
     public function getCheckoutSubscribeValue($scopeId, $scope = 'stores')
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_CHECKOUT_SUBSCRIBE, $scopeId, $scope);
