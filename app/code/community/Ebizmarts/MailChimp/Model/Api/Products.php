@@ -680,23 +680,24 @@ class Ebizmarts_MailChimp_Model_Api_Products
             array("eav_attribute" => $eavTableName),
             'super_attribute.attribute_id=eav_attribute.attribute_id'
         );
-        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns('eav_attribute.attribute_code');
+        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns('eav_attribute.attribute_id');
 
         $rc = Mage::getResourceModel('catalog/product');
         $url = $this->_parentUrl;
-        $tailUrl = '?';
+        $tailUrl = '#';
         $count = 0;
         foreach ($collection as $attribute) {
-            if ($attribute->getAttributeCode()) {
-                $attributeLabel = $attribute->getAttributeCode();
-                $attributeValue = $rc->getAttributeRawValue($childId, $attribute->getAttributeCode(), $magentoStoreId);
+            if ($attribute->getAttributeId()) {
+                $attributeId = $attribute->getAttributeId();
+                $attributeValue = $rc->getAttributeRawValue($childId, $attribute->getAttributeId(), $magentoStoreId);
                 if ($count > 0) {
                     $tailUrl .= '&';
                 }
-                $tailUrl .= $attributeLabel . '=' . $attributeValue;
+                $tailUrl .= $attributeId . '=' . $attributeValue;
             }
+            $count++;
         }
-        if ($tailUrl != '?') {
+        if ($tailUrl != '#') {
             $url .= $tailUrl;
         }
         return $url;
