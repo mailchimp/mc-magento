@@ -208,14 +208,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["id"] = $product->getId();
         $data["title"] = ($product->getName()) ? $product->getName() : $product->getDefaultName();
         $visibility = ($product->getVisibility()) ? $product->getVisibility() : $product->getDefaultVisibility();
-        if ($visibility == Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE && $this->_parentId) {
-            $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
-            if (!$url) {
-                $url = $this->getProductUrl($product, $magentoStoreId);
+        $url = null;
+        if ($visibility == Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
+            if ($this->_parentUrl) {
+                $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
             }
-            $data["url"] = $url;
         } else {
             $url = $this->getProductUrl($product, $magentoStoreId);
+        }
+        if ($url) {
             $data["url"] = $url;
         }
 
@@ -254,7 +255,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     $this->_parentImageUrl = $data["image_url"];
                 }
                 $this->_parentId = $product->getId();
-                $this->_parentUrl = $data['url'];
+                if ($visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
+                    $this->_parentUrl = $data['url'];
+                }
                 $price = (float)$product->getDefaultPrice();
                 if ($price) {
                     $this->_parentPrice = $price;
