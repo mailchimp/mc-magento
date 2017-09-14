@@ -210,9 +210,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $visibility = ($product->getVisibility()) ? $product->getVisibility() : $product->getDefaultVisibility();
         $url = null;
         if ($visibility == Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
-            if ($this->_parentUrl) {
-                $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
-            }
+            $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
         } else {
             $url = $this->getProductUrl($product, $magentoStoreId);
         }
@@ -667,41 +665,59 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function getNotVisibleProductUrl($childId, $magentoStoreId)
     {
-        $tableName = Mage::getSingleton('core/resource')->getTableName('catalog/product_super_attribute');
-        $eavTableName = Mage::getSingleton('core/resource')->getTableName('eav/attribute');
-
-        $collection = $this->getProductResourceCollection();
-        $collection->addStoreFilter($magentoStoreId);
-        $collection->addFieldToFilter('entity_id', array('eq' => $this->_parentId));
-
-        $collection->getSelect()->joinLeft(
-            array("super_attribute" => $tableName),
-            'entity_id=super_attribute.product_id'
-        );
-
-        $collection->getSelect()->joinLeft(
-            array("eav_attribute" => $eavTableName),
-            'super_attribute.attribute_id=eav_attribute.attribute_id'
-        );
-        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns('eav_attribute.attribute_id');
-
-        $rc = Mage::getResourceModel('catalog/product');
-        $url = $this->_parentUrl;
-        $tailUrl = '#';
-        $count = 0;
-        foreach ($collection as $attribute) {
-            if ($attribute->getAttributeId()) {
-                $attributeId = $attribute->getAttributeId();
-                $attributeValue = $rc->getAttributeRawValue($childId, $attribute->getAttributeId(), $magentoStoreId);
-                if ($count > 0) {
-                    $tailUrl .= '&';
-                }
-                $tailUrl .= $attributeId . '=' . $attributeValue;
+        $parentId = null;
+        if (!$this->_parentId) {
+            $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+            if (count($parentIds)) {
+                $parentId = $parentIds[0];
             }
-            $count++;
+        } else {
+            $parentId = $this->_parentId;
         }
-        if ($tailUrl != '#') {
-            $url .= $tailUrl;
+        if ($parentId) {
+            $tableName = Mage::getSingleton('core/resource')->getTableName('catalog/product_super_attribute');
+            $eavTableName = Mage::getSingleton('core/resource')->getTableName('eav/attribute');
+
+            $collection = $this->getProductResourceCollection();
+            $collection->addStoreFilter($magentoStoreId);
+            $collection->addFieldToFilter('entity_id', array('eq' => $parentId));
+
+            $collection->getSelect()->joinLeft(
+                array("super_attribute" => $tableName),
+                'entity_id=super_attribute.product_id'
+            );
+
+            $collection->getSelect()->joinLeft(
+                array("eav_attribute" => $eavTableName),
+                'super_attribute.attribute_id=eav_attribute.attribute_id'
+            );
+            $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns('eav_attribute.attribute_id');
+
+            $rc = Mage::getResourceModel('catalog/product');
+            if ($this->_parentUrl) {
+                $url = $this->_parentUrl;
+            } else {
+                $path = $rc->getAttributeRawValue($parentId, 'url_path', $magentoStoreId);
+                $url = Mage::getUrl($path, array('_store' => $magentoStoreId));
+            }
+            $tailUrl = '#';
+            $count = 0;
+            foreach ($collection as $attribute) {
+                if ($attribute->getAttributeId()) {
+                    $attributeId = $attribute->getAttributeId();
+                    $attributeValue = $rc->getAttributeRawValue($childId, $attribute->getAttributeId(), $magentoStoreId);
+                    if ($count > 0) {
+                        $tailUrl .= '&';
+                    }
+                    $tailUrl .= $attributeId . '=' . $attributeValue;
+                }
+                $count++;
+            }
+            if ($tailUrl != '#') {
+                $url .= $tailUrl;
+            }
+        } else {
+            $url = null;
         }
         return $url;
     }
