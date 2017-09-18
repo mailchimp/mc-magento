@@ -32,6 +32,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 
         Mage::app()->getResponse()->setBody($result);
     }
+
     public function resetEcommerceDataAction()
     {
         $param = Mage::app()->getRequest()->getParam('scope');
@@ -39,7 +40,25 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $result = 1;
         try {
             Mage::helper('mailchimp')->resetMCEcommerceData($scopeArray[1], $scopeArray[0], true);
-            Mage::helper('mailchimp')->resetErrors($scopeArray[1], $scopeArray[0]);
+        }
+        catch(MailChimp_Error $e) {
+            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
+            $result = 0;
+        }
+        catch(Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+        }
+
+        Mage::app()->getResponse()->setBody($result);
+    }
+
+    public function resendEcommerceDataAction()
+    {
+        $param = Mage::app()->getRequest()->getParam('scope');
+        $scopeArray = explode('-', $param);
+        $result = 1;
+        try {
+            Mage::helper('mailchimp')->resetMCEcommerceData($scopeArray[1], $scopeArray[0], false);
         }
         catch(MailChimp_Error $e) {
             Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
@@ -76,6 +95,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         switch ($this->getRequest()->getActionName()) {
         case 'resetLocalErrors':
         case 'resetEcommerceData':
+        case 'resendEcommerceData':
         case 'createMergeFields':
             $acl = 'system/config/mailchimp';
             break;

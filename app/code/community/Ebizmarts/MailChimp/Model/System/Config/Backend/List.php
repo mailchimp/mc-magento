@@ -17,7 +17,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
         $thisScopeHasSubMinSyncDateFlag = Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $this->getScopeId(), $this->getScope());
 
-        if ($this->isValueChanged() && $moduleIsActive && $this->getValue() && !$thisScopeHasSubMinSyncDateFlag)
+        if ($this->isValueChanged() && ($moduleIsActive || $thisScopeHasSubMinSyncDateFlag) && $this->getValue())
         {
             $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
             Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $this->getScopeId(), $this->getScope());

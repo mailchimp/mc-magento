@@ -90,19 +90,23 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function handleEcommerceBatches()
     {
+        $helper = $this->getHelper();
         $stores = Mage::app()->getStores();
         foreach ($stores as $store) {
-            $this->_getResults($store->getId());
-            $this->_sendEcommerceBatch($store->getId());
+            $storeId = $store->getId();
+            $this->_getResults($storeId);
+            $helper->handleResendDataBefore($storeId);
+            $this->_sendEcommerceBatch($storeId);
+            $helper->handleResendDataAfter($storeId);
         }
 
         foreach ($stores as $store) {
-            if ($this->getHelper()->getIsReseted($store->getId())) {
-                $scopeToReset = $this->getHelper()->getMailChimpScopeByStoreId($store->getId());
+            if ($helper->getIsReseted($store->getId())) {
+                $scopeToReset = $helper->getMailChimpScopeByStoreId($store->getId());
                 if ($scopeToReset) {
-                    $this->getHelper()->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
+                    $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
                     $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
-                    $this->getHelper()->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
+                    $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
                 }
             }
         }
@@ -298,7 +302,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _sendSubscriberBatches()
     {
-        $subscriberLimit = Ebizmarts_MailChimp_Model_Api_Subscribers::BATCH_LIMIT;
+        $helper = $this->getHelper();
+        $subscriberLimit = $helper->getSubscriberAmountLimit();
         $stores = Mage::app()->getStores();
         $batchResponses = array();
         foreach ($stores as $store) {
@@ -334,10 +339,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function sendStoreSubscriberBatch($storeId, $limit)
     {
+        $helper = $this->getHelper();
         try {
             $subscribersArray = array();
-            if ($this->getHelper()->isMailChimpEnabled($storeId)) {
-                $listId = $this->getHelper()->getGeneralList($storeId);
+            if ($helper->isMailChimpEnabled($storeId)) {
+                $listId = $helper->getGeneralList($storeId);
 
                 $batchArray = array();
 
@@ -351,25 +357,29 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if (!empty($batchArray['operations'])) {
                 $batchJson = json_encode($batchArray);
                 if (!$batchJson || $batchJson == '') {
-                    $this->getHelper()->logRequest('An empty operation was detected', $storeId);
+                    $helper->logRequest('An empty operation was detected', $storeId);
                 } else {
-                    $mailchimpApi = $this->getHelper()->getApi($storeId);
-                    $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-                    $this->getHelper()->logRequest($batchJson, $storeId, $batchResponse['id']);
+                    try {
+                        $mailchimpApi = $helper->getApi($storeId);
+                        $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                        $helper->logRequest($batchJson, $storeId, $batchResponse['id']);
 
-                    //save batch id to db
-                    $batch = Mage::getModel('mailchimp/synchbatches');
-                    $batch->setStoreId($storeId)
-                        ->setBatchId($batchResponse['id'])
-                        ->setStatus($batchResponse['status']);
-                    $batch->save();
-                    return array($batchResponse, $limit);
+                        //save batch id to db
+                        $batch = Mage::getModel('mailchimp/synchbatches');
+                        $batch->setStoreId($storeId)
+                            ->setBatchId($batchResponse['id'])
+                            ->setStatus($batchResponse['status']);
+                        $batch->save();
+                        return array($batchResponse, $limit);
+                    } catch (MailChimp_Error $e) {
+                        $helper->logRequest($batchJson, $storeId);
+                    }
                 }
             }
         } catch (MailChimp_Error $e) {
-            $this->getHelper()->logError($e->getFriendlyMessage(), $storeId);
+            $helper->logError($e->getFriendlyMessage(), $storeId);
         } catch (Exception $e) {
-            $this->getHelper()->logError($e->getMessage(), $storeId);
+            $helper->logError($e->getMessage(), $storeId);
         }
 
         return array(null, $limit);
@@ -466,9 +476,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if ($errorDetails == "") {
                         $errorDetails = $response->detail;
                     }
-                    if (strstr($errorDetails, 'already exists in the account')) {
-                        continue;
-                    }
 
                     if (strstr($errorDetails, 'already exists in the account')) {
                         $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, null, null, true);
@@ -555,8 +562,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                     $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false)
     {
         $helper = $this->getHelper();
-        if ($itemType == 'SUB') {
-            $helper->updateSubscriberSyndData($itemId,$syncDelta, $syncError, 0, null);
+        if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
+            $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
             $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $saveOnlyIfexists);
         }

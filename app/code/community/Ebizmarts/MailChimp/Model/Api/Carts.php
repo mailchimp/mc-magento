@@ -28,20 +28,24 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $helper = $this->getHelper();
         $allCarts = array();
-        if (!Mage::helper('mailchimp')->isAbandonedCartEnabled($magentoStoreId)) {
+        if (!$helper->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
         }
 
-        $this->_firstDate = Mage::helper('mailchimp')->getAbandonedCartFirstDate($magentoStoreId);
+        $this->_firstDate = $helper->getAbandonedCartFirstDate($magentoStoreId);
         $this->_counter = 0;
 
-        $date = Mage::helper('mailchimp')->getDateMicrotime();
+        $date = $helper->getDateMicrotime();
         $this->_batchId = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_QUOTE.'_'.$date;
-        // get all the carts converted in orders (must be deleted on mailchimp)
-        $allCarts = array_merge($allCarts, $this->_getConvertedQuotes($mailchimpStoreId, $magentoStoreId));
-        // get all the carts modified but not converted in orders
-        $allCarts = array_merge($allCarts, $this->_getModifiedQuotes($mailchimpStoreId, $magentoStoreId));
+        $resendTurn = $helper->getResendTurn($magentoStoreId);
+        if (!$resendTurn) {
+            // get all the carts converted in orders (must be deleted on mailchimp)
+            $allCarts = array_merge($allCarts, $this->_getConvertedQuotes($mailchimpStoreId, $magentoStoreId));
+            // get all the carts modified but not converted in orders
+            $allCarts = array_merge($allCarts, $this->_getModifiedQuotes($mailchimpStoreId, $magentoStoreId));
+        }
         // get new carts
         $allCarts = array_merge($allCarts, $this->_getNewQuotes($mailchimpStoreId, $magentoStoreId));
         return $allCarts;
@@ -70,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         // be sure that the quotes are already in mailchimp and not deleted
         $convertedCarts->getSelect()->where("m4m.mailchimp_sync_deleted = 0");
         // limit the collection
-        $convertedCarts->getSelect()->limit(self::BATCH_LIMIT);
+        $convertedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
         foreach ($convertedCarts as $cart) {
             $cartId = $cart->getEntityId();
                 // we need to delete all the carts associated with this email
@@ -126,7 +130,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
-        $modifiedCarts->getSelect()->limit(self::BATCH_LIMIT);
+        $modifiedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
         foreach ($modifiedCarts as $cart) {
             $cartId = $cart->getEntityId();
             $allCarts[$this->_counter]['method'] = 'DELETE';
@@ -190,7 +194,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getNewQuotes($mailchimpStoreId, $magentoStoreId)
     {
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $helper = $this->getHelper();
         $allCarts = array();
         $newCarts = Mage::getResourceModel('sales/quote_collection');
         $newCarts->addFieldToFilter('is_active', array('eq'=>1));
@@ -198,22 +202,18 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->addFieldToFilter('items_count', array('gt'=>0));
         // select carts for the current Magento store id
         $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
+        $helper->addResendFilter($newCarts, $magentoStoreId);
         // filter by first date if exists.
         if ($this->_firstDate) {
             $newCarts->addFieldToFilter('updated_at', array('gt' => $this->_firstDate));
         }
 
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
-        $newCarts->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            array('m4m.*')
-        );
+        $this->joinMailchimpSyncDataWithoutWhere($newCarts, $mailchimpStoreId);
         // be sure that the quotes are already in mailchimp and not deleted
         $newCarts->getSelect()->where("m4m.mailchimp_sync_delta IS NULL");
         // limit the collection
-        $newCarts->getSelect()->limit(self::BATCH_LIMIT);
+        $newCarts->getSelect()->limit($this->getBatchLimitFromConfig());
 
         foreach ($newCarts as $cart) {
             $cartId = $cart->getEntityId();
@@ -348,7 +348,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $line['product_id'] = $item->getProductId();
             $line['product_variant_id'] = $variantId;
             $line['quantity'] = (int)$item->getQty();
-            $line['price'] = $item->getPrice();
+            $line['price'] = $item->getRowTotal();
             $lines[] = $line;
         }
 
@@ -379,6 +379,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true,'_secure' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->_token = $token;
         return $url;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getBatchLimitFromConfig()
+    {
+        $helper = $this->getHelper();
+        return $helper->getCustomerAmountLimit();
     }
 
     /**
@@ -506,5 +515,25 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCarts = $productDataArray[0];
         $this->_counter = $productDataArray[1];
         return $allCarts;
+    }
+
+    protected function getHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @param $newCarts
+     * @param $mailchimpStoreId
+     */
+    public function joinMailchimpSyncDataWithoutWhere($newCarts, $mailchimpStoreId)
+    {
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $newCarts->getSelect()->joinLeft(
+            array('m4m' => $mailchimpTableName),
+            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
+            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+            array('m4m.*')
+        );
     }
 }

@@ -8,15 +8,15 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @date:     5/27/16 1:16 PM
- * @file:     ResetEcommerceData.php
+ * @file:     ResendEcommerceData.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected function _construct()
     {
         parent::_construct();
-        $this->setTemplate('ebizmarts/mailchimp/system/config/resetecommercedata.phtml');
+        $this->setTemplate('ebizmarts/mailchimp/system/config/resendecommercedata.phtml');
     }
 
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
@@ -28,14 +28,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
     {
         $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
         if (Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
-            $label = $this->helper('mailchimp')->__('Reset MailChimp Store');
+            $label = $this->helper('mailchimp')->__('Resend Ecommerce Data');
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(
-                        'id' => 'resetecommercedata_button',
+                        'id' => 'resendecommercedata_button',
                         'label' => $label,
-                        'onclick' => 'javascript:resetecommerce(); return false;',
-                        'title' => $this->helper('mailchimp')->__('Re-create MailChimp store for current scope')
+                        'onclick' => 'javascript:resendecommerce(); return false;',
+                        'title' => $this->helper('mailchimp')->__('Resend Ecommerce Data current scope')
                     )
                 );
 
@@ -48,14 +48,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
      */
     public function getMessage()
     {
-        $message = 'Are you sure you want to delete the current MailChimp store for this scope and create a new one?\nAutomations created for this store will need to be re-created.';
+        $message = 'Are you sure you want to delete the local data in order to send all items again?\nAutomations will work normally but the synchronization process for the old data will take longer than resetting the MailChimp store.';
         return $this->helper('mailchimp')->__($message);
     }
 
     public function getAjaxCheckUrl()
     {
         $scopeString = Mage::helper('mailchimp')->getScopeString();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetEcommerceData', array('scope' => $scopeString));
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeString));
     }
 
 }

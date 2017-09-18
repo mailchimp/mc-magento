@@ -16,4 +16,36 @@ class MailChimp_Automation extends MailChimp_Abstract
      * @var MailChimp_AutomationEmails
      */
     public $emails;
+
+    public function get($id = null, $fields = null, $excludeFields = null, $status = null, $beforeSendTime = null,
+                        $sinceSendTime = null, $beforeCreateTime = null, $sinceCreateTime = null)
+    {
+        $_params = array();
+        if ($fields) {
+            $_params['fields'] = $fields;
+        }
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
+        }
+        if ($status) {
+            $_params['status'] = $status;
+        }
+        if ($beforeSendTime) {
+            $_params['before_send_time'] = $beforeSendTime;
+        }
+        if ($sinceSendTime) {
+            $_params['since_send_time'] = $sinceSendTime;
+        }
+        if ($beforeCreateTime) {
+            $_params['before_create_time'] = $beforeCreateTime;
+        }
+        if ($sinceCreateTime) {
+            $_params['since_create_time'] = $sinceCreateTime;
+        }
+        if ($id) {
+            return $this->_master->call('automations/' . $id, $_params, Ebizmarts_MailChimp::GET);
+        } else {
+            return $this->_master->call('automations', $_params, Ebizmarts_MailChimp::GET);
+        }
+    }
 }

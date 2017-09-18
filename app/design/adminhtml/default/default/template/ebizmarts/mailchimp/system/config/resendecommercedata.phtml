@@ -1,0 +1,25 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function resendecommerce() {
+        if (confirm('<?php echo $this->getMessage() ?>')) {
+            new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+                method: 'get',
+                onSuccess: function (transport) {
+
+                    if (transport.responseText == 1) {
+                        alert('The sending data process has been reset.')
+                    }
+                    else {
+                        alert('An error happened while removing the local sync data.')
+                    }
+                },
+                onFailure: function () {
+                    alert('Something went wrong.')
+                }
+            });
+        }
+    }
+    //]]>
+</script>
+
+<?php echo $this->getButtonHtml(); ?>

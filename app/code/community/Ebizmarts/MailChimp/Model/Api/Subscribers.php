@@ -23,13 +23,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function createBatchJson($listId, $storeId, $limit)
     {
         $helper = $this->mcHelper;
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);;
+        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
+        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
         $moduleIsActive = $helper->isMailChimpEnabled($storeId);
         $subscriberArray = array();
 
         if ($moduleIsActive) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
-            if ($helper->getGeneralList($realScope['scope_id'], $realScope['scope']) && !$thisScopeHasSubMinSyncDateFlag) {
+            if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
+                $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
                 $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
             }
@@ -52,6 +53,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         array('eq' => 1)
                     )
                 );
+            $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
             $collection->getSelect()->limit($limit);
             $date = $helper->getDateMicrotime();
             $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
@@ -81,6 +83,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
                     $subscriber->setData("mailchimp_sync_error", "");
                     $subscriber->setData("mailchimp_sync_modified", 0);
+                    $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
                     $subscriber->save();
                 }
 
@@ -93,6 +96,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     protected function _buildSubscriberData($subscriber)
     {
+        $helper = $this->mcHelper;
         $storeId = $subscriber->getStoreId();
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
@@ -102,6 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
 
         $data["status_if_new"] = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $data["language"] = $helper->getStoreLanguageCode($storeId);
 
         return $data;
     }
@@ -137,17 +142,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 case 'default_billing':
                                 case 'default_shipping':
                                     $address = $customer->getPrimaryAddress($attributeCode);
-
-                                    if ($address) {
-                                        $street = $address->getStreet();
-                                        $eventValue = $mergeVars[$key] = array(
-                                            "addr1" => $street[0] ? $street[0] : "",
-                                            "addr2" => count($street) > 1 ? $street[1] : "",
-                                            "city" => $address->getCity() ? $address->getCity() : "",
-                                            "state" => $address->getRegion() ? $address->getRegion() : "",
-                                            "zip" => $address->getPostcode() ? $address->getPostcode() : "",
-                                            "country" => $address->getCountry() ? Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName() : ""
-                                        );
+                                    $addressData = $this->getAddressData($address);
+                                    if (count($addressData)) {
+                                        $eventValue = $mergeVars[$key] = $addressData;
                                     }
                                     break;
                                 case 'gender':
@@ -455,7 +452,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $api = $helper->getApi($storeId);
         try {
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->update($listId, $md5HashEmail, null, 'cleaned');
+            $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
         } catch (MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage(), $storeId);
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
@@ -472,5 +469,42 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         }
+    }
+
+    /**
+     * @param $address
+     * @return array
+     */
+    protected function getAddressData($address)
+    {
+        $addressData = array();
+        if ($address) {
+            $street = $address->getStreet();
+            if (count($street) > 1) {
+                $addressData["addr1"] = $street[0];
+                $addressData["addr2"] = $street[1];
+            } else {
+                if (!empty($street[0])) {
+                    $addressData["addr1"] = $street[0];
+                }
+            }
+
+            if ($address->getCity()) {
+                $addressData["city"] = $address->getCity();
+            }
+
+            if ($address->getRegion()) {
+                $addressData["state"] = $address->getRegion();
+            }
+
+            if ($address->getPostcode()) {
+                $addressData["zip"] = $address->getPostcode();
+            }
+
+            if ($address->getCountry()) {
+                $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+            }
+        }
+        return $addressData;
     }
 }
