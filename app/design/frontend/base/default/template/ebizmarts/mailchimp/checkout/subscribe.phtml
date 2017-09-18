@@ -46,10 +46,8 @@ $generalList = $this->getGeneralList();
 //                $("co-payment-form").insert(listValue);
             }
         } else {
-            alert(element.readAttribute('value'));
             var arrCheckedLists = checkedLists.split(',');
             var pos = arrCheckedLists.indexOf(element.readAttribute('value'));
-            alert(pos);
             if (pos != -1) {
                 arrCheckedLists.splice(pos, 1);
                 checkedLists = arrCheckedLists.join(',');
