@@ -485,7 +485,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $addressData["addr2"] = $street[1];
             } else {
                 if (!empty($street[0])) {
-                    $addressData["address1"] = $street[0];
+                    $addressData["addr1"] = $street[0];
                 }
             }
 
