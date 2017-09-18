@@ -762,7 +762,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
                     if (!$alreadyExists) {
                         foreach ($customFieldTypes as $customFieldType) {
-                            if ($customFieldType['value'] == $chimpTag) {
+                            if ($customFieldType['value'] == $customAtt) {
                                 try {
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
                                 } catch (MailChimp_Error $e) {
@@ -1941,7 +1941,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getModel('mailchimp/api_stores');
     }
-  
+
     public function getCheckoutSubscribeValue($scopeId, $scope = 'stores')
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_CHECKOUT_SUBSCRIBE, $scopeId, $scope);

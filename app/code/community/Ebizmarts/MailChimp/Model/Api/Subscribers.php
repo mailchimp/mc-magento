@@ -495,11 +495,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($address) {
             $street = $address->getStreet();
             if (count($street) > 1) {
-                $addressData["address1"] = $street[0];
-                $addressData["address2"] = $street[1];
+                $addressData["addr1"] = $street[0];
+                $addressData["addr2"] = $street[1];
             } else {
                 if (!empty($street[0])) {
-                    $addressData["address1"] = $street[0];
+                    $addressData["addr1"] = $street[0];
                 }
             }
 
