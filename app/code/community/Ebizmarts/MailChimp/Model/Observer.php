@@ -192,7 +192,23 @@ class Ebizmarts_MailChimp_Model_Observer
         $storeId = Mage::app()->getStore()->getStoreId();
 
         //update mailchimp ecommerce data for that product variant
-        Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
+        if ($storeId == 0) {
+            $mailchimpStoreIdsArray = $this->makeHelper()->getAllMailChimpStoreIds();
+            foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
+                $scopeArray = explode('_', $scopeData);
+                if ($scopeArray[0] != 'websites'){
+                    Mage::getModel('mailchimp/api_orders')->update($order->getId(), $scopeArray[1]);
+                } else {
+                    $website = Mage::getModel('core/website')->load($scopeArray[1]);
+                    $storeIds = $website->getStoreIds();
+                    foreach ($storeIds as $storeId) {
+                        Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
+                    }
+                }
+            }
+        } else {
+            Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
+        }
     }
 
     /**
