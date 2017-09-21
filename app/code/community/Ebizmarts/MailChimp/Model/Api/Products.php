@@ -237,10 +237,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
             //mailchimp product type (magento category)
-            $categoryId = $product->getCategoryId();
-            if ($categoryId) {
-                $category = Mage::getResourceModel('catalog/category')->checkId($categoryId);
-                $data["type"] = $category->getName();
+            $categoryIds = $product->getCategoryIds();
+            $categoryNames = array();
+            if (is_array($categoryIds) && count($categoryIds)) {
+                foreach ($categoryIds as $categoryId) {
+                    $category = Mage::getModel('catalog/category')->setStoreId($magentoStoreId)->load($categoryId);
+                    $categoryNames[] = $category->getName();
+                }
+                $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
+                $data["type"] = $categoryName;
                 $data["vendor"] = $data["type"];
             }
 
