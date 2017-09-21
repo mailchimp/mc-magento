@@ -2310,4 +2310,28 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return $this->getConfigValueForScope('general/store_information/phone', $scopeId, $scope);
     }
+
+    public function subscribeMember($subscriber, $forceUpdateStatus = false)
+    {
+        $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+        $subscriber->setSubscriberConfirmCode($subscriber->randomSequence());
+        if ($forceUpdateStatus) {
+            $subscriber->setMailchimpSyncModified(1);
+        }
+        $this->setMemberGeneralData($subscriber);
+    }
+
+    protected function unsubscribeMember($subscriber)
+    {
+        $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+        $this->setMemberGeneralData($subscriber);
+    }
+
+    protected function setMemberGeneralData($subscriber)
+    {
+        $subscriber->setImportMode(true);
+        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+        $subscriber->setIsStatusChanged(true);
+        $subscriber->save();
+    }
 }
