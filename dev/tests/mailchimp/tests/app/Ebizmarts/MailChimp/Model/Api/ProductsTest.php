@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     "getProductUrl",
                     "getDescription",
                     "getDefaultDescription",
-                    "getCategoryIds",
+                    "getCategoryIds"
                 )
             )
             ->getMock();
