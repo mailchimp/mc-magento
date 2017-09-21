@@ -1651,6 +1651,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $customer = $this->loadListCustomer($listId, $email);
                 if ($customer) {
                     $subscriber->setStoreId($customer->getStoreId());
+                    $subscriber->setCustomerId($customer->getId());
                 } else {
                     /**
                      * No customer with that address. Just assume the first
