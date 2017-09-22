@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     "getProductUrl",
                     "getDescription",
                     "getDefaultDescription",
-                    "getCategoryId",
+                    "getCategoryIds"
                 )
             )
             ->getMock();
@@ -110,7 +110,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productMock->expects($this->exactly(2))->method('getProductUrl')->willReturn("http://a.example");
         $productMock->expects($this->exactly(2))->method('getDescription')->willReturn(null);
         $productMock->expects($this->exactly(2))->method('getDefaultDescription')->willReturn("Lorem ipsum dolor sit amet. LONG");
-        $productMock->expects($this->once())->method('getCategoryId')->willReturn(null);
+        $productMock->expects($this->once())->method('getCategoryIds')->willReturn(null);
 
         $products []= $productMock;
 

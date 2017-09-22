@@ -236,11 +236,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $data["description"] = ($product->getDescription()) ? $product->getDescription() : $product->getDefaultDescription();
             }
 
-            //mailchimp product type (magento category)
-            $categoryId = $product->getCategoryId();
-            if ($categoryId) {
-                $category = Mage::getResourceModel('catalog/category')->checkId($categoryId);
-                $data["type"] = $category->getName();
+            //mailchimp product type and vendor (magento category)
+            $categoryName = $this->getProductCategories($product, $magentoStoreId);
+            if ($categoryName) {
+                $data["type"] = $categoryName;
                 $data["vendor"] = $data["type"];
             }
 
@@ -735,5 +734,20 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $url = $product->getProductUrl();
         Mage::app()->setCurrentStore($oldStoreId);
         return $url;
+    }
+
+    protected function getProductCategories($product, $magentoStoreId)
+    {
+        $categoryIds = $product->getCategoryIds();
+        $categoryNames = array();
+        $categoryName = null;
+        if (is_array($categoryIds) && count($categoryIds)) {
+            foreach ($categoryIds as $categoryId) {
+                $category = Mage::getModel('catalog/category')->setStoreId($magentoStoreId)->load($categoryId);
+                $categoryNames[] = $category->getName();
+            }
+            $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
+        }
+        return $categoryName;
     }
 }
