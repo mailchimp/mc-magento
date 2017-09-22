@@ -742,8 +742,16 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $categoryNames = array();
         $categoryName = null;
         if (is_array($categoryIds) && count($categoryIds)) {
-            foreach ($categoryIds as $categoryId) {
-                $category = Mage::getModel('catalog/category')->setStoreId($magentoStoreId)->load($categoryId);
+            /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
+            $collection = Mage::getModel('catalog/category')->getCollection();
+            $collection->addAttributeToSelect(array('name'))
+                ->setStoreId($magentoStoreId)
+                ->addAttributeToFilter('is_active', array('eq'=>'1'))
+                ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
+                ->addAttributeToSort('level', 'asc');
+
+            /* @var $category Mage_Catalog_Model_Category */
+            foreach ($collection as $category) {
                 $categoryNames[] = $category->getName();
             }
             $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
