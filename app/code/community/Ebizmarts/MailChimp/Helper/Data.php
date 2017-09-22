@@ -2312,6 +2312,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope('general/store_information/phone', $scopeId, $scope);
     }
 
+    public function getAllMailChimpStoreIds()
+    {
+        $collection = Mage::getResourceModel('core/config_data_collection')
+            ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID));
+        $mailchimpStoreIdsArray = array();
+        foreach ($collection as $row) {
+            $scopeData = $row->getScope().'_'.$row->getScopeId();
+            $mailchimpStoreIdsArray[$scopeData] = $row->getValue();
+        }
+        return $mailchimpStoreIdsArray;
+    }
+  
     public function subscribeMember($subscriber, $forceUpdateStatus = false)
     {
         $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
