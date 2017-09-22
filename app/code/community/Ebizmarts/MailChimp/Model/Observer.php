@@ -320,7 +320,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $email = $order->getCustomerEmail();
             $subscriber = $helper->loadListSubscriber($post, $email);
             if ($subscriber) {
-                Mage::getModel('mailchimp/processWebhook')->subscribeMember($subscriber);
+                $helper->subscribeMember($subscriber, true);
             }
         }
         if(($this->_getLandingCookie())) {

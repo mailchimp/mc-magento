@@ -105,7 +105,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $data["merge_fields"] = $mergeVars;
         }
 
-        $data["status_if_new"] = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $data["status_if_new"] = $status;
+        if ($subscriber->getMailchimpSyncModified()) {
+            $data["status"] = $status;
+        }
         $data["language"] = $helper->getStoreLanguageCode($storeId);
 
         return $data;
