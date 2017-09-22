@@ -304,6 +304,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
         }
 
+        $newVars = new Varien_Object;
+
+        Mage::dispatchEvent(
+            'mailchimp_mergevars_after', array(
+                'subscriber' => $subscriber,
+                'vars' => $mergeVars,
+                'new_vars' => $newVars
+            )
+        );
+
+        if ($newVars->hasData()) {
+            $mergeVars = array_merge($mergeVars, $newVars->getData());
+        }
+
         return (!empty($mergeVars)) ? $mergeVars : null;
     }
 
