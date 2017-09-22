@@ -350,25 +350,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         Mage::getSingleton('core/session')->addWarning($message);
                     } catch (MailChimp_Error $e) {
                         $helper->logError($e->getFriendlyMessage(), $storeId);
-                        if ($isAdmin) {
-                            Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
-                        }
+                        $this->addError($isAdmin, $e);
                         $subscriber->unsubscribe();
                     } catch (Exception $e) {
                         $helper->logError($e->getMessage(), $storeId);
                     }
                 } else {
                     $helper->logError($e->getFriendlyMessage(), $storeId);
-                    if ($isAdmin) {
-                        Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
-                    }
+                    $this->addError($isAdmin, $e);
                     $subscriber->unsubscribe();
                 }
             } else {
                 $helper->logError($e->getFriendlyMessage(), $storeId);
-                if ($isAdmin) {
-                    Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
-                }
+                $this->addError($isAdmin, $e);
             }
         } catch (Exception $e) {
             $helper->logError($e->getMessage(), $storeId);
@@ -525,5 +519,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
         }
         return $addressData;
+    }
+
+    /**
+     * @param $isAdmin
+     * @param $e
+     */
+    protected function addError($isAdmin, $e)
+    {
+        if ($isAdmin) {
+            Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+        }
     }
 }
