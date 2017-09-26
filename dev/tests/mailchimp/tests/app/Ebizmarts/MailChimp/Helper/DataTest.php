@@ -175,12 +175,20 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isEcomSyncDataEnabled', 'getConfigValueForScope', 'areJsUrlAndListScopesEqual'))
+            ->setMethods(array('isEcomSyncDataEnabled', 'getConfigValueForScope', 'areJsUrlAndListScopesEqual', 'getApiStores'))
+            ->getMock();
+
+        $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMCJs'))
             ->getMock();
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(1);
         $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId)->willReturn($currentUrl);
         $helperMock->expects($this->once())->method('areJsUrlAndListScopesEqual')->with($storeId)->willReturn(1);
+        $helperMock->expects($this->any())->method('getApiStores')->willReturn($apiStoresMock);
+
+        $apiStoresMock->expects($this->any())->method('getMCJs')->with($storeId, 'stores')->willReturn($currentUrl);
 
         $this->assertEquals($helperMock->getMCJs(), $expected);
     }
