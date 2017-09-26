@@ -182,6 +182,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId)->willReturn($currentUrl);
         $helperMock->expects($this->once())->method('areJsUrlAndListScopesEqual')->with($storeId)->willReturn(1);
 
-        $this->assertSame($helperMock->getMCJs(), $expected);
+        $this->assertEquals($helperMock->getMCJs(), $expected);
     }
 }
