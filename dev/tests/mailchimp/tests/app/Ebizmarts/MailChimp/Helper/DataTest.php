@@ -166,4 +166,22 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->handleResendDataAfter($storeId);
     }
+
+    public function testGetMCJs()
+    {
+        $storeId = 1;
+        $currentUrl = Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+        $expected = '<script type="text/javascript" src="' . $currentUrl . '"></script>';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isEcomSyncDataEnabled', 'getConfigValueForScope', 'areJsUrlAndListScopesEqual'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(1);
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId)->willReturn($currentUrl);
+        $helperMock->expects($this->once())->method('areJsUrlAndListScopesEqual')->with($storeId)->willReturn(1);
+
+        $this->assertSame($helperMock->getMCJs(), $expected);
+    }
 }
