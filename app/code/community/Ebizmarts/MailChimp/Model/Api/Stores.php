@@ -113,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             if (isset($response['connected_site']['site_script']['url'])) {
                 $url = $response['connected_site']['site_script']['url'];
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
-                $realScope = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scopeId, $scope);
+                $realScope = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
                 Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
                 return $url;
             }
