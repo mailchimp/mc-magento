@@ -109,11 +109,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = Mage::helper('mailchimp')->getApi($scopeId, $scope);
             $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeId, $scope);
-            $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
+            $response = $this->getStoreConnectedSiteData($api, $mailchimpStoreId);
             if (isset($response['connected_site']['site_script']['url'])) {
                 $url = $response['connected_site']['site_script']['url'];
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
-                $realScope = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scopeId, $scope);
+                $realScope = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
                 Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
                 return $url;
             }
@@ -138,5 +138,16 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
         $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, (int)$isSincingValue));
         Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
+    }
+
+    /**
+     * @param $api
+     * @param $mailchimpStoreId
+     * @return mixed
+     */
+    protected function getStoreConnectedSiteData($api, $mailchimpStoreId)
+    {
+        $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
+        return $response;
     }
 }

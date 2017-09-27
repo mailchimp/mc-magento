@@ -1126,9 +1126,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getMCJs()
     {
         $script = '';
+        $url = null;
         $storeId = Mage::app()->getStore()->getId();
         if ($this->isEcomSyncDataEnabled($storeId)) {
-            $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+            $currentUrl = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+            if ($this->areJsUrlAndListScopesEqual($storeId)) {
+                $url = $currentUrl;
+            }
+
             if (!$url) {
                 $url = $this->getApiStores()->getMCJsUrl($storeId, 'stores');
             }
@@ -1823,7 +1828,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $scopeSoFar = null;
         foreach ($configCollection as $config) {
             //Discard possible extra website or store
-            if ($this->isExtraEntry($config, $scope, $websiteId)) {
+            if ($this->isExtraEntry($config, $scope, $scopeId, $websiteId)) {
                 continue;
             }
             switch ($config->getScope()) {
@@ -1851,12 +1856,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param $config
      * @param $scope
+     * @param $scopeId
      * @param $websiteId
      * @return bool
      */
-    protected function isExtraEntry($config, $scope, $websiteId)
+    protected function isExtraEntry($config, $scope, $scopeId, $websiteId)
     {
-        return $config->getScopeId() != 0 && (($config->getScope() == 'stores' && $scope != 'stores') || ($config->getScope() == 'websites' && $scope == 'stores' && $config->getScopeId() != $websiteId));
+        return $this->isNotDefaultScope($config) && ($this->isIncorrectScope($config, $scope) || $this->isDifferentWebsite($config, $scope, $websiteId) || $this->isDifferentStoreView($config, $scope, $scopeId));
     }
 
     public function updateSubscriberSyndData($itemId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null)
@@ -2346,5 +2352,61 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
         $subscriber->setIsStatusChanged(true);
         $subscriber->save();
+    }
+
+    /**
+     * @param $config
+     * @param $scope
+     * @param $scopeId
+     * @return bool
+     */
+    protected function isDifferentStoreView($config, $scope, $scopeId)
+    {
+        return $config->getScope() == 'stores' && $scope == 'stores' && $scopeId != $config->getScopeId();
+    }
+
+    /**
+     * @param $config
+     * @param $scope
+     * @param $websiteId
+     * @return bool
+     */
+    protected function isDifferentWebsite($config, $scope, $websiteId)
+    {
+        return ($config->getScope() == 'websites' && $scope == 'stores' && $config->getScopeId() != $websiteId);
+    }
+
+    /**
+     * @param $config
+     * @param $scope
+     * @return bool
+     */
+    protected function isIncorrectScope($config, $scope)
+    {
+        return ($config->getScope() == 'stores' && $scope != 'stores');
+    }
+
+    /**
+     * @param $config
+     * @return bool
+     */
+    protected function isNotDefaultScope($config)
+    {
+        return $config->getScopeId() != 0;
+    }
+
+    /**
+     * @param $storeId
+     * @return bool
+     */
+    protected function areJsUrlAndListScopesEqual($storeId)
+    {
+        $scopesMatch = false;
+        $realScopeList = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+        $realScopeJs = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+        if ($realScopeList && $realScopeJs && $realScopeList['scope'] == $realScopeJs['scope'] && $realScopeList['scope_id'] == $realScopeJs['scope_id']) {
+            $scopesMatch = true;
+        }
+        return $scopesMatch;
     }
 }
