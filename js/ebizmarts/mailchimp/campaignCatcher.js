@@ -22,13 +22,15 @@ function getCampaign() {
         }
         if (key == 'utm_campaign') {
             var campaignArray = val.split("-");
-            campaign = campaignArray[0];
+            var campaignValue = campaignArray[0];
+            if (campaignValue.length == 10)
+            campaign = campaignValue;
         }
     }
     if (mc_cid) {
         Mage.Cookies.set('mailchimp_campaign_id', mc_cid);
     } else {
-        if (campaign && campaign.length == 10) {
+        if (campaign) {
             Mage.Cookies.set('mailchimp_campaign_id', campaign);
         }
     }
