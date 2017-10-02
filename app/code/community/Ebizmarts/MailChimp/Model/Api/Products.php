@@ -220,7 +220,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["url"] = $url;
 
         //image
-        $imageUrl = $this->getMailChimpHelper()->getMailChimpProductImageUrl($this->_parentImageUrl, $this->getMailChimpHelper()->getImageUrlById($product->getId()));
+        $imageUrl = $this->getMailChimpHelper()->getMailChimpProductImageUrl($this->_parentImageUrl, $this->getMailChimpHelper()->getImageUrlById($product->getId(), $magentoStoreId));
         if ($imageUrl) {
             $data["image_url"] = $imageUrl;
         }
