@@ -193,13 +193,12 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
-     * Delete campaign cookie after it was added to the order object.
+     * Delete campaign and landing cookies.
      *
-     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
-    public function removeCampaignData(Varien_Event_Observer $observer)
+    public function removeCampaignData()
     {
         if ($this->_getCampaignCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
@@ -208,8 +207,6 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($this->_getLandingCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
         }
-
-        return $observer;
     }
 
     /**
@@ -323,13 +320,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 $helper->subscribeMember($subscriber, true);
             }
         }
-        if(($this->_getLandingCookie())) {
-            Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
-        }
 
-        if ($this->_getCampaignCookie()) {
-            Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
-        }
+        $this->removeCampaignData();
 
         $order = $observer->getEvent()->getOrder();
         $items = $order->getAllItems();
