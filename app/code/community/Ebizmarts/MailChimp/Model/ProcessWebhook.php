@@ -181,12 +181,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         if (Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
                             $subscriber->delete();
                         } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                            $this->unsubscribeMember($subscriber);
+                            $helper->unsubscribeMember($subscriber);
                         }
                         break;
                     case 'unsub':
                         if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
-                            $this->unsubscribeMember($subscriber);
+                            $helper->unsubscribeMember($subscriber);
                         }
                         break;
                 }
@@ -248,7 +248,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                             $helper->subscribeMember($subscriber);
                         } elseif ($member['status'] == 'unsubscribed') {
                             if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
-                                $this->unsubscribeMember($subscriber);
+                                $helper->unsubscribeMember($subscriber);
                             }
                         }
                     } catch (MailChimp_Error $e) {
