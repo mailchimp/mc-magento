@@ -1029,16 +1029,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Returns product image url by id, if it does not have one returns null.
      *
      * @param  $productId
+     * @param  $magentoStoreId
      * @return null
      */
-    public function getImageUrlById($productId)
+    public function getImageUrlById($productId, $magentoStoreId)
     {
-        $productMediaConfig = $this->getProductMediaConfig();
-        $product = $this->loadProductById($productId);
-        $productImage = $product->getImage();
+        $model = Mage::getResourceModel('catalog/product');
+        $productImage = $model->getAttributeRawValue($productId, 'image', $magentoStoreId);
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
+            $productMediaConfig = $this->getProductMediaConfig();
             $imageUrl = $productMediaConfig->getMediaUrl($productImage);
         }
         return $imageUrl;
@@ -1047,11 +1048,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     private function getProductMediaConfig()
     {
         return Mage::getModel('catalog/product_media_config');
-    }
-
-    private function loadProductById($productId)
-    {
-        return Mage::getModel('catalog/product')->load($productId);
     }
 
     /**
