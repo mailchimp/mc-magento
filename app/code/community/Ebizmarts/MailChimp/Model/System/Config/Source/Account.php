@@ -36,6 +36,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         if ($api) {
             try {
                 $this->_accountDetails = $api->root->info('account_name,total_subscribers');
+                $listData = $api->lists->getLists($listId, 'stats');
+                $this->_accountDetails['list_subscribers'] = $listData['stats']['member_count'];
                 if ($mcStoreId && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
                     try {
                         $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
@@ -80,12 +82,16 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         $helper = $this->helper;
         $scopeArray = explode('-', $helper->getScopeString());
         if (is_array($this->_accountDetails)) {
-            $totalSubscribersText = $helper->__('Total subscribers:');
-            $totalSubscribers = $totalSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
+            $totalAccountSubscribersText = $helper->__('Total Account Aubscribers:');
+            $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
+            $totalListSubscribersText = $helper->__('Total List Subscribers:');
+            $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
+//            $options['total_list_subscribers'] = ['label' => __('Total List Subscribers:'), 'value' => $list['stats']['member_count']];
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
             $returnArray = array(
                 array('value' => 0, 'label' => $username),
-                array('value' => 1, 'label' => $totalSubscribers)
+                array('value' => 1, 'label' => $totalAccountSubscribers),
+                array('value' => 2, 'label' => $totalListSubscribers)
             );
             if ($this->_accountDetails['store_exists']) {
                 $totalCustomersText = $helper->__('  Total Customers:');
@@ -106,12 +112,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 2, 'label' => $title),
-                        array('value' => 3, 'label' => $syncLabel),
-                        array('value' => 4, 'label' => $totalCustomers),
-                        array('value' => 5, 'label' => $totalProducts),
-                        array('value' => 6, 'label' => $totalOrders),
-                        array('value' => 7, 'label' => $totalCarts)
+                        array('value' => 3, 'label' => $title),
+                        array('value' => 4, 'label' => $syncLabel),
+                        array('value' => 5, 'label' => $totalCustomers),
+                        array('value' => 6, 'label' => $totalProducts),
+                        array('value' => 7, 'label' => $totalOrders),
+                        array('value' => 8, 'label' => $totalCarts)
                     )
                 );
             } elseif ($helper->isEcomSyncDataEnabled($scopeArray[1], $scopeArray[0], true)) {
@@ -120,8 +126,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 8, 'label' => $noStoreText),
-                        array('value' => 9, 'label' => $newStoreText)
+                        array('value' => 20, 'label' => $noStoreText),
+                        array('value' => 21, 'label' => $newStoreText)
                     )
                 );
             }
@@ -131,7 +137,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 10, 'label' => $storeMigrationText)
+                        array('value' => 30, 'label' => $storeMigrationText)
                     )
                 );
             }

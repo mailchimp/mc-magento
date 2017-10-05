@@ -18,11 +18,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
         $html = '<ul class="checkboxes">';
 
         foreach ($values as $dat) {
-            if ($dat['value'] > 7 && $dat['value'] < 10) {
+            if ($dat['value'] >= 20 && $dat['value'] < 30) {
                 $html .= "<li style='color:red;font-weight: bold;'>{$dat['label']}</li>";
-            } elseif ($dat['value'] == 10) {
+            } elseif ($dat['value'] == 30) {
                 $html .= "<li style='color:forestgreen;font-weight: bold;'>{$dat['label']}</li>";
-            } elseif($dat['value'] == 3) {
+            } elseif($dat['value'] == 4) {
                 $textArray = explode(':', $dat['label']);
                 if (strstr($textArray[1], $this->__('Finished'))) {
                     $html .= "<li>{$textArray[0]} : <span style='color:forestgreen;font-weight: bold;'>{$textArray[1]}</span></li>";
