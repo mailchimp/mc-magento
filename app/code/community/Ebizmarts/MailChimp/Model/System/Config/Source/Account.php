@@ -98,7 +98,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
             $totalListSubscribersText = $helper->__('Total List Subscribers:');
             $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
-//            $options['total_list_subscribers'] = ['label' => __('Total List Subscribers:'), 'value' => $list['stats']['member_count']];
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
             $returnArray = array(
                 array('value' => self::USERNAME_KEY, 'label' => $username),
