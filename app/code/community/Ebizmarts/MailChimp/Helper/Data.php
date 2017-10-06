@@ -2336,7 +2336,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->setMemberGeneralData($subscriber);
     }
 
-    protected function unsubscribeMember($subscriber)
+    public function unsubscribeMember($subscriber)
     {
         $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
         $this->setMemberGeneralData($subscriber);
