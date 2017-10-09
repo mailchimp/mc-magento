@@ -100,14 +100,48 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $helper->handleResendDataAfter($storeId);
         }
 
+        $syncedDateArray = array();
         foreach ($stores as $store) {
-            if ($helper->getIsReseted($store->getId())) {
-                $scopeToReset = $helper->getMailChimpScopeByStoreId($store->getId());
+            $storeId = $store->getId();
+            if ($helper->getIsReseted($storeId)) {
+                $scopeToReset = $helper->getMailChimpScopeByStoreId($storeId);
                 if ($scopeToReset) {
                     $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
                     $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
                     $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
                 }
+            }
+            $mailchimpStoreId = $helper->getMCStoreId($storeId);
+            $syncedDate = $helper->getMCIsSyncing($storeId);
+            // Check if $syncedDate is in date format to support previous versions.
+            if (isset($syncedDateArray[$mailchimpStoreId]) && $syncedDateArray[$mailchimpStoreId]) {
+                if ($this->isDate($syncedDate)) {
+                    if ($syncedDate > $syncedDateArray[$mailchimpStoreId]) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
+                    }
+                } elseif ((int)$syncedDate === 1) {
+                    $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
+                }
+            } else {
+                if ($this->isDate($syncedDate)) {
+                    $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
+                } else {
+                    if ((int)$syncedDate === 1) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
+                    } elseif (!isset($syncedDateArray[$mailchimpStoreId])) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => true);
+                    }
+                }
+            }
+        }
+
+        foreach ($syncedDateArray as $mailchimpStoreId => $val) {
+            $data = $val[0];
+            $magentoStoreId = key($data);
+            $date = $data[$magentoStoreId];
+            if ($date) {
+                $api = $helper->getApi($magentoStoreId);
+                Mage::getModel('mailchimp/api_stores')->editIsSyncing($api, false, $mailchimpStoreId, $magentoStoreId);
             }
         }
     }
@@ -222,8 +256,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
 
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
-                    if ($helper->getMCIsSyncing($magentoStoreId) && $itemAmount == 0) {
-                        Mage::getModel('mailchimp/api_stores')->editIsSyncing($mailchimpApi, false, $mailchimpStoreId, $magentoStoreId);
+                    if ($helper->getMCIsSyngetMCIsSyncingcing($magentoStoreId) && $itemAmount == 0) {
+                        $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
+                        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, date('Y-m-d His')));
+                        Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
                         $helper->handleWebhookChange($magentoStoreId);
                     }
                 } catch (MailChimp_Error $e) {
