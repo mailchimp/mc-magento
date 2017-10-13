@@ -922,6 +922,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $ecommerceSyndDataItem;
     }
 
+    public function getAllEcommerceSyncDataItemsPerId($itemId, $itemType)
+    {
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('related_id', array('eq' => $itemId))
+            ->addFieldToFilter('type', array('eq' => $itemType));
+
+        return $collection;
+    }
+
     /**
      * Filter collection by all the stores associated to MailChimp for given scope.
      *
@@ -1276,7 +1285,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         $syncModified = $customer->getMailchimpSyncModified();
                     }
 
-                    Mage::helper('mailchimp')->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
+                    $this->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
                 );
             }
@@ -2299,6 +2308,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     public function getOrderAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_AMOUNT, 0, 'default');
+    }
+
+    public function getPromoRuleAmountLimit()
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_AMOUNT, 0, 'default');
     }

@@ -527,4 +527,27 @@ class Ebizmarts_MailChimp_Model_Observer
             Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
         }
     }
+
+    public function salesruleSaveAfter(Varien_Event_Observer $observer)
+    {
+        $rule = $observer->getEvent()->getRule();
+        $ruleId = $rule->getRuleId();
+        $couponId = $rule->getPrimaryCoupon()->getCouponId();
+        $ruleHasCoupon = $rule->getCouponType() == Mage_SalesRule_Model_Rule::COUPON_TYPE_SPECIFIC;
+        Mage::getModel('mailchimp/api_promoRules')->update($ruleId);
+        if ($couponId) {
+            if ($ruleHasCoupon) {
+                Mage::getModel('mailchimp/api_promoCodes')->update($couponId);
+            } else {
+                Mage::getModel('mailchimp/api_promoCodes')->delete($couponId);
+            }
+        }
+    }
+
+    public function salesruleDeleteAfter(Varien_Event_Observer $observer)
+    {
+        $rule = $observer->getEvent()->getRule();
+        $ruleId = $rule->getRuleId();
+        Mage::getModel('mailchimp/api_promoRules')->delete($ruleId);
+    }
 }

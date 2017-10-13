@@ -137,7 +137,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                 } else {
-                    $error = Mage::helper('mailchimp')->__('Something went wrong when retreiving product information.');
+                    $error = Mage::helper('mailchimp')->__('Something went wrong when retrieving product information.');
                     $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
                     continue;
                 }

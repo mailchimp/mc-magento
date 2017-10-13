@@ -36,6 +36,16 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     private $apiOrders;
 
+    /**
+     * @var Ebizmarts_MailChimp_Model_Api_PromoRules
+     */
+    private $apiPromoRules;
+
+    /**
+     * @var Ebizmarts_MailChimp_Model_Api_PromoCodes
+     */
+    private $apiPromoCodes;
+
     public function __construct()
     {
         $this->mailchimpHelper = Mage::helper('mailchimp');
@@ -43,6 +53,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $this->apiProducts = Mage::getModel('mailchimp/api_products');
         $this->apiCarts = Mage::getModel('mailchimp/api_carts');
         $this->apiOrders = Mage::getModel('mailchimp/api_orders');
+        $this->apiPromoRules = Mage::getModel('mailchimp/api_promoRules');
+        $this->apiPromoCodes = Mage::getModel('mailchimp/api_promoCodes');
     }
 
     /**
@@ -83,6 +95,22 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function getApiOrders()
     {
         return $this->apiOrders;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_PromoRules|false|Mage_Core_Model_Abstract
+     */
+    public function getApiPromoRules()
+    {
+        return $this->apiPromoRules;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_PromoCodes|false|Mage_Core_Model_Abstract
+     */
+    public function getApiPromoCodes()
+    {
+        return $this->apiPromoCodes;
     }
 
     /**
@@ -194,6 +222,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
+                $apiPromoRules = $this->getApiPromoRules();
+                $promoRulesArray = $apiPromoRules->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
+                $apiPromoCodes = $this->getApiPromoCodes();
+                $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
                 $batchJson = null;
                 $batchResponse = null;
 

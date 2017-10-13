@@ -81,4 +81,6 @@ class Ebizmarts_MailChimp_Model_Config
     const IS_ORDER      = "ORD";
     const IS_QUOTE      = "QUO";
     const IS_SUBSCRIBER = "SUB";
+    const IS_PROMO_RULE = "PRL";
+    const IS_PROMO_CODE = "PCD";
 }
