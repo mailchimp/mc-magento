@@ -1045,20 +1045,33 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $model = Mage::getResourceModel('catalog/product');
         $configImageSize = $this->getImageSize($magentoStoreId);
-
-        if ($configImageSize == 0) {
-            $productImage = $model->getAttributeRawValue($productId, 'image', $magentoStoreId);
-        } else if ($configImageSize == 1){
-            $productImage = $model->getAttributeRawValue($productId, 'small_image', $magentoStoreId);
-        } else {
-            $productImage = $model->getAttributeRawValue($productId, 'thumbnail', $magentoStoreId);
+        switch ($configImageSize) {
+            case 0:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
+                break;
+            case 1:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_SMALL;
+                break;
+            case 2:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_THUMBNAIL;
+                break;
+            default:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
+                break;
         }
+
+        $productImage = $model->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
         
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
-            $productMediaConfig = $this->getProductMediaConfig();
-            $imageUrl = $productMediaConfig->getMediaUrl($productImage);
+            $curStore = Mage::app()->getStore()->getId();
+            Mage::app()->setCurrentStore($magentoStoreId);
+            $productImageModel = $this->getProductImageModel();
+            $productImageModel->setDestinationSubdir($imageSize);
+            $productImageModel->setBaseFile($productImage);
+            $imageUrl = $productImageModel->getUrl();
+            Mage::app()->setCurrentStore($curStore);
         }
         return $imageUrl;
     }
@@ -1068,9 +1081,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_IMAGE_SIZE, $scopeId, $scope);
     }
 
-    private function getProductMediaConfig()
+    private function getProductImageModel()
     {
-        return Mage::getModel('catalog/product_media_config');
+        return Mage::getModel('catalog/product_image');
     }
 
     /**
@@ -2433,4 +2446,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $scopesMatch;
     }
+
+    public function wasProductImageCacheFlushed()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 0, 'default');
+    }
+
 }
