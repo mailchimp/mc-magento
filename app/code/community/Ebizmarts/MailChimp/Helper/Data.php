@@ -1048,8 +1048,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
+            $oldStoreId = Mage::app()->getStore()->getId();
+            Mage::app()->setCurrentStore($magentoStoreId);
             $productMediaConfig = $this->getProductMediaConfig();
             $imageUrl = $productMediaConfig->getMediaUrl($productImage);
+            Mage::app()->setCurrentStore($oldStoreId);
         }
         return $imageUrl;
     }
