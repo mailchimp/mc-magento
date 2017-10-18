@@ -149,7 +149,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $configMock->expects($this->once())->method('getScope')->willReturn($scope);
         $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
-        $configEntries []= $configMock;
+        $configEntries [] = $configMock;
         $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
         $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
         $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
@@ -182,7 +182,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $configMock->expects($this->once())->method('getScope')->willReturn($scope);
         $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
-        $configEntries []= $configMock;
+        $configEntries [] = $configMock;
         $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
         $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
         $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
@@ -210,5 +210,25 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('deleteStore')->with($scopeId, $scope);
 
         $helperMock->resetMCEcommerceData($scopeId, $scope, $deleteDataInMailchimp);
+    }
+
+    public function testSaveMailChimpConfig()
+    {
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfig'))
+            ->getMock();
+
+        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('saveConfig', 'cleanCache'))
+            ->getMock();
+
+
+        $helperMock->expects($this->exactly(2))->method('getConfig')->willReturn($configMock);
+        $configMock->expects($this->once())->method('saveConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 1, 'default', 0);
+        $configMock->expects($this->once())->method('cleanCache');
+
+        $helperMock->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 1)), 0, 'default');
     }
 }
