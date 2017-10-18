@@ -127,6 +127,26 @@ class Ebizmarts_MailChimp_Model_Observer
         $customer = $observer->getEvent()->getCustomer();
         $storeId = $customer->getStoreId();
 
+        if($customer->getOrigData('email')) {
+            // check if customer has changed email address
+            if($customer->getOrigData('email') != $customer->getEmail()) {
+
+                // unsubscribe old email address
+                $subscriber = Mage::getModel('newsletter/subscriber');
+                $subscriber
+                    ->setSubscriberEmail($customer->getOrigData('email'))
+                    ->setStoreId($storeId);
+
+                Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
+
+                // subscribe new email address
+                $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($customer);
+                $subscriber->setSubscriberEmail($customer->getEmail()); // make sure we set the new email address
+
+                $response = Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+            }
+        }
+
         //update mailchimp ecommerce data for that customer
         Mage::getModel('mailchimp/api_customers')->update($customer->getId(), $storeId);
         //update subscriber data if a subscriber with the same email address exists
