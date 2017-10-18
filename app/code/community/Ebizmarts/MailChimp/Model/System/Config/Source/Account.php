@@ -41,7 +41,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
                         $this->_accountDetails['store_exists'] = true;
                         $this->_accountDetails['store_name'] = $storeData['name'];
+                        //Keep both values for backward compatibility
                         $this->_accountDetails['store_sync_flag'] = $storeData['is_syncing'];
+                        $this->_accountDetails['store_sync_date'] = $this->getDateSync($mcStoreId);
                         $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
                         $this->_accountDetails['total_customers'] = $totalCustomers['total_items'];
                         $totalProducts = $api->ecommerce->products->getAll($mcStoreId, 'total_items');
@@ -97,10 +99,15 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $totalCartsText = $helper->__('  Total Carts:');
                 $totalCarts = $totalCartsText . ' ' . $this->_accountDetails['total_carts'];
                 $title = $helper->__('Ecommerce Data uploaded to MailChimp store ' . $this->_accountDetails['store_name'] . ':');
-                if ($this->_accountDetails['store_sync_flag'] && !$helper->getResendEnabled($scopeArray[1], $scopeArray[0])) {
+                if ($this->_accountDetails['store_sync_flag'] && !$this->_accountDetails['store_sync_date'] && !$helper->getResendEnabled($scopeArray[1], $scopeArray[0])) {
                     $syncValue = 'In Progress';
                 } else {
-                    $syncValue = 'Finished';
+                    $syncData = $this->_accountDetails['store_sync_date'];
+                    if ($helper->validateDate($syncData)) {
+                        $syncValue = $syncData;
+                    } else {
+                        $syncValue = 'Finished';
+                    }
                 }
                 $syncLabel = $helper->__('Initial sync: ' . $syncValue);
                 $returnArray = array_merge(
@@ -147,6 +154,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     protected function getHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    protected function getDateSync($mailchimpStoreId)
+    {
+        return $this->getHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE."_$mailchimpStoreId", 0, 'default');
     }
 
 }

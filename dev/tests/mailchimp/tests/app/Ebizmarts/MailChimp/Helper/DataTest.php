@@ -127,43 +127,88 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testHandleResendDataBefore()
     {
-        $storeId = 1;
+        $scopeId = 0;
+        $scope = 'default';
+        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getScope', 'getScopeId'))
+            ->getMock();
+        $configEntries = array();
 
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getResendEnabled', 'getResendTurn', 'setIsSyncingIfFinishedPerStore'))
+            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getResendEnabled')->with($storeId)->willReturn(1);
-        $helperMock->expects($this->once())->method('getResendTurn')->with($storeId)->willReturn(1);
-        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerStore')->with($storeId);
+        $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $helperMock->handleResendDataBefore($storeId);
+        $configMock->expects($this->once())->method('getScope')->willReturn($scope);
+        $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
+        $configEntries []= $configMock;
+        $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
+        $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
+        $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
+        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(true, $scopeId, $scope);
+
+        $helperMock->handleResendDataBefore();
     }
 
     public function testHandleResendDataAfter()
     {
-        $storeId = 1;
-        $scopeArray = array('scope_id' => 1, 'scope' => 'stores');
+        $scopeId = 0;
+        $scope = 'default';
+        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getScope', 'getScopeId'))
+            ->getMock();
+        $configEntries = array();
 
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getResendEnabled', 'getResendTurn', 'getRealScopeForConfig', 'setIsSyncingIfFinishedPerStore', 'setResendTurn', 'handleResendFinish'))
+            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getResendEnabled')->with($storeId)->willReturn(1);
-        $helperMock->expects($this->once())->method('getResendTurn')->with($storeId)->willReturn(1);
-        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $storeId)->willReturn($scopeArray);
-        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerStore')->with(false, $storeId);
-        $helperMock->expects($this->once())->method('setResendTurn')->with(0, $scopeArray['scope_id'], $scopeArray['scope']);
-        $helperMock->expects($this->once())->method('handleResendFinish')->with($scopeArray['scope_id'], $scopeArray['scope']);
+        $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $helperMock->handleResendDataAfter($storeId);
+        $configMock->expects($this->once())->method('getScope')->willReturn($scope);
+        $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
+        $configEntries []= $configMock;
+        $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
+        $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
+        $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
+        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(false, $scopeId, $scope);
+
+        $helperMock->handleResendDataAfter();
+    }
+
+    public function testResetMCEcommerceData()
+    {
+        $scopeId = 0;
+        $scope = 'default';
+        $deleteDataInMailchimp = true;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGeneralList', 'getMCStoreId', 'removeEcommerceSyncData', 'resetCampaign', 'clearErrorGrid', 'deleteStore', 'isEcomSyncDataEnabled'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn('a1s2d3f4g5');
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn('q1w2e3r4t5y6u7i8o9p0');
+        $helperMock->expects($this->once())->method('removeEcommerceSyncData')->with($scopeId, $scope);
+        $helperMock->expects($this->once())->method('resetCampaign')->with($scopeId, $scope);
+        $helperMock->expects($this->once())->method('clearErrorGrid')->with($scopeId, $scope, true);
+        $helperMock->expects($this->once())->method('deleteStore')->with($scopeId, $scope);
+
+        $helperMock->resetMCEcommerceData($scopeId, $scope, $deleteDataInMailchimp);
     }
 }

@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
         $values = $element->getValues();
-
+        $helper = Mage::helper('mailchimp');
         $html = '<ul class="checkboxes">';
 
         foreach ($values as $dat) {
@@ -24,8 +24,15 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
                 $html .= "<li style='color:forestgreen;font-weight: bold;'>{$dat['label']}</li>";
             } elseif($dat['value'] == 3) {
                 $textArray = explode(':', $dat['label']);
-                if (strstr($textArray[1], $this->__('Finished'))) {
-                    $html .= "<li>{$textArray[0]} : <span style='color:forestgreen;font-weight: bold;'>{$textArray[1]}</span></li>";
+                if (count($textArray) == 4) {
+                    $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
+                }
+                if (!strstr($textArray[1], $this->__('In Progress'))) {
+                    if (strstr($textArray[1], $this->__('Finished'))) {
+                        $html .= "<li>{$textArray[0]} : <span style='color:forestgreen;font-weight: bold;'>{$textArray[1]}</span></li>";
+                    } else {
+                        $html .= "<li>{$textArray[0]} : <span style='color:forestgreen;font-weight: bold;'>Finished at $textArray[1]</span></li>";
+                    }
                 } else {
                     $html .= "<li>{$textArray[0]} : <span style='color:#ed6502;font-weight: bold;'>{$textArray[1]}</span></li>";
                 }
