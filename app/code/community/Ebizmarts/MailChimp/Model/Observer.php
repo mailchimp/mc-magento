@@ -143,7 +143,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($customer);
                 $subscriber->setSubscriberEmail($customer->getEmail()); // make sure we set the new email address
 
-                $response = Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
             }
         }
 
