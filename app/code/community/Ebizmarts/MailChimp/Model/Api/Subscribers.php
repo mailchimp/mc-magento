@@ -130,6 +130,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $subscriberEmail = $subscriber->getSubscriberEmail();
         $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
 
+        $customerFirstname = '';
+        $customerLastname = '';
+        if (!Mage::getSingleton('customer/session')->isLoggedIn() ) {
+            $session = Mage::getSingleton('checkout/session');
+            $quote_id = $session->getQuoteId();
+            if ($quote_id) {
+                $quote = Mage::getModel('sales/quote')->load($quote_id);
+                $data = $quote->getData();
+                $customerFirstname = $data['customer_firstname'];
+                $customerLastname = $data['customer_lastname'];
+            }
+        }
+
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
             $chimpTag = $map['mailchimp'];
@@ -175,6 +188,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                                     if (!$firstName) {
                                         $firstName = $subscriber->getSubscriberFirstname();
+                                        if (empty($firstName)) {
+                                            $firstName = $customerFirstname;
+                                        }
                                     }
 
                                     if ($firstName) {
@@ -186,6 +202,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                                     if (!$lastName) {
                                         $lastName = $subscriber->getSubscriberLastname();
+                                        if (empty($lastName)) {
+                                            $lastName = $customerLastname;
+                                        }
                                     }
 
                                     if ($lastName) {
