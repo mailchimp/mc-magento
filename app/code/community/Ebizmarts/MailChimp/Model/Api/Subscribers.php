@@ -105,7 +105,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $data["merge_fields"] = $mergeVars;
         }
 
-        $data["status_if_new"] = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $data["status_if_new"] = $status;
+        if ($subscriber->getMailchimpSyncModified()) {
+            $data["status"] = $status;
+        }
         $data["language"] = $helper->getStoreLanguageCode($storeId);
 
         return $data;
@@ -300,6 +304,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
         }
 
+        $newVars = new Varien_Object;
+
+        Mage::dispatchEvent(
+            'mailchimp_merge_field_send_after', array(
+                'subscriber' => $subscriber,
+                'vars' => $mergeVars,
+                'new_vars' => $newVars
+            )
+        );
+
+        if ($newVars->hasData()) {
+            $mergeVars = array_merge($mergeVars, $newVars->getData());
+        }
+
         return (!empty($mergeVars)) ? $mergeVars : null;
     }
 
@@ -309,6 +327,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
+        $isAdmin = Mage::app()->getStore()->isAdmin();
         $helper = $this->mcHelper;
         $storeId = $subscriber->getStoreId();
         $listId = $helper->getGeneralList($storeId);
@@ -335,21 +354,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         Mage::getSingleton('core/session')->addWarning($message);
                     } catch (MailChimp_Error $e) {
                         $helper->logError($e->getFriendlyMessage(), $storeId);
-                        Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                        $this->addError($isAdmin, $e);
                         $subscriber->unsubscribe();
-                        $this->_processUpdateSubscriberError($e, $storeId);
                     } catch (Exception $e) {
                         $helper->logError($e->getMessage(), $storeId);
                     }
                 } else {
                     $helper->logError($e->getFriendlyMessage(), $storeId);
-                    Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                    $this->addError($isAdmin, $e);
                     $subscriber->unsubscribe();
-                    $this->_processUpdateSubscriberError($e, $storeId);
                 }
             } else {
                 $helper->logError($e->getFriendlyMessage(), $storeId);
-                Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                $this->addError($isAdmin, $e);
             }
         } catch (Exception $e) {
             $helper->logError($e->getMessage(), $storeId);
@@ -506,5 +523,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
         }
         return $addressData;
+    }
+
+    /**
+     * @param $isAdmin
+     * @param $e
+     */
+    protected function addError($isAdmin, $e)
+    {
+        if ($isAdmin) {
+            Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+        }
     }
 }

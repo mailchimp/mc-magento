@@ -220,7 +220,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["url"] = $url;
 
         //image
-        $imageUrl = $this->getMailChimpHelper()->getMailChimpProductImageUrl($this->_parentImageUrl, $this->getMailChimpHelper()->getImageUrlById($product->getId()));
+        $imageUrl = $this->getMailChimpHelper()->getMailChimpProductImageUrl($this->_parentImageUrl, $this->getMailChimpHelper()->getImageUrlById($product->getId(), $magentoStoreId));
         if ($imageUrl) {
             $data["image_url"] = $imageUrl;
         }
@@ -236,11 +236,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $data["description"] = ($product->getDescription()) ? $product->getDescription() : $product->getDefaultDescription();
             }
 
-            //mailchimp product type (magento category)
-            $categoryId = $product->getCategoryId();
-            if ($categoryId) {
-                $category = Mage::getResourceModel('catalog/category')->checkId($categoryId);
-                $data["type"] = $category->getName();
+            //mailchimp product type and vendor (magento category)
+            $categoryName = $this->getProductCategories($product, $magentoStoreId);
+            if ($categoryName) {
+                $data["type"] = $categoryName;
                 $data["vendor"] = $data["type"];
             }
 
@@ -257,7 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = (float)$product->getDefaultPrice();
+                $price = ((float)$product->getPrice()) ? (float)$product->getPrice() : (float)$product->getDefaultPrice();
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -522,13 +521,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($attributeCodes as $_code) {
             $attributeName = $config->getAttribute("catalog_product", $_code);
 
-            if ($_code != 'price') {
-                $collection->joinField(
-                    $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
-                    '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
-                );
-            }
-
+            $collection->joinField(
+              $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
+              '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
+            );
+          
             $collection->joinField(
                 'default_' . $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
                 '{{table}}.store_id = 0 AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
@@ -735,5 +732,28 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $url = $product->getProductUrl();
         Mage::app()->setCurrentStore($oldStoreId);
         return $url;
+    }
+
+    protected function getProductCategories($product, $magentoStoreId)
+    {
+        $categoryIds = $product->getCategoryIds();
+        $categoryNames = array();
+        $categoryName = null;
+        if (is_array($categoryIds) && count($categoryIds)) {
+            /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
+            $collection = Mage::getModel('catalog/category')->getCollection();
+            $collection->addAttributeToSelect(array('name'))
+                ->setStoreId($magentoStoreId)
+                ->addAttributeToFilter('is_active', array('eq'=>'1'))
+                ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
+                ->addAttributeToSort('level', 'asc');
+
+            /* @var $category Mage_Catalog_Model_Category */
+            foreach ($collection as $category) {
+                $categoryNames[] = $category->getName();
+            }
+            $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
+        }
+        return $categoryName;
     }
 }

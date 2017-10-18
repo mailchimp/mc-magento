@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.9.1</version>
+            <version>1.1.9.2</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.9.1</version>
+            <version>1.1.9.2</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -366,6 +366,14 @@
                     <model>mailchimp/cron::processWebhookData</model>
                 </run>
             </mailchimp_process_webhook_data>
+	    <mailchimp_delete_webhook_processed>
+                <schedule>
+                    <cron_expr>0 0 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>mailchimp/cron::deleteWebhookRequests</model>
+                </run>
+            </mailchimp_delete_webhook_processed>
         </jobs>
     </crontab>
 </config>
