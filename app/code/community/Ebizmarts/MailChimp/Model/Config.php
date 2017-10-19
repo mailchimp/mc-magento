@@ -50,6 +50,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_PRODUCT_AMOUNT      = 'mailchimp/ecommerce/product_batch_amount';
     const ECOMMERCE_ORDER_AMOUNT        = 'mailchimp/ecommerce/order_batch_amount';
     const ECOMMERCE_IMAGE_SIZE          = 'mailchimp/ecommerce/image_size';
+    const ECOMMERCE_SYNC_DATE           = 'mailchimp/ecommerce/sync_date';
 
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';
