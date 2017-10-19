@@ -19,9 +19,28 @@ class Mandrill_Message extends Mandrill_Mandrill
     protected $_headers = array();
     protected $_fromName;
 
+    /**
+     * Flag: whether or not email has attachments
+     * @var boolean
+     */
+    public $hasAttachments = false;
 
     public function getMail()
     {
+        return $this;
+    }
+
+    /**
+     * Adds an existing attachment to the mail message
+     *
+     * @param  Zend_Mime_Part $attachment
+     * @return Zend_Mail Provides fluent interface
+     */
+    public function addAttachment(Zend_Mime_Part $attachment)
+    {
+        $this->_attachments[] = $attachment;
+        $this->hasAttachments = true;
+
         return $this;
     }
 
@@ -31,9 +50,16 @@ class Mandrill_Message extends Mandrill_Mandrill
         $encoding = Zend_Mime::ENCODING_BASE64,
         $filename = null
     ) {
-    
-        $att = array('type' => $mimeType, 'name' => $filename, 'content' => base64_encode($body));
-        array_push($this->_attachments, $att);
+
+        $mp = new Zend_Mime_Part($body);
+        $mp->encoding = $encoding;
+        $mp->type = $mimeType;
+        $mp->disposition = $disposition;
+        $mp->filename = $filename;
+
+        $this->addAttachment($mp);
+
+        return $mp;
     }
 
     public function log($m)
@@ -46,7 +72,17 @@ class Mandrill_Message extends Mandrill_Mandrill
 
     public function getAttachments()
     {
-        return $this->_attachments;
+        $_attachments = array();
+        foreach($this->_attachments as $attachment) {
+            /** @var Zend_Mime_Part $attachment */
+            $_attachments[] = array(
+                'type' => $attachment->type,
+                'name' => $attachment->filename,
+                'content' => $attachment->getContent()
+            );
+        }
+
+        return $_attachments;
     }
 
     public function addBcc($bcc)
