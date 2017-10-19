@@ -1029,29 +1029,42 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Returns product image url by id, if it does not have one returns null.
      *
      * @param  $productId
+     * @param  $magentoStoreId
      * @return null
      */
-    public function getImageUrlById($productId)
+    public function getImageUrlById($productId, $magentoStoreId)
     {
-        $productMediaConfig = $this->getProductMediaConfig();
-        $product = $this->loadProductById($productId);
-        $productImage = $product->getImage();
+        $model = Mage::getResourceModel('catalog/product');
+        $configImageSize = $this->getImageSize($magentoStoreId);
+
+        if ($configImageSize == 0) {
+            $productImage = $model->getAttributeRawValue($productId, 'image', $magentoStoreId);
+        } else if ($configImageSize == 1){
+            $productImage = $model->getAttributeRawValue($productId, 'small_image', $magentoStoreId);
+        } else {
+            $productImage = $model->getAttributeRawValue($productId, 'thumbnail', $magentoStoreId);
+        }
+        
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
+            $oldStoreId = Mage::app()->getStore()->getId();
+            Mage::app()->setCurrentStore($magentoStoreId);
+            $productMediaConfig = $this->getProductMediaConfig();
             $imageUrl = $productMediaConfig->getMediaUrl($productImage);
+            Mage::app()->setCurrentStore($oldStoreId);
         }
         return $imageUrl;
+    }
+
+    public function getImageSize($scopeId, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_IMAGE_SIZE, $scopeId, $scope);
     }
 
     private function getProductMediaConfig()
     {
         return Mage::getModel('catalog/product_media_config');
-    }
-
-    private function loadProductById($productId)
-    {
-        return Mage::getModel('catalog/product')->load($productId);
     }
 
     /**
@@ -1126,9 +1139,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getMCJs()
     {
         $script = '';
+        $url = null;
         $storeId = Mage::app()->getStore()->getId();
         if ($this->isEcomSyncDataEnabled($storeId)) {
-            $url = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+            $currentUrl = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+            if ($this->areJsUrlAndListScopesEqual($storeId)) {
+                $url = $currentUrl;
+            }
+
             if (!$url) {
                 $url = $this->getApiStores()->getMCJsUrl($storeId, 'stores');
             }
@@ -1651,6 +1669,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $customer = $this->loadListCustomer($listId, $email);
                 if ($customer) {
                     $subscriber->setStoreId($customer->getStoreId());
+                    $subscriber->setCustomerId($customer->getId());
                 } else {
                     /**
                      * No customer with that address. Just assume the first
@@ -1822,7 +1841,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $scopeSoFar = null;
         foreach ($configCollection as $config) {
             //Discard possible extra website or store
-            if ($this->isExtraEntry($config, $scope, $websiteId)) {
+            if ($this->isExtraEntry($config, $scope, $scopeId, $websiteId)) {
                 continue;
             }
             switch ($config->getScope()) {
@@ -1850,12 +1869,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param $config
      * @param $scope
+     * @param $scopeId
      * @param $websiteId
      * @return bool
      */
-    protected function isExtraEntry($config, $scope, $websiteId)
+    protected function isExtraEntry($config, $scope, $scopeId, $websiteId)
     {
-        return $config->getScopeId() != 0 && (($config->getScope() == 'stores' && $scope != 'stores') || ($config->getScope() == 'websites' && $scope == 'stores' && $config->getScopeId() != $websiteId));
+        return $this->isNotDefaultScope($config) && ($this->isIncorrectScope($config, $scope) || $this->isDifferentWebsite($config, $scope, $websiteId) || $this->isDifferentStoreView($config, $scope, $scopeId));
     }
 
     public function updateSubscriberSyndData($itemId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null)
@@ -2309,5 +2329,97 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getStorePhone($scopeId, $scope = 'stores')
     {
         return $this->getConfigValueForScope('general/store_information/phone', $scopeId, $scope);
+    }
+
+    public function getAllMailChimpStoreIds()
+    {
+        $collection = Mage::getResourceModel('core/config_data_collection')
+            ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID));
+        $mailchimpStoreIdsArray = array();
+        foreach ($collection as $row) {
+            $scopeData = $row->getScope().'_'.$row->getScopeId();
+            $mailchimpStoreIdsArray[$scopeData] = $row->getValue();
+        }
+        return $mailchimpStoreIdsArray;
+    }
+  
+    public function subscribeMember($subscriber, $forceUpdateStatus = false)
+    {
+        $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+        $subscriber->setSubscriberConfirmCode($subscriber->randomSequence());
+        if ($forceUpdateStatus) {
+            $subscriber->setMailchimpSyncModified(1);
+        }
+        $this->setMemberGeneralData($subscriber);
+    }
+
+    public function unsubscribeMember($subscriber)
+    {
+        $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+        $this->setMemberGeneralData($subscriber);
+    }
+
+    protected function setMemberGeneralData($subscriber)
+    {
+        $subscriber->setImportMode(true);
+        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+        $subscriber->setIsStatusChanged(true);
+        $subscriber->save();
+    }
+
+    /**
+     * @param $config
+     * @param $scope
+     * @param $scopeId
+     * @return bool
+     */
+    protected function isDifferentStoreView($config, $scope, $scopeId)
+    {
+        return $config->getScope() == 'stores' && $scope == 'stores' && $scopeId != $config->getScopeId();
+    }
+
+    /**
+     * @param $config
+     * @param $scope
+     * @param $websiteId
+     * @return bool
+     */
+    protected function isDifferentWebsite($config, $scope, $websiteId)
+    {
+        return ($config->getScope() == 'websites' && $scope == 'stores' && $config->getScopeId() != $websiteId);
+    }
+
+    /**
+     * @param $config
+     * @param $scope
+     * @return bool
+     */
+    protected function isIncorrectScope($config, $scope)
+    {
+        return ($config->getScope() == 'stores' && $scope != 'stores');
+    }
+
+    /**
+     * @param $config
+     * @return bool
+     */
+    protected function isNotDefaultScope($config)
+    {
+        return $config->getScopeId() != 0;
+    }
+
+    /**
+     * @param $storeId
+     * @return bool
+     */
+    protected function areJsUrlAndListScopesEqual($storeId)
+    {
+        $scopesMatch = false;
+        $realScopeList = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+        $realScopeJs = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+        if ($realScopeList && $realScopeJs && $realScopeList['scope'] == $realScopeJs['scope'] && $realScopeList['scope_id'] == $realScopeJs['scope_id']) {
+            $scopesMatch = true;
+        }
+        return $scopesMatch;
     }
 }

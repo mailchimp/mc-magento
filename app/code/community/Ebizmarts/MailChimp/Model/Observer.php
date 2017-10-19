@@ -127,6 +127,26 @@ class Ebizmarts_MailChimp_Model_Observer
         $customer = $observer->getEvent()->getCustomer();
         $storeId = $customer->getStoreId();
 
+        if($customer->getOrigData('email')) {
+            // check if customer has changed email address
+            if($customer->getOrigData('email') != $customer->getEmail()) {
+
+                // unsubscribe old email address
+                $subscriber = Mage::getModel('newsletter/subscriber');
+                $subscriber
+                    ->setSubscriberEmail($customer->getOrigData('email'))
+                    ->setStoreId($storeId);
+
+                Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
+
+                // subscribe new email address
+                $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($customer);
+                $subscriber->setSubscriberEmail($customer->getEmail()); // make sure we set the new email address
+
+                Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+            }
+        }
+
         //update mailchimp ecommerce data for that customer
         Mage::getModel('mailchimp/api_customers')->update($customer->getId(), $storeId);
         //update subscriber data if a subscriber with the same email address exists
@@ -189,20 +209,16 @@ class Ebizmarts_MailChimp_Model_Observer
     public function orderSaveBefore(Varien_Event_Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        $storeId = Mage::app()->getStore()->getStoreId();
-
-        //update mailchimp ecommerce data for that product variant
-        Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
+        $this->handleOrderUpdate($order);
     }
 
     /**
-     * Delete campaign cookie after it was added to the order object.
+     * Delete campaign and landing cookies.
      *
-     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
      */
-    public function removeCampaignData(Varien_Event_Observer $observer)
+    public function removeCampaignData()
     {
         if ($this->_getCampaignCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
@@ -211,8 +227,6 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($this->_getLandingCookie()) {
             Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
         }
-
-        return $observer;
     }
 
     /**
@@ -323,16 +337,11 @@ class Ebizmarts_MailChimp_Model_Observer
             $email = $order->getCustomerEmail();
             $subscriber = $helper->loadListSubscriber($post, $email);
             if ($subscriber) {
-                Mage::getModel('mailchimp/processWebhook')->subscribeMember($subscriber);
+                $helper->subscribeMember($subscriber, true);
             }
         }
-        if(($this->_getLandingCookie())) {
-            Mage::getModel('core/cookie')->delete('mailchimp_landing_page');
-        }
 
-        if ($this->_getCampaignCookie()) {
-            Mage::getModel('core/cookie')->delete('mailchimp_campaign_id');
-        }
+        $this->removeCampaignData();
 
         $order = $observer->getEvent()->getOrder();
         $items = $order->getAllItems();
@@ -503,5 +512,39 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function makeApiProducts()
     {
         return Mage::getModel('mailchimp/api_products');
+    }
+
+    /**
+     * @param $order
+     */
+    protected function handleAdminOrderUpdate($order)
+    {
+        $mailchimpStoreIdsArray = $this->makeHelper()->getAllMailChimpStoreIds();
+        foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
+            $scopeArray = explode('_', $scopeData);
+            if ($scopeArray[0] != 'websites') {
+                Mage::getModel('mailchimp/api_orders')->update($order->getId(), $scopeArray[1]);
+            } else {
+                $website = Mage::getModel('core/website')->load($scopeArray[1]);
+                $storeIds = $website->getStoreIds();
+                foreach ($storeIds as $storeId) {
+                    Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $order
+     */
+    protected function handleOrderUpdate($order)
+    {
+        $storeId = Mage::app()->getStore()->getStoreId();
+
+        if ($storeId == 0) {
+            $this->handleAdminOrderUpdate($order);
+        } else {
+            Mage::getModel('mailchimp/api_orders')->update($order->getId(), $storeId);
+        }
     }
 }
