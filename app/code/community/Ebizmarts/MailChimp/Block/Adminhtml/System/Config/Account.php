@@ -17,7 +17,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
         $firstMigrationKey = Ebizmarts_MailChimp_Model_System_Config_Source_Account::STORE_MIGRATION_TEXT_KEY;
         $syncLabelKey = Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY;
         $values = $element->getValues();
-        $helper = Mage::helper('mailchimp');
         $html = '<ul class="checkboxes">';
 
         foreach ($values as $dat) {
@@ -26,19 +25,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
             } elseif ($dat['value'] == $firstMigrationKey) {
                 $html .= "<li style='color:forestgreen;font-weight: bold;'>{$dat['label']}</li>";
             } elseif($dat['value'] == $syncLabelKey) {
-                $textArray = explode(':', $dat['label']);
-                if (count($textArray) == 4) {
-                    $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
-                }
-                if (!strstr($textArray[1], $this->__('In Progress'))) {
-                    if (strstr($textArray[1], $this->__('Finished'))) {
-                        $html .= "<li>{$textArray[0]} : <span style='color:forestgreen;font-weight: bold;'>{$textArray[1]}</span></li>";
-                    } else {
-                        $html .= "<li>{$textArray[0]} : <span style='color:forestgreen;font-weight: bold;'>Finished at $textArray[1]</span></li>";
-                    }
-                } else {
-                    $html .= "<li>{$textArray[0]} : <span style='color:#ed6502;font-weight: bold;'>{$textArray[1]}</span></li>";
-                }
+                $html = $this->getSyncFlagDataHtml($dat, $html);
             } else {
                 $html .= "<li>{$dat['label']}</li>";
             }
@@ -47,5 +34,57 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
         $html .= '</ul>';
 
         return $html;
+    }
+
+    /**
+     * @param $dat
+     * @return array
+     */
+    protected function getSyncFlagDataArray($dat)
+    {
+        $textArray = explode(':', $dat['label']);
+        $textArray = $this->fixTimeTextIfNecessary($textArray);
+        return $textArray;
+    }
+
+    /**
+     * @param $dat
+     * @param $html
+     * @return string
+     */
+    protected function getSyncFlagDataHtml($dat, $html)
+    {
+        $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
+        if (!strstr($syncFlagDataArray[1], $this->__('In Progress'))) {
+            if (strstr($syncFlagDataArray[1], $this->__('Finished'))) {
+                $html .= "<li>{$syncFlagDataArray[0]} : <span style='color:forestgreen;font-weight: bold;'>{$syncFlagDataArray[1]}</span></li>";
+            } else {
+                $html .= "<li>{$syncFlagDataArray[0]} : <span style='color:forestgreen;font-weight: bold;'>" . $this->__('Finished at ') . "$syncFlagDataArray[1]</span></li>";
+            }
+        } else {
+            $html .= "<li>{$syncFlagDataArray[0]} : <span style='color:#ed6502;font-weight: bold;'>{$syncFlagDataArray[1]}</span></li>";
+        }
+        return $html;
+    }
+
+    /**
+     * @param $textArray
+     * @return bool
+     */
+    protected function isDate($textArray)
+    {
+        return count($textArray) == 4;
+    }
+
+    /**
+     * @param $textArray
+     * @return array
+     */
+    protected function fixTimeTextIfNecessary($textArray)
+    {
+        if ($this->isDate($textArray)) {
+            $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
+        }
+        return $textArray;
     }
 }
