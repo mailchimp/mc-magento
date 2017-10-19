@@ -21,6 +21,18 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      */
     protected $_accountDetails = false;
     protected $helper;
+    const USERNAME_KEY = 0;
+    const TOTAL_ACCOUNT_SUB_KEY = 1;
+    const TOTAL_LIST_SUB_KEY = 2;
+    const STORENAME_KEY = 10;
+    const SYNC_LABEL_KEY = 11;
+    const TOTAL_CUS_KEY = 12;
+    const TOTAL_PRO_KEY = 13;
+    const TOTAL_ORD_KEY = 14;
+    const TOTAL_QUO_KEY = 15;
+    const NO_STORE_TEXT_KEY = 20;
+    const NEW_STORE_TEXT_KEY = 21;
+    const STORE_MIGRATION_TEXT_KEY = 30;
 
     /**
      * Set AccountDetails on class property if not already set
@@ -36,6 +48,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         if ($api) {
             try {
                 $this->_accountDetails = $api->root->info('account_name,total_subscribers');
+                $listData = $api->lists->getLists($listId, 'stats');
+                $this->_accountDetails['list_subscribers'] = $listData['stats']['member_count'];
                 if ($mcStoreId && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
                     try {
                         $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
@@ -82,12 +96,15 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         $helper = $this->helper;
         $scopeArray = explode('-', $helper->getScopeString());
         if (is_array($this->_accountDetails)) {
-            $totalSubscribersText = $helper->__('Total subscribers:');
-            $totalSubscribers = $totalSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
+            $totalAccountSubscribersText = $helper->__('Total Account Subscribers:');
+            $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
+            $totalListSubscribersText = $helper->__('Total List Subscribers:');
+            $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
             $returnArray = array(
-                array('value' => 0, 'label' => $username),
-                array('value' => 1, 'label' => $totalSubscribers)
+                array('value' => self::USERNAME_KEY, 'label' => $username),
+                array('value' => self::TOTAL_ACCOUNT_SUB_KEY, 'label' => $totalAccountSubscribers),
+                array('value' => self::TOTAL_LIST_SUB_KEY, 'label' => $totalListSubscribers)
             );
             if ($this->_accountDetails['store_exists']) {
                 $totalCustomersText = $helper->__('  Total Customers:');
@@ -113,12 +130,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 2, 'label' => $title),
-                        array('value' => 3, 'label' => $syncLabel),
-                        array('value' => 4, 'label' => $totalCustomers),
-                        array('value' => 5, 'label' => $totalProducts),
-                        array('value' => 6, 'label' => $totalOrders),
-                        array('value' => 7, 'label' => $totalCarts)
+                        array('value' => self::STORENAME_KEY, 'label' => $title),
+                        array('value' => self::SYNC_LABEL_KEY, 'label' => $syncLabel),
+                        array('value' => self::TOTAL_CUS_KEY, 'label' => $totalCustomers),
+                        array('value' => self::TOTAL_PRO_KEY, 'label' => $totalProducts),
+                        array('value' => self::TOTAL_ORD_KEY, 'label' => $totalOrders),
+                        array('value' => self::TOTAL_QUO_KEY, 'label' => $totalCarts)
                     )
                 );
             } elseif ($helper->isEcomSyncDataEnabled($scopeArray[1], $scopeArray[0], true)) {
@@ -127,8 +144,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 8, 'label' => $noStoreText),
-                        array('value' => 9, 'label' => $newStoreText)
+                        array('value' => self::NO_STORE_TEXT_KEY, 'label' => $noStoreText),
+                        array('value' => self::NEW_STORE_TEXT_KEY, 'label' => $newStoreText)
                     )
                 );
             }
@@ -138,7 +155,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => 10, 'label' => $storeMigrationText)
+                        array('value' => self::STORE_MIGRATION_TEXT_KEY, 'label' => $storeMigrationText)
                     )
                 );
             }
