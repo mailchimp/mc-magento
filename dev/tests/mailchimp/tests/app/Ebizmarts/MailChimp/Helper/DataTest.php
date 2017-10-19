@@ -125,71 +125,71 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->handleResendFinish($scopeId, $scope);
     }
 
-    public function testHandleResendDataBefore()
-    {
-        $scopeId = 0;
-        $scope = 'default';
-        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getScope', 'getScopeId'))
-            ->getMock();
-        $configEntries = array();
+//    public function testHandleResendDataBefore()
+//    {
+//        $scopeId = 0;
+//        $scope = 'default';
+//        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getScope', 'getScopeId'))
+//            ->getMock();
+//        $configEntries = array();
+//
+//        /**
+//         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+//         */
+//        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope'))
+//            ->getMock();
+//
+//        $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
+//            ->disableOriginalConstructor()
+//            ->getMock();
+//
+//        $configMock->expects($this->once())->method('getScope')->willReturn($scope);
+//        $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
+//        $configEntries [] = $configMock;
+//        $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
+//        $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
+//        $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
+//        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(true, $scopeId, $scope);
+//
+//        $helperMock->handleResendDataBefore();
+//    }
 
-        /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
-         */
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope'))
-            ->getMock();
-
-        $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configMock->expects($this->once())->method('getScope')->willReturn($scope);
-        $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
-        $configEntries [] = $configMock;
-        $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
-        $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
-        $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
-        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(true, $scopeId, $scope);
-
-        $helperMock->handleResendDataBefore();
-    }
-
-    public function testHandleResendDataAfter()
-    {
-        $scopeId = 0;
-        $scope = 'default';
-        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getScope', 'getScopeId'))
-            ->getMock();
-        $configEntries = array();
-
-        /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
-         */
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope'))
-            ->getMock();
-
-        $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configMock->expects($this->once())->method('getScope')->willReturn($scope);
-        $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
-        $configEntries [] = $configMock;
-        $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
-        $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
-        $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
-        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(false, $scopeId, $scope);
-
-        $helperMock->handleResendDataAfter();
-    }
+//    public function testHandleResendDataAfter()
+//    {
+//        $scopeId = 0;
+//        $scope = 'default';
+//        $configMock = $this->getMockBuilder(Mage_Core_Model_Config_Data::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getScope', 'getScopeId'))
+//            ->getMock();
+//        $configEntries = array();
+//
+//        /**
+//         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+//         */
+//        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope'))
+//            ->getMock();
+//
+//        $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
+//            ->disableOriginalConstructor()
+//            ->getMock();
+//
+//        $configMock->expects($this->once())->method('getScope')->willReturn($scope);
+//        $configMock->expects($this->once())->method('getScopeId')->willReturn($scopeId);
+//        $configEntries [] = $configMock;
+//        $collectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($configEntries));
+//        $helperMock->expects($this->once())->method('getResendTurnConfigCollection')->willReturn($collectionMock);
+//        $helperMock->expects($this->once())->method('getResendTurn')->with($scopeId, $scope)->willReturn(1);
+//        $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(false, $scopeId, $scope);
+//
+//        $helperMock->handleResendDataAfter();
+//    }
 
 //    public function testResetMCEcommerceData()
 //    {
