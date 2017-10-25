@@ -107,7 +107,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     }
 
     /**
-     * @return Mage_SalesRule_Model_Mysql4_Rule_Collection
+     * @return Mage_SalesRule_Model_Resource_Rule_Collection
      */
     protected function getPromoRuleResourceCollection()
     {
@@ -116,12 +116,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
 
     /**
      * @param $magentoStoreId
-     * @return Mage_SalesRule_Model_Mysql4_Rule_Collection
+     * @return Mage_SalesRule_Model_Resource_Rule_Collection
      */
     public function makePromoRulesCollection($magentoStoreId)
     {
         /**
-         * @var Mage_SalesRule_Model_Mysql4_Rule_Collection $collection
+         * @var Mage_SalesRule_Model_Resource_Rule_Collection $collection
          */
         $collection = $this->getPromoRuleResourceCollection();
         $websiteId = $this->getWebsiteIdByStoreId($magentoStoreId);

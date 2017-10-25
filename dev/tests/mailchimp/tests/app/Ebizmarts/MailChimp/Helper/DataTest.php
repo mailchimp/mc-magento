@@ -144,8 +144,19 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
 
+        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
 
-        $configMock->expects($this->exactly(6))->method('deleteConfig');
+        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
+
+        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, $scope, $scopeId);
+
+        $param4 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG, $scope, $scopeId);
+
+        $param5 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scope, $scopeId);
+
+        $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0);
+
+        $configMock->expects($this->exactly(6))->method('deleteConfig')->withConsecutive($param1, $param2, $param3, $param4, $param5, $param6);
         $configMock->expects($this->once())->method('cleanCache');
 
         $helperMock->deleteLocalMCStoreData($mailchimpStoreId, $scopeId, $scope);
