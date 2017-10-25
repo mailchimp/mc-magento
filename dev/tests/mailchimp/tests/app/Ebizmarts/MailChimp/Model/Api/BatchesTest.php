@@ -62,8 +62,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
     public function testSendEcommerceBatch()
     {
         $apiBatchesMock = $this->apiBatchesMock->setMethods(
-            array('getHelper', 'isMailChimpEnabled', 'isEcomSyncDataEnabled',
-            'getApiCustomers', 'getApiProducts', 'getApiCarts', 'getApiOrders', 'deleteUnsentItems', 'markItemsAsSent')
+            array('getHelper', 'isMailChimpEnabled', 'isEcomSyncDataEnabled', 'getApiCustomers', 'getApiProducts',
+                'getApiCarts', 'getApiOrders', 'deleteUnsentItems', 'markItemsAsSent', 'getApiPromoRules', 'getApiPromoCodes')
         )
             ->getMock();
 
@@ -94,6 +94,16 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(array('createBatchJson'))
             ->getMock();
 
+        $apiPromoRulesMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoRules::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('createBatchJson'))
+            ->getMock();
+
+        $apiPromoCodesMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoCodes::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('createBatchJson'))
+            ->getMock();
+
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,6 +113,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiBatchesMock->expects($this->once())->method('getApiProducts')->willReturn($apiProductsMock);
         $apiBatchesMock->expects($this->once())->method('getApiCarts')->willReturn($apiCartsMock);
         $apiBatchesMock->expects($this->once())->method('getApiOrders')->willReturn($apiOrdersMock);
+        $apiBatchesMock->expects($this->once())->method('getApiPromoRules')->willReturn($apiPromoRulesMock);
+        $apiBatchesMock->expects($this->once())->method('getApiPromoCodes')->willReturn($apiPromoCodesMock);
         $helperMock->expects($this->once())->method('getMCStoreId')->with(1)->willReturn('b81c3085c51fa593e1d6b0cf59884f3e');
         $helperMock->expects($this->once())->method('isMailChimpEnabled')->with(1)->willReturn(1);
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with(1)->willReturn(1);
@@ -112,6 +124,10 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiProductsMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
         $apiCartsMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
         $apiOrdersMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
+        $apiOrdersMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
+        $apiOrdersMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
+        $apiPromoRulesMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
+        $apiPromoCodesMock->expects($this->once())->method('createBatchJson')->with('b81c3085c51fa593e1d6b0cf59884f3e', 1);
         $helperMock->expects($this->once())->method('getApi')->with(1)->willReturn($apiMock);
 
         $apiBatchesMock->_sendEcommerceBatch(1);

@@ -67,7 +67,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
                         $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
                     } catch (MailChimp_Error $e) {
-                        $helper->deleteLocalMCStoreData($scopeArray[1], $scopeArray[0]);
+                        $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray[1], $scopeArray[0]);
                         if ($listId) {
                             $helper->createStore($listId, $scopeArray[1], $scopeArray[0]);
                             $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');

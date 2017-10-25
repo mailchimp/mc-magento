@@ -68,6 +68,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $scopeId = 1;
         $scope = 'stores';
+        $mailchimpStoreId = 'a18a1a8a1aa7aja1a';
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getMCStoreId', 'getApiStores', 'getGeneralList', 'deleteCurrentWebhook', 'deleteLocalMCStoreData'))
@@ -76,11 +77,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn('a18a1a8a1aa7aja1a');
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
         $helperMock->expects($this->once())->method('getApiStores')->willReturn($apiStoresMock);
         $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn('listId');
         $helperMock->expects($this->once())->method('deleteCurrentWebhook')->with($scopeId, $scope, 'listId');
-        $helperMock->expects($this->once())->method('deleteLocalMCStoreData')->with($scopeId, $scope);
+        $helperMock->expects($this->once())->method('deleteLocalMCStoreData')->with($mailchimpStoreId, $scopeId, $scope);
 
         $helperMock->deleteStore($scopeId, $scope);
     }
@@ -123,6 +124,48 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('deleteResendConfigValues')->with($scopeId, $scope);
 
         $helperMock->handleResendFinish($scopeId, $scope);
+    }
+
+    public function testDeleteLocalMCStoreData()
+    {
+        $scope = 'default';
+        $scopeId = 0;
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfig'))
+            ->getMock();
+
+        $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('deleteConfig', 'cleanCache'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
+
+
+        $configMock->expects($this->exactly(6))->method('deleteConfig');
+        $configMock->expects($this->once())->method('cleanCache');
+
+        $helperMock->deleteLocalMCStoreData($mailchimpStoreId, $scopeId, $scope);
+    }
+
+    public function testGetDateSyncFinishByStoreId()
+    {
+        $scope = 'default';
+        $scopeId = 0;
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMCStoreId', 'getConfigValueForScope'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE."_$mailchimpStoreId", $scopeId, $scope);
+
+        $helperMock->getDateSyncFinishByStoreId($scopeId, $scope);
     }
 
 //    public function testHandleResendDataBefore()

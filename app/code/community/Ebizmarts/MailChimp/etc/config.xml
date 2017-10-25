@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.9.2</version>
+            <version>1.1.10</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.9.2</version>
+            <version>1.1.10</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -321,6 +321,15 @@
                     </mailchimp_save_before_product>
                 </observers>
             </catalog_product_save_before>
+            <controller_action_postdispatch_adminhtml_promo_quote_couponsMassDelete>
+                <observers>
+                    <mailchimp_controller_couponsMassDelete>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>secondaryCouponsDelete</method>
+                    </mailchimp_controller_couponsMassDelete>
+                </observers>
+            </controller_action_postdispatch_adminhtml_promo_quote_couponsMassDelete>
         </events>
     </adminhtml>
     <default>

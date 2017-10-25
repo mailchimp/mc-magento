@@ -293,7 +293,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * @return string
      */
-    public function getSyncdataTableName()
+    public function getSyncDataTableName()
     {
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
 
@@ -397,7 +397,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $mailchimpStoreId = $this->mailchimpStoreId;
         }
         $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getSyncdataTableName();
+        $mailchimpTableName = $this->getSyncDataTableName();
 
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),

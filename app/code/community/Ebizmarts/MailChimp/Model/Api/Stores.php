@@ -133,7 +133,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId)
     {
-        $response = $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
+        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
     }
 
     /**
