@@ -128,7 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->getData();
         $mergeVars = array();
         $subscriberEmail = $subscriber->getSubscriberEmail();
-        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($subscriberEmail);
+        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];

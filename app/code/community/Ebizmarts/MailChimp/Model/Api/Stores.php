@@ -130,14 +130,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @param $mailchimpApi
      * @param $isSincingValue
      * @param $mailchimpStoreId
-     * @param $magentoStoreId
      */
-    public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId, $magentoStoreId)
+    public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId)
     {
-        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
-        $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
-        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, (int)$isSincingValue));
-        Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
+        $response = $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
     }
 
     /**

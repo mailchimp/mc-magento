@@ -256,7 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = (float)$product->getDefaultPrice();
+                $price = ((float)$product->getPrice()) ? (float)$product->getPrice() : (float)$product->getDefaultPrice();
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -521,13 +521,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($attributeCodes as $_code) {
             $attributeName = $config->getAttribute("catalog_product", $_code);
 
-            if ($_code != 'price') {
-                $collection->joinField(
-                    $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
-                    '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
-                );
-            }
-
+            $collection->joinField(
+              $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
+              '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
+            );
+          
             $collection->joinField(
                 'default_' . $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
                 '{{table}}.store_id = 0 AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
