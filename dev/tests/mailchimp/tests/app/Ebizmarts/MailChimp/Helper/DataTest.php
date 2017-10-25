@@ -218,7 +218,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope', 'setResendTurn'))
+            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope', 'setResendTurn', 'handleResendFinish'))
             ->getMock();
 
         $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
@@ -234,6 +234,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('setIsSyncingIfFinishedPerScope')->with(false, $scopeId, $scope);
 
         $helperMock->expects($this->once())->method('setResendTurn')->with(0, $scopeId, $scope);
+        $helperMock->expects($this->once())->method('handleResendFinish')->with($scopeId, $scope);
 
         $helperMock->handleResendDataAfter();
     }
