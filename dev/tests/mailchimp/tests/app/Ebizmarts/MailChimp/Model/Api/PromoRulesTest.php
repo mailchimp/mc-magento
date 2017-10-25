@@ -72,28 +72,28 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $this->assertEquals(self::BATCH_ID . "_" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_' . self::PROMORULE_ID, $return["operation_id"]);
     }
 
-//    public function testMakePromoRulesCollection()
-//    {
-//        $magentoStoreId = 1;
-//        $websiteId = 1;
-//
-//        $promoRulesApiMock = $this->promoRulesApiMock
-//            ->setMethods(array('getPromoRuleResourceCollection', 'getWebsiteIdByStoreId'))
-//            ->getMock();
-//
-//        $promoRulesCollectionMock = $this->getMockBuilder(Mage_SalesRule_Model_Mysql4_Rule_Collection::class)
-//            ->setMethods(array('addWebsiteFilter'))
-//            ->getMock();
-//
-//        $promoRulesApiMock->expects($this->once())->method('getPromoRuleResourceCollection')->willReturn($promoRulesCollectionMock);
-//        $promoRulesApiMock->expects($this->once())->method('getWebsiteIdByStoreId')->with($magentoStoreId)->willReturn($websiteId);
-//
-//        $promoRulesCollectionMock->expects($this->once())->method('addWebsiteFilter')->with($websiteId);
-//
-//        $return = $promoRulesApiMock->makePromoRulesCollection($magentoStoreId);
-//
-//        $this->assertContains(Mage_SalesRule_Model_Mysql4_Rule_Collection::class, get_class($return));
-//    }
+    public function testMakePromoRulesCollection()
+    {
+        $magentoStoreId = 1;
+        $websiteId = 1;
+
+        $promoRulesApiMock = $this->promoRulesApiMock
+            ->setMethods(array('getPromoRuleResourceCollection', 'getWebsiteIdByStoreId'))
+            ->getMock();
+
+        $promoRulesCollectionMock = $this->getMockBuilder(Mage_SalesRule_Model_Mysql4_Rule_Collection::class)
+            ->setMethods(array('addWebsiteFilter'))
+            ->getMock();
+
+        $promoRulesApiMock->expects($this->once())->method('getPromoRuleResourceCollection')->willReturn($promoRulesCollectionMock);
+        $promoRulesApiMock->expects($this->once())->method('getWebsiteIdByStoreId')->with($magentoStoreId)->willReturn($websiteId);
+
+        $promoRulesCollectionMock->expects($this->once())->method('addWebsiteFilter')->with($websiteId);
+
+        $return = $promoRulesApiMock->makePromoRulesCollection($magentoStoreId);
+
+        $this->assertContains(Mage_SalesRule_Model_Mysql4_Rule_Collection::class, get_class($return));
+    }
 
     public function testGetSyncDataTableName()
     {
