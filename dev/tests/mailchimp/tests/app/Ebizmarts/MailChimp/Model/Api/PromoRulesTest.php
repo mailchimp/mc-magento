@@ -82,6 +82,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->getMock();
 
         $promoRulesCollectionMock = $this->getMockBuilder(Mage_SalesRule_Model_Resource_Rule_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addWebsiteFilter'))
             ->getMock();
 
