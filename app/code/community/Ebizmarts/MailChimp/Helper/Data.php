@@ -1735,13 +1735,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 ->addFieldToFilter('email', array('eq' => $email))
                 ->getFirstItem();
             if ($customer->getId()) {
-                $customer = Mage::getModel('customer/customer')->load($customer->getId());;
+                $customer = Mage::getModel('customer/customer')->load($customer->getId());
             } else {
                 $customer = null;
             }
         }
 
         return $customer;
+    }
+
+    public function createWebhookIfRequired($scopeId, $scope = 'stores')
+    {
+        $webhookId = $this->getWebhookId($scopeId, $scope);
+        if (!$webhookId) {
+            $this->handleWebhookChange($scopeId, $scope);
+        }
     }
 
     public function handleWebhookChange($scopeId, $scope = 'stores')

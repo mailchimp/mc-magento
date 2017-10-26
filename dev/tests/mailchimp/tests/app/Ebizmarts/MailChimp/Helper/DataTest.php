@@ -290,4 +290,42 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 1)), 0, 'default');
     }
+
+    public function testHandleWebhookChange()
+    {
+        $scopeId = 0;
+        $scope = 'default';
+        $realScopeArray = array('scope_id' => 0, 'scope' => 'default');
+        $listId = 'a1s2d3f4g5';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRealScopeForConfig', 'getGeneralList', 'deleteCurrentWebhook', 'isMailChimpEnabled', 'createNewWebhook'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scopeId, $scope)->willReturn($realScopeArray);
+        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
+        $helperMock->expects($this->once())->method('deleteCurrentWebhook')->with($realScopeArray['scope_id'], $realScopeArray['scope'], $listId);
+        $helperMock->expects($this->once())->method('isMailChimpEnabled')->with($scopeId, $scope)->willReturn(1);
+        $helperMock->expects($this->once())->method('createNewWebhook')->with($scopeId, $scope, $listId);
+
+        $helperMock->handleWebhookChange($scopeId, $scope);
+    }
+
+    public function testCreateWebhookIfRequired()
+    {
+        $scopeId = 0;
+        $scope = 'default';
+        $webhookId = null;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getWebhookId', 'handleWebhookChange'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getWebhookId')->with($scopeId, $scope)->willReturn($webhookId);
+        $helperMock->expects($this->once())->method('handleWebhookChange')->with($scopeId, $scope);
+
+        $helperMock->createWebhookIfRequired($scopeId, $scope);
+    }
 }
