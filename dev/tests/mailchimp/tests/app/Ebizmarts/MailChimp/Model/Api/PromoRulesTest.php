@@ -93,7 +93,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $return = $promoRulesApiMock->makePromoRulesCollection($magentoStoreId);
 
-        $this->assertContains(Mage_SalesRule_Model_Mysql4_Rule_Collection::class, get_class($return));
+        $this->assertContains(Mage_SalesRule_Model_Resource_Rule_Collection::class, get_class($return));
     }
 
     public function testGetSyncDataTableName()
