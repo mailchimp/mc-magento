@@ -35,6 +35,8 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommerceOrdersLines.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommerceProducts.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommerceProductsVariants.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommercePromoRules.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommercePromoRulesPromoCodes.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/FileManagerFiles.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/FileManagerFolders.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Lists.php';
@@ -91,6 +93,8 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/MailChimp/EcommerceOrdersLines.php';
     include_once dirname(__FILE__) . '/MailChimp/EcommerceProducts.php';
     include_once dirname(__FILE__) . '/MailChimp/EcommerceProductsVariants.php';
+    include_once dirname(__FILE__) . '/MailChimp/EcommercePromoRules.php';
+    include_once dirname(__FILE__) . '/MailChimp/EcommercePromoRulesPromoCodes.php';
     include_once dirname(__FILE__) . '/MailChimp/FileManagerFiles.php';
     include_once dirname(__FILE__) . '/MailChimp/FileManagerFolders.php';
     include_once dirname(__FILE__) . '/MailChimp/Lists.php';
@@ -203,6 +207,8 @@ class Ebizmarts_MailChimp
         $this->ecommerce->orders->lines                     = new MailChimp_EcommerceOrdersLines($this);
         $this->ecommerce->products                          = new MailChimp_EcommerceProducts($this);
         $this->ecommerce->products->variants                = new MailChimp_EcommerceProductsVariants($this);
+        $this->ecommerce->promoRules                        = new MailChimp_EcommercePromoRules($this);
+        $this->ecommerce->promoRules->promoCodes            = new MailChimp_EcommercePromoRulesPromoCodes($this);
         $this->fileManagerFiles                             = new MailChimp_FileManagerFiles($this);
         $this->fileManagerFolders                           = new MailChimp_FileManagerFolders($this);
         $this->lists                                        = new MailChimp_Lists($this);

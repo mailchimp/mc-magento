@@ -87,15 +87,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $incrementId;
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
+                    //update order delta
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
+                    $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
                     $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
                     continue;
                 }
-
-                //update order delta
-                $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
-                $this->_counter++;
             } catch (Exception $e) {
                 Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
             }
@@ -136,15 +135,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
+                    //update order delta
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
+                    $this->_counter++;
                 } else {
                     $error = Mage::helper('mailchimp')->__('Something went wrong when retrieving product information.');
                     $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
                     continue;
                 }
-
-                //update order delta
-                $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
-                $this->_counter++;
             } catch (Exception $e) {
                 Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
             }
@@ -179,6 +177,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
         $data['discount_total'] = abs($order->getBaseDiscountAmount());
         $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
+        $data['promos'] = $this->getPromoData();
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
@@ -639,5 +638,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
+    }
+
+    protected function getPromoData()
+    {
+        return array(array(
+            'code' => 'abcd',
+            'amount_discounted' => 10,
+            'type' => 'percentage'
+        ));
     }
 }
