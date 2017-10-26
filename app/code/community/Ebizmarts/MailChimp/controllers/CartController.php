@@ -67,4 +67,27 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
             }
         }
     }
+
+    public function loadcouponAction()
+    {
+        $params = $this->getRequest()->getParams();
+        if (isset($params['code'])) {
+            $code = $params['code'];
+            $coupon = Mage::getModel('salesrule/coupon')->load($code, 'code');
+            if ($coupon->getId()) {
+                Mage::getSingleton("checkout/session")->setData("coupon_code", $code);
+                $quote = Mage::getSingleton('checkout/cart')->getQuote();
+                $quote->setCouponCode($code)->save();
+                Mage::getSingleton('core/session')->addSuccess($this->__('Coupon was automatically applied.'));
+                if (!$quote->getItemsCount()) {
+                    Mage::getSingleton('core/session')->addWarning($this->__('If you log in without adding any item to the cart, you will need to re-apply the coupon code manually.'));
+                }
+            } else {
+                Mage::getSingleton('core/session')->addError($this->__('Something went wrong when trying to apply the coupon code.'));
+            }
+
+            $url = Mage::getUrl('checkout/cart');
+            $this->getResponse()->setRedirect($url, 301);
+        }
+    }
 }

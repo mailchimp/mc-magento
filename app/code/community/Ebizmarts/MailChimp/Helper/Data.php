@@ -926,6 +926,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $ecommerceSyndDataItem;
     }
 
+    public function getAllEcommerceSyncDataItemsPerId($itemId, $itemType)
+    {
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToFilter('related_id', array('eq' => $itemId))
+            ->addFieldToFilter('type', array('eq' => $itemType));
+
+        return $collection;
+    }
+
     /**
      * Filter collection by all the stores associated to MailChimp for given scope.
      *
@@ -1040,23 +1049,33 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $model = Mage::getResourceModel('catalog/product');
         $configImageSize = $this->getImageSize($magentoStoreId);
-
-        if ($configImageSize == 0) {
-            $productImage = $model->getAttributeRawValue($productId, 'image', $magentoStoreId);
-        } else if ($configImageSize == 1){
-            $productImage = $model->getAttributeRawValue($productId, 'small_image', $magentoStoreId);
-        } else {
-            $productImage = $model->getAttributeRawValue($productId, 'thumbnail', $magentoStoreId);
+        switch ($configImageSize) {
+            case 0:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
+                break;
+            case 1:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_SMALL;
+                break;
+            case 2:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_THUMBNAIL;
+                break;
+            default:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
+                break;
         }
-        
+
+        $productImage = $model->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
+
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
-            $oldStoreId = Mage::app()->getStore()->getId();
+            $curStore = Mage::app()->getStore()->getId();
             Mage::app()->setCurrentStore($magentoStoreId);
-            $productMediaConfig = $this->getProductMediaConfig();
-            $imageUrl = $productMediaConfig->getMediaUrl($productImage);
-            Mage::app()->setCurrentStore($oldStoreId);
+            $productImageModel = $this->getProductImageModel();
+            $productImageModel->setDestinationSubdir($imageSize);
+            $productImageModel->setBaseFile($productImage);
+            $imageUrl = $productImageModel->getUrl();
+            Mage::app()->setCurrentStore($curStore);
         }
         return $imageUrl;
     }
@@ -1066,9 +1085,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_IMAGE_SIZE, $scopeId, $scope);
     }
 
-    private function getProductMediaConfig()
+    private function getProductImageModel()
     {
-        return Mage::getModel('catalog/product_media_config');
+        return Mage::getModel('catalog/product_image');
     }
 
     /**
@@ -1283,7 +1302,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         $syncModified = $customer->getMailchimpSyncModified();
                     }
 
-                    Mage::helper('mailchimp')->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
+                    $this->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
                 );
             }
@@ -2312,6 +2331,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_AMOUNT, 0, 'default');
     }
 
+    public function getPromoRuleAmountLimit()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_AMOUNT, 0, 'default');
+    }
+
     public function getCartAmountLimit()
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::CART_AMOUNT, 0, 'default');
@@ -2452,4 +2476,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getConfig();
     }
+
+    public function wasProductImageCacheFlushed()
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 0, 'default');
+    }
+
 }

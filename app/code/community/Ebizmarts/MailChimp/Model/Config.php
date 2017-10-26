@@ -52,6 +52,11 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_IMAGE_SIZE          = 'mailchimp/ecommerce/image_size';
     const ECOMMERCE_SYNC_DATE           = 'mailchimp/ecommerce/sync_date';
 
+    const IMAGE_SIZE_DEFAULT            = 'image';
+    const IMAGE_SIZE_SMALL              = 'small_image';
+    const IMAGE_SIZE_THUMBNAIL          = 'thumbnail';
+    const PRODUCT_IMAGE_CACHE_FLUSH     = 'mailchimp/ecommerce/product_image_cache_flush';
+
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';
     const POPUP_TEXT                    = 'mailchimp/emailcatcher/popup_text';
@@ -82,4 +87,6 @@ class Ebizmarts_MailChimp_Model_Config
     const IS_ORDER      = "ORD";
     const IS_QUOTE      = "QUO";
     const IS_SUBSCRIBER = "SUB";
+    const IS_PROMO_RULE = "PRL";
+    const IS_PROMO_CODE = "PCD";
 }

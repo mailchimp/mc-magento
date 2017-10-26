@@ -109,6 +109,30 @@
                     </mailchimp_product_website_update>
                 </observers>
             </catalog_product_website_update>
+            <salesrule_rule_save_after>
+                <observers>
+                    <mailchimp_salesrule_save_after>
+                        <class>mailchimp/observer</class>
+                        <method>salesruleSaveAfter</method>
+                    </mailchimp_salesrule_save_after>
+                </observers>
+            </salesrule_rule_save_after>
+            <salesrule_rule_delete_after>
+                <observers>
+                    <mailchimp_salesrule_delete_after>
+                        <class>mailchimp/observer</class>
+                        <method>salesruleDeleteAfter</method>
+                    </mailchimp_salesrule_delete_after>
+                </observers>
+            </salesrule_rule_delete_after>
+            <clean_catalog_images_cache_after>
+                <observers>
+                    <mailchimp_clean_catalog_images_cache_after>
+                        <class>mailchimp/observer</class>
+                        <method>cleanProductImagesCacheAfter</method>
+                    </mailchimp_clean_catalog_images_cache_after>
+                </observers>
+            </clean_catalog_images_cache_after>
         </events>
         <models>
             <mailchimp>
@@ -207,6 +231,14 @@
                     </ebizmarts_mailchimp_quote_save>
                 </observers>
             </sales_quote_save_before>
+            <controller_front_init_before>
+                <observers>
+                    <mailchimp_controller_front_init_before>
+                        <class>mailchimp/observer</class>
+                        <method>frontInitBefore</method>
+                    </mailchimp_controller_front_init_before>
+                </observers>
+            </controller_front_init_before>
         </events>
         <translate>
             <modules>
