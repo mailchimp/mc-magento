@@ -553,7 +553,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $mailchimpStoreId = $this->getHelper()->getMCStoreId($magentoStoreId);
 
             $batchArray['operations'] = Mage::getModel('mailchimp/api_orders')->replaceAllOrdersBatch($initialTime, $mailchimpStoreId, $magentoStoreId);
-            $itemAmount = count($batchArray['operations']);
             try {
                 /**
                  * @var $mailchimpApi \Ebizmarts_MailChimp
@@ -577,11 +576,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                 }
 
-                $syncingFlag = $this->getHelper()->getMCIsSyncing($magentoStoreId);
-                if ($syncingFlag && $itemAmount == 0) {
-                    $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, date('Y-m-d H:i:s')));
-                    Mage::helper('mailchimp')->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
-                }
             } catch (MailChimp_Error $e) {
                 $this->getHelper()->logError($e->getFriendlyMessage(), $magentoStoreId);
             } catch (Exception $e) {
