@@ -593,4 +593,29 @@ class Ebizmarts_MailChimp_Model_Observer
         $promoRulesApi = Mage::getModel('mailchimp/api_promoRules');
         return $promoRulesApi;
     }
+
+    public function cleanProductImagesCacheAfter(Varien_Event_Observer $observer)
+    {
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
+        $this->makeHelper()->saveMailchimpConfig($configValues, 0, 'default');
+    }
+
+    public function frontInitBefore(Varien_Event_Observer $observer)
+    {
+        $helper = $this->makeHelper();
+        if ($helper->wasProductImageCacheFlushed()) {
+            try {
+                $tableName = $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+                $sqlQuery = "UPDATE " . $tableName . " SET mailchimp_sync_modified = 1 WHERE type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "';";
+                $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+                $connection->query($sqlQuery);
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage());
+            }
+            $config = Mage::getConfig();
+            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 0, 'default');
+            $config->cleanCache();
+        }
+
+    }
 }
