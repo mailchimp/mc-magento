@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Twowaysync extends Mage_Co
         $syncingFlag = $helper->getMCIsSyncing($this->getScopeId(), $this->getScope());
         $ecommerceEnabled = $helper->isEcommerceEnabled($this->getScopeId(), $this->getScope());
         $listId = $helper->getGeneralList($this->getScopeId(), $this->getScope());
-        if ($moduleIsActive && (!$ecommerceEnabled && $listId || $syncingFlag === 0)) {
+        if ($moduleIsActive && (!$ecommerceEnabled && $listId || $syncingFlag != 1)) {
             $helper->handleWebhookChange($this->getScopeId(), $this->getScope());
         }
     }
