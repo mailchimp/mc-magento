@@ -42,13 +42,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
             $helper->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }
 
-        if ($moduleIsActive &&  $this->isValueChanged()) {
+        if ($moduleIsActive && $this->isValueChanged()) {
             $helper->handleWebhookChange($this->getScopeId(), $this->getScope());
         }
     }
 
     /**
-     * @return Mage_Core_Helper_Abstract
+     * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function getMailchimpHelper()
     {

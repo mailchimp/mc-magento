@@ -303,7 +303,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getRealScopeForConfig', 'getGeneralList', 'deleteCurrentWebhook', 'isMailChimpEnabled', 'createNewWebhook'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scopeId, $scope)->willReturn($realScopeArray);
+        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)->willReturn($realScopeArray);
         $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
         $helperMock->expects($this->once())->method('deleteCurrentWebhook')->with($realScopeArray['scope_id'], $realScopeArray['scope'], $listId);
         $helperMock->expects($this->once())->method('isMailChimpEnabled')->with($scopeId, $scope)->willReturn(1);

@@ -363,7 +363,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if ($batchResponse) {
                 $batchResponses[] = $batchResponse;
             }
-            $helper->createWebhookIfRequired(0);
+            $helper->createWebhookIfRequired(0, 'default');
         }
 
         return $batchResponses;
