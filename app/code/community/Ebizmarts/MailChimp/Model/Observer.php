@@ -605,17 +605,39 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         if ($helper->wasProductImageCacheFlushed()) {
             try {
-                $tableName = $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-                $sqlQuery = "UPDATE " . $tableName . " SET mailchimp_sync_modified = 1 WHERE type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "';";
-                $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-                $connection->query($sqlQuery);
+                $this->markProductsAsModified();
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
             }
-            $config = Mage::getConfig();
-            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 0, 'default');
+            $config = $this->getConfig();
+            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
             $config->cleanCache();
         }
 
+    }
+
+    /**
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getCoreResource()
+    {
+        return Mage::getSingleton('core/resource');
+    }
+
+    protected function markProductsAsModified()
+    {
+        $tableName = $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
+        $sqlQuery = "UPDATE " . $tableName . " SET mailchimp_sync_modified = 1 WHERE type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "';";
+        $connection = $this->getCoreResource()->getConnection('core_write');
+        $connection->query($sqlQuery);
+    }
+
+    /**
+     * @return Mage_Core_Model_Config
+     */
+    protected function getConfig()
+    {
+        $config = Mage::getConfig();
+        return $config;
     }
 }

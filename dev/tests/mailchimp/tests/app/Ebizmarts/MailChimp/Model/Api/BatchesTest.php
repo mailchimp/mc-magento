@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('handleResendDataBefore', 'handleResendDataAfter'))
+            ->setMethods(array('handleResendDataBefore', 'handleResendDataAfter', 'isEcomSyncDataEnabled'))
             ->getMock();
 
         $storeArrayMock = $this->getMockBuilder(Mage_Core_Model_Resource_Store_Collection::class)
@@ -48,6 +48,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $helperMock->expects($this->once())->method('handleResendDataBefore');
         $helperMock->expects($this->once())->method('handleResendDataAfter');
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 
         $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $apiBatchesMock->expects($this->once())->method('getStores')->willReturn($storeArrayMock);

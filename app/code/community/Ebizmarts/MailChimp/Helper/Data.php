@@ -25,7 +25,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getConfigValueForScope($path, $scopeId, $scope = null)
     {
         if ($scope == 'websites') {
-            $configValue = Mage::app()->getWebsite($scopeId)->getConfig($path);
+            $configValue = $this->getMageApp()->getWebsite($scopeId)->getConfig($path);
         } else {
             $configValue = Mage::getStoreConfig($path, $scopeId);
         }
@@ -48,7 +48,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) {
             // website level
             $websiteId = Mage::getModel('core/website')->load($code)->getId();
-            $storeId = Mage::app()->getWebsite($websiteId)->getDefaultStore()->getId();
+            $storeId = $this->getMageApp()->getWebsite($websiteId)->getDefaultStore()->getId();
         }
         $scopeArray['websiteId'] = $websiteId;
         $scopeArray['storeId'] = $storeId;
@@ -86,15 +86,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $storeName = null;
         switch ($scope) {
             case 'stores':
-                $store = Mage::app()->getStore($scopeId);
+                $store = $this->getMageApp()->getStore($scopeId);
                 $storeName = $store->getFrontendName();
                 break;
             case 'websites':
-                $website = Mage::app()->getWebsite($scopeId);
+                $website = $this->getMageApp()->getWebsite($scopeId);
                 $storeName = $website->getDefaultStore()->getFrontendName();
                 break;
             case 'default':
-                $storeView = Mage::app()->getDefaultStoreView();
+                $storeView = $this->getMageApp()->getDefaultStoreView();
                 $storeName = $storeView->getWebsite()->getDefaultStore()->getFrontendName();
                 break;
         }
@@ -120,7 +120,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getStoreRelation()
     {
-        $stores = Mage::app()->getStores();
+        $stores = $this->getMageApp()->getStores();
         $storeRelation = array();
         foreach ($stores as $storeId => $store) {
             $mcStoreId = $this->getMCStoreId($storeId);
@@ -1003,12 +1003,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $scopeArray = $this->getMailChimpScopeByStoreId($magentoStoreId);
         if ($scopeArray) {
             if ($scopeArray['scope'] == 'websites') {
-                $magentoStoreId = Mage::app()
+                $magentoStoreId = $this->getMageApp()
                     ->getWebsite($scopeArray['scope_id'])
                     ->getDefaultGroup()
                     ->getDefaultStoreId();
             } elseif ($scopeArray['scope'] == 'default') {
-                $magentoStoreId = Mage::app()
+                $magentoStoreId = $this->getMageApp()
                     ->getWebsite(true)
                     ->getDefaultGroup()
                     ->getDefaultStoreId();
@@ -1056,7 +1056,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getImageUrlById($productId, $magentoStoreId)
     {
-        $model = Mage::getResourceModel('catalog/product');
+        $productResourceModel = $this->getProductResourceModel();
+        $productModel = $this->getProductModel();
         $configImageSize = $this->getImageSize($magentoStoreId);
         switch ($configImageSize) {
             case 0:
@@ -1073,25 +1074,78 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 break;
         }
 
-        $productImage = $model->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
+        $productImage = $productResourceModel->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
+        $productModel->setData('image', $productImage);
 
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
         } else {
-            $curStore = Mage::app()->getStore()->getId();
-            Mage::app()->setCurrentStore($magentoStoreId);
-            $productImageModel = $this->getProductImageModel();
-            $productImageModel->setDestinationSubdir($imageSize);
-            $productImageModel->setBaseFile($productImage);
-            $imageUrl = $productImageModel->getUrl();
-            Mage::app()->setCurrentStore($curStore);
+            $curStore = $this->getCurrentStoreId();
+            $this->setCurrentStore($magentoStoreId);
+            $upperCaseImage = str_replace('_', '', ucwords($imageSize, "_"));
+            $functionName = "get{$upperCaseImage}Url";
+            $imageUrl = $productModel->$functionName();
+            $this->setCurrentStore($curStore);
         }
         return $imageUrl;
+    }
+
+    /**
+     * Return Catalog Product Image helper instance
+     *
+     * @return Mage_Catalog_Helper_Image
+     */
+    protected function _getImageHelper()
+    {
+        return Mage::helper('catalog/image');
     }
 
     public function getImageSize($scopeId, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_IMAGE_SIZE, $scopeId, $scope);
+    }
+
+    /**
+     * @return Object
+     */
+    protected function getProductResourceModel()
+    {
+        $productResourceModel = Mage::getResourceModel('catalog/product');
+        return $productResourceModel;
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getProductModel()
+    {
+        $productModel = Mage::getModel('catalog/product');
+        return $productModel;
+    }
+
+    /**
+     * @return Mage_Core_Model_App
+     */
+    protected function getMageApp()
+    {
+        return Mage::app();
+    }
+
+    /**
+     * @return int
+     */
+    protected function getCurrentStoreId()
+    {
+        $curStore = $this->getMageApp()->getStore()->getId();
+        return $curStore;
+    }
+
+    /**
+     * @param $magentoStoreId
+     */
+    protected function setCurrentStore($magentoStoreId)
+    {
+        $this->getMageApp()->setCurrentStore($magentoStoreId);
     }
 
     private function getProductImageModel()
@@ -1172,7 +1226,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $script = '';
         $url = null;
-        $storeId = Mage::app()->getStore()->getId();
+        $storeId = $this->getMageApp()->getStore()->getId();
         if ($this->isEcomSyncDataEnabled($storeId)) {
             $currentUrl = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
             if ($this->areJsUrlAndListScopesEqual($storeId)) {
@@ -1350,7 +1404,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $productCollection, $mailchimpStoreId, $initialTime, function ($product, $mailchimpStoreId) {
                     $productId = $product->getEntityId();
                     $_resource = Mage::getResourceSingleton('catalog/product');
-                    $syncDelta = $_resource->getAttributeRawValue($productId, 'mailchimp_sync_delta', Mage::app()->getStore());
+                    $syncDelta = $_resource->getAttributeRawValue($productId, 'mailchimp_sync_delta', $this->getMageApp()->getStore());
                     $syncError = null;
                     $syncModified = null;
                     if ($product->getMailchimpSyncError()) {
@@ -1529,7 +1583,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function timePassed($initialTime)
     {
-        $storeCount = count(Mage::app()->getStores());
+        $storeCount = count($this->getMageApp()->getStores());
         $timePassed = false;
         $finalTime = time();
         $difference = $finalTime - $initialTime;
@@ -1565,7 +1619,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _setIsSyncingIfFinishedInAllStores($syncValue)
     {
-        $stores = Mage::app()->getStores();
+        $stores = $this->getMageApp()->getStores();
         foreach ($stores as $storeId => $store) {
             $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
         }
@@ -1583,7 +1637,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $finished = false;
         if (!$this->timePassed($initialTime)) {
             $finished = true;
-            $stores = Mage::app()->getStores();
+            $stores = $this->getMageApp()->getStores();
             foreach ($stores as $storeId => $store) {
                 Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
                 if ($this->timePassed($initialTime)) {
@@ -1619,7 +1673,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function delete116MigrationConfigData()
     {
-        $stores = Mage::app()->getStores();
+        $stores = $this->getMageApp()->getStores();
         $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 'default', 0);
         foreach ($stores as $storeId => $store) {
             $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID, 'stores', $storeId);
@@ -1654,7 +1708,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $storeIds = Mage::registry('mailchimp_store_ids_for_list_' . $listId);
         if ($storeIds === null) {
-            $stores = Mage::app()->getStores();
+            $stores = $this->getMageApp()->getStores();
             $storeIds = array();
             foreach ($stores as $storeId => $store) {
                 if ($this->isMailChimpEnabled($storeId)) {
@@ -1839,7 +1893,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     protected function getWebhookUrl()
     {
-        $store = Mage::app()->getDefaultStoreView();
+        $store = $this->getMageApp()->getDefaultStoreView();
         $webhooksKey = $this->getWebhooksKey();
         //Generating Webhooks URL
         $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
@@ -2100,7 +2154,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $storeIds = $website->getStoreIds();
                 $allItemsSent = $this->allResendItemsSentPerScope($storeIds);
             } else {
-                $stores = Mage::app()->getStores();
+                $stores = $this->getMageApp()->getStores();
                 $allItemsSent = $this->allResendItemsSentPerScope($stores);
             }
         }

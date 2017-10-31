@@ -123,8 +123,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper->handleResendDataBefore();
         foreach ($stores as $store) {
             $storeId = $store->getId();
-            $this->_getResults($storeId);
-            $this->_sendEcommerceBatch($storeId);
+            if ($helper->isEcomSyncDataEnabled($storeId)) {
+                $this->_getResults($storeId);
+                $this->_sendEcommerceBatch($storeId);
+            }
         }
         $helper->handleResendDataAfter();
 
@@ -646,7 +648,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if ($date) {
                 $api = $helper->getApi($magentoStoreId);
                 $isSyncingDate = $helper->getDateSyncFinishByMailChimpStoreId($mailchimpStoreId);
-                if (!$isSyncingDate) {
+                if (!$isSyncingDate && $mailchimpStoreId) {
                     Mage::getModel('mailchimp/api_stores')->editIsSyncing($api, false, $mailchimpStoreId);
                     $scopeToEdit = Mage::helper('mailchimp')->getMailChimpScopeByStoreId($magentoStoreId);
                     if ($scopeToEdit['scope'] != 'stores') {

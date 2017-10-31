@@ -90,4 +90,37 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         return $eventObserverMock;
     }
+
+    public function testFrontInitBefore()
+    {
+        $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'markProductsAsModified', 'getConfig'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('wasProductImageCacheFlushed'))
+            ->getMock();
+
+        $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('deleteConfig', 'cleanCache'))
+            ->getMock();
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $modelMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $modelMock->expects($this->once())->method('markProductsAsModified');
+        $modelMock->expects($this->once())->method('getConfig')->willReturn($configMock);
+
+        $helperMock->expects($this->once())->method('wasProductImageCacheFlushed')->willReturn(1);
+
+        $configMock->expects($this->once())->method('deleteConfig')->with(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
+        $configMock->expects($this->once())->method('cleanCache');
+
+        $modelMock->frontInitBefore($eventObserverMock);
+    }
 }
