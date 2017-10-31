@@ -290,4 +290,48 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 1)), 0, 'default');
     }
+
+    public function testGetImageUrlById()
+    {
+        $productId = 1;
+        $magentoStoreId = 1;
+        $defaultStoreId = 0;
+        $imageSize = 'image';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId', 'setCurrentStore'))
+            ->getMock();
+
+        $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setData', 'getImageUrl'))
+            ->getMock();
+
+        $productResourceModelMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAttributeRawValue'))
+            ->getMock();
+
+        $imageModelMock = $this->getMockBuilder(Mage_Media_Model_Image::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getProductResourceModel')->willReturn($productResourceModelMock);
+        $helperMock->expects($this->once())->method('getProductModel')->willReturn($productModelMock);
+        $helperMock->expects($this->once())->method('getImageSize')->with($magentoStoreId)->willReturn($imageSize);
+
+        $productResourceModelMock->expects($this->once())->method('getAttributeRawValue')->with($productId, $imageSize, $magentoStoreId)->willReturn($imageModelMock);
+
+        $productModelMock->expects($this->once())->method('setData')->with($imageSize, $imageModelMock);
+        $productModelMock->expects($this->once())->method('getImageUrl')->willReturn('ImageUrl');
+
+        $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn($defaultStoreId);
+
+        $helperMock->expects($this->exactly(2))->method('setCurrentStore')->withConsecutive(array($magentoStoreId), array($defaultStoreId));
+
+        $return = $helperMock->getImageUrlById($productId, $magentoStoreId);
+
+        $this->assertEquals($return, 'ImageUrl');
+    }
 }
