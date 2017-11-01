@@ -305,6 +305,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _makeCart($cart, $mailchimpStoreId, $magentoStoreId)
     {
+        $helper = $this->getHelper();
         $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
@@ -360,7 +361,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $jsonData = json_encode($oneCart);
             } catch (Exception $e) {
                 //json encode failed
-                Mage::helper('mailchimp')->logError("Carts " . $cart->getId() . " json encode failed", $magentoStoreId);
+                $helper->logError("Carts " . $cart->getId() . " json encode failed", $magentoStoreId);
             }
         }
 
@@ -400,7 +401,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _getCustomer($cart, $mailchimpStoreId, $magentoStoreId)
     {
-        $api = Mage::helper('mailchimp')->getApi($magentoStoreId);
+        $helper = $this->getHelper();
+        $api = $helper->getApi($magentoStoreId);
         if ($cart->getCustomerId()) {
             try {
                 $customer = $api->ecommerce->customers->get($mailchimpStoreId, $cart->getCustomerId(), 'email_address');
@@ -408,7 +410,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $err = $e->getMailchimpTitle();
                 if (!preg_match('/Resource Not Found for Api Call/', $err)) {
                     $msg = "Failed to lookup e-commerce customer via ID " . $cart->getCustomerId();
-                    Mage::helper('mailchimp')->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
+                    $helper->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
                 }
             }
             $custEmailAddr = null;
@@ -424,7 +426,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             try {
                 $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
             } catch (MailChimp_Error $e) {
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
+                $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
             }
 
             if (isset($customers['total_items']) && $customers['total_items'] > 0) {
@@ -434,7 +436,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     "opt_in_status" => false
                 );
             } else {
-                    $date = Mage::helper('mailchimp')->getDateMicrotime();
+                    $date = $helper->getDateMicrotime();
                     $customer = array(
                         "id" => ($cart->getCustomerId()) ? $cart->getCustomerId() : "GUEST-" . $date,
                         "email_address" => $cart->getCustomerEmail(),
@@ -512,7 +514,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null)
     {
-        Mage::helper('mailchimp')->saveEcommerceSyncData($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token);
+        $helper = $this->getHelper();
+        $helper->saveEcommerceSyncData($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token);
     }
 
     /**
@@ -524,8 +527,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     public function addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts)
     {
+        $helper = $this->getHelper();
         $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId, $magentoStoreId);
-        $productDataArray = Mage::helper('mailchimp')->addEntriesToArray($allCarts, $productData, $this->_counter);
+        $productDataArray = $helper->addEntriesToArray($allCarts, $productData, $this->_counter);
         $allCarts = $productDataArray[0];
         $this->_counter = $productDataArray[1];
         return $allCarts;
