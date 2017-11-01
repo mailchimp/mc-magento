@@ -243,50 +243,45 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         //customer data
         $api = Mage::helper('mailchimp')->getApi($magentoStoreId);
-        $customers = array();
-        try {
-            $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
-        } catch (MailChimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
-        }
-
-        if (!$isModifiedOrder) {
+        if ((bool)$order->getCustomerIsGuest()) {
+            try {
+                $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
+            } catch (MailChimp_Error $e) {
+                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $magentoStoreId);
+            }
             if (isset($customers['total_items']) && $customers['total_items'] > 0) {
-                $id = $customers['customers'][0]['id'];
-                $data['customer'] = array(
-                    'id' => $id
-                );
+                $customerId = $customers['customers'][0]['id'];
             } else {
-                if ((bool)$order->getCustomerIsGuest()) {
-                    $guestId = "GUEST-" . Mage::helper('mailchimp')->getDateMicrotime();
-                    $data["customer"] = array(
-                        "id" => $guestId,
-                        "email_address" => $order->getCustomerEmail(),
-                        "opt_in_status" => false
-                    );
-                } else {
-                    $custEmailAddr = null;
-                    try {
-                        $customer = $api->ecommerce->customers->get($mailchimpStoreId, $order->getCustomerId(), 'email_address');
-                        if (isset($customer['email_address'])) {
-                            $custEmailAddr = $customer['email_address'];
-                        }
-                    } catch (MailChimp_Error $e) {
-                    }
-
-                    $data["customer"] = array(
-                        "id" => ($order->getCustomerId()) ? $order->getCustomerId() : $guestId = "CUSTOMER-" . Mage::helper('mailchimp')->getDateMicrotime(),
-                        "email_address" => ($custEmailAddr) ? $custEmailAddr : $order->getCustomerEmail(),
-                        "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
-                    );
-                }
+                $customerId = "GUEST-" . Mage::helper('mailchimp')->getDateMicrotime();
+            }
+            $data["customer"] = array(
+                "id" => $customerId,
+            );
+            if (!$isModifiedOrder) {
+                $data["customer"]["email_address"] = $order->getCustomerEmail();
+                $data["customer"]["opt_in_status"] = false;
             }
         } else {
-            if (isset($customers['customers'][0]['id'])) {
-                $id = $customers['customers'][0]['id'];
-                $data['customer'] = array(
-                    'id' => $id
-                );
+            $data["customer"] = array(
+                "id" => ($order->getCustomerId()) ? $order->getCustomerId() : "CUSTOMER-" . Mage::helper('mailchimp')->getDateMicrotime()
+            );
+            if (!$isModifiedOrder) {
+                $custEmailAddr = $order->getCustomerEmail();
+                try {
+                    $customer = $api->ecommerce->customers->get($mailchimpStoreId, $order->getCustomerId(), 'email_address');
+                    if (isset($customer['email_address'])) {
+                        $custEmailAddr = $customer['email_address'];
+                    }
+                } catch (MailChimp_Error $e) {
+                    $err = $e->getMailchimpTitle();
+                    if (!preg_match('/Resource Not Found for Api Call/', $err)) {
+                        $msg = "Failed to lookup e-commerce customer via ID " . $order->getCustomerId();
+                        Mage::helper('mailchimp')->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
+                    }
+                }
+
+                $data["customer"]["email_address"] = ($custEmailAddr) ? $custEmailAddr : $order->getCustomerEmail();
+                $data["customer"]["opt_in_status"] = Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId);
             }
         }
 
