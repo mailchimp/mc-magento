@@ -356,6 +356,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             } else {
                 break;
             }
+            $helper->createWebhookIfRequired($storeId);
         }
 
         $this->_getResults(0, false);
@@ -364,6 +365,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if ($batchResponse) {
                 $batchResponses[] = $batchResponse;
             }
+            $helper->createWebhookIfRequired(0, 'default');
         }
 
         return $batchResponses;
@@ -656,7 +658,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                     $config = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", $date));
                     $helper->saveMailchimpConfig($config, 0, 'default');
-                    $helper->handleWebhookChange($magentoStoreId);
+                    $helper->createWebhookIfRequired($magentoStoreId);
                 }
             }
         }
