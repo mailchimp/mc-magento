@@ -327,6 +327,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('handleWebhookChange')->with($scopeId, $scope);
 
         $helperMock->createWebhookIfRequired($scopeId, $scope);
+    }
       
     public function testGetImageUrlById()
     {
