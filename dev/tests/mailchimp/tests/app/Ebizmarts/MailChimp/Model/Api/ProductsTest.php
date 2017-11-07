@@ -39,6 +39,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $mailChimpHelperMock->method("getMailChimpProductImageUrl")->willReturn("product_image_url");
         $this->productsApiMock->expects($this->any())->method("getMailChimpHelper")
             ->willReturn($mailChimpHelperMock);
@@ -167,5 +168,74 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     private function configurableNoChildren()
     {
         return \Ebizmarts_MailChimp_Model_Api_Products::$noChildrenIds;
+    }
+
+    public function testGetNotVisibleProductUrl()
+    {
+        $childId = 1;
+        $parentId = 2;
+        $magentoStoreId = 1;
+        $path = 'path';
+        $url = 'url/path';
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('getMailChimpHelper', 'getParentId', 'getProductWithAttributesById', 'getUrlByPath'))
+            ->getMock();
+
+        $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getProductResourceModel'))
+            ->getMock();
+
+        $productResourceMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAttributeRawValue'))
+            ->getMock();
+
+        $productResourceCollectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $productsApiMock->expects($this->once())->method('getParentId')->with($childId)->willReturn($parentId);
+        $productsApiMock->expects($this->once())->method('getProductWithAttributesById')->willReturn($productResourceCollectionMock);
+        $productsApiMock->expects($this->once())->method('getUrlByPath')->with($path, $magentoStoreId)->willReturn($url);
+
+        $productResourceCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator(array()));
+
+        $mailChimpHelperMock->expects($this->once())->method('getProductResourceModel')->willReturn($productResourceMock);
+
+        $productResourceMock->expects($this->once())->method('getAttributeRawValue')->with($parentId, 'url_path', $magentoStoreId)->willReturn($path);
+
+        $return = $productsApiMock->getNotVisibleProductUrl($childId, $magentoStoreId);
+
+        $this->assertEquals($return, $url);
+    }
+
+    public function testGetParentImageUrl()
+    {
+        $childId = 1;
+        $parentId = 2;
+        $magentoStoreId = 1;
+
+        $imageUrl = 'imageUrl';
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('getMailChimpHelper', 'getParentId'))
+            ->getMock();
+
+        $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getImageUrlById'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())->method('getParentId')->with($childId)->willReturn($parentId);
+        $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+
+        $mailChimpHelperMock->expects($this->once())->method('getImageUrlById')->with($parentId, $magentoStoreId)->willReturn($imageUrl);
+
+        $return = $productsApiMock->getParentImageUrl($childId, $magentoStoreId);
+
+        $this->assertEquals($return, $imageUrl);
     }
 }

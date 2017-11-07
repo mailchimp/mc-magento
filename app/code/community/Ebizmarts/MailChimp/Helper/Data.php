@@ -1106,9 +1106,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return Object
+     * @return Mage_Catalog_Model_Resource_Product
      */
-    protected function getProductResourceModel()
+    public function getProductResourceModel()
     {
         $productResourceModel = Mage::getResourceModel('catalog/product');
         return $productResourceModel;
