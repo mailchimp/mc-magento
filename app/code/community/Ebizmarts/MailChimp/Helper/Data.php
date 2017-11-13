@@ -1236,7 +1236,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if (!$url) {
                 $url = $this->getApiStores()->getMCJsUrl($storeId, 'stores');
             }
-            $script = '<script type="text/javascript" src="' . $url . '"></script>';
+            $script = '<script type="text/javascript" src="' . $url . '" async></script>';
         }
         return $script;
     }
