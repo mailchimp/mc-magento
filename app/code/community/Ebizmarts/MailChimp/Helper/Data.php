@@ -1832,10 +1832,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
             try {
-                $webhooks = $api->lists->webhooks->getAll($listId);
-                foreach ($webhooks['webhooks'] as $webhook) {
-                    if (strpos($webhook['url'], $webhookUrl) !== false) {
-                        $api->lists->webhooks->delete($listId, $webhook['id']);
+                if ($listId) {
+                    $webhooks = $api->lists->webhooks->getAll($listId);
+                    foreach ($webhooks['webhooks'] as $webhook) {
+                        if (strpos($webhook['url'], $webhookUrl) !== false) {
+                            $api->lists->webhooks->delete($listId, $webhook['id']);
+                        }
                     }
                 }
             } catch (MailChimp_Error $e) {
