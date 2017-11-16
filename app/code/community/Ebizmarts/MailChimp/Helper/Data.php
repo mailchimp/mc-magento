@@ -1823,8 +1823,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($webhookId) {
             try {
                 $api->lists->webhooks->delete($listId, $webhookId);
-            } catch (Exception $e) {
+            } catch (MailChimp_Error $e) {
                 $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            } catch (Exception $e) {
+                $this->logError($e->getMessage(), $scopeId, $scope);
             }
             $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
         } else {
@@ -1836,8 +1838,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         $api->lists->webhooks->delete($listId, $webhook['id']);
                     }
                 }
-            } catch (Exception $e) {
+            } catch (MailChimp_Error $e) {
                 $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            } catch (Exception $e) {
+                $this->logError($e->getMessage(), $scopeId, $scope);
             }
         }
     }
