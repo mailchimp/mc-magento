@@ -1082,12 +1082,32 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $curStore = $this->getCurrentStoreId();
             $this->setCurrentStore($magentoStoreId);
-            $upperCaseImage = str_replace('_', '', ucwords($imageSize, "_"));
-            $functionName = "get{$upperCaseImage}Url";
-            $imageUrl = $productModel->$functionName();
+            $upperCaseImage = $this->getImageFunctionName($imageSize)
+            $imageUrl = $productModel->$upperCaseImage();
             $this->setCurrentStore($curStore);
         }
         return $imageUrl;
+    }
+
+    /**
+     * Returns imageSize converted to camel case, and concatenates with functionName
+     *
+     * @param $imageSize
+     * @return string
+     */
+
+    protected function getImageFunctionName($imageSize){
+        $upperCaseImage = explode('_', $imageSize);
+        $functionName = "get";
+
+        foreach ($upperCaseImage as $word) {
+            $word = ucwords($word);
+            $functionName .= $word;
+        }
+
+        $functionName .= "Url";
+
+        return $functionName;
     }
 
     /**
