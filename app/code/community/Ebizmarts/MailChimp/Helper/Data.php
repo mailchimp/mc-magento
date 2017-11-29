@@ -1082,7 +1082,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $curStore = $this->getCurrentStoreId();
             $this->setCurrentStore($magentoStoreId);
-            $upperCaseImage = $this->getImageFunctionName($imageSize)
+            $upperCaseImage = $this->getImageFunctionName($imageSize);
             $imageUrl = $productModel->$upperCaseImage();
             $this->setCurrentStore($curStore);
         }
