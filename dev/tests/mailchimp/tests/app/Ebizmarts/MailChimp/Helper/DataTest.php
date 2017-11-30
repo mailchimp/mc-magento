@@ -338,7 +338,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId', 'setCurrentStore'))
+            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId', 'setCurrentStore', 'getImageFunctionName'))
             ->getMock();
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
@@ -367,6 +367,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn($defaultStoreId);
 
         $helperMock->expects($this->exactly(2))->method('setCurrentStore')->withConsecutive(array($magentoStoreId), array($defaultStoreId));
+
+        $helperMock->expects($this->once())->method('getImageFunctionName')->willReturn('getImageUrl');
 
         $return = $helperMock->getImageUrlById($productId, $magentoStoreId);
 
