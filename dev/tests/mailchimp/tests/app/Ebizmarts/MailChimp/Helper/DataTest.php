@@ -335,6 +335,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $magentoStoreId = 1;
         $defaultStoreId = 0;
         $imageSize = 'image';
+        $upperCaseImage = 'getImageUrl';
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -368,7 +369,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->exactly(2))->method('setCurrentStore')->withConsecutive(array($magentoStoreId), array($defaultStoreId));
 
-        $helperMock->expects($this->once())->method('getImageFunctionName')->willReturn('getImageUrl');
+        $helperMock->expects($this->once())->method('getImageFunctionName')->with($imageSize)->willReturn($upperCaseImage);
 
         $return = $helperMock->getImageUrlById($productId, $magentoStoreId);
 
