@@ -48,8 +48,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         if ($api) {
             try {
                 $this->_accountDetails = $api->root->info('account_name,total_subscribers');
-                $listData = $api->lists->getLists($listId, 'stats');
-                $this->_accountDetails['list_subscribers'] = $listData['stats']['member_count'];
+                if ($listId) {
+                    $listData = $api->lists->getLists($listId, 'stats');
+                    $this->_accountDetails['list_subscribers'] = $listData['stats']['member_count'];
+                }
                 if ($mcStoreId && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
                     try {
                         $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
@@ -67,7 +69,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
                         $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
                     } catch (MailChimp_Error $e) {
-                        $helper->deleteLocalMCStoreData($scopeArray[1], $scopeArray[0]);
+                        $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray[1], $scopeArray[0]);
                         if ($listId) {
                             $helper->createStore($listId, $scopeArray[1], $scopeArray[0]);
                             $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');
@@ -98,14 +100,19 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         if (is_array($this->_accountDetails)) {
             $totalAccountSubscribersText = $helper->__('Total Account Subscribers:');
             $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
-            $totalListSubscribersText = $helper->__('Total List Subscribers:');
-            $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
+            $totalListSubscribers = null;
+            if (isset($this->_accountDetails['list_subscribers'])) {
+                $totalListSubscribersText = $helper->__('Total List Subscribers:');
+                $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
+            }
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
             $returnArray = array(
                 array('value' => self::USERNAME_KEY, 'label' => $username),
-                array('value' => self::TOTAL_ACCOUNT_SUB_KEY, 'label' => $totalAccountSubscribers),
-                array('value' => self::TOTAL_LIST_SUB_KEY, 'label' => $totalListSubscribers)
+                array('value' => self::TOTAL_ACCOUNT_SUB_KEY, 'label' => $totalAccountSubscribers)
             );
+            if ($totalListSubscribers) {
+                $returnArray[] = array('value' => self::TOTAL_LIST_SUB_KEY, 'label' => $totalListSubscribers);
+            }
             if ($this->_accountDetails['store_exists']) {
                 $totalCustomersText = $helper->__('  Total Customers:');
                 $totalCustomers = $totalCustomersText . ' ' . $this->_accountDetails['total_customers'];

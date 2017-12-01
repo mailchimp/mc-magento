@@ -32,5 +32,8 @@ class MailChimp_Ecommerce extends MailChimp_Abstract
      * @var MailChimp_EcommerceProducts
      */
     public $products;
-
+    /**
+     * @var MailChimp_EcommercePromoRules
+     */
+    public $promoRules;
 }

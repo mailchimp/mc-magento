@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.9.2</version>
+            <version>1.1.10</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.9.2</version>
+            <version>1.1.10</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -133,6 +133,22 @@
                     </mailchimp_clean_catalog_images_cache_after>
                 </observers>
             </clean_catalog_images_cache_after>
+            <controller_action_predispatch_adminhtml_cache_index>
+                <observers>
+                    <mailchimp_clean_cache_after>
+                        <class>mailchimp/observer</class>
+                        <method>cleanProductImagesCacheAfter</method>
+                    </mailchimp_clean_cache_after>
+                </observers>
+            </controller_action_predispatch_adminhtml_cache_index>
+            <controller_front_init_before>
+                <observers>
+                    <mailchimp_controller_front_init_before>
+                        <class>mailchimp/observer</class>
+                        <method>frontInitBefore</method>
+                    </mailchimp_controller_front_init_before>
+                </observers>
+            </controller_front_init_before>
         </events>
         <models>
             <mailchimp>
@@ -231,14 +247,6 @@
                     </ebizmarts_mailchimp_quote_save>
                 </observers>
             </sales_quote_save_before>
-            <controller_front_init_before>
-                <observers>
-                    <mailchimp_controller_front_init_before>
-                        <class>mailchimp/observer</class>
-                        <method>frontInitBefore</method>
-                    </mailchimp_controller_front_init_before>
-                </observers>
-            </controller_front_init_before>
         </events>
         <translate>
             <modules>
@@ -337,6 +345,15 @@
                     </mailchimp_save_before_product>
                 </observers>
             </catalog_product_save_before>
+            <controller_action_postdispatch_adminhtml_promo_quote_couponsMassDelete>
+                <observers>
+                    <mailchimp_controller_couponsMassDelete>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>secondaryCouponsDelete</method>
+                    </mailchimp_controller_couponsMassDelete>
+                </observers>
+            </controller_action_postdispatch_adminhtml_promo_quote_couponsMassDelete>
         </events>
     </adminhtml>
     <default>
