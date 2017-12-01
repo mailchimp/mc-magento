@@ -1879,15 +1879,29 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $api = $this->getApi($scopeId, $scope);
         $webhookId = $this->getWebhookId($scopeId, $scope);
         if ($webhookId) {
-            $api->lists->webhooks->delete($listId, $webhookId);
+            try {
+                $api->lists->webhooks->delete($listId, $webhookId);
+            } catch (MailChimp_Error $e) {
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            } catch (Exception $e) {
+                $this->logError($e->getMessage(), $scopeId, $scope);
+            }
             $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
         } else {
             $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
-            $webhooks = $api->lists->webhooks->getAll($listId);
-            foreach ($webhooks['webhooks'] as $webhook) {
-                if (strpos($webhook['url'], $webhookUrl) !== false) {
-                    $api->lists->webhooks->delete($listId, $webhook['id']);
+            try {
+                if ($listId) {
+                    $webhooks = $api->lists->webhooks->getAll($listId);
+                    foreach ($webhooks['webhooks'] as $webhook) {
+                        if (strpos($webhook['url'], $webhookUrl) !== false) {
+                            $api->lists->webhooks->delete($listId, $webhook['id']);
+                        }
+                    }
                 }
+            } catch (MailChimp_Error $e) {
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            } catch (Exception $e) {
+                $this->logError($e->getMessage(), $scopeId, $scope);
             }
         }
     }
