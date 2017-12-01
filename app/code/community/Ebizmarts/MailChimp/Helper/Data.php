@@ -1096,19 +1096,57 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @return string
      */
 
-    protected function getImageFunctionName($imageSize){
-        $upperCaseImage = explode('_', $imageSize);
-        $functionName = "get";
+    public function getImageFunctionName($imageSize){
 
-        foreach ($upperCaseImage as $word) {
-            $word = ucwords($word);
-            $functionName .= $word;
-        }
-
-        $functionName .= "Url";
+        $imageArray = $this->setImageSizeVarToArray($imageSize);
+        $upperCaseImage = $this->setWordToCamelCase($imageArray);
+        $functionName = $this->setFunctionName($upperCaseImage);
 
         return $functionName;
     }
+
+    /**
+     * Returns imageSize separated word by word in array
+     *
+     * @param $imageSize
+     * @return array
+     */
+
+    public function setImageSizeVarToArray($imageSize){
+        $imageArray = explode('_', $imageSize);
+
+        return $imageArray;
+    }
+
+    /**
+     * Returns imageSize in camel case concatenated
+     *
+     * @param $imageArray
+     * @return string
+     */
+
+    public function setWordToCamelCase($imageArray){
+        foreach ($imageArray as $word) {
+            $word = ucwords($word);
+            $upperCaseImage .= $word;
+        }
+
+        return $upperCaseImage;
+    }
+
+    /**
+     * Returns imageSize in camel case concatenated with functionName
+     *
+     * @param $functionName
+     * @return string
+     */
+
+    public function setFunctionName($functionName){
+        $functionName = "get".$functionName."Url";
+        return $functionName;
+    }
+
+
 
     /**
      * Return Catalog Product Image helper instance

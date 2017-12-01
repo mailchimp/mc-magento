@@ -375,4 +375,65 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($return, 'ImageUrl');
     }
+
+    public function testGetImageFunctionName(){
+        $imageSize = 'image_size';
+        $imageArray = array('image', 'size');
+        $upperCaseImage = 'ImageSize';
+        $functionName = 'getImageSizeUrl';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setImageSizeVarToArray', 'setWordToCamelCase', 'setFunctionName'))
+            #->setMethods()
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('setImageSizeVarToArray')->with($imageSize)->willReturn($imageArray);
+        $helperMock->expects($this->once())->method('setWordToCamelCase')->with($imageArray)->willReturn($upperCaseImage);
+        $helperMock->expects($this->once())->method('setFunctionName')->with($upperCaseImage)->willReturn($functionName);
+
+        $result = $helperMock->getImageFunctionName($imageSize);
+
+        $this->assertEquals($result, 'getImageSizeUrl');
+
+    }
+
+    public function testSetImageSizeVarToArray(){
+        $imageSize = 'image_size';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods()
+            ->getMock();
+
+        $result = $helperMock->setImageSizeVarToArray($imageSize);
+
+        $this->assertEquals($result, array('image', 'size'));
+    }
+
+    public function testSetWordToCamelCase(){
+        $imageArray = array('image', 'size');
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods()
+            ->getMock();
+
+        $result = $helperMock->setWordToCamelCase($imageArray);
+
+        $this->assertEquals($result, 'ImageSize');
+    }
+
+    public function testSetFunctionName(){
+        $upperCaseImage = 'ImageSize';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods()
+            ->getMock();
+
+        $result = $helperMock->setFunctionName($upperCaseImage);
+
+        $this->assertEquals($result, 'getImageSizeUrl');
+    }
 }
