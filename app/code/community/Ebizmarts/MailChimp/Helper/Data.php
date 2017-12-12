@@ -1082,13 +1082,71 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $curStore = $this->getCurrentStoreId();
             $this->setCurrentStore($magentoStoreId);
-            $upperCaseImage = str_replace('_', '', ucwords($imageSize, "_"));
-            $functionName = "get{$upperCaseImage}Url";
-            $imageUrl = $productModel->$functionName();
+            $upperCaseImage = $this->getImageFunctionName($imageSize);
+            $imageUrl = $productModel->$upperCaseImage();
             $this->setCurrentStore($curStore);
         }
         return $imageUrl;
     }
+
+    /**
+     * Returns imageSize converted to camel case, and concatenates with functionName
+     *
+     * @param $imageSize
+     * @return string
+     */
+
+    public function getImageFunctionName($imageSize){
+
+        $imageArray = $this->setImageSizeVarToArray($imageSize);
+        $upperCaseImage = $this->setWordToCamelCase($imageArray);
+        $functionName = $this->setFunctionName($upperCaseImage);
+
+        return $functionName;
+    }
+
+    /**
+     * Returns imageSize separated word by word in array
+     *
+     * @param $imageSize
+     * @return array
+     */
+
+    public function setImageSizeVarToArray($imageSize){
+        $imageArray = explode('_', $imageSize);
+
+        return $imageArray;
+    }
+
+    /**
+     * Returns imageSize in camel case concatenated
+     *
+     * @param $imageArray
+     * @return string
+     */
+
+    public function setWordToCamelCase($imageArray){
+        foreach ($imageArray as $word) {
+            $word = ucwords($word);
+            $upperCaseImage .= $word;
+        }
+
+        return $upperCaseImage;
+    }
+
+    /**
+     * Returns imageSize in camel case concatenated with functionName
+     *
+     * @param $functionName
+     * @return string
+     */
+
+    public function setFunctionName($functionName){
+        $functionName = "get".$functionName."Url";
+        return $functionName;
+    }
+
+
 
     /**
      * Return Catalog Product Image helper instance
