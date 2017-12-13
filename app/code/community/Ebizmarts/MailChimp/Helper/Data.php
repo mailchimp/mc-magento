@@ -382,6 +382,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get if synced orders should be displayed in order grid.
+     *
+     * @param  int $scopeId
+     * @param  null $scope
+     * @return mixed
+     */
+    public function getSyncedOrderInGrid($scopeId = 0, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::SYNCED_GRID, $scopeId, $scope);
+    }
+
+    /**
      * Get if Email Catcher popup is enabled for given scope.
      *
      * @param  int $scopeId
