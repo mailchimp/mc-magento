@@ -112,6 +112,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             'renderer' => 'mailchimp/adminhtml_mailchimperrors_link'
             )
         );
+        $this->addColumn(
+            'original_id', array(
+                'header' => Mage::helper('mailchimp')->__('Created At'),
+                'index' => 'created_at',
+                'sortable' => true,
+            )
+        );
 
         return parent::_prepareColumns();
     }
