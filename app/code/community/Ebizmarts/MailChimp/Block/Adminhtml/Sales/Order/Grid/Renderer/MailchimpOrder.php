@@ -14,23 +14,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 {
     public function render(Varien_Object $row)
     {
-        $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId();
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        $apiKey = Mage::helper('mailchimp')->getApiKey($scopeArray[1], $scopeArray[0]);
-        $datacenter = explode('-', $apiKey);
+        $helper = Mage::helper('mailchimp');
+        $orderId = $row->getData('increment_id');
+        $status = Mage::getModel('mailchimp/api_orders')->getOrderFromAPI($orderId);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        json_decode(curl_setopt($ch, CURLOPT_URL,'https://'.$datacenter[1].'.api.mailchimp.com/3.0/ecommerce/stores/'.$mailchimpStoreId.'/orders/'.$row->getData('increment_id')));
-        curl_setopt($ch, CURLOPT_USERPWD, "noname:".$apiKey);
-        $content = curl_exec($ch);
-        $array=json_decode($content, true);
-        $status = array_search('404', $array);
-
-        if (!$status) {
-            $result = Mage::helper('mailchimp')->__('Yes');
+        if ($status) {
+            $result = $helper->__('Yes');
         } else {
-            $result = Mage::helper('mailchimp')->__('No');
+            $result = $helper->__('No');
         }
 
         return $result;
