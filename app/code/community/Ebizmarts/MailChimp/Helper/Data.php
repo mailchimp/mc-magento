@@ -1126,6 +1126,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
 
     public function setWordToCamelCase($imageArray){
+        $upperCaseImage = '';
         foreach ($imageArray as $word) {
             $word = ucwords($word);
             $upperCaseImage .= $word;
