@@ -34,7 +34,10 @@ function getCampaign() {
             Mage.Cookies.set('mailchimp_campaign_id', campaign);
         }
     }
-    Mage.Cookies.set('mailchimp_landing_page', location);
+    var landingPage = Mage.Cookies.get('mailchimp_landing_page');
+    if (!landingPage) {
+        Mage.Cookies.set('mailchimp_landing_page', location);
+    }
 }
 
 if (document.loaded) {
