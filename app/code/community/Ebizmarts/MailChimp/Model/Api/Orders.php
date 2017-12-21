@@ -651,4 +651,19 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             'type' => 'percentage'
         ));
     }
+    
+    public function getOrderFromAPI($orderId)
+    {
+        $helper = $this->getHelper();
+        $mailchimpStoreId = $helper->getMCStoreId();
+        $scopeArray = explode('-', $helper->getScopeString());
+        $api = $helper->getApi($scopeArray[1], $scopeArray[0]);
+
+        try {
+            $status=$api->ecommerce->orders->get($mailchimpStoreId, $orderId);
+        }catch(MailChimp_Error $e){
+        }
+
+        return $status;
+    }
 }

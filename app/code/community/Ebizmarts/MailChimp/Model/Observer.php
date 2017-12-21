@@ -255,7 +255,7 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param  $observer
      * @return mixed
      */
-    public function addColumnToSalesOrderGrid($observer)
+    public function addColumnToSalesOrderGridFlag($observer)
     {
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
         $block = $observer->getEvent()->getBlock();
@@ -275,6 +275,39 @@ class Ebizmarts_MailChimp_Model_Observer
                 'width' => 70
             ), 'created_at'
             );
+
+        }
+
+        return $observer;
+    }
+
+    /**
+     * Add column to display if orders are synced to MailChimp
+     *
+     * @param  $observer
+     * @return mixed
+     */
+    public function addColumnToSalesOrderGridSynced($observer)
+    {
+        $scopeArray = explode('-', $this->makeHelper()->getScopeString());
+        $block = $observer->getEvent()->getBlock();
+        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
+            && $this->makeHelper()->getSyncedOrderInGrid($scopeArray[1], $scopeArray[0])
+            && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
+                || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
+        ) {
+            $block->addColumnAfter(
+                'mailchimp_order_flag', array(
+                'header' => $this->makeHelper()->__('Synced to MailChimp'),
+                'index' => 'mailchimp_order_flag',
+                'align' => 'center',
+                'filter' => false,
+                'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
+                'sortable' => false,
+                'width' => 50
+            ), 'created_at'
+            );
+
         }
 
         return $observer;
