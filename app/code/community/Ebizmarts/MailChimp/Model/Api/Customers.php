@@ -247,8 +247,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $this->joinSalesData($collection);
 
-        $collection->getSelect()->group("e.entity_id");
-
         $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
         return $collection;
