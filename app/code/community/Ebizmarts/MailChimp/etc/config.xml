@@ -315,8 +315,13 @@
                     <mailchimp_add_abandoned_to_grid_order>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>addColumnToSalesOrderGrid</method>
+                        <method>addColumnToSalesOrderGridFlag</method>
                     </mailchimp_add_abandoned_to_grid_order>
+                    <mailchimp_add_synced_to_grid_order>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>addColumnToSalesOrderGridSynced</method>
+                    </mailchimp_add_synced_to_grid_order>
                 </observers>
             </core_block_abstract_to_html_before>
             <admin_system_config_changed_section_mailchimp>

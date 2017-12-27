@@ -346,6 +346,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $syncModified,
             $syncDeleted,
             null,
+            0,
             $saveOnlyIfexists
         );
     }

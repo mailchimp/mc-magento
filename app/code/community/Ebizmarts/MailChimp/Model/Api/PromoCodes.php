@@ -212,6 +212,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             $syncModified,
             $syncDeleted,
             $token,
+            0,
             $saveOnlyIfexists,
             $deletedRelatedId
         );

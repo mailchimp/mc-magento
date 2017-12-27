@@ -255,7 +255,7 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param  $observer
      * @return mixed
      */
-    public function addColumnToSalesOrderGrid($observer)
+    public function addColumnToSalesOrderGridFlag($observer)
     {
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
         $block = $observer->getEvent()->getBlock();
@@ -273,6 +273,37 @@ class Ebizmarts_MailChimp_Model_Observer
                 'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
                 'sortable' => false,
                 'width' => 70
+            ), 'created_at'
+            );
+        }
+
+        return $observer;
+    }
+
+    /**
+     * Add column to display if orders are synced to MailChimp
+     *
+     * @param  $observer
+     * @return mixed
+     */
+    public function addColumnToSalesOrderGridSynced($observer)
+    {
+        $scopeArray = explode('-', $this->makeHelper()->getScopeString());
+        $block = $observer->getEvent()->getBlock();
+        if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
+            && $this->makeHelper()->getSyncedOrderInGrid($scopeArray[1], $scopeArray[0])
+            && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
+                || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
+        ) {
+            $block->addColumnAfter(
+                'mailchimp_order_flag', array(
+                'header' => $this->makeHelper()->__('Synced to MailChimp'),
+                'index' => 'mailchimp_order_flag',
+                'align' => 'center',
+                'filter' => false,
+                'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
+                'sortable' => false,
+                'width' => 50
             ), 'created_at'
             );
         }
@@ -351,7 +382,7 @@ class Ebizmarts_MailChimp_Model_Observer
             }
 
             $mailchimpStoreId = $this->makeHelper()->getMCStoreId($order->getStoreId());
-            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
 
         return $observer;
@@ -375,10 +406,10 @@ class Ebizmarts_MailChimp_Model_Observer
                 continue;
             }
 
-            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
 
-        $this->makeHelper()->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, true);
+        $this->makeHelper()->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, null, true);
         return $observer;
     }
 
@@ -400,10 +431,10 @@ class Ebizmarts_MailChimp_Model_Observer
                 continue;
             }
 
-            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null,true);
         }
 
-        $this->makeHelper()->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, true);
+        $this->makeHelper()->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, null, true);
         return $observer;
     }
 
@@ -419,7 +450,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $item = $observer->getEvent()->getItem();
         $mailchimpStoreId = $this->makeHelper()->getMCStoreId($item->getStoreId());
         if ($item->getProductType() != 'bundle' && $item->getProductType() != 'configurable') {
-            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
 
         return $observer;

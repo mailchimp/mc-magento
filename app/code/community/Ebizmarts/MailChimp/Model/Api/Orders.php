@@ -528,7 +528,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
     {
         $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
+        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, 0);
     }
 
     /**
@@ -650,5 +650,24 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             'amount_discounted' => 10,
             'type' => 'percentage'
         ));
+    }
+
+    /**
+     * @param $orderId
+     */
+
+    public function getSyncedOrder($orderId)
+    {
+        //Brings collection filtering by order, to be used in the order grid
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+            ->addFieldToSelect('mailchimp_synced_flag')
+            #->addFieldToSelect('related_id')
+            ->addFieldToFilter('type', array('eq' => 'ORD'))
+            ->addFieldToFilter('related_id', array('eq' => $orderId));
+
+        //Returns the value of mailchimp_sync_flag on DB, can be 1 or 0
+        foreach ($collection->getData() as $key => $item) {
+            return $item['mailchimp_synced_flag'];
+        }
     }
 }
