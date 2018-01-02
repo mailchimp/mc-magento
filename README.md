@@ -57,6 +57,10 @@ For reporting issues, follow this [guidelines](https://github.com/mailchimp/mc-m
 | ![blocked](https://s3.amazonaws.com/ebizmartsgithubimages/blocked.png) | Issue can not be solved due to external causes. |
 | ![read documentation](https://s3.amazonaws.com/ebizmartsgithubimages/readdocumentation.png) | Issue will be closed. Available documentation: [MailChimp For Magento doc](https://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-magento)|
 
+## Pull requests
+
+Before creating a pull request please make sure to follow this [guidelines](https://github.com/mailchimp/mc-magento/wiki/Pull-Request-guideliness) or it will be rejected.
+
 ## Support
 
 Need support? [Click here](http://ebizmarts.com/forums/view/6)
