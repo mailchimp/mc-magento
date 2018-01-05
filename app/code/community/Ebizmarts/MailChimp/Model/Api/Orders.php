@@ -178,7 +178,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
         $data['discount_total'] = abs($order->getBaseDiscountAmount());
         $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
-        $data['promos'] = $this->getPromoData();
+        $data['promos'] = $this->getPromoData($order);
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
@@ -643,12 +643,31 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         );
     }
 
-    protected function getPromoData()
+    /**
+     * @param $order
+     * @return array
+     */
+
+    protected function getPromoData($order)
     {
+        $couponCode = $order->getCouponCode();
+
+        $code = Mage::getModel('salesrule/coupon')->load($couponCode, 'code');
+        $rule = Mage::getModel('salesrule/rule')->load($code->getRuleId());
+
+        $amountDiscounted = round($rule->getDiscountAmount(), 1);
+
+        $type = $rule->getSimpleAction();
+        if ($type == 'by_percent'){
+            $type = 'percentage';
+        } else {
+            $type = 'fixed';
+        }
+
         return array(array(
-            'code' => 'abcd',
-            'amount_discounted' => 10,
-            'type' => 'percentage'
+            'code' => $couponCode,
+            'amount_discounted' => $amountDiscounted,
+            'type' => $type
         ));
     }
 }
