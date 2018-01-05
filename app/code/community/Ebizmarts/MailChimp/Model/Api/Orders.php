@@ -655,7 +655,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $code = Mage::getModel('salesrule/coupon')->load($couponCode, 'code');
         $rule = Mage::getModel('salesrule/rule')->load($code->getRuleId());
 
-        $amountDiscounted = round($rule->getDiscountAmount(), 1);
+        $amountDiscounted = $order->getBaseDiscountAmount();
 
         $type = $rule->getSimpleAction();
         if ($type == 'by_percent'){
