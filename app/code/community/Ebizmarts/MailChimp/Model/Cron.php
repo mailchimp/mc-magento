@@ -13,7 +13,7 @@
 class Ebizmarts_MailChimp_Model_Cron
 {
     /**
- * @var Ebizmarts_MailChimp_Helper_Data 
+ * @var Ebizmarts_MailChimp_Helper_Data
 */
     private $mailChimpHelper;
 

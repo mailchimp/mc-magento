@@ -19,7 +19,7 @@ Magento Community Edition (1.7 or above) or Magento Enterprise (1.11 or above)
 
 To get a copy of the project up and running on your local machine for development and testing purposes, just clone this repository on your Magento’s root directory and flush the Magento’s cache.
 
-Alternatively, use modman to install this module. 
+Alternatively, use modman to install this module.
 
 ``modman clone https://github.com/mailchimp/mc-magento.git -b 'master'``
 
@@ -40,7 +40,7 @@ For reporting issues, follow this [guidelines](https://github.com/mailchimp/mc-m
 
 <h3>Labels applied by the team</h3>
 
-| Label        | Description           | 
+| Label        | Description           |
 | ------------- |-------------|
 | ![bug](https://s3.amazonaws.com/ebizmartsgithubimages/bug.png) | Bug report contains sufficient information to reproduce. Will be solved for associated Milestone.|
 | ![enhancement](https://s3.amazonaws.com/ebizmartsgithubimages/enhancement.png) | Improvement accepted. Will be added for associated Milestone.|

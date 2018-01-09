@@ -17,17 +17,17 @@ $installer->startSetup();
 
 $installer->run(
     "
-	CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_errors')}` (
-	  `id`     INT(10) unsigned NOT NULL auto_increment,
-	  `type`   VARCHAR(256) DEFAULT '',
-	  `title`  VARCHAR(128) DEFAULT '',
-	  `status` INT(5) DEFAULT 0,
-	  `errors` TEXT,
-	  `regtype` CHAR(3) DEFAULT '',
-	  `original_id` INT(10) DEFAULT 0,
-      `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	  PRIMARY KEY  (`id`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    CREATE TABLE IF NOT EXISTS `{$this->getTable('mailchimp_errors')}` (
+        `id`     INT(10) unsigned NOT NULL auto_increment,
+        `type`   VARCHAR(256) DEFAULT '',
+        `title`  VARCHAR(128) DEFAULT '',
+        `status` INT(5) DEFAULT 0,
+        `errors` TEXT,
+        `regtype` CHAR(3) DEFAULT '',
+        `original_id` INT(10) DEFAULT 0,
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY  (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 "
 );
 
