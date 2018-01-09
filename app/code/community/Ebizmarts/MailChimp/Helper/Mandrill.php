@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
 
     /**
      * Get if Mandrill Api Key for given scope.
-     * 
+     *
      * @param  int  $scopeId
      * @param  null $scope
      * @return mixed

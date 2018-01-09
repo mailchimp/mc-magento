@@ -20,7 +20,7 @@ try {
         "
  ALTER TABLE `{$this->getTable('mailchimp_errors')}`
  ADD column `mailchimp_store_id` VARCHAR(50) NOT NULL DEFAULT '';
- ALTER TABLE `{$this->getTable('newsletter_subscriber')}` 
+ ALTER TABLE `{$this->getTable('newsletter_subscriber')}`
  ADD column `mailchimp_sync_modified` INT(1) NOT NULL DEFAULT 0;
  "
     );

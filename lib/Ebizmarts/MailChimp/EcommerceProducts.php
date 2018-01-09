@@ -38,7 +38,7 @@ class MailChimp_EcommerceProducts extends MailChimp_Abstract
     public function add($storeId, $id, $title, $variants, $handle=null, $url=null, $description=null, $type=null,
         $vendor=null, $imageUrl=null, $publishedAtForeign=null
     ) {
-    
+
         $_params=array('id'=>$id,'title'=>$title,'variants'=>$variants);
         if($handle) { $_params['handle'] = $handle;
         }

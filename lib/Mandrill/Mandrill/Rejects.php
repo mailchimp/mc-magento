@@ -84,5 +84,3 @@ class Mandrill_Rejects
     }
 
 }
-
-
