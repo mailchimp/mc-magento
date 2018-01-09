@@ -154,5 +154,3 @@ class Mandrill_Inbound
     }
 
 }
-
-

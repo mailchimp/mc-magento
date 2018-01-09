@@ -67,7 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $convertedCarts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "' 
+            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
@@ -126,7 +126,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where(
-            "m4m.mailchimp_sync_deleted = 0 
+            "m4m.mailchimp_sync_deleted = 0
         AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
