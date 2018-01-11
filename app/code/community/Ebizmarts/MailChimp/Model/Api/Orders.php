@@ -648,14 +648,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @return array
      */
 
-    protected function getPromoData($order)
+    public function getPromoData($order)
     {
         $couponCode = $order->getCouponCode();
 
-        $code = Mage::getModel('salesrule/coupon')->load($couponCode, 'code');
-        $rule = Mage::getModel('salesrule/rule')->load($code->getRuleId());
-
         $amountDiscounted = $order->getBaseDiscountAmount();
+
+        $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
+        $rule = $this->makeSalesRule()->load($code->getRuleId());
 
         $type = $rule->getSimpleAction();
         if ($type == 'by_percent'){
@@ -669,5 +669,21 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             'amount_discounted' => $amountDiscounted,
             'type' => $type
         ));
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeSalesRuleCoupon()
+    {
+        return Mage::getModel('salesrule/coupon');
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeSalesRule()
+    {
+        return Mage::getModel('salesrule/rule');
     }
 }
