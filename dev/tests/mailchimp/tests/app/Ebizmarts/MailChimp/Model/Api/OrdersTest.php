@@ -98,10 +98,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
     public function getPromoDataProvider()
     {
         return array(
-            ['by_percent'],
-            ['by_fixed'],
-            ['cart_fixed'],
-            ['buy_x_get_y']
+            array('by_percent'),
+            array('by_fixed'),
+            array('cart_fixed'),
+            array('buy_x_get_y')
         );
     }
 
