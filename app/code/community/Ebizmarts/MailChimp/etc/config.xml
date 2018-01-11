@@ -133,14 +133,6 @@
                     </mailchimp_clean_catalog_images_cache_after>
                 </observers>
             </clean_catalog_images_cache_after>
-            <controller_action_predispatch_adminhtml_cache_index>
-                <observers>
-                    <mailchimp_clean_cache_after>
-                        <class>mailchimp/observer</class>
-                        <method>cleanProductImagesCacheAfter</method>
-                    </mailchimp_clean_cache_after>
-                </observers>
-            </controller_action_predispatch_adminhtml_cache_index>
             <controller_front_init_before>
                 <observers>
                     <mailchimp_controller_front_init_before>

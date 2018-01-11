@@ -5,7 +5,7 @@ $installer = $this;
 try {
     $installer->run(
         "
-ALTER TABLE `{$this->getTable('sales_flat_order')}` 
+ALTER TABLE `{$this->getTable('sales_flat_order')}`
 ADD INDEX `IDX_M4M_SALES_FLAT_ORDER_CUSTOMER_EMAIL` (`customer_email`);
 "
     );
@@ -16,7 +16,7 @@ ADD INDEX `IDX_M4M_SALES_FLAT_ORDER_CUSTOMER_EMAIL` (`customer_email`);
 try {
     $installer->run(
         "
-ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}` 
+ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}`
 ADD INDEX `batch_id` (`batch_id`);
 "
     );
