@@ -258,9 +258,10 @@ class Ebizmarts_MailChimp_Model_Observer
     public function addColumnToSalesOrderGridFlag($observer)
     {
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
+        Mage::log($scopeArray, null, 'testBlock1.log', true);
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
-            && $this->makeHelper()->getMonkeyInGrid($scopeArray[1], $scopeArray[0])
+            && ($this->makeHelper()->getMailChimpInGrid($scopeArray[1], $scopeArray[0]) == (1) || $this->makeHelper()->getMailChimpInGrid($scopeArray[1], $scopeArray[0]) == (3))
             && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
                 || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
         ) {
@@ -291,7 +292,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
-            && $this->makeHelper()->getSyncedOrderInGrid($scopeArray[1], $scopeArray[0])
+            && ($this->makeHelper()->getMailChimpInGrid($scopeArray[1], $scopeArray[0]) == (2) || $this->makeHelper()->getMailChimpInGrid($scopeArray[1], $scopeArray[0]) == (3))
             && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
                 || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
         ) {

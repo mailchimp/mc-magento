@@ -489,11 +489,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
             foreach ($items as $item) {
+
+                $line = explode('_', $item->operation_id);
+                $store = explode('-', $line[0]);
+                $type = $line[1];
+                $id = $line[3];
+
                 if ($item->status_code != 200) {
-                    $line = explode('_', $item->operation_id);
-                    $store = explode('-', $line[0]);
-                    $type = $line[1];
-                    $id = $line[3];
+
                     if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
                         $order = Mage::getModel('sales/order')->load($id);
                         $id = $order->getEntityId();
@@ -536,9 +539,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $mailchimpErrors->save();
                     $this->getHelper()->logError($error, $store[1]);
                 } else {
-                    $line = explode('_', $item->operation_id);
-                    $type = $line[1];
-                    $id = $line[3];
 
                     $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
                 }

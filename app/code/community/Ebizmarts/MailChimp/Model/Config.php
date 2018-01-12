@@ -28,6 +28,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
     const GENERAL_WEBHOOK_ID            = 'mailchimp/general/webhook_id';
     const GENERAL_LOG                   = 'mailchimp/general/enable_log';
+    const GENERAL_ORDER_GRID            = 'mailchimp/general/order_grid';
     const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
     const GENERAL_CUSTOM_MAP_FIELDS     = 'mailchimp/general/customer_map_fields';
     const GENERAL_MIGRATE_FROM_115      = 'mailchimp/general/migrate_from_115';
@@ -72,8 +73,8 @@ class Ebizmarts_MailChimp_Model_Config
     const ABANDONEDCART_ACTIVE      = 'mailchimp/abandonedcart/active';
     const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
     const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
-    const MONKEY_GRID               = 'mailchimp/general/monkey_grid';
-    const SYNCED_GRID               = 'mailchimp/general/synced_grid';
+//    const MONKEY_GRID               = 'mailchimp/general/monkey_grid';
+//    const SYNCED_GRID               = 'mailchimp/general/synced_grid';
     const CART_AMOUNT               = 'mailchimp/abandonedcart/cart_batch_amount';
 
     const WARNING_MESSAGE           = 'mailchimp/warning_message';

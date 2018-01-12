@@ -14,15 +14,20 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 {
     public function render(Varien_Object $row)
     {
+        $store = Mage::getSingleton('adminhtml/config_data')->getStore();
+        $scopeId = Mage::getModel('core/store')->load($store)->getId();
         $helper = Mage::helper('mailchimp');
         $order = Mage::getModel('sales/order')->load($row->getData('entity_id'));
         $orderId = $order->getEntityId();
-        $status = Mage::getModel('mailchimp/api_orders')->getSyncedOrder($orderId);
+        $mailchimpStoreId = $helper->getMCStoreId($scopeId);
+        $status = Mage::getModel('mailchimp/api_orders')->getSyncedOrder($orderId, $mailchimpStoreId);
 
 
             if ($status == 1) {
                 $result = $helper->__('Yes');
-            } else {
+            } elseif ($status === null)
+                $result = $helper->__('Processing');
+            else{
                 $result = $helper->__('No');
             }
 

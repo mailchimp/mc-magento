@@ -19,7 +19,7 @@ try {
     $installer->run(
         "
  ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}`
- ADD column `mailchimp_synced_flag` INT(1) NOT NULL DEFAULT 0;
+ ADD column `mailchimp_synced_flag` INT(1) DEFAULT NULL;
  "
      );
 } catch (Exception $e) {

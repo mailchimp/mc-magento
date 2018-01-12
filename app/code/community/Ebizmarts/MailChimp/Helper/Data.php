@@ -376,22 +376,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param  null $scope
      * @return mixed
      */
-    public function getMonkeyInGrid($scopeId = 0, $scope = null)
+    public function getMailChimpInGrid($scopeId = 0, $scope = null)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MONKEY_GRID, $scopeId, $scope);
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_ORDER_GRID , $scopeId, $scope);
     }
 
-    /**
-     * Get if synced orders should be displayed in order grid.
-     *
-     * @param  int $scopeId
-     * @param  null $scope
-     * @return mixed
-     */
-    public function getSyncedOrderInGrid($scopeId = 0, $scope = null)
-    {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::SYNCED_GRID, $scopeId, $scope);
-    }
+//    /**
+//     * Get if synced orders should be displayed in order grid.
+//     *
+//     * @param  int $scopeId
+//     * @param  null $scope
+//     * @return mixed
+//     */
+//    public function getSyncedOrderInGrid($scopeId = 0, $scope = null)
+//    {
+//        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::SYNCED_GRID, $scopeId, $scope);
+//    }
 
     /**
      * Get if Email Catcher popup is enabled for given scope.
@@ -923,7 +923,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($deletedRelatedId) {
                 $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
             }
-            if ($syncedFlag) {
+            if ($syncedFlag !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
             }
             $ecommerceSyncDataItem->save();
