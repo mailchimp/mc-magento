@@ -672,7 +672,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $type = 'fixed';
                     }
 
-                    return array(array(
+                    $promo = array(array(
                         'code' => $couponCode,
                         'amount_discounted' => $amountDiscounted,
                         'type' => $type
@@ -680,9 +680,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 }
             }
-        } else {
-            return $promo;
         }
+        return $promo;
     }
 
     /**
