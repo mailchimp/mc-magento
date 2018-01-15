@@ -178,7 +178,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
         $data['discount_total'] = abs($order->getBaseDiscountAmount());
         $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
-        $data['promos'] = $this->getPromoData($order);
+        $dataPromo = $this->getPromoData($order);
+        if ($dataPromo !== null) {
+            $data['promos'] = $dataPromo;
+        }
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
@@ -650,25 +653,35 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     public function getPromoData($order)
     {
+        $promo = null;
+
         $couponCode = $order->getCouponCode();
 
-        $amountDiscounted = $order->getBaseDiscountAmount();
+        if ($couponCode !== null) {
+            $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
+            if ($code->getCouponId() !== null) {
+                $rule = $this->makeSalesRule()->load($code->getRuleId());
+                if ($rule->getRuleId() !== null) {
 
-        $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
-        $rule = $this->makeSalesRule()->load($code->getRuleId());
+                    $amountDiscounted = $order->getBaseDiscountAmount();
 
-        $type = $rule->getSimpleAction();
-        if ($type == 'by_percent'){
-            $type = 'percentage';
-        } else {
-            $type = 'fixed';
+                    $type = $rule->getSimpleAction();
+                    if ($type == 'by_percent') {
+                        $type = 'percentage';
+                    } else {
+                        $type = 'fixed';
+                    }
+
+                    $promo = array(array(
+                        'code' => $couponCode,
+                        'amount_discounted' => $amountDiscounted,
+                        'type' => $type
+                    ));
+
+                }
+            }
         }
-
-        return array(array(
-            'code' => $couponCode,
-            'amount_discounted' => $amountDiscounted,
-            'type' => $type
-        ));
+        return $promo;
     }
 
     /**
