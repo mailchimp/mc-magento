@@ -440,7 +440,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Remove items from mailchimp_ecommerce_sync_data table to allow them to be sent
+     * Remove items from mailchimp_ecommerce_sync_data table to allow them to be sent. If scopeId is 0 remova from all scopes.
      *
      * @param $scopeId
      * @param $scope
@@ -448,14 +448,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
-        if (!$deleteErrorsOnly || $scopeId != 0) {
-            $collection->addFieldToFilter('mailchimp_store_id', array('eq' => $this->getMCStoreId($scopeId, $scope)));
+        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        if ($deleteErrorsOnly) {
+            if ($scopeId === 0) {
+                $where = "mailchimp_sync_error != ''";
+            } else {
+                $where = "mailchimp_store_id = '".$mailchimpStoreId."' and mailchimp_sync_error != ''";
+            }
         } else {
-            $collection->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
+            $where = "mailchimp_store_id = '".$mailchimpStoreId."'";
         }
-        foreach ($collection as $item) {
-            $item->delete();
+        try {
+            $connection->delete($tableName, $where);
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
         }
     }
 
@@ -570,18 +579,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->handleOldErrors();
 
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        $errorCollection = Mage::getResourceModel('mailchimp/mailchimperrors_collection');
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/mailchimperrors');
         if ($excludeSubscribers) {
-            $errorCollection->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
+            $where = "mailchimp_store_id = '".$mailchimpStoreId."'";
         } else {
-            if ($scopeId != 0) {
-                $errorCollection->addFieldToFilter('store_id', array('eq' => $scopeId));
+            if ($scopeId !== 0) {
+                $where = "store_id = '".$scopeId."'";
+            } else {
+                $where = '';
             }
         }
-
-        foreach ($errorCollection as $item) {
-            $item->delete();
-        }
+        $connection->delete($tableName, $where);
     }
 
     /**
@@ -1207,6 +1217,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->getMageApp()->setCurrentStore($magentoStoreId);
     }
 
+    /**
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getCoreResource()
+    {
+        return Mage::getSingleton('core/resource');
+    }
+
     private function getProductImageModel()
     {
         return Mage::getModel('catalog/product_image');
@@ -1359,7 +1377,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $this->logError($e->getMessage());
                         }
 
-                        $coreResource = Mage::getSingleton('core/resource');
+                        $coreResource = $this->getCoreResource();
                         try {
                             $quoteTable = $coreResource->getTableName('sales/quote');
                             $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_delta');
@@ -1397,7 +1415,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $entityType = Mage::getSingleton('eav/config')->getEntityType('customer');
             $attribute = Mage::getModel('customer/attribute')->loadByCode($entityType, 'mailchimp_sync_delta');
             if ($attribute->getId()) {
-                $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+                $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
                 $customerCollection = Mage::getResourceModel('customer/customer_collection');
                 $customerCollection->addAttributeToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
                 $customerCollection->getSelect()->joinLeft(
@@ -1447,7 +1465,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $attribute = Mage::getModel('eav/entity_attribute')
                 ->loadByCode($entityType, $attributeCode);
             if ($attribute->getId()) {
-                $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+                $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
                 $productCollection = Mage::getResourceModel('catalog/product_collection');
                 $productCollection->addAttributeToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
                 $productCollection->getSelect()->joinLeft(
@@ -1492,12 +1510,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _migrateOrdersFrom115($mailchimpStoreId, $initialTime)
     {
         try {
-            $resource = Mage::getSingleton('core/resource');
+            $resource = $this->getCoreResource();
             $readConnection = $resource->getConnection('core_read');
             $tableName = $resource->getTableName('sales/order');
             $orderFields = $readConnection->describeTable($tableName);
             if (isset($orderFields['mailchimp_sync_delta'])) {
-                $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+                $mailchimpTableName = $resource->getTableName('mailchimp/ecommercesyncdata');
                 $orderCollection = Mage::getResourceModel('sales/order_collection');
 
                 $orderCollection->getSelect()->joinLeft(
@@ -1541,12 +1559,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _migrateCartsFrom115($mailchimpStoreId, $initialTime)
     {
         try {
-            $resource = Mage::getSingleton('core/resource');
+            $resource = $this->getCoreResource();
             $readConnection = $resource->getConnection('core_read');
             $tableName = $resource->getTableName('sales/quote');
             $quoteFields = $readConnection->describeTable($tableName);
             if (isset($quoteFields['mailchimp_sync_delta'])) {
-                $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+                $mailchimpTableName = $resource->getTableName('mailchimp/ecommercesyncdata');
                 $quoteCollection = Mage::getResourceModel('sales/quote_collection');
                 $quoteCollection->getSelect()->joinLeft(
                     array('m4m' => $mailchimpTableName),
@@ -1748,7 +1766,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _migrateFrom1164($initialTime)
     {
         if (!$this->timePassed($initialTime)) {
-            $write_connection = Mage::getSingleton('core/resource')->getConnection('core_write');
+            $write_connection = $this->getCoreResource()->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
             $write_connection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
             $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 'default', 0);
