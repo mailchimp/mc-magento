@@ -30,7 +30,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
     public function add($storeId,$productId,$id,$title,$url=null,$sku=null,$price=null,$inventoryQuantity=null,
         $imageUrl=null,$backorders=null,$visibility=null
     ) {
-    
+
         $_params=array('id'=>$id,'title'=>$title);
         if($url) { $_params['url'] = $url;
         }
@@ -118,7 +118,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
     public function modify($storeId,$productId,$variantId,$title=null,$url=null,$sku=null,$price=null,
         $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
     ) {
-    
+
         $_params=array();
         if($title) { $_params['title'] = $title;
         }
@@ -158,7 +158,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
     public function addOrModify($storeId,$productId,$variantId,$title,$url=null,$sku=null,$price=null,
         $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
     ) {
-    
+
         $_params=array('id'=>$variantId,'title'=>$title);
         if($url) { $_params['url'] = $url;
         }

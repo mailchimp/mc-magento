@@ -75,7 +75,7 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
     public function add($listId,$name,$type,$displayOrder=null,$tag=null,$required=null,$defaulValue=null,$public=true,
         $options=null,$helpText=null
     ) {
-    
+
         $_params = array('name'=>$name,'type'=>$type);
         if($tag) { $_params['tag'] = $tag;
         }
@@ -113,7 +113,7 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
     public function modify($listId, $mergeId, $displayOrder, $tag=null, $name=null, $type=null, $required=null,
         $defaulValue=null, $public=null, $options=null, $helpText=null
     ) {
-    
+
         $_params = array();
         if($name) { $_params['name'] = $name;
         }

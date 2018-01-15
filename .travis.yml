@@ -21,14 +21,20 @@ matrix:
   allow_failures:
     - env: TEST_SUITE=ecg_coding_standards
     - env: TEST_SUITE=meqp1_coding_standards
+  include:
+    - php: 7.0
+      env: TEST_SUITE=editorconfig NODE_JS_VERSION=6
 
 cache:
   directories:
     - $HOME/.composer/cache
 
-before_install: test -n "$GITHUB_TOKEN" && echo "Found GitHub token" && composer config github-oauth.github.com "$GITHUB_TOKEN" || echo "No GitHub token found"
+before_install:
+  - test -n "$GITHUB_TOKEN" && echo "Found GitHub token" && composer config github-oauth.github.com "$GITHUB_TOKEN" || echo "No GitHub token found"
+  - test -n "$NODE_JS_VERSION" && . $HOME/.nvm/nvm.sh && nvm install "$NODE_JS_VERSION" && nvm use "$NODE_JS_VERSION" || true
 install:
   - composer install --no-interaction --prefer-dist
+  - test -n "$NODE_JS_VERSION" && npm install || true
   - |
     if [ "$TEST_SUITE" = "phpunit" ]; then
       wget http://ebizmartsbackup.s3.amazonaws.com/$MAGENTO_ARCHIVE &&
@@ -56,4 +62,8 @@ script:
   - |
     if [ "$TEST_SUITE" = "phpunit" ]; then
       cd magento/dev/tests/mailchimp && phpunit && cd $TRAVIS_BUILD_DIR
+    fi
+  - |
+    if [ "$TEST_SUITE" = "editorconfig" ]; then
+      git grep --cached -Il '' | xargs `npm bin`/editorconfig-tools check
     fi

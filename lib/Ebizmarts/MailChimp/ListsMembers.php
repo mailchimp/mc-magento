@@ -43,7 +43,7 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     public function add($listId, $status, $emailAddress, $emailType=null, $mergeFields=null, $interests=null,
         $language=null, $vip=null, $location=null, $ipOpt=null
     ) {
-    
+
         $_params = array('status'=>$status, 'email_address' => $emailAddress);
         if($emailType) { $_params['email_type'] = $emailType;
         }
@@ -90,7 +90,7 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
         $status=null, $sinceTimpestampOpt=null, $beforeTimestampOpt=null,$sinceLastChanged=null,
         $beforeLastChanged=null, $uniqueEmailId=null
     ) {
-    
+
         $_params = array();
         if($fields) { $_params['fields'] = $fields;
         }
@@ -155,7 +155,7 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     public function update($listId, $subscriberHash, $emailType=null, $status=null, $mergeFields=null, $interests=null,
         $language=null, $vip=null, $location=null
     ) {
-    
+
         $_params = array();
         if($status) { $_params['status'] = $status;
         }
@@ -196,7 +196,7 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     public function addOrUpdate($listId, $subscriberHash, $emailAddress, $statusIfNew, $emailType=null, $status=null,
         $mergeFields=null, $interests=null, $language=null, $vip=null, $location=null
     ) {
-    
+
         $_params = array('status_if_new'=>$statusIfNew,'email_address'=>$emailAddress);
         if($emailType) { $_params['email_type'] = $emailType;
         }

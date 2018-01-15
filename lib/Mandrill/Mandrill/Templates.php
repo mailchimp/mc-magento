@@ -246,5 +246,3 @@ class Mandrill_Templates
     }
 
 }
-
-
