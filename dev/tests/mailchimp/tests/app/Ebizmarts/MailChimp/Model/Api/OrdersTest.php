@@ -69,22 +69,24 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $couponMock = $this->getMockBuilder(Mage_SalesRule_Model_Coupon::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('load', 'getRuleId'))
+            ->setMethods(array('load', 'getRuleId', 'getCouponId'))
             ->getMock();
 
         $ruleMock = $this->getMockBuilder(Mage_SalesRule_Model_Rule::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('load', 'getSimpleAction'))
+            ->setMethods(array('load', 'getSimpleAction', 'getRuleId'))
             ->getMock();
 
         $modelMock->expects($this->once())->method('makeSalesRuleCoupon')->willReturn($couponMock);
         $modelMock->expects($this->once())->method('makeSalesRule')->willReturn($ruleMock);
+
         $couponMock->expects($this->once())->method('getRuleId')->willReturn(1);
-        $ruleMock->expects($this->once())->method('getSimpleAction')->willReturn($type);
-
+        $couponMock->expects($this->once())->method('getCouponId')->willReturn(1);
         $couponMock->expects($this->once())->method('load')->with('aa12', 'code')->willReturnSelf();
-        $ruleMock->expects($this->once())->method('load')->with(1)->willReturnSelf();
 
+        $ruleMock->expects($this->once())->method('getSimpleAction')->willReturn($type);
+        $ruleMock->expects($this->once())->method('getRuleId')->willReturn(1);
+        $ruleMock->expects($this->once())->method('load')->with(1)->willReturnSelf();
 
         $orderMock->expects($this->once())->method('getCouponCode')->willReturn('aa12');
         $orderMock->expects($this->once())->method('getBaseDiscountAmount')->willReturn(10);
