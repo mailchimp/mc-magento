@@ -658,9 +658,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $amountDiscounted = $order->getBaseDiscountAmount();
 
         $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
-//        Mage::log($code->getCouponId(), null, 'testCode.log', true);
         $rule = $this->makeSalesRule()->load($code->getRuleId());
-//        Mage::log($rule->getRuleId(), null, 'testRule.log', true);
 
         if ($couponCode !== null && $code->getCouponId() !== null && $rule->getRuleId() !== null) {
 
