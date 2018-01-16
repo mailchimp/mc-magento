@@ -399,7 +399,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
          */
         $collection = $this->getProductResourceCollection();
         $collection->addStoreFilter($magentoStoreId);
-        $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId);
+        $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
         $this->joinQtyAndBackorders($collection);
 
