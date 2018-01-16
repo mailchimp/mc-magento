@@ -178,7 +178,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
         $data['discount_total'] = abs($order->getBaseDiscountAmount());
         $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
-        $data['promos'] = $this->getPromoData();
+        $dataPromo = $this->getPromoData($order);
+        if ($dataPromo !== null) {
+            $data['promos'] = $dataPromo;
+        }
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
@@ -643,13 +646,58 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         );
     }
 
-    protected function getPromoData()
+    /**
+     * @param $order
+     * @return array
+     */
+
+    public function getPromoData($order)
     {
-        return array(array(
-            'code' => 'abcd',
-            'amount_discounted' => 10,
-            'type' => 'percentage'
-        ));
+        $promo = null;
+
+        $couponCode = $order->getCouponCode();
+
+        if ($couponCode !== null) {
+            $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
+            if ($code->getCouponId() !== null) {
+                $rule = $this->makeSalesRule()->load($code->getRuleId());
+                if ($rule->getRuleId() !== null) {
+
+                    $amountDiscounted = $order->getBaseDiscountAmount();
+
+                    $type = $rule->getSimpleAction();
+                    if ($type == 'by_percent') {
+                        $type = 'percentage';
+                    } else {
+                        $type = 'fixed';
+                    }
+
+                    $promo = array(array(
+                        'code' => $couponCode,
+                        'amount_discounted' => $amountDiscounted,
+                        'type' => $type
+                    ));
+
+                }
+            }
+        }
+        return $promo;
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeSalesRuleCoupon()
+    {
+        return Mage::getModel('salesrule/coupon');
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeSalesRule()
+    {
+        return Mage::getModel('salesrule/rule');
     }
 
     /**

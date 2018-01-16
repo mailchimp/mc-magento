@@ -47,7 +47,7 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
     public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $type=null,
         $sinceCreatedAt=null, $beforeCreatedAt=null, $sinceUpdatedAt=null, $beforeUpdatedAt=null
     ) {
-    
+
         $_params = array();
         if($fields) { $_params['fields'] = $fields;
         }

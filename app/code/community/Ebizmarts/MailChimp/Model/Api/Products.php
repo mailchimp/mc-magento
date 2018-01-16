@@ -122,34 +122,38 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $variantProducts[] = $product;
             $parentIds = $this->productTypeConfigurableResource->getParentIdsByChild($product->getId());
             foreach ($parentIds as $parentId) {
-                $parent = Mage::getModel('catalog/product')->load($parentId);
-                $variantProducts[] = $parent;
+                $helper = $this->getMailChimpHelper();
+                $productSyncDataItem = $helper->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                if ($productSyncDataItem->getMailchimpSyncDelta()) {
+                    $parent = Mage::getModel('catalog/product')->load($parentId);
+                    $variantProducts[] = $parent;
 
-                $collection = $this->makeProductChildrenCollection($magentoStoreId);
+                    $collection = $this->makeProductChildrenCollection($magentoStoreId);
 
-                $childProducts = $this->getConfigurableChildrenIds($parent);
-                $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
+                    $childProducts = $this->getConfigurableChildrenIds($parent);
+                    $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
 
-                foreach ($collection as $childProduct) {
-                    if ($childProduct->getId() != $product->getId()) {
-                        $variantProducts[] = $childProduct;
+                    foreach ($collection as $childProduct) {
+                        if ($childProduct->getId() != $product->getId()) {
+                            $variantProducts[] = $childProduct;
+                        }
                     }
-                }
-                $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
-                try {
-                    $body = json_encode($bodyData);
-                } catch (Exception $e) {
-                    //json encode failed
-                    $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
-                    return array();
-                }
+                    $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
+                    try {
+                        $body = json_encode($bodyData);
+                    } catch (Exception $e) {
+                        //json encode failed
+                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+                        return array();
+                    }
 
-                $data = array();
-                $data['method'] = "PATCH";
-                $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parent->getId();
-                $data['operation_id'] = $batchId . '_' . $parent->getId();
-                $data['body'] = $body;
-                $operations[] = $data;
+                    $data = array();
+                    $data['method'] = "PATCH";
+                    $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parent->getId();
+                    $data['operation_id'] = $batchId . '_' . $parent->getId();
+                    $data['body'] = $body;
+                    $operations[] = $data;
+                }
             }
 
         } else if ($this->isConfigurableProduct($product)) {

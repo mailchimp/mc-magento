@@ -31,7 +31,7 @@ class Mandrill_Message extends Mandrill_Mandrill
         $encoding = Zend_Mime::ENCODING_BASE64,
         $filename = null
     ) {
-    
+
         $att = array('type' => $mimeType, 'name' => $filename, 'content' => base64_encode($body));
         array_push($this->_attachments, $att);
     }

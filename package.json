@@ -1,0 +1,6 @@
+{
+  "name": "mc-magento",
+  "devDependencies": {
+    "editorconfig-tools": "^0.1.1"
+  }
+}

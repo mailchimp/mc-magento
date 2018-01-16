@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $this->joinMailchimpSyncData($collection);
 
         $customerArray = array();
-        
+
         $this->makeBatchId();
 
         $this->optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
@@ -172,7 +172,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
     }
 
-    public function createGuestCustomer($guestId, $order) 
+    public function createGuestCustomer($guestId, $order)
     {
         $guestCustomer = Mage::getModel('customer/customer')->setId($guestId);
         foreach ($order->getData() as $key => $value) {
@@ -203,7 +203,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     /**
      * update customer sync data
-     * 
+     *
      * @param $customerId
      * @param $mailchimpStoreId
      * @param null             $syncDelta
