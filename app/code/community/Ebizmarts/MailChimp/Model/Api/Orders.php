@@ -662,7 +662,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         $result = $helper->getEcommerceSyncDataItem($orderId, 'ORD', $mailchimpStoreId);
 
-        return $result->getMailchimpSyncedFlag();
+        $mailchimpSyncedFlag = $result->getMailchimpSyncedFlag();
+        $mailchimpItemId = $result->getId();
+
+        return array($mailchimpSyncedFlag, $mailchimpItemId);
 
     }
 }
