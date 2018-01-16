@@ -448,7 +448,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
         $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = "mailchimp_store_id = '".$mailchimpStoreId."'";
+        $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -514,7 +514,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
         $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = "mailchimp_store_id = '".$mailchimpStoreId."' and mailchimp_sync_error != ''";
+        $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -547,7 +547,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/mailchimperrors';
         $mailchimpEcommTableName = 'mailchimp_errors';
-        $where = "mailchimp_store_id = '".$mailchimpStoreId."'";
+        $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -615,7 +615,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/mailchimperrors';
         $mailchimpEcommTableName = 'mailchimp_errors';
-        $where = "store_id = '".$scopeId."'";
+        $where = array("store_id = ?" => $scopeId);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()

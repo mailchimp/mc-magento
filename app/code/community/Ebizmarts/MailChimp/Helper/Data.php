@@ -456,10 +456,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($scopeId === 0) {
                 $where = "mailchimp_sync_error != ''";
             } else {
-                $where = "mailchimp_store_id = '".$mailchimpStoreId."' and mailchimp_sync_error != ''";
+                $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
             }
         } else {
-            $where = "mailchimp_store_id = '".$mailchimpStoreId."'";
+            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
         }
         try {
             $connection->delete($tableName, $where);
@@ -583,10 +583,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/mailchimperrors');
         if ($excludeSubscribers) {
-            $where = "mailchimp_store_id = '".$mailchimpStoreId."'";
+            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
         } else {
             if ($scopeId !== 0) {
-                $where = "store_id = '".$scopeId."'";
+                $where = array("store_id = ?" => $scopeId);
             } else {
                 $where = '';
             }
