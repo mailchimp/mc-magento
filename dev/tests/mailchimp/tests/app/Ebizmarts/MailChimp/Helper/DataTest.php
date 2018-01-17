@@ -105,7 +105,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('getResendTurn')->with($storeId)->willReturn(1);
         $helperMock->expects($this->once())->method('getOrderResendLastId')->with($storeId);
 
-        $helperMock->addResendFilter($orderCollectionMock, $storeId);
+        $helperMock->addResendFilter($orderCollectionMock, $storeId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
     }
 
     public function testHandleResendFinish()

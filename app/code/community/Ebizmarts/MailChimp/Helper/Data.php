@@ -2230,6 +2230,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
                     $lastItemSent = $this->getPromoCodeResendLastId($magentoStoreId);
                     break;
+                default:
+                    $lastItemSent = 0;
+                    $this->logError($this->__('The item type sent in the filter does not match any of the available options.'));
             }
             if ($resendTurn) {
                 $collection->addFieldToFilter('entity_id', array('lteq' => $lastItemSent));
