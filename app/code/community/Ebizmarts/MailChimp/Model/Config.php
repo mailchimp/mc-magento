@@ -73,8 +73,6 @@ class Ebizmarts_MailChimp_Model_Config
     const ABANDONEDCART_ACTIVE      = 'mailchimp/abandonedcart/active';
     const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
     const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
-//    const MONKEY_GRID               = 'mailchimp/general/monkey_grid';
-//    const SYNCED_GRID               = 'mailchimp/general/synced_grid';
     const CART_AMOUNT               = 'mailchimp/abandonedcart/cart_batch_amount';
 
     const WARNING_MESSAGE           = 'mailchimp/warning_message';

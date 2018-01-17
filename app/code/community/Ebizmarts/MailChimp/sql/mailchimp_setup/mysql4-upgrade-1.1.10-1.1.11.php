@@ -26,10 +26,6 @@ try {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
-$installer->endSetup();
-
-$installer = $this;
-
 try {
     $installer->run(
         "

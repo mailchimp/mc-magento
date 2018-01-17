@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -23,17 +24,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $status = Mage::getModel('mailchimp/api_orders')->getSyncedOrder($orderId, $mailchimpStoreId);
 
 
-            if ($status[0] == 1) {
-                $result = $helper->__('Yes');
-            } elseif ($status[0] === null && $status[1] !== null)
-                $result = $helper->__('Processing');
-            elseif ($status[0] === null){
-                $result = $helper->__('In queue');
-            }else{
-                $result = $helper->__('No');
-            }
-
-            return $result;
+        if ($status[0] == 1) {
+            $result = $helper->__('Yes');
+        } elseif ($status[0] === null && $status[1] !== null)
+            $result = $helper->__('Processing');
+        elseif ($status[0] === null) {
+            $result = $helper->__('In queue');
+        } else {
+            $result = $helper->__('No');
         }
+
+        return $result;
+    }
 
 }
