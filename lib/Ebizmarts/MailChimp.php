@@ -135,6 +135,8 @@ class Ebizmarts_MailChimp
     protected $_root    = 'https://api.mailchimp.com/3.0';
     protected $_debug   = false;
 
+    public $batchOperation;
+
     const POST      = 'POST';
     const GET       = 'GET';
     const PATCH     = 'PATCH';
@@ -241,6 +243,15 @@ class Ebizmarts_MailChimp
         $this->templates                                    = new MailChimp_Templates($this);
         $this->templates->defaultContent                    = new MailChimp_TemplatesDefaultContent($this);
     }
+
+    /**
+     * @return MailChimp_BatchOperations
+     */
+    public function getBatchOperation()
+    {
+        return $this->batchOperation;
+    }
+
     public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
     {
         if (count($params) && $encodeJson && $method!=Ebizmarts_MailChimp::GET) {

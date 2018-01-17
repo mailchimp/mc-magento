@@ -241,10 +241,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $helper->logRequest('An empty operation was detected', $magentoStoreId);
                         } else {
                             if (!$helper->getIsReseted($magentoStoreId)) {
-                                $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                                $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                                 $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                                 //save batch id to db
-                                $batch = Mage::getModel('mailchimp/synchbatches');
+                                $batch = $this->getSyncBatchesModel();
                                 $batch->setStoreId($mailchimpStoreId)
                                     ->setBatchId($batchResponse['id'])
                                     ->setStatus($batchResponse['status']);
@@ -406,7 +406,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $helper->logRequest($batchJson, $storeId, $batchResponse['id']);
 
                         //save batch id to db
-                        $batch = Mage::getModel('mailchimp/synchbatches');
+                        $batch = $this->getSyncBatchesModel();
                         $batch->setStoreId($storeId)
                             ->setBatchId($batchResponse['id'])
                             ->setStatus($batchResponse['status']);
@@ -577,7 +577,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                             $this->getHelper()->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                             //save batch id to db
-                            $batch = Mage::getModel('mailchimp/synchbatches');
+                            $batch = $this->getSyncBatchesModel();
                             $batch->setStoreId($mailchimpStoreId)
                                 ->setBatchId($batchResponse['id'])
                                 ->setStatus($batchResponse['status']);
@@ -692,5 +692,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function getStores()
     {
         return Mage::app()->getStores();
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getSyncBatchesModel()
+    {
+        return Mage::getModel('mailchimp/synchbatches');
     }
 }
