@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        if (Mage::helper('catalog/category_flat')->isEnabled()) {
+        if ($this->isProductFlatTableEnabled()) {
             Mage::app()->getStore($magentoStoreId)
                 ->setConfig(Mage_Catalog_Helper_Category_Flat::XML_PATH_IS_ENABLED_FLAT_CATALOG_CATEGORY, 0)
                 ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
@@ -847,5 +847,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $url = Mage::getUrl($path, array('_store' => $magentoStoreId));
         return $url;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function isProductFlatTableEnabled()
+    {
+        return Mage::helper('catalog/category_flat')->isEnabled();
     }
 }
