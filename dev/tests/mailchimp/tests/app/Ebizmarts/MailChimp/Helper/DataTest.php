@@ -403,11 +403,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods()
+            ->setMethods(array('setWordToCamelCase'))
             ->getMock();
 
         $result = $helperMock->setImageSizeVarToArray($imageSize);
-
         $this->assertEquals($result, array('image', 'size'));
     }
 
@@ -417,7 +416,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods()
+            ->setMethods(array('setImageSizeVarToArray'))
             ->getMock();
 
         $result = $helperMock->setWordToCamelCase($imageArray);
@@ -431,7 +430,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods()
+            ->setMethods(array('setImageSizeVarToArray'))
             ->getMock();
 
         $result = $helperMock->setFunctionName($upperCaseImage);
