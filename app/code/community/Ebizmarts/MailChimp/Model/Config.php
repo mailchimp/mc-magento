@@ -44,7 +44,6 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_PRODUCT_LAST_ID     = 'mailchimp/ecommerce/product_last_id';
     const ECOMMERCE_ORDER_LAST_ID       = 'mailchimp/ecommerce/order_last_id';
     const ECOMMERCE_CART_LAST_ID        = 'mailchimp/ecommerce/cart_last_id';
-    const ECOMMERCE_PRL_LAST_ID        = 'mailchimp/ecommerce/prl_last_id';
     const ECOMMERCE_PCD_LAST_ID        = 'mailchimp/ecommerce/pcd_last_id';
     const ECOMMERCE_RESEND_ENABLED      = 'mailchimp/ecommerce/resend_enabled';
     const ECOMMERCE_RESEND_TURN         = 'mailchimp/ecommerce/resend_turn';
