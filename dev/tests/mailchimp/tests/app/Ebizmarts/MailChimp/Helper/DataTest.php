@@ -89,6 +89,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     public function testAddResendFilter()
     {
         $storeId = 1;
+        $lastItemSent = 100;
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
@@ -97,15 +98,18 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getResendEnabled', 'getResendTurn', 'getOrderResendLastId'))
             ->getMock();
 
-        $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
+        $collectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
             ->disableOriginalConstructor()
+            ->setMethods(array('addFieldToFilter'))
             ->getMock();
 
         $helperMock->expects($this->once())->method('getResendEnabled')->with($storeId)->willReturn(1);
         $helperMock->expects($this->once())->method('getResendTurn')->with($storeId)->willReturn(1);
-        $helperMock->expects($this->once())->method('getOrderResendLastId')->with($storeId);
+        $helperMock->expects($this->once())->method('getOrderResendLastId')->with($storeId)->willReturn($lastItemSent);
 
-        $helperMock->addResendFilter($orderCollectionMock, $storeId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
+        $collectionMock->expects($this->once())->method('addFieldToFilter')->with('entity_id', array('lteq' => $lastItemSent));
+
+        $helperMock->addResendFilter($collectionMock, $storeId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
     }
 
     public function testHandleResendFinish()
