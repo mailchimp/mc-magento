@@ -523,7 +523,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     mkdir($logDir, 0750);
                 }
                 $fileName = $logDir . DS . $batchId . '.Request.log';
-                $oldPermission = umask(0046);
+                $oldPermission = umask(0033);
                 file_put_contents($fileName, $message);
                 umask($oldPermission);
             }
