@@ -709,52 +709,81 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     protected function getLastCustomerSent($scopeId, $scope)
     {
+        $lastCustomerSent = 0;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER));
-        $customerSyncData = $syncDataCollection->getLastItem();
-        return $customerSyncData->getRelatedId();
+
+        if ($syncDataCollection->getSize()) {
+            $customerSyncData = $syncDataCollection->getLastItem();
+            $lastCustomerSent = $customerSyncData->getRelatedId();
+        }
+
+        return $lastCustomerSent;
     }
 
     protected function getLastProductSent($scopeId, $scope)
     {
+        $lastProductSent = 0;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PRODUCT));
-        $productSyncData = $syncDataCollection->getLastItem();
-        return $productSyncData->getRelatedId();
+
+        if ($syncDataCollection->getSize()) {
+            $productSyncData = $syncDataCollection->getLastItem();
+            $lastProductSent = $productSyncData->getRelatedId();
+        }
+
+        return $lastProductSent;
     }
 
     protected function getLastOrderSent($scopeId, $scope)
     {
+        $lastOrderSent = 0;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_ORDER));
-        $orderSyncData = $syncDataCollection->getLastItem();
-        return $orderSyncData->getRelatedId();
+
+        if ($syncDataCollection->getSize()) {
+            $orderSyncData = $syncDataCollection->getLastItem();
+            $lastOrderSent = $orderSyncData->getRelatedId();
+        }
+
+        return $lastOrderSent;
     }
 
     protected function getLastCartSent($scopeId, $scope)
     {
+        $lastCartSent = 0;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_QUOTE));
-        $cartSyncData = $syncDataCollection->getLastItem();
-        return $cartSyncData->getRelatedId();
+
+        if ($syncDataCollection->getSize()) {
+            $cartSyncData = $syncDataCollection->getLastItem();
+            $lastCartSent = $cartSyncData->getRelatedId();
+        }
+        return $lastCartSent;
     }
 
     protected function getLastPromoCodeSent($scopeId, $scope)
     {
+        $lastPromoCodeSent = 0;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE));
-        $promoCodeSyncData = $syncDataCollection->getLastItem();
-        return $promoCodeSyncData->getRelatedId();
+
+        if ($syncDataCollection->getSize()) {
+            $promoCodeSyncData = $syncDataCollection->getLastItem();
+            $lastPromoCodeSent = $promoCodeSyncData->getRelatedId();
+        }
+
+        return $lastPromoCodeSent;
     }
 
     /**
