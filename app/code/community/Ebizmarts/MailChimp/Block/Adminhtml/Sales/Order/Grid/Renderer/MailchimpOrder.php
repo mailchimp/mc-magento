@@ -15,23 +15,21 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 {
     public function render(Varien_Object $row)
     {
-        $store = Mage::getSingleton('adminhtml/config_data')->getStore();
-        $scopeId = Mage::getModel('core/store')->load($store)->getId();
+        $storeId = $row->getStoreId();
         $helper = Mage::helper('mailchimp');
-        $order = Mage::getModel('sales/order')->load($row->getData('entity_id'));
-        $orderId = $order->getEntityId();
-        $mailchimpStoreId = $helper->getMCStoreId($scopeId);
+        $orderId = $row->getEntityId();
+        $mailchimpStoreId = $helper->getMCStoreId($storeId);
         $status = Mage::getModel('mailchimp/api_orders')->getSyncedOrder($orderId, $mailchimpStoreId);
 
 
         if ($status[0] == 1) {
-            $result = $helper->__('Yes');
+            $result = "<div style =color:green>".$helper->__('Yes')."</div>";
         } elseif ($status[0] === null && $status[1] !== null)
-            $result = $helper->__('Processing');
+            $result = '<div style ="color:#ed6502">'.$helper->__('Processing').'</div>';
         elseif ($status[0] === null) {
-            $result = $helper->__('In queue');
+            $result = '<div style ="color:mediumblue">'.$helper->__('In queue').'</div>';
         } else {
-            $result = $helper->__('No');
+            $result = "<div style =color:red>".$helper->__('No')."</div>";
         }
 
         return $result;
