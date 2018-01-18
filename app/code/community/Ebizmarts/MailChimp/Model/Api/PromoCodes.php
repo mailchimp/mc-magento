@@ -152,7 +152,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
 
     protected function makeDeletedPromoCodesCollection($mailchimpStoreId)
     {
-        $deletedPromoCodes = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
+        $deletedPromoCodes = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
         $deletedPromoCodes->getSelect()->where("mailchimp_store_id = '" . $mailchimpStoreId . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE . "' AND mailchimp_sync_deleted = 1");
         $deletedPromoCodes->getSelect()->limit($this->getBatchLimitFromConfig());
         return $deletedPromoCodes;
