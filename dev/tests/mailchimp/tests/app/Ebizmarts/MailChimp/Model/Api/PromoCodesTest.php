@@ -88,13 +88,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
     public function testMarkAsDeleted()
     {
+        $promoRuleId = 1;
         $promoCodesApiMock = $this->promoCodesApiMock
             ->setMethods(array('_setDeleted'))
             ->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('_setDeleted')->with(self::PROMOCODE_ID);
+        $promoCodesApiMock->expects($this->once())->method('_setDeleted')->with(self::PROMOCODE_ID, $promoRuleId);
 
-        $promoCodesApiMock->markAsDeleted(self::PROMOCODE_ID);
+        $promoCodesApiMock->markAsDeleted(self::PROMOCODE_ID, $promoRuleId);
     }
 
     public function testDeletePromoCodesSyncDataByRule()
