@@ -156,7 +156,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _getResults($magentoStoreId, $isEcommerceData = true)
     {
         $mailchimpStoreId = $this->getHelper()->getMCStoreId($magentoStoreId);
-        $collection = Mage::getResourceModel('mailchimp/synchbatches_collection')
+        $collection = Mage::getModel('mailchimp/synchbatches')->getCollection()
             ->addFieldToFilter('status', array('eq' => 'pending'));
         if ($isEcommerceData) {
             $collection->addFieldToFilter('store_id', array('eq' => $mailchimpStoreId));
@@ -285,7 +285,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function deleteUnsentItems()
     {
-        $ecommerceDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
             ->addFieldToFilter('batch_id', array('null' => true));
         Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceDeleteCallback')));
     }
@@ -299,7 +299,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
     {
-        $ecommerceDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
             ->addFieldToFilter('batch_id', array('null' => true))
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
         Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceSentCallback')));
