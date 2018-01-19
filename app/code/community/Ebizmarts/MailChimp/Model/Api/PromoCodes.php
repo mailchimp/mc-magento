@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     {
         $batchArray = array();
         $helper = $this->getMailChimpHelper();
-        $newPromoCodes = $this->makePromoCodesCollection();
+        $newPromoCodes = $this->makePromoCodesCollection($magentoStoreId);
 
         $this->joinMailchimpSyncDataWithoutWhere($newPromoCodes, $mailchimpStoreId);
         // be sure that the orders are not in mailchimp
@@ -137,14 +137,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     }
 
     /**
+     * @param $magentoStoreId
      * @return Mage_SalesRule_Model_Resource_Coupon_Collection
      */
-    public function makePromoCodesCollection()
+    public function makePromoCodesCollection($magentoStoreId)
     {
+        $helper = $this->getMailChimpHelper();
         /**
          * @var Mage_SalesRule_Model_Resource_Coupon_Collection $collection
          */
         $collection = $this->getPromoCodeResourceCollection();
+        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
         $this->addWebsiteColumn($collection);
         $this->joinPromoRuleData($collection);
         return $collection;

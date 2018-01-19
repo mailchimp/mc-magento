@@ -239,7 +239,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection = $this->getCustomerResourceCollection();
         $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
 
-        $helper->addResendFilter($collection, $magentoStoreId);
+        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
 
         $collection->addNameToSelect();
 
