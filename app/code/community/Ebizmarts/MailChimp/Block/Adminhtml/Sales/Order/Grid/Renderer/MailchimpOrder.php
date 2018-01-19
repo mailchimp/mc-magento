@@ -16,10 +16,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
     public function render(Varien_Object $row)
     {
         $storeId = $row->getStoreId();
-        $helper = Mage::helper('mailchimp');
         $orderId = $row->getEntityId();
+        $helper = $this->makeHelper();
         $mailchimpStoreId = $helper->getMCStoreId($storeId);
-        $status = Mage::getModel('mailchimp/api_orders')->getSyncedOrder($orderId, $mailchimpStoreId);
+        $status = $this->makeApiOrders()->getSyncedOrder($orderId, $mailchimpStoreId);
 
 
         if ($status[0] == 1) {
@@ -33,6 +33,22 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         }
 
         return $result;
+    }
+
+    /**
+     * @return Mage_Core_Helper_Abstract
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeApiOrders()
+    {
+        return Mage::getModel('mailchimp/api_orders');
     }
 
 }
