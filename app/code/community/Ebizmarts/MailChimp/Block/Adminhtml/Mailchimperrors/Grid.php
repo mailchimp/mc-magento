@@ -25,24 +25,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
 
     protected function _prepareCollection()
     {
-        $collection = Mage::getResourceModel('mailchimp/mailchimperrors_collection');
+        $collection = Mage::getModel('mailchimp/mailchimperrors')->getCollection();
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }
 
     protected function _prepareColumns()
     {
-
-        //        $this->addColumn('action', array(
-        //            'header' => Mage::helper('mailchimp')->__('Action'),
-        //            'index' => 'action',
-        //            'sortable' => false
-        //        ));
-        //        $this->addColumn('type', array(
-        //            'header' => Mage::helper('mailchimp')->__('Type'),
-        //            'index' => 'type',
-        //            'sortable' => true
-        //        ));
         $this->addColumn(
             'title', array(
             'header' => Mage::helper('mailchimp')->__('Title'),

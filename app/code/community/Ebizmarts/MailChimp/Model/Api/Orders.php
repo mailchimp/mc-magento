@@ -110,7 +110,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $newOrders = Mage::getResourceModel('sales/order_collection');
         // select carts for the current Magento store id
         $newOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        $helper->addResendFilter($newOrders, $magentoStoreId);
+        $helper->addResendFilter($newOrders, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
         // filter by first date if exists.
         if ($this->_firstDate) {
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));

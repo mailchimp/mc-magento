@@ -202,7 +202,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->addFieldToFilter('items_count', array('gt' => 0));
         // select carts for the current Magento store id
         $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        $helper->addResendFilter($newCarts, $magentoStoreId);
+        $helper->addResendFilter($newCarts, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
         // filter by first date if exists.
         if ($this->_firstDate) {
             $newCarts->addFieldToFilter('updated_at', array('gt' => $this->_firstDate));
