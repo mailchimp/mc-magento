@@ -1075,7 +1075,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $productImage = $productResourceModel->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
-        $productModel->setData('image', $productImage);
+        $productModel->setData($imageSize, $productImage);
 
         if ($productImage == 'no_selection' || $productImage == null) {
             $imageUrl = null;
