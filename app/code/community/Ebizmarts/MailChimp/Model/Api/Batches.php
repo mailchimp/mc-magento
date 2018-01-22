@@ -156,7 +156,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _getResults($magentoStoreId, $isEcommerceData = true)
     {
         $mailchimpStoreId = $this->getHelper()->getMCStoreId($magentoStoreId);
-        $collection = Mage::getResourceModel('mailchimp/synchbatches_collection')
+        $collection = Mage::getModel('mailchimp/synchbatches')->getCollection()
             ->addFieldToFilter('status', array('eq' => 'pending'));
         if ($isEcommerceData) {
             $collection->addFieldToFilter('store_id', array('eq' => $mailchimpStoreId));
@@ -241,10 +241,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $helper->logRequest('An empty operation was detected', $magentoStoreId);
                         } else {
                             if (!$helper->getIsReseted($magentoStoreId)) {
-                                $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
+                                $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                                 $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                                 //save batch id to db
-                                $batch = Mage::getModel('mailchimp/synchbatches');
+                                $batch = $this->getSyncBatchesModel();
                                 $batch->setStoreId($mailchimpStoreId)
                                     ->setBatchId($batchResponse['id'])
                                     ->setStatus($batchResponse['status']);
@@ -285,7 +285,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function deleteUnsentItems()
     {
-        $ecommerceDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
             ->addFieldToFilter('batch_id', array('null' => true));
         Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceDeleteCallback')));
     }
@@ -299,7 +299,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
     {
-        $ecommerceDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
+        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
             ->addFieldToFilter('batch_id', array('null' => true))
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
         Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceSentCallback')));
@@ -406,7 +406,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $helper->logRequest($batchJson, $storeId, $batchResponse['id']);
 
                         //save batch id to db
-                        $batch = Mage::getModel('mailchimp/synchbatches');
+                        $batch = $this->getSyncBatchesModel();
                         $batch->setStoreId($storeId)
                             ->setBatchId($batchResponse['id'])
                             ->setStatus($batchResponse['status']);
@@ -517,7 +517,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $errorDetails = $response->detail;
                     }
 
-                    if (strstr($errorDetails, 'already exists in the account')) {
+                    if (strstr($errorDetails, 'already exists')) {
                         $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, null, null, true);
                         continue;
                     }
@@ -571,7 +571,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                             $this->getHelper()->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                             //save batch id to db
-                            $batch = Mage::getModel('mailchimp/synchbatches');
+                            $batch = $this->getSyncBatchesModel();
                             $batch->setStoreId($mailchimpStoreId)
                                 ->setBatchId($batchResponse['id'])
                                 ->setStatus($batchResponse['status']);
@@ -686,5 +686,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function getStores()
     {
         return Mage::app()->getStores();
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getSyncBatchesModel()
+    {
+        return Mage::getModel('mailchimp/synchbatches');
     }
 }
