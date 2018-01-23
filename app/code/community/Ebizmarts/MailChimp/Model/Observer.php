@@ -258,7 +258,6 @@ class Ebizmarts_MailChimp_Model_Observer
     public function addColumnToSalesOrderGrid($observer)
     {
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
-        Mage::log($scopeArray, null, 'testBlock1.log', true);
         $block = $observer->getEvent()->getBlock();
         $config = $this->makeHelper()->getMailChimpInGrid($scopeArray[1], $scopeArray[0]);
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
