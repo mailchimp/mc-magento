@@ -520,7 +520,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $errorDetails = $response->detail;
                     }
 
-                    if (strstr($errorDetails, 'already exists in the account')) {
+                    if (strstr($errorDetails, 'already exists')) {
                         $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, null, null, 0, true);
                         continue;
                     }

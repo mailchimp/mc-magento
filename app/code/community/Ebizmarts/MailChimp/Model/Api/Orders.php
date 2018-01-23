@@ -528,7 +528,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param int $syncModified
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag, $saveOnlyIfexists = false)
+    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
     {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
