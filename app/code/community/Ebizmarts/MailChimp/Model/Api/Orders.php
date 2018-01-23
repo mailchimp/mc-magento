@@ -526,6 +526,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param null $syncDelta
      * @param null $syncError
      * @param int $syncModified
+     * @param null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
