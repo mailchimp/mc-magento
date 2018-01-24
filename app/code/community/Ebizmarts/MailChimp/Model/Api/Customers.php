@@ -168,7 +168,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         if ($this->mailchimpHelper->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, true);
+            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
         }
     }
 
