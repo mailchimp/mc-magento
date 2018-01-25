@@ -376,9 +376,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param  null $scope
      * @return mixed
      */
-    public function getMonkeyInGrid($scopeId = 0, $scope = null)
+    public function getMailChimpInGrid($scopeId = 0, $scope = null)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MONKEY_GRID, $scopeId, $scope);
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_ORDER_GRID , $scopeId, $scope);
     }
 
     /**
@@ -935,11 +935,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param int $syncModified
      * @param null $syncDeleted
      * @param null $token
+     * @param null $syncedFlag
      * @param bool $saveOnlyIfexists
      * @param null $deletedRelatedId
      */
     public function saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
-                                          $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false, $deletedRelatedId = null
+                                          $syncModified = 0, $syncDeleted = null, $token = null, $syncedFlag = null, $saveOnlyIfexists = false, $deletedRelatedId = null
     )
     {
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
@@ -960,6 +961,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
             if ($deletedRelatedId) {
                 $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
+            }
+            if ($syncedFlag !== null) {
+                $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
             }
             $ecommerceSyncDataItem->save();
         }

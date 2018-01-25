@@ -92,7 +92,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -140,7 +140,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -514,7 +514,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
             $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
-            $this->_updateSyncData($orderId, $mailchimpStoreId, null, null, 1, true);
+            $this->_updateSyncData($orderId, $mailchimpStoreId, null, null, 1, null, true);
         }
     }
 
@@ -526,12 +526,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param null $syncDelta
      * @param null $syncError
      * @param int $syncModified
+     * @param null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
+    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
     {
         $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
+        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
     }
 
     /**
@@ -588,7 +589,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter += 1;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information during migration from 1.1.6.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
                     continue;
                 }
             } else {
@@ -698,5 +699,22 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function makeSalesRule()
     {
         return Mage::getModel('salesrule/rule');
+    }
+
+    /**
+     * @param $orderId
+     * @param $mailchimpStoreId
+     */
+
+    public function getSyncedOrder($orderId, $mailchimpStoreId)
+    {
+        $helper = $this->getHelper();
+        $result = $helper->getEcommerceSyncDataItem($orderId, 'ORD', $mailchimpStoreId);
+
+        $mailchimpSyncedFlag = $result->getMailchimpSyncedFlag();
+        $mailchimpItemId = $result->getId();
+
+        return array($mailchimpSyncedFlag, $mailchimpItemId);
+
     }
 }

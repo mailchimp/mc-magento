@@ -168,7 +168,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         if ($this->mailchimpHelper->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, true);
+            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
         }
     }
 
@@ -209,11 +209,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param null             $syncDelta
      * @param null             $syncError
      * @param int              $syncModified
+     * @param null             $syncedFlag
      * @param bool             $saveOnlyIfexists
      */
-    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
+    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
     {
-        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
+        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
     }
 
     /**
