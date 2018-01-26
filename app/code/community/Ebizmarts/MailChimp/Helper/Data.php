@@ -2261,6 +2261,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $resendEnabled = $this->getResendEnabled($magentoStoreId);
         if ($resendEnabled) {
             $resendTurn = $this->getResendTurn($magentoStoreId);
+            $keyCol = 'entity_id';
             switch ($itemType) {
                 case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
                     $lastItemSent = $this->getOrderResendLastId($magentoStoreId);
@@ -2275,6 +2276,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $lastItemSent = $this->getCartResendLastId($magentoStoreId);
                     break;
                 case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
+                    $keyCol =  "coupon_id";
                     $lastItemSent = $this->getPromoCodeResendLastId($magentoStoreId);
                     break;
                 default:
@@ -2282,19 +2284,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $this->logError($this->__('The item type sent in the filter does not match any of the available options.'));
             }
             if ($resendTurn) {
-                if($itemType == Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE) {
-                    $collection->addFieldToFilter('coupon_id', array('lteq' => $lastItemSent));
-                }
-                else {
-                    $collection->addFieldToFilter('entity_id', array('lteq' => $lastItemSent));
-                }
+                $collection->addFieldToFilter($keyCol, array('lteq' => $lastItemSent));
             } else {
-                if($itemType == Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE) {
-                    $collection->addFieldToFilter('coupon_id', array('gt' => $lastItemSent));
-                }
-                else{
-                    $collection->addFieldToFilter('entity_id', array('gt' => $lastItemSent));
-                }
+                $collection->addFieldToFilter($keyCol, array('gt' => $lastItemSent));
             }
         }
     }
