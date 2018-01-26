@@ -183,5 +183,3 @@ class Mandrill_Subaccounts
     }
 
 }
-
-

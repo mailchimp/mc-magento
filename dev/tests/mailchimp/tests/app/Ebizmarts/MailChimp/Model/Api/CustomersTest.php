@@ -3,7 +3,7 @@
 class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_TestCase
 {
     /**
- * @var Ebizmarts_MailChimp_Model_Api_Customers 
+ * @var Ebizmarts_MailChimp_Model_Api_Customers
 */
     private $customersApiMock;
 

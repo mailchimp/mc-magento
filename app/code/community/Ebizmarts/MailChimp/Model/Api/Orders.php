@@ -92,7 +92,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -110,7 +110,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $newOrders = Mage::getResourceModel('sales/order_collection');
         // select carts for the current Magento store id
         $newOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        $helper->addResendFilter($newOrders, $magentoStoreId);
+        $helper->addResendFilter($newOrders, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
         // filter by first date if exists.
         if ($this->_firstDate) {
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
@@ -140,7 +140,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -178,7 +178,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
         $data['discount_total'] = abs($order->getBaseDiscountAmount());
         $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
-        $data['promos'] = $this->getPromoData();
+        $dataPromo = $this->getPromoData($order);
+        if ($dataPromo !== null) {
+            $data['promos'] = $dataPromo;
+        }
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
@@ -511,7 +514,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
             $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
-            $this->_updateSyncData($orderId, $mailchimpStoreId, null, null, 1, true);
+            $this->_updateSyncData($orderId, $mailchimpStoreId, null, null, 1, null, true);
         }
     }
 
@@ -523,12 +526,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param null $syncDelta
      * @param null $syncError
      * @param int $syncModified
+     * @param null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
+    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
     {
         $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
+        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
     }
 
     /**
@@ -585,7 +589,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter += 1;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information during migration from 1.1.6.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
                     continue;
                 }
             } else {
@@ -643,12 +647,74 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         );
     }
 
-    protected function getPromoData()
+    /**
+     * @param $order
+     * @return array
+     */
+
+    public function getPromoData($order)
     {
-        return array(array(
-            'code' => 'abcd',
-            'amount_discounted' => 10,
-            'type' => 'percentage'
-        ));
+        $promo = null;
+
+        $couponCode = $order->getCouponCode();
+
+        if ($couponCode !== null) {
+            $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
+            if ($code->getCouponId() !== null) {
+                $rule = $this->makeSalesRule()->load($code->getRuleId());
+                if ($rule->getRuleId() !== null) {
+
+                    $amountDiscounted = $order->getBaseDiscountAmount();
+
+                    $type = $rule->getSimpleAction();
+                    if ($type == 'by_percent') {
+                        $type = 'percentage';
+                    } else {
+                        $type = 'fixed';
+                    }
+
+                    $promo = array(array(
+                        'code' => $couponCode,
+                        'amount_discounted' => $amountDiscounted,
+                        'type' => $type
+                    ));
+
+                }
+            }
+        }
+        return $promo;
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeSalesRuleCoupon()
+    {
+        return Mage::getModel('salesrule/coupon');
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeSalesRule()
+    {
+        return Mage::getModel('salesrule/rule');
+    }
+
+    /**
+     * @param $orderId
+     * @param $mailchimpStoreId
+     */
+
+    public function getSyncedOrder($orderId, $mailchimpStoreId)
+    {
+        $helper = $this->getHelper();
+        $result = $helper->getEcommerceSyncDataItem($orderId, 'ORD', $mailchimpStoreId);
+
+        $mailchimpSyncedFlag = $result->getMailchimpSyncedFlag();
+        $mailchimpItemId = $result->getId();
+
+        return array($mailchimpSyncedFlag, $mailchimpItemId);
+
     }
 }

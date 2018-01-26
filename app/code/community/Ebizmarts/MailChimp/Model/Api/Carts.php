@@ -67,7 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $convertedCarts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "' 
+            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
             AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                     $allCarts[$this->_counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, 1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null,1);
                     $this->_counter += 1;
                 }
             }
@@ -96,7 +96,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
             $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
             $allCarts[$this->_counter]['body'] = '';
-            $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, 1);
+            $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
             $this->_counter += 1;
         }
 
@@ -126,7 +126,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where(
-            "m4m.mailchimp_sync_deleted = 0 
+            "m4m.mailchimp_sync_deleted = 0
         AND m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
@@ -153,7 +153,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                         $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                         $allCarts[$this->_counter]['body'] = '';
-                        $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, 1);
+                        $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
                         $this->_counter += 1;
                     }
                 }
@@ -177,7 +177,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
                 $allCarts[$this->_counter]['body'] = $cartJson;
                 $this->_counter += 1;
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, $this->_token);
+                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, null, $this->_token);
             } else {
                 $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
             }
@@ -202,7 +202,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $newCarts->addFieldToFilter('items_count', array('gt' => 0));
         // select carts for the current Magento store id
         $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        $helper->addResendFilter($newCarts, $magentoStoreId);
+        $helper->addResendFilter($newCarts, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
         // filter by first date if exists.
         if ($this->_firstDate) {
             $newCarts->addFieldToFilter('updated_at', array('gt' => $this->_firstDate));
@@ -237,7 +237,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                     $allCarts[$this->_counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, 1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
                     $this->_counter += 1;
                 }
 
@@ -260,7 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
                 $allCarts[$this->_counter]['body'] = $cartJson;
                 $this->_counter += 1;
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, $this->_token);
+                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, null, $this->_token);
             } else {
                 $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
             }
@@ -509,13 +509,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param null $syncDelta
      * @param null $syncError
      * @param int $syncModified
+     * @param null $syncedFlag
      * @param null $syncDeleted
      * @param null $token
      */
-    protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null)
+    protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $syncDeleted = null, $token = null)
     {
         $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token);
+        $helper->saveEcommerceSyncData($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag);
     }
 
     /**
