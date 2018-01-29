@@ -15,6 +15,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Twowaysync extends Mage_Co
 {
     protected function _afterSave()
     {
+        $groups = $this->getData('groups');
         $helper = $this->getHelper();
         $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($this->getScopeId(), $this->getScope());
         $listId = $helper->getGeneralList($this->getScopeId(), $this->getScope());
