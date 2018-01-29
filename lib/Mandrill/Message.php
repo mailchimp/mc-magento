@@ -34,7 +34,7 @@ class Mandrill_Message extends Mandrill_Mandrill
      * Adds an existing attachment to the mail message
      *
      * @param  Zend_Mime_Part $attachment
-     * @return Zend_Mail Provides fluent interface
+     * @return Mandrill_Message Provides fluent interface
      */
     public function addAttachment(Zend_Mime_Part $attachment)
     {
@@ -44,6 +44,14 @@ class Mandrill_Message extends Mandrill_Mandrill
         return $this;
     }
 
+    /**
+     * @param $body
+     * @param string $mimeType
+     * @param string $disposition
+     * @param string $encoding
+     * @param null $filename
+     * @return Zend_Mime_Part
+     */
     public function createAttachment($body,
         $mimeType = Zend_Mime::TYPE_OCTETSTREAM,
         $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
@@ -86,13 +94,12 @@ class Mandrill_Message extends Mandrill_Mandrill
 
     public function addBcc($bcc)
     {
-        $storeId = Mage::app()->getStore()->getId();
         if (is_array($bcc)) {
             foreach ($bcc as $email) {
-                array_push($this->_bcc, $email);
+                $this->_bcc[] = $email;
             }
         } else {
-            array_push($this->_bcc, $bcc);
+            $this->_bcc[] = $bcc;
         }
     }
 
@@ -240,7 +247,7 @@ class Mandrill_Message extends Mandrill_Mandrill
             throw new Zend_Mail_Exception('Cannot set standard header from addHeader()');
         }
 
-        $this->_header[$name] = $value;
+        $this->_headers[$name] = $value;
 
         return $this;
     }
@@ -249,9 +256,9 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
         if (isset($this->_headers[0])) {
             return $this->_headers[0];
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function send()
@@ -287,7 +294,7 @@ class Mandrill_Message extends Mandrill_Mandrill
         }
 
         try {
-            $result = $this->messages->send($email);
+            $this->messages->send($email);
         } catch (Exception $e) {
             Mage::logException($e);
             return false;
