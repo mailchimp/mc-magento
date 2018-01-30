@@ -5,7 +5,7 @@
     <default>
         <reference name="head">
             <action method="addJs" ifconfig="mailchimp/general/active">
-                <script>ebizmarts/mailchimp/campaignCatcher.js</script>
+                <script>ebizmarts/mailchimp/campaignCatcher.js</script><params>async</params>
             </action>
             <action method="addJs" ifconfig="mailchimp/emailcatcher/popup_general">
                 <script>prototype/window.js</script>
