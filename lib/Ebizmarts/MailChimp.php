@@ -285,6 +285,14 @@ class Ebizmarts_MailChimp
     }
 
     /**
+     * @return MailChimp_Ecommerce
+     */
+    public function getEcommerce()
+    {
+        return $this->ecommerce;
+    }
+
+    /**
      * @return MailChimp_BatchOperations
      */
     public function getBatchOperation()
