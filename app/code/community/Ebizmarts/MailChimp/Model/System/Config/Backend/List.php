@@ -16,6 +16,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
     {
         $helper = $this->getMailchimpHelper();
         $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($this->getScopeId(), $this->getScope());
+        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($this->getScopeId(), $this->getScope());
         $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $this->getScopeId(), $this->getScope());
 
         if ($this->isValueChanged() && ($moduleIsActive || $thisScopeHasSubMinSyncDateFlag) && $this->getValue())
@@ -31,18 +32,18 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         }
         $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $this->getScopeId(), $this->getScope());
 
-        if ($this->isValueChanged() && $thisScopeHasMCStoreId) {
+        if ($apiKey && $this->isValueChanged() && $thisScopeHasMCStoreId) {
             $helper->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
             $helper->resetCampaign($this->getScopeId(), $this->getScope());
             $helper->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
             $helper->deleteStore($this->getScopeId(), $this->getScope());
         }
 
-        if ($moduleIsActive && $ecommerceActive && $this->getValue() && !$thisScopeHasMCStoreId) {
+        if ($apiKey && $moduleIsActive && $ecommerceActive && $this->getValue() && !$thisScopeHasMCStoreId) {
             $helper->createStore($this->getValue(), $this->getScopeId(), $this->getScope());
         }
 
-        if ($moduleIsActive && $this->isValueChanged()) {
+        if ($apiKey && $moduleIsActive && $this->isValueChanged()) {
             $helper->handleWebhookChange($this->getScopeId(), $this->getScope());
         }
     }

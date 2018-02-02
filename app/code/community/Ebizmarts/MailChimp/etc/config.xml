@@ -101,14 +101,6 @@
                     </mailchimp_product_attribute_update_after>
                 </observers>
             </catalog_product_attribute_update_before>
-            <catalog_product_website_update>
-                <observers>
-                    <mailchimp_product_website_update>
-                        <class>mailchimp/observer</class>
-                        <method>productWebsiteUpdate</method>
-                    </mailchimp_product_website_update>
-                </observers>
-            </catalog_product_website_update>
             <salesrule_rule_save_after>
                 <observers>
                     <mailchimp_salesrule_save_after>

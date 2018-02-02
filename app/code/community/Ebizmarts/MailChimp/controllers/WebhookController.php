@@ -39,11 +39,14 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
                 if (count($storeIds)) {
-                    $api = $helper->getApi($storeIds[0]);
-                    $webhooks = $api->lists->webhooks->getAll($listId);
-                    foreach ($webhooks['webhooks'] as $webhook) {
-                        if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                            $api->lists->webhooks->delete($listId, $webhook['id']);
+                    $storeId = $storeIds[0];
+                    if ($helper->isSubscriptionEnabled($storeId)) {
+                        $api = $helper->getApi($storeId);
+                        $webhooks = $api->lists->webhooks->getAll($listId);
+                        foreach ($webhooks['webhooks'] as $webhook) {
+                            if (strpos($webhook['url'], 'monkey/webhook') !== false) {
+                                $api->lists->webhooks->delete($listId, $webhook['id']);
+                            }
                         }
                     }
                 }

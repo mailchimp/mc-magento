@@ -28,16 +28,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function __construct()
     {
-        $this->mailchimpHelper      = Mage::helper('mailchimp');
-        $this->optInConfiguration   = array();
-        $this->locale               = Mage::app()->getLocale();
+        $this->mailchimpHelper = Mage::helper('mailchimp');
+        $this->optInConfiguration = array();
+        $this->locale = Mage::app()->getLocale();
         $this->directoryRegionModel = Mage::getModel('directory/region');
     }
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $this->mailchimpStoreId = $mailchimpStoreId;
-        $this->magentoStoreId   = $magentoStoreId;
+        $this->magentoStoreId = $magentoStoreId;
 
         $collection = $this->makeCustomersNotSentCollection();
         $this->joinMailchimpSyncData($collection);
@@ -71,7 +71,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function makePutBatchStructure(
         $customerJson
-    ) {
+    )
+    {
         $customerId = json_decode($customerJson)->id;
 
         $batchData = array();
@@ -142,7 +143,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
 
         if ($customer->getCountryId()) {
-            $customerAddress["country"]      = $this->getCountryNameByCode($customer->getCountryId());
+            $customerAddress["country"] = $this->getCountryNameByCode($customer->getCountryId());
             $customerAddress["country_code"] = $customer->getCountryId();
         }
 
@@ -166,10 +167,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     public function update($customerId, $storeId)
     {
-        if ($this->mailchimpHelper->isEcomSyncDataEnabled($storeId)) {
-            $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, true);
-        }
+        $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
+        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, true);
     }
 
     public function createGuestCustomer($guestId, $order)
@@ -206,10 +205,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      *
      * @param $customerId
      * @param $mailchimpStoreId
-     * @param null             $syncDelta
-     * @param null             $syncError
-     * @param int              $syncModified
-     * @param bool             $saveOnlyIfexists
+     * @param null $syncDelta
+     * @param null $syncError
+     * @param int $syncModified
+     * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
     {

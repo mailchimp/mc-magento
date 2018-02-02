@@ -309,7 +309,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
-        $oneCart['customer'] = $this->_getCustomer($cart, $mailchimpStoreId, $magentoStoreId);
+        $customer = $this->_getCustomer($cart, $mailchimpStoreId, $magentoStoreId);
+        if (empty($customer)) {
+            return "";
+        }
+        $oneCart['customer'] = $customer;
         if ($campaignId) {
             $oneCart['campaign_id'] = $campaignId;
         }
@@ -402,100 +406,105 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getCustomer($cart, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
-        $api = $helper->getApi($magentoStoreId);
-        if ($cart->getCustomerId()) {
-            try {
-                $customer = $api->ecommerce->customers->get($mailchimpStoreId, $cart->getCustomerId(), 'email_address');
-            } catch (MailChimp_Error $e) {
-                $err = $e->getMailchimpTitle();
-                if (!preg_match('/Resource Not Found for Api Call/', $err)) {
-                    $msg = "Failed to lookup e-commerce customer via ID " . $cart->getCustomerId();
-                    $helper->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
+        $customer = array();
+        try {
+            $api = $helper->getApi($magentoStoreId);
+            if ($cart->getCustomerId()) {
+                try {
+                    $customer = $api->ecommerce->customers->get($mailchimpStoreId, $cart->getCustomerId(), 'email_address');
+                } catch (MailChimp_Error $e) {
+                    $err = $e->getMailchimpTitle();
+                    if (!preg_match('/Resource Not Found for Api Call/', $err)) {
+                        $msg = "Failed to lookup e-commerce customer via ID " . $cart->getCustomerId();
+                        $helper->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
+                    }
                 }
-            }
-            $custEmailAddr = null;
-            if (isset($customer['email_address'])) {
-                $custEmailAddr = $customer['email_address'];
-            }
-            $customer = array(
-                "id" => $cart->getCustomerId(),
-                "email_address" => ($custEmailAddr) ? $custEmailAddr : $cart->getCustomerEmail(),
-                "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
-            );
-        } else {
-            try {
-                $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
-            }
-
-            if (isset($customers['total_items']) && $customers['total_items'] > 0) {
+                $custEmailAddr = null;
+                if (isset($customer['email_address'])) {
+                    $custEmailAddr = $customer['email_address'];
+                }
                 $customer = array(
-                    'id' => $customers['customers'][0]['id'],
-                    "email_address" => $cart->getCustomerEmail(),
-                    "opt_in_status" => false
+                    "id" => $cart->getCustomerId(),
+                    "email_address" => ($custEmailAddr) ? $custEmailAddr : $cart->getCustomerEmail(),
+                    "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
                 );
             } else {
+                try {
+                    $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
+                } catch (MailChimp_Error $e) {
+                    $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+                }
+
+                if (isset($customers['total_items']) && $customers['total_items'] > 0) {
+                    $customer = array(
+                        'id' => $customers['customers'][0]['id'],
+                        "email_address" => $cart->getCustomerEmail(),
+                        "opt_in_status" => false
+                    );
+                } else {
                     $date = $helper->getDateMicrotime();
                     $customer = array(
                         "id" => ($cart->getCustomerId()) ? $cart->getCustomerId() : "GUEST-" . $date,
                         "email_address" => $cart->getCustomerEmail(),
                         "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
                     );
-            }
-        }
-
-        $firstName = $cart->getCustomerFirstname();
-        if ($firstName) {
-            $customer["first_name"] = $firstName;
-        }
-
-        $lastName = $cart->getCustomerLastname();
-        if ($lastName) {
-            $customer["last_name"] = $lastName;
-        }
-
-        $billingAddress = $cart->getBillingAddress();
-        if ($billingAddress) {
-            $street = $billingAddress->getStreet();
-            $address = array();
-            if ($street[0]) {
-                $address['address1'] = $street[0];
+                }
             }
 
-            if (count($street) > 1) {
-                $address['address1'] = $street[1];
+            $firstName = $cart->getCustomerFirstname();
+            if ($firstName) {
+                $customer["first_name"] = $firstName;
             }
 
-            if ($billingAddress->getCity()) {
-                $address['city'] = $billingAddress->getCity();
+            $lastName = $cart->getCustomerLastname();
+            if ($lastName) {
+                $customer["last_name"] = $lastName;
             }
 
-            if ($billingAddress->getRegion()) {
-                $address['province'] = $billingAddress->getRegion();
+            $billingAddress = $cart->getBillingAddress();
+            if ($billingAddress) {
+                $street = $billingAddress->getStreet();
+                $address = array();
+                if ($street[0]) {
+                    $address['address1'] = $street[0];
+                }
+
+                if (count($street) > 1) {
+                    $address['address1'] = $street[1];
+                }
+
+                if ($billingAddress->getCity()) {
+                    $address['city'] = $billingAddress->getCity();
+                }
+
+                if ($billingAddress->getRegion()) {
+                    $address['province'] = $billingAddress->getRegion();
+                }
+
+                if ($billingAddress->getRegionCode()) {
+                    $address['province_code'] = $billingAddress->getRegionCode();
+                }
+
+                if ($billingAddress->getPostcode()) {
+                    $address['postal_code'] = $billingAddress->getPostcode();
+                }
+
+                if ($billingAddress->getCountry()) {
+                    $address['country'] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+                    $address['country_code'] = $billingAddress->getCountry();
+                }
+
+                if (count($address)) {
+                    $customer['address'] = $address;
+                }
             }
 
-            if ($billingAddress->getRegionCode()) {
-                $address['province_code'] = $billingAddress->getRegionCode();
+            //company
+            if ($billingAddress->getCompany()) {
+                $customer["company"] = $billingAddress->getCompany();
             }
-
-            if ($billingAddress->getPostcode()) {
-                $address['postal_code'] = $billingAddress->getPostcode();
-            }
-
-            if ($billingAddress->getCountry()) {
-                $address['country'] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
-                $address['country_code'] = $billingAddress->getCountry();
-            }
-
-            if (count($address)) {
-                $customer['address'] = $address;
-            }
-        }
-
-        //company
-        if ($billingAddress->getCompany()) {
-            $customer["company"] = $billingAddress->getCompany();
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage());
         }
 
         return $customer;

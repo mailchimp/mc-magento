@@ -14,23 +14,40 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
 {
     protected function _afterSave()
     {
+        $helper = $this->makeHelper();
+        $scopeId = $this->getScopeId();
+        $scope = $this->getScope();
         $groups = $this->getData('groups');
+
+        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
         //If settings are inherited get from config.
         if (isset($groups['ecommerce']['fields']['active']) && isset($groups['ecommerce']['fields']['active']['value'])) {
             $ecommerceActive = $groups['ecommerce']['fields']['active']['value'];
         } else {
-            $ecommerceActive = Mage::helper('mailchimp')->isEcommerceEnabled($this->getScopeId(), $this->getScope());
+            $ecommerceActive = $helper->isEcommerceEnabled($scopeId, $scope);
         }
         if (isset($groups['general']['fields']['list']) && isset($groups['general']['fields']['list']['value'])) {
             $listId = $groups['general']['fields']['list']['value'];
         } else {
-            $listId = Mage::helper('mailchimp')->getGeneralList($this->getScopeId(), $this->getScope());
+            $listId = $helper->getGeneralList($scopeId, $scope);
         }
 
-        $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $this->getScopeId(), $this->getScope());
+        $thisScopeHasMCStoreId = $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
 
-        if ($this->isValueChanged() && $this->getValue() && $listId && $ecommerceActive && !$thisScopeHasMCStoreId) {
-            Mage::helper('mailchimp')->createStore($listId, $this->getScopeId(), $this->getScope());
+        if ($apiKey && $this->isValueChanged() && $this->getValue() && $listId && $ecommerceActive && !$thisScopeHasMCStoreId) {
+            $helper->createStore($listId, $scopeId, $scope);
         }
+
+        if ($apiKey && $this->isValueChanged() && $this->getValue() && $listId) {
+            $helper->createNewWebhook($scopeId, $scope, $listId);
+        }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }

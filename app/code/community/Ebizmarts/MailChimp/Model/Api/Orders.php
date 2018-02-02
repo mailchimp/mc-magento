@@ -246,7 +246,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer data
-        $api = $helper->getApi($magentoStoreId);
+        try {
+            $api = $helper->getApi($magentoStoreId);
+        } catch (Exception $e) {
+            Mage::helper('mailchimp')->logError($e->getMessage());
+            return "";
+        }
         if ((bool)$order->getCustomerIsGuest()) {
             try {
                 $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());

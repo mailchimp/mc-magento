@@ -73,18 +73,20 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 
     public function createMergeFieldsAction()
     {
+        $helper = $this->makeHelper();
         $param = Mage::app()->getRequest()->getParam('scope');
         $scopeArray = explode('-', $param);
-        $result = 1;
-        try {
-            Mage::helper('mailchimp')->createMergeFields($scopeArray[1], $scopeArray[0]);
-        }
-        catch(MailChimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
-            $result = 0;
-        }
-        catch(Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+        $result = 0;
+        $subEnabled = $helper->isSubscriptionEnabled($scopeArray[1], $scopeArray[0]);
+        if ($subEnabled) {
+            try {
+                $helper->createMergeFields($scopeArray[1], $scopeArray[0]);
+                $result = 1;
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+            }
         }
 
         Mage::app()->getResponse()->setBody($result);
@@ -102,5 +104,13 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }

@@ -44,8 +44,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
 
         $mcStoreId = ($helper->getMCStoreId($scopeArray[1], $scopeArray[0])) ? $helper->getMCStoreId($scopeArray[1], $scopeArray[0]) : null;
         $listId = $helper->getGeneralList($scopeArray[1], $scopeArray[0]);
+        try {
         $api = $helper->getApi($scopeArray[1], $scopeArray[0]);
-        if ($api) {
             try {
                 $this->_accountDetails = $api->root->info('account_name,total_subscribers');
                 if ($listId) {
@@ -85,6 +85,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $this->_accountDetails = "--- Invalid API Key ---";
                 $helper->logError($e->getMessage(), $scopeArray[1]);
             }
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->_accountDetails = "--- Invalid API Key ---";
+            $helper->logError($e->getMessage());
         }
     }
 

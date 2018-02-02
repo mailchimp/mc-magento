@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
     public function getButtonHtml()
     {
         $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        if (Mage::helper('mailchimp')->isMailChimpEnabled($scopeArray[1], $scopeArray[0]) || $scopeArray[1] == 0) {
+        if (Mage::helper('mailchimp')->isSubscriptionEnabled($scopeArray[1], $scopeArray[0]) || $scopeArray[1] == 0) {
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(

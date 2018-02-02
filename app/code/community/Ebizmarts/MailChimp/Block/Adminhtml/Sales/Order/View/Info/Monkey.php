@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -12,6 +13,9 @@
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends Mage_Core_Block_Template
 {
+
+    public $campaignName = null;
+
     public function isReferred()
     {
         $order = $this->getCurrentOrder();
@@ -31,13 +35,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
 
     public function addCampaignName()
     {
-        $helper = $this->getMailChimpHelper();
-        $campaignId = $this->getCampaignId();
-        $order = $this->getCurrentOrder();
-        $campaignName = $helper->getMailChimpCampaignNameById($campaignId, $order->getStoreId());
-        return $campaignName;
+        return $this->campaignName;
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
     protected function getMailChimpHelper()
     {
         return Mage::helper('mailchimp');
@@ -49,5 +52,24 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
     protected function getCurrentOrder()
     {
         return Mage::registry('current_order');
+    }
+
+    public function isDataAvailable()
+    {
+        $helper = $this->getMailChimpHelper();
+        $campaignId = $this->getCampaignId();
+        $order = $this->getCurrentOrder();
+        $storeId = $order->getStoreId();
+        if ($helper->isEcomSyncDataEnabled($storeId)) {
+            $this->campaignName = $helper->getMailChimpCampaignNameById($campaignId, $storeId);
+        }
+
+        $dataAvailable = false;
+
+        if ($order->getMailchimpCampaignId() && $this->campaignName) {
+            $dataAvailable = true;
+        }
+
+        return $dataAvailable;
     }
 }
