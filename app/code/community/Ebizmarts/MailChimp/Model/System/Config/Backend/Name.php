@@ -28,9 +28,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Name extends Mage_Core_Mod
                     if ($name == '') {
                         $name = $helper->getMCStoreName($scopeId, $scope, true);
                     }
+                    $helper->changeName($name, $scopeId, $scope);
                 }
             }
-            $helper->changeName($name, $scopeId, $scope);
         }
     }
 
