@@ -32,7 +32,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
     }
 
     /**
-     * @return Mage_Core_Helper_Abstract
+     * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function makeHelper()
     {

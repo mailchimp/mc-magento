@@ -265,7 +265,7 @@ class Ebizmarts_MailChimp_Model_Observer
             && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
                 || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
         ) {
-            if ($config == 1 || $config == 3){
+            if ($config == Ebizmarts_MailChimp_Model_Config::ADD_MAILCHIMP_LOGO_TO_GRID || $config == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
                     'mailchimp_campaign_flag', array(
                     'header' => $this->makeHelper()->__('MailChimp'),
@@ -278,7 +278,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 ), 'created_at'
                 );
             }
-            if ($config == 2 || $config == 3) {
+            if ($config == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $config == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
                     'mailchimp_order_flag', array(
                     'header' => $this->makeHelper()->__('Synced to MailChimp'),
@@ -416,7 +416,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 continue;
             }
 
-            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null,true);
+            $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
 
         $this->makeHelper()->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, null, true);
@@ -461,17 +461,57 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
+     * Catch Magento store group change event and call changeName function for the relevant stores.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     */
+    public function changeStoreGroupName(Varien_Event_Observer $observer)
+    {
+        $stores = $observer->getGroup()->getStores();
+
+        foreach ($stores as $store) {
+            $storeId = $store->getId();
+            $this->changeStoreNameIfModuleEnabled($storeId);
+        }
+
+        return $observer;
+    }
+
+    /**
      * Catch Magento store name change event and call changeName function to check if MailChimp store name must be changed as well.
      *
      * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
      */
     public function changeStoreName(Varien_Event_Observer $observer)
     {
-        $scopeArray = explode('-', $this->makeHelper()->getScopeString());
-        $group = $observer->getGroup();
-        $storeName = Mage::getStoreConfig('general/store_information/name');
-        if ($storeName == '') {
-            $this->makeHelper()->changeName($group->getName(), $scopeArray[1], $scopeArray[0]);
+        $storeId = $observer->getStore()->getId();
+
+        $this->changeStoreNameIfModuleEnabled($storeId);
+
+        return $observer;
+    }
+
+    /**
+     * @param $storeId
+     */
+    public function changeStoreNameIfModuleEnabled($storeId)
+    {
+        $helper = $this->makeHelper();
+        $mailchimpStoreId = $helper->getMCStoreId($storeId);
+
+        if ($mailchimpStoreId) {
+            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
+            if ($realScope['scope_id'] == $storeId && $realScope['scope'] == 'stores') {
+                $ecomEnabled = $helper->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
+                if ($ecomEnabled) {
+                    if (!$helper->isUsingConfigStoreName($realScope['scope_id'], $realScope['scope'])) {
+                        $storeName = $helper->getMCStoreName($realScope['scope_id'], $realScope['scope']);
+                        $helper->changeName($storeName, $realScope['scope_id'], $realScope['scope']);
+                    }
+                }
+            }
         }
     }
 

@@ -64,8 +64,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $products []= $productMock;
         $productCollection->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($products));
 
-        $productsApiMock->expects($this->never())->method('buildProductDataRemoval')->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn(array());
-
         $productsApiMock->expects($this->once())->method('shouldSendProductUpdate')->with($magentoStoreId, $productMock)->willReturn(false);
 
         $productsApiMock->expects($this->once())->method('_buildNewProductRequest')->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn($productData);
