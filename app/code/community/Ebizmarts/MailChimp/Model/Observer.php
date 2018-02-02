@@ -265,7 +265,7 @@ class Ebizmarts_MailChimp_Model_Observer
             && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
                 || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
         ) {
-            if ($config == 1 || $config == 3) {
+            if ($config == Ebizmarts_MailChimp_Model_Config::ADD_MAILCHIMP_LOGO_TO_GRID || $config == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
                     'mailchimp_campaign_flag', array(
                     'header' => $this->makeHelper()->__('MailChimp'),
@@ -278,7 +278,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 ), 'created_at'
                 );
             }
-            if ($config == 2 || $config == 3) {
+            if ($config == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $config == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
                     'mailchimp_order_flag', array(
                     'header' => $this->makeHelper()->__('Synced to MailChimp'),
