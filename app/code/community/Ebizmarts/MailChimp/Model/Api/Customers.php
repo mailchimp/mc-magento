@@ -69,9 +69,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $customerJson
      * @return array
      */
-    protected function makePutBatchStructure(
-        $customerJson
-    )
+    protected function makePutBatchStructure($customerJson)
     {
         $customerId = json_decode($customerJson)->id;
 
@@ -167,8 +165,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     public function update($customerId, $storeId)
     {
-        $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, true);
+        if ($this->mailchimpHelper->isEcomSyncDataEnabled($storeId)) {
+            $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
+            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
+        }
     }
 
     public function createGuestCustomer($guestId, $order)
@@ -208,11 +208,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param null $syncDelta
      * @param null $syncError
      * @param int $syncModified
+     * @param null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
-    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $saveOnlyIfexists = false)
+    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
     {
-        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $saveOnlyIfexists);
+        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
     }
 
     /**
@@ -238,7 +239,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection = $this->getCustomerResourceCollection();
         $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
 
-        $helper->addResendFilter($collection, $magentoStoreId);
+        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
 
         $collection->addNameToSelect();
 

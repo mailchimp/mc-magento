@@ -12,16 +12,33 @@
  */
 class Ebizmarts_MailChimp_Model_System_Config_Backend_Name extends Mage_Core_Model_Config_Data
 {
-    protected function _afterSave()
+
+    public function save()
     {
+        parent::save();
+        $scopeId = $this->getScopeId();
+        $scope = $this->getScope();
+        $helper = $this->makeHelper();
         if ($this->isValueChanged()) {
             $name = $this->getValue();
-            if ($name == '') {
-                Mage::getConfig()->cleanCache();
-                $name = Mage::app()->getDefaultStoreView()->getWebsite()->getDefaultStore()->getFrontendName();
+            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+            if ($realScope['scope_id'] == $scopeId && $realScope['scope'] == $scope) {
+                $ecomEnabled = $helper->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
+                if ($ecomEnabled) {
+                    if ($name == '') {
+                        $name = $helper->getMCStoreName($scopeId, $scope, true);
+                    }
+                    $helper->changeName($name, $scopeId, $scope);
+                }
             }
-
-            Mage::helper('mailchimp')->changeName($name, $this->getScopeId(), $this->getScope());
         }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }

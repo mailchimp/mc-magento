@@ -130,12 +130,52 @@ if (defined("COMPILER_INCLUDE_PATH")) {
 
 class Ebizmarts_MailChimp
 {
+    /** @var MailChimp_BatchOperations */
+    public $batchOperation;
+
+    /** @var MailChimp_Root */
+    public $root;
+
+    /** @var MailChimp_AuthorizedApps */
+    public $authorizedApps;
+
+    /** @var MailChimp_Automation */
+    public $automation;
+
+    /** @var MailChimp_CampaignFolders */
+    public $campaignFolders;
+
+    /** @var MailChimp_Campaigns */
+    public $campaigns;
+
+    /** @var MailChimp_Conversations  */
+    public $conversations;
+
+    /** @var MailChimp_Ecommerce  */
+    public $ecommerce;
+
+    /** @var MailChimp_FileManagerFiles  */
+    public $fileManagerFiles;
+
+    /** @var MailChimp_FileManagerFolders  */
+    public $fileManagerFolders;
+
+    /** @var MailChimp_Lists  */
+    public $lists;
+
+    /** @var MailChimp_Reports  */
+    public $reports;
+
+    /** @var MailChimp_TemplateFolders  */
+    public $templateFolders;
+
+    /** @var MailChimp_Templates  */
+    public $templates;
+
     protected $_apiKey;
     protected $_ch;
     protected $_root    = 'https://api.mailchimp.com/3.0';
     protected $_debug   = false;
-
-    public $batchOperation;
 
     const POST      = 'POST';
     const GET       = 'GET';
@@ -223,7 +263,7 @@ class Ebizmarts_MailChimp
         $this->lists->members                               = new MailChimp_ListsMembers($this);
         $this->lists->members->memberActivity               = new MailChimp_ListsMembersActivity($this);
         $this->lists->members->memberGoal                   = new MailChimp_ListsMembersGoals($this);
-        $this->lists->members->memberNotes                  = new MailChimp_ListsMembersNotes($this);;
+        $this->lists->members->memberNotes                  = new MailChimp_ListsMembersNotes($this);
         $this->lists->mergeFields                           = new MailChimp_ListsMergeFields($this);
         $this->lists->segments                              = new MailChimp_ListsSegments($this);
         $this->lists->segments->segmentMembers              = new MailChimp_ListsSegmentsMembers($this);
@@ -242,6 +282,14 @@ class Ebizmarts_MailChimp
         $this->templateFolders                              = new MailChimp_TemplateFolders($this);
         $this->templates                                    = new MailChimp_Templates($this);
         $this->templates->defaultContent                    = new MailChimp_TemplatesDefaultContent($this);
+    }
+
+    /**
+     * @return MailChimp_Ecommerce
+     */
+    public function getEcommerce()
+    {
+        return $this->ecommerce;
     }
 
     /**

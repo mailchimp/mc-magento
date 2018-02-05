@@ -223,7 +223,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
 
                 $mailchimpStoreId = $this->makeHelper()->getMCStoreId($storeId);
-                $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+                $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
             }
         }
 
@@ -351,22 +351,36 @@ class Ebizmarts_MailChimp_Model_Observer
         $addColumnConfig = $helper->getMonkeyInGrid(0);
         $ecommEnabledAnyScope = $helper->isEcomSyncDataEnabledInAnyScope();
         $block = $observer->getEvent()->getBlock();
-
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
             && $ecommEnabledAnyScope && $addColumnConfig
         ) {
+            if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_MAILCHIMP_LOGO_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
+                $block->addColumnAfter(
+                    'mailchimp_flag', array(
+                    'header' => $helper->__('MailChimp'),
+                    'index' => 'mailchimp_flag',
+                    'align' => 'center',
+                    'filter' => false,
+                    'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
+                    'sortable' => false,
+                    'width' => 70
+                ), 'created_at'
+                );
+        }
+        if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
             $block->addColumnAfter(
-                'mailchimp_flag', array(
-                'header' => $helper->__('MailChimp'),
-                'index' => 'mailchimp_flag',
+                'mailchimp_order_flag', array(
+                'header' => $helper->__('Synced to MailChimp'),
+                'index' => 'mailchimp_order_flag',
                 'align' => 'center',
                 'filter' => false,
-                'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
+                'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
                 'sortable' => false,
                 'width' => 70
             ), 'created_at'
             );
         }
+    }
 
         return $observer;
     }
@@ -443,12 +457,11 @@ class Ebizmarts_MailChimp_Model_Observer
                     continue;
                 }
 
-                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
             }
 
-            $helper->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, true);
+            $helper->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
-
         return $observer;
     }
 
@@ -476,13 +489,12 @@ class Ebizmarts_MailChimp_Model_Observer
                     continue;
                 }
 
-                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
             }
 
-            $helper->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, true);
+            $helper->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
-
-        return $observer;
+            return $observer;
     }
 
     /**
@@ -504,7 +516,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
             if ($item->getProductType() != 'bundle' && $item->getProductType() != 'configurable') {
-                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, true);
+                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
             }
         }
 
@@ -535,6 +547,59 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
+    }
+
+    /**
+     * Catch Magento store group change event and call changeName function for the relevant stores.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     */
+    public function changeStoreGroupName(Varien_Event_Observer $observer)
+    {
+        $stores = $observer->getGroup()->getStores();
+
+        foreach ($stores as $store) {
+            $storeId = $store->getId();
+            $this->changeStoreNameIfModuleEnabled($storeId);
+        }
+
+        return $observer;
+    }
+
+    /**
+     * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     */
+    public function changeStoreName(Varien_Event_Observer $observer)
+    {
+        $storeId = $observer->getStore()->getId();
+
+        $this->changeStoreNameIfModuleEnabled($storeId);
+
+        return $observer;
+    }
+
+    /**
+     * @param $storeId
+     */
+    public function changeStoreNameIfModuleEnabled($storeId)
+    {
+        $helper = $this->makeHelper();
+        $mailchimpStoreId = $helper->getMCStoreId($storeId);
+
+        if ($mailchimpStoreId) {
+            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
+            if ($realScope['scope_id'] == $storeId && $realScope['scope'] == 'stores') {
+                $ecomEnabled = $helper->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
+                if ($ecomEnabled) {
+                    if (!$helper->isUsingConfigStoreName($realScope['scope_id'], $realScope['scope'])) {
+                        $storeName = $helper->getMCStoreName($realScope['scope_id'], $realScope['scope']);
+                        $helper->changeName($storeName, $realScope['scope_id'], $realScope['scope']);
+                    }
+                }
+            }
+        }
     }
 
     /**

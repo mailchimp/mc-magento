@@ -89,6 +89,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     public function testAddResendFilter()
     {
         $storeId = 1;
+        $lastItemSent = 100;
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
@@ -97,15 +98,18 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getResendEnabled', 'getResendTurn', 'getOrderResendLastId'))
             ->getMock();
 
-        $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
+        $collectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
             ->disableOriginalConstructor()
+            ->setMethods(array('addFieldToFilter'))
             ->getMock();
 
         $helperMock->expects($this->once())->method('getResendEnabled')->with($storeId)->willReturn(1);
         $helperMock->expects($this->once())->method('getResendTurn')->with($storeId)->willReturn(1);
-        $helperMock->expects($this->once())->method('getOrderResendLastId')->with($storeId);
+        $helperMock->expects($this->once())->method('getOrderResendLastId')->with($storeId)->willReturn($lastItemSent);
 
-        $helperMock->addResendFilter($orderCollectionMock, $storeId);
+        $collectionMock->expects($this->once())->method('addFieldToFilter')->with('entity_id', array('lteq' => $lastItemSent));
+
+        $helperMock->addResendFilter($collectionMock, $storeId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
     }
 
     public function testHandleResendFinish()
@@ -637,5 +641,123 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($mailchimpEcommTableName, $where);
 
         $helperMock->clearErrorGrid($scopeId, $scope, $excludeSubscribers);
+    }
+
+    public function testGetMCStoreNameForStore()
+    {
+        $scopeId = 1;
+        $scope = 'stores';
+        $storeGroupName = 'StoreName';
+        $storeViewName = 'StoreViewName';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfigValueForScope', 'getMageApp'))
+            ->getMock();
+
+        $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
+
+        $storeMock = $this->getMockBuilder(Mage_Core_Model_Store::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGroup', 'getName'))
+            ->getMock();
+
+        $groupMock = $this->getMockBuilder(Mage_Core_Model_Store_Group::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getName'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope)->willReturn('');
+        $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
+
+        $mageAppMock->expects($this->once())->method('getStore')->with($scopeId)->willReturn($storeMock);
+
+        $storeMock->expects($this->once())->method('getGroup')->willReturn($groupMock);
+
+        $storeMock->expects($this->once())->method('getName')->willReturn($storeViewName);
+        $groupMock->expects($this->once())->method('getName')->willReturn($storeGroupName);
+
+        $result = $helperMock->getMCStoreName($scopeId, $scope);
+
+        $this->assertEquals($result, $storeGroupName . ' - ' . $storeViewName);
+
+    }
+
+    public function testGetMCStoreNameForWebsite()
+    {
+        $scopeId = 1;
+        $scope = 'websites';
+        $storeName = 'StoreName';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfigValueForScope', 'getMageApp'))
+            ->getMock();
+
+        $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getWebsite'))
+            ->getMock();
+
+        $websiteMock = $this->getMockBuilder(Mage_Core_Model_Website::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getName'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope)->willReturn('');
+        $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
+
+        $mageAppMock->expects($this->once())->method('getWebsite')->with($scopeId)->willReturn($websiteMock);
+
+        $websiteMock->expects($this->once())->method('getName')->willReturn($storeName);
+
+        $result = $helperMock->getMCStoreName($scopeId, $scope);
+
+        $this->assertEquals($result, $storeName);
+    }
+
+    public function testGetMCStoreNameForDefault()
+    {
+        $scopeId = 0;
+        $scope = 'default';
+        $storeName = 'StoreName';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfigValueForScope'))
+            ->getMock();
+
+        $helperMock->expects($this->exactly(2))->method('getConfigValueForScope')->withConsecutive(
+            array(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope),
+            array('web/unsecure/base_url', 0)
+            )->willReturnOnConsecutiveCalls(
+            '',
+            $storeName
+            );
+
+        $result = $helperMock->getMCStoreName($scopeId, $scope);
+
+        $this->assertEquals($result, $storeName);
+    }
+
+    public function testIsUsingConfigStoreName()
+    {
+        $scopeId = 1;
+        $scope = 'stores';
+        $storeName = 'StoreName';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConfigValueForScope'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope)->willReturn($storeName);
+
+        $result = $helperMock->isUsingConfigStoreName($scopeId, $scope);
+
+        $this->assertEquals($result, true);
     }
 }
