@@ -13,6 +13,8 @@
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
+    const SYNCED = 1;
+
     public function render(Varien_Object $row)
     {
         $storeId = $row->getStoreId();
@@ -20,14 +22,15 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $helper = $this->makeHelper();
         if ($helper->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
-            $status = $this->makeApiOrders()->getSyncedOrder($orderId, $mailchimpStoreId);
+            $resultArray = $this->makeApiOrders()->getSyncedOrder($orderId, $mailchimpStoreId);
+            $id = $resultArray[1];
+            $status = $resultArray[0];
 
-
-            if ($status[0] == 1) {
+            if ($status == self::SYNCED) {
                 $result = '<div style ="color:green">' . $helper->__("Yes") . '</div>';
-            } elseif ($status[0] === null && $status[1] !== null)
+            } elseif ($status === null && $id !== null && !$helper->getIsReseted($storeId))
                 $result = '<div style ="color:#ed6502">' . $helper->__("Processing") . '</div>';
-            elseif ($status[0] === null) {
+            elseif ($status === null || $helper->getIsReseted($storeId)) {
                 $result = '<div style ="color:mediumblue">' . $helper->__("In queue") . '</div>';
             } else {
                 $result = '<div style ="color:red">' . $helper->__("No") . '</div>';
@@ -41,7 +44,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
     }
 
     /**
-     * @return Mage_Core_Helper_Abstract
+     * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function makeHelper()
     {
@@ -49,7 +52,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Ebizmarts_MailChimp_Model_Api_Orders
      */
     protected function makeApiOrders()
     {

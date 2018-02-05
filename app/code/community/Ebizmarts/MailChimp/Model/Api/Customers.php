@@ -165,10 +165,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     public function update($customerId, $storeId)
     {
-        if ($this->mailchimpHelper->isEcomSyncDataEnabled($storeId)) {
-            $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-            $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
-        }
+        $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
+        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
     }
 
     public function createGuestCustomer($guestId, $order)

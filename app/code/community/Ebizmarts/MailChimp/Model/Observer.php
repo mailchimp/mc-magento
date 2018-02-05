@@ -366,21 +366,21 @@ class Ebizmarts_MailChimp_Model_Observer
                     'width' => 70
                 ), 'created_at'
                 );
+            }
+            if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
+                $block->addColumnAfter(
+                    'mailchimp_order_flag', array(
+                    'header' => $helper->__('Synced to MailChimp'),
+                    'index' => 'mailchimp_order_flag',
+                    'align' => 'center',
+                    'filter' => false,
+                    'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
+                    'sortable' => false,
+                    'width' => 70
+                ), 'created_at'
+                );
+            }
         }
-        if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
-            $block->addColumnAfter(
-                'mailchimp_order_flag', array(
-                'header' => $helper->__('Synced to MailChimp'),
-                'index' => 'mailchimp_order_flag',
-                'align' => 'center',
-                'filter' => false,
-                'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
-                'sortable' => false,
-                'width' => 70
-            ), 'created_at'
-            );
-        }
-    }
 
         return $observer;
     }
@@ -494,7 +494,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $helper->saveEcommerceSyncData($order->getEntityId(), Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, null, null, 1, null, null, null, true);
         }
-            return $observer;
+        return $observer;
     }
 
     /**

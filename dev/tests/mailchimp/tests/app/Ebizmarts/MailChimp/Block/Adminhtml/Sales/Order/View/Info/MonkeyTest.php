@@ -47,9 +47,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
     }
 
 
-    public function testAddCampaignName()
+    public function testIsDataAvailable()
     {
         $campaignId = '1111111';
+        $campaignName = 'campaignName';
         $storeId = 1;
         /**
          * @var \Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey $monkeyBlock
@@ -72,8 +73,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $monkeyBlockMock->expects($this->once())->method('getCampaignId')->willReturn($campaignId);
         $monkeyBlockMock->expects($this->once())->method('getCurrentOrder')->willReturn($orderMock);
         $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
-        $helperMock->expects($this->once())->method('getMailChimpCampaignNameById')->with($campaignId, $storeId);
+        $helperMock->expects($this->once())->method('getMailChimpCampaignNameById')->with($campaignId, $storeId)->willReturn($campaignName);
 
-        $monkeyBlockMock->addCampaignName();
+        $orderMock->expects($this->once())->method('getMailchimpCampaignId')->willReturn($campaignId);
+
+        $result = $monkeyBlockMock->isDataAvailable();
+
+        $this->assertEquals($result, true);
     }
 }

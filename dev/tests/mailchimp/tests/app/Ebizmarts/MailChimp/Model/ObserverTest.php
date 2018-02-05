@@ -9,36 +9,47 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
     public function testProductAttributeUpdateIsUsingCorrectStoreId()
     {
+        $scopeId = 1;
+        $scope = 'stores';
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
+        $mailchimpStoreIdsArray = array($scope.'_'.$scopeId => $mailchimpStoreId);
         /**
          * @var \Ebizmarts_MailChimp_Model_Observer $modelMock
          */
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('changeStoreName', 'makeHelper', 'makeApiProducts'))
+            ->setMethods(array('makeHelper', 'makeApiProducts'))
             ->getMock();
 
         $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
             ->setMethods(array('update'))
             ->getMock();
-        $apiProductsMock->expects($this->exactly(2))->method('update')->withConsecutive(
-            array(12, 0),
-            array(34, 0)
-        );
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAllMailChimpStoreIds', 'isEcommerceEnabled'))
+            ->getMock();
 
         $eventMock = $this->getMockBuilder(Varien_Event::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductIds', 'getStoreId'))
+            ->setMethods(array('getProductIds'))
             ->getMock();
+
         $eventMock->expects($this->once())->method('getProductIds')->willReturn(array(12, 34));
-        $eventMock->expects($this->once())->method('getStoreId')->willReturn(0);
 
-        $eventObserverMock = $this->makeEventObserverMock($eventMock, 2);
+        $modelMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $modelMock->expects($this->once())->method('makeApiProducts')->willReturn($apiProductsMock);
 
-        $modelMock->expects($this->never())->method('makeHelper');
+        $helperMock->expects($this->once())->method('getAllMailChimpStoreIds')->willReturn($mailchimpStoreIdsArray);
+        $helperMock->expects($this->once())->method('isEcommerceEnabled')->with($scopeId, $scope)->willReturn(true);
 
-        $modelMock->expects($this->exactly(2))->method('makeApiProducts')->willReturn($apiProductsMock);
+        $apiProductsMock->expects($this->exactly(2))->method('update')->withConsecutive(
+            array(12, $mailchimpStoreId),
+            array(34, $mailchimpStoreId)
+        );
 
+        $eventObserverMock = $this->makeEventObserverMock($eventMock, 1);
         $modelMock->productAttributeUpdate($eventObserverMock);
     }
 

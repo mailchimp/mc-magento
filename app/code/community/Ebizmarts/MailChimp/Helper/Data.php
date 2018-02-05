@@ -425,7 +425,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param  null $scope
      * @return mixed
      */
-    public function getMailChimpInGrid($scopeId = 0, $scope = null)
+    public function getMonkeyInGrid($scopeId = 0, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_ORDER_GRID, $scopeId, $scope);
     }

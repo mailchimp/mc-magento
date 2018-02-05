@@ -709,12 +709,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * @param $orderId
      * @param $mailchimpStoreId
+     * @return array
      */
-
     public function getSyncedOrder($orderId, $mailchimpStoreId)
     {
         $helper = $this->getHelper();
-        $result = $helper->getEcommerceSyncDataItem($orderId, 'ORD', $mailchimpStoreId);
+        $result = $helper->getEcommerceSyncDataItem($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId);
 
         $mailchimpSyncedFlag = $result->getMailchimpSyncedFlag();
         $mailchimpItemId = $result->getId();

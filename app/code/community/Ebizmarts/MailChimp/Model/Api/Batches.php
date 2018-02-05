@@ -503,7 +503,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $store = explode('-', $line[0]);
                 $type = $line[1];
                 $id = $line[3];
-
                 if ($item->status_code != 200) {
 
                     if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
@@ -553,7 +552,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $mailchimpErrors->save();
                     $this->getHelper()->logError($error, $store[1]);
                 } else {
-
                     $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
                 }
             }

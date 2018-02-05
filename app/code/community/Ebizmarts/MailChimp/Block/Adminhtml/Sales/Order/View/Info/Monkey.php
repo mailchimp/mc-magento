@@ -14,7 +14,9 @@
 class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends Mage_Core_Block_Template
 {
 
-    public $campaignName = null;
+    protected $campaignName;
+
+    protected $order;
 
     public function isReferred()
     {
@@ -51,7 +53,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
      */
     protected function getCurrentOrder()
     {
-        return Mage::registry('current_order');
+        if (!$this->order) {
+            $this->order = Mage::registry('current_order');
+        }
+        return $this->order;
     }
 
     public function isDataAvailable()

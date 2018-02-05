@@ -79,11 +79,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now());
             } else {
                 $error = $promoRule->getMailchimpSyncError();
-                if (!$error) {
-                    $error = 'Something went wrong when retrieving the information.';
-                }
                 $helper = $this->getMailChimpHelper();
-                $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now(), $helper->__($error));
+                if (!$error) {
+                    $error = $helper->__('Something went wrong when retrieving the information.');
+                }
+                $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now(), $error);
             }
         } catch (Exception $e) {
             Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
