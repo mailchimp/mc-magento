@@ -15,10 +15,18 @@
                 <observers>
                     <mailchimp_change_store_name>
                         <class>mailchimp/observer</class>
-                        <method>changeStoreName</method>
+                        <method>changeStoreGroupName</method>
                     </mailchimp_change_store_name>
                 </observers>
             </store_group_save>
+            <store_edit>
+                <observers>
+                    <mailchimp_change_store_name>
+                        <class>mailchimp/observer</class>
+                        <method>changeStoreName</method>
+                    </mailchimp_change_store_name>
+                </observers>
+            </store_edit>
             <newsletter_subscriber_save_before>
                 <observers>
                     <mailchimp_subscribe_observer>

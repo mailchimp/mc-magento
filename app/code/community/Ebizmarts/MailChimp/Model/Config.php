@@ -58,6 +58,9 @@ class Ebizmarts_MailChimp_Model_Config
     const IMAGE_SIZE_SMALL              = 'small_image';
     const IMAGE_SIZE_THUMBNAIL          = 'thumbnail';
     const PRODUCT_IMAGE_CACHE_FLUSH     = 'mailchimp/ecommerce/product_image_cache_flush';
+    const ADD_MAILCHIMP_LOGO_TO_GRID    = 1;
+    const ADD_SYNC_STATUS_TO_GRID       = 2;
+    const ADD_BOTH_TO_GRID              = 3;
 
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';
