@@ -35,7 +35,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     {
         $helper = $this->makeHelper();
         $errorId = $this->getRequest()->getParam('id');
-        $error = Mage::getModel('mailchimp/mailchimperrors')->load($errorId);
+        $error = $this->getMailchimperrorsModel()->load($errorId);
+        $apiBatches = $this->getApiBatches();
         $batchId = $error->getBatchId();
         $storeId = $error->getStoreId();
         $mailchimpStoreId = $error->getMailchimpStoreId();
@@ -46,29 +47,30 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         }
 
         if ($enabled) {
-            $this->getResponse()->setHeader('Content-disposition', 'attachment; filename=' . $batchId . '.json');
-            $this->getResponse()->setHeader('Content-type', 'application/json');
+            $response = $this->getResponse();
+            $response->setHeader('Content-disposition', 'attachment; filename=' . $batchId . '.json');
+            $response->setHeader('Content-type', 'application/json');
             $counter = 0;
             do {
                 $counter++;
-                $files = Mage::getModel('mailchimp/api_batches')->getBatchResponse($batchId, $storeId);
+                $files = $apiBatches->getBatchResponse($batchId, $storeId);
                 $fileContent = array();
                 foreach ($files as $file) {
-                    $items = json_decode(file_get_contents($file));
+                    $items = $this->getFileContent($file);
                     foreach ($items as $item) {
                         $fileContent[] = array('status_code' => $item->status_code, 'operation_id' => $item->operation_id, 'response' => json_decode($item->response));
                     }
 
-                    unlink($file);
+                    $this->unlink($file);
                 }
 
-                $baseDir = Mage::getBaseDir();
-                if (is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId)) {
-                    rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+                $baseDir = $apiBatches->getMagentoBaseDir();
+                if ($apiBatches->batchDirExists($baseDir, $batchId)) {
+                    $apiBatches->removeBatchDir($baseDir, $batchId);
                 }
             } while (!count($fileContent) && $counter < self::MAX_RETRIES);
 
-            $this->getResponse()->setBody(json_encode($fileContent, JSON_PRETTY_PRINT));
+            $response->setBody(json_encode($fileContent, JSON_PRETTY_PRINT));
         }
         return;
     }
@@ -92,5 +94,38 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Mailchimperrors
+     */
+    protected function getMailchimperrorsModel()
+    {
+        return Mage::getModel('mailchimp/mailchimperrors');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Batches
+     */
+    protected function getApiBatches()
+    {
+        return Mage::getModel('mailchimp/api_batches');
+    }
+
+    /**
+     * @param $file
+     * @return mixed
+     */
+    protected function getFileContent($file)
+    {
+        return json_decode(file_get_contents($file));
+    }
+
+    /**
+     * @param $file
+     */
+    protected function unlink($file)
+    {
+        unlink($file);
     }
 }

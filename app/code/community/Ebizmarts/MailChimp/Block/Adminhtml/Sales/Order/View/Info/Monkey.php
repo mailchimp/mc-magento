@@ -70,8 +70,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
         }
 
         $dataAvailable = false;
-
-        if ($order->getMailchimpCampaignId() && $this->campaignName) {
+        $campaignId = $order->getMailchimpCampaignId();
+        if ($campaignId && $this->campaignName) {
             $dataAvailable = true;
         }
 

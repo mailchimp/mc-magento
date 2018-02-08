@@ -12,6 +12,96 @@
  */
 class Ebizmarts_MailChimp_Model_Observer
 {
+
+
+    /**
+     * @return Mage_Core_Model_Resource
+     */
+    protected function getCoreResource()
+    {
+        return Mage::getSingleton('core/resource');
+    }
+
+    /**
+     * @return Mage_Core_Model_Config
+     */
+    protected function getConfig()
+    {
+        return Mage::getConfig();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Orders
+     */
+    protected function makeApiOrders()
+    {
+        return Mage::getModel('mailchimp/api_orders');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_PromoCodes
+     */
+    protected function getPromoCodesApi()
+    {
+        return Mage::getModel('mailchimp/api_promoCodes');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_PromoRules
+     */
+    protected function getPromoRulesApi()
+    {
+        return Mage::getModel('mailchimp/api_promoRules');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Products
+     */
+    protected function makeApiProducts()
+    {
+        return Mage::getModel('mailchimp/api_products');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Subscribers
+     */
+    protected function getApiSubscriber()
+    {
+        return Mage::getModel('mailchimp/api_subscribers');
+    }
+
+    /**
+     * @return Mage_Newsletter_Model_Subscriber
+     */
+    protected function getSubscriberModel()
+    {
+        return Mage::getModel('newsletter/subscriber');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Customers
+     */
+    protected function getApiCustomer()
+    {
+        return Mage::getModel('mailchimp/api_customers');
+    }
+
+    /**
+     * @return Mage_Customer_Model_Customer
+     */
+    protected function getCustomerModel()
+    {
+        return Mage::getModel('customer/customer');
+    }
+
     /**
      * Handle save of System -> Configuration, section <mailchimp>
      *
@@ -46,6 +136,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $isEnabled = $helper->isSubscriptionEnabled($subscriber->getStoreId());
             if ($isEnabled) {
+                $apiSubscriber = $this->getApiSubscriber();
                 $subscriber->setImportMode(true);
                 if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
                     Mage::getModel('core/cookie')->set(
@@ -54,14 +145,14 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
 
                 if (true === $subscriber->getIsStatusChanged()) {
-                    Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                    $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
                     $origData = $subscriber->getOrigData();
 
                     if (is_array($origData) && isset($origData['subscriber_status'])
                         && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
                     ) {
-                        Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                        $apiSubscriber->updateSubscriber($subscriber, true);
                     }
                 }
             }
@@ -83,7 +174,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $isEnabled = $helper->isSubscriptionEnabled($subscriber->getStoreId());
 
         if ($isEnabled) {
-            Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
+            $this->getApiSubscriber()->deleteSubscriber($subscriber);
         }
 
         return $observer;
@@ -138,31 +229,32 @@ class Ebizmarts_MailChimp_Model_Observer
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
 
         if ($isEnabled) {
-            if ($customer->getOrigData('email')) {
+            $apiSubscriber = $this->getApiSubscriber();
+            $origEmail = $customer->getOrigData('email');
+            if ($origEmail) {
                 // check if customer has changed email address
-                if ($customer->getOrigData('email') != $customer->getEmail()) {
-
-                    // unsubscribe old email address
-                    $subscriber = Mage::getModel('newsletter/subscriber');
-                    $subscriber
-                        ->setSubscriberEmail($customer->getOrigData('email'))
-                        ->setStoreId($storeId);
-
-                    Mage::getModel('mailchimp/api_subscribers')->deleteSubscriber($subscriber);
+                $customerEmail = $customer->getEmail();
+                if ($origEmail != $customerEmail) {
+                    $subscriberModel = $this->getSubscriberModel();
+                    $subscriber = $subscriberModel->loadByEmail($origEmail);
+                    if ($subscriber->getId()) {
+                        // unsubscribe old email address
+                        $apiSubscriber->deleteSubscriber($subscriber);
+                    }
 
                     // subscribe new email address
-                    $subscriber = Mage::getModel('newsletter/subscriber')->loadByCustomer($customer);
-                    $subscriber->setSubscriberEmail($customer->getEmail()); // make sure we set the new email address
+                    $subscriber = $subscriberModel->loadByCustomer($customer);
+                    $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
 
-                    Mage::getModel('mailchimp/api_subscribers')->updateSubscriber($subscriber, true);
+                    $apiSubscriber->updateSubscriber($subscriber, true);
                 }
             }
             //update subscriber data if a subscriber with the same email address exists
-            Mage::getModel('mailchimp/api_subscribers')->update($customer->getEmail(), $storeId);
+            $apiSubscriber->update($customerEmail, $storeId);
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 //update mailchimp ecommerce data for that customer
-                Mage::getModel('mailchimp/api_customers')->update($customer->getId(), $storeId);
+                $this->getApiCustomer()->update($customer->getId(), $storeId);
             }
         }
 
@@ -172,18 +264,18 @@ class Ebizmarts_MailChimp_Model_Observer
     public function customerAddressSaveBefore(Varien_Event_Observer $observer)
     {
         $customerId = $observer->getEvent()->getCustomerAddress()->getCustomerId();
-        $customer = Mage::getModel('customer/customer')->load($customerId);
+        $customer = $this->getCustomerModel()->load($customerId);
         $storeId = $customer->getStoreId();
         $helper = $this->makeHelper();
 
         if ($helper->isSubscriptionEnabled($storeId)) {
             //update subscriber data if a subscriber with the same email address exists
-            Mage::getModel('mailchimp/api_subscribers')->update($customer->getEmail(), $storeId);
+            $this->getApiSubscriber()->update($customer->getEmail(), $storeId);
         }
 
         if ($helper->isEcomSyncDataEnabled($storeId)) {
             //update mailchimp ecommerce data for that customer
-            Mage::getModel('mailchimp/api_customers')->update($customerId, $storeId);
+            $this->getApiCustomer()->update($customerId, $storeId);
         }
 
         return $observer;
@@ -198,8 +290,8 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function newOrder(Varien_Event_Observer $observer)
     {
-        $post = Mage::app()->getRequest()->getPost('mailchimp_subscribe');
         $helper = $this->makeHelper();
+        $post = $helper->getMageApp()->getRequest()->getPost('mailchimp_subscribe');
         $order = $observer->getEvent()->getOrder();
         $storeId = $order->getStoreId();
         $ecommEnabled = $helper->isEcomSyncDataEnabled($storeId);
@@ -215,15 +307,14 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $this->removeCampaignData();
 
-            $order = $observer->getEvent()->getOrder();
             $items = $order->getAllItems();
             foreach ($items as $item) {
                 if ($item->getProductType() == 'bundle' || $item->getProductType() == 'configurable') {
                     continue;
                 }
 
-                $mailchimpStoreId = $this->makeHelper()->getMCStoreId($storeId);
-                $this->makeHelper()->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
+                $mailchimpStoreId = $helper->getMCStoreId($storeId);
+                $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
             }
         }
 
@@ -709,61 +800,5 @@ class Ebizmarts_MailChimp_Model_Observer
         $sqlQuery = "UPDATE " . $tableName . " SET mailchimp_sync_modified = 1 WHERE type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "';";
         $connection = $this->getCoreResource()->getConnection('core_write');
         $connection->query($sqlQuery);
-    }
-
-    /**
-     * @return Mage_Core_Model_Resource
-     */
-    protected function getCoreResource()
-    {
-        return Mage::getSingleton('core/resource');
-    }
-
-    /**
-     * @return Mage_Core_Model_Config
-     */
-    protected function getConfig()
-    {
-        return Mage::getConfig();
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Api_Orders
-     */
-    protected function makeApiOrders()
-    {
-        return Mage::getModel('mailchimp/api_orders');
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Api_PromoCodes
-     */
-    protected function getPromoCodesApi()
-    {
-        return Mage::getModel('mailchimp/api_promoCodes');
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Api_PromoRules
-     */
-    protected function getPromoRulesApi()
-    {
-        return Mage::getModel('mailchimp/api_promoRules');
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Helper_Data
-     */
-    protected function makeHelper()
-    {
-        return Mage::helper('mailchimp');
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Api_Products
-     */
-    protected function makeApiProducts()
-    {
-        return Mage::getModel('mailchimp/api_products');
     }
 }

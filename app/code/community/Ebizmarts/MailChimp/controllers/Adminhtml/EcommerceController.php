@@ -14,67 +14,70 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 {
     public function resetLocalErrorsAction()
     {
-        $param = Mage::app()->getRequest()->getParam('scope');
+        $helper = $this->makeHelper();
+        $mageApp = $helper->getMageApp();
+        $param = $mageApp->getRequest()->getParam('scope');
         $scopeArray = explode('-', $param);
         $result = 1;
         try {
-            $stores = Mage::app()->getStores();
+            $stores = $mageApp->getStores();
             if ($scopeArray[1] == 0) {
                 foreach ($stores as $store) {
-                    Mage::helper('mailchimp')->resetErrors($store->getId());
+                    $helper->resetErrors($store->getId());
                 }
             }
-            Mage::helper('mailchimp')->resetErrors($scopeArray[1], $scopeArray[0]);
+            $helper->resetErrors($scopeArray[1], $scopeArray[0]);
         } catch(Exception $e)
         {
             $result = 0;
         }
 
-        Mage::app()->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($result);
     }
 
     public function resetEcommerceDataAction()
     {
-        $param = Mage::app()->getRequest()->getParam('scope');
+        $helper = $this->makeHelper();
+        $mageApp = $helper->getMageApp();
+        $param = $mageApp->getRequest()->getParam('scope');
         $scopeArray = explode('-', $param);
-        $result = 1;
+        $result = 0;
         try {
-            Mage::helper('mailchimp')->resetMCEcommerceData($scopeArray[1], $scopeArray[0], true);
-        }
-        catch(MailChimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
-            $result = 0;
-        }
-        catch(Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+            $helper->resetMCEcommerceData($scopeArray[1], $scopeArray[0], true);
+            $result = 1;
+        } catch(MailChimp_Error $e) {
+            $helper->logError($e->getFriendlyMessage());
+        } catch(Exception $e) {
+            $helper->logError($e->getMessage());
         }
 
-        Mage::app()->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($result);
     }
 
     public function resendEcommerceDataAction()
     {
-        $param = Mage::app()->getRequest()->getParam('scope');
+        $helper = $this->makeHelper();
+        $mageApp = $helper->getMageApp();
+        $param = $mageApp->getRequest()->getParam('scope');
         $scopeArray = explode('-', $param);
-        $result = 1;
+        $result = 0;
         try {
-            Mage::helper('mailchimp')->resetMCEcommerceData($scopeArray[1], $scopeArray[0], false);
-        }
-        catch(MailChimp_Error $e) {
-            Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
-            $result = 0;
-        }
-        catch(Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+            $helper->resetMCEcommerceData($scopeArray[1], $scopeArray[0], false);
+            $result = 1;
+        } catch(MailChimp_Error $e) {
+            $helper->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
+        } catch(Exception $e) {
+            $helper->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
         }
 
-        Mage::app()->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($result);
     }
 
     public function createMergeFieldsAction()
     {
         $helper = $this->makeHelper();
-        $param = Mage::app()->getRequest()->getParam('scope');
+        $mageApp = $helper->getMageApp();
+        $param = $mageApp->getRequest()->getParam('scope');
         $scopeArray = explode('-', $param);
         $result = 0;
         $subEnabled = $helper->isSubscriptionEnabled($scopeArray[1], $scopeArray[0]);
@@ -89,7 +92,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             }
         }
 
-        Mage::app()->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($result);
     }
 
     protected function _isAllowed()

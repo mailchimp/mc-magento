@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMailChimpCampaignNameById'))
+            ->setMethods(array('getMailChimpCampaignNameById', 'isEcomSyncDataEnabled'))
             ->getMock();
 
         $orderMock = $this->_orderMock;
@@ -73,6 +73,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $monkeyBlockMock->expects($this->once())->method('getCampaignId')->willReturn($campaignId);
         $monkeyBlockMock->expects($this->once())->method('getCurrentOrder')->willReturn($orderMock);
         $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
         $helperMock->expects($this->once())->method('getMailChimpCampaignNameById')->with($campaignId, $storeId)->willReturn($campaignName);
 
         $orderMock->expects($this->once())->method('getMailchimpCampaignId')->willReturn($campaignId);

@@ -39,51 +39,57 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      */
     public function __construct()
     {
-        $helper = $this->helper = $this->getHelper();
+        $helper = $this->helper = $this->makeHelper();
         $scopeArray = explode('-', $helper->getScopeString());
 
         $mcStoreId = ($helper->getMCStoreId($scopeArray[1], $scopeArray[0])) ? $helper->getMCStoreId($scopeArray[1], $scopeArray[0]) : null;
         $listId = $helper->getGeneralList($scopeArray[1], $scopeArray[0]);
         try {
-        $api = $helper->getApi($scopeArray[1], $scopeArray[0]);
-            try {
-                $this->_accountDetails = $api->root->info('account_name,total_subscribers');
-                if ($listId) {
-                    $listData = $api->lists->getLists($listId, 'stats');
-                    $this->_accountDetails['list_subscribers'] = $listData['stats']['member_count'];
-                }
-                if ($mcStoreId && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
-                    try {
-                        $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
-                        $this->_accountDetails['store_exists'] = true;
-                        $this->_accountDetails['store_name'] = $storeData['name'];
-                        //Keep both values for backward compatibility
-                        $this->_accountDetails['store_sync_flag'] = $storeData['is_syncing'];
-                        $this->_accountDetails['store_sync_date'] = $this->getDateSync($mcStoreId);
-                        $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
-                        $this->_accountDetails['total_customers'] = $totalCustomers['total_items'];
-                        $totalProducts = $api->ecommerce->products->getAll($mcStoreId, 'total_items');
-                        $this->_accountDetails['total_products'] = $totalProducts['total_items'];
-                        $totalOrders = $api->ecommerce->orders->getAll($mcStoreId, 'total_items');
-                        $this->_accountDetails['total_orders'] = $totalOrders['total_items'];
-                        $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
-                        $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
-                    } catch (MailChimp_Error $e) {
-                        $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray[1], $scopeArray[0]);
-                        if ($listId) {
-                            $helper->createStore($listId, $scopeArray[1], $scopeArray[0]);
-                            $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');
-                            Mage::getSingleton('adminhtml/session')->addWarning($message);
+            $apiKey = $helper->getApiKey($scopeArray[1], $scopeArray[0]);
+            if ($apiKey) {
+                $api = $helper->getApi($scopeArray[1], $scopeArray[0]);
+                try {
+                    $this->_accountDetails = $api->root->info('account_name,total_subscribers');
+                    if ($listId) {
+                        $listData = $api->lists->getLists($listId, 'stats');
+                        $this->_accountDetails['list_subscribers'] = $listData['stats']['member_count'];
+                    }
+                    if ($mcStoreId && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
+                        try {
+                            $storeData = $api->ecommerce->stores->get($mcStoreId, 'name,is_syncing');
+                            $this->_accountDetails['store_exists'] = true;
+                            $this->_accountDetails['store_name'] = $storeData['name'];
+                            //Keep both values for backward compatibility
+                            $this->_accountDetails['store_sync_flag'] = $storeData['is_syncing'];
+                            $this->_accountDetails['store_sync_date'] = $this->getDateSync($mcStoreId);
+                            $totalCustomers = $api->ecommerce->customers->getAll($mcStoreId, 'total_items');
+                            $this->_accountDetails['total_customers'] = $totalCustomers['total_items'];
+                            $totalProducts = $api->ecommerce->products->getAll($mcStoreId, 'total_items');
+                            $this->_accountDetails['total_products'] = $totalProducts['total_items'];
+                            $totalOrders = $api->ecommerce->orders->getAll($mcStoreId, 'total_items');
+                            $this->_accountDetails['total_orders'] = $totalOrders['total_items'];
+                            $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
+                            $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
+                        } catch (MailChimp_Error $e) {
+                            if ($helper->isEcommerceEnabled($scopeArray[1], $scopeArray[0])) {
+                                $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray[1], $scopeArray[0]);
+                                if ($listId) {
+                                    $helper->createStore($listId, $scopeArray[1], $scopeArray[0]);
+                                    $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');
+                                    Mage::getSingleton('adminhtml/session')->addWarning($message);
+                                }
+                            }
+                            $this->_accountDetails['store_exists'] = false;
                         }
-
+                    } else {
                         $this->_accountDetails['store_exists'] = false;
                     }
-                } else {
-                    $this->_accountDetails['store_exists'] = false;
+                } catch (Exception $e) {
+                    $this->_accountDetails = "--- Invalid API Key ---";
+                    $helper->logError($e->getMessage(), $scopeArray[1]);
                 }
-            } catch (Exception $e) {
+            } else {
                 $this->_accountDetails = "--- Invalid API Key ---";
-                $helper->logError($e->getMessage(), $scopeArray[1]);
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $this->_accountDetails = "--- Invalid API Key ---";
@@ -178,14 +184,17 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         }
     }
 
-    protected function getHelper()
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
     {
         return Mage::helper('mailchimp');
     }
 
     protected function getDateSync($mailchimpStoreId)
     {
-        return $this->getHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE."_$mailchimpStoreId", 0, 'default');
+        return $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
     }
 
 }

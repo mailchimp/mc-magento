@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -32,14 +33,21 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
             $listId = $helper->getGeneralList($scopeId, $scope);
         }
 
-        $thisScopeHasMCStoreId = $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+        if ($this->isValueChanged() && $this->getValue()) {
+            if ($apiKey && $listId) {
+                $thisScopeHasMCStoreId = $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
 
-        if ($apiKey && $this->isValueChanged() && $this->getValue() && $listId && $ecommerceActive && !$thisScopeHasMCStoreId) {
-            $helper->createStore($listId, $scopeId, $scope);
-        }
+                if ($ecommerceActive && !$thisScopeHasMCStoreId) {
+                    $helper->createStore($listId, $scopeId, $scope);
+                }
 
-        if ($apiKey && $this->isValueChanged() && $this->getValue() && $listId) {
-            $helper->createNewWebhook($scopeId, $scope, $listId);
+                $helper->createNewWebhook($scopeId, $scope, $listId);
+            } else {
+                $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
+                $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
+                $message = $helper->__('Please add an api key and select a list before enabling the extension.');
+                $this->getAdminSession()->addError($message);
+            }
         }
     }
 
@@ -49,5 +57,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
     }
 }

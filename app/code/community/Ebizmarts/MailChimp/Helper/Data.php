@@ -974,7 +974,29 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($apiKey != null && $apiKey != "") {
             $api = new Ebizmarts_MailChimp($apiKey, null, 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         } else {
-            throw new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
+            $e = new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
+            $this->logError($e->getTraceAsString());
+            throw $e;
+        }
+
+        return $api;
+    }
+
+    /**
+     * Get Api object by ApiKey.
+     *
+     * @param $apiKey
+     * @return Ebizmarts_MailChimp|null
+     * @throws Ebizmarts_MailChimp_Helper_Data_ApiKeyException
+     */
+    public function getApiByKey($apiKey)
+    {
+        $api = null;
+        if ($apiKey != null && $apiKey != "") {
+            $api = new Ebizmarts_MailChimp($apiKey, null, 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        } else {
+            $e = new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
+            throw $e;
         }
 
         return $api;
@@ -2818,7 +2840,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Mage_Core_Model_Config
      */
-    protected function getConfig()
+    public function getConfig()
     {
         return Mage::getConfig();
     }
@@ -2880,5 +2902,40 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
+    }
+
+    /**
+     * Compare old api key with new one and return true if they belong to the same MailChimp account.
+     *
+     * @param $oldApiKey
+     * @param $newApiKey
+     * @return bool
+     */
+    public function isNewApiKeyForSameAccount($oldApiKey, $newApiKey)
+    {
+        $isNewApiKeyForSameAccount = false;
+
+        if ($oldApiKey && $newApiKey) {
+            if ($oldApiKey == $newApiKey) {
+                $isNewApiKeyForSameAccount = true;
+            } else {
+                try {
+                    $api = $this->getApiByKey($oldApiKey);
+                    $oldInfo = $api->getRoot()->info('account_id');
+                    $oldAccountId = $oldInfo['account_id'];
+                    $api = $this->getApiByKey($newApiKey);
+                    $newInfo = $api->getRoot()->info('account_id');
+                    $newAccountId = $newInfo['account_id'];
+                    if ($oldAccountId == $newAccountId) {
+                        $isNewApiKeyForSameAccount = true;
+                    }
+                } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                    $this->logError($e->getMessage());
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage());
+                }
+            }
+        }
+        return $isNewApiKeyForSameAccount;
     }
 }
