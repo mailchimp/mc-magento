@@ -195,10 +195,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $data = array();
 
+        $productId = $product->getId();
+        $helper = $this->getMailChimpHelper();
+        $rc = $helper->getProductResourceModel();
         //data applied for both root and varient products
-        $data["id"] = $product->getId();
-        $data["title"] = ($product->getName()) ? $product->getName() : $product->getDefaultName();
-        $this->_visibility = ($product->getVisibility()) ? $product->getVisibility() : $product->getDefaultVisibility();
+        $data["id"] = $productId;
+//        $data["title"] = ($product->getName()) ? $product->getName() : $product->getDefaultName();
+        $data["title"] = $rc->getAttributeRawValue($productId, 'name', $magentoStoreId);
+        $this->_visibility = $rc->getAttributeRawValue($productId, 'visibility', $magentoStoreId);
         $url = null;
         if (!$this->currentProductIsVisible()) {
             $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
@@ -222,10 +226,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($isVariant) {
             $data += $this->getProductVariantData($product, $magentoStoreId);
         } else {
-            //this is for a root product
-            if ($product->getDescription() || $product->getDefaultDescription()) {
-                $data["description"] = ($product->getDescription()) ? $product->getDescription() : $product->getDefaultDescription();
-            }
+            $data["description"] = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
 
             //mailchimp product type and vendor (magento category)
             $categoryName = $this->getProductCategories($product, $magentoStoreId);
@@ -387,11 +388,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $this->joinQtyAndBackorders($collection);
 
-        $this->joinCategoryId($collection);
+//        $this->joinCategoryId($collection);
 
-        $this->joinProductAttributes($collection, $magentoStoreId);
+//        $this->joinProductAttributes($collection, $magentoStoreId);
 
-        $collection->getSelect()->group("e.entity_id");
+//        $collection->getSelect()->group("e.entity_id");
         $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
         return $collection;
