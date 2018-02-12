@@ -20,6 +20,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
      */
     protected $_lists = null;
 
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     protected $_helper;
 
 
@@ -29,12 +32,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     public function __construct()
     {
         $helper = $this->_helper = $this->makeHelper();
-        $scopeArray = explode('-', $helper->getScopeString());
+        $scopeArray = $helper->getCurrentScope();
         if ($this->_lists == null) {
-            $apiKey = $helper->getApiKey($scopeArray[1], $scopeArray[0]);
+            $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
             if ($apiKey) {
                 try {
-                    $api = $helper->getApi($scopeArray[1], $scopeArray[0]);
+                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
                     $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
                     if (isset($this->_lists['lists']) && count($this->_lists['lists']) == 0) {
                         $apiKeyArray = explode('-', $apiKey);

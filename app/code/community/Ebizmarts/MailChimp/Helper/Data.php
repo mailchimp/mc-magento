@@ -58,19 +58,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Create string for current scope with format scope-scopeId.
      *
-     * @return string
+     * @return array
      */
-    public function getScopeString()
+    public function getCurrentScope()
     {
-        $scopeArray = $this->getConfigScopeId();
-        if (isset($scopeArray['websiteId'])) {
-            $scopeString = 'websites-' . $scopeArray['websiteId'];
-        } elseif (isset($scopeArray['storeId'])) {
-            $scopeString = 'stores-' . $scopeArray['storeId'];
+        $scopeIdArray = $this->getConfigScopeId();
+        $scopeArray = array();
+        if (isset($scopeIdArray['websiteId'])) {
+            $scopeArray['scope'] = 'websites';
+            $scopeArray['scope_id'] = $scopeIdArray['websiteId'];
+        } elseif (isset($scopeIdArray['storeId'])) {
+            $scopeArray['scope'] = 'stores';
+            $scopeArray['scope_id'] = $scopeIdArray['storeId'];
         } else {
-            $scopeString = 'default-0';
+            $scopeArray['scope'] = 'default';
+            $scopeArray['scope_id'] = 0;
         }
-        return $scopeString;
+        return $scopeArray;
     }
 
     /**
@@ -311,13 +315,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get if store has been reseted for given scope.
+     * Get if store has been reset for given scope.
      *
      * @param  $scopeId
      * @param  null $scope
      * @return mixed
      */
-    public function getIsReseted($scopeId, $scope = null)
+    public function getIsReset($scopeId, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, $scopeId, $scope);
     }

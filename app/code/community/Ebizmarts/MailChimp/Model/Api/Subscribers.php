@@ -27,66 +27,66 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
 
         $subscriberArray = array();
-            if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
-                $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
-                $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
+        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
+            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
+            $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
+        }
+
+        //get subscribers
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
+            ->addFieldToFilter('subscriber_status', array('eq' => 1))
+            ->addFieldToFilter('store_id', array('eq' => $storeId))
+            ->addFieldToFilter(
+                array(
+                    'mailchimp_sync_delta',
+                    'mailchimp_sync_delta',
+                    'mailchimp_sync_delta',
+                    'mailchimp_sync_modified'
+                ),
+                array(
+                    array('null' => true),
+                    array('eq' => ''),
+                    array('lt' => $helper->getSubMinSyncDateFlag($storeId)),
+                    array('eq' => 1)
+                )
+            );
+        $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
+        $collection->getSelect()->limit($limit);
+        $date = $helper->getDateMicrotime();
+        $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
+
+        $counter = 0;
+        foreach ($collection as $subscriber) {
+            $data = $this->_buildSubscriberData($subscriber);
+            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            $subscriberJson = "";
+
+            //enconde to JSON
+            try {
+                $subscriberJson = json_encode($data);
+            } catch (Exception $e) {
+                //json encode failed
+                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed";
+                $helper->logError($errorMessage, $storeId);
             }
 
-            //get subscribers
-            $collection = Mage::getResourceModel('newsletter/subscriber_collection')
-                ->addFieldToFilter('subscriber_status', array('eq' => 1))
-                ->addFieldToFilter('store_id', array('eq' => $storeId))
-                ->addFieldToFilter(
-                    array(
-                        'mailchimp_sync_delta',
-                        'mailchimp_sync_delta',
-                        'mailchimp_sync_delta',
-                        'mailchimp_sync_modified'
-                    ),
-                    array(
-                        array('null' => true),
-                        array('eq' => ''),
-                        array('lt' => $helper->getSubMinSyncDateFlag($storeId)),
-                        array('eq' => 1)
-                    )
-                );
-            $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
-            $collection->getSelect()->limit($limit);
-            $date = $helper->getDateMicrotime();
-            $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
+            if (!empty($subscriberJson)) {
+                $subscriberArray[$counter]['method'] = "PUT";
+                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+                $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
+                $subscriberArray[$counter]['body'] = $subscriberJson;
 
-            $counter = 0;
-            foreach ($collection as $subscriber) {
-                $data = $this->_buildSubscriberData($subscriber);
-                $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-                $subscriberJson = "";
-
-                //enconde to JSON
-                try {
-                    $subscriberJson = json_encode($data);
-                } catch (Exception $e) {
-                    //json encode failed
-                    $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed";
-                    $helper->logError($errorMessage, $storeId);
-                }
-
-                if (!empty($subscriberJson)) {
-                    $subscriberArray[$counter]['method'] = "PUT";
-                    $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
-                    $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
-                    $subscriberArray[$counter]['body'] = $subscriberJson;
-
-                    //update subscribers delta
-                    $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $subscriber->setData("mailchimp_sync_error", "");
-                    $subscriber->setData("mailchimp_sync_modified", 0);
-                    $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
-                    $subscriber->save();
-                }
-
-                $counter++;
+                //update subscribers delta
+                $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
+                $subscriber->setData("mailchimp_sync_error", "");
+                $subscriber->setData("mailchimp_sync_modified", 0);
+                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                $subscriber->save();
             }
+
+            $counter++;
+        }
 
         return $subscriberArray;
     }
@@ -334,49 +334,46 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $forceStatus = ($updateStatus) ? $newStatus : null;
             try {
                 $api = $helper->getApi($storeId);
-                $mergeVars = $this->getMergeVars($subscriber);
-                $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-                try {
-                    $api->lists->members->addOrUpdate(
-                        $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
-                        null, null, null, null
-                    );
-                    $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
-                    $subscriber->setData("mailchimp_sync_error", "");
-                    $subscriber->setData("mailchimp_sync_modified", 0);
-                } catch (MailChimp_Error $e) {
-                    if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
-                        if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
-                            try {
-                                $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
-                                $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
-                                $message = $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
-                                Mage::getSingleton('core/session')->addWarning($message);
-                            } catch (MailChimp_Error $e) {
-                                $helper->logError($e->getFriendlyMessage(), $storeId);
-                                $this->addError($isAdmin, $e);
-                                $subscriber->unsubscribe();
-                            } catch (Exception $e) {
-                                $helper->logError($e->getMessage(), $storeId);
-                            }
-                        } else {
+            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                $helper->logError($e->getMessage());
+                return;
+            }
+            $mergeVars = $this->getMergeVars($subscriber);
+            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            try {
+                $api->lists->members->addOrUpdate(
+                    $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
+                    null, null, null, null
+                );
+                $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
+                $subscriber->setData("mailchimp_sync_error", "");
+                $subscriber->setData("mailchimp_sync_modified", 0);
+            } catch (MailChimp_Error $e) {
+                if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
+                    if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
+                        try {
+                            $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
+                            $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
+                            $message = $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
+                            Mage::getSingleton('core/session')->addWarning($message);
+                        } catch (MailChimp_Error $e) {
                             $helper->logError($e->getFriendlyMessage(), $storeId);
                             $this->addError($isAdmin, $e);
                             $subscriber->unsubscribe();
+                        } catch (Exception $e) {
+                            $helper->logError($e->getMessage(), $storeId);
                         }
                     } else {
                         $helper->logError($e->getFriendlyMessage(), $storeId);
                         $this->addError($isAdmin, $e);
+                        $subscriber->unsubscribe();
                     }
-                } catch (Exception $e) {
-                    $helper->logError($e->getMessage(), $storeId);
+                } else {
+                    $helper->logError($e->getFriendlyMessage(), $storeId);
+                    $this->addError($isAdmin, $e);
                 }
-            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                Mage::helper('mailchimp')->logError($e->getMessage());
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage(), $storeId);
             } catch (Exception $e) {
-                $helper->logError($e->getMessage());
+                $helper->logError($e->getMessage(), $storeId);
             }
         }
     }

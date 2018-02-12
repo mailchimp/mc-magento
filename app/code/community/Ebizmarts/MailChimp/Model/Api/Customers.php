@@ -201,12 +201,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * update customer sync data
      *
-     * @param $customerId
-     * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncedFlag
+     * @param int $customerId
+     * @param string $mailchimpStoreId
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)

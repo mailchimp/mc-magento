@@ -12,7 +12,7 @@
                     </td>
                     <td class="value">
                         <?php if ($this->isDataAvailable()): ?>
-                            <strong><?php echo $this->__("Yaay! Recovered by MailChimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->addCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId(); ?></strong>
+                            <strong><?php echo $this->__("Yaay! Recovered by MailChimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->getCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId(); ?></strong>
                         <?php else: ?>
                             <strong><?php echo $this->__("Campaign data could not be retrieved."); ?></strong>
                         <?php endif; ?>

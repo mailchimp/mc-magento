@@ -12,7 +12,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $scopeId = 1;
         $scope = 'stores';
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $mailchimpStoreIdsArray = array($scope.'_'.$scopeId => $mailchimpStoreId);
+        $mailchimpStoreIdsArray = array('stores_1' => $mailchimpStoreId);
         /**
          * @var \Ebizmarts_MailChimp_Model_Observer $modelMock
          */
