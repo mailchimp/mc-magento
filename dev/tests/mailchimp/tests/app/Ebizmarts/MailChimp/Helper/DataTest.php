@@ -48,20 +48,22 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testIsCheckoutSubscribeEnabled()
     {
+        $scopeId = 1;
+        $scope = 'stores';
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isMailChimpEnabled', 'getCheckoutSubscribeValue'))
+            ->setMethods(array('isSubscriptionEnabled', 'getCheckoutSubscribeValue'))
             ->getMock();
-        $helperMock->expects($this->once())->method('isMailChimpEnabled')->with(1, 'stores')
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)
             ->willReturn(true);
 
-        $helperMock->expects($this->once())->method('getCheckoutSubscribeValue')->with(1, 'stores')
+        $helperMock->expects($this->once())->method('getCheckoutSubscribeValue')->with($scopeId, $scope)
             ->willReturn(Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::NOT_CHECKED_BY_DEFAULT);
 
-        $this->assertTrue($helperMock->isCheckoutSubscribeEnabled(1, "stores"));
+        $this->assertTrue($helperMock->isCheckoutSubscribeEnabled($scopeId, $scope));
     }
 
     public function testDeleteStore()
