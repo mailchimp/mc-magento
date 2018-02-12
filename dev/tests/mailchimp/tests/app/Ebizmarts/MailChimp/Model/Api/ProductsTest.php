@@ -52,7 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->setMethods(array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
                 'shouldSendProductUpdate', 'getChildrenIdsForConfigurable', 'makeProductChildrenCollection',
                 'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData'))
-        ->getMock();
+            ->getMock();
 
         $productsApiMock->expects($this->once())->method("isProductFlatTableEnabled")->willReturn(false);
 
@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock->expects($this->once())->method('makeBatchId')->with($magentoStoreId)->willReturn(self::BATCH_ID);
 
-        $products []= $productMock;
+        $products [] = $productMock;
         $productCollection->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($products));
 
         $productsApiMock->expects($this->once())->method('shouldSendProductUpdate')->with($magentoStoreId, $productMock)->willReturn(false);
@@ -119,15 +119,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $collection = $this->productsApiMock->makeProductsNotSentCollection(0);
 
         $this->assertInstanceOf("Mage_Catalog_Model_Resource_Product_Collection", $collection);
-    }
-
-    /**
-     * @see \Mage_Catalog_Model_Resource_Product_Type_Configurable::getChildrenIds
-     * @return array
-     */
-    private function configurableNoChildren()
-    {
-        return \Ebizmarts_MailChimp_Model_Api_Products::$noChildrenIds;
     }
 
     public function testGetNotVisibleProductUrl()
