@@ -68,7 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             } catch (Exception $e) {
                 //json encode failed
                 $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed";
-                $helper->logError($errorMessage, $storeId);
+                $helper->logError($errorMessage);
             }
 
             if (!empty($subscriberJson)) {
@@ -102,7 +102,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $data["merge_fields"] = $mergeVars;
         }
 
-        $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+        $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus());
         $data["status_if_new"] = $status;
         if ($subscriber->getMailchimpSyncModified()) {
             $data["status"] = $status;
@@ -330,7 +330,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $subscriptionEnabled = $helper->isSubscriptionEnabled($storeId);
         if ($subscriptionEnabled) {
             $listId = $helper->getGeneralList($storeId);
-            $newStatus = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus(), $storeId);
+            $newStatus = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus());
             $forceStatus = ($updateStatus) ? $newStatus : null;
             try {
                 $api = $helper->getApi($storeId);
@@ -357,47 +357,32 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $message = $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
                             Mage::getSingleton('core/session')->addWarning($message);
                         } catch (MailChimp_Error $e) {
-                            $helper->logError($e->getFriendlyMessage(), $storeId);
+                            $helper->logError($e->getFriendlyMessage());
                             $this->addError($isAdmin, $e);
                             $subscriber->unsubscribe();
                         } catch (Exception $e) {
-                            $helper->logError($e->getMessage(), $storeId);
+                            $helper->logError($e->getMessage());
                         }
                     } else {
-                        $helper->logError($e->getFriendlyMessage(), $storeId);
+                        $helper->logError($e->getFriendlyMessage());
                         $this->addError($isAdmin, $e);
                         $subscriber->unsubscribe();
                     }
                 } else {
-                    $helper->logError($e->getFriendlyMessage(), $storeId);
+                    $helper->logError($e->getFriendlyMessage());
                     $this->addError($isAdmin, $e);
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $storeId);
+                $helper->logError($e->getMessage());
             }
         }
     }
 
     /**
-     * @param $e
-     * @param $storeId
-     */
-    protected function _processUpdateSubscriberError($e, $storeId)
-    {
-        $message = $e->getFriendlyMessage();
-        Mage::helper('mailchimp')->logError($message, $storeId);
-        if (Mage::getDesign()->getArea() === 'frontend') {
-            $message = Mage::helper('mailchimp')->__('Please, try again later');
-        }
-        Mage::getSingleton('core/session')->addError($message);
-    }
-
-    /**
      * @param $status
-     * @param $storeId
      * @return string
      */
-    public function translateMagentoStatusToMailchimpStatus($status, $storeId)
+    public function translateMagentoStatusToMailchimpStatus($status)
     {
         if ($this->statusEqualsUnsubscribed($status)) {
             $status = 'unsubscribed';
@@ -459,12 +444,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $storeId);
+            $helper->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $storeId);
+            $helper->logError($e->getMessage());
         }
     }
 

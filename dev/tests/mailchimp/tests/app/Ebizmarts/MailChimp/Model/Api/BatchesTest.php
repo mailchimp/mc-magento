@@ -339,7 +339,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiMock->expects($this->once())->method('getBatchOperation')->willReturn($apiBatchOperationMock);
         $apiBatchOperationMock->expects($this->once())->method('add')->with($batchJson)->willReturn($batchResponse);
 
-        $helperMock->expects($this->once())->method('logRequest')->with($batchJson, $magentoStoreId, $batchResponse['id']);
+        $helperMock->expects($this->once())->method('logRequest')->with($batchJson, $batchResponse['id']);
 
         $apiBatchesMock->expects($this->once())->method('getSyncBatchesModel')->willReturn($syncBatchesMock);
         $syncBatchesMock->expects($this->once())->method('setStoreId')->with($mailchimpStoreId)->willReturnSelf();
@@ -479,7 +479,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchOperationMock->expects($this->once())->method('add')->with($subscribersJson)->willReturn($batchResponse);
 
-        $helperMock->expects($this->once())->method('logRequest')->with($subscribersJson, $storeId, $batchResponse['id']);
+        $helperMock->expects($this->once())->method('logRequest')->with($subscribersJson, $batchResponse['id']);
 
         $apiBatchesMock->expects($this->once())->method('getSyncBatchesModel')->willReturn($syncBatchesMock);
 

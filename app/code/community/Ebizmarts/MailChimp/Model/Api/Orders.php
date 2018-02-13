@@ -96,7 +96,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -144,7 +144,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -249,14 +249,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         try {
             $api = $helper->getApi($magentoStoreId);
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage());
+            $helper->logError($e->getMessage());
             return "";
         }
         if ((bool)$order->getCustomerIsGuest()) {
             try {
                 $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
             } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+                $helper->logError($e->getFriendlyMessage());
             }
             if (isset($customers['total_items']) && $customers['total_items'] > 0) {
                 $customerId = $customers['customers'][0]['id'];
@@ -285,7 +285,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $err = $e->getMailchimpTitle();
                     if (!preg_match('/Resource Not Found for Api Call/', $err)) {
                         $msg = "Failed to lookup e-commerce customer via ID " . $order->getCustomerId();
-                        $helper->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
+                        $helper->logError($msg . ': ' . $e->getFriendlyMessage());
                     }
                 }
 
@@ -424,7 +424,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $jsonData = json_encode($data);
         } catch (Exception $e) {
             //json encode failed
-            $helper->logError("Order " . $order->getEntityId() . " json encode failed", $magentoStoreId);
+            $helper->logError("Order " . $order->getEntityId() . " json encode failed");
         }
 
         return $jsonData;

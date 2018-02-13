@@ -365,7 +365,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $jsonData = json_encode($oneCart);
             } catch (Exception $e) {
                 //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed", $magentoStoreId);
+                $helper->logError("Carts " . $cart->getId() . " json encode failed");
             }
         }
 
@@ -421,7 +421,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $err = $e->getMailchimpTitle();
                 if (!preg_match('/Resource Not Found for Api Call/', $err)) {
                     $msg = "Failed to lookup e-commerce customer via ID " . $cart->getCustomerId();
-                    $helper->logError($msg . ': ' . $e->getFriendlyMessage(), $magentoStoreId);
+                    $helper->logError($msg . ': ' . $e->getFriendlyMessage());
                 }
             }
             $custEmailAddr = null;
@@ -437,7 +437,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             try {
                 $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
             } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+                $helper->logError($e->getFriendlyMessage());
             }
 
             if (isset($customers['total_items']) && $customers['total_items'] > 0) {

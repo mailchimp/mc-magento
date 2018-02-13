@@ -252,9 +252,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                             }
                         }
                     } catch (MailChimp_Error $e) {
-                        $helper->logError($e->getFriendlyMessage(), $subscriber->getStoreId());
+                        $helper->logError($e->getFriendlyMessage());
                     } catch (Exception $e) {
-                        $helper->logError($e->getMessage(), $subscriber->getStoreId());
+                        $helper->logError($e->getMessage());
                     }
                 }
             }

@@ -32,6 +32,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             'operation_id' => self::BATCH_ID,
             'body' => '{"id":"906","title":"test Prod","url":"http:\/\/127.0.0.1\/mcmagento-1937\/test-prod.html","published_at_foreign":"","description":"Test","type":"Default Category","vendor":"Default Category","handle":"","variants":[{"id":"906","title":"test Prod","url":"http:\/\/127.0.0.1\/mcmagento-1937\/test-prod.html","published_at_foreign":"","sku":"testprod","price":10,"inventory_quantity":1000,"backorders":"0","visibility":"Catalog, Search"}]}'
         );
+        $date = '2018-02-13 15:14:28';
 
 
         $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
@@ -51,7 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->productsApiMock
             ->setMethods(array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
                 'shouldSendProductUpdate', 'getChildrenIdsForConfigurable', 'makeProductChildrenCollection',
-                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData'))
+                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData', 'getCurrentDate'))
             ->getMock();
 
         $productsApiMock->expects($this->once())->method("isProductFlatTableEnabled")->willReturn(false);
@@ -65,10 +66,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productCollection->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($products));
 
         $productsApiMock->expects($this->once())->method('shouldSendProductUpdate')->with($magentoStoreId, $productMock)->willReturn(false);
-
         $productsApiMock->expects($this->once())->method('_buildNewProductRequest')->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn($productData);
-
-        $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId, Varien_Date::now());
+        $productsApiMock->expects($this->once())->method('getCurrentDate')->willReturn($date);
+        $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId, $date);
 
 
         $return = $productsApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
