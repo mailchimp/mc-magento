@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($this->shouldSendProductUpdate($magentoStoreId, $product)) {
                 $batchArray = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = count($batchArray);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
                 continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
@@ -66,9 +66,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $counter++;
 
                 //update product delta
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
             } else {
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now(), "This product type is not supported on MailChimp.", null, null, 0);
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
             }
         }
         return $batchArray;
@@ -294,17 +294,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $productSyncData = $this->getMailChimpHelper()->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
             if ($product->getId() != $item->getProductId() || $this->isBundleProduct($product) || $this->isGroupedProduct($product)) {
                 if ($product->getId()) {
-                    $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now(), "This product type is not supported on MailChimp.", null, null, 0);
+                    $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
                 }
                 continue;
             }
 
             if ($productSyncData->getMailchimpSyncModified() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId)) {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
             } elseif (!$productSyncData->getMailchimpSyncDelta() || $productSyncData->getMailchimpSyncDelta() < Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId)) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
             }
         }
         return $data;
@@ -839,5 +839,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function isProductFlatTableEnabled()
     {
         return Mage::helper('catalog/category_flat')->isEnabled();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrentDate()
+    {
+        return Varien_Date::now();
     }
 }
