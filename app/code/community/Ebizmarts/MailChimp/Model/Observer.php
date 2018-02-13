@@ -232,9 +232,9 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($isEnabled) {
             $apiSubscriber = $this->getApiSubscriber();
             $origEmail = $customer->getOrigData('email');
+            $customerEmail = $customer->getEmail();
             if ($origEmail) {
                 // check if customer has changed email address
-                $customerEmail = $customer->getEmail();
                 if ($origEmail != $customerEmail) {
                     $subscriberModel = $this->getSubscriberModel();
                     $subscriber = $subscriberModel->loadByEmail($origEmail);
