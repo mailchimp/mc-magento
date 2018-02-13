@@ -1489,62 +1489,63 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _migrateFrom115($initialTime)
     {
         //migrate data from older version to the new schemma
-        $mailchimpStoreId = $this->getMCStoreId(0);
+        if ($this->isEcommerceEnabled(0)) {
+            $mailchimpStoreId = $this->getMCStoreId(0);
 
-        //migrate customers
-        $this->_migrateCustomersFrom115($mailchimpStoreId, $initialTime);
+            //migrate customers
+            $this->_migrateCustomersFrom115($mailchimpStoreId, $initialTime);
 
-        if (!$this->timePassed($initialTime)) {
-            //migrate products
-            $this->_migrateProductsFrom115($mailchimpStoreId, $initialTime);
             if (!$this->timePassed($initialTime)) {
-                //migrate orders
-                $this->_migrateOrdersFrom115($mailchimpStoreId, $initialTime);
+                //migrate products
+                $this->_migrateProductsFrom115($mailchimpStoreId, $initialTime);
                 if (!$this->timePassed($initialTime)) {
-                    //migrate carts
-                    $finished = $this->_migrateCartsFrom115($mailchimpStoreId, $initialTime);
-                    if ($finished) {
+                    //migrate orders
+                    $this->_migrateOrdersFrom115($mailchimpStoreId, $initialTime);
+                    if (!$this->timePassed($initialTime)) {
+                        //migrate carts
+                        $finished = $this->_migrateCartsFrom115($mailchimpStoreId, $initialTime);
+                        if ($finished) {
 
-                        $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 'default', 0);
-                        $this->getConfig()->cleanCache();
+                            $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 'default', 0);
+                            $this->getConfig()->cleanCache();
 
-                        //Remove attributes no longer used
-                        $setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
-                        try {
-                            $setup->removeAttribute('catalog_product', 'mailchimp_sync_delta');
-                            $setup->removeAttribute('catalog_product', 'mailchimp_sync_error');
-                            $setup->removeAttribute('catalog_product', 'mailchimp_sync_modified');
-                            $setup->removeAttribute('customer', 'mailchimp_sync_delta');
-                            $setup->removeAttribute('customer', 'mailchimp_sync_error');
-                            $setup->removeAttribute('customer', 'mailchimp_sync_modified');
-                        } catch (Exception $e) {
-                            $this->logError($e->getMessage());
-                        }
+                            //Remove attributes no longer used
+                            $setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
+                            try {
+                                $setup->removeAttribute('catalog_product', 'mailchimp_sync_delta');
+                                $setup->removeAttribute('catalog_product', 'mailchimp_sync_error');
+                                $setup->removeAttribute('catalog_product', 'mailchimp_sync_modified');
+                                $setup->removeAttribute('customer', 'mailchimp_sync_delta');
+                                $setup->removeAttribute('customer', 'mailchimp_sync_error');
+                                $setup->removeAttribute('customer', 'mailchimp_sync_modified');
+                            } catch (Exception $e) {
+                                $this->logError($e->getMessage());
+                            }
 
-                        $coreResource = $this->getCoreResource();
-                        try {
-                            $quoteTable = $coreResource->getTableName('sales/quote');
-                            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_delta');
-                            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_error');
-                            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_deleted');
-                            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_token');
-                        } catch (Exception $e) {
-                            $this->logError($e->getMessage());
-                        }
+                            $coreResource = $this->getCoreResource();
+                            try {
+                                $quoteTable = $coreResource->getTableName('sales/quote');
+                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_delta');
+                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_error');
+                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_deleted');
+                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_token');
+                            } catch (Exception $e) {
+                                $this->logError($e->getMessage());
+                            }
 
-                        try {
-                            $orderTable = $coreResource->getTableName('sales/order');
-                            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_delta');
-                            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_error');
-                            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_modified');
-                        } catch (Exception $e) {
-                            $this->logError($e->getMessage());
+                            try {
+                                $orderTable = $coreResource->getTableName('sales/order');
+                                $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_delta');
+                                $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_error');
+                                $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_modified');
+                            } catch (Exception $e) {
+                                $this->logError($e->getMessage());
+                            }
                         }
                     }
                 }
             }
         }
-
     }
 
     /**
