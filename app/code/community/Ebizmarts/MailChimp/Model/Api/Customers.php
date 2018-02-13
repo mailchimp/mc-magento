@@ -365,7 +365,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function logCouldNotEncodeCustomerError($customer)
     {
         $this->mailchimpHelper->logError(
-            "Customer " . $customer->getId() . " json encode failed on store " . $this->getBatchMagentoStoreId(), $this->getBatchMagentoStoreId()
+            "Customer " . $customer->getId() . " json encode failed on store " . $this->getBatchMagentoStoreId()
         );
     }
 

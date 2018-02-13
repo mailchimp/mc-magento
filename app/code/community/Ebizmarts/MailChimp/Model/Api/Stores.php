@@ -51,7 +51,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 return $response;
 
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                Mage::helper('mailchimp')->logError($e->getMessage());
+                $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
                 $helper->logError($e->getFriendlyMessage());
             }
@@ -76,9 +76,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $scopeId, $scope);
+            $helper->logError($e->getMessage());
         }
 
         $connection = $helper->getCoreResource()->getConnection('core_write');
@@ -103,9 +103,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $scopeId, $scope);
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -131,11 +131,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 return $url;
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $scopeId, $scope);
+            $helper->logError($e->getMessage());
         }
     }
 

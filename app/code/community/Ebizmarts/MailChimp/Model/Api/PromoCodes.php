@@ -112,7 +112,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 

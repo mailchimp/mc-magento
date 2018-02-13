@@ -11,11 +11,10 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
 
     /**
      * @param $magentoStatus
-     * @param $storeId
      * @param $expected
      * @dataProvider magentoSubscriberStatus
      */
-    public function testMailchimpStatus($magentoStatus, $storeId, $expected)
+    public function testMailchimpStatus($magentoStatus, $expected)
     {
         $subscribersApiMock =
             $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
@@ -23,7 +22,7 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
                 ->setMethods(array('magentoConfigNeedsConfirmation'))
                 ->getMock();
 
-        $return = $subscribersApiMock->translateMagentoStatusToMailchimpStatus($magentoStatus, $storeId);
+        $return = $subscribersApiMock->translateMagentoStatusToMailchimpStatus($magentoStatus);
 
         $this->assertEquals($expected, $return);
     }
@@ -34,10 +33,10 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
     public function magentoSubscriberStatus()
     {
         return array(
-            array(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED, self::DEFAULT_STORE_ID, "subscribed"),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE, self::DEFAULT_STORE_ID, "pending"),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED, self::DEFAULT_STORE_ID, "unsubscribed"),
-            array(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED, self::DEFAULT_STORE_ID, "pending"),
+            array(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED, "subscribed"),
+            array(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE, "pending"),
+            array(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED, "unsubscribed"),
+            array(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED, "pending"),
         );
     }
 }

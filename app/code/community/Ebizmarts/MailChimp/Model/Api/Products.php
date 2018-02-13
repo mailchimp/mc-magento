@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $body = json_encode($bodyData);
         } catch (Exception $e) {
             //json encode failed
-            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
             return array();
         }
 
@@ -143,7 +143,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         $body = json_encode($bodyData);
                     } catch (Exception $e) {
                         //json encode failed
-                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
                         return array();
                     }
 
@@ -178,7 +178,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $body = json_encode($bodyData);
         } catch (Exception $e) {
             //json encode failed
-            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
             return array();
         }
 

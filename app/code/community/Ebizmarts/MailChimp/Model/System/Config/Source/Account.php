@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     }
                 } catch (Exception $e) {
                     $this->_accountDetails = "--- Invalid API Key ---";
-                    $helper->logError($e->getMessage(), $scopeArray['scope_id']);
+                    $helper->logError($e->getMessage());
                 }
             } else {
                 $this->_accountDetails = "--- Invalid API Key ---";
