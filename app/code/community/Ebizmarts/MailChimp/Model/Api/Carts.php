@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                     $allCarts[$this->_counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null,1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
                     $this->_counter += 1;
                 }
             }
@@ -309,7 +309,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
-        $oneCart['customer'] = $this->_getCustomer($cart, $mailchimpStoreId, $magentoStoreId);
+        $customer = $this->_getCustomer($cart, $mailchimpStoreId, $magentoStoreId);
+        if (empty($customer)) {
+            return "";
+        }
+        $oneCart['customer'] = $customer;
         if ($campaignId) {
             $oneCart['campaign_id'] = $campaignId;
         }
@@ -402,7 +406,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getCustomer($cart, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
-        $api = $helper->getApi($magentoStoreId);
+        $customer = array();
+        try {
+            $api = $helper->getApi($magentoStoreId);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $helper->logError($e->getMessage());
+            return $customer;
+        }
+
         if ($cart->getCustomerId()) {
             try {
                 $customer = $api->ecommerce->customers->get($mailchimpStoreId, $cart->getCustomerId(), 'email_address');
@@ -436,12 +447,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     "opt_in_status" => false
                 );
             } else {
-                    $date = $helper->getDateMicrotime();
-                    $customer = array(
-                        "id" => ($cart->getCustomerId()) ? $cart->getCustomerId() : "GUEST-" . $date,
-                        "email_address" => $cart->getCustomerEmail(),
-                        "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
-                    );
+                $date = $helper->getDateMicrotime();
+                $customer = array(
+                    "id" => ($cart->getCustomerId()) ? $cart->getCustomerId() : "GUEST-" . $date,
+                    "email_address" => $cart->getCustomerEmail(),
+                    "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
+                );
             }
         }
 
@@ -506,12 +517,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      *
      * @param $cartId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncedFlag
-     * @param null $syncDeleted
-     * @param null $token
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncedFlag
+     * @param int|null $syncDeleted
+     * @param string|null $token
      */
     protected function _updateSyncData($cartId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $syncDeleted = null, $token = null)
     {

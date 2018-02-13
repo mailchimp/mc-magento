@@ -58,19 +58,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Create string for current scope with format scope-scopeId.
      *
-     * @return string
+     * @return array
      */
-    public function getScopeString()
+    public function getCurrentScope()
     {
-        $scopeArray = $this->getConfigScopeId();
-        if (isset($scopeArray['websiteId'])) {
-            $scopeString = 'websites-' . $scopeArray['websiteId'];
-        } elseif (isset($scopeArray['storeId'])) {
-            $scopeString = 'stores-' . $scopeArray['storeId'];
+        $scopeIdArray = $this->getConfigScopeId();
+        $scopeArray = array();
+        if (isset($scopeIdArray['websiteId'])) {
+            $scopeArray['scope'] = 'websites';
+            $scopeArray['scope_id'] = $scopeIdArray['websiteId'];
+        } elseif (isset($scopeIdArray['storeId'])) {
+            $scopeArray['scope'] = 'stores';
+            $scopeArray['scope_id'] = $scopeIdArray['storeId'];
         } else {
-            $scopeString = 'default-0';
+            $scopeArray['scope'] = 'default';
+            $scopeArray['scope_id'] = 0;
         }
-        return $scopeString;
+        return $scopeArray;
     }
 
     /**
@@ -177,6 +181,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Validate if api key exists, could still be incorrect
+     *
+     * @param  $scopeId
+     * @param  null $scope
+     * @return mixed
+     */
+    public function validateApiKey($scopeId, $scope = null)
+    {
+        $apiKey = $this->getApiKey($scopeId, $scope);
+        $isApiKeyValid = !is_null($apiKey) && $apiKey != "";
+        return $isApiKeyValid;
+    }
+
+    /**
      * Return if module is enabled for given scope.
      *
      * @param  $scopeId
@@ -186,6 +204,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function isMailChimpEnabled($scopeId, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, $scopeId, $scope);
+    }
+
+    /**
+     * Return if module is enabled and list selected for given scope.
+     *
+     * @param  $scopeId
+     * @param  null $scope
+     * @return mixed
+     */
+    public function isSubscriptionEnabled($scopeId, $scope = null)
+    {
+        $apiKeyValid = $this->validateApiKey($scopeId, $scope);
+        $mailChimpEnabled = $this->isMailChimpEnabled($scopeId, $scope);
+        $generalList = $this->getGeneralList($scopeId, $scope);
+
+        return $apiKeyValid && $mailChimpEnabled && $generalList;
     }
 
     /**
@@ -281,13 +315,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get if store has been reseted for given scope.
+     * Get if store has been reset for given scope.
      *
      * @param  $scopeId
      * @param  null $scope
      * @return mixed
      */
-    public function getIsReseted($scopeId, $scope = null)
+    public function getIsReset($scopeId, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, $scopeId, $scope);
     }
@@ -395,7 +429,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param  null $scope
      * @return mixed
      */
-    public function getMailChimpInGrid($scopeId = 0, $scope = null)
+    public function getMonkeyInGrid($scopeId = 0, $scope = null)
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_ORDER_GRID, $scopeId, $scope);
     }
@@ -497,13 +531,30 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isEcomSyncDataEnabled($scopeId, $scope = null, $isStoreCreation = false)
     {
-        $apiKey = $this->getApiKey($scopeId, $scope);
-        $moduleEnabled = $this->isMailChimpEnabled($scopeId, $scope);
+        $subscriptionEnabled = $this->isSubscriptionEnabled($scopeId, $scope);
         $ecommerceEnabled = $this->isEcommerceEnabled($scopeId, $scope);
-        $generalList = $this->getGeneralList($scopeId, $scope);
-        $ret = (!is_null($this->getMCStoreId($scopeId, $scope)) || $isStoreCreation) && !is_null($apiKey)
-            && $apiKey != "" && $moduleEnabled && $ecommerceEnabled && $generalList;
+        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+
+        $ret = (!is_null($mailchimpStoreId) || $isStoreCreation)
+            && $subscriptionEnabled && $ecommerceEnabled;
         return $ret;
+    }
+
+    /**
+     * Check if Ecommerce data is configured to be sent in any scope.
+     *
+     * @return bool
+     */
+    public function isEcomSyncDataEnabledInAnyScope()
+    {
+        $stores = $this->getMageApp()->getStores();
+        foreach ($stores as $storeId => $store) {
+            $ecomEnabled = $this->isEcomSyncDataEnabled($storeId);
+             if ($ecomEnabled) {
+                 return true;
+             }
+        }
+        return false;
     }
 
     /**
@@ -681,7 +732,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 );
                 if (isset($response['connected_site']['site_script']['url'])) {
                     $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $response['connected_site']['site_script']['url']);
-                    Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeId, $scope);
+                    $this->saveMailchimpConfig($configValues, $scopeId, $scope);
                 }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
             } catch (Exception $e) {
@@ -699,15 +750,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function deleteStore($scopeId, $scope)
     {
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        if (!empty($mailchimpStoreId)) {
-            try {
-                $this->getApiStores()->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
-            } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+        $listId = $this->getGeneralList($scopeId, $scope);
+        $apiKey = $this->getApiKey($scopeId, $scope);
+        if ($mailchimpStoreId) {
+            if ($listId && $apiKey) {
+                try {
+                    $this->getApiStores()->deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope);
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                }
             }
 
             //delete configured webhook
-            $listId = $this->getGeneralList($scopeId, $scope);
             $this->deleteCurrentWebhook($scopeId, $scope, $listId);
             //clear store config values
             $this->deleteLocalMCStoreData($mailchimpStoreId, $scopeId, $scope);
@@ -826,13 +880,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $listId = $this->getGeneralList($scopeId, $scope);
         $maps = unserialize($this->getMapFields($scopeId, $scope));
         $customFieldTypes = unserialize($this->getCustomMergeFieldsSerialized($scopeId, $scope));
-        $api = $this->getApi($scopeId, $scope);
-        $mailchimpFields = array();
-        if ($api) {
+        try {
+            $api = $this->getApi($scopeId, $scope);
+            $mailchimpFields = array();
             try {
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
             } catch (MailChimp_Error $e) {
-                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
             }
 
             if (count($mailchimpFields) > 0) {
@@ -853,7 +907,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 try {
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
                                 } catch (MailChimp_Error $e) {
-                                    Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
                                 }
                                 $created = true;
                             }
@@ -884,12 +938,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                     }
                                 }
                             } catch (MailChimp_Error $e) {
-                                Mage::helper('mailchimp')->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
                             }
                         }
                     }
                 }
             }
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
         }
     }
 
@@ -910,9 +966,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get Api object for given scope.
      *
-     * @param  $scopeId
-     * @param  null $scope
+     * @param $scopeId
+     * @param null $scope
      * @return Ebizmarts_MailChimp|null
+     * @throws Exception
      */
     public function getApi($scopeId, $scope = null)
     {
@@ -920,6 +977,30 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $api = null;
         if ($apiKey != null && $apiKey != "") {
             $api = new Ebizmarts_MailChimp($apiKey, null, 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        } else {
+            $e = new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
+            $this->logError($e->getTraceAsString());
+            throw $e;
+        }
+
+        return $api;
+    }
+
+    /**
+     * Get Api object by ApiKey.
+     *
+     * @param $apiKey
+     * @return Ebizmarts_MailChimp|null
+     * @throws Ebizmarts_MailChimp_Helper_Data_ApiKeyException
+     */
+    public function getApiByKey($apiKey)
+    {
+        $api = null;
+        if ($apiKey != null && $apiKey != "") {
+            $api = new Ebizmarts_MailChimp($apiKey, null, 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+        } else {
+            $e = new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
+            throw $e;
         }
 
         return $api;
@@ -934,8 +1015,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function changeName($name, $scopeId, $scope)
     {
-        $this->getApiStores()->modifyName($name, $scopeId, $scope);
-
+        if ($this->getMCStoreId($scopeId, $scope) && $this->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope)) {
+            try {
+                $this->getApiStores()->modifyName($name, $scopeId, $scope);
+            } catch (MailChimp_Error $e) {
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            }
+        }
     }
 
     /**
@@ -1554,7 +1640,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         $syncModified = $product->getMailchimpSyncModified();
                     }
 
-                    Mage::helper('mailchimp')->saveEcommerceSyncData($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
+                    $this->saveEcommerceSyncData($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
                 );
             }
@@ -1602,7 +1688,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         $syncModified = $order->getMailchimpSyncModified();
                     }
 
-                    Mage::helper('mailchimp')->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
+                    $this->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified);
                 }
                 );
             }
@@ -1656,7 +1742,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         $token = $quote->getMailchimpToken();
                     }
 
-                    Mage::helper('mailchimp')->saveEcommerceSyncData($quoteId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, null, $syncDeleted, $token);
+                    $this->saveEcommerceSyncData($quoteId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $mailchimpStoreId, $syncDelta, $syncError, null, $syncDeleted, $token);
                 }
                 );
             } else {
@@ -1760,7 +1846,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $stores = $this->getMageApp()->getStores();
         foreach ($stores as $storeId => $store) {
-            $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
+            $ecommEnabled = $this->isEcomSyncDataEnabled($storeId);
+            if ($ecommEnabled) {
+                $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
+            }
         }
     }
 
@@ -1778,7 +1867,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $finished = true;
             $stores = $this->getMageApp()->getStores();
             foreach ($stores as $storeId => $store) {
-                Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
+                if ($this->isEcomSyncDataEnabled($storeId)) {
+                    Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
+                }
                 if ($this->timePassed($initialTime)) {
                     $finished = false;
                     break;
@@ -1850,7 +1941,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $stores = $this->getMageApp()->getStores();
             $storeIds = array();
             foreach ($stores as $storeId => $store) {
-                if ($this->isMailChimpEnabled($storeId)) {
+                if ($this->isSubscriptionEnabled($storeId)) {
                     $storeListId = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
                     if ($storeListId == $listId) {
                         $storeIds[] = $storeId;
@@ -1940,7 +2031,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function createWebhookIfRequired($scopeId, $scope = 'stores')
     {
         $webhookId = $this->getWebhookId($scopeId, $scope);
-        if (!$webhookId) {
+        $enabled = $this->isSubscriptionEnabled($scopeId, $scope);
+        if ($enabled && !$webhookId) {
             $this->handleWebhookChange($scopeId, $scope);
         }
     }
@@ -1950,105 +2042,112 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $webhookScope = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
         $listId = $this->getGeneralList($scopeId, $scope);
         $this->deleteCurrentWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
-        if ($this->isMailChimpEnabled($scopeId, $scope)) {
+        if ($this->isSubscriptionEnabled($scopeId, $scope)) {
             $this->createNewWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
         }
     }
 
     protected function deleteCurrentWebhook($scopeId, $scope, $listId)
     {
-        $api = $this->getApi($scopeId, $scope);
-        $webhookId = $this->getWebhookId($scopeId, $scope);
-        if ($webhookId) {
-            try {
-                $api->lists->webhooks->delete($listId, $webhookId);
-            } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
-            } catch (Exception $e) {
-                $this->logError($e->getMessage(), $scopeId, $scope);
-            }
-            $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
-        } else {
-            $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
-            try {
-                if ($listId) {
-                    $webhooks = $api->lists->webhooks->getAll($listId);
-                    foreach ($webhooks['webhooks'] as $webhook) {
-                        if (strpos($webhook['url'], $webhookUrl) !== false) {
-                            $api->lists->webhooks->delete($listId, $webhook['id']);
+        try {
+            $api = $this->getApi($scopeId, $scope);
+            $webhookId = $this->getWebhookId($scopeId, $scope);
+            $apiKey = $this->getApiKey($scopeId, $scope);
+            if ($webhookId && $apiKey && $listId) {
+                try {
+                    $api->lists->webhooks->delete($listId, $webhookId);
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                } catch (Exception $e) {
+                    $this->logError($e->getMessage(), $scopeId, $scope);
+                }
+                $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
+            } else {
+                $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
+                try {
+                    if ($listId) {
+                        $webhooks = $api->lists->webhooks->getAll($listId);
+                        foreach ($webhooks['webhooks'] as $webhook) {
+                            if (strpos($webhook['url'], $webhookUrl) !== false) {
+                                $api->lists->webhooks->delete($listId, $webhook['id']);
+                            }
                         }
                     }
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                } catch (Exception $e) {
+                    $this->logError($e->getMessage(), $scopeId, $scope);
                 }
-            } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
-            } catch (Exception $e) {
-                $this->logError($e->getMessage(), $scopeId, $scope);
             }
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
         }
     }
 
-    protected function createNewWebhook($scopeId, $scope, $listId)
+    public function createNewWebhook($scopeId, $scope, $listId)
     {
         $hookUrl = $this->getWebhookUrl();
-
-        $api = $this->getApi($scopeId, $scope);
-        if ($this->getTwoWaySyncEnabled($scopeId, $scope)) {
-            $events = array(
-                'subscribe' => true,
-                'unsubscribe' => true,
-                'profile' => false,
-                'cleaned' => true,
-                'upemail' => true,
-                'campaign' => false
-            );
-            $sources = array(
-                'user' => true,
-                'admin' => true,
-                'api' => true
-            );
-        } else {
-            $events = array(
-                'subscribe' => true,
-                'unsubscribe' => true,
-                'profile' => false,
-                'cleaned' => false,
-                'upemail' => false,
-                'campaign' => false
-            );
-            $sources = array(
-                'user' => true,
-                'admin' => true,
-                'api' => false
-            );
-        }
         try {
-            $response = $api->lists->webhooks->getAll($listId);
-            $createWebhook = true;
-            if (isset($response['total_items']) && $response['total_items'] > 0) {
-                foreach ($response['webhooks'] as $webhook) {
-                    if ($webhook['url'] == $hookUrl) {
-                        $createWebhook = false;
+            $api = $this->getApi($scopeId, $scope);
+            if ($this->getTwoWaySyncEnabled($scopeId, $scope)) {
+                $events = array(
+                    'subscribe' => true,
+                    'unsubscribe' => true,
+                    'profile' => false,
+                    'cleaned' => true,
+                    'upemail' => true,
+                    'campaign' => false
+                );
+                $sources = array(
+                    'user' => true,
+                    'admin' => true,
+                    'api' => true
+                );
+            } else {
+                $events = array(
+                    'subscribe' => true,
+                    'unsubscribe' => true,
+                    'profile' => false,
+                    'cleaned' => false,
+                    'upemail' => false,
+                    'campaign' => false
+                );
+                $sources = array(
+                    'user' => true,
+                    'admin' => true,
+                    'api' => false
+                );
+            }
+            try {
+                $response = $api->lists->webhooks->getAll($listId);
+                $createWebhook = true;
+                if (isset($response['total_items']) && $response['total_items'] > 0) {
+                    foreach ($response['webhooks'] as $webhook) {
+                        if ($webhook['url'] == $hookUrl) {
+                            $createWebhook = false;
+                        }
                     }
                 }
-            }
-            if ($createWebhook) {
-                $newWebhook = $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
-                $newWebhookId = $newWebhook['id'];
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
-                $this->saveMailchimpConfig($configValues, $scopeId, $scope);
+                if ($createWebhook) {
+                    $newWebhook = $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                    $newWebhookId = $newWebhook['id'];
+                    $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
+                    $this->saveMailchimpConfig($configValues, $scopeId, $scope);
 
+                }
+            } catch (MailChimp_Error $e) {
+                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
+                if ($e->getMailchimpDetails() == $textToCompare) {
+                    $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: ' . $hookUrl . ' is accessible externally to allow the webhook creation.';
+                    $this->logError($errorMessage, $scopeId, $scope);
+                }
+            } catch (Exception $e) {
+                $this->logError($e->getMessage(), $scopeId, $scope);
             }
-        } catch (MailChimp_Error $e) {
-            $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
-            $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
-            if ($e->getMailchimpDetails() == $textToCompare) {
-                $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: ' . $hookUrl . ' is accessible externally to allow the webhook creation.';
-                $this->logError($errorMessage, $scopeId, $scope);
-            }
-        } catch (Exception $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
         }
-
     }
 
 
@@ -2219,7 +2318,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function isCheckoutSubscribeEnabled($scopeId, $scope = 'stores')
     {
-        return ($this->isMailChimpEnabled($scopeId, $scope) && $this->getCheckoutSubscribeValue($scopeId, $scope) != Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::DISABLED);
+        return ($this->isSubscriptionEnabled($scopeId, $scope) && $this->getCheckoutSubscribeValue($scopeId, $scope) != Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::DISABLED);
     }
 
     /**
@@ -2231,11 +2330,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function setIsSyncingIfFinishedPerScope($syncValue, $scopeId, $scope = 'stores')
     {
-        $mailchimpApi = $this->getApi($scopeId, $scope);
-        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        $isSyncing = $this->getMCIsSyncing($scopeId, $scope);
-        if ($mailchimpStoreId && $isSyncing != 1) {
-            $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId);
+        try {
+            $mailchimpApi = $this->getApi($scopeId, $scope);
+            $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+            $isSyncing = $this->getMCIsSyncing($scopeId, $scope);
+            if ($mailchimpStoreId && $isSyncing != 1) {
+                $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId);
+            }
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
         }
     }
 
@@ -2315,6 +2418,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Check if all items have been sent and delete config values used in the resend process
+     *
+     * @param $scopeId
+     * @param string $scope
+     */
     public function handleResendFinish($scopeId, $scope = 'stores')
     {
         $allItemsSent = $this->allResendItemsSent($scopeId, $scope);
@@ -2362,7 +2471,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $scopeId = $config->getScopeId();
             $resendTurn = $this->getResendTurn($scopeId, $scope);
             $resendEnabled = $this->getResendEnabled($scopeId, $scope);
-            if ($resendEnabled && $resendTurn) {
+            $ecommEnabled = $this->isEcomSyncDataEnabled($scopeId, $scope);
+            if ($ecommEnabled && $resendEnabled && $resendTurn) {
                 $this->setIsSyncingIfFinishedPerScope(true, $scopeId, $scope);
             }
         }
@@ -2376,13 +2486,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $scope = $config->getScope();
             $scopeId = $config->getScopeId();
             $resendTurn = $this->getResendTurn($scopeId, $scope);
-            if ($resendTurn) {
-                $this->setIsSyncingIfFinishedPerScope(false, $scopeId, $scope);
-                $this->setResendTurn(0, $scopeId, $scope);
+            $ecommEnabled = $this->isEcomSyncDataEnabled($scopeId, $scope);
+            if ($ecommEnabled) {
+                if ($resendTurn) {
+                    $this->setIsSyncingIfFinishedPerScope(false, $scopeId, $scope);
+                    $this->setResendTurn(0, $scopeId, $scope);
+                } else {
+                    $this->setResendTurn(1, $scopeId, $scope);
+                }
+                $this->handleResendFinish($scopeId, $scope);
             } else {
-                $this->setResendTurn(1, $scopeId, $scope);
+                //if ecommerce data sync is disabled delete old config values.
+                $this->deleteResendConfigValues($scopeId, $scope);
             }
-            $this->handleResendFinish($scopeId, $scope);
         }
     }
 
@@ -2562,6 +2678,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $campaignName = $campaignData['settings']['subject_line'];
                 }
             }
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
             $this->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
@@ -2699,8 +2817,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function areJsUrlAndListScopesEqual($storeId)
     {
         $scopesMatch = false;
-        $realScopeList = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
-        $realScopeJs = Mage::helper('mailchimp')->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+        $realScopeList = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+        $realScopeJs = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
         if ($realScopeList && $realScopeJs && $realScopeList['scope'] == $realScopeJs['scope'] && $realScopeList['scope_id'] == $realScopeJs['scope_id']) {
             $scopesMatch = true;
         }
@@ -2726,7 +2844,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Mage_Core_Model_Config
      */
-    protected function getConfig()
+    public function getConfig()
     {
         return Mage::getConfig();
     }
@@ -2763,6 +2881,65 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getApiByMailChimpStoreId($mailchimpStoreId)
     {
         $scopeArray = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
-        return $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+        try {
+            $api = $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+            return $api;
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
+        }
+    }
+
+    public function changeStoreNameIfRequired($groupStoreName, $scopeId, $scope)
+    {
+        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+        if ($mailchimpStoreId) {
+            $realScope = $this->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+            if ($realScope['scope_id'] == $scopeId && $realScope['scope'] == $scope) {
+                $ecomEnabled = $this->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
+                if ($ecomEnabled) {
+                    $storeName = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $realScope['scope_id'], $realScope['scope']);
+                    if ($storeName == '') {
+                        $this->changeName($groupStoreName, $scopeId, $scope);
+                    } else {
+                        $this->changeName($storeName, $scopeId, $scope);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Compare old api key with new one and return true if they belong to the same MailChimp account.
+     *
+     * @param $oldApiKey
+     * @param $newApiKey
+     * @return bool
+     */
+    public function isNewApiKeyForSameAccount($oldApiKey, $newApiKey)
+    {
+        $isNewApiKeyForSameAccount = false;
+
+        if ($oldApiKey && $newApiKey) {
+            if ($oldApiKey == $newApiKey) {
+                $isNewApiKeyForSameAccount = true;
+            } else {
+                try {
+                    $api = $this->getApiByKey($oldApiKey);
+                    $oldInfo = $api->getRoot()->info('account_id');
+                    $oldAccountId = $oldInfo['account_id'];
+                    $api = $this->getApiByKey($newApiKey);
+                    $newInfo = $api->getRoot()->info('account_id');
+                    $newAccountId = $newInfo['account_id'];
+                    if ($oldAccountId == $newAccountId) {
+                        $isNewApiKeyForSameAccount = true;
+                    }
+                } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                    $this->logError($e->getMessage());
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage());
+                }
+            }
+        }
+        return $isNewApiKeyForSameAccount;
     }
 }

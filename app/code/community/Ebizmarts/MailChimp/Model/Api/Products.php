@@ -269,28 +269,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * Get stores to update and call update function after modification.
      *
      * @param $productId
-     * @param $storeId
+     * @param $mailchimpStoreId
      */
-    public function update($productId, $storeId)
+    public function update($productId, $mailchimpStoreId)
     {
-        if ($storeId == 0) {
-            $this->_updateIfEnabled($productId, $storeId);
-        }
-        $stores = Mage::app()->getStores();
-        foreach ($stores as $curStoreId => $curStore) {
-            $this->_updateIfEnabled($productId, $curStoreId);
-        }
-    }
-
-    /**
-     * Update product sync data if
-     *
-     * @param $productId
-     * @param $storeId
-     */
-    protected function _updateIfEnabled($productId, $storeId)
-    {
-        $mailchimpStoreId = $this->getMailChimpHelper()->getMCStoreId($storeId);
         $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true);
     }
 
@@ -333,11 +315,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
      *
      * @param $productId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
-     * @param null $syncedFlag
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncDeleted
+     * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false)

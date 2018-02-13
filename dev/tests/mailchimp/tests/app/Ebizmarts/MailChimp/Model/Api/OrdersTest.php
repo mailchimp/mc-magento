@@ -135,7 +135,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $result = $modelMock->getSyncedOrder($orderId, $mailchimpStoreId);
 
-        $this->assertEquals($result, array(1, 1));
+        $this->assertEquals($result, array('synced_status' => 1, 'order_id' => 1));
     }
 
 }

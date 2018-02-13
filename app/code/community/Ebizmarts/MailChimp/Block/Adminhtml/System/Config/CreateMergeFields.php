@@ -13,6 +13,9 @@
 class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
+
+    const CREATE_MERGE_PATH = 'adminhtml/ecommerce/createMergeFields';
+
     protected function _construct()
     {
         parent::_construct();
@@ -39,8 +42,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     }
     public function getAjaxCheckUrl()
     {
-        $scopeString = Mage::helper('mailchimp')->getScopeString();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/createMergeFields', array('scope' => $scopeString));
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        return Mage::helper('adminhtml')->getUrl(self::CREATE_MERGE_PATH, $scopeArray);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 
 }

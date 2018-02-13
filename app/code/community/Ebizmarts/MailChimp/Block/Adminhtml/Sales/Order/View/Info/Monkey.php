@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -12,6 +13,17 @@
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends Mage_Core_Block_Template
 {
+
+    /**
+     * @var string $campaignName
+     */
+    protected $campaignName = null;
+
+    /**
+     * @var Mage_Sales_Model_Order $order
+     */
+    protected $order = null;
+
     public function isReferred()
     {
         $order = $this->getCurrentOrder();
@@ -23,31 +35,67 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
         return $ret;
     }
 
+    /**
+     * @return string
+     */
     public function getCampaignId()
     {
         $order = $this->getCurrentOrder();
         return $order->getMailchimpCampaignId();
     }
 
-    public function addCampaignName()
+    /**
+     * @return string
+     */
+    public function getCampaignName()
     {
-        $helper = $this->getMailChimpHelper();
-        $campaignId = $this->getCampaignId();
-        $order = $this->getCurrentOrder();
-        $campaignName = $helper->getMailChimpCampaignNameById($campaignId, $order->getStoreId());
-        return $campaignName;
+        if (!$this->campaignName) {
+            $campaignId = $this->getCampaignId();
+            $order = $this->getCurrentOrder();
+            $storeId = $order->getStoreId();
+            $helper = $this->getMailChimpHelper();
+
+            if ($helper->isEcomSyncDataEnabled($storeId)) {
+                $this->campaignName = $helper->getMailChimpCampaignNameById($campaignId, $storeId);
+            }
+        }
+
+        return $this->campaignName;
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
     protected function getMailChimpHelper()
     {
         return Mage::helper('mailchimp');
     }
 
     /**
-     * @return mixed
+     * @return Mage_Sales_Model_Order
      */
     protected function getCurrentOrder()
     {
-        return Mage::registry('current_order');
+        if (!$this->order) {
+            $this->order = Mage::registry('current_order');
+        }
+        return $this->order;
+    }
+
+    /**
+     * Return true if campaign data is available with the current api and list selected.
+     *
+     * @return bool
+     */
+    public function isDataAvailable()
+    {
+        $dataAvailable = false;
+        $campaignName = $this->getCampaignName();
+
+        if ($campaignName) {
+            $dataAvailable = true;
+        }
+
+        return $dataAvailable;
     }
 }

@@ -11,7 +11,11 @@
                         <img src="<?php echo $this->getSkinUrl('ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png')?>" width="40" title="hep hep thanks MailChimp" />
                     </td>
                     <td class="value">
-                        <strong><?php echo $this->__("Yaay! Recovered by MailChimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->addCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId() ?></strong>
+                        <?php if ($this->isDataAvailable()): ?>
+                            <strong><?php echo $this->__("Yaay! Recovered by MailChimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->getCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId(); ?></strong>
+                        <?php else: ?>
+                            <strong><?php echo $this->__("Campaign data could not be retrieved."); ?></strong>
+                        <?php endif; ?>
                     </td>
                 </tr>
             </table>

@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         }
         return $this->mailchimpHelper;
     }
+
     /**
      * Entry point for all webhook operations
      */
@@ -35,23 +36,34 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         $data = $request->getPost();
         $helper = $this->getHelper();
         if ($moduleName == 'monkey') {
-            try {
+
+            if (isset($data['data']['list_id'])) {
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
                 if (count($storeIds)) {
-                    $api = $helper->getApi($storeIds[0]);
-                    $webhooks = $api->lists->webhooks->getAll($listId);
-                    foreach ($webhooks['webhooks'] as $webhook) {
-                        if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                            $api->lists->webhooks->delete($listId, $webhook['id']);
+                    $storeId = $storeIds[0];
+                    if ($helper->isSubscriptionEnabled($storeId)) {
+                        try {
+                            $api = $helper->getApi($storeId);
+                        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                            $helper->logError($e->getMessage());
+                            $api = null;
+                        }
+                        if (!$api) {
+                            try {
+                                $webhooks = $api->lists->webhooks->getAll($listId);
+                                foreach ($webhooks['webhooks'] as $webhook) {
+                                    if (strpos($webhook['url'], 'monkey/webhook') !== false) {
+                                        $api->lists->webhooks->delete($listId, $webhook['id']);
+                                    }
+                                }
+                            } catch (MailChimp_Error $e) {
+                                $helper->logError($e->getFriendlyMessage());
+
+                            }
                         }
                     }
                 }
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-
-            } catch (Exception $e) {
-                $helper->logError($e->getMessage());
             }
         } else {
 

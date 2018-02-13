@@ -21,16 +21,23 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     protected $_lists = null;
 
     /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
+    protected $_helper;
+
+
+    /**
      * Load lists and store on class property
      */
     public function __construct()
     {
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
+        $helper = $this->_helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
         if ($this->_lists == null) {
-            $apiKey = Mage::helper('mailchimp')->getApiKey($scopeArray[1], $scopeArray[0]);
+            $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
             if ($apiKey) {
                 try {
-                    $api = Mage::helper('mailchimp')->getApi($scopeArray[1], $scopeArray[0]);
+                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
                     $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
                     if (isset($this->_lists['lists']) && count($this->_lists['lists']) == 0) {
                         $apiKeyArray = explode('-', $apiKey);
@@ -39,6 +46,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
                         $message = 'Please create a list at '. $htmlAnchor;
                         Mage::getSingleton('adminhtml/session')->addWarning($message);
                     }
+                } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                    $helper->logError($e->getMessage());
                 } catch(MailChimp_Error $e) {
                     Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
                 }
@@ -53,21 +62,38 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
      */
     public function toOptionArray()
     {
+        $helper = $this->getHelper();
         $lists = array();
 
         if (is_array($this->_lists)) {
-            $lists[] = array('value' => '', 'label' => Mage::helper('mailchimp')->__('--- Select a list ---'));
+            $lists[] = array('value' => '', 'label' => $helper->__('--- Select a list ---'));
             foreach ($this->_lists['lists'] as $list) {
                 $memberCount = $list['stats']['member_count'];
-                $memberText = Mage::helper('mailchimp')->__('members');
+                $memberText = $helper->__('members');
                 $label = $list['name'] . ' (' . $memberCount . ' ' . $memberText . ')';
                 $lists [] = array('value' => $list['id'], 'label' => $label);
             }
         } else {
-            $lists [] = array('value' => '', 'label' => Mage::helper('mailchimp')->__('--- No data ---'));
+            $lists [] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
 
         return $lists;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function getHelper()
+    {
+        return $this->_helper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 
 }
