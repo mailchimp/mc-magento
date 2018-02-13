@@ -26,16 +26,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
 
     public function getButtonHtml()
     {
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        if (Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
-            $label = $this->helper('mailchimp')->__('Reset MailChimp Store');
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        if ($helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
+            $label = $helper->__('Reset MailChimp Store');
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(
                         'id' => 'resetecommercedata_button',
                         'label' => $label,
                         'onclick' => 'javascript:resetecommerce(); return false;',
-                        'title' => $this->helper('mailchimp')->__('Re-create MailChimp store for current scope')
+                        'title' => $helper->__('Re-create MailChimp store for current scope')
                     )
                 );
 
@@ -54,8 +55,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
 
     public function getAjaxCheckUrl()
     {
-        $scopeString = Mage::helper('mailchimp')->getScopeString();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetEcommerceData', array('scope' => $scopeString));
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetEcommerceData', $scopeArray);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return $this->helper('mailchimp');
     }
 
 }

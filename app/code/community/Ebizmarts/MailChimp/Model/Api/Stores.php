@@ -16,7 +16,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * Create MailChimp store.
      *
      * @param $mailChimpStoreId
-     * @param null $listId
+     * @param string|null $listId
      * @param $scopeId
      * @param $scope
      * @return mixed
@@ -25,13 +25,14 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     public function createMailChimpStore($mailChimpStoreId, $listId = null, $scopeId, $scope)
     {
         $helper = $this->makeHelper();
-        try {
-            $api = $helper->getApi($scopeId, $scope);
-            if (!$listId) {
-                $listId = $helper->getGeneralList($scopeId, $scope);
-            }
+        if (!$listId) {
+            $listId = $helper->getGeneralList($scopeId, $scope);
+        }
 
-            if ($listId != null && $listId != "") {
+        if ($listId != null && $listId != "") {
+            try {
+                $api = $helper->getApi($scopeId, $scope);
+
                 $storeName = $helper->getMCStoreName($scopeId, $scope);
                 $storeEmail = $helper->getConfigValueForScope('trans_email/ident_general/email', $scopeId, $scope);
                 $storeDomain = $helper->getStoreDomain($scopeId, $scope);
@@ -48,13 +49,14 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
                 $response = $api->getEcommerce()->getStores()->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone);
                 return $response;
-            } else {
-                throw new Exception('You don\'t have any lists configured in MailChimp');
+
+            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                Mage::helper('mailchimp')->logError($e->getMessage());
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage());
             }
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage());
-        } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
+        } else {
+            throw new Exception('You don\'t have any lists configured in MailChimp');
         }
     }
 

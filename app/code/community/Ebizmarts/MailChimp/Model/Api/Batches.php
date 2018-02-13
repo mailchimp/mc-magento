@@ -268,7 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * Send Customers, Products, Orders, Carts to MailChimp store for given scope.
-     * Return true if MailChimp store is reseted in the process.
+     * Return true if MailChimp store is reset in the process.
      *
      * @param  $magentoStoreId
      * @return null
@@ -315,7 +315,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         if (!$batchJson || $batchJson == '') {
                             $helper->logRequest('An empty operation was detected', $magentoStoreId);
                         } else {
-                            if (!$helper->getIsReseted($magentoStoreId)) {
+                            if (!$helper->getIsReset($magentoStoreId)) {
                                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                                 $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                                 //save batch id to db
@@ -659,7 +659,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if (!$batchJson || $batchJson == '') {
                         $helper->logRequest('An empty operation was detected', $magentoStoreId);
                     } else {
-                        if (!$helper->getIsReseted($magentoStoreId)) {
+                        if (!$helper->getIsReset($magentoStoreId)) {
                             $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                             $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
                             //save batch id to db
@@ -773,7 +773,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function handleResetIfNecessary($storeId)
     {
         $helper = $this->getHelper();
-        if ($helper->getIsReseted($storeId)) {
+        if ($helper->getIsReset($storeId)) {
             $scopeToReset = $helper->getMailChimpScopeByStoreId($storeId);
             if ($scopeToReset) {
                 $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);

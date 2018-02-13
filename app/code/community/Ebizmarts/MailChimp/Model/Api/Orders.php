@@ -248,7 +248,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         //customer data
         try {
             $api = $helper->getApi($magentoStoreId);
-        } catch (Exception $e) {
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             Mage::helper('mailchimp')->logError($e->getMessage());
             return "";
         }
@@ -526,12 +526,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * update customer sync data
      *
-     * @param $orderId
-     * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncedFlag
+     * @param int $orderId
+     * @param string $mailchimpStoreId
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
@@ -717,9 +717,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $result = $helper->getEcommerceSyncDataItem($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId);
 
         $mailchimpSyncedFlag = $result->getMailchimpSyncedFlag();
-        $mailchimpItemId = $result->getId();
+        $mailchimpOrderId = $result->getId();
 
-        return array($mailchimpSyncedFlag, $mailchimpItemId);
+        return array('synced_status' => $mailchimpSyncedFlag, 'order_id' => $mailchimpOrderId);
 
     }
 }

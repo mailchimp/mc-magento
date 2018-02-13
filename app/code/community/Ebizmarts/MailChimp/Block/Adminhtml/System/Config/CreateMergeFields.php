@@ -43,9 +43,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     public function getAjaxCheckUrl()
     {
         $helper = $this->makeHelper();
-        $scopeString = $helper->getScopeString();
-        $adminHelper = $this->getAdminHelper();
-        return $adminHelper->getUrl(self::CREATE_MERGE_PATH, array('scope' => $scopeString));
+        $scopeArray = $helper->getCurrentScope();
+        return Mage::helper('adminhtml')->getUrl(self::CREATE_MERGE_PATH, $scopeArray);
     }
 
     /**
@@ -54,14 +53,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
-    }
-
-    /**
-     * @return Mage_Adminhtml_Helper_Data
-     */
-    protected function getAdminHelper()
-    {
-        return Mage::helper('adminhtml');
     }
 
 }

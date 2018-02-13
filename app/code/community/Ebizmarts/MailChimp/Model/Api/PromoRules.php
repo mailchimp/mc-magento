@@ -174,12 +174,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     /**
      * update promo rule sync data
      *
-     * @param $ruleId
-     * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
+     * @param int $ruleId
+     * @param string $mailchimpStoreId
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncDeleted
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($ruleId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $saveOnlyIfexists = false)
