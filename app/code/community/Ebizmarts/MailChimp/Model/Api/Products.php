@@ -200,7 +200,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $rc = $helper->getProductResourceModel();
         //data applied for both root and varient products
         $data["id"] = $productId;
-//        $data["title"] = ($product->getName()) ? $product->getName() : $product->getDefaultName();
         $data["title"] = $rc->getAttributeRawValue($productId, 'name', $magentoStoreId);
         $this->_visibility = $rc->getAttributeRawValue($productId, 'visibility', $magentoStoreId);
         $url = null;
@@ -389,11 +388,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $this->joinQtyAndBackorders($collection);
 
-//        $this->joinCategoryId($collection);
-
-//        $this->joinProductAttributes($collection, $magentoStoreId);
-
-//        $collection->getSelect()->group("e.entity_id");
         $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
         return $collection;
@@ -486,29 +480,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * @param $collection
-     * @param $magentoStoreId
-     */
-    public function joinProductAttributes($collection, $magentoStoreId)
-    {
-        $attributeCodes = array("name", "visibility", "description", "price");
-        $config = Mage::getSingleton("eav/config");
-        foreach ($attributeCodes as $_code) {
-            $attributeName = $config->getAttribute("catalog_product", $_code);
-
-            $collection->joinField(
-                $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
-                '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
-            );
-
-            $collection->joinField(
-                'default_' . $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
-                '{{table}}.store_id = 0 AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
-            );
-        }
-    }
-
-    /**
-     * @param $collection
      */
     public function joinQtyAndBackorders($collection)
     {
@@ -531,17 +502,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $this->joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId);
         $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
-    }
-
-    /**
-     * @param $collection
-     */
-    public function joinCategoryId($collection)
-    {
-        $collection->joinField(
-            'category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null,
-            'left'
-        );
     }
 
     /**
