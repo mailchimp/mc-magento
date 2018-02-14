@@ -248,7 +248,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = ((float)$product->getPrice()) ? (float)$product->getPrice() : (float)$product->getDefaultPrice();
+//                $price = ((float)$product->getPrice()) ? (float)$product->getPrice() : (float)$product->getDefaultPrice();
+                $price = $rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -709,7 +710,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     protected function getProductCategories($product, $magentoStoreId)
     {
-        $categoryIds = $product->getCategoryIds();
+        $categoryIds = $product->getResource()->getCategoryIds($product);
         $categoryNames = array();
         $categoryName = null;
         if (is_array($categoryIds) && count($categoryIds)) {
