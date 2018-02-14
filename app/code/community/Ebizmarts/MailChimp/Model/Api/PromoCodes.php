@@ -112,7 +112,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -196,11 +196,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      *
      * @param $codeId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
-     * @param null $token
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncDeleted
+     * @param int|null $token
      * @param bool $saveOnlyIfexists
      * @param null $deletedRelatedId
      */

@@ -16,83 +16,87 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
-        $param = $mageApp->getRequest()->getParam('scope');
-        $scopeArray = explode('-', $param);
-        $result = 1;
+        $request = $mageApp->getRequest();
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
+        $success = 1;
         try {
             $stores = $mageApp->getStores();
-            if ($scopeArray[1] == 0) {
+            if ($scopeId == 0) {
                 foreach ($stores as $store) {
                     $helper->resetErrors($store->getId());
                 }
             }
-            $helper->resetErrors($scopeArray[1], $scopeArray[0]);
+            $helper->resetErrors($scopeId, $scope);
         } catch(Exception $e)
         {
-            $result = 0;
+            $success = 0;
         }
 
-        $mageApp->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($success);
     }
 
     public function resetEcommerceDataAction()
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
-        $param = $mageApp->getRequest()->getParam('scope');
-        $scopeArray = explode('-', $param);
-        $result = 0;
+        $request = $mageApp->getRequest();
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
+        $success = 0;
         try {
-            $helper->resetMCEcommerceData($scopeArray[1], $scopeArray[0], true);
-            $result = 1;
+            $helper->resetMCEcommerceData($scopeId, $scope, true);
+            $success = 1;
         } catch(MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
         } catch(Exception $e) {
             $helper->logError($e->getMessage());
         }
 
-        $mageApp->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($success);
     }
 
     public function resendEcommerceDataAction()
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
-        $param = $mageApp->getRequest()->getParam('scope');
-        $scopeArray = explode('-', $param);
-        $result = 0;
+        $request = $mageApp->getRequest();
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
+        $success = 0;
         try {
-            $helper->resetMCEcommerceData($scopeArray[1], $scopeArray[0], false);
-            $result = 1;
+            $helper->resetMCEcommerceData($scopeId, $scope, false);
+            $success = 1;
         } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
+            $helper->logError($e->getFriendlyMessage());
         } catch(Exception $e) {
-            $helper->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+            $helper->logError($e->getMessage());
         }
 
-        $mageApp->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($success);
     }
 
     public function createMergeFieldsAction()
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
-        $param = $mageApp->getRequest()->getParam('scope');
-        $scopeArray = explode('-', $param);
-        $result = 0;
-        $subEnabled = $helper->isSubscriptionEnabled($scopeArray[1], $scopeArray[0]);
+        $request = $mageApp->getRequest();
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
+        $success = 0;
+        $subEnabled = $helper->isSubscriptionEnabled($scopeId, $scope);
         if ($subEnabled) {
             try {
-                $helper->createMergeFields($scopeArray[1], $scopeArray[0]);
-                $result = 1;
+                $helper->createMergeFields($scopeId, $scope);
+                $success = 1;
             } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage(), $scopeArray[1], $scopeArray[0]);
+                $helper->logError($e->getFriendlyMessage());
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $scopeArray[1], $scopeArray[0]);
+                $helper->logError($e->getMessage());
             }
         }
 
-        $mageApp->getResponse()->setBody($result);
+        $mageApp->getResponse()->setBody($success);
     }
 
     protected function _isAllowed()

@@ -14,9 +14,15 @@
 class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends Mage_Core_Block_Template
 {
 
-    protected $campaignName;
+    /**
+     * @var string $campaignName
+     */
+    protected $campaignName = null;
 
-    protected $order;
+    /**
+     * @var Mage_Sales_Model_Order $order
+     */
+    protected $order = null;
 
     public function isReferred()
     {
@@ -29,14 +35,31 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
         return $ret;
     }
 
+    /**
+     * @return string
+     */
     public function getCampaignId()
     {
         $order = $this->getCurrentOrder();
         return $order->getMailchimpCampaignId();
     }
 
-    public function addCampaignName()
+    /**
+     * @return string
+     */
+    public function getCampaignName()
     {
+        if (!$this->campaignName) {
+            $campaignId = $this->getCampaignId();
+            $order = $this->getCurrentOrder();
+            $storeId = $order->getStoreId();
+            $helper = $this->getMailChimpHelper();
+
+            if ($helper->isEcomSyncDataEnabled($storeId)) {
+                $this->campaignName = $helper->getMailChimpCampaignNameById($campaignId, $storeId);
+            }
+        }
+
         return $this->campaignName;
     }
 
@@ -49,7 +72,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
     }
 
     /**
-     * @return mixed
+     * @return Mage_Sales_Model_Order
      */
     protected function getCurrentOrder()
     {
@@ -59,19 +82,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
         return $this->order;
     }
 
+    /**
+     * Return true if campaign data is available with the current api and list selected.
+     *
+     * @return bool
+     */
     public function isDataAvailable()
     {
-        $helper = $this->getMailChimpHelper();
-        $campaignId = $this->getCampaignId();
-        $order = $this->getCurrentOrder();
-        $storeId = $order->getStoreId();
-        if ($helper->isEcomSyncDataEnabled($storeId)) {
-            $this->campaignName = $helper->getMailChimpCampaignNameById($campaignId, $storeId);
-        }
-
         $dataAvailable = false;
-        $campaignId = $order->getMailchimpCampaignId();
-        if ($campaignId && $this->campaignName) {
+        $campaignName = $this->getCampaignName();
+
+        if ($campaignName) {
             $dataAvailable = true;
         }
 

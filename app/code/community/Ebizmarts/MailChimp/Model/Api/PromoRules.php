@@ -67,6 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     {
         $promoData = array();
         $promoRule = $this->getPromoRule($ruleId);
+        $helper = $this->getMailChimpHelper();
         try {
             $ruleData = $this->generateRuleData($promoRule);
             $promoRuleJson = json_encode($ruleData);
@@ -79,14 +80,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now());
             } else {
                 $error = $promoRule->getMailchimpSyncError();
-                $helper = $this->getMailChimpHelper();
                 if (!$error) {
                     $error = $helper->__('Something went wrong when retrieving the information.');
                 }
                 $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now(), $error);
             }
         } catch (Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
+            $helper->logError($e->getMessage());
         }
 
         return $promoData;
@@ -174,12 +174,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     /**
      * update promo rule sync data
      *
-     * @param $ruleId
-     * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
+     * @param int $ruleId
+     * @param string $mailchimpStoreId
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncDeleted
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($ruleId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $saveOnlyIfexists = false)

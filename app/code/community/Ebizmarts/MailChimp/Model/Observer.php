@@ -111,13 +111,14 @@ class Ebizmarts_MailChimp_Model_Observer
     public function saveConfig(Varien_Event_Observer $observer)
     {
         $post = Mage::app()->getRequest()->getPost();
-        $scopeArray = explode('-', $this->makeHelper()->getScopeString());
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
 
         if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
-            $this->makeHelper()->removeEcommerceSyncData($scopeArray[1], $scopeArray[0]);
-            $this->makeHelper()->resetCampaign($scopeArray[1], $scopeArray[0]);
-            $this->makeHelper()->clearErrorGrid($scopeArray[1], $scopeArray[0], true);
-            $this->makeHelper()->deleteStore($scopeArray[1], $scopeArray[0]);
+            $helper->removeEcommerceSyncData($scopeArray['scope_id'], $scopeArray['scope']);
+            $helper->resetCampaign($scopeArray['scope_id'], $scopeArray['scope']);
+            $helper->clearErrorGrid($scopeArray['scope_id'], $scopeArray['scope'], true);
+            $helper->deleteStore($scopeArray['scope_id'], $scopeArray['scope']);
         }
 
         return $observer;
@@ -231,9 +232,9 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($isEnabled) {
             $apiSubscriber = $this->getApiSubscriber();
             $origEmail = $customer->getOrigData('email');
+            $customerEmail = $customer->getEmail();
             if ($origEmail) {
                 // check if customer has changed email address
-                $customerEmail = $customer->getEmail();
                 if ($origEmail != $customerEmail) {
                     $subscriberModel = $this->getSubscriberModel();
                     $subscriber = $subscriberModel->loadByEmail($origEmail);
@@ -309,7 +310,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $items = $order->getAllItems();
             foreach ($items as $item) {
-                if ($item->getProductType() == 'bundle' || $item->getProductType() == 'configurable') {
+                if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
                     continue;
                 }
 
@@ -544,7 +545,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $items = $creditMemo->getAllItems();
 
             foreach ($items as $item) {
-                if ($item->getProductType() == 'bundle' || $item->getProductType() == 'configurable') {
+                if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
                     continue;
                 }
 
@@ -576,7 +577,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $items = $creditMemo->getAllItems();
             foreach ($items as $item) {
-                if ($item->getProductType() == 'bundle' || $item->getProductType() == 'configurable') {
+                if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
                     continue;
                 }
 
@@ -606,7 +607,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
-            if ($item->getProductType() != 'bundle' && $item->getProductType() != 'configurable') {
+            if (!$this->isBundleItem($item) && !$this->isConfigurableItem($item)) {
                 $helper->saveEcommerceSyncData($item->getProductId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
             }
         }
@@ -629,8 +630,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
         foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
 
-            $scopeArray = explode('_', $scopeData);
-            $ecommEnabled = $helper->isEcommerceEnabled($scopeArray[1], $scopeArray[0]);
+            $scopeArray = $this->getScopeArrayFromString($scopeData);
+            $ecommEnabled = $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']);
 
             if ($ecommEnabled) {
                 $apiProduct->update($product->getId(), $mailchimpStoreId);
@@ -706,8 +707,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
         foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
 
-            $scopeArray = explode('_', $scopeData);
-            $ecommEnabled = $helper->isEcommerceEnabled($scopeArray[1], $scopeArray[0]);
+            $scopeArray = $this->getScopeArrayFromString($scopeData);
+            $ecommEnabled = $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']);
 
             if ($ecommEnabled) {
                 foreach ($productIds as $productId) {
@@ -800,5 +801,35 @@ class Ebizmarts_MailChimp_Model_Observer
         $sqlQuery = "UPDATE " . $tableName . " SET mailchimp_sync_modified = 1 WHERE type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "';";
         $connection = $this->getCoreResource()->getConnection('core_write');
         $connection->query($sqlQuery);
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function isBundleItem($item)
+    {
+        return $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE;
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function isConfigurableItem($item)
+    {
+        return $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
+    }
+
+    /**
+     * Transform array in format scope_scopeId to array.
+     *
+     * @param $scopeData
+     * @return array
+     */
+    protected function getScopeArrayFromString($scopeData)
+    {
+        $scopeArray = explode('_', $scopeData);
+        return array('scope' => $scopeArray[0], 'scope_id' => $scopeArray[1]);
     }
 }

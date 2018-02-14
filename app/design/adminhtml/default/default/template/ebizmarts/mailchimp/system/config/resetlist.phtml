@@ -1,8 +1,9 @@
 <script type="text/javascript">
     //<![CDATA[
     function preshow() {
-        <?php $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-            $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($scopeArray[1], $scopeArray[0]);
+        <?php   $helper = Mage::helper('mailchimp');
+            $scopeArray = $helper->getCurrentScope();
+            $mailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
         ?>
         if($('mailchimp_general_list').value != '' && '<?php echo $mailchimpStoreId ?>' != 0) {
             $('mailchimp_general_list').setAttribute('disabled',true);

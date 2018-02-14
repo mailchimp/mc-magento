@@ -113,8 +113,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     }
 
     /**
-     * @param $file
-     * @return mixed
+     * @param string $file
+     * @return stdClass
      */
     protected function getFileContent($file)
     {
@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     }
 
     /**
-     * @param $file
+     * @param string $file
      */
     protected function unlink($file)
     {

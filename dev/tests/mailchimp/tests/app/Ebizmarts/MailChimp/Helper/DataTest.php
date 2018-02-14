@@ -10,6 +10,9 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testGetLastDateOfPurchase()
     {
+        $emailAddress = "john@example.com";
+        $lastDateOfPurchase = '2018-02-13 15:14:28';
+
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
@@ -18,10 +21,28 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getOrderCollectionByCustomerEmail'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getOrderCollectionByCustomerEmail')->with("john@example.com")
-            ->willReturn(array());
+        $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSize', 'setOrder', 'getFirstItem'))
+            ->getMock();
 
-        $this->assertNull($helperMock->getLastDateOfPurchase("john@example.com"));
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCreatedAt'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getOrderCollectionByCustomerEmail')->with($emailAddress)
+            ->willReturn($orderCollectionMock);
+
+        $orderCollectionMock->expects($this->once())->method('getSize')->willReturn(1);
+        $orderCollectionMock->expects($this->once())->method('setOrder')->with('created_at', 'DESC')->willReturnSelf();
+        $orderCollectionMock->expects($this->once())->method('getFirstItem')->willReturn($orderMock);
+
+        $orderMock->expects($this->once())->method('getCreatedAt')->willReturn($lastDateOfPurchase);
+
+        $result = $helperMock->getLastDateOfPurchase($emailAddress);
+
+        $this->assertEquals($result, $lastDateOfPurchase);
     }
 
     public function testCustomMergeFieldAlreadyExists()
@@ -48,20 +69,22 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testIsCheckoutSubscribeEnabled()
     {
+        $scopeId = 1;
+        $scope = 'stores';
         /**
          * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isMailChimpEnabled', 'getCheckoutSubscribeValue'))
+            ->setMethods(array('isSubscriptionEnabled', 'getCheckoutSubscribeValue'))
             ->getMock();
-        $helperMock->expects($this->once())->method('isMailChimpEnabled')->with(1, 'stores')
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)
             ->willReturn(true);
 
-        $helperMock->expects($this->once())->method('getCheckoutSubscribeValue')->with(1, 'stores')
+        $helperMock->expects($this->once())->method('getCheckoutSubscribeValue')->with($scopeId, $scope)
             ->willReturn(Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::NOT_CHECKED_BY_DEFAULT);
 
-        $this->assertTrue($helperMock->isCheckoutSubscribeEnabled(1, "stores"));
+        $this->assertTrue($helperMock->isCheckoutSubscribeEnabled($scopeId, $scope));
     }
 
     public function testDeleteStore()

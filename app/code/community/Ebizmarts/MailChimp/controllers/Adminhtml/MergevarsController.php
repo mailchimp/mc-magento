@@ -25,20 +25,21 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
         $label = $postData['label'];
         $value = $postData['value'];
         $fieldType = $postData['fieldtype'];
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
         $blankSpacesAmount = (count(explode(' ', $value)) - 1);
 
         if (is_numeric($value)) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value can not be numeric.'));
-        } elseif (Mage::helper('mailchimp')->customMergeFieldAlreadyExists($value, $scopeArray[1], $scopeArray[0])) {
+        } elseif ($helper->customMergeFieldAlreadyExists($value, $scopeArray['scope_id'], $scopeArray['scope'])) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value already exists.'));
         } elseif ($blankSpacesAmount > 0) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value can not contain blank spaces.'));
         } else {
-            $customMergeFields = Mage::helper('mailchimp')->getCustomMergeFields($scopeArray[1], $scopeArray[0]);
+            $customMergeFields = $helper->getCustomMergeFields($scopeArray['scope_id'], $scopeArray['scope']);
             $customMergeFields[] = array('label' => $label, 'value' => $value, 'field_type' => $fieldType);
             $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS, serialize($customMergeFields)));
-            Mage::helper('mailchimp')->saveMailchimpConfig($configValues, $scopeArray[1], $scopeArray[0]);
+            $helper->saveMailchimpConfig($configValues, $scopeArray['scope_id'], $scopeArray['scope']);
             Mage::getSingleton('core/session')->setMailChimpValue($value);
             Mage::getSingleton('core/session')->setMailChimpLabel($label);
             Mage::getSingleton('adminhtml/session')->addSuccess($this->__('The custom value was added successfully.'));
@@ -58,5 +59,13 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }
