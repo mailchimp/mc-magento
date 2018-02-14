@@ -4,18 +4,18 @@
 ### Preconditions
 <!--- Provide a more detailed information of environment you use -->
 <!--- Magento version, tag, HEAD, etc., PHP & MySQL version, etc.. -->
-1. 
-2. 
+1.
+2.
 
 ### Steps to reproduce
 <!--- Provide a set of unambiguous steps to reproduce this bug include code, if relevant -->
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ### Expected result
 <!--- Tell us what should happen -->
-1. 
+1.
 
 ### Actual result
 <!--- Tell us what happens instead -->
