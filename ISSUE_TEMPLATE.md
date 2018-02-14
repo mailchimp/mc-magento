@@ -20,5 +20,3 @@
 ### Actual result
 <!--- Tell us what happens instead -->
 1. [Screenshot, logs]
-
-<!--- (This may be platform independent comment) -->
