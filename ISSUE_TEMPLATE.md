@@ -1,5 +1,5 @@
 <!--- Provide a general summary of the issue in the Title above -->
-<!--- Before adding new issues, please, check this article https://github.com/magento/magento2/wiki/Issue-reporting-guidelines-->
+<!--- Before adding new issues, please, check this article https://github.com/magento/magento2/wiki/Issue-reporting-guidelines -->
 
 ### Preconditions
 <!--- Provide a more detailed information of environment you use -->
@@ -8,7 +8,7 @@
 2. 
 
 ### Steps to reproduce
-<!--- Provide a set of unambiguous steps to reproduce this bug include code, if relevant  -->
+<!--- Provide a set of unambiguous steps to reproduce this bug include code, if relevant -->
 1. 
 2. 
 3. 
