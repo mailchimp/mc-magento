@@ -1,7 +1,14 @@
 # MailChimp For Magento 1
 [![Build Status](https://travis-ci.org/mailchimp/mc-magento.svg?branch=develop)](https://travis-ci.org/mailchimp/mc-magento)
 
+## MailChimp Integration
+
 Integration to sync all the Magento data (Newsletter subscriber, Customers, Orders, Products) with MailChimp. It allows to use all the MailChimp potential for email Marketing such as sending Campaigns, Automations and more.
+
+## Mandrill Integration
+
+The integration includes a Mandrill SMTP module that overrides the one integrated from Magento, you will need to enable Mandrill with its API key from your Mandrill account (mandrillapp.com) for the transactional emails to work.
+If you want to use the Mailchimp integration without Mandrill for SMTP, contact our support so we can tell you how to set that up.
 
 ## Features
 
@@ -22,11 +29,6 @@ To get a copy of the project up and running on your local machine for developmen
 Alternatively, use modman to install this module.
 
 ``modman clone https://github.com/mailchimp/mc-magento.git -b 'master'``
-
-## Mandrill Integration
-
-The integration includes a Mandrill SMTP module that overrides the one integrated from Magento, you will need to enable Mandrill with its API key from your Mandrill account (mandrillapp.com) for the transactional emails to work. 
-If you want to use the Mailchimp integration without Mandrill for SMTP, contact our support so we can tell you how to set that up.
 
 ## Module Configuriation
 
