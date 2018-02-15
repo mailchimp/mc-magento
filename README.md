@@ -23,6 +23,10 @@ Alternatively, use modman to install this module.
 
 ``modman clone https://github.com/mailchimp/mc-magento.git -b 'master'``
 
+## Mandrill Integration
+
+The integration includes a Mandrill SMTP module that overrides the one integrated from Magento, you will need to enable Mandrill with its API key from your Mandrill account (mandrillapp.com) for the transactional emails to work. 
+If you want to use the Mailchimp integration without Mandrill for SMTP, contact our support so we can tell you how to set that up.
 
 ## Module Configuriation
 
