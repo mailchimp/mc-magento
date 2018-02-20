@@ -85,7 +85,7 @@
                         <reset_errors translate="label comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
-                            <sort_order>45</sort_order>
+                            <sort_order>42</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -95,7 +95,7 @@
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_list</source_model>
                             <backend_model>mailchimp/system_config_backend_list</backend_model>
-                            <sort_order>50</sort_order>
+                            <sort_order>44</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -106,12 +106,58 @@
                             <label></label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetList</frontend_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>46</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Warning, read the manual before change the list.]]></comment>
                         </reset_list>
+                        <interest_categories translate="label comment">
+                            <label>Interest Categories</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>mailchimp/system_config_source_customerGroup</source_model>
+                            <sort_order>48</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
+                        </interest_categories>
+                        <interest_in_success translate="label">
+                            <label>Interest groups in checkout success</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>49</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </interest_in_success>
+                        <interest_before>
+                            <label>Add html code before the interest groups are displayed</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
+                            <depends>
+                                <interest_categories>1</interest_categories>
+                            </depends>
+                        </interest_before>
+                        <interest_after>
+                            <label>Add html code after the interest groups are displayed</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
+                            <depends>
+                                <interest_categories>1</interest_categories>
+                            </depends>
+                        </interest_after>
                         <subscriber_batch_amount>
                             <label>Subscriber amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
@@ -225,7 +271,7 @@
                                 <active>1</active>
                             </depends>
                         </customers_optin>
-			<image_size translate="label">
+			            <image_size translate="label">
                             <label>Select product image size to send</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_imageSize</source_model>

@@ -441,23 +441,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $status == Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED;
     }
 
-    public function removeSubscriber($subscriber)
-    {
-        $helper = $this->mcHelper;
-        $storeId = $subscriber->getStoreId();
-        $listId = $helper->getGeneralList($storeId);
-        $api = $helper->getApi($storeId);
-        try {
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
-        } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $storeId);
-            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $storeId);
-        }
-    }
-
     /**
      * @param $subscriber
      */
@@ -480,9 +463,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     public function update($emailAddress, $storeId)
     {
-        $helper = $this->mcHelper;
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
-        if ($subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $subscriber->getMailchimpSyncDelta() != $helper->getSubMinSyncDateFlag($storeId)) {
+        if ($subscriber->getId()) {
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         }

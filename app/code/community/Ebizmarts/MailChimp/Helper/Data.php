@@ -396,12 +396,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getDateSyncFinishByStoreId($scopeId = 0, $scope = null)
     {
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE."_$mailchimpStoreId", 0, 'default');
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
     }
 
     public function getDateSyncFinishByMailChimpStoreId($mailchimpStoreId)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE."_$mailchimpStoreId", 0, 'default');
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
     }
 
     /**
@@ -1146,11 +1146,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function setCurrentStore($magentoStoreId)
     {
         $this->getMageApp()->setCurrentStore($magentoStoreId);
-    }
-
-    private function getProductImageModel()
-    {
-        return Mage::getModel('catalog/product_image');
     }
 
     /**
@@ -2430,12 +2425,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID));
         $mailchimpStoreIdsArray = array();
         foreach ($collection as $row) {
-            $scopeData = $row->getScope().'_'.$row->getScopeId();
+            $scopeData = $row->getScope() . '_' . $row->getScopeId();
             $mailchimpStoreIdsArray[$scopeData] = $row->getValue();
         }
         return $mailchimpStoreIdsArray;
     }
-  
+
     public function subscribeMember($subscriber, $forceUpdateStatus = false)
     {
         $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
@@ -2573,5 +2568,128 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $scopeArray = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
         return $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+    }
+
+    public function getListInterestCategories($scopeId, $scope = 'stores')
+    {
+        $interestGroupsArray = array();
+        $api = $this->getApi($scopeId, $scope);
+        $listId = $this->getGeneralList($scopeId, $scope);
+        try {
+            $interestCategories = $api->lists->interestCategory->getAll($listId, 'categories');
+            foreach ($interestCategories['categories'] as $interestCategory) {
+                $interestGroupsArray[] = array(
+                    'id' => $interestCategory['id'],
+                    'title' => $interestCategory['title'],
+                    'type' => $interestCategory['type']
+                );
+            }
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
+        return $interestGroupsArray;
+    }
+
+    public function getListInterestGroups($scopeId, $scope = 'stores')
+    {
+        $interestGroupsArray = array();
+        $api = $this->getApi($scopeId, $scope);
+        $listId = $this->getGeneralList($scopeId, $scope);
+        try {
+            $interestCategories = $api->lists->interestCategory->getAll($listId, 'categories');
+            foreach ($interestCategories['categories'] as $interestCategory) {
+                $interestGroups = $api->lists->interestCategory->interests->getAll($listId, $interestCategory['id']);
+                $groups = array();
+                foreach ($interestGroups['interests'] as $interestGroup) {
+                    $groups[$interestGroup['id']] = $interestGroup['name'];
+                }
+                $interestGroupsArray[] = array(
+                    'id' => $interestCategory['id'],
+                    'title' => $interestCategory['title'],
+                    'type' => $interestCategory['type'],
+                    'groups' => $groups
+                );
+            }
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
+        return $interestGroupsArray;
+    }
+
+    public function getLocalInterestCategories($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_CATEGORIES, $scopeId, $scope);
+    }
+
+    public function getCheckoutSuccessHtmlBefore($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_BEFORE, $scopeId, $scope);
+    }
+
+    public function getCheckoutSuccessHtmlAfter($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_AFTER, $scopeId, $scope);
+    }
+
+    public function getInterest($storeId)
+    {
+        $rc = [];
+        $interest = $this->getLocalInterestCategories($storeId);
+        if ($interest != '') {
+            $interest = explode(",", $interest);
+        } else {
+            $interest = [];
+        }
+        $api = $this->getApi($storeId);
+        $listId = $this->getGeneralList($storeId);
+        $allInterest = $api->lists->interestCategory->getAll($listId);
+        foreach ($allInterest['categories'] as $item) {
+            if (in_array($item['id'], $interest)) {
+                $rc[$item['id']]['interest'] = ['id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']];
+            }
+        }
+        foreach ($interest as $interestId) {
+            $mailchimpInterest = $api->lists->interestCategory->interests->getAll($listId, $interestId);
+            foreach ($mailchimpInterest['interests'] as $mi) {
+                $rc[$mi['category_id']]['category'][$mi['display_order']] = ['id' => $mi['id'], 'name' => $mi['name'], 'checked' => false];
+            }
+        }
+        return $rc;
+    }
+
+    public function getSubscriberInterest($subscriberId, $storeId, $interest = null)
+    {
+        if (!$interest) {
+            $interest = $this->getInterest($storeId);
+        }
+        $interestGroup = Mage::getModel('mailchimp/interestgroup');
+        $interestGroup->getBySubscriberIdStoreId($subscriberId, $storeId);
+        $groups = unserialize($interestGroup->getGroupdata());
+        if (isset($groups['group'])) {
+            foreach ($groups['group'] as $key => $value) {
+                if (isset($interest[$key])) {
+                    if (is_array($value)) {
+                        foreach ($value as $groupId) {
+                            foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                                if ($gvalue['id'] == $groupId) {
+                                    $interest[$key]['category'][$gkey]['checked'] = true;
+                                } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
+                                    $interest[$key]['category'][$gkey]['checked'] = false;
+                                }
+                            }
+                        }
+                    } else {
+                        foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                            if ($gvalue['id'] == $value) {
+                                $interest[$key]['category'][$gkey]['checked'] = true;
+                            } else {
+                                $interest[$key]['category'][$gkey]['checked'] = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $interest;
     }
 }

@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.10</version>
+            <version>1.1.11</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.10</version>
+            <version>1.1.11</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -27,6 +27,14 @@
                     </mailchimp_subscribe_observer>
                 </observers>
             </newsletter_subscriber_save_before>
+            <newsletter_subscriber_save_after>
+                <observers>
+                    <mailchimp_subscribe_after_observer>
+                        <class>mailchimp/observer</class>
+                        <method>SubscriberSaveAfter</method>
+                    </mailchimp_subscribe_after_observer>
+                </observers>
+            </newsletter_subscriber_save_after>
             <newsletter_subscriber_delete_after>
                 <observers>
                     <mailchimp_subscribe_delete_observer>
@@ -170,6 +178,9 @@
                     <ecommercesyncdata>
                         <table>mailchimp_ecommerce_sync_data</table>
                     </ecommercesyncdata>
+                    <interestgroup>
+                        <table>mailchimp_interest_group</table>
+                    </interestgroup>
                 </entities>
             </mailchimp_mysql4>
             <newsletter>
@@ -301,6 +312,15 @@
             </updates>
         </layout>
         <events>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <magebuzz_add_custom_tab>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>addTabToCustomer</method>
+                    </magebuzz_add_custom_tab>
+                </observers>
+            </core_block_abstract_prepare_layout_before>
             <core_block_abstract_to_html_after>
                 <observers>
                     <mailchimp_order_view_to_html_after>

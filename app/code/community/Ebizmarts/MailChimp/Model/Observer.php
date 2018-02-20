@@ -41,6 +41,7 @@ class Ebizmarts_MailChimp_Model_Observer
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
+
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $isEnabled = $this->makeHelper()->isMailChimpEnabled($subscriber->getStoreId());
             if ($isEnabled) {
@@ -63,6 +64,26 @@ class Ebizmarts_MailChimp_Model_Observer
                     }
                 }
             }
+        }
+    }
+
+    public function subscriberSaveAfter(Varien_Event_Observer $observer)
+    {
+        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
+        $params = Mage::app()->getRequest()->getParams();
+        $subscriber = $observer->getEvent()->getSubscriber();
+        $storeId = $subscriber->getStoreId();
+
+        if (isset($params['group'])) {
+            Mage::log('groups', null, 'ebizmarts.log', true);
+            Mage::log('subscriber id ' . $subscriber->getSubscriberId(), null, 'ebizmarts.log', true);
+            $interestGroup = Mage::getModel('mailchimp/interestgroup');
+            $interestGroup->getBySubscriberIdStoreId($subscriber->getSubscriberId(), $storeId);
+            $interestGroup->setGroupdata(serialize($params));
+            $interestGroup->setSubscriberId($subscriber->getSubscriberId());
+            $interestGroup->setStoreId($storeId);
+            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
+            $interestGroup->save();
         }
     }
 
@@ -257,16 +278,17 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function addColumnToSalesOrderGrid($observer)
     {
+        $helper = $this->makeHelper();
         $scopeArray = explode('-', $this->makeHelper()->getScopeString());
         $block = $observer->getEvent()->getBlock();
         if ($block instanceof Mage_Adminhtml_Block_Sales_Order_Grid
-            && $this->makeHelper()->getMonkeyInGrid($scopeArray[1], $scopeArray[0])
-            && ($this->makeHelper()->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
-                || $this->makeHelper()->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
+            && $helper->getMonkeyInGrid($scopeArray[1], $scopeArray[0])
+            && ($helper->isAbandonedCartEnabled($scopeArray[1], $scopeArray[0])
+                || $helper->isMailChimpEnabled($scopeArray[1], $scopeArray[0]))
         ) {
             $block->addColumnAfter(
                 'mailchimp_flag', array(
-                'header' => $this->makeHelper()->__('MailChimp'),
+                'header' => $helper->__('MailChimp'),
                 'index' => 'mailchimp_flag',
                 'align' => 'center',
                 'filter' => false,
@@ -596,6 +618,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function cleanProductImagesCacheAfter(Varien_Event_Observer $observer)
     {
+        Mage::log(__METHOD__, null, 'ebizmarts2.log', true);
         $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
         $this->makeHelper()->saveMailchimpConfig($configValues, 0, 'default');
     }
@@ -639,5 +662,20 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $config = Mage::getConfig();
         return $config;
+    }
+
+    public function addTabToCustomer(Varien_Event_Observer $observer)
+    {
+        $block = $observer->getEvent()->getBlock();
+        if ($block->getType() == 'adminhtml/customer_edit_tabs') {
+
+            Mage::log($block->getType(), null, 'ebizmarts.log', true);
+            $block->addTab('custom_tab', array(
+                'label' => Mage::helper('mailchimp')->__('MailChimp'),
+                'title' => Mage::helper('mailchimp')->__('MailChimp'),
+                'url' => $block->getUrl('mailchimp/adminhtml_custom/index', array('_current' => true)),
+                'class' => 'ajax',));
+        }
+
     }
 }
