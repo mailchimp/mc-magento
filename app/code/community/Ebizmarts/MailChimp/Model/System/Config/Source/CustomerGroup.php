@@ -16,9 +16,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
      */
     public function __construct()
     {
-        $helper = Mage::helper('mailchimp');
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        $this->_categories = $helper->getListInterestCategories($scopeArray[1], $scopeArray[0]);
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        $this->_categories = $helper->getListInterestCategories($scopeArray['scope_id'], $scopeArray['scope']);
     }
 
     /**
@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     public function toOptionArray()
     {
         $groups = array();
-        $helper = Mage::helper('mailchimp');
+        $helper = $this->makeHelper();
         if (is_array($this->_categories)) {
             foreach ($this->_categories as $category) {
                 $groups[] = array('value'=> $category['id'], 'label' => $category['title']);
@@ -38,6 +38,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
             $groups []= array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
         return $groups;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 
 }

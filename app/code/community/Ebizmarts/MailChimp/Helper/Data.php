@@ -1397,11 +1397,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getSingleton('core/resource');
     }
 
-    private function getProductImageModel()
-    {
-        return Mage::getModel('catalog/product_image');
-    }
-
     /**
      * If orders with the given email exists, returns the date of the last order made.
      *
@@ -2967,4 +2962,5 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $isNewApiKeyForSameAccount;
     }
+
 }
