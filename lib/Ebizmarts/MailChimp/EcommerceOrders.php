@@ -44,7 +44,7 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
         $financialStatus=null, $fullfillmentStatus=null, $taxTotal=null, $processedAtForeign=null,
         $cancelledAtForeign=null, $updateAtForeign=null, $shippingAddress=null, $billingAddress=null
     ) {
-    
+
         $_params=array('id'=>$id, 'customer'=>$customer, 'currency_code'=>$currencyCode, 'order_total'=>$orderTotal,
             'lines'=>$lines);
         if($campaignId) { $_params['campaign_id'] = $campaignId;
@@ -146,7 +146,7 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
         $processedAtForeign=null,$cancelledAtForeign=null, $updateAtForeign=null,
         $shippingAddress=null, $billingAddress=null, $lines=null
     ) {
-    
+
         $_params = array();
         if($customer) { $_params['customer'] = $customer;
         }

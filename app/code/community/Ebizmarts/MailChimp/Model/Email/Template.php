@@ -22,7 +22,9 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function send($email, $name = null, array $variables = array())
     {
-        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE)) {
+        $email_config = $this->getDesignConfig();
+        $store = (integer) $email_config->getStore();
+        if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $store)) {
             return parent::send($email, $name, $variables);
         }
 

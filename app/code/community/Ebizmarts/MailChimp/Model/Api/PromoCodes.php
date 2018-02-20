@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     {
         $batchArray = array();
         $helper = $this->getMailChimpHelper();
-        $newPromoCodes = $this->makePromoCodesCollection();
+        $newPromoCodes = $this->makePromoCodesCollection($magentoStoreId);
 
         $this->joinMailchimpSyncDataWithoutWhere($newPromoCodes, $mailchimpStoreId);
         // be sure that the orders are not in mailchimp
@@ -112,7 +112,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -137,14 +137,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     }
 
     /**
+     * @param $magentoStoreId
      * @return Mage_SalesRule_Model_Resource_Coupon_Collection
      */
-    public function makePromoCodesCollection()
+    public function makePromoCodesCollection($magentoStoreId)
     {
+        $helper = $this->getMailChimpHelper();
         /**
          * @var Mage_SalesRule_Model_Resource_Coupon_Collection $collection
          */
         $collection = $this->getPromoCodeResourceCollection();
+        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
         $this->addWebsiteColumn($collection);
         $this->joinPromoRuleData($collection);
         return $collection;
@@ -152,7 +155,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
 
     protected function makeDeletedPromoCodesCollection($mailchimpStoreId)
     {
-        $deletedPromoCodes = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
+        $deletedPromoCodes = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
         $deletedPromoCodes->getSelect()->where("mailchimp_store_id = '" . $mailchimpStoreId . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE . "' AND mailchimp_sync_deleted = 1");
         $deletedPromoCodes->getSelect()->limit($this->getBatchLimitFromConfig());
         return $deletedPromoCodes;
@@ -193,11 +196,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      *
      * @param $codeId
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
-     * @param null $token
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncDeleted
+     * @param int|null $token
      * @param bool $saveOnlyIfexists
      * @param null $deletedRelatedId
      */
@@ -212,6 +215,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             $syncModified,
             $syncDeleted,
             $token,
+            null,
             $saveOnlyIfexists,
             $deletedRelatedId
         );

@@ -14,13 +14,41 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Apikey extends Mage_Core_M
 {
     protected function _afterSave()
     {
-        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : Mage::helper('mailchimp')->isMailChimpEnabled($this->getScopeId(), $this->getScope());
-        $thisScopeHasMCStoreId = Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $this->getScopeId(), $this->getScope());
-        if ($this->isValueChanged() && $moduleIsActive && $thisScopeHasMCStoreId) {
-            Mage::helper('mailchimp')->removeEcommerceSyncData($this->getScopeId(), $this->getScope());
-            Mage::helper('mailchimp')->resetCampaign($this->getScopeId(), $this->getScope());
-            Mage::helper('mailchimp')->clearErrorGrid($this->getScopeId(), $this->getScope(), true);
-            Mage::helper('mailchimp')->deleteStore($this->getScopeId(), $this->getScope());
+        $helper = $this->makeHelper();
+        $scopeId = $this->getScopeId();
+        $scope = $this->getScope();
+        $isNewApiKeyForSameAccount = $helper->isNewApiKeyForSameAccount($this->getOldValue(), $this->getValue(), $scopeId, $scope);
+        $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+
+        if ($this->isValueChanged() && !$this->getValue()) {
+            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
+            $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
+            $message = $helper->__('Please note the extension has been disabled due to the lack of an api key or list configured.');
+            $this->getAdminSession()->addWarning($message);
         }
+
+        if (($this->isValueChanged() && !$isNewApiKeyForSameAccount || !$this->getValue()) && $thisScopeHasMCStoreId) {
+            $helper = $this->makeHelper();
+            $helper->removeEcommerceSyncData($scope, $scope);
+            $helper->resetCampaign($scopeId, $scope);
+            $helper->clearErrorGrid($scopeId, $scope, true);
+            $helper->deleteStore($scope, $scope);
+        }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
     }
 }

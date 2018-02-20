@@ -67,6 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     {
         $promoData = array();
         $promoRule = $this->getPromoRule($ruleId);
+        $helper = $this->getMailChimpHelper();
         try {
             $ruleData = $this->generateRuleData($promoRule);
             $promoRuleJson = json_encode($ruleData);
@@ -80,13 +81,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             } else {
                 $error = $promoRule->getMailchimpSyncError();
                 if (!$error) {
-                    $error = 'Something went wrong when retrieving the information.';
+                    $error = $helper->__('Something went wrong when retrieving the information.');
                 }
-                $helper = $this->getMailChimpHelper();
-                $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now(), $helper->__($error));
+                $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now(), $error);
             }
         } catch (Exception $e) {
-            Mage::helper('mailchimp')->logError($e->getMessage(), $magentoStoreId);
+            $helper->logError($e->getMessage());
         }
 
         return $promoData;
@@ -135,7 +135,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
      */
     protected function makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId)
     {
-        $deletedPromoRules = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection');
+        $deletedPromoRules = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
         $deletedPromoRules->getSelect()->where("mailchimp_store_id = '" . $mailchimpStoreId . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . "' AND (mailchimp_sync_modified = 1 OR mailchimp_sync_deleted = 1)");
         $deletedPromoRules->getSelect()->limit($this->getBatchLimitFromConfig());
         return $deletedPromoRules;
@@ -174,12 +174,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     /**
      * update promo rule sync data
      *
-     * @param $ruleId
-     * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
+     * @param int $ruleId
+     * @param string $mailchimpStoreId
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncDeleted
      * @param bool $saveOnlyIfexists
      */
     protected function _updateSyncData($ruleId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $saveOnlyIfexists = false)
@@ -192,6 +192,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             $syncError,
             $syncModified,
             $syncDeleted,
+            null,
             null,
             $saveOnlyIfexists
         );

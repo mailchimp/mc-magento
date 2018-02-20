@@ -3,7 +3,7 @@
 class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_TestCase
 {
     /**
- * @var Ebizmarts_MailChimp_Model_Api_Customers 
+ * @var Ebizmarts_MailChimp_Model_Api_Customers
 */
     private $customersApiMock;
 
@@ -64,7 +64,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->getMock();
 
         $this->customersApiMock->expects($this->once())->method('makeBatchId')->willReturn('storeid-0_CUS_2017-05-18-14-45-54-38849500');
-        $this->customersApiMock->expects($this->never())->method('buildProductDataRemoval');
         $this->customersApiMock->expects($this->once())->method('joinMailchimpSyncData');
         $this->customersApiMock->expects($this->once())->method('makeBatchId');
         $this->customersApiMock->expects($this->once())->method('getOptin')->with(1);

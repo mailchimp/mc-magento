@@ -25,6 +25,15 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
     {
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $magentoStoreId = 1;
+        $promoRulesArray = array(
+            array(
+                'method' => 'DELETE',
+                'path' => '/ecommerce/stores/ef3bf57fb9bd695a02b7f7c7fb0d2db5/promo-rules/43',
+                'operation_id' => 'storeid-2_PRL_2018-01-16-14-48-03-29881000_43',
+                'body' => ''
+            )
+        );
+
         $promoRulesApiMock = $this->promoRulesApiMock
             ->setMethods(array('getMailChimpHelper', '_getModifiedAndDeletedPromoRules'))
             ->getMock();
@@ -36,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
         $mailChimpHelperMock->expects($this->once())->method('getDateMicrotime')->willReturn('2017-10-23-19-34-31-92333600');
-        $promoRulesApiMock->expects($this->once())->method('_getModifiedAndDeletedPromoRules')->with($mailchimpStoreId)->willReturn($mailChimpHelperMock);
+        $promoRulesApiMock->expects($this->once())->method('_getModifiedAndDeletedPromoRules')->with($mailchimpStoreId)->willReturn($promoRulesArray);
 
         $promoRulesApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
     }

@@ -11,30 +11,31 @@
  */
 class Ebizmarts_MailChimp_Model_Config
 {
-    const GENERAL_ACTIVE                    = 'mailchimp/general/active';
-    const GENERAL_APIKEY                    = 'mailchimp/general/apikey';
-    const GENERAL_OAUTH_WIZARD              = 'mailchimp/general/oauth_wizard';
-    const GENERAL_ACCOUNT_DETAILS           = 'mailchimp/general/account_details';
-    const GENERAL_LIST                      = 'mailchimp/general/list';
-    const GENERAL_OLD_LIST                  = 'mailchimp/general/old_list';
-    const GENERAL_LIST_CHANGED_SCOPES       = 'mailchimp/general/list_changed_scopes';
-    const GENERAL_CHECKOUT_SUBSCRIBE        = 'mailchimp/general/checkout_subscribe';
-    const GENERAL_MCSTOREID                 = 'mailchimp/general/storeid';
-    const GENERAL_MCISSYNCING               = 'mailchimp/general/is_syicing';
-    const GENERAL_ECOMMMINSYNCDATEFLAG      = 'mailchimp/general/mcminsyncdateflag';
-    const GENERAL_SUBMINSYNCDATEFLAG        = 'mailchimp/general/subminsyncdateflag';
-    const GENERAL_MCSTORE_RESETED           = 'mailchimp/general/mcstore_reset';
-    const GENERAL_TWO_WAY_SYNC              = 'mailchimp/general/webhook_active';
-    const GENERAL_UNSUBSCRIBE               = 'mailchimp/general/webhook_delete';
-    const GENERAL_WEBHOOK_ID                = 'mailchimp/general/webhook_id';
-    const GENERAL_LOG                       = 'mailchimp/general/enable_log';
-    const GENERAL_MAP_FIELDS                = 'mailchimp/general/map_fields';
-    const GENERAL_CUSTOM_MAP_FIELDS         = 'mailchimp/general/customer_map_fields';
-    const GENERAL_MIGRATE_FROM_115          = 'mailchimp/general/migrate_from_115';
-    const GENERAL_MIGRATE_FROM_116          = 'mailchimp/general/migrate_from_116';
-    const GENERAL_MIGRATE_FROM_1164         = 'mailchimp/general/migrate_from_1164';
-    const GENERAL_MIGRATE_LAST_ORDER_ID     = 'mailchimp/general/migrate_last_order_id';
-    const GENERAL_SUBSCRIBER_AMOUNT         = 'mailchimp/general/subscriber_batch_amount';
+    const GENERAL_ACTIVE                = 'mailchimp/general/active';
+    const GENERAL_APIKEY                = 'mailchimp/general/apikey';
+    const GENERAL_OAUTH_WIZARD          = 'mailchimp/general/oauth_wizard';
+    const GENERAL_ACCOUNT_DETAILS       = 'mailchimp/general/account_details';
+    const GENERAL_LIST                  = 'mailchimp/general/list';
+    const GENERAL_OLD_LIST              = 'mailchimp/general/old_list';
+    const GENERAL_LIST_CHANGED_SCOPES   = 'mailchimp/general/list_changed_scopes';
+    const GENERAL_CHECKOUT_SUBSCRIBE    = 'mailchimp/general/checkout_subscribe';
+    const GENERAL_MCSTOREID             = 'mailchimp/general/storeid';
+    const GENERAL_MCISSYNCING           = 'mailchimp/general/is_syicing';
+    const GENERAL_ECOMMMINSYNCDATEFLAG  = 'mailchimp/general/mcminsyncdateflag';
+    const GENERAL_SUBMINSYNCDATEFLAG    = 'mailchimp/general/subminsyncdateflag';
+    const GENERAL_MCSTORE_RESETED       = 'mailchimp/general/mcstore_reset';
+    const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
+    const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
+    const GENERAL_WEBHOOK_ID            = 'mailchimp/general/webhook_id';
+    const GENERAL_LOG                   = 'mailchimp/general/enable_log';
+    const GENERAL_ORDER_GRID            = 'mailchimp/general/order_grid';
+    const GENERAL_MAP_FIELDS            = 'mailchimp/general/map_fields';
+    const GENERAL_CUSTOM_MAP_FIELDS     = 'mailchimp/general/customer_map_fields';
+    const GENERAL_MIGRATE_FROM_115      = 'mailchimp/general/migrate_from_115';
+    const GENERAL_MIGRATE_FROM_116      = 'mailchimp/general/migrate_from_116';
+    const GENERAL_MIGRATE_FROM_1164     = 'mailchimp/general/migrate_from_1164';
+    const GENERAL_MIGRATE_LAST_ORDER_ID = 'mailchimp/general/migrate_last_order_id';
+    const GENERAL_SUBSCRIBER_AMOUNT     = 'mailchimp/general/subscriber_batch_amount';
     const GENERAL_INTEREST_CATEGORIES       = 'mailchimp/general/interest_categories';
     const GENERAL_INTEREST_SUCCESS_BEFORE   = 'mailchimp/general/interest_success_before';
     const GENERAL_INTEREST_SUCCESS_AFTER    = 'mailchimp/general/interest_success_after';
@@ -47,6 +48,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_PRODUCT_LAST_ID     = 'mailchimp/ecommerce/product_last_id';
     const ECOMMERCE_ORDER_LAST_ID       = 'mailchimp/ecommerce/order_last_id';
     const ECOMMERCE_CART_LAST_ID        = 'mailchimp/ecommerce/cart_last_id';
+    const ECOMMERCE_PCD_LAST_ID        = 'mailchimp/ecommerce/pcd_last_id';
     const ECOMMERCE_RESEND_ENABLED      = 'mailchimp/ecommerce/resend_enabled';
     const ECOMMERCE_RESEND_TURN         = 'mailchimp/ecommerce/resend_turn';
     const ECOMMERCE_CUSTOMER_AMOUNT     = 'mailchimp/ecommerce/customer_batch_amount';
@@ -59,6 +61,9 @@ class Ebizmarts_MailChimp_Model_Config
     const IMAGE_SIZE_SMALL              = 'small_image';
     const IMAGE_SIZE_THUMBNAIL          = 'thumbnail';
     const PRODUCT_IMAGE_CACHE_FLUSH     = 'mailchimp/ecommerce/product_image_cache_flush';
+    const ADD_MAILCHIMP_LOGO_TO_GRID    = 1;
+    const ADD_SYNC_STATUS_TO_GRID       = 2;
+    const ADD_BOTH_TO_GRID              = 3;
 
     const ENABLE_POPUP                  = 'mailchimp/emailcatcher/popup_general';
     const POPUP_HEADING                 = 'mailchimp/emailcatcher/popup_heading';
@@ -75,7 +80,6 @@ class Ebizmarts_MailChimp_Model_Config
     const ABANDONEDCART_ACTIVE      = 'mailchimp/abandonedcart/active';
     const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
     const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
-    const MONKEY_GRID               = 'mailchimp/general/monkey_grid';
     const CART_AMOUNT               = 'mailchimp/abandonedcart/cart_batch_amount';
 
     const WARNING_MESSAGE           = 'mailchimp/warning_message';

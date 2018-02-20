@@ -5,7 +5,7 @@ $installer = $this;
 try {
     $installer->run(
         "
-ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}` 
+ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}`
 ADD COLUMN `deleted_related_id` INT(10) DEFAULT NULL;
 "
     );

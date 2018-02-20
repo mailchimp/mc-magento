@@ -26,16 +26,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
 
     public function getButtonHtml()
     {
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        if (Mage::helper('mailchimp')->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
-            $label = $this->helper('mailchimp')->__('Resend Ecommerce Data');
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        if ($helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
+            $label = $helper->__('Resend Ecommerce Data');
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(
                         'id' => 'resendecommercedata_button',
                         'label' => $label,
                         'onclick' => 'javascript:resendecommerce(); return false;',
-                        'title' => $this->helper('mailchimp')->__('Resend Ecommerce Data current scope')
+                        'title' => $helper->__('Resend Ecommerce Data current scope')
                     )
                 );
 
@@ -48,14 +49,24 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
      */
     public function getMessage()
     {
+        $helper = $this->makeHelper();
         $message = 'Are you sure you want to delete the local data in order to send all items again?\nAutomations will work normally but the synchronization process for the old data will take longer than resetting the MailChimp store.';
-        return $this->helper('mailchimp')->__($message);
+        return $helper->__($message);
     }
 
     public function getAjaxCheckUrl()
     {
-        $scopeString = Mage::helper('mailchimp')->getScopeString();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeString));
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']));
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return $this->helper('mailchimp');
     }
 
 }
