@@ -448,26 +448,26 @@ class Ebizmarts_MailChimp_Model_Observer
         ) {
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_MAILCHIMP_LOGO_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
-                    'mailchimp_flag', array(
+                    'mailchimp_campaign_id', array(
                     'header' => $helper->__('MailChimp'),
-                    'index' => 'mailchimp_flag',
+                    'index' => 'mailchimp_campaign_id',
                     'align' => 'center',
                     'filter' => false,
                     'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
-                    'sortable' => false,
+                    'sortable' => true,
                     'width' => 70
                 ), 'created_at'
                 );
             }
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
-                    'mailchimp_order_flag', array(
+                    'mailchimp_synced_flag', array(
                     'header' => $helper->__('Synced to MailChimp'),
-                    'index' => 'mailchimp_order_flag',
+                    'index' => 'mailchimp_synced_flag',
                     'align' => 'center',
                     'filter' => false,
                     'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
-                    'sortable' => false,
+                    'sortable' => true,
                     'width' => 70
                 ), 'created_at'
                 );
@@ -475,6 +475,24 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
+    }
+
+    public function addColumnToSalesOrderGridCollection(Varien_Event_Observer $observer)
+    {
+        $helper = $this->makeHelper();
+        $addColumnConfig = $helper->getMonkeyInGrid(0);
+        $ecommEnabledAnyScope = $helper->isEcomSyncDataEnabledInAnyScope();
+        if ($ecommEnabledAnyScope && $addColumnConfig) {
+            $collection = $observer->getOrderGridCollection();
+            $collection->addFilterToMap('store_id', 'main_table.store_id');
+            $select = $collection->getSelect();
+            $select->joinLeft(array('oe' => $collection->getTable('sales/order')), 'oe.entity_id=main_table.entity_id', array('oe.mailchimp_campaign_id'));
+            $adapter = $this->getCoreResource()->getConnection('core_write');
+            $select->joinLeft(array('mc' => $collection->getTable('mailchimp/ecommercesyncdata')), $adapter->quoteInto('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER), array('mc.mailchimp_synced_flag', 'mc.id'));
+            $select->group("main_table.entity_id");
+            $select->order("mc.id");
+            Mage::log((string)$select, null, 'ebizmarts.log', true);
+        }
     }
 
     /**
@@ -485,7 +503,6 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function loadCustomerToQuote(Varien_Event_Observer $observer)
     {
-
         $quote = $observer->getEvent()->getQuote();
         $storeId = $quote->getStoreId();
         $helper = $this->makeHelper();
