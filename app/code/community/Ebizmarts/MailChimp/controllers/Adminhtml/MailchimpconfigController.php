@@ -41,8 +41,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpconfigController extends Mage_Admin
         $api = $helper->getApiByKey($apiKey);
         $apiInfo = $api->root->info('account_name,total_subscribers');
         if (isset($apiInfo['account_name'])) {
-            $options['username'] = ['label' => __('User name:'), 'value' => $apiInfo['account_name']];
-            $options['total_subscribers'] = ['label' => __('Total Account Subscribers:'), 'value' => $apiInfo['total_subscribers']];
+            $options['username'] = array('label' => __('User name:'), 'value' => $apiInfo['account_name']);
+            $options['total_subscribers'] = array('label' => __('Total Account Subscribers:'), 'value' => $apiInfo['total_subscribers']);
         }
 
 
@@ -52,5 +52,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpconfigController extends Mage_Admin
         $response->setBody(json_encode($options, JSON_PRETTY_PRINT));
         return;
 
+    }
+    protected function _isAllowed()
+    {
+        $acl = 'system/config/mailchimp';
+        return Mage::getSingleton('admin/session')->isAllowed($acl);
     }
 }
