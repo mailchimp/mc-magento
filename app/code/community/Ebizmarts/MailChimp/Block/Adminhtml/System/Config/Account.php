@@ -17,7 +17,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
         $firstMigrationKey = Ebizmarts_MailChimp_Model_System_Config_Source_Account::STORE_MIGRATION_TEXT_KEY;
         $syncLabelKey = Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY;
         $values = $element->getValues();
-        $html = '<ul class="checkboxes">';
+        $html = '<div id="mailchimp_general_account_details">';
+        $html .= '<ul class="checkboxes" id="mailchimp_general_account_details_ul">';
 
         foreach ($values as $dat) {
             if ($dat['value'] >= $firstErrorKey && $dat['value'] < $firstMigrationKey) {
@@ -32,6 +33,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
         }
 
         $html .= '</ul>';
+        $html .= '</div>';
 
         return $html;
     }

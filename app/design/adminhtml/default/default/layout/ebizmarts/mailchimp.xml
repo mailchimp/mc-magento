@@ -31,16 +31,23 @@
             <action method="addCss">
                 <name>lib/prototype/windows/themes/magento.css</name>
             </action>
-        </reference>
-        <reference name="head">
             <action method="addCss">
                 <stylesheet>ebizmarts/mailchimp/css/mailchimp.css</stylesheet>
             </action>
-        </reference>
-        <reference name="head">
             <action method="addCss">
                 <stylesheet>ebizmarts/mandrill/css/mandrill.css</stylesheet>
             </action>
+            <action method="addJs">
+                <script>lib/jquery/jquery-1.12.0.js</script>
+            </action>
+            <action method="addJs">
+                <script>lib/jquery/noconflict.js</script>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>ebizmarts/mailchimp/js/mailchimp.js</name>
+            </action>
+
         </reference>
     </adminhtml_system_config_edit>
     <adminhtml_sales_order_view>

@@ -11,3 +11,8 @@
         <?php echo Mage::helper('mailchimp')->__('Need help? Read how to <a href="http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-magento#Configure-and-Connect" target="_blank">Configure and Connect</a> or browse our <a href="http://ebizmarts.com/mailchimp-for-magento-support" target="_blank">support forums</a>'); ?>
     </h4>
 </div>
+<div style="display: none">
+    <input class="hidden" id="mailchimp-getlist-url" value="<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/mailchimpconfig/getLists'); ?>"/>
+    <input class="hidden" id="mailchimp-getdetails-url" value="<?php echo Mage::helper("adminhtml")->getUrl('adminhtml/mailchimpconfig/getDetails'); ?>"/>
+</div>
+
