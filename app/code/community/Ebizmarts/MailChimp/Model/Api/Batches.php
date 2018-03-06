@@ -707,25 +707,30 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function addSyncValueToArray($storeId, $syncedDateArray)
     {
         $helper = $this->getHelper();
-        $mailchimpStoreId = $helper->getMCStoreId($storeId);
-        $syncedDate = $helper->getMCIsSyncing($storeId);
-        // Check if $syncedDate is in date format to support previous versions.
-        if (isset($syncedDateArray[$mailchimpStoreId]) && $syncedDateArray[$mailchimpStoreId]) {
-            if ($helper->validateDate($syncedDate)) {
-                if ($syncedDate > $syncedDateArray[$mailchimpStoreId]) {
-                    $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
-                }
-            } elseif ((int)$syncedDate === 1) {
-                $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
-            }
-        } else {
-            if ($helper->validateDate($syncedDate)) {
-                $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
-            } else {
-                if ((int)$syncedDate === 1) {
+        $ecomEnabled = $helper->isEcomSyncDataEnabled($storeId);
+
+        if ($ecomEnabled) {
+            $mailchimpStoreId = $helper->getMCStoreId($storeId);
+            $syncedDate = $helper->getMCIsSyncing($storeId);
+
+            // Check if $syncedDate is in date format to support previous versions.
+            if (isset($syncedDateArray[$mailchimpStoreId]) && $syncedDateArray[$mailchimpStoreId]) {
+                if ($helper->validateDate($syncedDate)) {
+                    if ($syncedDate > $syncedDateArray[$mailchimpStoreId]) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
+                    }
+                } elseif ((int)$syncedDate === 1) {
                     $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
-                } elseif (!isset($syncedDateArray[$mailchimpStoreId])) {
-                    $syncedDateArray[$mailchimpStoreId] = array($storeId => true);
+                }
+            } else {
+                if ($helper->validateDate($syncedDate)) {
+                    $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
+                } else {
+                    if ((int)$syncedDate === 1) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
+                    } elseif (!isset($syncedDateArray[$mailchimpStoreId])) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => true);
+                    }
                 }
             }
         }
