@@ -568,6 +568,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function processEachResponseFile($files, $batchId, $mailchimpStoreId)
     {
+        $helper = $this->getHelper();
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
             foreach ($items as $item) {
@@ -623,9 +624,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
 
                     $mailchimpErrors->save();
-                    $this->getHelper()->logError($error);
+                    $helper->logError($error);
                 } else {
-                    $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                    $syncDataItem = $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+                    if (!$syncDataItem->getMailchimpSyncModified()) {
+                        $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                    }
                 }
             }
 

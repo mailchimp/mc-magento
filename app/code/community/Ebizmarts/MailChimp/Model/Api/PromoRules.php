@@ -74,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             if (!empty($ruleData)) {
                 $promoData['method'] = "POST";
                 $promoData['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules';
-                $promoData['operation_id'] = $batchId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_' . $ruleId;
+                $promoData['operation_id'] = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_' . $helper->getDateMicrotime() . '_' . $ruleId;
                 $promoData['body'] = $promoRuleJson;
                 //update promo rule delta
                 $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now());
