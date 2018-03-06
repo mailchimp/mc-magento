@@ -10,7 +10,7 @@
  * @date:     3/5/18 1:41 PM
  * @file:     Grid.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_Stores_Grid extends Mage_Adminhtml_Block_Widget_Grid
+class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
 
     public function __construct()
@@ -66,13 +66,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Stores_Grid extends Mage_Adminhtml_Blo
             'email_address', array(
                 'header' => Mage::helper('mailchimp')->__('Email'),
                 'index'  => 'email_address',
-                'sortable' => false
-            )
-        );
-        $this->addColumn(
-            'batch_id', array(
-                'header' => Mage::helper('mailchimp')->__('Batch ID'),
-                'index'  => 'batch_id',
                 'sortable' => false
             )
         );
