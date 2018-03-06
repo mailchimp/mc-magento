@@ -114,7 +114,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
 
-        if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray[1], $scopeArray[0])) {
+        if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
             $helper->removeEcommerceSyncData($scopeArray['scope_id'], $scopeArray['scope']);
             $helper->resetCampaign($scopeArray['scope_id'], $scopeArray['scope']);
             $helper->clearErrorGrid($scopeArray['scope_id'], $scopeArray['scope'], true);
@@ -471,14 +471,23 @@ class Ebizmarts_MailChimp_Model_Observer
                     'width' => 70
                 ), 'created_at'
                 );
+
+                $columnId = $block->getParam($block->getVarNameSort());
+                $direction = $block->getParam($block->getVarNameDir());
+                if ($columnId == 'mailchimp_synced_flag') {
+                    Mage::register('sort_column_dir', $direction);
+                }
             }
         }
 
         return $observer;
     }
 
+
+
     public function addColumnToSalesOrderGridCollection(Varien_Event_Observer $observer)
     {
+
         $helper = $this->makeHelper();
         $addColumnConfig = $helper->getMonkeyInGrid(0);
         $ecommEnabledAnyScope = $helper->isEcomSyncDataEnabledInAnyScope();
@@ -490,8 +499,11 @@ class Ebizmarts_MailChimp_Model_Observer
             $adapter = $this->getCoreResource()->getConnection('core_write');
             $select->joinLeft(array('mc' => $collection->getTable('mailchimp/ecommercesyncdata')), $adapter->quoteInto('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER), array('mc.mailchimp_synced_flag', 'mc.id'));
             $select->group("main_table.entity_id");
-            $select->order("mc.id");
-            Mage::log((string)$select, null, 'ebizmarts.log', true);
+            $direction = Mage::registry('sort_column_dir');
+            if ($direction) {
+                $collection->addOrder('mc.id', $direction);
+                Mage::unregister('sort_column_dir');
+            }
         }
     }
 
