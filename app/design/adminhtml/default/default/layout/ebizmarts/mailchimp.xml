@@ -11,6 +11,17 @@
                    name="mailchimp_mailchimperrors.grid.container"></block>
         </reference>
     </adminhtml_mailchimperrors_index>
+    <adminhtml_mailchimpstores_grid>
+        <update handle="formkey"/>
+        <block type="mailchimp/adminhtml_mailchimpstores_grid"
+               name="mailchimp_mailchimpstores.grid" output="toHtml"></block>
+    </adminhtml_mailchimpstores_grid>
+    <adminhtml_mailchimpstores_index>
+        <reference name="content">
+            <block type="mailchimp/adminhtml_mailchimpstores"
+                   name="mailchimp_mailchimpstores.grid.container"></block>
+        </reference>
+    </adminhtml_mailchimpstores_index>
     <adminhtml_mergevars_addmergevar>
         <reference name="content">
             <update handle="default"/>
