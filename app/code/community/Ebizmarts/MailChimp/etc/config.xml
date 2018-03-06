@@ -162,6 +162,9 @@
                     <ecommercesyncdata>
                         <table>mailchimp_ecommerce_sync_data</table>
                     </ecommercesyncdata>
+                    <stores>
+                        <table>mailchimp_stores</table>
+                    </stores>
                 </entities>
             </mailchimp_mysql4>
             <newsletter>
