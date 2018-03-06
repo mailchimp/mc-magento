@@ -304,13 +304,22 @@
             </core_block_abstract_to_html_after>
             <core_block_abstract_to_html_before>
                 <observers>
-                    <mailchimp_add_synced_to_grid_order>
+                    <mailchimp_add_synced_to_order_grid>
                         <type>model</type>
                         <class>mailchimp/observer</class>
                         <method>addColumnToSalesOrderGrid</method>
-                    </mailchimp_add_synced_to_grid_order>
+                    </mailchimp_add_synced_to_order_grid>
                 </observers>
             </core_block_abstract_to_html_before>
+            <sales_order_grid_collection_load_before>
+                <observers>
+                    <mailchimp_add_synced_to_order_grid_collection>
+                        <type>model</type>
+                        <class>mailchimp/observer</class>
+                        <method>addColumnToSalesOrderGridCollection</method>
+                    </mailchimp_add_synced_to_order_grid_collection>
+                </observers>
+            </sales_order_grid_collection_load_before>
             <admin_system_config_changed_section_mailchimp>
                 <observers>
                     <mailchimp_save_config>
