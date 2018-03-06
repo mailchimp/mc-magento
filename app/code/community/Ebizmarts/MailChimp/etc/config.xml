@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
