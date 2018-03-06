@@ -2967,4 +2967,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $isNewApiKeyForSameAccount;
     }
+    public function getAllApiKeys()
+    {
+        $ret = array();
+        $stores = Mage::app()->getStores();
+        foreach ($stores as $store) {
+            try {
+                $apiKey = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY, $store);
+                if(!isset($ret[$apiKey])) {
+                    $ret[$apiKey] = $apiKey;
+                }
+            } catch(Exception $e) {
+                continue;
+            }
+
+        }
+        return $ret;
+    }
 }
