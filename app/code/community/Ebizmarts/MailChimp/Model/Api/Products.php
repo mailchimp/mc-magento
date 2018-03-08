@@ -718,7 +718,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 ->setStoreId($magentoStoreId)
                 ->addAttributeToFilter('is_active', array('eq' => '1'))
                 ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
-                ->addAttributeToSort('level', 'asc');
+                ->addAttributeToSort('level', 'asc')
+                ->addAttributeToSort('name', 'asc');
 
             /* @var $category Mage_Catalog_Model_Category */
             foreach ($collection as $category) {
