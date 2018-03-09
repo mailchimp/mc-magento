@@ -296,12 +296,15 @@ class Ebizmarts_MailChimp_Model_Observer
         $order = $observer->getEvent()->getOrder();
         $storeId = $order->getStoreId();
         $ecommEnabled = $helper->isEcomSyncDataEnabled($storeId);
+        $subEnabled = $helper->isSubscriptionEnabled($storeId);
 
-        if (isset($post)) {
-            $email = $order->getCustomerEmail();
-            $subscriber = $helper->loadListSubscriber($post, $email);
-            if ($subscriber) {
-                $helper->subscribeMember($subscriber, true);
+        if ($subEnabled) {
+            if (isset($post)) {
+                $email = $order->getCustomerEmail();
+                $subscriber = $helper->loadListSubscriber($post, $email);
+                if ($subscriber) {
+                    $helper->subscribeMember($subscriber, true);
+                }
             }
         }
 
