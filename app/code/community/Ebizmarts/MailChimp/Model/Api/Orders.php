@@ -680,7 +680,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                     $promo = array(array(
                         'code' => $couponCode,
-                        'amount_discounted' => $amountDiscounted,
+                        'amount_discounted' => abs($amountDiscounted),
                         'type' => $type
                     ));
 
