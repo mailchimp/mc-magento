@@ -490,7 +490,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'loadListSubscriber', 'subscribeMember',
+            ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'isSubscriptionEnabled', 'loadListSubscriber', 'subscribeMember',
                 'saveEcommerceSyncData', 'getMCStoreId'))
             ->getMock();
 
@@ -522,6 +522,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
+
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
 
         $orderMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
 

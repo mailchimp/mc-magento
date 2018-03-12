@@ -88,8 +88,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $this->productsApiMock = $this->productsApiMock->setMethods(
             array(
                 'joinQtyAndBackorders',
-                'joinCategoryId',
-                'joinProductAttributes',
                 'getProductResourceCollection',
                 'getBatchLimitFromConfig'
             )
@@ -99,20 +97,17 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $dbSelectMock = $this->getMockBuilder(Varien_Db_Select::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $dbSelectMock->expects($this->once())->method('group')->with('e.entity_id');
         $dbSelectMock->expects($this->once())->method('limit')->with(100);
 
         $productResourceCollectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $productResourceCollectionMock->expects($this->exactly(2))->method('getSelect')->willReturn($dbSelectMock);
+        $productResourceCollectionMock->expects($this->once())->method('getSelect')->willReturn($dbSelectMock);
         $productResourceCollectionMock->expects($this->once())->method('addStoreFilter');
 
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection')
             ->willReturn($productResourceCollectionMock);
         $this->productsApiMock->expects($this->once())->method('joinQtyAndBackorders');
-        $this->productsApiMock->expects($this->once())->method('joinCategoryId');
-        $this->productsApiMock->expects($this->once())->method('joinProductAttributes');
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection');
         $this->productsApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
 
