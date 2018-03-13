@@ -461,6 +461,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $productId = 1;
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $customerEmail = 'email@example.com';
+        $customerFirstname = 'John';
+        $customerLastname = 'Smith';
 
 
         $itemMock = $this->getMockBuilder(Mage_Sales_Model_Order_Item::class)
@@ -470,7 +472,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getStoreId', 'getCustomerEmail', 'getAllItems'))
+            ->setMethods(array('getStoreId', 'getCustomerEmail', 'getCustomerFirstname', 'getCustomerLastname', 'getAllItems'))
             ->getMock();
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
@@ -506,6 +508,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
+            ->setMethods(array('getCustomerId', 'setSubscriberFirstname', 'setSubscriberLastname'))
             ->getMock();
 
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
@@ -528,6 +531,16 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $orderMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
 
         $helperMock->expects($this->once())->method('loadListSubscriber')->with($post, $customerEmail)->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getCustomerId')->willReturn(false);
+
+        $orderMock->expects($this->once())->method('getCustomerFirstname')->willReturn($customerFirstname);
+
+        $subscriberMock->expects($this->once())->method('setSubscriberFirstname')->with($customerFirstname);
+
+        $orderMock->expects($this->once())->method('getCustomerLastname')->willReturn($customerLastname);
+
+        $subscriberMock->expects($this->once())->method('setSubscriberLastname')->with($customerLastname);
 
         $helperMock->expects($this->once())->method('subscribeMember')->with($subscriberMock, true);
 

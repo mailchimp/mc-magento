@@ -303,6 +303,10 @@ class Ebizmarts_MailChimp_Model_Observer
                 $email = $order->getCustomerEmail();
                 $subscriber = $helper->loadListSubscriber($post, $email);
                 if ($subscriber) {
+                    if(!$subscriber->getCustomerId()) {
+                        $subscriber->setSubscriberFirstname($order->getCustomerFirstname());
+                        $subscriber->setSubscriberLastname($order->getCustomerLastname());
+                    }
                     $helper->subscribeMember($subscriber, true);
                 }
             }
