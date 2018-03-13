@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($this->shouldSendProductUpdate($magentoStoreId, $product)) {
                 $batchArray = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = count($batchArray);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId);
                 continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
@@ -66,7 +66,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $counter++;
 
                 //update product delta
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId);
             } else {
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
             }
@@ -301,10 +301,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             if ($productSyncData->getMailchimpSyncModified() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId)) {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId);
             } elseif (!$productSyncData->getMailchimpSyncDelta() || $productSyncData->getMailchimpSyncDelta() < Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId)) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId);
             }
         }
         return $data;

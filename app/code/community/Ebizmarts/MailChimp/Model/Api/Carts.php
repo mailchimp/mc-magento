@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                     $allCarts[$this->_counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
                     $this->_counter += 1;
                 }
             }
@@ -96,7 +96,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
             $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
             $allCarts[$this->_counter]['body'] = '';
-            $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
+            $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, null, null, 1);
             $this->_counter += 1;
         }
 
@@ -153,7 +153,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                         $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                         $allCarts[$this->_counter]['body'] = '';
-                        $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
+                        $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
                         $this->_counter += 1;
                     }
                 }
@@ -163,7 +163,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             // avoid carts abandoned as guests when customer email associated to a registered customer.
             if (!$cart->getCustomerId() && $customer->getEmail() == $cart->getCustomerEmail()) {
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
 
@@ -177,9 +177,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
                 $allCarts[$this->_counter]['body'] = $cartJson;
                 $this->_counter += 1;
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, null, $this->_token);
+                $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, null, null, null, $this->_token);
             } else {
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($cartId, $mailchimpStoreId);
             }
 
             $this->_token = null;
@@ -222,7 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 ->addFieldToFilter('main_table.updated_at', array('from' => $cart->getUpdatedAt()));
             //if cart is empty or customer has an order made after the abandonment skip current cart.
             if (!count($cart->getAllVisibleItems()) || $orderCollection->getSize()) {
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
 
@@ -237,7 +237,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $alreadySentCartId;
                     $allCarts[$this->_counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, 1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
                     $this->_counter += 1;
                 }
 
@@ -246,7 +246,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             // don't send the carts for guest customers who are registered
             if (!$cart->getCustomerId() && $customer->getEmail() == $cart->getCustomerEmail()) {
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
 
@@ -260,9 +260,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
                 $allCarts[$this->_counter]['body'] = $cartJson;
                 $this->_counter += 1;
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now(), null, null, null, null, $this->_token);
+                $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, null, null, null, $this->_token);
             } else {
-                $this->_updateSyncData($cartId, $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($cartId, $mailchimpStoreId);
             }
 
             $this->_token = null;

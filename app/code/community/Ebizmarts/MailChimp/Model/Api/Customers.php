@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
-                $this->_updateSyncData($customer->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
             } else {
                 $this->logCouldNotEncodeCustomerError($customer);
             }

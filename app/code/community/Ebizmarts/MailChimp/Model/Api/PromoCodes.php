@@ -104,7 +104,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $codeId;
                     $batchArray[$counter]['body'] = $promoCodeJson;
 
-                    $this->_updateSyncData($codeId, $mailchimpStoreId, Varien_Date::now(), null, null, null, $promoCode->getToken());
+                    $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, null, null, $promoCode->getToken());
                     $counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving the information.');

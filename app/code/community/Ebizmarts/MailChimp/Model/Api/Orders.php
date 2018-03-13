@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                     //update order delta
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
+                    $this->_updateSyncData($orderId, $mailchimpStoreId);
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
@@ -136,7 +136,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                     //update order delta
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
+                    $this->_updateSyncData($orderId, $mailchimpStoreId);
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
