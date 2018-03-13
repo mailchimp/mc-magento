@@ -461,7 +461,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $productId = 1;
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $customerEmail = 'email@example.com';
-        $customerId = 1;
         $customerFirstname = 'John';
         $customerLastname = 'Smith';
 
@@ -533,7 +532,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('loadListSubscriber')->with($post, $customerEmail)->willReturn($subscriberMock);
 
-        $subscriberMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
+        $subscriberMock->expects($this->once())->method('getCustomerId')->willReturn(false);
 
         $orderMock->expects($this->once())->method('getCustomerFirstname')->willReturn($customerFirstname);
 
