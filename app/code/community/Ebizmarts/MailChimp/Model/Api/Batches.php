@@ -382,6 +382,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceSentCallback')));
         foreach ($ecommerceDataCollection as $ecommerceData) {
             $ecommerceData->setBatchId($batchResponseId)
+                ->setMailchimpSyncDelta($this->getCurrentDate())
                 ->save();
         }
     }
@@ -790,5 +791,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrentDate()
+    {
+        return Varien_Date::now();
     }
 }
