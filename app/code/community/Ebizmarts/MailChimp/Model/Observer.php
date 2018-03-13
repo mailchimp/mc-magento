@@ -502,10 +502,10 @@ class Ebizmarts_MailChimp_Model_Observer
             $adapter = $this->getCoreResource()->getConnection('core_write');
             $select->joinLeft(array('mc' => $collection->getTable('mailchimp/ecommercesyncdata')), $adapter->quoteInto('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER), array('mc.mailchimp_synced_flag', 'mc.id'));
             $select->group("main_table.entity_id");
-            $direction = Mage::registry('sort_column_dir');
+            $direction = $this->getRegistry();
             if ($direction) {
                 $collection->addOrder('mc.id', $direction);
-                Mage::unregister('sort_column_dir');
+                $this->removeRegistry();
             }
         }
     }
@@ -863,5 +863,18 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $scopeArray = explode('_', $scopeData);
         return array('scope' => $scopeArray[0], 'scope_id' => $scopeArray[1]);
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getRegistry()
+    {
+        return Mage::registry('sort_column_dir');
+    }
+
+    protected function removeRegistry()
+    {
+        return Mage::unregister('sort_column_dir');
     }
 }

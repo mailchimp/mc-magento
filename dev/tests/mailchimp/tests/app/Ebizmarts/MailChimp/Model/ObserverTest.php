@@ -545,4 +545,87 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock->newOrder($eventObserverMock);
     }
+
+    public function testAddColumnToSalesOrderGridCollection()
+    {
+        $addColumnConfig = 1;
+        $scopeId = 0;
+        $orderTableName = 'sales_flat_order';
+        $mcTableName = 'mailchimp_ecommerce_sync_data';
+        $condition = 'mc.related_id=main_table.entity_id AND type = '.Ebizmarts_MailChimp_Model_Config::IS_ORDER;
+        $direction = 'ASC';
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getOrderGridCollection'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getCoreResource', 'getRegistry', 'removeRegistry'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMonkeyInGrid', 'isEcomSyncDataEnabledInAnyScope'))
+            ->getMock();
+
+        $orderGridCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Grid_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addFilterToMap', 'getSelect', 'getTable', 'addOrder'))
+            ->getMock();
+
+        $selectMock = $this->getMockBuilder(Varien_Db_Select::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('joinLeft', 'group'))
+            ->getMock();
+
+        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConnection'))
+            ->getMock();
+
+        $writeAdapterMock = $this->getMockBuilder(Varien_Db_Adapter_Pdo_Mysql::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('quoteInto'))
+            ->getMock();
+
+        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('getMonkeyInGrid')->with($scopeId)->willReturn($addColumnConfig);
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabledInAnyScope')->willReturn(true);
+
+        $eventObserverMock->expects($this->once())->method('getOrderGridCollection')->willReturn($orderGridCollectionMock);
+
+        $orderGridCollectionMock->expects($this->once())->method('addFilterToMap')->with('store_id', 'main_table.store_id');
+        $orderGridCollectionMock->expects($this->once())->method('getSelect')->willReturn($selectMock);
+        $orderGridCollectionMock->expects($this->exactly(2))->method('getTable')->withConsecutive(
+            array('sales/order'),
+            array('mailchimp/ecommercesyncdata')
+            )->willReturnOnConsecutiveCalls(
+                $orderTableName,
+                $mcTableName
+            );
+
+        $selectMock->expects($this->exactly(2))->method('joinLeft')->withConsecutive(
+            array(array('oe' => $orderTableName), 'oe.entity_id=main_table.entity_id', array('oe.mailchimp_campaign_id')),
+            array(array('mc' => $mcTableName), $condition, array('mc.mailchimp_synced_flag', 'mc.id'))
+        );
+
+        $observerMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
+
+        $coreResourceMock->expects($this->once())->method('getConnection')->with('core_write')->willReturn($writeAdapterMock);
+
+        $writeAdapterMock->expects($this->once())->method('quoteInto')->with('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER)->willReturn($condition);
+
+        $selectMock->expects($this->once())->method('group');
+
+        $observerMock->expects($this->once())->method('getRegistry')->willReturn($direction);
+
+        $orderGridCollectionMock->expects($this->once())->method('addOrder')->with('mc.id', $direction);
+
+        $observerMock->expects($this->once())->method('removeRegistry');
+
+        $observerMock->addColumnToSalesOrderGridCollection($eventObserverMock);
+    }
 }
