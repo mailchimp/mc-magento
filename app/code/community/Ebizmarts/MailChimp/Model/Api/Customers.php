@@ -36,8 +36,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $this->mailchimpStoreId = $mailchimpStoreId;
-        $this->magentoStoreId = $magentoStoreId;
+        $this->setMailchimpStoreId($mailchimpStoreId);
+        $this->setMagentoStoreId($magentoStoreId);
 
         $collection = $this->makeCustomersNotSentCollection();
         $this->joinMailchimpSyncData($collection);
@@ -51,7 +51,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $counter = 0;
         foreach ($collection as $customer) {
             $data = $this->_buildCustomerData($customer);
-
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
@@ -407,5 +406,21 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 "m4m.mailchimp_sync_modified"
             )
         );
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     */
+    protected function setMailchimpStoreId($mailchimpStoreId)
+    {
+        $this->mailchimpStoreId = $mailchimpStoreId;
+    }
+
+    /**
+     * @param $magentoStoreId
+     */
+    protected function setMagentoStoreId($magentoStoreId)
+    {
+        $this->magentoStoreId = $magentoStoreId;
     }
 }
