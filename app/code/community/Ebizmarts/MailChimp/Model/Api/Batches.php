@@ -362,9 +362,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function deleteUnsentItems()
     {
-        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
-            ->addFieldToFilter('batch_id', array('null' => true));
-        Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceDeleteCallback')));
+        $helper = $this->getHelper();
+        $resource = $helper->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = array("batch_id IS NULL");
+        $connection->delete($tableName, $where);
     }
 
     public function ecommerceDeleteCallback($args)
@@ -376,15 +379,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
     {
-        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
-            ->addFieldToFilter('batch_id', array('null' => true))
-            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
-        Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceSentCallback')));
-        foreach ($ecommerceDataCollection as $ecommerceData) {
-            $ecommerceData->setBatchId($batchResponseId)
-                ->setMailchimpSyncDelta($this->getCurrentDate())
-                ->save();
-        }
+        $helper = $this->getHelper();
+        $resource = $helper->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = array("batch_id IS NULL AND mailchimp_store_id = ?" => $mailchimpStoreId);
+        $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate()), $where);
+
     }
 
     public function ecommerceSentCallback($args)
