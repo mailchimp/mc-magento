@@ -1064,15 +1064,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param null $syncedFlag
      * @param bool $saveOnlyIfexists
      * @param null $deletedRelatedId
+     * @param bool $allowBatchRemoval
      */
     public function saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
-                                          $syncModified = 0, $syncDeleted = null, $token = null, $syncedFlag = null, $saveOnlyIfexists = false, $deletedRelatedId = null
+                                          $syncModified = 0, $syncDeleted = null, $token = null, $syncedFlag = null, $saveOnlyIfexists = false, $deletedRelatedId = null, $allowBatchRemoval = true
     )
     {
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
             if ($syncDelta) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
+            } elseif ($allowBatchRemoval) {
+                $ecommerceSyncDataItem->setData("batch_id", null);
             }
             if ($syncError) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);

@@ -273,7 +273,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     public function update($productId, $mailchimpStoreId)
     {
-        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true);
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true, false);
     }
 
     /**
@@ -321,8 +321,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param int|null $syncDeleted
      * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $productId,
@@ -334,7 +335,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $syncDeleted,
             null,
             $syncedFlag,
-            $saveOnlyIfexists
+            $saveOnlyIfexists,
+            $allowBatchRemoval
         );
     }
 
