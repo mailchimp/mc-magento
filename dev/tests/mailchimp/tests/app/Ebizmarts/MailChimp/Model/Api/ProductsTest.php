@@ -253,7 +253,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $categories[] = $categoryMockOne;
         $categories[] = $categoryMockTwo;
-        
         $categoryCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($categories));
 
         $categoryMockOne->expects($this->once())->method('getName')->willReturn('catO');
