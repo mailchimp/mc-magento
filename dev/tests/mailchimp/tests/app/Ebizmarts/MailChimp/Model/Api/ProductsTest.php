@@ -194,6 +194,11 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
             ->disableOriginalConstructor()
+            ->setMethods(array('getResource'))
+            ->getMock();
+
+        $productResourceMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getCategoryIds'))
             ->getMock();
 
@@ -208,7 +213,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $categoryCollectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Category_Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addAttributeToSelect', 'setStoreId', 'addAttributeToFilter', 'addAttributeToSort'))
+            ->setMethods(array('addAttributeToSelect', 'setStoreId', 'addAttributeToFilter', 'addAttributeToSort', 'getIterator'))
             ->getMock();
 
         $categoryMockOne = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
@@ -221,7 +226,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->setMethods(array('getName'))
             ->getMock();
 
-        $productMock->expects($this->once())->method('getCategoryIds')->willReturn($catArray);
+        $productMock->expects($this->once())->method('getResource')->willReturn($productResourceMock);
+        $productResourceMock->expects($this->once())->method('getCategoryIds')->willReturn($catArray);
 
         $productsApiMock->expects($this->once())->method('makeCatalogCategory')->willReturn($categoryMockGeneric);
 
@@ -250,8 +256,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $categoryMockOne->expects($this->once())->method('getName')->willReturn('catO');
         $categoryMockTwo->expects($this->once())->method('getName')->willReturn('catR');
-
-
 
         $return = $productsApiMock->getProductCategories($productMock, $magentoStoreId);
 
