@@ -667,14 +667,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $url;
     }
 
-    protected function getProductCategories($product, $magentoStoreId)
+    public function getProductCategories($product, $magentoStoreId)
     {
         $categoryIds = $product->getResource()->getCategoryIds($product);
         $categoryNames = array();
         $categoryName = null;
         if (is_array($categoryIds) && count($categoryIds)) {
             /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
-            $collection = Mage::getModel('catalog/category')->getCollection();
+            $collection = $this->makeCatalogCategory()->getCollection();
             $collection->addAttributeToSelect(array('name'))
                 ->setStoreId($magentoStoreId)
                 ->addAttributeToFilter('is_active', array('eq' => '1'))
@@ -809,5 +809,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getCurrentDate()
     {
         return Varien_Date::now();
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeCatalogCategory()
+    {
+        return Mage::getModel('catalog/category');
     }
 }
