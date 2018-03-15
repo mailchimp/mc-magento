@@ -189,4 +189,77 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $this->assertEquals($return, $imageUrl);
     }
+
+    public function testGetProductCategories()
+    {
+        $catArray = array(13,14);
+        $magentoStoreId = '1';
+        $result = 'catO - catR';
+        $categories = array();
+
+        $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCategoryIds'))
+            ->getMock();
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('makeCatalogCategory'))
+            ->getMock();
+
+        $categoryMockGeneric = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
+          ->disableOriginalConstructor()
+            ->setMethods(array('getCollection'))
+            ->getMock();
+
+        $categoryCollectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Category_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addAttributeToSelect', 'setStoreId', 'addAttributeToFilter', 'addAttributeToSort'))
+            ->getMock();
+
+        $categoryMockOne = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getName'))
+            ->getMock();
+
+        $categoryMockTwo = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getName'))
+            ->getMock();
+
+        $productMock->expects($this->once())->method('getCategoryIds')->willReturn($catArray);
+
+        $productsApiMock->expects($this->once())->method('makeCatalogCategory')->willReturn($categoryMockGeneric);
+
+        $categoryMockGeneric->expects($this->once())->method('getCollection')->willReturn($categoryCollectionMock);
+
+        $categoryCollectionMock->expects($this->once())->method('setStoreId')->with($magentoStoreId)->willReturnSelf();
+        $categoryCollectionMock->expects($this->once())->method('addAttributeToSelect')->with(array('name'))->willReturnSelf();
+        $categoryCollectionMock->expects($this->exactly(2))->method('addAttributeToFilter')->withConsecutive(
+            array('is_active', array('eq' => '1')),
+            array('entity_id', array('in' => $catArray))
+        )->willReturnOnConsecutiveCalls(
+            $categoryCollectionMock,
+            $categoryCollectionMock
+        );
+        $categoryCollectionMock->expects($this->exactly(2))->method('addAttributeToSort')->withConsecutive(
+            array('level', 'asc'),
+            array('name', 'asc')
+        )->willReturnOnConsecutiveCalls(
+            $categoryCollectionMock,
+            $categoryCollectionMock
+        );
+
+        $categories[] = $categoryMockOne;
+        $categories[] = $categoryMockTwo;
+        $categoryCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($categories));
+
+        $categoryMockOne->expects($this->once())->method('getName')->willReturn('catO');
+        $categoryMockTwo->expects($this->once())->method('getName')->willReturn('catR');
+
+
+
+        $return = $productsApiMock->getProductCategories($productMock, $magentoStoreId);
+
+        $this->assertEquals($result, $return);
+    }
 }
