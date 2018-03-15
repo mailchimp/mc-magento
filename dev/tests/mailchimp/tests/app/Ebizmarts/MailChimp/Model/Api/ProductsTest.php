@@ -183,4 +183,21 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $this->assertEquals($return, $imageUrl);
     }
+
+    public function testSendModifiedProduct()
+    {
+        $magentoStoreId = 1;
+        $batchId = 'storeid-1_PRO_';
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('makeBatchId', '_updateSyncData'))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAllVisibleItems'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())->method('makeBatchId')->with($magentoStoreId)->willReturn();
+    }
 }

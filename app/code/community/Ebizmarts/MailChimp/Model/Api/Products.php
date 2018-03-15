@@ -290,7 +290,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = $this->makeBatchId($magentoStoreId);
         $items = $order->getAllVisibleItems();
         foreach ($items as $item) {
-            $product = Mage::getModel('catalog/product')->load($item->getProductId());
+            $product = $this->loadProductById($item);
             $productSyncData = $this->getMailChimpHelper()->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
             if ($product->getId() != $item->getProductId() || $this->isBundleProduct($product) || $this->isGroupedProduct($product)) {
                 if ($product->getId()) {
@@ -810,5 +810,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getCurrentDate()
     {
         return Varien_Date::now();
+    }
+
+    /**
+     * @param $item
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function loadProductById($item)
+    {
+        return Mage::getModel('catalog/product')->load($item->getProductId());
     }
 }
