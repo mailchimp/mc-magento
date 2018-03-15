@@ -227,6 +227,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $productMock->expects($this->once())->method('getResource')->willReturn($productResourceMock);
+
         $productResourceMock->expects($this->once())->method('getCategoryIds')->willReturn($catArray);
 
         $productsApiMock->expects($this->once())->method('makeCatalogCategory')->willReturn($categoryMockGeneric);
@@ -252,6 +253,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $categories[] = $categoryMockOne;
         $categories[] = $categoryMockTwo;
+        
         $categoryCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($categories));
 
         $categoryMockOne->expects($this->once())->method('getName')->willReturn('catO');
