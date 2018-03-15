@@ -307,8 +307,7 @@ class Ebizmarts_MailChimp_Model_Observer
                         $subscriber->setSubscriberFirstname($order->getCustomerFirstname());
                         $subscriber->setSubscriberLastname($order->getCustomerLastname());
                     }
-                    $subscriber->setStoreId($storeId)
-                        ->subscribe($email);
+                    $subscriber->subscribe($email);
                 }
             }
         }

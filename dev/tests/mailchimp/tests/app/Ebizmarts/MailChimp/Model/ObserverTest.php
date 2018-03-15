@@ -507,7 +507,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getCustomerId', 'setSubscriberFirstname', 'setSubscriberLastname', 'setStoreId', 'subscribe'))
+            ->setMethods(array('getCustomerId', 'setSubscriberFirstname', 'setSubscriberLastname', 'subscribe'))
             ->getMock();
 
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
@@ -540,8 +540,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $orderMock->expects($this->once())->method('getCustomerLastname')->willReturn($customerLastname);
 
         $subscriberMock->expects($this->once())->method('setSubscriberLastname')->with($customerLastname);
-
-        $subscriberMock->expects($this->once())->method('setStoreId')->with($storeId);
 
         $subscriberMock->expects($this->once())->method('subscribe')->with($customerEmail);
 
