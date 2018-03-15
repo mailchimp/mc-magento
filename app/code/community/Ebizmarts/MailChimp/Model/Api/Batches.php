@@ -366,7 +366,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $resource = $helper->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
-        $where = array("batch_id IS NULL");
+        $where = array("batch_id IS NULL AND mailchimp_sync_modified != 1");
         $connection->delete($tableName, $where);
     }
 

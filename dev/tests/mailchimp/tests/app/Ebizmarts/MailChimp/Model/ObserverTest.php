@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
          */
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'makeApiProducts'))
+            ->setMethods(array('makeHelper', 'makeApiProduct'))
             ->getMock();
 
         $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $eventMock->expects($this->once())->method('getProductIds')->willReturn(array(12, 34));
 
         $modelMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-        $modelMock->expects($this->once())->method('makeApiProducts')->willReturn($apiProductsMock);
+        $modelMock->expects($this->once())->method('makeApiProduct')->willReturn($apiProductsMock);
 
         $helperMock->expects($this->once())->method('getAllMailChimpStoreIds')->willReturn($mailchimpStoreIdsArray);
         $helperMock->expects($this->once())->method('isEcommerceEnabled')->with($scopeId, $scope)->willReturn(true);
@@ -256,7 +256,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getApiSubscriber'))
+            ->setMethods(array('makeHelper', 'makeApiSubscriber'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -284,7 +284,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
 
-        $observerMock->expects($this->once())->method('getApiSubscriber')->willReturn($apiSubscriberMock);
+        $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
 
         $apiSubscriberMock->expects($this->once())->method('deleteSubscriber')->with($subscriberMock);
 
@@ -316,7 +316,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getApiSubscriber', 'getSubscriberModel', 'getApiCustomer'))
+            ->setMethods(array('makeHelper', 'makeApiSubscriber', 'getSubscriberModel', 'makeApiCustomer'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -349,7 +349,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
 
-        $observerMock->expects($this->once())->method('getApiSubscriber')->willReturn($apiSubscriberMock);
+        $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
 
         $customerMock->expects($this->once())->method('getOrigData')->with('email')->willReturn($oldEmailAddress);
         $customerMock->expects($this->once())->method('getEmail')->willReturn($newEmailAddress);
@@ -369,7 +369,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 
-        $observerMock->expects($this->once())->method('getApiCustomer')->willReturn($apiCustomerMock);
+        $observerMock->expects($this->once())->method('makeApiCustomer')->willReturn($apiCustomerMock);
 
         $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
 
@@ -396,7 +396,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getCustomerModel', 'getApiSubscriber', 'getApiCustomer'))
+            ->setMethods(array('makeHelper', 'getCustomerModel', 'makeApiSubscriber', 'makeApiCustomer'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -441,13 +441,13 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $customerMock->expects($this->once())->method('getEmail')->willReturn($customerEmail);
 
-        $observerMock->expects($this->once())->method('getApiSubscriber')->willReturn($apiSubscriberMock);
+        $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
 
         $apiSubscriberMock->expects($this->once())->method('update')->with($customerEmail, $storeId);
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 
-        $observerMock->expects($this->once())->method('getApiCustomer')->willReturn($apiCustomerMock);
+        $observerMock->expects($this->once())->method('makeApiCustomer')->willReturn($apiCustomerMock);
 
         $apiCustomerMock->expects($this->once())->method('update')->with($customerId, $storeId);
 
@@ -487,13 +487,12 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'removeCampaignData', 'isBundleItem', 'isConfigurableItem'))
+            ->setMethods(array('makeHelper', 'removeCampaignData', 'isBundleItem', 'isConfigurableItem', 'makeApiProduct'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'isSubscriptionEnabled', 'loadListSubscriber', 'subscribeMember',
-                'saveEcommerceSyncData', 'getMCStoreId'))
+            ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'isSubscriptionEnabled', 'loadListSubscriber', 'subscribeMember', 'getMCStoreId'))
             ->getMock();
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
@@ -509,6 +508,11 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getCustomerId', 'setSubscriberFirstname', 'setSubscriberLastname'))
+            ->getMock();
+
+        $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('update'))
             ->getMock();
 
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
@@ -554,7 +558,10 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $itemMock->expects($this->once())->method('getProductId')->willReturn($productId);
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($storeId)->willReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('saveEcommerceSyncData')->with($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId, null, null, 1, null, null, null, true);
+
+        $observerMock->expects($this->once())->method('makeApiProduct')->willReturn($apiProductsMock);
+
+        $apiProductsMock->expects($this->once())->method('update')->with($productId, $mailchimpStoreId);
 
         $observerMock->newOrder($eventObserverMock);
     }
