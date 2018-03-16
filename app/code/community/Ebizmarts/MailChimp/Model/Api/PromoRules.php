@@ -77,7 +77,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 $promoData['operation_id'] = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_' . $helper->getDateMicrotime() . '_' . $ruleId;
                 $promoData['body'] = $promoRuleJson;
                 //update promo rule delta
-                $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($ruleId, $mailchimpStoreId);
             } else {
                 $error = $promoRule->getMailchimpSyncError();
                 if (!$error) {
@@ -181,8 +181,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
      * @param int|null $syncModified
      * @param int|null $syncDeleted
      * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($ruleId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($ruleId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $ruleId,
@@ -194,7 +195,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             $syncDeleted,
             null,
             null,
-            $saveOnlyIfexists
+            $saveOnlyIfexists,
+            $allowBatchRemoval
         );
     }
 
@@ -296,7 +298,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $promoRules = $helper->getAllEcommerceSyncDataItemsPerId($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $helper->saveEcommerceSyncData($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId, null, null, 1);
+            $this->_updateSyncData($ruleId, $mailchimpStoreId, null, null, 1, null, true, false);
         }
     }
 
@@ -311,7 +313,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $promoRules = $helper->getAllEcommerceSyncDataItemsPerId($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $helper->saveEcommerceSyncData($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId, null, null, null, 1);
+            $this->_updateSyncData($ruleId, $mailchimpStoreId, null, null, null, 1, true, false);
         }
     }
 
