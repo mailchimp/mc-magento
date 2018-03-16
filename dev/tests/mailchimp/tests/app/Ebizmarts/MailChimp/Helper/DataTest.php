@@ -870,7 +870,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $subscriberTableAlias = 'newsletter/subscriber';
         $subscriberTableName = 'newsletter_subscriber';
         $where = array("store_id = ?" => $scopeId);
-        $setCondition = array('mailchimp_sync_delta' => '0000-00-00 00:00:00');
+        $setCondition = array('mailchimp_sync_delta' => '0000-00-00 00:00:00', 'mailchimp_sync_error' => '');
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()

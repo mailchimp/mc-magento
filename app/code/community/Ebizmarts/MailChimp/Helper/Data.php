@@ -2982,7 +2982,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         foreach ($storeIdArray as $storeId) {
             $where = array("store_id = ?" => $storeId);
-            $setCondition = array('mailchimp_sync_delta' => '0000-00-00 00:00:00');
+            $setCondition = array('mailchimp_sync_delta' => '0000-00-00 00:00:00', 'mailchimp_sync_error' => '');
             $connection->update($tableName, $setCondition, $where);
         }
     }
