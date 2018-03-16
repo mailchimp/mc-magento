@@ -1395,7 +1395,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return Mage_Core_Model_Abstract
+     * @return Mage_Core_Model_Resource
      */
     public function getCoreResource()
     {
@@ -1408,11 +1408,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getCoreWebsite()
     {
         return Mage::getModel('core/website');
-    }
-
-    private function getProductImageModel()
-    {
-        return Mage::getModel('catalog/product_image');
     }
 
     /**
@@ -2987,7 +2982,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         foreach ($storeIdArray as $storeId) {
             $where = array("store_id = ?" => $storeId);
-            $connection->update($tableName, array('mailchimp_sync_delta' => '0000-00-00 00:00:00'), $where);
+            $setCondition = array('mailchimp_sync_delta' => '0000-00-00 00:00:00');
+            $connection->update($tableName, $setCondition, $where);
         }
     }
 
