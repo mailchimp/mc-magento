@@ -47,7 +47,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $storeId = Mage::getModel('core/store')->load($code)->getId();
         } elseif ($code = Mage::getSingleton('adminhtml/config_data')->getWebsite()) {
             // website level
-            $websiteId = Mage::getModel('core/website')->load($code)->getId();
+            $websiteId = $this->getCoreWebsite()->load($code)->getId();
             $storeId = $this->getMageApp()->getWebsite($websiteId)->getDefaultStore()->getId();
         }
         $scopeArray['websiteId'] = $websiteId;
@@ -1402,6 +1402,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getSingleton('core/resource');
     }
 
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getCoreWebsite()
+    {
+        return Mage::getModel('core/website');
+    }
+
     private function getProductImageModel()
     {
         return Mage::getModel('catalog/product_image');
@@ -2480,7 +2488,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $allItemsSent = $this->allResendItemsSentPerStoreView($scopeId);
         } else {
             if ($scope == 'websites') {
-                $website = Mage::getModel('core/website')->load($scopeId);
+                $website = $this->getCoreWebsite()->load($scopeId);
                 $storeIds = $website->getStoreIds();
                 $allItemsSent = $this->allResendItemsSentPerScope($storeIds);
             } else {
@@ -2968,5 +2976,41 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
         return $isNewApiKeyForSameAccount;
+    }
+
+    public function resendSubscribers($scopeId, $scope = 'stores')
+    {
+        $storeIdArray = $this->getAllStoresForScope($scopeId, $scope);
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('newsletter/subscriber');
+
+        foreach ($storeIdArray as $storeId) {
+            $where = array("store_id = ?" => $storeId);
+            $connection->update($tableName, array('mailchimp_sync_delta' => '0000-00-00 00:00:00'), $where);
+        }
+    }
+
+    protected function getAllStoresForScope($scopeId, $scope)
+    {
+        $storesResult = array();
+
+        switch ($scope) {
+            case 'default':
+                $stores = $this->getMageApp()->getStores();
+                foreach ($stores as $storeId => $store) {
+                    $storesResult[] = $storeId;
+                }
+                break;
+            case 'websites':
+                $website = $this->getCoreWebsite()->load($scopeId);
+                $storesResult = $website->getStoreIds();
+                break;
+            case 'stores':
+                $storesResult[] = $scopeId;
+                break;
+        }
+
+        return $storesResult;
     }
 }
