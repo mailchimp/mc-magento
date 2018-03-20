@@ -8,15 +8,15 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @date:     5/27/16 1:02 PM
- * @file:     ResetErrors.php
+ * @file:     ResendSubscribers.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendSubscribers
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected function _construct()
     {
         parent::_construct();
-        $this->setTemplate('ebizmarts/mailchimp/system/config/reseterrors.phtml');
+        $this->setTemplate('ebizmarts/mailchimp/system/config/resendsubscribers.phtml');
     }
 
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
@@ -32,10 +32,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(
-                        'id' => 'reseterrors_button',
-                        'label' => $helper->__('Reset Local Errors'),
-                        'onclick' => 'javascript:reseterrors(); return false;',
-                        'title' => $helper->__('Reset Local Errors only for current scope')
+                        'id' => 'resendsubscribers_button',
+                        'label' => $helper->__('Resend Subscribers'),
+                        'onclick' => 'javascript:resendsubscribers(); return false;',
+                        'title' => $helper->__('Send all subscribers again only for current scope')
                     )
                 );
 
@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resetLocalErrors', $scopeArray);
+        return Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/resendSubscribers', $scopeArray);
     }
 
     /**
