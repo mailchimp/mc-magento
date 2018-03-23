@@ -362,9 +362,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function deleteUnsentItems()
     {
-        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
-            ->addFieldToFilter('batch_id', array('null' => true));
-        Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceDeleteCallback')));
+        $helper = $this->getHelper();
+        $resource = $helper->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = array("batch_id IS NULL AND mailchimp_sync_modified != 1");
+        $connection->delete($tableName, $where);
     }
 
     public function ecommerceDeleteCallback($args)
@@ -376,14 +379,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
     {
-        $ecommerceDataCollection = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection()
-            ->addFieldToFilter('batch_id', array('null' => true))
-            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId));
-        Mage::getSingleton('core/resource_iterator')->walk($ecommerceDataCollection->getSelect(), array(array($this, 'ecommerceSentCallback')));
-        foreach ($ecommerceDataCollection as $ecommerceData) {
-            $ecommerceData->setBatchId($batchResponseId)
-                ->save();
-        }
+        $helper = $this->getHelper();
+        $resource = $helper->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = array("batch_id IS NULL AND mailchimp_store_id = ?" => $mailchimpStoreId);
+        $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate()), $where);
+
     }
 
     public function ecommerceSentCallback($args)
@@ -568,6 +570,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function processEachResponseFile($files, $batchId, $mailchimpStoreId)
     {
+        $helper = $this->getHelper();
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
             foreach ($items as $item) {
@@ -623,9 +626,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
 
                     $mailchimpErrors->save();
-                    $this->getHelper()->logError($error);
+                    $helper->logError($error);
                 } else {
-                    $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                    $syncDataItem = $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+                    if (!$syncDataItem->getMailchimpSyncModified()) {
+                        $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                    }
                 }
             }
 
@@ -707,25 +713,30 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function addSyncValueToArray($storeId, $syncedDateArray)
     {
         $helper = $this->getHelper();
-        $mailchimpStoreId = $helper->getMCStoreId($storeId);
-        $syncedDate = $helper->getMCIsSyncing($storeId);
-        // Check if $syncedDate is in date format to support previous versions.
-        if (isset($syncedDateArray[$mailchimpStoreId]) && $syncedDateArray[$mailchimpStoreId]) {
-            if ($helper->validateDate($syncedDate)) {
-                if ($syncedDate > $syncedDateArray[$mailchimpStoreId]) {
-                    $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
-                }
-            } elseif ((int)$syncedDate === 1) {
-                $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
-            }
-        } else {
-            if ($helper->validateDate($syncedDate)) {
-                $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
-            } else {
-                if ((int)$syncedDate === 1) {
+        $ecomEnabled = $helper->isEcomSyncDataEnabled($storeId);
+
+        if ($ecomEnabled) {
+            $mailchimpStoreId = $helper->getMCStoreId($storeId);
+            $syncedDate = $helper->getMCIsSyncing($storeId);
+
+            // Check if $syncedDate is in date format to support previous versions.
+            if (isset($syncedDateArray[$mailchimpStoreId]) && $syncedDateArray[$mailchimpStoreId]) {
+                if ($helper->validateDate($syncedDate)) {
+                    if ($syncedDate > $syncedDateArray[$mailchimpStoreId]) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
+                    }
+                } elseif ((int)$syncedDate === 1) {
                     $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
-                } elseif (!isset($syncedDateArray[$mailchimpStoreId])) {
-                    $syncedDateArray[$mailchimpStoreId] = array($storeId => true);
+                }
+            } else {
+                if ($helper->validateDate($syncedDate)) {
+                    $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
+                } else {
+                    if ((int)$syncedDate === 1) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
+                    } elseif (!isset($syncedDateArray[$mailchimpStoreId])) {
+                        $syncedDateArray[$mailchimpStoreId] = array($storeId => true);
+                    }
                 }
             }
         }
@@ -781,5 +792,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCurrentDate()
+    {
+        return Varien_Date::now();
     }
 }

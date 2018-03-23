@@ -104,7 +104,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $codeId;
                     $batchArray[$counter]['body'] = $promoCodeJson;
 
-                    $this->_updateSyncData($codeId, $mailchimpStoreId, Varien_Date::now(), null, null, null, $promoCode->getToken());
+                    $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, null, null, $promoCode->getToken());
                     $counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving the information.');
@@ -203,8 +203,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      * @param int|null $token
      * @param bool $saveOnlyIfexists
      * @param null $deletedRelatedId
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($codeId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false, $deletedRelatedId = null)
+    protected function _updateSyncData($codeId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false, $deletedRelatedId = null, $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $codeId,
@@ -217,7 +218,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             $token,
             null,
             $saveOnlyIfexists,
-            $deletedRelatedId
+            $deletedRelatedId,
+            $allowBatchRemoval
         );
     }
 
@@ -302,7 +304,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $promoCodes = $helper->getAllEcommerceSyncDataItemsPerId($codeId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
         foreach ($promoCodes as $promoCode) {
             $mailchimpStoreId = $promoCode->getMailchimpStoreId();
-            $helper->saveEcommerceSyncData($codeId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, $mailchimpStoreId, null, null, null, 1, null, null, $promoRuleId);
+            $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, null, 1, null, true, $promoRuleId, false);
         }
     }
 
