@@ -589,7 +589,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $apiProduct->update($item->getProductId(), $mailchimpStoreId);
             }
 
-            $apiOrder->update($order->getEntityId(), $mailchimpStoreId);
+            $apiOrder->update($order->getEntityId(), $storeId);
         }
         return $observer;
     }
@@ -623,7 +623,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $apiProduct->update($item->getProductId(), $mailchimpStoreId);
             }
 
-            $apiOrder->update($order->getEntityId(), $mailchimpStoreId);
+            $apiOrder->update($order->getEntityId(), $storeId);
         }
         return $observer;
     }
