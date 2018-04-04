@@ -12,6 +12,15 @@
  */
 class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_Controller_Action
 {
+    public function indexAction()
+    {
+        $this->getResponse()->setBody(
+            $this->getLayout()->createBlock('mailchimp/adminhtml_customer_edit_tab_mailchimp','admin.customer.mailchimp')->setCustomerId(Mage::registry('current_customer')->getId())
+                ->setUseAjax(true)
+                ->toHtml()
+        );
+    }
+
     public function resendSubscribersAction()
     {
         $helper = $this->makeHelper();

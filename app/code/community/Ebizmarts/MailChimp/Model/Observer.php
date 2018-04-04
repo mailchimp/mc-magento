@@ -110,7 +110,7 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function saveConfig(Varien_Event_Observer $observer)
     {
-        $post = Mage::app()->getRequest()->getPost();
+        $post = $this->getRequest()->getPost();
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
 
@@ -133,9 +133,22 @@ class Ebizmarts_MailChimp_Model_Observer
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
+        $storeId = $subscriber->getStoreId();
+        $groups = $this->getRequest()->getParam('group');
         $helper = $this->makeHelper();
+        try {
+            $interestGroup = Mage::getModel('mailchimp/interestgroup');
+            $interestGroup->getBySubscriberIdStoreId($subscriber->getSubscriberId(),$storeId);
+            $interestGroup->setGroupdata(serialize($groups));
+            $interestGroup->setSubscriberId($subscriber->getSubscriberId());
+            $interestGroup->setStoreId($storeId);
+            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
+            $interestGroup->save();
+        } catch (Exception $e) {
+            $helper->logError($e->getMessage());
+        }
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
-            $isEnabled = $helper->isSubscriptionEnabled($subscriber->getStoreId());
+            $isEnabled = $helper->isSubscriptionEnabled($storeId);
             if ($isEnabled) {
                 $apiSubscriber = $this->makeApiSubscriber();
                 $subscriber->setImportMode(true);
@@ -531,7 +544,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if (!Mage::getSingleton('customer/session')->isLoggedIn()
             && $isEcomEnabled && $isAbandonedCartEnabled
         ) {
-            $action = Mage::app()->getRequest()->getActionName();
+            $action = $this->getRequest()->getActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
             if (Mage::getModel('core/cookie')->get('email')
@@ -798,7 +811,7 @@ class Ebizmarts_MailChimp_Model_Observer
     public function secondaryCouponsDelete(Varien_Event_Observer $observer)
     {
         $promoCodesApi = $this->makeApiPromoCode();
-        $params = Mage::app()->getRequest()->getParams();
+        $params = $this->getRequest()->getParams();
         if (isset($params['ids']) && isset($params['id'])) {
             $promoRuleId = $params['id'];
             $promoCodeIds = $params['ids'];
@@ -885,5 +898,25 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function removeRegistry()
     {
         return Mage::unregister('sort_column_dir');
+    }
+
+    public function addCustomerTab(Varien_Event_Observer $observer)
+    {
+//        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
+        $block = $observer->getEvent()->getBlock();
+        // add tab in customer edit page
+        if ($block instanceof Mage_Adminhtml_Block_Customer_Edit_Tabs) {
+            Mage::log('is instance', null, 'ebizmarts.log', true);
+            if ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type')) {
+                Mage::log('add tab', null, 'ebizmarts.log', true);
+                $block->addTab('mailchimp', array('label' => Mage::helper('customer')->__('MailChimp'), 'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)), 'class' => 'ajax'));
+            }
+        }
+        return $observer;
+    }
+
+    protected function getRequest()
+    {
+        return Mage::app()->getRequest();
     }
 }

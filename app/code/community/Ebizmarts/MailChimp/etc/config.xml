@@ -304,15 +304,15 @@
             </updates>
         </layout>
         <events>
-            <core_block_abstract_prepare_layout_before>
+            <core_block_abstract_prepare_layout_after>
                 <observers>
-                    <magebuzz_add_custom_tab>
+                    <mailchimp_add_customer_tab>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>addTabToCustomer</method>
-                    </magebuzz_add_custom_tab>
+                        <method>addCustomerTab</method>
+                    </mailchimp_add_customer_tab>
                 </observers>
-            </core_block_abstract_prepare_layout_before>
+            </core_block_abstract_prepare_layout_after>
             <core_block_abstract_to_html_after>
                 <observers>
                     <mailchimp_order_view_to_html_after>
