@@ -619,18 +619,9 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $orderGridCollectionMock->expects($this->once())->method('addFilterToMap')->with('store_id', 'main_table.store_id');
         $orderGridCollectionMock->expects($this->once())->method('getSelect')->willReturn($selectMock);
-        $orderGridCollectionMock->expects($this->exactly(2))->method('getTable')->withConsecutive(
-            array('sales/order'),
-            array('mailchimp/ecommercesyncdata')
-            )->willReturnOnConsecutiveCalls(
-                $orderTableName,
-                $mcTableName
-            );
+        $orderGridCollectionMock->expects($this->once())->method('getTable')->with('mailchimp/ecommercesyncdata')->willReturn($mcTableName);
 
-        $selectMock->expects($this->exactly(2))->method('joinLeft')->withConsecutive(
-            array(array('oe' => $orderTableName), 'oe.entity_id=main_table.entity_id', array('oe.mailchimp_campaign_id')),
-            array(array('mc' => $mcTableName), $condition, array('mc.mailchimp_synced_flag', 'mc.id'))
-        );
+        $selectMock->expects($this->once())->method('joinLeft')->with(array('mc' => $mcTableName), $condition, array('mc.mailchimp_synced_flag', 'mc.id'));
 
         $observerMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
 
