@@ -71,12 +71,16 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                             $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
                             $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
                         } catch (MailChimp_Error $e) {
-                            if ($helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+                            $adminSession = Mage::getSingleton('adminhtml/session');
+                            if (strstr($e->getFriendlyMessage(), 'A store with the domain')) {
+                                $errorMessage = $helper->__("A MailChimp store with the domain already exists in this account. You need to have a different URL for each scope you set up the ecommerce data.");
+                                $adminSession->addError($errorMessage);
+                            } else if ($helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
                                 $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                                 if ($listId) {
                                     $helper->createStore($listId, $scopeArray['scope_id'], $scopeArray['scope']);
                                     $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');
-                                    Mage::getSingleton('adminhtml/session')->addWarning($message);
+                                    $adminSession->addWarning($message);
                                 }
                             }
                             $this->_accountDetails['store_exists'] = false;
