@@ -36,8 +36,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $this->mailchimpStoreId = $mailchimpStoreId;
-        $this->magentoStoreId = $magentoStoreId;
+        $this->setMailchimpStoreId($mailchimpStoreId);
+        $this->setMagentoStoreId($magentoStoreId);
 
         $collection = $this->makeCustomersNotSentCollection();
         $this->joinMailchimpSyncData($collection);
@@ -51,11 +51,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $counter = 0;
         foreach ($collection as $customer) {
             $data = $this->_buildCustomerData($customer);
-
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
-                $this->_updateSyncData($customer->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
             } else {
                 $this->logCouldNotEncodeCustomerError($customer);
             }
@@ -166,7 +165,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function update($customerId, $storeId)
     {
         $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
+        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true, false);
     }
 
     public function createGuestCustomer($guestId, $order)
@@ -208,10 +207,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param int|null $syncModified
      * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
-        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
+        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists, $allowBatchRemoval);
     }
 
     /**
@@ -407,5 +407,21 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 "m4m.mailchimp_sync_modified"
             )
         );
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     */
+    protected function setMailchimpStoreId($mailchimpStoreId)
+    {
+        $this->mailchimpStoreId = $mailchimpStoreId;
+    }
+
+    /**
+     * @param $magentoStoreId
+     */
+    protected function setMagentoStoreId($magentoStoreId)
+    {
+        $this->magentoStoreId = $magentoStoreId;
     }
 }
