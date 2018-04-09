@@ -53,7 +53,6 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
-                Mage::log($e->getFriendlyMessage(), null, 'ebizmarts.log', true);
                 $adminSession = Mage::getSingleton('adminhtml/session');
                 if (strstr($e->getFriendlyMessage(), 'A store with the domain')) {
                     $errorMessage = $helper->__("A MailChimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data.");
