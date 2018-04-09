@@ -14,11 +14,14 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 {
     public function indexAction()
     {
-        $this->getResponse()->setBody(
-            $this->getLayout()->createBlock('mailchimp/adminhtml_customer_edit_tab_mailchimp','admin.customer.mailchimp')->setCustomerId(Mage::registry('current_customer')->getId())
-                ->setUseAjax(true)
-                ->toHtml()
-        );
+        $customerId = (int) $this->getRequest()->getParam('id');
+        if ($customerId) {
+            $this->getResponse()->setBody(
+                $this->getLayout()->createBlock('mailchimp/adminhtml_customer_edit_tab_mailchimp', 'admin.customer.mailchimp')->setCustomerId($customerId)
+                    ->setUseAjax(true)
+                    ->toHtml()
+            );
+        }
     }
 
     public function resendSubscribersAction()
@@ -42,6 +45,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
+        case 'index':
         case 'resendSubscribers':
             $acl = 'system/config/mailchimp';
             break;
