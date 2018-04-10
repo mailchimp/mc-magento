@@ -75,7 +75,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                                 $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                                 if ($listId) {
                                     $helper->createStore($listId, $scopeArray['scope_id'], $scopeArray['scope']);
-                                    $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');
+                                    $message = $helper->__('Looks like your MailChimp store was deleted. Attempting to create a new one.');
                                     Mage::getSingleton('adminhtml/session')->addWarning($message);
                                 }
                             }
