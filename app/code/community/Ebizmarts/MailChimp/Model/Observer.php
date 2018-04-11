@@ -237,15 +237,44 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function customerSaveBefore(Varien_Event_Observer $observer)
     {
+        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
         $customer = $observer->getEvent()->getCustomer();
+        $origEmail = $customer->getOrigData('email');
+        $customerEmail = $customer->getEmail();
         $storeId = $customer->getStoreId();
+
+        //@Todo if is admin
+        $params = $this->getRequest()->getParams();
+        Mage::log($params, null, 'ebizmarts.log', true);
+        if (isset($params['customer']) && isset($params['customer']['interestgroup'])) {
+            $subscriberModel = $this->getSubscriberModel();
+            $subscriber = $subscriberModel->loadByEmail($origEmail);
+            $subscriberId = $subscriber->getSubcriberId();
+            if (!$subscriberId) {
+                $subscriber->setSubscriberEmail($customerEmail)
+                    ->setFirstname($customer->getFristname())
+                    ->setLastname($customer->getLastname())
+                    ->setCustomerId($customer->getEntityId())
+                    ->setStoreId($storeId)
+                    ->subscribe($customerEmail);
+                Mage::log('subscribe', null, 'ebizmarts.log', true);
+                Mage::log($subscriber->getData(), null, 'ebizmarts.log', true);
+            }
+            $interestGroup = Mage::getModel('mailchimp/interestgroup');
+            $interestGroup->getBySubscriberIdStoreId($subscriberId, $storeId);
+            $interestGroup->setGroupdata(serialize($params['customer']['interestgroup']));
+            $interestGroup->setSubscriberId($subscriber->getSubscriberId());
+            $interestGroup->setStoreId($storeId);
+            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
+            $interestGroup->save();
+            Mage::log('after save', null, 'ebizmarts.log', true);
+        }
+
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
 
         if ($isEnabled) {
             $apiSubscriber = $this->makeApiSubscriber();
-            $origEmail = $customer->getOrigData('email');
-            $customerEmail = $customer->getEmail();
             if ($origEmail) {
                 // check if customer has changed email address
                 if ($origEmail != $customerEmail) {
@@ -908,7 +937,7 @@ class Ebizmarts_MailChimp_Model_Observer
             Mage::log('is instance', null, 'ebizmarts.log', true);
             if ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type')) {
                 Mage::log('add tab', null, 'ebizmarts.log', true);
-                $block->addTab('mailchimp', array('label' => Mage::helper('customer')->__('MailChimp'), 'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)), 'class' => 'ajax'));
+                $block->addTab('mailchimp', array('order' => 100,'label' => Mage::helper('mailchimp')->__('MailChimp'), 'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)), 'class' => 'ajax'));
             }
         }
         return $observer;

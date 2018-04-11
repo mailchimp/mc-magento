@@ -212,7 +212,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         $subscriber = Mage::getModel('newsletter/subscriber');
         $order = Mage::getSingleton('checkout/session')->getLastRealOrder();
         $subscriber->loadByEmail($order->getCustomerEmail());
-        $interest = $this->helper->getSubscriberInterest($subscriber->getSubscriberId(),$subscriber->getStoreId());
+        $interest = $this->helper->getSubscriberInterest($subscriber->getSubscriberId(),$order->getStoreId());
         return $interest;
     }
 
