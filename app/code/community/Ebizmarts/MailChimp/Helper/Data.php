@@ -133,7 +133,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getStoreDomain($scopeId, $scope)
     {
-        return $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_UNSECURE_BASE_URL, $scopeId, $scope);
+        if ($scope == 'stores') {
+            $domain = $this->getMageApp()->getStore($scopeId)->getBaseUrl();
+        } else {
+            $domain = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_UNSECURE_BASE_LINK_URL, $scopeId, $scope);
+        }
+        return $domain;
     }
 
     /**
