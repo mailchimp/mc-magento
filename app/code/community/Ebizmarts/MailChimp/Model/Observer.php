@@ -247,7 +247,9 @@ class Ebizmarts_MailChimp_Model_Observer
                     $subscriber = $subscriberModel->loadByCustomer($customer);
                     $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
 
-                    $apiSubscriber->updateSubscriber($subscriber, true);
+                    if ($subscriber->getId()) {
+                        $apiSubscriber->updateSubscriber($subscriber, true);
+                    }
                 }
             }
             //update subscriber data if a subscriber with the same email address exists
