@@ -241,13 +241,13 @@ class Ebizmarts_MailChimp_Model_Observer
                     if ($subscriber->getId()) {
                         // unsubscribe old email address
                         $apiSubscriber->deleteSubscriber($subscriber);
+
+                        // subscribe new email address
+                        $subscriber = $subscriberModel->loadByCustomer($customer);
+                        $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
+
+                        $apiSubscriber->updateSubscriber($subscriber, true);
                     }
-
-                    // subscribe new email address
-                    $subscriber = $subscriberModel->loadByCustomer($customer);
-                    $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
-
-                    $apiSubscriber->updateSubscriber($subscriber, true);
                 }
             }
             //update subscriber data if a subscriber with the same email address exists
