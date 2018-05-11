@@ -134,19 +134,7 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $subscriber = $observer->getEvent()->getSubscriber();
         $storeId = $subscriber->getStoreId();
-        $groups = $this->getRequest()->getParam('group');
         $helper = $this->makeHelper();
-        try {
-            $interestGroup = Mage::getModel('mailchimp/interestgroup');
-            $interestGroup->getBySubscriberIdStoreId($subscriber->getSubscriberId(),$storeId);
-            $interestGroup->setGroupdata(serialize($groups));
-            $interestGroup->setSubscriberId($subscriber->getSubscriberId());
-            $interestGroup->setStoreId($storeId);
-            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
-            $interestGroup->save();
-        } catch (Exception $e) {
-            $helper->logError($e->getMessage());
-        }
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $isEnabled = $helper->isSubscriptionEnabled($storeId);
             if ($isEnabled) {
@@ -237,7 +225,6 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function customerSaveBefore(Varien_Event_Observer $observer)
     {
-        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
         $customer = $observer->getEvent()->getCustomer();
         $origEmail = $customer->getOrigData('email');
         $customerEmail = $customer->getEmail();
@@ -245,8 +232,12 @@ class Ebizmarts_MailChimp_Model_Observer
 
         //@Todo if is admin
         $params = $this->getRequest()->getParams();
-        Mage::log($params, null, 'ebizmarts.log', true);
-        if (isset($params['customer']) && isset($params['customer']['interestgroup'])) {
+        if (isset($params['customer']) && isset($params['customer']['interestgroup']) || isset($params['group'])) {
+            if (isset($params['group'])) {
+                $groups = $params['group'];
+            } else {
+                $groups = $params['customer']['interestgroup'];
+            }
             $subscriberModel = $this->getSubscriberModel();
             $subscriber = $subscriberModel->loadByEmail($origEmail);
             $subscriberId = $subscriber->getSubcriberId();
@@ -257,17 +248,14 @@ class Ebizmarts_MailChimp_Model_Observer
                     ->setCustomerId($customer->getEntityId())
                     ->setStoreId($storeId)
                     ->subscribe($customerEmail);
-                Mage::log('subscribe', null, 'ebizmarts.log', true);
-                Mage::log($subscriber->getData(), null, 'ebizmarts.log', true);
             }
             $interestGroup = Mage::getModel('mailchimp/interestgroup');
             $interestGroup->getBySubscriberIdStoreId($subscriberId, $storeId);
-            $interestGroup->setGroupdata(serialize($params['customer']['interestgroup']));
+            $interestGroup->setGroupdata(serialize($groups));
             $interestGroup->setSubscriberId($subscriber->getSubscriberId());
             $interestGroup->setStoreId($storeId);
             $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
             $interestGroup->save();
-            Mage::log('after save', null, 'ebizmarts.log', true);
         }
 
         $helper = $this->makeHelper();
@@ -930,14 +918,18 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function addCustomerTab(Varien_Event_Observer $observer)
     {
-//        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
         $block = $observer->getEvent()->getBlock();
+        $helper = $this->makeHelper();
         // add tab in customer edit page
         if ($block instanceof Mage_Adminhtml_Block_Customer_Edit_Tabs) {
-            Mage::log('is instance', null, 'ebizmarts.log', true);
-            if ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type')) {
-                Mage::log('add tab', null, 'ebizmarts.log', true);
-                $block->addTab('mailchimp', array('order' => 100,'label' => Mage::helper('mailchimp')->__('MailChimp'), 'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)), 'class' => 'ajax'));
+            $customerId = (int) $this->getRequest()->getParam('id');
+            $customer = Mage::getModel('customer/customer')->load($customerId);
+            if ($helper->getLocalInterestCategories($customer->getStoreId()) && ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type'))) {
+                $block->addTab('mailchimp', array(
+                    'label' => $helper->__('MailChimp'),
+                    'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
+                    'class' => 'ajax'
+                    ));
             }
         }
         return $observer;

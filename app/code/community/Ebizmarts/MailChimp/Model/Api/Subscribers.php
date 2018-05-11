@@ -108,8 +108,31 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $data["status"] = $status;
         }
         $data["language"] = $helper->getStoreLanguageCode($storeId);
+        $interest = $this->_getInterest($subscriber);
+        if(count($interest)) {
+            $data['interests'] = $interest;
+        }
 
         return $data;
+    }
+
+    /**
+     * @param $subscriber
+     * @return array
+     */
+    protected function _getInterest($subscriber)
+    {
+        $storeId = $subscriber->getStoreId();
+        $rc = array();
+        $helper = $this->mcHelper;
+        $interestsAvailable = $helper->getInterest($storeId);
+        $interest = $helper->getSubscriberInterest($subscriber->getSubscriberId(), $storeId, $interestsAvailable);
+        foreach($interest as $i) {
+            foreach($i['category'] as $key=>$value) {
+                $rc[$value['id']] = $value['checked'];
+            }
+        }
+        return $rc;
     }
 
     public function getMergeVars($subscriber)
@@ -339,6 +362,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 return;
             }
             $mergeVars = $this->getMergeVars($subscriber);
+            $interest = $this->_getInterest($subscriber);
+
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
@@ -352,7 +377,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
-                            $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
+                            $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars, $interest);
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
                             $message = $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
                             Mage::getSingleton('core/session')->addWarning($message);

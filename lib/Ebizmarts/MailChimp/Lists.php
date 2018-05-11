@@ -80,8 +80,8 @@ class MailChimp_Lists extends MailChimp_Abstract
     )
     {
 
-        $_params = array('name' => $name, 'contact' => $contact, 'permission_remainder' => $permissionRemanider,
-            'use_archive_bar' => $useArchiveBar, 'campaignDefaults' => $campaingDefaults,
+        $_params = array('name' => $name, 'contact' => $contact, 'permission_reminder' => $permissionRemanider,
+            'use_archive_bar' => $useArchiveBar, 'campaign_defaults' => $campaingDefaults,
             'notify_on_subscribe' => $notifyOnSubscribe, 'notify_on_unsubscribe' => $notifyOnUnsubscribe,
             'email_type_option' => $emailTypeOption, 'visibility' => $visibility);
         return $this->_master->call('lists', $_params, Ebizmarts_MailChimp::POST);
@@ -133,7 +133,7 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @param $name                     The name of the list.
      * @param $contact                  Contact information displayed in campaign footers to comply with international
      *                                  spam laws.
-     * @param $permissionRemainder      The permission reminder for the list.
+     * @param $permissionReminder      The permission reminder for the list.
      * @param null $useArchiveBar Whether campaigns for this list use the Archive Bar in archives by default.
      * @param null $campaignDefaults Default values for campaigns created for this list.
      * @param null $notifyOnSubscribe The email address to send subscribe notifications to.
@@ -148,12 +148,12 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function edit($listId, $name, $contact, $permissionRemainder, $emailTypeOption, $useArchiveBar = null,
+    public function edit($listId, $name, $contact, $permissionReminder, $emailTypeOption, $useArchiveBar = null,
                          $campaignDefaults = null, $notifyOnSubscribe = null, $notifyOnUnsubscribe = null, $visibility = null
     )
     {
 
-        $_params = array('name' => $name, 'contact' => $contact, 'permission_remainder' => $permissionRemainder,
+        $_params = array('name' => $name, 'contact' => $contact, 'permission_reminder' => $permissionReminder,
             'email_type_option' => $emailTypeOption);
         if ($useArchiveBar) {
             $_params['use_archive_bar'] = $useArchiveBar;

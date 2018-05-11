@@ -25,9 +25,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
         $subscriber = Mage::getModel('newsletter/subscriber')
             ->loadByEmail($order->getCustomerEmail());
         try {
-            if ($subscriber->getSubscriberEmail() == $order->getCustomerEmail()) {
-                $this->getApiSubscriber()->update($subscriber->getSubscriberEmail(), $storeId, '', 1);
-            } else {
+            if (!$subscriber->getSubscriberId()) {
                 $subscriber->setSubscriberEmail($order->getCustomerEmail());
                 $subscriber->setSubscriberFirstname($order->getCustomerFirstname());
                 $subscriber->setSubscriberLastname($order->getCustomerLastname());
@@ -39,6 +37,8 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
             $interestGroup->setStoreId($storeId);
             $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
             $interestGroup->save();
+
+            $this->getApiSubscriber()->update($subscriber->getSubscriberEmail(), $storeId, '', 1);
 
             $session->addSuccess($this->__('Thanks for share your interest with us.'));
         } catch (Exception $e) {

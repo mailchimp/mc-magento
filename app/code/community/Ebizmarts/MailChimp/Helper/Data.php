@@ -3055,18 +3055,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $interestGroupsArray;
     }
+
     public function getLocalInterestCategories($scopeId, $scope = 'stores')
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_CATEGORIES, $scopeId, $scope);
     }
+
     public function getCheckoutSuccessHtmlBefore($scopeId, $scope = 'stores')
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_BEFORE, $scopeId, $scope);
     }
+
     public function getCheckoutSuccessHtmlAfter($scopeId, $scope = 'stores')
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_AFTER, $scopeId, $scope);
     }
+
     public function getInterest($storeId)
     {
         $rc = [];
@@ -3092,6 +3096,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $rc;
     }
+
     public function getSubscriberInterest($subscriberId, $storeId, $interest = null)
     {
         if (!$interest) {
@@ -3099,9 +3104,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         $interestGroup = Mage::getModel('mailchimp/interestgroup');
         $interestGroup->getBySubscriberIdStoreId($subscriberId, $storeId);
-        $groups = unserialize($interestGroup->getGroupdata());
-        if (isset($groups['group'])) {
-            foreach ($groups['group'] as $key => $value) {
+        if ($interestGroup->getId()) {
+            $groups = unserialize($interestGroup->getGroupdata());
+            foreach ($groups as $key => $value) {
                 if (isset($interest[$key])) {
                     if (is_array($value)) {
                         foreach ($value as $groupId) {
