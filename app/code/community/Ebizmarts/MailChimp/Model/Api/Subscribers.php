@@ -197,12 +197,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     $eventValue = $mergeVars[$key] = $websiteId;
                                     break;
                                 case 'created_in':
-                                    if ($customer->getData($attributeCode)) {
-                                        $eventValue = $mergeVars[$key] = $customer->getData($attributeCode);
-                                    } else {
-                                        $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
-                                        $eventValue = $mergeVars[$key] = $storeCode;
-                                    }
+                                        $storeName = Mage::getModel('core/store')->load($storeId)->getName();
+                                        $eventValue = $mergeVars[$key] = $storeName;
                                     break;
                                 case 'dob':
                                     if ($customer->getData($attributeCode)) {
@@ -283,6 +279,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 $eventValue = $mergeVars[$key] = $dop;
                             }
                             break;
+                        case 'store_code':
+                            $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
+                            $eventValue = $mergeVars[$key] = $storeCode;
                     }
 
                     Mage::dispatchEvent(
