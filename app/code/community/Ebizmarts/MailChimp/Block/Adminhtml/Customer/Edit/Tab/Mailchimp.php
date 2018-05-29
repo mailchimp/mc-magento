@@ -30,19 +30,43 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
     {
         parent::__construct();
         $this->setTemplate('ebizmarts/mailchimp/customer/tab/mailchimp.phtml');
-        $this->helper = Mage::helper('mailchimp');
+        $this->helper = $this->makeHelper();
         $customerId = (int) $this->getRequest()->getParam('id');
         if ($customerId) {
-            $this->_customer = Mage::getModel('customer/customer')->load($customerId);
+            $this->_customer = $this->getCustomerModel()->load($customerId);
             $this->storeId = $this->_customer->getStoreId();
         }
     }
 
     public function getInterest()
     {
-        $subscriber = Mage::getModel('newsletter/subscriber');
+        $subscriber = $this->getSubscriberModel();
         $subscriber->loadByEmail($this->_customer->getEmail());
         $interest = $this->helper->getSubscriberInterest($subscriber->getSubscriberId(), $this->storeId);
         return $interest;
+    }
+
+    /**
+     * @return Mage_Newsletter_Model_Subscriber
+     */
+    protected function getSubscriberModel()
+    {
+        return Mage::getModel('newsletter/subscriber');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getCustomerModel()
+    {
+        return Mage::getModel('customer/customer');
     }
 }
