@@ -3,10 +3,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.11</version>
+            <version>1.1.12</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -361,8 +361,8 @@
         <mailchimp>
             <general>
                 <webhook_active>1</webhook_active>
-                <map_fields><![CDATA[a:27:{s:18:"_1468601283719_719";a:2:{s:9:"mailchimp";s:7:"WEBSITE";s:7:"magento";s:1:"1";}s:18:"_1468609069544_544";a:2:{s:9:"mailchimp";s:7:"STOREID";s:7:"magento";s:1:"2";}s:18:"_1469026825907_907";a:2:{s:9:"mailchimp";s:9:"STORECODE";s:7:"magento";s:1:"3";}s:18:"_1469027411717_717";a:2:{s:9:"mailchimp";s:6:"PREFIX";s:7:"magento";s:1:"4";}s:18:"_1469027418285_285";a:2:{s:9:"mailchimp";s:5:"FNAME";s:7:"magento";s:1:"5";}s:18:"_1469027422918_918";a:2:{s:9:"mailchimp";s:5:"MNAME";s:7:"magento";s:1:"6";}s:18:"_1469027429502_502";a:2:{s:9:"mailchimp";s:5:"LNAME";s:7:"magento";s:1:"7";}s:18:"_1469027434574_574";a:2:{s:9:"mailchimp";s:6:"SUFFIX";s:7:"magento";s:1:"8";}s:18:"_1469027444231_231";a:2:{s:9:"mailchimp";s:5:"EMAIL";s:7:"magento";s:1:"9";}s:18:"_1469027453439_439";a:2:{s:9:"mailchimp";s:6:"CGROUP";s:7:"magento";s:2:"10";}s:18:"_1469027462887_887";a:2:{s:9:"mailchimp";s:3:"DOB";s:7:"magento";s:2:"11";}s:18:"_1469027468903_903";a:2:{s:9:"mailchimp";s:7:"BILLING";s:7:"magento";s:2:"13";}s:18:"_1469027475632_632";a:2:{s:9:"mailchimp";s:8:"SHIPPING";s:7:"magento";s:2:"14";}s:18:"_1469027480560_560";a:2:{s:9:"mailchimp";s:3:"TAX";s:7:"magento";s:2:"15";}s:18:"_1469027486920_920";a:2:{s:9:"mailchimp";s:9:"CONFIRMED";s:7:"magento";s:2:"16";}s:18:"_1469027496512_512";a:2:{s:9:"mailchimp";s:9:"CREATEDAT";s:7:"magento";s:2:"17";}s:18:"_1469027502720_720";a:2:{s:9:"mailchimp";s:6:"GENDER";s:7:"magento";s:2:"18";}s:18:"_1469027508616_616";a:2:{s:9:"mailchimp";s:9:"DISGRPCHG";s:7:"magento";s:2:"35";}s:18:"_1472845935735_735";a:2:{s:9:"mailchimp";s:8:"BCOMPANY";s:7:"magento";s:15:"billing_company";}s:18:"_1472846546252_252";a:2:{s:9:"mailchimp";s:8:"BCOUNTRY";s:7:"magento";s:15:"billing_country";}s:18:"_1472846569989_989";a:2:{s:9:"mailchimp";s:10:"BTELEPHONE";s:7:"magento";s:17:"billing_telephone";}s:18:"_1472846572949_949";a:2:{s:9:"mailchimp";s:8:"BZIPCODE";s:7:"magento";s:15:"billing_zipcode";}s:18:"_1472846578861_861";a:2:{s:9:"mailchimp";s:8:"SCOMPANY";s:7:"magento";s:16:"shipping_company";}s:17:"_1472846584014_14";a:2:{s:9:"mailchimp";s:8:"SCOUNTRY";s:7:"magento";s:16:"shipping_country";}s:18:"_1472846587534_534";a:2:{s:9:"mailchimp";s:10:"STELEPHONE";s:7:"magento";s:18:"shipping_telephone";}s:18:"_1472846591374_374";a:2:{s:9:"mailchimp";s:8:"SZIPCODE";s:7:"magento";s:16:"shipping_zipcode";}s:18:"_1490127043147_147";a:2:{s:9:"mailchimp";s:3:"DOP";s:7:"magento";s:3:"dop";}}]]></map_fields>
-                <customer_map_fields><![CDATA[a:10:{i:0;a:3:{s:5:"label";s:18:"Shipping Telephone";s:5:"value";s:18:"shipping_telephone";s:10:"field_type";s:4:"text";}i:1;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:2;a:3:{s:5:"label";s:15:"Billing Company";s:5:"value";s:15:"billing_company";s:10:"field_type";s:4:"text";}i:3;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:4;a:3:{s:5:"label";s:17:"Billing Telephone";s:5:"value";s:17:"billing_telephone";s:10:"field_type";s:4:"text";}i:5;a:3:{s:5:"label";s:15:"Billing Country";s:5:"value";s:15:"billing_country";s:10:"field_type";s:4:"text";}i:6;a:3:{s:5:"label";s:16:"Shipping Country";s:5:"value";s:16:"shipping_country";s:10:"field_type";s:4:"text";}i:7;a:3:{s:5:"label";s:15:"Billing ZipCode";s:5:"value";s:15:"billing_zipcode";s:10:"field_type";s:4:"text";}i:8;a:3:{s:5:"label";s:16:"Shipping ZipCode";s:5:"value";s:16:"shipping_zipcode";s:10:"field_type";s:4:"text";}i:9;a:3:{s:5:"label";s:21:"Last Date Of Purchase";s:5:"value";s:3:"dop";s:10:"field_type";s:4:"date";}}]]></customer_map_fields>
+                <map_fields><![CDATA[a:27:{s:18:"_1468601283719_719";a:2:{s:9:"mailchimp";s:7:"WEBSITE";s:7:"magento";s:1:"1";}s:18:"_1468609069544_544";a:2:{s:9:"mailchimp";s:7:"STOREID";s:7:"magento";s:1:"2";}s:18:"_1469026825907_907";a:2:{s:9:"mailchimp";s:9:"STORENAME";s:7:"magento";s:1:"3";}s:18:"_1469027411717_717";a:2:{s:9:"mailchimp";s:6:"PREFIX";s:7:"magento";s:1:"4";}s:18:"_1469027418285_285";a:2:{s:9:"mailchimp";s:5:"FNAME";s:7:"magento";s:1:"5";}s:18:"_1469027422918_918";a:2:{s:9:"mailchimp";s:5:"MNAME";s:7:"magento";s:1:"6";}s:18:"_1469027429502_502";a:2:{s:9:"mailchimp";s:5:"LNAME";s:7:"magento";s:1:"7";}s:18:"_1469027434574_574";a:2:{s:9:"mailchimp";s:6:"SUFFIX";s:7:"magento";s:1:"8";}s:18:"_1469027444231_231";a:2:{s:9:"mailchimp";s:5:"EMAIL";s:7:"magento";s:1:"9";}s:18:"_1469027453439_439";a:2:{s:9:"mailchimp";s:6:"CGROUP";s:7:"magento";s:2:"10";}s:18:"_1469027462887_887";a:2:{s:9:"mailchimp";s:3:"DOB";s:7:"magento";s:2:"11";}s:18:"_1469027468903_903";a:2:{s:9:"mailchimp";s:7:"BILLING";s:7:"magento";s:2:"13";}s:18:"_1469027475632_632";a:2:{s:9:"mailchimp";s:8:"SHIPPING";s:7:"magento";s:2:"14";}s:18:"_1469027480560_560";a:2:{s:9:"mailchimp";s:3:"TAX";s:7:"magento";s:2:"15";}s:18:"_1469027486920_920";a:2:{s:9:"mailchimp";s:9:"CONFIRMED";s:7:"magento";s:2:"16";}s:18:"_1469027496512_512";a:2:{s:9:"mailchimp";s:9:"CREATEDAT";s:7:"magento";s:2:"17";}s:18:"_1469027502720_720";a:2:{s:9:"mailchimp";s:6:"GENDER";s:7:"magento";s:2:"18";}s:18:"_1469027508616_616";a:2:{s:9:"mailchimp";s:9:"DISGRPCHG";s:7:"magento";s:2:"35";}s:18:"_1472845935735_735";a:2:{s:9:"mailchimp";s:8:"BCOMPANY";s:7:"magento";s:15:"billing_company";}s:18:"_1472846546252_252";a:2:{s:9:"mailchimp";s:8:"BCOUNTRY";s:7:"magento";s:15:"billing_country";}s:18:"_1472846569989_989";a:2:{s:9:"mailchimp";s:10:"BTELEPHONE";s:7:"magento";s:17:"billing_telephone";}s:18:"_1472846572949_949";a:2:{s:9:"mailchimp";s:8:"BZIPCODE";s:7:"magento";s:15:"billing_zipcode";}s:18:"_1472846578861_861";a:2:{s:9:"mailchimp";s:8:"SCOMPANY";s:7:"magento";s:16:"shipping_company";}s:17:"_1472846584014_14";a:2:{s:9:"mailchimp";s:8:"SCOUNTRY";s:7:"magento";s:16:"shipping_country";}s:18:"_1472846587534_534";a:2:{s:9:"mailchimp";s:10:"STELEPHONE";s:7:"magento";s:18:"shipping_telephone";}s:18:"_1472846591374_374";a:2:{s:9:"mailchimp";s:8:"SZIPCODE";s:7:"magento";s:16:"shipping_zipcode";}s:18:"_1490127043147_147";a:2:{s:9:"mailchimp";s:3:"DOP";s:7:"magento";s:3:"dop";}}]]></map_fields>
+                <customer_map_fields><![CDATA[a:11:{i:0;a:3:{s:5:"label";s:18:"Shipping Telephone";s:5:"value";s:18:"shipping_telephone";s:10:"field_type";s:4:"text";}i:1;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:2;a:3:{s:5:"label";s:15:"Billing Company";s:5:"value";s:15:"billing_company";s:10:"field_type";s:4:"text";}i:3;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:4;a:3:{s:5:"label";s:17:"Billing Telephone";s:5:"value";s:17:"billing_telephone";s:10:"field_type";s:4:"text";}i:5;a:3:{s:5:"label";s:15:"Billing Country";s:5:"value";s:15:"billing_country";s:10:"field_type";s:4:"text";}i:6;a:3:{s:5:"label";s:16:"Shipping Country";s:5:"value";s:16:"shipping_country";s:10:"field_type";s:4:"text";}i:7;a:3:{s:5:"label";s:15:"Billing ZipCode";s:5:"value";s:15:"billing_zipcode";s:10:"field_type";s:4:"text";}i:8;a:3:{s:5:"label";s:16:"Shipping ZipCode";s:5:"value";s:16:"shipping_zipcode";s:10:"field_type";s:4:"text";}i:9;a:3:{s:5:"label";s:21:"Last Date Of Purchase";s:5:"value";s:3:"dop";s:10:"field_type";s:4:"date";}i:10;a:3:{s:5:"label";s:10:"Store Code";s:5:"value";s:10:"store_code";s:10:"field_type";s:4:"text";}}]]></customer_map_fields>
                 <order_grid>3</order_grid>
                 <subscriber_batch_amount>200</subscriber_batch_amount>
             </general>
@@ -399,6 +399,7 @@
                 <run>
                     <model>mailchimp/cron::syncEcommerceBatchData</model>
                 </run>
+                <groups>ebizmarts_mailchimp</groups>
             </mailchimp_bulksync_ecommerce_data>
             <mailchimp_bulksync_subscriber_data>
                 <schedule>
@@ -407,6 +408,7 @@
                 <run>
                     <model>mailchimp/cron::syncSubscriberBatchData</model>
                 </run>
+                <groups>ebizmarts_mailchimp</groups>
             </mailchimp_bulksync_subscriber_data>
             <mailchimp_process_webhook_data>
                 <schedule>
@@ -415,14 +417,16 @@
                 <run>
                     <model>mailchimp/cron::processWebhookData</model>
                 </run>
+                <groups>ebizmarts_mailchimp</groups>
             </mailchimp_process_webhook_data>
-	    <mailchimp_delete_webhook_processed>
+            <mailchimp_delete_webhook_processed>
                 <schedule>
                     <cron_expr>0 0 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>mailchimp/cron::deleteWebhookRequests</model>
                 </run>
+                <groups>ebizmarts_mailchimp</groups>
             </mailchimp_delete_webhook_processed>
         </jobs>
     </crontab>

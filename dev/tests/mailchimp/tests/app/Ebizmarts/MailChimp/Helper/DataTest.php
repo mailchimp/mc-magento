@@ -860,4 +860,75 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->isNewApiKeyForSameAccount($oldApiKey, $newApiKey);
     }
+
+    public function testResendSubscribers()
+    {
+        $scopeId = 1;
+        $scope = 'stores';
+        $storeArray = array(1);
+        $connectionType = 'core_write';
+        $subscriberTableAlias = 'newsletter/subscriber';
+        $subscriberTableName = 'newsletter_subscriber';
+        $where = array("store_id = ?" => $scopeId);
+        $setCondition = array('mailchimp_sync_delta' => '0000-00-00 00:00:00', 'mailchimp_sync_error' => '');
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAllStoresForScope', 'getCoreResource'))
+            ->getMock();
+
+        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConnection', 'getTableName'))
+            ->getMock();
+
+        $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
+
+        $helperMock->expects($this->once())->method('getAllStoresForScope')->with($scopeId, $scope)->willReturn($storeArray);
+
+        $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
+        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
+        $coreResourceMock->expects($this->once())->method('getTableName')->with($subscriberTableAlias)->willReturn($subscriberTableName);
+
+        $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($subscriberTableName, $setCondition, $where);
+
+        $helperMock->resendSubscribers($scopeId, $scope);
+    }
+
+    public function testResetCampaign()
+    {
+        $scopeId = 1;
+        $scope = 'stores';
+        $connectionType = 'core_write';
+        $orderTableAlias = 'sales/order';
+        $orderTableName = 'sales_flat_order';
+        $whereString = "mailchimp_campaign_id IS NOT NULL AND (store_id = 1)";
+        $where = array($whereString);
+        $setCondition = array('mailchimp_campaign_id' => NULL);
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCoreResource', 'makeWhereString'))
+            ->getMock();
+
+        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConnection', 'getTableName'))
+            ->getMock();
+
+        $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
+
+
+        $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
+
+        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
+
+        $helperMock->expects($this->once())->method('makeWhereString')->with($dbAdapterInterfaceMock, $scopeId, $scope)->willReturn($whereString);
+
+        $coreResourceMock->expects($this->once())->method('getTableName')->with($orderTableAlias)->willReturn($orderTableName);
+
+        $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($orderTableName, $setCondition, $where);
+
+        $helperMock->resetCampaign($scopeId, $scope);
+    }
 }

@@ -1,0 +1,24 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function resendsubscribers() {
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method: 'get',
+            onSuccess: function (transport) {
+
+                if (transport.responseText == 1) {
+                    alert('The subscriber sending process has been reset.')
+                }
+                else {
+                    alert('An error happened while removing the local sync data.')
+                }
+            },
+            onFailure: function () {
+                alert('Something went wrong.')
+            }
+        });
+    }
+    //]]>
+</script>
+
+
+<?php echo $this->getButtonHtml(); ?>
