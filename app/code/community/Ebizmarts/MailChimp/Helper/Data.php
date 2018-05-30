@@ -133,7 +133,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getStoreDomain($scopeId, $scope)
     {
-        return $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_UNSECURE_BASE_URL, $scopeId, $scope);
+        if ($scope == 'stores') {
+            $domain = $this->getMageApp()->getStore($scopeId)->getBaseUrl();
+        } else {
+            $domain = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_UNSECURE_BASE_LINK_URL, $scopeId, $scope);
+        }
+        return $domain;
     }
 
     /**
@@ -716,21 +721,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetCampaign($scopeId, $scope)
     {
-        $orderCollection = Mage::getResourceModel('sales/order_collection')
-            ->addFieldToFilter(
-                'mailchimp_campaign_id', array(
-                    array('neq' => 0))
-            )
-            ->addFieldToFilter(
-                'mailchimp_campaign_id', array(
-                    array('notnull' => true)
-                )
-            );
-        $orderCollection = $this->addStoresToFilter($orderCollection, $scopeId, $scope);
-        foreach ($orderCollection as $order) {
-            $order->setMailchimpCampaignId(0);
-            $order->save();
-        }
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $whereString = $this->makeWhereString($connection, $scopeId, $scope);
+        $tableName = $resource->getTableName('sales/order');
+        $where = array($whereString);
+        $connection->update($tableName, array('mailchimp_campaign_id' => NULL), $where);
     }
 
     /**
@@ -3008,6 +3004,33 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $storesResult;
+    }
+
+    /**
+     * @param $connection
+     * @param $scopeId
+     * @param $scope
+     * @return string
+     */
+    protected function makeWhereString($connection, $scopeId, $scope)
+    {
+        $storesForScope = $this->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
+        $whereString = "mailchimp_campaign_id IS NOT NULL";
+        if (count($storesForScope)) {
+            $whereString .= " AND (";
+        }
+        $counter = 0;
+        foreach ($storesForScope as $storeId) {
+            if ($counter) {
+                $whereString .= " OR ";
+            }
+            $whereString .= $connection->quoteInto("store_id = ?", $storeId);
+            $counter++;
+        }
+        if (count($storesForScope)) {
+            $whereString .= ")";
+        }
+        return $whereString;
     }
 
     public function getListInterestCategories($scopeId, $scope = 'stores')
