@@ -17,7 +17,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $customerId = (int) $this->getRequest()->getParam('id');
         if ($customerId) {
             $this->getResponse()->setBody(
-                $this->getLayout()->createBlock('mailchimp/adminhtml_customer_edit_tab_mailchimp', 'admin.customer.mailchimp')->setCustomerId($customerId)
+                $this->getLayout()
+                    ->createBlock('mailchimp/adminhtml_customer_edit_tab_mailchimp', 'admin.customer.mailchimp')
+                    ->setCustomerId($customerId)
                     ->setUseAjax(true)
                     ->toHtml()
             );
