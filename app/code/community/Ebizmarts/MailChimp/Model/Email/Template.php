@@ -52,13 +52,13 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $subject = $this->getProcessedTemplateSubject($variables);
 
         $email = array('subject' => $subject, 'to' => array());
-        $setReturnPath = $this->getSendingReturnPath();
+        $setReturnPath = $this->getSendingSetReturnPath();
         switch ($setReturnPath) {
         case 1:
             $returnPathEmail = $this->getSenderEmail();
             break;
         case 2:
-            $returnPathEmail = Mage::getStoreConfig(self::XML_PATH_SENDING_RETURN_PATH_EMAIL);
+            $returnPathEmail = $this->getSendingReturnPathEmail();
             break;
         default:
             $returnPathEmail = null;
@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         }
 
         if(!$senderExists) {
-            $email['from_email'] = Mage::getStoreConfig('trans_email/ident_general/email');
+            $email['from_email'] = $this->getGeneralEmail();
         }
 
         $headers = $mail->getHeaders();
@@ -219,7 +219,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
     /**
      * @return mixed
      */
-    protected function getSendingReturnPath()
+    protected function getSendingSetReturnPath()
     {
         return Mage::getStoreConfig(self::XML_PATH_SENDING_SET_RETURN_PATH);
     }
@@ -241,5 +241,21 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
     protected function sendMail($email, $mail)
     {
         return $mail->messages->send($email);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSendingReturnPathEmail()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_SENDING_RETURN_PATH_EMAIL);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getGeneralEmail()
+    {
+        return Mage::getStoreConfig('trans_email/ident_general/email');
     }
 }
