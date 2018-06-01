@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getDesignConfig', 'isValidForSend', 'setUseAbsoluteLinks', 'getProcessedTemplate',
                 'getProcessedTemplateSubject', 'getSenderEmail', 'getMail', 'getSenderName', 'isPlain', 'makeMandrillHelper',
-                'hasQueue', 'getQueue', 'makeHelper', 'getSendingReturnPath', 'getSendersDomains', 'sendMail'))
+                'hasQueue', 'getQueue', 'makeHelper', 'getSendingSetReturnPath', 'getSendersDomains', 'sendMail'))
             ->getMock();
 
         $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
         $templateMock->expects($this->once())->method('setUseAbsoluteLinks')->willReturn(true);
         $templateMock->expects($this->once())->method('getProcessedTemplate')->with($variables, true)->willReturn($message);
         $templateMock->expects($this->once())->method('getProcessedTemplateSubject')->with($variables)->willReturn($subject);
-        $templateMock->expects($this->once())->method('getSendingReturnPath')->willReturn($returnPath);
+        $templateMock->expects($this->once())->method('getSendingSetReturnPath')->willReturn($returnPath);
         $templateMock->expects($this->exactly(2))->method('getSenderEmail')->willReturnOnConsecutiveCalls($senderEmail, $senderEmail);
         $templateMock->expects($this->once())->method('getMail')->willReturn($mailObjectMock);
 
