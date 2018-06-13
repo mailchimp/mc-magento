@@ -42,7 +42,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $frontEndCollection = $this->makeCustomersNotSentCollection();
         $adminCollection = $this->makeAdminCustomersNotSentCollection();
 
-        $collectionIds = array_merge($frontEndCollection->getAllIds(), $adminCollection->getAllIds());
+        $collectionIds = array_unique(array_merge($frontEndCollection->getAllIds(), $adminCollection->getAllIds()));
 
         $collection = $this->getCustomerResourceCollection()
             ->addFieldToFilter('entity_id', array('in' => $collectionIds))
