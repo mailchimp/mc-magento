@@ -23,14 +23,11 @@ $attributeGroupId = $setup->getDefaultAttributeGroupId($entityTypeId, $attribute
 
 $setup->addAttribute("customer", "mailchimp_store_view",  array(
     "type"     => "int",
-    "backend"  => "",
     "label"    => "Store View (For MailChimp)",
     "input"    => "select",
     "source"   => "mailchimp/system_config_source_mailchimpStoreView",
     "visible"  => true,
     "required" => false,
-    "default" => "",
-    "frontend" => "",
     "unique"     => false,
     "note"       => "A store view must be specified to sync this customer to MailChimp"
 
