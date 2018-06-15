@@ -338,11 +338,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 return;
             }
             $mergeVars = $this->getMergeVars($subscriber);
+            $language = $helper->getStoreLanguageCode($storeId);
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
                     $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
-                    null, null, null, null
+                    null, $language, null, null
                 );
                 $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
                 $subscriber->setData("mailchimp_sync_error", "");
