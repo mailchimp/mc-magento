@@ -320,7 +320,7 @@ class Ebizmarts_MailChimp
         );
         // check for language param to set as browser language
         // mailchimp uses header/browser detection for the language rather than any profile setting
-        if (count($paramsOrig) && array_key_exists('language', $paramsOrig) && !empty($paramsOrig['language'])) {
+        if (is_array($paramsOrig) && array_key_exists('language', $paramsOrig) && !empty($paramsOrig['language'])) {
             $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
         }
 
