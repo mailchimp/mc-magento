@@ -2804,9 +2804,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getStoreLanguageCode($scopeId, $scope = 'stores')
     {
-        $userLangCode = Mage::app()->getLocale()->getLocaleCode();
-        if ('' == $lang = $this->_lang2MCLanguage($userLangCode)) {
-            // if users lang is not supported, try store views default locale
+        $isAdmin        = Mage::app()->getStore()->isAdmin();
+        $userLangCode   = Mage::app()->getLocale()->getLocaleCode();
+        if ($isAdmin || '' == $lang = $this->_lang2MCLanguage($userLangCode)) {
+            // IS Admin OR if users lang is not supported, try store views default locale
             $userLangCode = $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $scopeId, $scope);
             $lang = $this->_lang2MCLanguage($userLangCode);
         }
