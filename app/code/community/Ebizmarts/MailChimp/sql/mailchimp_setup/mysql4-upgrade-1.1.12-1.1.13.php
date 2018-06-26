@@ -1,20 +1,23 @@
 <?php
-/**
- * mc-magento Magento Component
- *
- * @category  Ebizmarts
- * @package   mc-magento
- * @author    Ebizmarts Team <info@ebizmarts.com>
- * @copyright Ebizmarts (http://ebizmarts.com)
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date:     30/05/18 2:46 PM
- * @file:     mysql4-upgrade-1.1.12-1.1.13.php
- */
 
 $installer = $this;
 
+/** @var Mage_Eav_Model_Entity_Setup $installer */
 $installer->startSetup();
 
+try {
+    $salesOrderTableName = $installer->getTable('sales/order');
+    $indexFields = array('customer_id');
+
+    $installer->getConnection()->addIndex(
+        $salesOrderTableName,
+        $installer->getIdxName($salesOrderTableName, $indexFields),
+        $indexFields,
+        Varien_Db_Adapter_Interface::INDEX_TYPE_INDEX
+    );
+} catch (Exception $e) {
+    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+}
 $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
 
 $entityTypeId     = $setup->getEntityTypeId('customer');
