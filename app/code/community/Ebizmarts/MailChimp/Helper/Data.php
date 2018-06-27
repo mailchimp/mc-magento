@@ -14,6 +14,64 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 {
 
     /**
+     * All MailChimp available language codes
+     * @var array
+     */
+    public static $MAILCHIMP_LANGUAGES = array(
+        'en', // English
+        'ar', // Arabic
+        'af', // Afrikaans
+        'be', // Belarusian
+        'bg', // Bulgarian
+        'ca', // Catalan
+        'zh', // Chinese
+        'hr', // Croatian
+        'cs', // Czech
+        'da', // Danish
+        'nl', // Dutch
+        'et', // Estonian
+        'fa', // Farsi
+        'fi', // Finnish
+        'fr', // French (France)
+        'fr_CA', // French (Canada)
+        'de', // German
+        'el', // Greek
+        'he', // Hebrew
+        'hi', // Hindi
+        'hu', // Hungarian
+        'is', // Icelandic
+        'id', // Indonesian
+        'ga', // Irish
+        'it', // Italian
+        'ja', // Japanese
+        'km', // Khmer
+        'ko', // Korean
+        'lv', // Latvian
+        'lt', // Lithuanian
+        'mt', // Maltese
+        'ms', // Malay
+        'mk', // Macedonian
+        'no', // Norwegian
+        'pl', // Polish
+        'pt', // Portuguese (Brazil)
+        'pt_PT', // Portuguese (Portugal)
+        'ro', // Romanian
+        'ru', // Russian
+        'sr', // Serbian
+        'sk', // Slovak
+        'sl', // Slovenian
+        'es', // Spanish (Mexico)
+        'es_ES', // Spanish (Spain)
+        'sw', // Swahili
+        'sv', // Swedish
+        'ta', // Tamil
+        'th', // Thai
+        'tr', // Turkish
+        'uk', // Ukrainian
+        'vi', // Vietnamese
+    );
+
+    /**
      * Get Config value for certain scope.
      *
      * @param  $path
@@ -2746,7 +2804,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getStoreLanguageCode($scopeId, $scope = 'stores')
     {
-        return $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $scopeId, $scope);
+        $isAdmin        = Mage::app()->getStore()->isAdmin();
+        $userLangCode   = Mage::app()->getLocale()->getLocaleCode();
+        if ($isAdmin || '' == $lang = $this->_lang2MCLanguage($userLangCode)) {
+            // IS Admin OR if users lang is not supported, try store views default locale
+            $userLangCode = $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $scopeId, $scope);
+            $lang = $this->_lang2MCLanguage($userLangCode);
+        }
+
+        return $lang;
     }
 
     public function getStoreTimeZone($scopeId, $scope = 'stores')
@@ -3031,6 +3097,27 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $whereString .= ")";
         }
         return $whereString;
+    }
+
+    /**
+     * Convert language into Mailchimp compatible language code.
+     * @param string $languageCode
+     * @return string   Returns empty string if not MC Language match found
+     */
+    private function _lang2MCLanguage($languageCode = '')
+    {
+        $mailchimpLanguage = '';
+
+        if (in_array($languageCode, self::$MAILCHIMP_LANGUAGES)) {
+            $mailchimpLanguage = $languageCode;
+        } else {
+            $langIso2 = substr($languageCode, 0, 2);
+            if (in_array($langIso2, self::$MAILCHIMP_LANGUAGES)) {
+                $mailchimpLanguage = $langIso2;
+            }
+        }
+
+        return $mailchimpLanguage;
     }
 
     public function isSubscriptionConfirmationEnabled($scopeId, $scope = 'stores')
