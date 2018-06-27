@@ -639,4 +639,71 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock->addColumnToSalesOrderGridCollection($eventObserverMock);
     }
+
+    public function testHandleSubscriber()
+    {
+        $storeId = 1;
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getCoreResource', 'getRegistry', 'removeRegistry', 'createEmailCookie',
+                'makeApiSubscriber', 'addSuccessIfRequired'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isSubscriptionEnabled', 'isEcomSyncDataEnabledInAnyScope',
+                'isSubscriptionConfirmationEnabled'))
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriber'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriberSource', 'getStoreId', 'getIsStatusChanged', 'getStatus', 'setStatus',
+                'setImportMode', 'getOrigData', 'getSubscriberStatus'))
+            ->getMock();
+
+        $apiSubscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('updateSubscriber'))
+            ->getMock();
+
+        $eventObserverMock->expects($this->once())->method('getEvent')->willReturn($eventMock);
+
+        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $eventMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn(null);
+        $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
+
+        $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
+        $subscriberMock->expects($this->once())->method('getStatus')->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+
+        $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)->willReturn(true);
+
+        $subscriberMock->expects($this->once())->method('setStatus')->with(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+
+        $observerMock->expects($this->once())->method('addSuccessIfRequired')->with($helperMock);
+        $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
+
+        $subscriberMock->expects($this->once())->method('setImportMode')->with(true);
+
+        $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
+
+        $apiSubscriberMock->expects($this->once())->method('updateSubscriber')->with($subscriberMock, true);
+
+        $observerMock->handleSubscriber($eventObserverMock);
+    }
 }
