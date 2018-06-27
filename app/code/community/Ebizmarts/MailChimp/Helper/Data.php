@@ -3120,4 +3120,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $mailchimpLanguage;
     }
 
+    public function isSubscriptionConfirmationEnabled($scopeId, $scope = 'stores')
+    {
+        return (bool)$this->getConfigValueForScope(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG, $scopeId, $scope);
+    }
 }
