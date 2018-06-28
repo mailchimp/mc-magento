@@ -205,7 +205,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncedDateArray = array();
         foreach ($stores as $store) {
             $storeId = $store->getId();
-            $this->handleResetIfNecessary($storeId);
             $syncedDateArray = $this->addSyncValueToArray($storeId, $syncedDateArray);
         }
         $this->handleSyncingValue($syncedDateArray);
