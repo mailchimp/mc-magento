@@ -20,7 +20,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $storeId = $row->getStoreId();
         $orderId = $row->getEntityId();
         $helper = $this->makeHelper();
-        $isReset = $helper->getIsReset($storeId);
         if ($helper->isEcomSyncDataEnabled($storeId)) {
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
             $resultArray = $this->makeApiOrders()->getSyncedOrder($orderId, $mailchimpStoreId);
@@ -29,9 +28,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 
             if ($status == self::SYNCED) {
                 $result = '<div style ="color:green">' . $helper->__("Yes") . '</div>';
-            } elseif ($status === null && $id !== null && !$isReset)
+            } elseif ($status === null && $id !== null)
                 $result = '<div style ="color:#ed6502">' . $helper->__("Processing") . '</div>';
-            elseif ($status === null || $isReset) {
+            elseif ($status === null) {
                 $result = '<div style ="color:mediumblue">' . $helper->__("In queue") . '</div>';
             } else {
                 $result = '<div style ="color:red">' . $helper->__("No") . '</div>';

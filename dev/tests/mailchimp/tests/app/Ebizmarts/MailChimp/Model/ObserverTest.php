@@ -570,7 +570,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     {
         $addColumnConfig = 1;
         $scopeId = 0;
-        $orderTableName = 'sales_flat_order';
         $mcTableName = 'mailchimp_ecommerce_sync_data';
         $condition = 'mc.related_id=main_table.entity_id AND type = '.Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $direction = 'ASC';
@@ -592,7 +591,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $orderGridCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Grid_Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addFilterToMap', 'getSelect', 'getTable', 'addOrder'))
+            ->setMethods(array('getSelect', 'getTable', 'addOrder'))
             ->getMock();
 
         $selectMock = $this->getMockBuilder(Varien_Db_Select::class)
@@ -617,7 +616,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $eventObserverMock->expects($this->once())->method('getOrderGridCollection')->willReturn($orderGridCollectionMock);
 
-        $orderGridCollectionMock->expects($this->once())->method('addFilterToMap')->with('store_id', 'main_table.store_id');
         $orderGridCollectionMock->expects($this->once())->method('getSelect')->willReturn($selectMock);
         $orderGridCollectionMock->expects($this->once())->method('getTable')->with('mailchimp/ecommercesyncdata')->willReturn($mcTableName);
 
