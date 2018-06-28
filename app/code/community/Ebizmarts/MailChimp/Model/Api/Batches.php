@@ -779,22 +779,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $storeId
-     */
-    protected function handleResetIfNecessary($storeId)
-    {
-        $helper = $this->getHelper();
-        if ($helper->getIsReset($storeId)) {
-            $scopeToReset = $helper->getMailChimpScopeByStoreId($storeId);
-            if ($scopeToReset) {
-                $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
-                $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
-                $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
-            }
-        }
-    }
-
-    /**
      * @return string
      */
     protected function getCurrentDate()
