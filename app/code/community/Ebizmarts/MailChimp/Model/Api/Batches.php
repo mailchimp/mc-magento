@@ -383,7 +383,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
         $where = array("batch_id IS NULL AND mailchimp_store_id = ?" => $mailchimpStoreId);
-        $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate()), $where);
+        $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate(), 'mailchimp_synced_flag' => 1), $where);
 
     }
 
