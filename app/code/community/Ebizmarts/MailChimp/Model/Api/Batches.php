@@ -314,7 +314,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         if (!$batchJson || $batchJson == '') {
                             $helper->logRequest('An empty operation was detected');
                         } else {
-                            if (!$helper->getIsReset($magentoStoreId)) {
                                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                                 $helper->logRequest($batchJson, $batchResponse['id']);
                                 //save batch id to db
@@ -324,7 +323,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                     ->setStatus($batchResponse['status']);
                                 $batch->save();
                                 $this->markItemsAsSent($batchResponse['id'], $mailchimpStoreId);
-                            }
                         }
                     }
 
@@ -664,7 +662,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if (!$batchJson || $batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
-                        if (!$helper->getIsReset($magentoStoreId)) {
                             $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                             $helper->logRequest($batchJson, $batchResponse['id']);
                             //save batch id to db
@@ -673,7 +670,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 ->setBatchId($batchResponse['id'])
                                 ->setStatus($batchResponse['status']);
                             $batch->save();
-                        }
                     }
                 }
 
