@@ -205,7 +205,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncedDateArray = array();
         foreach ($stores as $store) {
             $storeId = $store->getId();
-            $this->handleResetIfNecessary($storeId);
             $syncedDateArray = $this->addSyncValueToArray($storeId, $syncedDateArray);
         }
         $this->handleSyncingValue($syncedDateArray);
@@ -774,22 +773,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 } catch (Exception $e) {
                     $helper->logError($e->getMessage());
                 }
-            }
-        }
-    }
-
-    /**
-     * @param $storeId
-     */
-    protected function handleResetIfNecessary($storeId)
-    {
-        $helper = $this->getHelper();
-        if ($helper->getIsReset($storeId)) {
-            $scopeToReset = $helper->getMailChimpScopeByStoreId($storeId);
-            if ($scopeToReset) {
-                $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
-                $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
-                $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
             }
         }
     }

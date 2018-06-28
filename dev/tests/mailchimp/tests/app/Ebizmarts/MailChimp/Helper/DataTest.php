@@ -211,7 +211,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE."_$mailchimpStoreId", $scopeId, $scope);
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", $scopeId, $scope);
 
         $helperMock->getDateSyncFinishByStoreId($scopeId, $scope);
     }
@@ -441,7 +441,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testSetImageSizeVarToArray(){
+    public function testSetImageSizeVarToArray()
+    {
         $imageSize = 'image_size';
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -772,10 +773,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->exactly(2))->method('getConfigValueForScope')->withConsecutive(
             array(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope),
             array('web/unsecure/base_url', 0)
-            )->willReturnOnConsecutiveCalls(
+        )->willReturnOnConsecutiveCalls(
             '',
             $storeName
-            );
+        );
 
         $result = $helperMock->getMCStoreName($scopeId, $scope);
 
@@ -930,5 +931,41 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($orderTableName, $setCondition, $where);
 
         $helperMock->resetCampaign($scopeId, $scope);
+    }
+
+    public function testSaveLastItemsSent()
+    {
+        $scope = 'stores';
+        $scopeId = 1;
+        $customerLastId = 10;
+        $productLastId = 10;
+        $orderLastId = 10;
+        $cartLastId = 10;
+        $promoCodeLastId = 10;
+        $configValues = array(
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId),
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId),
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId),
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId),
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $promoCodeLastId),
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, 1),
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, 1)
+            );
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMCIsSyncing', 'getLastCustomerSent', 'getLastProductSent', 'getLastOrderSent',
+                'getLastCartSent', 'getLastPromoCodeSent', 'saveMailchimpConfig'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getMCIsSyncing')->with($scopeId, $scope)->willReturn(false);
+        $helperMock->expects($this->once())->method('getLastCustomerSent')->with($scopeId, $scope)->willReturn($customerLastId);
+        $helperMock->expects($this->once())->method('getLastProductSent')->with($scopeId, $scope)->willReturn($productLastId);
+        $helperMock->expects($this->once())->method('getLastOrderSent')->with($scopeId, $scope)->willReturn($orderLastId);
+        $helperMock->expects($this->once())->method('getLastCartSent')->with($scopeId, $scope)->willReturn($cartLastId);
+        $helperMock->expects($this->once())->method('getLastPromoCodeSent')->with($scopeId, $scope)->willReturn($promoCodeLastId);
+        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, $scopeId, $scope);
+
+        $helperMock->saveLastItemsSent($scopeId, $scope);
     }
 }
