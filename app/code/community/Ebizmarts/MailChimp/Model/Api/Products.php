@@ -100,7 +100,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
         try {
-            $body = json_encode($bodyData);
+            $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
         } catch (Exception $e) {
             //json encode failed
             $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
@@ -140,7 +140,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     }
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
                     try {
-                        $body = json_encode($bodyData);
+                        $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
                     } catch (Exception $e) {
                         //json encode failed
                         $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
@@ -175,7 +175,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
         try {
-            $body = json_encode($bodyData);
+            $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
         } catch (Exception $e) {
             //json encode failed
             $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
@@ -227,7 +227,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else {
             $productDesc = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
             if (is_string($productDesc)) {
-                $productDesc = strip_tags($productDesc);
                 $data["description"] = $productDesc;
                 }
 
