@@ -69,23 +69,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Grid extends Mage_Admi
                 'sortable' => false
             )
         );
-//        $this->addColumn(
-//            'action_donwload', array(
-//                'header'   => $this->helper('mailchimp')->__('Edit'),
-//                'width'    => 15,
-//                'sortable' => false,
-//                'filter'   => false,
-//                'type'     => 'action',
-//                'getter'   => 'getId',
-//                'actions'  => array(
-//                    array(
-//                        'url'     => array('base'=> '*/*/edit'),
-//                        'caption' => $this->helper('mailchimp')->__('Edit'),
-//                        'field'   => 'id'
-//                    ),
-//                )
-//            )
-//        );
 
         return parent::_prepareColumns();
     }
