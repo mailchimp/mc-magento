@@ -23,9 +23,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
 
         $store = Mage::registry('current_mailchimpstore');
 
-        if ($store->getId()) {
-            $form->addField('entity_id', 'hidden', array(
-                'name' => 'store_id',
+        if ($store->getStoreid()) {
+            $form->addField('storeid', 'hidden', array(
+                'name' => 'storeid',
+            ));
+            $form->addField('apikey', 'hidden', array(
+                'name' => 'apikey'
             ));
             $form->setValues($store->getData());
         }
@@ -158,12 +161,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             'required'  => true,
             'options'   => $countryArray,
         ));
-
-
-
-
-
-
 
         $form->setValues($store->getData());
 
