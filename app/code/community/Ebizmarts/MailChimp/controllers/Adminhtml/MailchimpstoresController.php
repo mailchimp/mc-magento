@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * mc-magento Magento Component
  *
@@ -78,15 +78,77 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     }
     public function newAction()
     {
+
         $this->_forward('edit');
     }
     public function saveAction()
     {
-        Mage::log(__METHOD__);
-        $this->_redirectReferer();
+        $isPost = $this->getRequest()->getPost();
+        if($isPost) {
+            $this->_updateMailchimp($isPost);
+        }
+        $this->_redirect('*/*/index');
     }
-    protected function _updateMailchimp()
+    protected function _updateMailchimp($formData)
     {
+        $api = Mage::helper('mailchimp')->getApiByKey($formData['apikey']);
+        $address = [];
+        $address['address1']    = $formData['address_address_one'];
+        $address['address2']    = $formData['address_address_two'];
+        $address['city']        = $formData['address_city'];
+        $address['province']    = '';
+        $address['province_code'] = '';
+        $address['postal_code'] = $formData['address_postal_code'];
+        $address['country']     = '';
+        $address['country_code'] = $formData['address_country_code'];
+        // *****
+        $emailAddress   = $formData['email_address'];
+        $currencyCode   = $formData['currency_code'];
+        $primaryLocale  = $formData['primary_locale'];
+        $timeZone       = $formData['timezone'];
+        $phone          = $formData['phone'];
+        $name           = $formData['name'];
+        $domain         = $formData['domain'];
+        $storeId = isset($formData['storeid']) ? $formData['storeid'] : null;
+        $is_sync = null;
+
+        if ($storeId) {
+            $api->ecommerce->stores->edit(
+                $storeId,
+                $name,
+                'Magento',
+                $domain,
+                $is_sync,
+                $emailAddress,
+                $currencyCode,
+                null,
+                $primaryLocale,
+                $timeZone,
+                $phone,
+                $address
+            );
+        } else {
+            $date =  Mage::helper('mailchimp')->getDateMicrotime();
+            $mailchimpStoreId = md5($name. '_' . $date);
+            $is_sync = true;
+            $ret =$api->ecommerce->stores->add(
+                $mailchimpStoreId,
+                $formData['listid'],
+                $name,
+                $currencyCode,
+                $is_sync,
+                'Magento',
+                $domain,
+                $emailAddress,
+                null,
+                $primaryLocale,
+                $timeZone,
+                $phone,
+                $address
+            );
+            $formData['storeid'] = $mailchimpStoreId;
+        }
+        return $formData['storeid'];
 
     }
     protected function _loadStores()
@@ -138,8 +200,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
                         ->setAddressProvince($store['address']['province'])
                         ->setAddressProvinceCode($store['address']['province_code'])
                         ->setAddressPostalCode($store['address']['postal_code'])
-                        ->setCountry($store['address']['country'])
-                        ->setCountryCode($store['address']['country_code'])
+                        ->setAddressCountry($store['address']['country'])
+                        ->setAddressCountryCode($store['address']['country_code'])
                         ->setDomain($store['domain'])
                         ->setMcAccountName($root['account_name'])
                         ->setListName(key_exists('name',$list) ? $list['name']: '')
@@ -148,5 +210,38 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
             }
         }
 
+    }
+    public function getstoresAction()
+    {
+        $apiKey = $this->getRequest()->getParam('apikey');
+        $helper = Mage::helper('mailchimp');
+        $data = array();
+        try {
+            $api = $helper->getApiByKey($apiKey);
+            $lists = $api->lists->getLists();
+            $data = array();
+            foreach ($lists['lists'] as $list) {
+                $data[$list['id']] = array('id' => $list['id'], 'name' => $list['name']);
+            }
+            $jsonData = json_encode($data);
+        } catch(Exception $e) {
+
+        }
+        $this->getResponse()->setHeader('Content-type', 'application/json');
+        $this->getResponse()->setBody($jsonData);
+    }
+    public function deleteAction()
+    {
+        $id = $this->getRequest()->getParam('id');
+        $store = Mage::getModel('mailchimp/stores')->load($id);
+        if($store->getId()) {
+            try {
+                $api = Mage::helper('mailchimp')->getApiByKey($store->getApikey());
+                $api->ecommerce->stores->delete($store->getStoreid());
+            } catch(Exception $e) {
+
+            }
+        }
+        $this->_redirect('*/*/index');
     }
 }
