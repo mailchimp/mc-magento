@@ -42,18 +42,22 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
                     $apikeys[$apikey] = $apikey;
                 }
             }
-            $fieldset->addField('apikey', 'select', array(
+            $apikeyField =$fieldset->addField('apikey', 'select', array(
                 'label'     => Mage::helper('mailchimp')->__('Api Key'),
                 'title'     => Mage::helper('mailchimp')->__('Api Key'),
                 'name'      => 'apikey',
                 'required'  => true,
                 'options'   => $apikeys,
             ));
-            $fieldset->addField('listid', 'text', array(
+            $getStoresUrl = Mage::helper('adminhtml')->getUrl('adminhtml/mailchimpstores/getstores');
+            $apikeyField->setAfterElementHtml("<script>var GET_STORES_URL = '".$getStoresUrl."';</script>");
+
+            $fieldset->addField('listid', 'select', array(
                 'name'      => 'listid',
                 'label'     => Mage::helper('mailchimp')->__('List'),
                 'title'     => Mage::helper('mailchimp')->__('List'),
                 'required'  => true,
+                'options'   => array()
             ));
         }
         $fieldset->addField('name', 'text', array(
