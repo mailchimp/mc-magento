@@ -19,7 +19,7 @@ function loadStores() {
 
 function loadApiKeys()
 {
-    if($('apikey')!= undefined) {
+    if($('apikey')!= undefined && $('apikey').offsetWidth > 0 && $('apikey').offsetHeight > 0) {
         loadStores();
         $("apikey").onchange = loadStores;
     }
