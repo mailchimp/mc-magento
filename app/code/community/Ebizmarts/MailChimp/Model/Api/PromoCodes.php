@@ -82,7 +82,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             $ruleId = $promoCode->getRuleId();
             try {
                 $promoRuleSyncData = $this->getMailChimpHelper()->getEcommerceSyncDataItem($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId);
-                if (!$promoRuleSyncData->getMailchimpSyncDelta() || $promoRuleSyncData->getMailchimpSyncDelta() < $helper->getEcommMinSyncDateFlag($magentoStoreId)) {
+                if (!$promoRuleSyncData->getId() || $promoRuleSyncData->getMailchimpSyncDelta() < $helper->getEcommMinSyncDateFlag($magentoStoreId)) {
                     $promoRuleMailchimpData = $this->getApiPromoRules()->getNewPromoRule($ruleId, $this->_batchId, $mailchimpStoreId, $magentoStoreId);
                     if (!empty($promoRuleMailchimpData)) {
                         $batchArray[$counter] = $promoRuleMailchimpData;
@@ -274,7 +274,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     {
         $token = $this->getToken();
         $promoCode->setToken($token);
-        $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl('', array('_nosid' => true, '_secure' => true)) . 'mailchimp/cart/loadcoupon?coupon_id=' . $promoCode->getCouponId() . '&coupon_token=' . $token;
+        $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl('mailchimp/cart/loadcoupon', array('_nosid' => true, '_secure' => true, 'coupon_id' =>$promoCode->getCouponId(), 'coupon_token' => $token)) . 'mailchimp/cart/loadcoupon?coupon_id=' . $promoCode->getCouponId() . '&coupon_token=' . $token;
         return $url;
     }
 
