@@ -505,6 +505,12 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($ecommEnabledAnyScope && $addColumnConfig) {
             $collection = $observer->getOrderGridCollection();
             $select = $collection->getSelect();
+            $p = $select->getPart(Zend_Db_Select::FROM);
+            if (array_key_exists('mc', $p))
+            {
+                return;
+            }
+
             $adapter = $this->getCoreResource()->getConnection('core_write');
             $select->joinLeft(array('mc' => $collection->getTable('mailchimp/ecommercesyncdata')), $adapter->quoteInto('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER), array('mc.mailchimp_synced_flag', 'mc.id'));
             $select->group("main_table.entity_id");
