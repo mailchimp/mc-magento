@@ -193,6 +193,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         if ($scope == 'stores') {
             $domain = $this->getMageApp()->getStore($scopeId)->getBaseUrl();
+        } elseif ($scope == 'websites') {
+            $website = Mage::getModel('core/website')->load($scopeId);
+            $websiteCode = $website->getCode();
+            $domain = (string)Mage::getConfig()->getNode('web/unsecure/base_url', 'website', $websiteCode);
         } else {
             $domain = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_UNSECURE_BASE_LINK_URL, $scopeId, $scope);
         }
@@ -1124,7 +1128,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param bool $allowBatchRemoval
      */
     public function saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
-                                          $syncModified = 0, $syncDeleted = null, $token = null, $syncedFlag = null, $saveOnlyIfexists = false, $deletedRelatedId = null, $allowBatchRemoval = true
+                                          $syncModified = 0, $syncDeleted = null, $token = null, $syncedFlag = null,
+                                          $saveOnlyIfexists = false, $deletedRelatedId = null, $allowBatchRemoval = true
     )
     {
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
