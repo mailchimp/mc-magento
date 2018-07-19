@@ -381,7 +381,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
         $where = array("batch_id IS NULL AND mailchimp_store_id = ?" => $mailchimpStoreId);
-        $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate(), 'mailchimp_synced_flag' => 1), $where);
+        $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate()), $where);
 
     }
 
@@ -550,10 +550,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
+            $files['error'] = $e->getMessage();
         } catch (MailChimp_Error $e) {
             $files['error'] = $e->getFriendlyMessage();
             $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
+            $files['error'] = $e->getMessage();
             $helper->logError($e->getMessage());
         }
 
@@ -577,11 +579,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $type = $line[1];
                 $id = $line[3];
                 if ($item->status_code != 200) {
-
-                    if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
-                        $order = Mage::getModel('sales/order')->load($id);
-                        $id = $order->getEntityId();
-                    }
 
                     $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
