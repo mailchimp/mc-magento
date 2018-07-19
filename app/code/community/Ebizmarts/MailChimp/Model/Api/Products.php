@@ -225,9 +225,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($isVariant) {
             $data += $this->getProductVariantData($product, $magentoStoreId);
         } else {
-         
             $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
-            if ($description) {
+            if (is_string($description)) {
                 $data["description"] = $description;
             }
 
