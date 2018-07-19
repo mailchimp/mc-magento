@@ -505,9 +505,9 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($ecommEnabledAnyScope && $addColumnConfig) {
             $collection = $observer->getOrderGridCollection();
             $select = $collection->getSelect();
-            $p = $select->getPart(Zend_Db_Select::FROM);
-            if (array_key_exists('mc', $p))
-            {
+            $fromClause = $select->getPart(Zend_Db_Select::FROM);
+            //check if mc alias is already defined, avoids possible conflicts
+            if (array_key_exists('mc', $fromClause)) {
                 return;
             }
 
