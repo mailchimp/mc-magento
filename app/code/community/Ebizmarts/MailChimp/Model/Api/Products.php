@@ -225,10 +225,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($isVariant) {
             $data += $this->getProductVariantData($product, $magentoStoreId);
         } else {
-            $productDesc = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
-            if (is_string($productDesc)) {
-                $data["description"] = $productDesc;
-                }
+            $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
+            if (is_string($description)) {
+                $data["description"] = $description;
+            }
 
             //mailchimp product type and vendor (magento category)
             $categoryName = $this->getProductCategories($product, $magentoStoreId);
@@ -347,6 +347,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             null,
             $syncedFlag,
             $saveOnlyIfexists,
+            null,
             $allowBatchRemoval
         );
     }
