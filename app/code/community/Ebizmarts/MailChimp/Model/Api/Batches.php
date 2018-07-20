@@ -693,7 +693,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
-            $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $saveOnlyIfexists);
+            $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $saveOnlyIfexists, null, false);
         }
     }
 
