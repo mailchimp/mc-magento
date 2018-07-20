@@ -170,7 +170,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = true);
+            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
             if ($cartJson != "") {
                 $allCarts[$this->_counter]['method'] = 'POST';
                 $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
