@@ -310,22 +310,38 @@ class Ebizmarts_MailChimp
 
     public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
     {
-        if (count($params) && $encodeJson && $method!=Ebizmarts_MailChimp::GET) {
+        $paramsOrig = $params;
+
+        $hasParams = true;
+        if (is_array($params) && count($params) === 0 || $params == null) {
+            $hasParams = false;
+        }
+
+        if ($hasParams && $encodeJson && $method!=Ebizmarts_MailChimp::GET) {
             $params = json_encode($params);
         }
 
+        $headers = array(
+            'Content-Type: application/json',
+        );
+        // check for language param to set as browser language
+        // mailchimp uses header/browser detection for the language rather than any profile setting
+        if (is_array($paramsOrig) && array_key_exists('language', $paramsOrig) && !empty($paramsOrig['language'])) {
+            $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
+        }
+
         $ch = $this->_ch;
-        if (count($params)&&$method!=Ebizmarts_MailChimp::GET) {
+        if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         } else {
-            if (count($params)) {
+            if ($hasParams) {
                 $_params = http_build_query($params);
                 $url .= '?' . $_params;
             }
         }
 
         curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
 

@@ -129,23 +129,27 @@ class Ebizmarts_MailChimp_Model_Observer
      *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function handleSubscriber(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
         $helper = $this->makeHelper();
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
-            $isEnabled = $helper->isSubscriptionEnabled($subscriber->getStoreId());
+            $storeId = $subscriber->getStoreId();
+            $isEnabled = $helper->isSubscriptionEnabled($storeId);
             if ($isEnabled) {
+                $statusChanged = $subscriber->getIsStatusChanged();
+                //Override Magento status to always send double opt-in confirmation.
+                if($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
+                    $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+                    $this->addSuccessIfRequired($helper);
+                }
                 $apiSubscriber = $this->makeApiSubscriber();
                 $subscriber->setImportMode(true);
-                if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
-                    Mage::getModel('core/cookie')->set(
-                        'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
-                    );
-                }
+                $this->createEmailCookie($subscriber);
 
-                if (true === $subscriber->getIsStatusChanged()) {
+                if ($statusChanged) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
                     $origData = $subscriber->getOrigData();
@@ -500,8 +504,13 @@ class Ebizmarts_MailChimp_Model_Observer
         $ecommEnabledAnyScope = $helper->isEcomSyncDataEnabledInAnyScope();
         if ($ecommEnabledAnyScope && $addColumnConfig) {
             $collection = $observer->getOrderGridCollection();
-            $collection->addFilterToMap('store_id', 'main_table.store_id');
             $select = $collection->getSelect();
+            $fromClause = $select->getPart(Zend_Db_Select::FROM);
+            //check if mc alias is already defined, avoids possible conflicts
+            if (array_key_exists('mc', $fromClause)) {
+                return;
+            }
+
             $adapter = $this->getCoreResource()->getConnection('core_write');
             $select->joinLeft(array('mc' => $collection->getTable('mailchimp/ecommercesyncdata')), $adapter->quoteInto('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER), array('mc.mailchimp_synced_flag', 'mc.id'));
             $select->group("main_table.entity_id");
@@ -884,5 +893,35 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function removeRegistry()
     {
         return Mage::unregister('sort_column_dir');
+    }
+
+    /**
+     * Add success message if subscribing from customer account.
+     *
+     * @param $helper
+     */
+    protected function addSuccessIfRequired($helper)
+    {
+        $request = Mage::app()->getRequest();
+        $module = $request->getControllerModule();
+        $module_controller = $request->getControllerName();
+        $module_controller_action = $request->getActionName();
+        $fullActionName = $module . '_' . $module_controller . '_' . $module_controller_action;
+        if (strstr($fullActionName, 'Mage_Newsletter_manage_save')) {
+            Mage::getSingleton('customer/session')->addSuccess($helper->__('Confirmation request has been sent.'));
+        }
+    }
+
+    /**
+     * @param $subscriber
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function createEmailCookie($subscriber)
+    {
+        if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
+            Mage::getModel('core/cookie')->set(
+                'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
+            );
+        }
     }
 }

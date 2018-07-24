@@ -42,13 +42,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $mailchimpStoreId = '5axx998994cxxxx47e6b3b5dxxxx26e2';
         $storeId = 1;
         $status = $syncedData['synced_status'];
-        $isReset = 0;
 
         if ($status){
             $assertStatus = '<div style ="color:green">Yes</div>';
-        } elseif ($orderId && $status === null && !$isReset){
+        } elseif ($orderId && $status === null){
             $assertStatus = '<div style ="color:#ed6502">Processing</div>';
-        } elseif ($status === null || $isReset){
+        } elseif ($status === null){
            $assertStatus = '<div style ="color:mediumblue">In queue</div>';
         } else {
             $assertStatus = '<div style ="color:red">No</div>';
@@ -64,7 +63,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'isEcomSyncDataEnabled', 'getIsReset'))
+            ->setMethods(array('getMCStoreId', 'isEcomSyncDataEnabled'))
             ->getMock();
 
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Orders::class)
@@ -79,7 +78,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $orderMock->expects($this->once())->method('getEntityId')->willReturn($orderId);
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($storeId)->willReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getIsReset')->with($storeId)->willReturn($isReset);
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 
         $modelMock->expects($this->once())->method('getSyncedOrder')->with($orderId, $mailchimpStoreId)->willReturn($syncedData);

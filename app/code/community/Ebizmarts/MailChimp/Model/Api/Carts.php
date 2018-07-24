@@ -170,7 +170,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
+            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
             if ($cartJson != "") {
                 $allCarts[$this->_counter]['method'] = 'POST';
                 $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
@@ -301,9 +301,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param $cart
      * @param $mailchimpStoreId
      * @param $magentoStoreId
+     * @param $isModified
      * @return string
      */
-    protected function _makeCart($cart, $mailchimpStoreId, $magentoStoreId)
+    protected function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
     {
         $helper = $this->getHelper();
         $campaignId = $cart->getMailchimpCampaignId();
@@ -318,7 +319,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $oneCart['campaign_id'] = $campaignId;
         }
 
-        $oneCart['checkout_url'] = $this->_getCheckoutUrl($cart);
+        $oneCart['checkout_url'] = $this->_getCheckoutUrl($cart, $isModified);
         $oneCart['currency_code'] = $cart->getQuoteCurrencyCode();
         $oneCart['order_total'] = $cart->getGrandTotal();
         $oneCart['tax_total'] = 0;
@@ -376,11 +377,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * Get URL for the cart.
      *
      * @param  $cart
+     * @param $isModified
      * @return string
      */
-    protected function _getCheckoutUrl($cart)
+    protected function _getCheckoutUrl($cart, $isModified)
     {
-        $token = md5(rand(0, 9999999));
+        if (!$isModified) {
+            $token = md5(rand(0, 9999999));
+        } else {
+            $token = $cart->getMailchimpToken();
+        }
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true, '_secure' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->_token = $token;
         return $url;
