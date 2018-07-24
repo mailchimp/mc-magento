@@ -205,7 +205,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncedDateArray = array();
         foreach ($stores as $store) {
             $storeId = $store->getId();
-            $this->handleResetIfNecessary($storeId);
             $syncedDateArray = $this->addSyncValueToArray($storeId, $syncedDateArray);
         }
         $this->handleSyncingValue($syncedDateArray);
@@ -315,7 +314,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         if (!$batchJson || $batchJson == '') {
                             $helper->logRequest('An empty operation was detected');
                         } else {
-                            if (!$helper->getIsReset($magentoStoreId)) {
                                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                                 $helper->logRequest($batchJson, $batchResponse['id']);
                                 //save batch id to db
@@ -325,7 +323,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                     ->setStatus($batchResponse['status']);
                                 $batch->save();
                                 $this->markItemsAsSent($batchResponse['id'], $mailchimpStoreId);
-                            }
                         }
                     }
 
@@ -553,10 +550,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
+            $files['error'] = $e->getMessage();
         } catch (MailChimp_Error $e) {
             $files['error'] = $e->getFriendlyMessage();
             $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
+            $files['error'] = $e->getMessage();
             $helper->logError($e->getMessage());
         }
 
@@ -580,11 +579,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $type = $line[1];
                 $id = $line[3];
                 if ($item->status_code != 200) {
-
-                    if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
-                        $order = Mage::getModel('sales/order')->load($id);
-                        $id = $order->getEntityId();
-                    }
 
                     $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
@@ -665,7 +659,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if (!$batchJson || $batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
-                        if (!$helper->getIsReset($magentoStoreId)) {
                             $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
                             $helper->logRequest($batchJson, $batchResponse['id']);
                             //save batch id to db
@@ -674,7 +667,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 ->setBatchId($batchResponse['id'])
                                 ->setStatus($batchResponse['status']);
                             $batch->save();
-                        }
                     }
                 }
 
@@ -701,7 +693,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
-            $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $saveOnlyIfexists);
+            $helper->saveEcommerceSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $saveOnlyIfexists, null, false);
         }
     }
 
@@ -774,22 +766,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 } catch (Exception $e) {
                     $helper->logError($e->getMessage());
                 }
-            }
-        }
-    }
-
-    /**
-     * @param $storeId
-     */
-    protected function handleResetIfNecessary($storeId)
-    {
-        $helper = $this->getHelper();
-        if ($helper->getIsReset($storeId)) {
-            $scopeToReset = $helper->getMailChimpScopeByStoreId($storeId);
-            if ($scopeToReset) {
-                $helper->resetMCEcommerceData($scopeToReset['scope_id'], $scopeToReset['scope'], true);
-                $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTORE_RESETED, 0));
-                $helper->saveMailchimpConfig($configValue, $scopeToReset['scope_id'], $scopeToReset['scope']);
             }
         }
     }

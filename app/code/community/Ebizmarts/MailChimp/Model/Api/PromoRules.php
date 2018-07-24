@@ -196,6 +196,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             null,
             null,
             $saveOnlyIfexists,
+            null,
             $allowBatchRemoval
         );
     }

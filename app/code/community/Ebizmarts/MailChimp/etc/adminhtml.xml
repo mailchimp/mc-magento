@@ -23,10 +23,10 @@
                     <newsletter>
                         <children>
                             <mailchimp translate="title" module="mailchimp">
-                                <title>Mailchimp</title>
+                                <title>MailChimp</title>
                                 <children>
                                     <mailchimperrors translate="title" module="mailchimp">
-                                        <title>Mailchimp Errors</title>
+                                        <title>MailChimp Errors</title>
                                     </mailchimperrors>
                                 </children>
                             </mailchimp>
