@@ -63,15 +63,17 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     public function toOptionArray()
     {
         $helper = $this->getHelper();
+        $scopeArray = $helper->getCurrentScope();
         $lists = array();
-
+        $listId = $helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeArray['scope_id'], $scopeArray['scope']);
         if (is_array($this->_lists)) {
-            $lists[] = array('value' => '', 'label' => $helper->__('--- Select a list ---'));
             foreach ($this->_lists['lists'] as $list) {
-                $memberCount = $list['stats']['member_count'];
-                $memberText = $helper->__('members');
-                $label = $list['name'] . ' (' . $memberCount . ' ' . $memberText . ')';
-                $lists [] = array('value' => $list['id'], 'label' => $label);
+                if($listId == $list['id']) {
+                    $memberCount = $list['stats']['member_count'];
+                    $memberText = $helper->__('members');
+                    $label = $list['name'] . ' (' . $memberCount . ' ' . $memberText . ')';
+                    $lists [] = array('value' => $list['id'], 'label' => $label);
+                }
             }
         } else {
             $lists [] = array('value' => '', 'label' => $helper->__('--- No data ---'));
