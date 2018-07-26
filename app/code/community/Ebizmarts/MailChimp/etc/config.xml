@@ -31,7 +31,7 @@
                 <observers>
                     <mailchimp_subscribe_observer>
                         <class>mailchimp/observer</class>
-                        <method>handleSubscriber</method>
+                        <method>SubscriberSaveBefore</method>
                     </mailchimp_subscribe_observer>
                 </observers>
             </newsletter_subscriber_save_before>
@@ -51,15 +51,15 @@
                     </mailchimp_subscribe_delete_observer>
                 </observers>
             </newsletter_subscriber_delete_after>
-            <customer_save_before>
+            <customer_save_after>
                 <observers>
-                    <mailchimp_save_before_customer>
+                    <mailchimp_save_after_customer>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>customerSaveBefore</method>
-                    </mailchimp_save_before_customer>
+                        <method>customerSaveAfter</method>
+                    </mailchimp_save_after_customer>
                 </observers>
-            </customer_save_before>
+            </customer_save_after>
             <customer_address_save_before>
                 <observers>
                     <mailchimp_save_before_address>

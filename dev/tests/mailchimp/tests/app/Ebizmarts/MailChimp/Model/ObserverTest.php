@@ -649,7 +649,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $observerMock->addColumnToSalesOrderGridCollection($eventObserverMock);
     }
 
-    public function testHandleSubscriber()
+    public function testSubscriberSaveBefore()
     {
         $storeId = 1;
 
@@ -713,6 +713,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $apiSubscriberMock->expects($this->once())->method('updateSubscriber')->with($subscriberMock, true);
 
-        $observerMock->handleSubscriber($eventObserverMock);
+        $observerMock->subscriberSaveBefore($eventObserverMock);
     }
 }

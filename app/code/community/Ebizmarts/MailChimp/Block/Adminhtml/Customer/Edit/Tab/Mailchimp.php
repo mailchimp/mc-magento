@@ -34,15 +34,20 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
         $customerId = (int) $this->getRequest()->getParam('id');
         if ($customerId) {
             $this->_customer = $this->getCustomerModel()->load($customerId);
-            $this->storeId = $this->_customer->getStoreId();
+            $this->storeId = $this->getCustomer()->getStoreId();
         }
     }
 
     public function getInterest()
     {
+        $customer = $this->getCustomer();
         $subscriber = $this->getSubscriberModel();
-        $subscriber->loadByEmail($this->_customer->getEmail());
-        $interest = $this->helper->getSubscriberInterest($subscriber->getSubscriberId(), $this->storeId);
+        $subscriber->loadByEmail($customer->getEmail());
+        $subscriberId = $subscriber->getSubscriberId();
+        $customerId = $customer->getId();
+        $storeId = $this->getStoreId();
+        $interest = $this->helper->getInterestGroups($customerId, $subscriberId, $storeId);
+
         return $interest;
     }
 
@@ -68,5 +73,27 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
     protected function getCustomerModel()
     {
         return Mage::getModel('customer/customer');
+    }
+
+    /**
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getCustomer()
+    {
+        return $this->_customer;
+    }
+
+    /**
+     * If customer was created in admin panel use the store view selected for MailChimp.
+     *
+     * @return mixed
+     */
+    protected function getStoreId()
+    {
+        $storeId = $this->storeId;
+        if (!$storeId) {
+            $storeId = $this->_customer->getMailchimpStoreView();
+        }
+        return $storeId;
     }
 }

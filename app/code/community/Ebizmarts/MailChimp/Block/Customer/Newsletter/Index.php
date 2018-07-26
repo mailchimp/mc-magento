@@ -35,7 +35,16 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
     {
         $subscriber = Mage::getModel('newsletter/subscriber');
         $subscriber->loadByEmail($this->_getEmail());
-        $interest = $this->helper->getSubscriberInterest($subscriber->getSubscriberId(), $subscriber->getStoreId());
+        $helper = $this->getMailChimpHelper();
+        if (!$helper->isAdmin() && Mage::getSingleton('customer/session')->isLoggedIn()) {
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+            $customerId = $customer->getId();
+            $storeId = ($subscriber->getStoreId()) ? $subscriber->getStoreId() : $customer->getStoreId();
+        } else {
+            $customerId = null;
+            $storeId = $subscriber->getStoreId();
+        }
+        $interest = $helper->getInterestGroups($customerId, $subscriber->getSubscriberId(), $storeId);
         return $interest;
     }
 
@@ -47,6 +56,14 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
     protected function _getEmail()
     {
         return $this->helper('customer')->getCustomer()->getEmail();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function getMailChimpHelper()
+    {
+        return $this->helper;
     }
 
 }

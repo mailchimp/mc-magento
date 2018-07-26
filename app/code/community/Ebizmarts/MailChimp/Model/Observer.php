@@ -125,18 +125,20 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
-     * Handle subscription change (subscribe/unsubscribe)
+     * Prevent Magento's subscription confirmation email to be sent if MailChimp For Magento is enabled.
+     * Override Magento's default status if confirmation email is enabled and the customer is logged in.
      *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function handleSubscriber(Varien_Event_Observer $observer)
+    public function SubscriberSaveBefore(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
+        $storeId = $subscriber->getStoreId();
         $helper = $this->makeHelper();
+
         if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
-            $storeId = $subscriber->getStoreId();
             $isEnabled = $helper->isSubscriptionEnabled($storeId);
             if ($isEnabled) {
                 $statusChanged = $subscriber->getIsStatusChanged();
@@ -145,25 +147,37 @@ class Ebizmarts_MailChimp_Model_Observer
                     $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                     $this->addSuccessIfRequired($helper);
                 }
-                $apiSubscriber = $this->makeApiSubscriber();
                 $subscriber->setImportMode(true);
-                $this->createEmailCookie($subscriber);
-
-                if ($statusChanged) {
-                    $apiSubscriber->updateSubscriber($subscriber, true);
-                } else {
-                    $origData = $subscriber->getOrigData();
-
-                    if (is_array($origData) && isset($origData['subscriber_status'])
-                        && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
-                    ) {
-                        $apiSubscriber->updateSubscriber($subscriber, true);
-                    }
-                }
             }
         }
 
         return $observer;
+    }
+
+    /**
+     * Hnalde Subscriber changes update.
+     *
+     * @param Varien_Event_Observer $observer
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function SubscriberSaveAfter(Varien_Event_Observer $observer)
+    {
+        $subscriber = $observer->getEvent()->getSubscriber();
+        $storeId = $subscriber->getStoreId();
+        $helper = $this->makeHelper();
+
+        if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+            $isEnabled = $helper->isSubscriptionEnabled($storeId);
+            if ($isEnabled) {
+                $params = $this->getRequest()->getParams();
+                $helper->saveInterestGroupData($params, $storeId, null, $subscriber);
+
+                $this->createEmailCookie($subscriber);
+
+                $apiSubscriber = $this->makeApiSubscriber();
+                $apiSubscriber->updateSubscriber($subscriber, true);
+            }
+        }
     }
 
     /**
@@ -226,65 +240,44 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
-    public function customerSaveBefore(Varien_Event_Observer $observer)
+    public function customerSaveAfter(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
         $origEmail = $customer->getOrigData('email');
         $customerEmail = $customer->getEmail();
         $storeId = $customer->getStoreId();
-
-        //@Todo if is admin
-        $params = $this->getRequest()->getParams();
-        if (isset($params['customer']) && isset($params['customer']['interestgroup']) || isset($params['group'])) {
-            if (isset($params['group'])) {
-                $groups = $params['group'];
-            } else {
-                $groups = $params['customer']['interestgroup'];
-            }
-            $subscriberModel = $this->getSubscriberModel();
-            $subscriber = $subscriberModel->loadByEmail($origEmail);
-            $subscriberId = $subscriber->getSubcriberId();
-            if (!$subscriberId) {
-                $subscriber->setSubscriberEmail($customerEmail)
-                    ->setFirstname($customer->getFristname())
-                    ->setLastname($customer->getLastname())
-                    ->setCustomerId($customer->getEntityId())
-                    ->setStoreId($storeId)
-                    ->subscribe($customerEmail);
-            }
-            $interestGroup = Mage::getModel('mailchimp/interestgroup');
-            $interestGroup->getBySubscriberIdStoreId($subscriberId, $storeId);
-            $interestGroup->setGroupdata(serialize($groups));
-            $interestGroup->setSubscriberId($subscriber->getSubscriberId());
-            $interestGroup->setStoreId($storeId);
-            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
-            $interestGroup->save();
+        // if customer was created in admin, use store id selected for Mailchimp.
+        if (!$storeId) {
+            $storeId = $customer->getMailchimpStoreView();
         }
-
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
+        $params = $this->getRequest()->getParams();
 
         if ($isEnabled) {
+            $subscriberEmail = ($origEmail) ? $origEmail : $customerEmail;
+            $subscriber = $this->handleCustomerGroups($subscriberEmail, $params, $storeId, $customer->getId());
             $apiSubscriber = $this->makeApiSubscriber();
             if ($origEmail) {
                 // check if customer has changed email address
                 if ($origEmail != $customerEmail) {
-                    $subscriberModel = $this->getSubscriberModel();
-                    $subscriber = $subscriberModel->loadByEmail($origEmail);
                     if ($subscriber->getId()) {
                         // unsubscribe old email address
                         $apiSubscriber->deleteSubscriber($subscriber);
 
                         // subscribe new email address
+                        $subscriberModel = $this->getSubscriberModel();
                         $subscriber = $subscriberModel->loadByCustomer($customer);
                         $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
+                        $subscriber->save();
 
-                        $apiSubscriber->updateSubscriber($subscriber, true);
                     }
                 }
             }
-            //update subscriber data if a subscriber with the same email address exists
-            $apiSubscriber->update($customerEmail, $storeId);
+            //update subscriber data if a subscriber with the same email address exists and was not affected.
+            if (!$origEmail || $origEmail == $customerEmail) {
+                $apiSubscriber->update($customerEmail, $storeId);
+            }
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 //update mailchimp ecommerce data for that customer
@@ -962,7 +955,12 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($block instanceof Mage_Adminhtml_Block_Customer_Edit_Tabs) {
             $customerId = (int) $this->getRequest()->getParam('id');
             $customer = Mage::getModel('customer/customer')->load($customerId);
-            if ($helper->getLocalInterestCategories($customer->getStoreId()) && ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type'))) {
+            $storeId = $customer->getStoreId();
+            //If the customer was created in the admin panel use the store view selected for MailChimp.
+            if (!$storeId) {
+                $storeId = $customer->getMailchimpStoreView();
+            }
+            if ($helper->getLocalInterestCategories($storeId) && ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type'))) {
                 $block->addTab('mailchimp', array(
                     'label' => $helper->__('MailChimp'),
                     'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
@@ -976,5 +974,38 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getRequest()
     {
         return Mage::app()->getRequest();
+    }
+
+    /**
+     * Handle admin customer groups and front end only when the customer is not subscribed.
+     *
+     * @param $subscriberEmail
+     * @param $params
+     * @param $storeId
+     * @param null $customerId
+     * @return Mage_Newsletter_Model_Subscriber
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId = null)
+    {
+        $helper = $this->makeHelper();
+        $subscriberModel = $this->getSubscriberModel();
+        $subscriber = $subscriberModel->loadByEmail($subscriberEmail);
+        if ($subscriber->getId()) {
+            $helper->saveInterestGroupData($params, $storeId, $customerId, $subscriber);
+        } elseif (isset($params['customer_id'])) {
+            $groups = $helper->getInterestGroupsIfAvailable($params);
+            if ($groups) {
+                $helper->saveInterestGroupData($params, $storeId, $customerId);
+                Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+            }
+        } else {
+            if (!$helper->isAdmin()) {
+                //save frontend groupdata when customer is not subscribed.
+                $helper->saveInterestGroupData($params, $storeId, $customerId);
+            }
+            Mage::getSingleton('adminhtml/session')->addError($helper->__('Something went wrong when trying to save the interest group data. The customer must be subscribed for this change to apply.'));
+        }
+        return $subscriber;
     }
 }

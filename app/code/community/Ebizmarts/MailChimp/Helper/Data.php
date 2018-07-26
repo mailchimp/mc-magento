@@ -2812,8 +2812,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getStoreLanguageCode($scopeId, $scope = 'stores')
     {
-        $isAdmin        = Mage::app()->getStore()->isAdmin();
-        $userLangCode   = Mage::app()->getLocale()->getLocaleCode();
+        $isAdmin = $this->isAdmin();
+        $userLangCode = Mage::app()->getLocale()->getLocaleCode();
         if ($isAdmin || '' == $lang = $this->_lang2MCLanguage($userLangCode)) {
             // IS Admin OR if users lang is not supported, try store views default locale
             $userLangCode = $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $scopeId, $scope);
@@ -3195,6 +3195,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_AFTER, $scopeId, $scope);
     }
 
+    /**
+     * @param $storeId
+     * @return array
+     * @throws MailChimp_Error
+     */
     public function getInterest($storeId)
     {
         $rc = [];
@@ -3221,13 +3226,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $rc;
     }
 
-    public function getSubscriberInterest($subscriberId, $storeId, $interest = null)
+    /**
+     * @param $customerId
+     * @param $subscriberId
+     * @param $storeId
+     * @param null $interest
+     * @return array|null
+     * @throws MailChimp_Error
+     */
+    public function getInterestGroups($customerId, $subscriberId, $storeId, $interest = null)
     {
         if (!$interest) {
             $interest = $this->getInterest($storeId);
         }
         $interestGroup = Mage::getModel('mailchimp/interestgroup');
-        $interestGroup->getBySubscriberIdStoreId($subscriberId, $storeId);
+        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
         if ($interestGroup->getId()) {
             $groups = unserialize($interestGroup->getGroupdata());
             foreach ($groups as $key => $value) {
@@ -3255,5 +3268,74 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
         return $interest;
+    }
+
+    /**
+     * @param $params
+     * @param $storeId
+     * @param null $customerId
+     * @param null $subscriber
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function saveInterestGroupData($params, $storeId, $customerId = null, $subscriber = null)
+    {
+        $groups = $this->getInterestGroupsIfAvailable($params);
+        if (!$customerId) {
+            if ($this->isAdmin()) {
+                $customerId = $params['customer_id'];
+            } elseif (Mage::getSingleton('customer/session')->isLoggedIn()) {
+                $customerData = Mage::getSingleton('customer/session')->getCustomer();
+                $customerId = $customerData->getId();
+            }
+        }
+        $subscriberId = null;
+        if ($subscriber) {
+            $subscriberId = $subscriber->getSubscriberId();
+        }
+        $interestGroup = Mage::getModel('mailchimp/interestgroup');
+        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+        $origSubscriberId = $interestGroup->getSubscriberId();
+        $origCustomerId = $interestGroup->getCustomerId();
+        if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
+            $interestGroup->setSubscriberId($subscriberId);
+        }
+        if (!$origCustomerId || $customerId && $origCustomerId != $customerId) {
+            $interestGroup->setCustomerId($customerId);
+        }
+        if ($groups) {
+            $interestGroup->setGroupdata(serialize($groups));
+        }
+        //Avoid creating a new entry if no groupData available. (Customer creation)
+        if ($interestGroup->getGroupdata()) {
+            if ($storeId) {
+                $interestGroup->setStoreId($storeId);
+            }
+            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
+            $interestGroup->save();
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function getInterestGroupsIfAvailable($params)
+    {
+        $groups = null;
+        if (isset($params['customer']) && isset($params['customer']['interestgroup'])) {
+            $groups = $params['customer']['interestgroup'];
+        } elseif (isset($params['group'])) {
+            $groups = $params['group'];
+        }
+        return $groups;
+    }
+
+    /**
+     * @return bool
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function isAdmin()
+    {
+        return Mage::app()->getStore()->isAdmin();
     }
 }

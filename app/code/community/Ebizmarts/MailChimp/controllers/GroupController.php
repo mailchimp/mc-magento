@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
         $interestGroup = Mage::getModel('mailchimp/interestgroup');
         $subscriber = Mage::getModel('newsletter/subscriber')
             ->loadByEmail($order->getCustomerEmail());
+        $customerId = $order->getCustomerId();
         try {
             if (!$subscriber->getSubscriberId()) {
                 $subscriber->setSubscriberEmail($order->getCustomerEmail());
@@ -31,9 +32,10 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
                 $subscriber->setSubscriberLastname($order->getCustomerLastname());
                 $subscriber->subscribe($order->getCustomerEmail());
             }
-            $interestGroup->getBySubscriberIdStoreId($subscriber->getSubscriberId(),$storeId);
+            $interestGroup->getByRelatedIdStoreId($customerId, $subscriber->getSubscriberId(),$storeId);
             $interestGroup->setGroupdata(serialize($params));
             $interestGroup->setSubscriberId($subscriber->getSubscriberId());
+            $interestGroup->setCustomerId($order->getCustomerId());
             $interestGroup->setStoreId($storeId);
             $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
             $interestGroup->save();

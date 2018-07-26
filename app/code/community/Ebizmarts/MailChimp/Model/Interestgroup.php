@@ -24,9 +24,9 @@ class Ebizmarts_MailChimp_Model_Interestgroup extends Mage_Core_Model_Abstract
         $this->_init('mailchimp/interestgroup');
     }
 
-    public function getBySubscriberIdStoreId($subscriberId, $storeId)
+    public function getByRelatedIdStoreId($customerId, $subscriberId, $storeId)
     {
-        $this->addData($this->getResource()->getBySubscriberIdStoreId($subscriberId, $storeId));
+        $this->addData($this->getResource()->getByRelatedIdStoreId($customerId, $subscriberId, $storeId));
         return $this;
     }
 }
