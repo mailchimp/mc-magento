@@ -550,7 +550,6 @@ class Ebizmarts_MailChimp_Model_Observer
                 $emailCookieArr = explode('/', $emailCookie);
                 $email = $emailCookieArr[0];
                 $email = str_replace(' ', '+', $email);
-
             } elseif (Mage::getModel('core/cookie')->get('mailchimp_email_id')) {
                 $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
                 $mailchimpApi = $helper->getApi($storeId);
@@ -558,7 +557,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
                 $email = $listMember['members'][0]['email_address'];
             }
-            
+
             if ($quote->getCustomerEmail() != $email && $email !== null) {
                 $quote->setCustomerEmail($email);
             }
