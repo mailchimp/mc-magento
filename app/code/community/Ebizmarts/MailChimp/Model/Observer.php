@@ -535,6 +535,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $isEcomEnabled = $helper->isEcomSyncDataEnabled($storeId);
         $isAbandonedCartEnabled = $helper->isAbandonedCartEnabled($storeId);
+        $email = null;
 
         if (!Mage::getSingleton('customer/session')->isLoggedIn()
             && $isEcomEnabled && $isAbandonedCartEnabled
@@ -549,9 +550,17 @@ class Ebizmarts_MailChimp_Model_Observer
                 $emailCookieArr = explode('/', $emailCookie);
                 $email = $emailCookieArr[0];
                 $email = str_replace(' ', '+', $email);
-                if ($quote->getCustomerEmail() != $email) {
-                    $quote->setCustomerEmail($email);
-                }
+
+            } elseif (Mage::getModel('core/cookie')->get('mailchimp_email_id')) {
+                $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+                $mailchimpApi = $helper->getApi($storeId);
+                $listId = $helper->getGeneralList($storeId);
+                $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
+                $email = $listMember['members'][0]['email_address'];
+            }
+            
+            if ($quote->getCustomerEmail() != $email && $email !== null) {
+                $quote->setCustomerEmail($email);
             }
         }
 
