@@ -3214,13 +3214,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $allInterest = $api->lists->interestCategory->getAll($listId);
         foreach ($allInterest['categories'] as $item) {
             if (in_array($item['id'], $interest)) {
-                $rc[$item['id']]['interest'] = ['id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']];
+                $rc[$item['id']]['interest'] = array('id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']);
             }
         }
         foreach ($interest as $interestId) {
             $mailchimpInterest = $api->lists->interestCategory->interests->getAll($listId, $interestId);
             foreach ($mailchimpInterest['interests'] as $mi) {
-                $rc[$mi['category_id']]['category'][$mi['display_order']] = ['id' => $mi['id'], 'name' => $mi['name'], 'checked' => false];
+                $rc[$mi['category_id']]['category'][$mi['display_order']] = array('id' => $mi['id'], 'name' => $mi['name'], 'checked' => false);
             }
         }
         return $rc;
