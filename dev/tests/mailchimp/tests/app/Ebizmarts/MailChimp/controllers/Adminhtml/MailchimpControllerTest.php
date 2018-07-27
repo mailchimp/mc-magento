@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getResponse', 'getLayout'))
+            ->setMethods(array('getRequest', 'getResponse', 'getLayout', 'getHtml'))
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
@@ -62,7 +62,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $blockMock->expects($this->once())->method('setCustomerId')->with($customerId)->willReturnSelf();
         $blockMock->expects($this->once())->method('setUseAjax')->with(true)->willReturnSelf();
-        $blockMock->expects($this->once())->method('toHtml')->willReturn($result);
+
+        $mailchimpControllerMock->expects($this->once())->method('getHtml')->with($blockMock)->willReturn($result);
 
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
         $responseMock->expects($this->once())->method('setBody')->with($result);

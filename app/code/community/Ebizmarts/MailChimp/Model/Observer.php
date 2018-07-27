@@ -255,8 +255,9 @@ class Ebizmarts_MailChimp_Model_Observer
         $params = $this->getRequest()->getParams();
 
         if ($isEnabled) {
+            $customerId = $customer->getId();
             $subscriberEmail = ($origEmail) ? $origEmail : $customerEmail;
-            $subscriber = $this->handleCustomerGroups($subscriberEmail, $params, $storeId, $customer->getId());
+            $subscriber = $this->handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId);
             $apiSubscriber = $this->makeApiSubscriber();
             if ($origEmail) {
                 // check if customer has changed email address
@@ -281,7 +282,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 //update mailchimp ecommerce data for that customer
-                $this->makeApiCustomer()->update($customer->getId(), $storeId);
+                $this->makeApiCustomer()->update($customerId, $storeId);
             }
         }
 
@@ -977,7 +978,7 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
-     * Handle admin customer groups and front end only when the customer is not subscribed.
+     * Handle frontend customer interest groups only if is not subscribed and all admin customer groups.
      *
      * @param $subscriberEmail
      * @param $params
