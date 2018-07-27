@@ -3202,12 +3202,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getInterest($storeId)
     {
-        $rc = [];
+        $rc = array();
         $interest = $this->getLocalInterestCategories($storeId);
         if ($interest != '') {
             $interest = explode(",", $interest);
         } else {
-            $interest = [];
+            $interest = array();
         }
         $api = $this->getApi($storeId);
         $listId = $this->getGeneralList($storeId);
