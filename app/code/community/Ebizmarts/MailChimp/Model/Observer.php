@@ -543,19 +543,13 @@ class Ebizmarts_MailChimp_Model_Observer
             $action = Mage::app()->getRequest()->getActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
-            if (Mage::getModel('core/cookie')->get('email')
-                && Mage::getModel('core/cookie')->get('email') != 'none' && !$onCheckout
+            $emailCookie = Mage::getModel('core/cookie')->get('email');
+            $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+            if ($emailCookie && $emailCookie != 'none' && !$onCheckout
             ) {
-                $emailCookie = Mage::getModel('core/cookie')->get('email');
-                $emailCookieArr = explode('/', $emailCookie);
-                $email = $emailCookieArr[0];
-                $email = str_replace(' ', '+', $email);
-            } elseif (Mage::getModel('core/cookie')->get('mailchimp_email_id')) {
-                $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
-                $mailchimpApi = $helper->getApi($storeId);
-                $listId = $helper->getGeneralList($storeId);
-                $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
-                $email = $listMember['members'][0]['email_address'];
+                $email = $this->getEmailFromPopUp($emailCookie);
+            } elseif ($mcEidCookie) {
+                $email = $this->getEmailFromMcEid($storeId, $mcEidCookie);
             }
 
             if ($quote->getCustomerEmail() != $email && $email !== null) {
@@ -775,6 +769,34 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
+    }
+
+    /**
+     * @param $emailCookie
+     * @return mixed
+     */
+    protected function getEmailFromPopUp($emailCookie)
+    {
+        $emailCookieArr = explode('/', $emailCookie);
+        $email = $emailCookieArr[0];
+        $email = str_replace(' ', '+', $email);
+        return $email;
+    }
+
+    /**
+     * @param $helper
+     * @param $storeId
+     * @param $mcEidCookie
+     * @return mixed
+     */
+    protected function getEmailFromMcEid($storeId, $mcEidCookie)
+    {
+        $helper = $this->makeHelper();
+        $mailchimpApi = $helper->getApi($storeId);
+        $listId = $helper->getGeneralList($storeId);
+        $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
+        $email = $listMember['members'][0]['email_address'];
+        return $email;
     }
 
     /**
