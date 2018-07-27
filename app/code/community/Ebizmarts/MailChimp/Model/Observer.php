@@ -537,14 +537,14 @@ class Ebizmarts_MailChimp_Model_Observer
         $isAbandonedCartEnabled = $helper->isAbandonedCartEnabled($storeId);
         $email = null;
 
-        if (!Mage::getSingleton('customer/session')->isLoggedIn()
+        if (!$this->getCustomerSession()
             && $isEcomEnabled && $isAbandonedCartEnabled
         ) {
-            $action = Mage::app()->getRequest()->getActionName();
+            $action = $this->getActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
-            $emailCookie = Mage::getModel('core/cookie')->get('email');
-            $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+            $emailCookie = $this->getEmailCookie();
+            $mcEidCookie = $this->getMcEidCookie();
             if ($emailCookie && $emailCookie != 'none' && !$onCheckout
             ) {
                 $email = $this->getEmailFromPopUp($emailCookie);
@@ -948,10 +948,44 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function createEmailCookie($subscriber)
     {
-        if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
+        if (!$this->getCustomerSession() && !Mage::app()->getStore()->isAdmin()) {
             Mage::getModel('core/cookie')->set(
                 'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
             );
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getEmailCookie()
+    {
+        $emailCookie = Mage::getModel('core/cookie')->get('email');
+        return $emailCookie;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getMcEidCookie()
+    {
+        $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+        return $mcEidCookie;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCustomerSession()
+    {
+        return Mage::getSingleton('customer/session')->isLoggedIn();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getActionName()
+    {
+        return Mage::app()->getRequest()->getActionName();
     }
 }
