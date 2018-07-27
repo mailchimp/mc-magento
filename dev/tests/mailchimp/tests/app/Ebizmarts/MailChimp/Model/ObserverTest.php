@@ -784,4 +784,83 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock->subscriberSaveAfter($eventObserverMock);
     }
+
+    /**
+     * @param array $cookieData
+     * @dataProvider loadCustomerToQuoteDataProvider
+     */
+
+    public function testLoadCustomerToQuote($cookieData){
+
+        $storeId = 1;
+        $ecomSyncEnabled = 1;
+        $abandonedCartEnabled = 1;
+        $isLoggedIn = 0;
+        $actionName = $cookieData['actionName'];
+        $emailCookie = 'keller%2Bpopup%40ebizmarts.com';
+        $mcEidCookie = 'f7e95531fb';
+        $customerEmail = 'customer@ebizmarts.com';
+        $email = 'keller@ebizmarts.com';
+        $campaignId = 'gf45f4gg';
+        $landingCookie = 'http%3A//127.0.0.1/MASTER1939m4m/%3Fmc_cid%3Dgf45f4gg%26mc_eid%3D7dgasydg';
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getQuote'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'isCustomerLoggedIn', 'getRequestActionName', 'getEmailFromPopUp', 'getEmailFromMcEid', 'getEmailCookie', 'getMcEidCookie', '_getCampaignCookie',
+                '_getLandingCookie'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isEcomSyncDataEnabled', 'isAbandonedCartEnabled'))
+            ->getMock();
+
+        $quoteMock = $this->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStoreId', 'getCustomerEmail', 'setCustomerEmail', 'setMailchimpCampaignId', 'setMailchimpLandingPage'))
+            ->getMock();
+
+        $eventObserverMock->expects($this->once())->method('getEvent')->willReturn($eventMock);
+        $eventMock->expects($this->once())->method('getQuote')->willReturn($quoteMock);
+        $quoteMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn($ecomSyncEnabled);
+        $helperMock->expects($this->once())->method('isAbandonedCartEnabled')->with($storeId)->willReturn($abandonedCartEnabled);
+        $observerMock->expects($this->once())->method('isCustomerLoggedIn')->willReturn($isLoggedIn);
+        $observerMock->expects($this->once())->method('getRequestActionName')->willReturn($actionName);
+        $observerMock->expects($this->once())->method('getEmailCookie')->willReturn($emailCookie);
+        $observerMock->expects($this->once())->method('getMcEidCookie')->willReturn($mcEidCookie);
+        $observerMock->expects($this->any())->method('getEmailFromPopUp')->with($emailCookie)->willReturn($email);
+        $observerMock->expects($this->any())->method('getEmailFromMcEid')->with($storeId, $mcEidCookie)->willReturn($email);
+        $quoteMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
+        $quoteMock->expects($this->once())->method('setCustomerEmail')->with($email);
+        $observerMock->expects($this->once())->method('_getCampaignCookie')->willReturn($campaignId);
+        $quoteMock->expects($this->once())->method('setMailchimpCampaignId')->with($campaignId);
+        $observerMock->expects($this->once())->method('_getLandingCookie')->willReturn($landingCookie);
+        $quoteMock->expects($this->once())->method('setMailchimpLandingPage')->with($landingCookie);
+
+        $observerMock->loadCustomerToQuote($eventObserverMock);
+
+    }
+
+    public function loadCustomerToQuoteDataProvider(){
+
+        return array(
+            array(array('actionName' => 'saveOrder')),
+            array(array('actionName' => 'savePayment')),
+            array(array('actionName' => 'saveShippingMethod')),
+            array(array('actionName' => 'saveBilling')),
+            array(array('actionName' => null))
+        );
+    }
 }

@@ -558,23 +558,25 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $isEcomEnabled = $helper->isEcomSyncDataEnabled($storeId);
         $isAbandonedCartEnabled = $helper->isAbandonedCartEnabled($storeId);
+        $email = null;
 
-        if (!Mage::getSingleton('customer/session')->isLoggedIn()
+        if (!$this->isCustomerLoggedIn()
             && $isEcomEnabled && $isAbandonedCartEnabled
         ) {
-            $action = $this->getRequest()->getActionName();
+            $action = $this->getRequestActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
-            if (Mage::getModel('core/cookie')->get('email')
-                && Mage::getModel('core/cookie')->get('email') != 'none' && !$onCheckout
+            $emailCookie = $this->getEmailCookie();
+            $mcEidCookie = $this->getMcEidCookie();
+            if ($emailCookie && $emailCookie != 'none' && !$onCheckout
             ) {
-                $emailCookie = Mage::getModel('core/cookie')->get('email');
-                $emailCookieArr = explode('/', $emailCookie);
-                $email = $emailCookieArr[0];
-                $email = str_replace(' ', '+', $email);
-                if ($quote->getCustomerEmail() != $email) {
-                    $quote->setCustomerEmail($email);
-                }
+                $email = $this->getEmailFromPopUp($emailCookie);
+            } elseif ($mcEidCookie) {
+                $email = $this->getEmailFromMcEid($storeId, $mcEidCookie);
+            }
+
+            if ($quote->getCustomerEmail() != $email && $email !== null) {
+                $quote->setCustomerEmail($email);
             }
         }
 
@@ -793,6 +795,34 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
+     * @param $emailCookie
+     * @return mixed
+     */
+    protected function getEmailFromPopUp($emailCookie)
+    {
+        $emailCookieArr = explode('/', $emailCookie);
+        $email = $emailCookieArr[0];
+        $email = str_replace(' ', '+', $email);
+        return $email;
+    }
+
+    /**
+     * @param $helper
+     * @param $storeId
+     * @param $mcEidCookie
+     * @return mixed
+     */
+    protected function getEmailFromMcEid($storeId, $mcEidCookie)
+    {
+        $helper = $this->makeHelper();
+        $mailchimpApi = $helper->getApi($storeId);
+        $listId = $helper->getGeneralList($storeId);
+        $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
+        $email = $listMember['members'][0]['email_address'];
+        return $email;
+    }
+
+    /**
      * @param $order
      */
     protected function handleOrderUpdate($order)
@@ -941,7 +971,7 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function createEmailCookie($subscriber)
     {
-        if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
+        if (!$this->isCustomerLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
             Mage::getModel('core/cookie')->set(
                 'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
             );
@@ -1008,5 +1038,39 @@ class Ebizmarts_MailChimp_Model_Observer
             Mage::getSingleton('adminhtml/session')->addError($helper->__('Something went wrong when trying to save the interest group data. The customer must be subscribed for this change to apply.'));
         }
         return $subscriber;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getEmailCookie()
+    {
+        $emailCookie = Mage::getModel('core/cookie')->get('email');
+        return $emailCookie;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getMcEidCookie()
+    {
+        $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+        return $mcEidCookie;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function isCustomerLoggedIn()
+    {
+        return Mage::getSingleton('customer/session')->isLoggedIn();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRequestActionName()
+    {
+        return $this->getRequest()->getActionName();
     }
 }
