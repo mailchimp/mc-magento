@@ -728,7 +728,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $abandonedCartEnabled = 1;
         $isLoggedIn = 0;
         $actionName = $cookieData['actionName'];
-        $emailCookie = '?';
+        $emailCookie = 'keller%2Bpopup%40ebizmarts.com';
         $mcEidCookie = 'f7e95531fb';
         $customerEmail = 'customer@ebizmarts.com';
         $email = 'keller@ebizmarts.com';
