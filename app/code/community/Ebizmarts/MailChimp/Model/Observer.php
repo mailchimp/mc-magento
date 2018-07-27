@@ -537,10 +537,10 @@ class Ebizmarts_MailChimp_Model_Observer
         $isAbandonedCartEnabled = $helper->isAbandonedCartEnabled($storeId);
         $email = null;
 
-        if (!$this->getCustomerSession()
+        if (!$this->isCustomerLoggedIn()
             && $isEcomEnabled && $isAbandonedCartEnabled
         ) {
-            $action = $this->getActionName();
+            $action = $this->getRequestActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
             $emailCookie = $this->getEmailCookie();
@@ -948,7 +948,7 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function createEmailCookie($subscriber)
     {
-        if (!$this->getCustomerSession() && !Mage::app()->getStore()->isAdmin()) {
+        if (!$this->isCustomerLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
             Mage::getModel('core/cookie')->set(
                 'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
             );
@@ -976,7 +976,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * @return mixed
      */
-    protected function getCustomerSession()
+    protected function isCustomerLoggedIn()
     {
         return Mage::getSingleton('customer/session')->isLoggedIn();
     }
@@ -984,7 +984,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * @return string
      */
-    protected function getActionName()
+    protected function getRequestActionName()
     {
         return Mage::app()->getRequest()->getActionName();
     }

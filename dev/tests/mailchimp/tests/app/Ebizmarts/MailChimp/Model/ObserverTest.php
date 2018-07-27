@@ -747,7 +747,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getCustomerSession', 'getActionName', 'getEmailFromPopUp', 'getEmailFromMcEid', 'getEmailCookie', 'getMcEidCookie', '_getCampaignCookie',
+            ->setMethods(array('makeHelper', 'isCustomerLoggedIn', 'getRequestActionName', 'getEmailFromPopUp', 'getEmailFromMcEid', 'getEmailCookie', 'getMcEidCookie', '_getCampaignCookie',
                 '_getLandingCookie'))
             ->getMock();
 
@@ -767,8 +767,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn($ecomSyncEnabled);
         $helperMock->expects($this->once())->method('isAbandonedCartEnabled')->with($storeId)->willReturn($abandonedCartEnabled);
-        $observerMock->expects($this->once())->method('getCustomerSession')->willReturn($isLoggedIn);
-        $observerMock->expects($this->once())->method('getActionName')->willReturn($actionName);
+        $observerMock->expects($this->once())->method('isCustomerLoggedIn')->willReturn($isLoggedIn);
+        $observerMock->expects($this->once())->method('getRequestActionName')->willReturn($actionName);
         $observerMock->expects($this->once())->method('getEmailCookie')->willReturn($emailCookie);
         $observerMock->expects($this->once())->method('getMcEidCookie')->willReturn($mcEidCookie);
         $observerMock->expects($this->any())->method('getEmailFromPopUp')->with($emailCookie)->willReturn($email);
