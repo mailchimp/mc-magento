@@ -3140,7 +3140,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $api = $this->getApi($scopeId, $scope);
         $listId = $this->getGeneralList($scopeId, $scope);
         try {
-            $interestCategories = $api->lists->interestCategory->getAll($listId, 'categories');
+            $interestCategories = $api->getLists()->getInterestCategory()->getAll($listId, 'categories');
             foreach ($interestCategories['categories'] as $interestCategory) {
                 $interestGroupsArray[] = array(
                     'id' => $interestCategory['id'],
@@ -3160,9 +3160,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $api = $this->getApi($scopeId, $scope);
         $listId = $this->getGeneralList($scopeId, $scope);
         try {
-            $interestCategories = $api->lists->interestCategory->getAll($listId, 'categories');
+            $apiInterestCategory = $api->getLists()->getInterestCategory();
+            $interestCategories = $apiInterestCategory->getAll($listId, 'categories');
             foreach ($interestCategories['categories'] as $interestCategory) {
-                $interestGroups = $api->lists->interestCategory->interests->getAll($listId, $interestCategory['id']);
+                $interestGroups = $apiInterestCategory->getInterests()->getAll($listId, $interestCategory['id']);
                 $groups = array();
                 foreach ($interestGroups['interests'] as $interestGroup) {
                     $groups[$interestGroup['id']] = $interestGroup['name'];
@@ -3206,23 +3207,27 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $interest = $this->getLocalInterestCategories($storeId);
         if ($interest != '') {
             $interest = explode(",", $interest);
+
         } else {
             $interest = array();
         }
         $api = $this->getApi($storeId);
         $listId = $this->getGeneralList($storeId);
-        $allInterest = $api->lists->interestCategory->getAll($listId);
+        $apiInterestCategory = $api->getLists()->getInterestCategory();
+        $allInterest = $apiInterestCategory->getAll($listId);
         foreach ($allInterest['categories'] as $item) {
             if (in_array($item['id'], $interest)) {
                 $rc[$item['id']]['interest'] = array('id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']);
             }
         }
+        $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
         foreach ($interest as $interestId) {
-            $mailchimpInterest = $api->lists->interestCategory->interests->getAll($listId, $interestId);
+            $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
             foreach ($mailchimpInterest['interests'] as $mi) {
                 $rc[$mi['category_id']]['category'][$mi['display_order']] = array('id' => $mi['id'], 'name' => $mi['name'], 'checked' => false);
             }
         }
+
         return $rc;
     }
 
@@ -3239,7 +3244,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$interest) {
             $interest = $this->getInterest($storeId);
         }
-        $interestGroup = Mage::getModel('mailchimp/interestgroup');
+        $interestGroup = $this->getInterestGroupModel();
         $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
         if ($interestGroup->getId()) {
             $groups = unserialize($interestGroup->getGroupdata());
@@ -3281,10 +3286,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $groups = $this->getInterestGroupsIfAvailable($params);
         if (!$customerId) {
+            $customerSession = $this->getCustomerSession();
             if ($this->isAdmin()) {
                 $customerId = $params['customer_id'];
-            } elseif (Mage::getSingleton('customer/session')->isLoggedIn()) {
-                $customerData = Mage::getSingleton('customer/session')->getCustomer();
+            } elseif ($customerSession->isLoggedIn()) {
+                $customerData = $customerSession->getCustomer();
                 $customerId = $customerData->getId();
             }
         }
@@ -3292,7 +3298,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($subscriber) {
             $subscriberId = $subscriber->getSubscriberId();
         }
-        $interestGroup = Mage::getModel('mailchimp/interestgroup');
+        $interestGroup = $this->getInterestGroupModel();
         $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
         $origSubscriberId = $interestGroup->getSubscriberId();
         $origCustomerId = $interestGroup->getCustomerId();
@@ -3310,7 +3316,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($storeId) {
                 $interestGroup->setStoreId($storeId);
             }
-            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
+            $interestGroup->setUpdatedAt($this->getCurrentDateTime());
             $interestGroup->save();
         }
     }
@@ -3337,5 +3343,29 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function isAdmin()
     {
         return Mage::app()->getStore()->isAdmin();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Interestgroup
+     */
+    protected function getInterestGroupModel()
+    {
+        return Mage::getModel('mailchimp/interestgroup');
+    }
+
+    /**
+     * @return Mage_Customer_Model_Session
+     */
+    protected function getCustomerSession()
+    {
+        return Mage::getSingleton('customer/session');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCurrentDateTime()
+    {
+        return Mage::getModel('core/date')->date('d-m-Y H:i:s');
     }
 }

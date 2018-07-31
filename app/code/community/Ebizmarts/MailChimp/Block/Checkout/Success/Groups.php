@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     public function getGeneralList()
     {
         $storeId = $this->storeId;
-        $helper = $this->helper;
+        $helper = $this->getMailChimpHelper();
         $listId = $helper->getGeneralList($storeId);
 
         return $listId;
@@ -47,7 +47,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     public function getListInterestGroups()
     {
         $storeId = $this->storeId;
-        $helper = $this->helper;
+        $helper = $this->getMailChimpHelper();
         $return = $helper->getListInterestGroups($storeId);
         return $return;
     }
@@ -91,7 +91,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     public function htmlGroupName($category)
     {
         $storeId = $this->storeId;
-        $helper = $this->helper;
+        $helper = $this->getMailChimpHelper();
         $listId = $helper->getGeneralList($storeId);
         $htmlName = "list[{$listId}]";
         $htmlName .= "[{$category['id']}]";
@@ -209,26 +209,51 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
 
     public function getInterest()
     {
-        $subscriber = Mage::getModel('newsletter/subscriber');
-        $order = Mage::getSingleton('checkout/session')->getLastRealOrder();
+        $subscriber = $this->getSubscriberModel();
+        $order = $this->getSessionLastRealOrder();
         $subscriber->loadByEmail($order->getCustomerEmail());
         $subscriberId = $subscriber->getSubscriberId();
         $customerId = $order->getCustomerId();
 
-        $interest = $this->helper->getInterestGroups($customerId, $subscriberId,$order->getStoreId());
+        $helper = $this->getMailChimpHelper();
+        $interest = $helper->getInterestGroups($customerId, $subscriberId,$order->getStoreId());
         return $interest;
     }
 
     public function getMessageBefore()
     {
         $storeId = $this->storeId;
-        return $this->helper->getCheckoutSuccessHtmlBefore($storeId);
+        return $this->getMailChimpHelper()->getCheckoutSuccessHtmlBefore($storeId);
     }
 
     public function getMessageAfter()
     {
         $storeId = $this->storeId;
-        return $this->helper->getCheckoutSuccessHtmlAfter($storeId);
+        return $this->getMailChimpHelper()->getCheckoutSuccessHtmlAfter($storeId);
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getSubscriberModel()
+    {
+        return Mage::getModel('newsletter/subscriber');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSessionLastRealOrder()
+    {
+        return Mage::getSingleton('checkout/session')->getLastRealOrder();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
+     */
+    protected function getMailChimpHelper()
+    {
+        return $this->helper;
     }
 
 }

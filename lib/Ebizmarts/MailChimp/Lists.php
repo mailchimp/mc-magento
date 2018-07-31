@@ -51,6 +51,14 @@ class MailChimp_Lists extends MailChimp_Abstract
     public $webhooks;
 
     /**
+     * @return MailChimp_ListsInterestCategory
+     */
+    public function getInterestCategory()
+    {
+        return $this->interestCategory;
+    }
+
+    /**
      * @param $name
      * @param $contact
      *          company *   (The company name for the list)
