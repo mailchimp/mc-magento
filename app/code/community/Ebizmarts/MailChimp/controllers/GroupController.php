@@ -16,35 +16,36 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
 {
     public function indexAction()
     {
-        $order = Mage::getSingleton('checkout/session')->getLastRealOrder();
-        $session = Mage::getSingleton('core/session');
-        $helper = $this->getHelper();
+        $order = $this->getSessionLastRealOrder();
+        $session = $this->getCoreSession();
+        $interestGroup = $this->getInterestGroupModel();
         $params = $this->getRequest()->getParams();
         $storeId = $order->getStoreId();
-        $interestGroup = Mage::getModel('mailchimp/interestgroup');
-        $subscriber = Mage::getModel('newsletter/subscriber')
-            ->loadByEmail($order->getCustomerEmail());
+        $customerEmail = $order->getCustomerEmail();
         $customerId = $order->getCustomerId();
+        $subscriber = $this->getSubscriberModel()
+            ->loadByEmail($customerEmail);
         try {
             if (!$subscriber->getSubscriberId()) {
-                $subscriber->setSubscriberEmail($order->getCustomerEmail());
+                $subscriber->setSubscriberEmail($customerEmail);
                 $subscriber->setSubscriberFirstname($order->getCustomerFirstname());
                 $subscriber->setSubscriberLastname($order->getCustomerLastname());
-                $subscriber->subscribe($order->getCustomerEmail());
+                $subscriber->subscribe($customerEmail);
             }
-            $interestGroup->getByRelatedIdStoreId($customerId, $subscriber->getSubscriberId(),$storeId);
+            $subscriberId = $subscriber->getSubscriberId();
+            $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             $interestGroup->setGroupdata(serialize($params));
-            $interestGroup->setSubscriberId($subscriber->getSubscriberId());
-            $interestGroup->setCustomerId($order->getCustomerId());
+            $interestGroup->setSubscriberId($subscriberId);
+            $interestGroup->setCustomerId($customerId);
             $interestGroup->setStoreId($storeId);
-            $interestGroup->setUpdatedAt(Mage::getModel('core/date')->date('d-m-Y H:i:s'));
+            $interestGroup->setUpdatedAt($this->getCurrentDateTime());
             $interestGroup->save();
 
             $this->getApiSubscriber()->update($subscriber->getSubscriberEmail(), $storeId, '', 1);
 
             $session->addSuccess($this->__('Thanks for share your interest with us.'));
         } catch (Exception $e) {
-            $helper->logError($e->getMessage());
+            $this->getHelper()->logError($e->getMessage());
             $session->addWarning($this->__('Something went wrong with the interests subscription. Please go to the account subscription menu to subscriber to the interests successfully.'));
         }
         $this->_redirect('/');
@@ -58,5 +59,45 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
     protected function getApiSubscriber()
     {
         return Mage::getModel('mailchimp/api_subscribers');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSessionLastRealOrder()
+    {
+        return Mage::getSingleton('checkout/session')->getLastRealOrder();
+    }
+
+    /**
+     * @return Mage_Core_Model_Session
+     */
+    protected function getCoreSession()
+    {
+        return Mage::getSingleton('core/session');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Interestgroup
+     */
+    protected function getInterestGroupModel()
+    {
+        return Mage::getModel('mailchimp/interestgroup');
+    }
+
+    /**
+     * @return Mage_Newsletter_Model_Subscriber
+     */
+    protected function getSubscriberModel()
+    {
+        return Mage::getModel('newsletter/subscriber');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCurrentDateTime()
+    {
+        return Mage::getModel('core/date')->date('d-m-Y H:i:s');
     }
 }
