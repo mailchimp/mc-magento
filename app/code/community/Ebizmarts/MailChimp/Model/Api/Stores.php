@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             } catch (MailChimp_Error $e) {
                 $adminSession = Mage::getSingleton('adminhtml/session');
                 if (strstr($e->getFriendlyMessage(), 'A store with the domain')) {
-                    $errorMessage = $helper->__("A MailChimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions <a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>");
+                    $errorMessage = $helper->__('A MailChimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
                     $adminSession->addError($errorMessage);
                 }
                 $helper->logError($e->getFriendlyMessage());
