@@ -292,6 +292,15 @@
                 </mailchimp>
             </updates>
         </layout>
+        <translate>
+        <modules>
+            <Ebizmarts_MailChimp>
+                <files>
+                    <default>Ebizmarts_MailChimp.csv</default>
+                </files>
+            </Ebizmarts_MailChimp>
+        </modules>
+    </translate>
         <events>
             <core_block_abstract_to_html_after>
                 <observers>
