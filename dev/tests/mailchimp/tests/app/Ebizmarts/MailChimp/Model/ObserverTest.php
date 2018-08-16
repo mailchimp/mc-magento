@@ -795,7 +795,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             array(array('actionName' => null))
         );
     }
-    
+
     public function testItemCancel()
     {
         $isBundle = false;
@@ -809,22 +809,27 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getEvent'))
             ->getMock();
+
         $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getItem'))
             ->getMock();
+
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper', 'makeApiProduct', 'isBundleItem', 'isConfigurableItem'))
             ->getMock();
+
         $itemMock = $this->getMockBuilder(Mage_Sales_Model_Order_Item::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getStoreId', 'getProductId'))
             ->getMock();
+
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('isEcomSyncDataEnabled', 'getMCStoreId'))
             ->getMock();
+
         $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
             ->setMethods(array('update'))
