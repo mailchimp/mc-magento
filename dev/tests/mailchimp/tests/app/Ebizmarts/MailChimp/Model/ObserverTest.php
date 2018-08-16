@@ -846,3 +846,4 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpObserverMock->itemCancel($observerMock);
     }
 }
+
