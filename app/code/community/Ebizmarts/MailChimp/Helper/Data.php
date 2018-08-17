@@ -875,7 +875,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER))
             ->setOrder('related_id', 'DESC')
-            ->getSelect()->limit(1);
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
             $customerSyncData = $syncDataCollection->getFirstItem();
@@ -893,7 +893,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PRODUCT))
             ->setOrder('related_id', 'DESC')
-            ->getSelect()->limit(1);
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
             $productSyncData = $syncDataCollection->getFirstItem();
@@ -911,7 +911,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_ORDER))
             ->setOrder('related_id', 'DESC')
-            ->getSelect()->limit(1);
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
             $orderSyncData = $syncDataCollection->getFirstItem();
@@ -929,7 +929,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_QUOTE))
             ->setOrder('related_id', 'DESC')
-            ->getSelect()->limit(1);
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
             $cartSyncData = $syncDataCollection->getFirstItem();
@@ -946,7 +946,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE))
             ->setOrder('related_id', 'DESC')
-            ->getSelect()->limit(1);
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
             $promoCodeSyncData = $syncDataCollection->getFirstItem();
