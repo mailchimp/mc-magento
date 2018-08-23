@@ -49,7 +49,8 @@ class Mandrill_Urls
      *         - time string the hour as a UTC date string in YYYY-MM-DD HH:MM:SS format
      *         - sent integer the number of emails that were sent with the URL during the hour
      *         - clicks integer the number of times the URL was clicked during the hour
-     *         - unique_clicks integer the number of unique clicks generated for emails sent with this URL during the hour
+     *         - unique_clicks integer the number of unique clicks generated for emails sent with this URL during the
+     *          hour
      */
     public function timeSeries($url)
     {
@@ -63,11 +64,15 @@ class Mandrill_Urls
      * @return array the tracking domains and their status
      *     - return[] struct the individual tracking domain
      *         - domain string the tracking domain name
-     *         - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - created_at string the date and time that the tracking domain was added as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *         - last_tested_at string when the domain's DNS settings were last tested as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
      *         - cname struct details about the domain's CNAME record
      *             - valid boolean whether the domain's CNAME record is valid for use with Mandrill
-     *             - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *             - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill
+     *              as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now,
+     *              but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *             - error string an error describing the CNAME record, or null if the record is correct
      *         - valid_tracking boolean whether this domain can be used as a tracking domain for email.
      */
@@ -83,11 +88,15 @@ class Mandrill_Urls
      * @param  string $domain a domain name
      * @return struct information about the domain
      *     - domain string the tracking domain name
-     *     - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the tracking domain was added as a UTC string
+     *       in YYYY-MM-DD HH:MM:SS format
+     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
      *     - cname struct details about the domain's CNAME record
      *         - valid boolean whether the domain's CNAME record is valid for use with Mandrill
-     *         - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as
+     *          a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *          previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *         - error string an error describing the CNAME record, or null if the record is correct
      *     - valid_tracking boolean whether this domain can be used as a tracking domain for email.
      */
@@ -98,16 +107,21 @@ class Mandrill_Urls
     }
 
     /**
-     * Checks the CNAME settings for a tracking domain. The domain must have been added already with the add-tracking-domain call
+     * Checks the CNAME settings for a tracking domain. The domain must have been added already with the
+     * add-tracking-domain call
      *
      * @param  string $domain an existing tracking domain name
      * @return struct information about the tracking domain
      *     - domain string the tracking domain name
-     *     - created_at string the date and time that the tracking domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the tracking domain was added as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
+     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
      *     - cname struct details about the domain's CNAME record
      *         - valid boolean whether the domain's CNAME record is valid for use with Mandrill
-     *         - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - valid_after string when the domain's CNAME record will be considered valid for use with Mandrill as a
+     *          UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *          previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *         - error string an error describing the CNAME record, or null if the record is correct
      *     - valid_tracking boolean whether this domain can be used as a tracking domain for email.
      */
