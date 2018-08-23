@@ -12,11 +12,16 @@ class Mandrill_Users
      *
      * @return struct the user information including username, key, reputation, quota, and historical sending stats
      *     - username string the username of the user (used for SMTP authentication)
-     *     - created_at string the date and time that the user's Mandrill account was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the user's Mandrill account was created as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
      *     - public_id string a unique, permanent identifier for this user
-     *     - reputation integer the reputation of the user on a scale from 0 to 100, with 75 generally being a "good" reputation
-     *     - hourly_quota integer the maximum number of emails Mandrill will deliver for this user each hour.  Any emails beyond that will be accepted and queued for later delivery.  Users with higher reputations will have higher hourly quotas
-     *     - backlog integer the number of emails that are queued for delivery due to exceeding your monthly or hourly quotas
+     *     - reputation integer the reputation of the user on a scale from 0 to 100, with 75 generally being a
+     *      "good" reputation
+     *     - hourly_quota integer the maximum number of emails Mandrill will deliver for this user each hour.
+     *       Any emails beyond that will be accepted and queued for later delivery.  Users with higher reputations
+     *       will have higher hourly quotas
+     *     - backlog integer the number of emails that are queued for delivery due to exceeding your monthly or
+     *      hourly quotas
      *     - stats struct an aggregate summary of the account's sending stats
      *         - today struct stats for this user so far today
      *             - sent integer the number of emails sent for this user so far today
@@ -81,9 +86,11 @@ class Mandrill_Users
      *             - complaints integer the number of spam complaints in the lifetime of the user's account
      *             - unsubs integer the number of unsubscribes in the lifetime of the user's account
      *             - opens integer the number of times emails have been opened in the lifetime of the user's account
-     *             - unique_opens integer the number of unique opens for emails sent in the lifetime of the user's account
+     *             - unique_opens integer the number of unique opens for emails sent in the lifetime of the user's
+     *              account
      *             - clicks integer the number of URLs that have been clicked in the lifetime of the user's account
-     *             - unique_clicks integer the number of unique clicks for emails sent in the lifetime of the user's account
+     *             - unique_clicks integer the number of unique clicks for emails sent in the lifetime of the user's
+     *              account
      */
     public function info()
     {
@@ -119,7 +126,8 @@ class Mandrill_Users
      * @return array an array of sender data, one for each sending addresses used by the account
      *     - return[] struct the information on each sending address in the account
      *         - address string the sender's email address
-     *         - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string in YYYY-MM-DD HH:MM:SS format
+     *         - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string
+     *          in YYYY-MM-DD HH:MM:SS format
      *         - sent integer the total number of messages sent by this sender
      *         - hard_bounces integer the total number of hard bounces by messages by this sender
      *         - soft_bounces integer the total number of soft bounces by messages by this sender
