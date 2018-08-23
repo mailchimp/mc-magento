@@ -65,9 +65,4 @@ if ($err) {
             printf($e->getMessage());
         }
     }
-
-    //    else {
-    //        echo "Error: the batch is not finished or have errors\n";
-    //        echo "Error ".$jsonResponse->title." Detail: ".$jsonResponse->detail."\n";
-    //    }
 }
