@@ -13,8 +13,10 @@ class Mandrill_Inbound
      * @return array the inbound domains associated with the account
      *     - return[] struct the individual domain info
      *         - domain string the domain name that is accepting mail
-     *         - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     *         - created_at string the date and time that the inbound domain was added as a UTC string in
+     *          YYYY-MM-DD HH:MM:SS format
+     *         - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to
+     *          the Mandrill servers
      */
     public function domains()
     {
@@ -28,8 +30,10 @@ class Mandrill_Inbound
      * @param  string $domain a domain name
      * @return struct information about the domain
      *     - domain string the domain name that is accepting mail
-     *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     *     - created_at string the date and time that the inbound domain was added as a UTC string in
+     *      YYYY-MM-DD HH:MM:SS format
+     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the
+     *      Mandrill servers
      */
     public function addDomain($domain)
     {
@@ -43,8 +47,10 @@ class Mandrill_Inbound
      * @param  string $domain an existing inbound domain
      * @return struct information about the inbound domain
      *     - domain string the domain name that is accepting mail
-     *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     *     - created_at string the date and time that the inbound domain was added as a UTC string in
+     *      YYYY-MM-DD HH:MM:SS format
+     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the
+     *      Mandrill servers
      */
     public function checkDomain($domain)
     {
@@ -58,8 +64,10 @@ class Mandrill_Inbound
      * @param  string $domain an existing inbound domain
      * @return struct information about the deleted domain
      *     - domain string the domain name that is accepting mail
-     *     - created_at string the date and time that the inbound domain was added as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the Mandrill servers
+     *     - created_at string the date and time that the inbound domain was added as a UTC string in
+     *      YYYY-MM-DD HH:MM:SS format
+     *     - valid_mx boolean true if this inbound domain has successfully set up an MX record to deliver mail to the
+     *      Mandrill servers
      */
     public function deleteDomain($domain)
     {
@@ -101,7 +109,8 @@ class Mandrill_Inbound
     }
 
     /**
-     * Update the pattern or webhook of an existing inbound mailbox route. If null is provided for any fields, the values will remain unchanged.
+     * Update the pattern or webhook of an existing inbound mailbox route. If null is provided for any fields, the
+     * values will remain unchanged.
      *
      * @param  string $id      the unique identifier of an existing mailbox route
      * @param  string $pattern the search pattern that the mailbox name should match
@@ -133,23 +142,29 @@ class Mandrill_Inbound
     }
 
     /**
-     * Take a raw MIME document destined for a domain with inbound domains set up, and send it to the inbound hook exactly as if it had been sent over SMTP
+     * Take a raw MIME document destined for a domain with inbound domains set up, and send it to the inbound hook
+     * exactly as if it had been sent over SMTP
      *
-     * @param  string     $raw_message    the full MIME document of an email message
-     * @param  array|null $to             optionally define the recipients to receive the message - otherwise we'll use the To, Cc, and Bcc headers provided in the document
+     * @param  string     $rawMessage    the full MIME document of an email message
+     * @param  array|null $to             optionally define the recipients to receive the message - otherwise we'll
+     *                                    use the To, Cc, and Bcc headers provided in the document
      *                                   - to[] string the email address of the recipient
-     * @param  string     $mail_from      the address specified in the MAIL FROM stage of the SMTP conversation. Required for the SPF check.
-     * @param  string     $helo           the identification provided by the client mta in the MTA state of the SMTP conversation. Required for the SPF check.
-     * @param  string     $client_address the remote MTA's ip address. Optional; required for the SPF check.
-     * @return array an array of the information for each recipient in the message (usually one) that matched an inbound route
+     * @param  string     $mailFrom      the address specified in the MAIL FROM stage of the SMTP conversation.
+     *                                      Required for the SPF check.
+     * @param  string     $helo           the identification provided by the client mta in the MTA state of the SMTP
+     *                              conversation. Required for the SPF check.
+     * @param  string     $clientAddress the remote MTA's ip address. Optional; required for the SPF check.
+     * @return array an array of the information for each recipient in the message (usually one) that matched an
+     *  inbound route
      *     - return[] struct the individual recipient information
      *         - email string the email address of the matching recipient
      *         - pattern string the mailbox route pattern that the recipient matched
      *         - url string the webhook URL that the message was posted to
      */
-    public function sendRaw($raw_message, $to = null, $mail_from = null, $helo = null, $client_address = null)
+    public function sendRaw($rawMessage, $to = null, $mailFrom = null, $helo = null, $clientAddress = null)
     {
-        $_params = array("raw_message" => $raw_message, "to" => $to, "mail_from" => $mail_from, "helo" => $helo, "client_address" => $client_address);
+        $_params = array("raw_message" => $rawMessage, "to" => $to, "mail_from" => $mailFrom, "helo" => $helo,
+            "client_address" => $clientAddress);
         return $this->master->call('inbound/send-raw', $_params);
     }
 
