@@ -26,9 +26,11 @@ class MailChimp_ListsMembersGoals extends MailChimp_Abstract
     public function get($listId,$subscriberHash,$fields,$excludeFields)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/goals';
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
