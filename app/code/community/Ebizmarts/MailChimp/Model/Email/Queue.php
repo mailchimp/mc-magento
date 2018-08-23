@@ -16,20 +16,20 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
      * Send all messages in a queue via mandrill
      *
      * @return Mage_Core_Model_Email_Queue
-     */
+    */
     public function send()
     {
         /**
- * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection
-*/
+         * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection
+        */
         $collection = Mage::getResourceModel('core/email_queue_collection')
             ->addOnlyForSendingFilter()
             ->setPageSize(self::MESSAGES_LIMIT_PER_CRON_RUN)
             ->setCurPage(1)
             ->load();
         /**
- * @var $message Mage_Core_Model_Email_Queue
-*/
+         * @var $message Mage_Core_Model_Email_Queue
+        */
         foreach ($collection as $message) {
             if ($message->getId()) {
                 if ($message->getEntityType() == 'order') {
@@ -160,7 +160,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
     /**
      * @param $storeId
      * @return Mandrill_Message|Zend_Mail
-     */
+    */
     public function getMail($storeId)
     {
         if (!Mage::helper('mailchimp/mandrill')->isMandrillEnabled($storeId)) {
