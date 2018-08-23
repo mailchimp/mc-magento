@@ -13,7 +13,8 @@ class Mandrill_Senders
      * @return array an array of sender data, one for each sending addresses used by the account
      *     - return[] struct the information on each sending address in the account
      *         - address string the sender's email address
-     *         - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string in YYYY-MM-DD HH:MM:SS format
+     *         - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string
+     *          in YYYY-MM-DD HH:MM:SS format
      *         - sent integer the total number of messages sent by this sender
      *         - hard_bounces integer the total number of hard bounces by messages by this sender
      *         - soft_bounces integer the total number of soft bounces by messages by this sender
@@ -37,18 +38,27 @@ class Mandrill_Senders
      * @return array an array of sender domain data, one for each sending domain used by the account
      *     - return[] struct the information on each sending domain for the account
      *         - domain string the sender domain name
-     *         - created_at string the date and time that the sending domain was first seen as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - created_at string the date and time that the sending domain was first seen as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *         - last_tested_at string when the domain's DNS settings were last tested as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
      *         - spf struct details about the domain's SPF record
      *             - valid boolean whether the domain's SPF record is valid for use with Mandrill
-     *             - valid_after string when the domain's SPF record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *             - valid_after string when the domain's SPF record will be considered valid for use with Mandrill as
+     *          a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *          previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *             - error string an error describing the spf record, or null if the record is correct
      *         - dkim struct details about the domain's DKIM record
      *             - valid boolean whether the domain's DKIM record is valid for use with Mandrill
-     *             - valid_after string when the domain's DKIM record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *             - valid_after string when the domain's DKIM record will be considered valid for use with Mandrill as
+     *          a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *          previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *             - error string an error describing the DKIM record, or null if the record is correct
-     *         - verified_at string if the domain has been verified, this indicates when that verification occurred as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - valid_signing boolean whether this domain can be used to authenticate mail, either for itself or as a custom signing domain. If this is false but spf and dkim are both valid, you will need to verify the domain before using it to authenticate mail
+     *         - verified_at string if the domain has been verified, this indicates when that verification occurred as a
+     *          UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - valid_signing boolean whether this domain can be used to authenticate mail, either for itself or as a
+     *          custom signing domain. If this is false but spf and dkim are both valid, you will need to verify the
+     *          domain before using it to authenticate mail
      */
     public function domains()
     {
@@ -63,18 +73,27 @@ class Mandrill_Senders
      * @param  string $domain a domain name
      * @return struct information about the domain
      *     - domain string the sender domain name
-     *     - created_at string the date and time that the sending domain was first seen as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the sending domain was first seen as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
      *     - spf struct details about the domain's SPF record
      *         - valid boolean whether the domain's SPF record is valid for use with Mandrill
-     *         - valid_after string when the domain's SPF record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - valid_after string when the domain's SPF record will be considered valid for use with Mandrill as a UTC
+     *      string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *      previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *         - error string an error describing the spf record, or null if the record is correct
      *     - dkim struct details about the domain's DKIM record
      *         - valid boolean whether the domain's DKIM record is valid for use with Mandrill
-     *         - valid_after string when the domain's DKIM record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - valid_after string when the domain's DKIM record will be considered valid for use with Mandrill as a
+     *          UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *      previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *         - error string an error describing the DKIM record, or null if the record is correct
-     *     - verified_at string if the domain has been verified, this indicates when that verification occurred as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - valid_signing boolean whether this domain can be used to authenticate mail, either for itself or as a custom signing domain. If this is false but spf and dkim are both valid, you will need to verify the domain before using it to authenticate mail
+     *     - verified_at string if the domain has been verified, this indicates when that verification occurred as a
+     *      UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - valid_signing boolean whether this domain can be used to authenticate mail, either for itself or as a
+     *      custom signing domain. If this is false but spf and dkim are both valid, you will need to verify the domain
+     *      before using it to authenticate mail
      */
     public function addDomain($domain)
     {
@@ -89,18 +108,27 @@ class Mandrill_Senders
      * @param  string $domain a domain name
      * @return struct information about the sender domain
      *     - domain string the sender domain name
-     *     - created_at string the date and time that the sending domain was first seen as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the sending domain was first seen as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
+     *     - last_tested_at string when the domain's DNS settings were last tested as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
      *     - spf struct details about the domain's SPF record
      *         - valid boolean whether the domain's SPF record is valid for use with Mandrill
-     *         - valid_after string when the domain's SPF record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - valid_after string when the domain's SPF record will be considered valid for use with Mandrill as a
+     *      UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *      previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *         - error string an error describing the spf record, or null if the record is correct
      *     - dkim struct details about the domain's DKIM record
      *         - valid boolean whether the domain's DKIM record is valid for use with Mandrill
-     *         - valid_after string when the domain's DKIM record will be considered valid for use with Mandrill as a UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
+     *         - valid_after string when the domain's DKIM record will be considered valid for use with Mandrill as a
+     *       UTC string in YYYY-MM-DD HH:MM:SS format. If set, this indicates that the record is valid now, but was
+     *          previously invalid, and Mandrill will wait until the record's TTL elapses to start using it.
      *         - error string an error describing the DKIM record, or null if the record is correct
-     *     - verified_at string if the domain has been verified, this indicates when that verification occurred as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - valid_signing boolean whether this domain can be used to authenticate mail, either for itself or as a custom signing domain. If this is false but spf and dkim are both valid, you will need to verify the domain before using it to authenticate mail
+     *     - verified_at string if the domain has been verified, this indicates when that verification occurred as a
+     *      UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - valid_signing boolean whether this domain can be used to authenticate mail, either for itself or as a
+     *      custom signing domain. If this is false but spf and dkim are both valid, you will need to verify the domain
+     *      before using it to authenticate mail
      */
     public function checkDomain($domain)
     {
@@ -118,7 +146,8 @@ class Mandrill_Senders
      * @param  string $domain  a domain name at which you can receive email
      * @param  string $mailbox a mailbox at the domain where the verification email should be sent
      * @return struct information about the verification that was sent
-     *     - status string "sent" indicates that the verification has been sent, "already_verified" indicates that the domain has already been verified with your account
+     *     - status string "sent" indicates that the verification has been sent, "already_verified" indicates that
+     *      the domain has already been verified with your account
      *     - domain string the domain name you provided
      *     - email string the email address the verification email was sent to
      */
@@ -134,7 +163,8 @@ class Mandrill_Senders
      * @param  string $address the email address of the sender
      * @return struct the detailed information on the sender
      *     - address string the sender's email address
-     *     - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string
+     *      in YYYY-MM-DD HH:MM:SS format
      *     - sent integer the total number of messages sent by this sender
      *     - hard_bounces integer the total number of hard bounces by messages by this sender
      *     - soft_bounces integer the total number of soft bounces by messages by this sender
@@ -165,7 +195,8 @@ class Mandrill_Senders
      *             - opens integer the number of times emails have been opened for this sender in the last 7 days
      *             - unique_opens integer the number of unique opens for emails sent for this sender in the last 7 days
      *             - clicks integer the number of URLs that have been clicked for this sender in the last 7 days
-     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last 7 days
+     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last
+     *              7 days
      *         - last_30_days struct stats for this sender in the last 30 days
      *             - sent integer the number of emails sent for this sender in the last 30 days
      *             - hard_bounces integer the number of emails hard bounced for this sender in the last 30 days
@@ -176,7 +207,8 @@ class Mandrill_Senders
      *             - opens integer the number of times emails have been opened for this sender in the last 30 days
      *             - unique_opens integer the number of unique opens for emails sent for this sender in the last 30 days
      *             - clicks integer the number of URLs that have been clicked for this sender in the last 30 days
-     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last 30 days
+     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last
+     *              30 days
      *         - last_60_days struct stats for this sender in the last 60 days
      *             - sent integer the number of emails sent for this sender in the last 60 days
      *             - hard_bounces integer the number of emails hard bounced for this sender in the last 60 days
@@ -187,7 +219,8 @@ class Mandrill_Senders
      *             - opens integer the number of times emails have been opened for this sender in the last 60 days
      *             - unique_opens integer the number of unique opens for emails sent for this sender in the last 60 days
      *             - clicks integer the number of URLs that have been clicked for this sender in the last 60 days
-     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last 60 days
+     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last
+     *              60 days
      *         - last_90_days struct stats for this sender in the last 90 days
      *             - sent integer the number of emails sent for this sender in the last 90 days
      *             - hard_bounces integer the number of emails hard bounced for this sender in the last 90 days
@@ -198,7 +231,8 @@ class Mandrill_Senders
      *             - opens integer the number of times emails have been opened for this sender in the last 90 days
      *             - unique_opens integer the number of unique opens for emails sent for this sender in the last 90 days
      *             - clicks integer the number of URLs that have been clicked for this sender in the last 90 days
-     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last 90 days
+     *             - unique_clicks integer the number of unique clicks for emails sent for this sender in the last
+     *              90 days
      */
     public function info($address)
     {
