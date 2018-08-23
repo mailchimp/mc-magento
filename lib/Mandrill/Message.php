@@ -58,7 +58,8 @@ class Mandrill_Message extends Mandrill_Mandrill
         $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
         $encoding = Zend_Mime::ENCODING_BASE64,
         $filename = null
-    ) {
+    ) 
+    {
         $mp = new Zend_Mime_Part($body);
         $mp->encoding = $encoding;
         $mp->type = $mimeType;
@@ -170,10 +171,9 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
 
         $email = $this->_filterEmail($email);
-        //        $name  = $this->_filterName($name);
+
         $this->_from = $email;
         $this->_fromName = $name;
-        //        $this->_storeHeader('From', $this->_formatAddress($email, $name), true);
 
         return $this;
     }
@@ -244,7 +244,6 @@ class Mandrill_Message extends Mandrill_Mandrill
             /**
              * @see Zend_Mail_Exception
              */
-            // require_once 'Zend/Mail/Exception.php';
             throw new Zend_Mail_Exception('Cannot set standard header from addHeader()');
         }
 
