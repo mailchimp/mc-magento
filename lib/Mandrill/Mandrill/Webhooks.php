@@ -17,12 +17,16 @@ class Mandrill_Webhooks
      *         - description string a description of the webhook
      *         - auth_key string the key used to requests for this webhook
      *         - events array The message events that will be posted to the hook
-     *             - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub, or reject)
-     *         - created_at string the date and time that the webhook was created as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - last_sent_at string the date and time that the webhook last successfully received events as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *             - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click,
+     *              spam, unsub, or reject)
+     *         - created_at string the date and time that the webhook was created as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *         - last_sent_at string the date and time that the webhook last successfully received events as a
+     *          UTC string in YYYY-MM-DD HH:MM:SS format
      *         - batches_sent integer the number of event batches that have ever been sent to this webhook
      *         - events_sent integer the total number of events that have ever been sent to this webhook
-     *         - last_error string if we've ever gotten an error trying to post to this webhook, the last error that we've seen
+     *         - last_error string if we've ever gotten an error trying to post to this webhook, the last error
+     *          that we've seen
      */
     public function getList()
     {
@@ -43,12 +47,16 @@ class Mandrill_Webhooks
      *     - description string a description of the webhook
      *     - auth_key string the key used to requests for this webhook
      *     - events array The message events that will be posted to the hook
-     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub, or reject)
-     *     - created_at string the date and time that the webhook was created as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam,
+     *          unsub, or reject)
+     *     - created_at string the date and time that the webhook was created as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
+     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string
+     *      in YYYY-MM-DD HH:MM:SS format
      *     - batches_sent integer the number of event batches that have ever been sent to this webhook
      *     - events_sent integer the total number of events that have ever been sent to this webhook
-     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error that we've seen
+     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error
+     *      that we've seen
      */
     public function add($url, $description = null, $events = array())
     {
@@ -66,12 +74,16 @@ class Mandrill_Webhooks
      *     - description string a description of the webhook
      *     - auth_key string the key used to requests for this webhook
      *     - events array The message events that will be posted to the hook
-     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub, or reject)
-     *     - created_at string the date and time that the webhook was created as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub,
+     *          or reject)
+     *     - created_at string the date and time that the webhook was created as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
      *     - batches_sent integer the number of event batches that have ever been sent to this webhook
      *     - events_sent integer the total number of events that have ever been sent to this webhook
-     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error that we've seen
+     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error
+     *      that we've seen
      */
     public function info($id)
     {
@@ -93,12 +105,16 @@ class Mandrill_Webhooks
      *     - description string a description of the webhook
      *     - auth_key string the key used to requests for this webhook
      *     - events array The message events that will be posted to the hook
-     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub, or reject)
-     *     - created_at string the date and time that the webhook was created as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub,
+     *          or reject)
+     *     - created_at string the date and time that the webhook was created as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
      *     - batches_sent integer the number of event batches that have ever been sent to this webhook
      *     - events_sent integer the total number of events that have ever been sent to this webhook
-     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error that we've seen
+     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error
+     *      that we've seen
      */
     public function update($id, $url, $description = null, $events = array())
     {
@@ -116,12 +132,16 @@ class Mandrill_Webhooks
      *     - description string a description of the webhook
      *     - auth_key string the key used to requests for this webhook
      *     - events array The message events that will be posted to the hook
-     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub, or reject)
-     *     - created_at string the date and time that the webhook was created as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - events[] string the individual message event (send, hard_bounce, soft_bounce, open, click, spam, unsub,
+     *          or reject)
+     *     - created_at string the date and time that the webhook was created as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
+     *     - last_sent_at string the date and time that the webhook last successfully received events as a UTC string
+     *          in YYYY-MM-DD HH:MM:SS format
      *     - batches_sent integer the number of event batches that have ever been sent to this webhook
      *     - events_sent integer the total number of events that have ever been sent to this webhook
-     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error that we've seen
+     *     - last_error string if we've ever gotten an error trying to post to this webhook, the last error
+     *      that we've seen
      */
     public function delete($id)
     {
