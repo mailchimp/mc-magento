@@ -13,7 +13,8 @@ class Mandrill_Ips
      * @return array an array of structs for each dedicated IP
      *     - return[] struct information about a single dedicated IP
      *         - ip string the ip address
-     *         - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *              YYYY-MM-DD HH:MM:SS format
      *         - pool string the name of the pool that this dedicated IP belongs to
      *         - domain string the domain name (reverse dns) of this dedicated IP
      *         - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -22,8 +23,10 @@ class Mandrill_Ips
      *             - error string if the ip's custom dns is invalid, this will include details about the error
      *         - warmup struct information about the ip's warmup status
      *             - warming_up boolean whether the ip is currently in warmup mode
-     *             - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *             - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *             - start_at string the start time for the warmup process as a UTC string in
+     *              YYYY-MM-DD HH:MM:SS format
+     *             - end_at string the end date and time for the warmup process as a UTC string in
+     *              YYYY-MM-DD HH:MM:SS format
      */
     public function getList()
     {
@@ -37,7 +40,8 @@ class Mandrill_Ips
      * @param  string $ip a dedicated IP address
      * @return struct Information about the dedicated ip
      *     - ip string the ip address
-     *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *          YYYY-MM-DD HH:MM:SS format
      *     - pool string the name of the pool that this dedicated IP belongs to
      *     - domain string the domain name (reverse dns) of this dedicated IP
      *     - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -47,7 +51,8 @@ class Mandrill_Ips
      *     - warmup struct information about the ip's warmup status
      *         - warming_up boolean whether the ip is currently in warmup mode
      *         - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS
+     *          format
      */
     public function info($ip)
     {
@@ -63,7 +68,8 @@ class Mandrill_Ips
      * @param  boolean $warmup whether to enable warmup mode for the ip
      * @param  string  $pool   the id of the pool to add the dedicated ip to, or null to use your account's default pool
      * @return struct a description of the provisioning request that was created
-     *     - requested_at string the date and time that the request was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
+     *     - requested_at string the date and time that the request was created as a UTC timestamp in
+     *      YYYY-MM-DD HH:MM:SS format
      */
     public function provision($warmup = false, $pool = null)
     {
@@ -80,7 +86,8 @@ class Mandrill_Ips
      * @param  string $ip a dedicated ip address
      * @return struct Information about the dedicated IP
      *     - ip string the ip address
-     *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *          YYYY-MM-DD HH:MM:SS format
      *     - pool string the name of the pool that this dedicated IP belongs to
      *     - domain string the domain name (reverse dns) of this dedicated IP
      *     - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -90,7 +97,8 @@ class Mandrill_Ips
      *     - warmup struct information about the ip's warmup status
      *         - warming_up boolean whether the ip is currently in warmup mode
      *         - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS
+     *          format
      */
     public function startWarmup($ip)
     {
@@ -104,7 +112,8 @@ class Mandrill_Ips
      * @param  string $ip a dedicated ip address
      * @return struct Information about the dedicated IP
      *     - ip string the ip address
-     *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *          YYYY-MM-DD HH:MM:SS format
      *     - pool string the name of the pool that this dedicated IP belongs to
      *     - domain string the domain name (reverse dns) of this dedicated IP
      *     - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -114,7 +123,8 @@ class Mandrill_Ips
      *     - warmup struct information about the ip's warmup status
      *         - warming_up boolean whether the ip is currently in warmup mode
      *         - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - end_at string the end date and time for the warmup process as a UTC string in
+     *          YYYY-MM-DD HH:MM:SS format
      */
     public function cancelWarmup($ip)
     {
@@ -127,10 +137,12 @@ class Mandrill_Ips
      *
      * @param  string  $ip          a dedicated ip address
      * @param  string  $pool        the name of the new pool to add the dedicated ip to
-     * @param  boolean $create_pool whether to create the pool if it does not exist; if false and the pool does not exist, an Unknown_Pool will be thrown.
+     * @param  boolean $createPool whether to create the pool if it does not exist; if false and the pool does not
+     * exist, an Unknown_Pool will be thrown.
      * @return struct Information about the updated state of the dedicated IP
      *     - ip string the ip address
-     *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *      YYYY-MM-DD HH:MM:SS format
      *     - pool string the name of the pool that this dedicated IP belongs to
      *     - domain string the domain name (reverse dns) of this dedicated IP
      *     - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -140,11 +152,12 @@ class Mandrill_Ips
      *     - warmup struct information about the ip's warmup status
      *         - warming_up boolean whether the ip is currently in warmup mode
      *         - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS
+     *          format
      */
-    public function setPool($ip, $pool, $create_pool = false)
+    public function setPool($ip, $pool, $createPool = false)
     {
-        $_params = array("ip" => $ip, "pool" => $pool, "create_pool" => $create_pool);
+        $_params = array("ip" => $ip, "pool" => $pool, "create_pool" => $createPool);
         return $this->master->call('ips/set-pool', $_params);
     }
 
@@ -168,11 +181,13 @@ class Mandrill_Ips
      * @return array the dedicated IP pools for your account, up to a maximum of 1,000
      *     - return[] struct information about each dedicated IP pool
      *         - name string this pool's name
-     *         - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
+     *         - created_at string the date and time that this pool was created as a UTC timestamp in
+     *          YYYY-MM-DD HH:MM:SS format
      *         - ips array the dedicated IPs in this pool
      *             - ips[] struct information about each dedicated IP
      *                 - ip string the ip address
-     *                 - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *                 - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *                  YYYY-MM-DD HH:MM:SS format
      *                 - pool string the name of the pool that this dedicated IP belongs to
      *                 - domain string the domain name (reverse dns) of this dedicated IP
      *                 - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -181,8 +196,10 @@ class Mandrill_Ips
      *                     - error string if the ip's custom dns is invalid, this will include details about the error
      *                 - warmup struct information about the ip's warmup status
      *                     - warming_up boolean whether the ip is currently in warmup mode
-     *                     - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *                     - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *                     - start_at string the start time for the warmup process as a UTC string in
+     *                      YYYY-MM-DD HH:MM:SS format
+     *                     - end_at string the end date and time for the warmup process as a UTC string in
+     *                      YYYY-MM-DD HH:MM:SS format
      */
     public function listPools()
     {
@@ -196,11 +213,13 @@ class Mandrill_Ips
      * @param  string $pool a pool name
      * @return struct Information about the dedicated ip pool
      *     - name string this pool's name
-     *     - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS
+     *      format
      *     - ips array the dedicated IPs in this pool
      *         - ips[] struct information about each dedicated IP
      *             - ip string the ip address
-     *             - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *             - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *              YYYY-MM-DD HH:MM:SS format
      *             - pool string the name of the pool that this dedicated IP belongs to
      *             - domain string the domain name (reverse dns) of this dedicated IP
      *             - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -209,8 +228,10 @@ class Mandrill_Ips
      *                 - error string if the ip's custom dns is invalid, this will include details about the error
      *             - warmup struct information about the ip's warmup status
      *                 - warming_up boolean whether the ip is currently in warmup mode
-     *                 - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *                 - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *                 - start_at string the start time for the warmup process as a UTC string in
+     *                  YYYY-MM-DD HH:MM:SS format
+     *                 - end_at string the end date and time for the warmup process as a UTC string in
+     *                  YYYY-MM-DD HH:MM:SS format
      */
     public function poolInfo($pool)
     {
@@ -225,11 +246,13 @@ class Mandrill_Ips
      * @param  string $pool the name of a pool to create
      * @return struct Information about the dedicated ip pool
      *     - name string this pool's name
-     *     - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that this pool was created as a UTC timestamp in YYYY-MM-DD HH:MM:SS
+     *        format
      *     - ips array the dedicated IPs in this pool
      *         - ips[] struct information about each dedicated IP
      *             - ip string the ip address
-     *             - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *             - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *              YYYY-MM-DD HH:MM:SS format
      *             - pool string the name of the pool that this dedicated IP belongs to
      *             - domain string the domain name (reverse dns) of this dedicated IP
      *             - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -238,8 +261,10 @@ class Mandrill_Ips
      *                 - error string if the ip's custom dns is invalid, this will include details about the error
      *             - warmup struct information about the ip's warmup status
      *                 - warming_up boolean whether the ip is currently in warmup mode
-     *                 - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *                 - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *                 - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS
+     *                  format
+     *                 - end_at string the end date and time for the warmup process as a UTC string in
+     *                  YYYY-MM-DD HH:MM:SS format
      */
     public function createPool($pool)
     {
@@ -284,7 +309,8 @@ class Mandrill_Ips
      * @param  string $domain a domain name to set as the dedicated IP's custom dns name.
      * @return struct information about the dedicated IP's new configuration
      *     - ip string the ip address
-     *     - created_at string the date and time that the dedicated IP was created as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *     - created_at string the date and time that the dedicated IP was created as a UTC string in
+     *       YYYY-MM-DD HH:MM:SS format
      *     - pool string the name of the pool that this dedicated IP belongs to
      *     - domain string the domain name (reverse dns) of this dedicated IP
      *     - custom_dns struct information about the ip's custom dns, if it has been configured
@@ -294,7 +320,8 @@ class Mandrill_Ips
      *     - warmup struct information about the ip's warmup status
      *         - warming_up boolean whether the ip is currently in warmup mode
      *         - start_at string the start time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
-     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS format
+     *         - end_at string the end date and time for the warmup process as a UTC string in YYYY-MM-DD HH:MM:SS
+     *          format
      */
     public function setCustomDns($ip, $domain)
     {
