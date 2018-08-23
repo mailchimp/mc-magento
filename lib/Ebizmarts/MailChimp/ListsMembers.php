@@ -27,60 +27,69 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
 
     /**
      * @param $listId               The unique id for the list.
-     * @param null                                               $emailType   Type of email this member asked to get (‘html’ or ‘text’).
+      * @param null                 $emailType   Type of email this member asked to get (‘html’ or ‘text’).
      * @param $status               Subscriber’s current status. (subscribed | unsubscribed | cleaned | pending)
      * @param $emailAddress        Subscriber's email address.
-     * @param null                                               $mergeFields An individual merge var and value for a member.
-     * @param null                                               $interests   The key of this object’s properties is the ID of the interest in question.
-     * @param null                                               $language    If set/detected, the subscriber’s language.
-     * @param null                                               $vip         VIP status for subscriber.
-     * @param null                                               $location    Subscriber location information.
-     * @param null                                               $ipOpt       The IP address the subscriber used to confirm their opt-in status.
+     * @param null               $mergeFields An individual merge var and value for a member.
+     * @param null              $interests   The key of this object’s properties is the ID of the
+     * interest in question.
+     * @param null               $language    If set/detected, the subscriber’s language.
+     * @param null               $vip         VIP status for subscriber.
+     * @param null               $location    Subscriber location information.
+     * @param null               $ipOpt       The IP address the subscriber used to confirm their opt-in status.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
     public function add($listId, $status, $emailAddress, $emailType=null, $mergeFields=null, $interests=null,
         $language=null, $vip=null, $location=null, $ipOpt=null
-    ) {
+    ) 
+    {
 
         $_params = array('status'=>$status, 'email_address' => $emailAddress);
-        if($emailType) { $_params['email_type'] = $emailType;
+        if ($emailType) {
+            $_params['email_type'] = $emailType;
         }
-        if($mergeFields) { $_params['merge_fields'] = $mergeFields;
+        if ($mergeFields) {
+            $_params['merge_fields'] = $mergeFields;
         }
-        if($interests) { $_params['interests'] = $interests;
+        if ($interests) {
+            $_params['interests'] = $interests;
         }
-        if($language) { $_params['language'] = $language;
+        if ($language) {
+            $_params['language'] = $language;
         }
-        if($vip) { $_params['vip'] = $vip;
+        if ($vip) {
+            $_params['vip'] = $vip;
         }
-        if($location) { $_params['location'] = $location;
+        if ($location) {
+            $_params['location'] = $location;
         }
-        if($ipOpt) { $_params['ip_opt'] = $ipOpt;
+        if ($ipOpt) {
+            $_params['ip_opt'] = $ipOpt;
         }
         return $this->_master->call('lists/'.$listId.'/members', $_params, Ebizmarts_MailChimp::POST);
     }
 
     /**
      * @param $listId                   The unique id for the list.
-     * @param null                                                $fields             A comma-separated list of fields to return. Reference parameters of sub-objects
+     * @param null   $fields           A comma-separated list of fields to return. Reference parameters of sub-objects
      *                                                                                with dot notation.
-     * @param null                                                $excludeFields      A comma-separated list of fields to exclude. Reference parameters of
+     * @param null   $excludeFields      A comma-separated list of fields to exclude. Reference parameters of
      *                                                                                sub-objects with dot notation.
-     * @param null                                                $count              The number of records to return.
-     * @param null                                                $offset             The number of records from a collection to skip. Iterating over large
-     *                                                                                collections with this parameter can be slow.
-     * @param null                                                $emailType          The email type.
-     * @param null                                                $status             The subscriber’s status.
-     * @param null                                                $sinceTimpestampOpt Restrict results to subscribers who opted-in after the set timeframe.
-     * @param null                                                $beforeTimestampOpt Restrict results to subscribers who opted-in before the set timeframe.
-     * @param null                                                $sinceLastChanged   Restrict results to subscribers whose information changed after the set
+     * @param null    $count              The number of records to return.
+     * @param null    $offset             The number of records from a collection to skip. Iterating over large
+     *                                                                   collections with this parameter can be slow.
+     * @param null    $emailType          The email type.
+     * @param null    $status             The subscriber’s status.
+     * @param null    $sinceTimpestampOpt Restrict results to subscribers who opted-in after the set timeframe.
+     * @param null    $beforeTimestampOpt Restrict results to subscribers who opted-in before the set timeframe.
+     * @param null    $sinceLastChanged   Restrict results to subscribers whose information changed after the set
      *                                                                                timeframe.
-     * @param null                                                $beforeLastChanged  Restrict results to subscribers whose information changed before the set
+     * @param null    $beforeLastChanged  Restrict results to subscribers whose information changed before the set
      *                                                                                timeframe.
-     * @param null                                                $uniqueEmailId      A unique identifier for the email address across all MailChimp lists.
-     *                                                                                This parameter can be found in any links with Ecommerce 360 tracking
+     * @param null    $uniqueEmailId      A unique identifier for the email address across all MailChimp lists.
+     *                                            This parameter can be found in any links with Ecommerce 360 tracking
      *                                                                                enabled.
      * @return mixed
      * @throws MailChimp_Error
@@ -89,30 +98,42 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $emailType=null,
         $status=null, $sinceTimpestampOpt=null, $beforeTimestampOpt=null,$sinceLastChanged=null,
         $beforeLastChanged=null, $uniqueEmailId=null
-    ) {
+    ) 
+    {
 
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
-        if($emailType) { $_params['email_type'] = $emailType;
+        if ($emailType) {
+            $_params['email_type'] = $emailType;
         }
-        if($status) { $_params['status'] = $status;
+        if ($status) {
+            $_params['status'] = $status;
         }
-        if($sinceTimpestampOpt) { $_params['since_timpestamp_opt'] = $sinceTimpestampOpt;
+        if ($sinceTimpestampOpt) {
+            $_params['since_timpestamp_opt'] = $sinceTimpestampOpt;
         }
-        if($beforeTimestampOpt) { $_params['before_timestamp_opt'] = $beforeTimestampOpt;
+        if ($beforeTimestampOpt) {
+            $_params['before_timestamp_opt'] = $beforeTimestampOpt;
         }
-        if($sinceLastChanged) { $_params['since_last_changed'] = $sinceLastChanged;
+        if ($sinceLastChanged) {
+            $_params['since_last_changed'] = $sinceLastChanged;
         }
-        if($beforeLastChanged) { $_params['before_last_changed'] = $beforeLastChanged;
+        if ($beforeLastChanged) {
+            $_params['before_last_changed'] = $beforeLastChanged;
         }
-        if($uniqueEmailId) { $_params['unique_email_id'] = $uniqueEmailId;
+        if ($uniqueEmailId) {
+            $_params['unique_email_id'] = $uniqueEmailId;
         }
         return $this->_master->call('lists/'.$listId.'/members', $_params, Ebizmarts_MailChimp::GET);
     }
@@ -120,10 +141,10 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     /**
      * @param $listId               The unique id for the list.
      * @param $subscriberHash       The MD5 hash of the lowercase version of the list member’s email address.
-     * @param null                                                                                            $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
-     *                                                                                                                       with dot notation.
-     * @param null                                                                                            $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                                                                                                                       with dot notation.
+     * @param null        $fields       A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                                                                                               with dot notation.
+     * @param null      $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                                                                                               with dot notation.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -131,9 +152,11 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     public function get($listId,$subscriberHash,$fields=null,$excludeFields=null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_MailChimp::GET);
     }
@@ -141,35 +164,45 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     /**
      * @param $listId               The unique id for the list.
      * @param $subscriberHash       The MD5 hash of the lowercase version of the list member’s email address.
-     * @param null                                                                                            $emailType   Type of email this member asked to get (‘html’ or ‘text’).
-     * @param null                                                                                            $status      Subscriber’s current status. (subscribed | unsubscribed | cleaned | pending)
-     * @param null                                                                                            $mergeFields An individual merge var and value for a member.
-     * @param null                                                                                            $interests   The key of this object’s properties is the ID of the interest in question.
-     * @param null                                                                                            $language    If set/detected, the subscriber’s language.
-     * @param null                                                                                            $vip         VIP status for subscriber.
-     * @param null                                                                                            $location    Subscriber location information.
+     * @param null                              $emailType   Type of email this member asked to get
+     * (‘html’ or ‘text’).
+     * @param null         $status      Subscriber’s current status. (subscribed | unsubscribed | cleaned | pending)
+     * @param null                                         $mergeFields An individual merge var and value for a member.
+     * @param null              $interests   The key of this object’s properties is the ID of
+     * the interest in question.
+     * @param null                                    $language    If set/detected, the subscriber’s language.
+     * @param null                                                           $vip         VIP status for subscriber.
+     * @param null                                                      $location    Subscriber location information.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
     public function update($listId, $subscriberHash, $emailType=null, $status=null, $mergeFields=null, $interests=null,
         $language=null, $vip=null, $location=null
-    ) {
+    ) 
+    {
 
         $_params = array();
-        if($status) { $_params['status'] = $status;
+        if ($status) {
+            $_params['status'] = $status;
         }
-        if($emailType) { $_params['email_type'] = $emailType;
+        if ($emailType) {
+            $_params['email_type'] = $emailType;
         }
-        if($mergeFields) { $_params['merge_fields'] = $mergeFields;
+        if ($mergeFields) {
+            $_params['merge_fields'] = $mergeFields;
         }
-        if($interests) { $_params['interests'] = $interests;
+        if ($interests) {
+            $_params['interests'] = $interests;
         }
-        if($language) { $_params['language'] = $language;
+        if ($language) {
+            $_params['language'] = $language;
         }
-        if($vip) { $_params['vip'] = $vip;
+        if ($vip) {
+            $_params['vip'] = $vip;
         }
-        if($location) { $_params['location'] = $location;
+        if ($location) {
+            $_params['location'] = $location;
         }
         return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_MailChimp::PATCH);
     }
@@ -177,13 +210,14 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     /**
      * @param $listId               The unique id for the list.
      * @param $subscriberHash       The MD5 hash of the lowercase version of the list member’s email address.
-     * @param null                                                                                                      $emailType   Type of email this member asked to get (‘html’ or ‘text’).
+     * @param null                          $emailType   Type of email this member asked to get
+     * (‘html’ or ‘text’).
      * @param $status               Subscriber’s current status. (subscribed | unsubscribed | cleaned | pending)
-     * @param null                                                                                                      $mergeFields An individual merge var and value for a member.
-     * @param null                                                                                                      $interests   The key of this object’s properties is the ID of the interest in question.
-     * @param null                                                                                                      $language    If set/detected, the subscriber’s language.
-     * @param null                                                                                                      $vip         VIP status for subscriber.
-     * @param null                                                                                                      $location    Subscriber location information.
+     * @param null                                     $mergeFields An individual merge var and value for a member.
+     * @param null            $interests   The key of this object’s properties is the ID of the interest in question.
+     * @param null                                         $language    If set/detected, the subscriber’s language.
+     * @param null                                                            $vip         VIP status for subscriber.
+     * @param null                                                    $location    Subscriber location information.
      * @param $emailAddress         Email address for a subscriber used only on a PUT request if the email is not
      *                              already present on the list.
      * @param $statusIfNew          Subscriber’s status used only on a PUT request if the email is not already present
@@ -195,22 +229,30 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
      */
     public function addOrUpdate($listId, $subscriberHash, $emailAddress, $statusIfNew, $emailType=null, $status=null,
         $mergeFields=null, $interests=null, $language=null, $vip=null, $location=null
-    ) {
+    ) 
+    {
 
         $_params = array('status_if_new'=>$statusIfNew,'email_address'=>$emailAddress);
-        if($emailType) { $_params['email_type'] = $emailType;
+        if ($emailType) {
+            $_params['email_type'] = $emailType;
         }
-        if($status) { $_params['status'] = $status;
+        if ($status) {
+            $_params['status'] = $status;
         }
-        if($mergeFields) { $_params['merge_fields'] = $mergeFields;
+        if ($mergeFields) {
+            $_params['merge_fields'] = $mergeFields;
         }
-        if($interests) { $_params['interests'] = $interests;
+        if ($interests) {
+            $_params['interests'] = $interests;
         }
-        if($language) { $_params['language'] = $language;
+        if ($language) {
+            $_params['language'] = $language;
         }
-        if($vip) { $_params['vip'] = $vip;
+        if ($vip) {
+            $_params['vip'] = $vip;
         }
-        if($location) { $_params['location'] = $location;
+        if ($location) {
+            $_params['location'] = $location;
         }
         return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, $_params, Ebizmarts_MailChimp::PUT);
     }
@@ -237,6 +279,9 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
      */
     public function getEmailByMcEid($listId,$mcEidCookie)
     {
-        return $this->_master->call('lists/'.$listId.'/members?unique_email_id='.$mcEidCookie, null, Ebizmarts_MailChimp::GET);
+        return $this->_master->call(
+            'lists/'.$listId.'/members?unique_email_id='.$mcEidCookie,
+            null, Ebizmarts_MailChimp::GET
+        );
     }
 }
