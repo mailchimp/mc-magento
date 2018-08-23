@@ -33,20 +33,24 @@ class Mandrill_Rejects
      * include_expired to true to include them.
      *
      * @param  string  $email           an optional email address to search by
-     * @param  boolean $include_expired whether to include rejections that have already expired.
+     * @param  boolean $includeExpired whether to include rejections that have already expired.
      * @param  string  $subaccount      an optional unique identifier for the subaccount to limit the blacklist
      * @return array Up to 1000 rejection entries
      *     - return[] struct the information for each rejection blacklist entry
      *         - email string the email that is blocked
-     *         - reason string the type of event (hard-bounce, soft-bounce, spam, unsub, custom) that caused this rejection
-     *         - detail string extended details about the event, such as the SMTP diagnostic for bounces or the comment for manually-created rejections
+     *         - reason string the type of event (hard-bounce, soft-bounce, spam, unsub, custom) that caused this
+     *          rejection
+     *         - detail string extended details about the event, such as the SMTP diagnostic for bounces or the comment
+     *          for manually-created rejections
      *         - created_at string when the email was added to the blacklist
-     *         - last_event_at string the timestamp of the most recent event that either created or renewed this rejection
+     *         - last_event_at string the timestamp of the most recent event that either created or renewed this
+     *          rejection
      *         - expires_at string when the blacklist entry will expire (this may be in the past)
      *         - expired boolean whether the blacklist entry has expired
      *         - sender struct the sender that this blacklist entry applies to, or null if none.
      *             - address string the sender's email address
-     *             - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string in YYYY-MM-DD HH:MM:SS format
+     *             - created_at string the date and time that the sender was first seen by Mandrill as a UTC date string
+     *              in YYYY-MM-DD HH:MM:SS format
      *             - sent integer the total number of messages sent by this sender
      *             - hard_bounces integer the total number of hard bounces by messages by this sender
      *             - soft_bounces integer the total number of soft bounces by messages by this sender
@@ -59,9 +63,9 @@ class Mandrill_Rejects
      *             - unique_clicks integer the number of unique clicks for emails sent for this sender
      *         - subaccount string the subaccount that this blacklist entry applies to, or null if none.
      */
-    public function getList($email = null, $include_expired = false, $subaccount = null)
+    public function getList($email = null, $includeExpired = false, $subaccount = null)
     {
-        $_params = array("email" => $email, "include_expired" => $include_expired, "subaccount" => $subaccount);
+        $_params = array("email" => $email, "include_expired" => $includeExpired, "subaccount" => $subaccount);
         return $this->master->call('rejects/list', $_params);
     }
 
