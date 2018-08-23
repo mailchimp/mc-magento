@@ -15,12 +15,15 @@ class MailChimp_ListsSegmentsMembers extends MailChimp_Abstract
     /**
      * @param $listId               The unique id for the list.
      * @param $segmentId            The unique id for the segment.
-     * @param null                                               $fields        A comma-separated list of fields to return. Reference parameters of sub-objects with
+     * @param null                                               $fields        A comma-separated list of fields to
+     *                                                              return. Reference parameters of sub-objects with
      *                                                                          dot notation.
-     * @param null                                               $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     * @param null                                               $excludeFields A comma-separated list of fields to
+     *                                                           exclude. Reference parameters of sub-objects
      *                                                                          with dot notation.
      * @param null                                               $count         The number of records to return.
-     * @param null                                               $offset        The number of records from a collection to skip. Iterating over large collections
+     * @param null                                               $offset        The number of records from a collection
+     *                                                           to skip. Iterating over large collections
      *                                                                          with this parameter can be slow.
      * @return mixed
      * @throws MailChimp_Error
@@ -29,15 +32,22 @@ class MailChimp_ListsSegmentsMembers extends MailChimp_Abstract
     public function getAll($listId, $segmentId, $fields=null, $excludeFields=null, $count=null, $offset=null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, MailChimp::GET);
+        return $this->_master->call(
+            'lists/'.$listId.'/segments/'.$segmentId.'/members', $_params,
+            MailChimp::GET
+        );
     }
 
     /**
@@ -51,7 +61,10 @@ class MailChimp_ListsSegmentsMembers extends MailChimp_Abstract
     public function add($listId, $segmentId, $emailAddress)
     {
         $_params = array('email_address'=>$emailAddress);
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId.'/members', $_params, MailChimp::POST);
+        return $this->_master->call(
+            'lists/'.$listId.'/segments/'.$segmentId.'/members', $_params,
+            MailChimp::POST
+        );
     }
     public function delete($listId, $segmentId, $subscriberHash)
     {
