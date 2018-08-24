@@ -254,6 +254,4 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock->markAsDeleted(self::PROMORULE_ID);
     }
-    
-
 }
