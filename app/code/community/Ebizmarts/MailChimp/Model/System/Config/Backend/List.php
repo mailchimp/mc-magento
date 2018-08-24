@@ -18,29 +18,41 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $helper = $this->getMailchimpHelper();
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
-        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($scopeId, $scope);
-        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $scopeId, $scope);
+        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ?
+            $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($scopeId, $scope);
+        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ?
+            $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
+        $thisScopeHasSubMinSyncDateFlag = $helper->
+        getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
+            $scopeId, $scope
+        );
 
         if ($this->isValueChanged() && !$this->getValue()) {
             $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
             $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
-            $message = $helper->__('Please note the extension has been disabled due to the lack of an api key or list configured.');
+            $message = $helper
+                ->__('Please note the extension has been disabled due to the lack of an api key or list configured.');
             $this->getAdminSession()->addWarning($message);
         }
 
-        if ($this->isValueChanged() && ($moduleIsActive || $thisScopeHasSubMinSyncDateFlag) && $this->getValue())
-        {
-            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
+        if ($this->isValueChanged() && ($moduleIsActive || $thisScopeHasSubMinSyncDateFlag) && $this->getValue()) {
+            $configValues = array(array(Ebizmarts_MailChimp_Model_Config
+            ::GENERAL_SUBMINSYNCDATEFLAG, Mage::getSingleton('core/date')));
             $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
         }
 
-        if (isset($groups['ecommerce']['fields']['active']) && isset($groups['ecommerce']['fields']['active']['value'])) {
+        if (isset($groups['ecommerce']['fields']['active']) &&
+            isset($groups['ecommerce']['fields']['active']['value'])) {
             $ecommerceActive = $groups['ecommerce']['fields']['active']['value'];
         } else {
             $ecommerceActive = $helper->isEcommerceEnabled($scopeId, $scope);
         }
-        $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+        $thisScopeHasMCStoreId = $helper
+            ->getIfConfigExistsForScope(
+                Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID,
+                $scopeId, $scope
+            );
 
         if ($apiKey && $this->isValueChanged() && $thisScopeHasMCStoreId) {
             $helper->removeEcommerceSyncData($scopeId, $scope);
