@@ -36,9 +36,11 @@ class MailChimp_BatchOperations extends MailChimp_Abstract
     public function status($id,$fields=null,$excludeFields=null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         return $this->_master->call('batches/'.$id, $_params, Ebizmarts_MailChimp::GET);
     }
@@ -58,13 +60,17 @@ class MailChimp_BatchOperations extends MailChimp_Abstract
     public function getAll($fields=null,$excludeFields=null,$count=null,$offset=null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
         return $this->_master->call('batches', $_params, Ebizmarts_MailChimp::GET);
     }
