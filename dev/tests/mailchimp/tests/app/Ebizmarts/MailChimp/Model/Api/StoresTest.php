@@ -92,7 +92,7 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $ecommerceStoresMock->expects($this->once())->method('add')->with($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmailAddress, $currencySymbol, $primaryLocale, $timeZone, $storePhone)->willReturn($response);
 
-        $apiStoresMock->createMailChimpStore($mailChimpStoreId, null, $scopeId, $scope);
+        $apiStoresMock->createMailChimpStore($mailChimpStoreId, $scopeId, $scope, null);
     }
 
     public function testDeleteMailChimpStore()
