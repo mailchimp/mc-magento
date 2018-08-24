@@ -5,19 +5,19 @@ require_once BP . DS . 'app/code/community/Ebizmarts/MailChimp/controllers/Admin
 class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var Ebizmarts_MailChimp_Adminhtml_EcommerceController $ecommerceController
+     * @var Ebizmarts_MailChimp_Adminhtml_EcommerceController $_ecommerceController
      */
-    private $ecommerceController;
+    private $_ecommerceController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->ecommerceController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_EcommerceController::class);
+        $this->_ecommerceController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_EcommerceController::class);
     }
 
     public function tearDown()
     {
-        $this->ecommerceController = null;
+        $this->_ecommerceController = null;
     }
 
     public function testResetLocalErrorsAction()
@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $storeId = 1;
         $result = 1;
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -74,7 +74,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
@@ -106,7 +107,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $scopeId = 1;
         $result = 1;
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -139,7 +140,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
@@ -162,7 +164,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $scopeId = 1;
         $result = 1;
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -195,7 +197,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
@@ -218,7 +221,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $scopeId = 1;
         $result = 1;
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -251,11 +254,12 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
-            $scope,
-            $scopeId
-        );
+                $scope,
+                $scopeId
+            );
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(true);
         $helperMock->expects($this->once())->method('createMergeFields')->with($scopeId, $scope);
