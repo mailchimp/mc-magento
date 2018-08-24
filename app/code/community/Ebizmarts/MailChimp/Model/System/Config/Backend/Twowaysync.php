@@ -17,8 +17,16 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Twowaysync extends Mage_Co
     {
         $helper = $this->makeHelper();
         $groups = $this->getData('groups');
-        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($this->getScopeId(), $this->getScope());
-        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($this->getScopeId(), $this->getScope());
+        $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ?
+            $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled(
+                $this->getScopeId(),
+                $this->getScope()
+            );
+        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ?
+            $groups['general']['fields']['apikey']['value'] : $helper->getApiKey(
+                $this->getScopeId(),
+                $this->getScope()
+            );
         $listId = $helper->getGeneralList($this->getScopeId(), $this->getScope());
         if ($apiKey && $moduleIsActive && $listId && $this->isValueChanged()) {
             $helper->handleWebhookChange($this->getScopeId(), $this->getScope());
