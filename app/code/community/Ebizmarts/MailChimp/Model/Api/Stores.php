@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                     $strC = ' You need to have a different URLs for each scope you set up the ecommerce data.';
                     $strB = ($strC . ' Possible solutions ');
                     $strA = 'A MailChimp store with the same domain already exists in this account.';
-                    $errorMessage = $helper->__($strA, $strB) . $str;
+                    $errorMessage = $helper->__($strA . $strB . $str);
                     $adminSession->addError($errorMessage);
                 }
                 $helper->logError($e->getFriendlyMessage());
