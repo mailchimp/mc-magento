@@ -238,7 +238,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             $error = 'The rule type is not supported by the MailChimp schema.';
         }
 
-        if (!$error && ($data['amount'] === NULL || !$data['description'] || !$data['id'])) {
+        if (!$error && ($data['amount'] === null || !$data['description'] || !$data['id'])) {
             $error = 'There is required information by the MailChimp schema missing.';
         }
 
