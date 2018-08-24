@@ -24,7 +24,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock = $this->customersApiMock->setMethods(array('isEcommerceCustomerOptInConfigEnabled'))
             ->getMock();
 
-        $this->customersApiMock->expects($this->once())->method('isEcommerceCustomerOptInConfigEnabled')->with(1)->willReturn('1');
+        $this->customersApiMock->expects($this->once())->method('isEcommerceCustomerOptInConfigEnabled')
+            ->with(1)->willReturn('1');
 
         $this->assertTrue($this->customersApiMock->getOptin(1));
     }
@@ -34,7 +35,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock = $this->customersApiMock->setMethods(array('isEcommerceCustomerOptInConfigEnabled'))
             ->getMock();
 
-        $this->customersApiMock->expects($this->once())->method('isEcommerceCustomerOptInConfigEnabled')->with(1)->willReturn('0');
+        $this->customersApiMock->expects($this->once())->method('isEcommerceCustomerOptInConfigEnabled')
+            ->with(1)->willReturn('0');
 
         $this->assertFalse($this->customersApiMock->getOptin(1));
     }
@@ -44,7 +46,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock = $this->customersApiMock->setMethods(array('isEcommerceCustomerOptInConfigEnabled'))
             ->getMock();
 
-        $this->customersApiMock->expects($this->once())->method('isEcommerceCustomerOptInConfigEnabled')->with(0)->willReturn('0');
+        $this->customersApiMock->expects($this->once())->method('isEcommerceCustomerOptInConfigEnabled')
+            ->with(0)->willReturn('0');
 
         $this->assertFalse($this->customersApiMock->getOptin(0));
 
@@ -66,12 +69,14 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             'orders_count' => 0,
             'total_spent' => 0
         );
-        $customerJson = '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName","last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}';
+        $customerJson = '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",
+        "last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}';
         $operationData = array(
             'method' => 'PUT',
             'path' => '/ecommerce/stores/00ee7808cc513ee772f209d63c034f1f/customers/142',
             'operation_id' => 'storeid-1_CUS_2018-03-14-20-15-03-44361800_142',
-            'body' => '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName","last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}'
+            'body' => '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",
+            "last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}'
         );
 
         $collectionIdsFrontEnd = $array = array (7, 5, 4);
@@ -84,7 +89,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             5 => 8);
 
         $this->customersApiMock = $this->customersApiMock->setMethods(
-            array('makeBatchId', 'joinMailchimpSyncData', 'makeCustomersNotSentCollection', 'makeAdminCustomersNotSentCollection', 'getOptin',
+            array('makeBatchId', 'joinMailchimpSyncData', 'makeCustomersNotSentCollection',
+                'makeAdminCustomersNotSentCollection', 'getOptin',
                 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId', 'getCustomerResourceCollection'
             )
@@ -110,7 +116,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->setMethods(array('getId'))
             ->getMock();
 
-        $customersResourceCollectionMock = $this->getMockBuilder(Mage_Customer_Model_Resource_Customer_Collection::class)
+        $customersResourceCollectionMock = $this
+            ->getMockBuilder(Mage_Customer_Model_Resource_Customer_Collection::class)
             ->disableOriginalConstructor()
             ->setMethods(array('addAttributeToSelect', 'addFieldToFilter', 'getSelect'))
             ->getMock();
@@ -135,8 +142,10 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock->expects($this->once())->method('getCustomerResourceCollection')
             ->willReturn($customersResourceCollectionMock);
 
-        $customersResourceCollectionMock->expects($this->once())->method('addFieldToFilter')->with('entity_id', array('in' => $collectionIds))->willReturnSelf();
-        $customersResourceCollectionMock->expects($this->once())->method('addAttributeToSelect')->with('*')->willReturn($customerFinalCollectionMock);
+        $customersResourceCollectionMock->expects($this->once())->method('addFieldToFilter')
+            ->with('entity_id', array('in' => $collectionIds))->willReturnSelf();
+        $customersResourceCollectionMock->expects($this->once())->method('addAttributeToSelect')
+            ->with('*')->willReturn($customerFinalCollectionMock);
 
         $this->customersApiMock->expects($this->once())->method('makeBatchId');
 
@@ -145,14 +154,18 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
         $this->customersApiMock->expects($this->once())->method('joinMailchimpSyncData');
 
-        $customerFinalCollectionMock->expects($this->once())->method('getIterator')->willReturn(new ArrayIterator($customerArray));
+        $customerFinalCollectionMock->expects($this->once())->method('getIterator')
+            ->willReturn(new ArrayIterator($customerArray));
 
-        $this->customersApiMock->expects($this->once())->method('_buildCustomerData')->with($customerMock)->willReturn($customerData);
-        $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')->with($customerJson)->willReturn($operationData);
+        $this->customersApiMock->expects($this->once())->method('_buildCustomerData')
+            ->with($customerMock)->willReturn($customerData);
+        $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')
+            ->with($customerJson)->willReturn($operationData);
 
         $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
 
-        $this->customersApiMock->expects($this->once())->method('_updateSyncData')->with($customerId, $mailchimpStoreId);
+        $this->customersApiMock->expects($this->once())->method('_updateSyncData')
+            ->with($customerId, $mailchimpStoreId);
 
 
         $return = $this->customersApiMock->createBatchJson($mailchimpStoreId, $storeId);
@@ -181,7 +194,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $dbSelectMock->expects($this->exactly(2))->method('group')->with('e.entity_id');
         $dbSelectMock->expects($this->exactly(2))->method('limit')->with(100);
 
-        $customersResourceCollectionMock = $this->getMockBuilder(Mage_Customer_Model_Resource_Customer_Collection::class)
+        $customersResourceCollectionMock = $this
+            ->getMockBuilder(Mage_Customer_Model_Resource_Customer_Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
         $customersResourceCollectionMock->expects($this->exactly(4))->method('getSelect')->willReturn($dbSelectMock);
