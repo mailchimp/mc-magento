@@ -93,7 +93,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $promoRulesApiMock->expects($this->once())->method('getMailChimpDiscountAmount')->with($promoRuleMock)->willReturn($data['amount']);
         $promoRulesApiMock->expects($this->once())->method('getMailChimpType')->with($ruleSimpleAction)->willReturn($data['type']);
         $promoRulesApiMock->expects($this->once())->method('getMailChimpTarget')->with($ruleSimpleAction)->willReturn($data['target']);
-        
+
         $promoRuleMock->expects($this->once())->method('getRuleId')->willReturn(self::PROMORULE_ID);
         $promoRuleMock->expects($this->once())->method('getName')->willReturn($ruleName);
         $promoRuleMock->expects($this->any())->method('getDescription')->willReturn($ruleDescription);
