@@ -270,7 +270,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 "id" => $customerId,
             );
             if (!$isModifiedOrder) {
-                $data["customer"]["email_address"] = $order->getCustomerEmail();
+                $data["customer"][$email] = $order->getCustomerEmail();
                 $data["customer"]["opt_in_status"] = false;
             }
         } else {
