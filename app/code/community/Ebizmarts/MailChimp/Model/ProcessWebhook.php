@@ -13,7 +13,7 @@
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
     const BATCH_LIMIT = 200;
-    private $helper;
+    private $_helper;
     /**
      * Webhooks request url path
      *
@@ -24,12 +24,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     public function __construct()
     {
-        $this->helper = Mage::helper('mailchimp');
+        $this->_helper = Mage::helper('mailchimp');
     }
 
     protected function getHelper()
     {
-        return $this->helper;
+        return $this->_helper;
     }
 
     public function saveWebhookRequest(array $data)
@@ -178,14 +178,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 switch ($action) {
                     case 'delete' :
                         //if config setting "Webhooks Delete action" is set as "Delete customer account"
-                        if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $subscriber->getStoreId())) {
+                        if (Mage::getStoreConfig(
+                            Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE,
+                            $subscriber->getStoreId()
+                        )) {
                             $subscriber->delete();
-                        } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                        } elseif ($subscriber
+                                ->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
                             $helper->unsubscribeMember($subscriber);
                         }
                         break;
                     case 'unsub':
-                        if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                        if ($subscriber->getSubscriberStatus()
+                            != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
                             $helper->unsubscribeMember($subscriber);
                         }
                         break;
@@ -247,7 +252,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         if ($member['status'] == 'subscribed') {
                             $helper->subscribeMember($subscriber);
                         } elseif ($member['status'] == 'unsubscribed') {
-                            if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
+                            if (!Mage::getStoreConfig(
+                                "mailchimp/general/webhook_delete",
+                                $subscriber->getStoreId()
+                            )) {
                                 $helper->unsubscribeMember($subscriber);
                             }
                         }
@@ -263,14 +271,16 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     public function deleteProcessed()
     {
-        $to= Mage::app()->getLocale()->date()->sub(30,Zend_Date::DAY);
+        $to= Mage::getSingleton('core/date');
         $to=$to->toString('yyyy-MM-dd');
 
         $collection = Mage::getModel('mailchimp/webhookrequest')->getCollection()
             ->addFieldToFilter('processed', 1)
-            ->addFieldToFilter('fired_at', array(
+            ->addFieldToFilter(
+                'fired_at', array(
                 'lt'=>$to
-            ));
+                )
+            );
             $collection->getSelect()->limit(self::BATCH_LIMIT);
 
         foreach ($collection as $row) {
