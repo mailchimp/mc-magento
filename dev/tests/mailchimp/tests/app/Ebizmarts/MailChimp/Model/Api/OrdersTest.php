@@ -34,8 +34,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $ordersApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-        $ordersApiMock->expects($this->once())->method('_getModifiedOrders')->with($mailchimpStoreId, $magentoStoreId)->willReturn($batchArray);
-        $ordersApiMock->expects($this->once())->method('_getNewOrders')->with($mailchimpStoreId, $magentoStoreId)->willReturn($batchArray);
+        $ordersApiMock->expects($this->once())->method('_getModifiedOrders')->with($mailchimpStoreId, $magentoStoreId)
+            ->willReturn($batchArray);
+        $ordersApiMock->expects($this->once())->method('_getNewOrders')->with($mailchimpStoreId, $magentoStoreId)
+            ->willReturn($batchArray);
 
         $helperMock->expects($this->once())->method('getEcommerceFirstDate')->with($magentoStoreId)->willReturn(null);
         $helperMock->expects($this->once())->method('getDateMicrotime')->willReturn('00-00-00 00:00:00');
@@ -48,7 +50,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
      * @dataProvider getPromoDataProvider
      */
 
-    public function testGetPromoData($type){
+    public function testGetPromoData($type)
+    {
 
         if ($type == 'by_percent') {
             $assertType = 'percentage';
@@ -106,7 +109,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         );
     }
 
-    public function testGetSyncedOrder(){
+    public function testGetSyncedOrder()
+    {
 
         $orderId = 1;
         $mailchimpStoreId = '5axx998994cxxxx47e6b3b5dxxxx26e2';
@@ -128,7 +132,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $modelMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
 
-        $helperMock->expects($this->once())->method('getEcommerceSyncDataItem')->with($orderId, 'ORD', $mailchimpStoreId)->willReturn($ecommerceMock);
+        $helperMock->expects($this->once())->method('getEcommerceSyncDataItem')
+            ->with($orderId, 'ORD', $mailchimpStoreId)->willReturn($ecommerceMock);
 
         $ecommerceMock->expects($this->once())->method('getMailchimpSyncedFlag')->willReturn(1);
         $ecommerceMock->expects($this->once())->method('getId')->willReturn(1);
