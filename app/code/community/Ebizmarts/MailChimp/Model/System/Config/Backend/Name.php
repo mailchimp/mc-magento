@@ -21,7 +21,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Name extends Mage_Core_Mod
         $helper = $this->makeHelper();
         if ($this->isValueChanged()) {
             $name = $this->getValue();
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+            $realScope = $helper
+                ->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
             if ($realScope['scope_id'] == $scopeId && $realScope['scope'] == $scope) {
                 $ecomEnabled = $helper->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
                 if ($ecomEnabled) {
