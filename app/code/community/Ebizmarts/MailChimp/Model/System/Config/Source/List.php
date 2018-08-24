@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
                 try {
                     $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
                     $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
-                    if (isset($this->_lists['lists']) && count($this->_lists['lists']) == 0) {
+                    if (isset($this->_lists['lists']) && empty($this->_lists['lists']) == 0) {
                         $apiKeyArray = explode('-', $apiKey);
                         $anchorUrl = 'https://' . $apiKeyArray[1] . '.admin.mailchimp.com/lists/new-list/';
                         $htmlAnchor = '<a target="_blank" href="' . $anchorUrl . '">' . $anchorUrl . '</a>';
