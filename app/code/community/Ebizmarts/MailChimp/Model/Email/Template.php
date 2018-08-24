@@ -23,8 +23,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function send($email, $name = null, array $variables = array())
     {
-        $email_config = $this->getDesignConfig();
-        $storeId = (integer) $email_config->getStore();
+        $emailConfig = $this->getDesignConfig();
+        $storeId = (integer) $emailConfig->getStore();
         $mandrillHelper = $this->makeMandrillHelper();
         if (!$mandrillHelper->isMandrillEnabled($storeId)) {
             return $this->parentSend($email, $name, $variables);
@@ -92,28 +92,27 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $email['from_email'] = $this->getSenderEmail();
         $mandrillSenders = $this->getSendersDomains($mail);
         $senderExists = false;
-        foreach ($mandrillSenders as $sender)
-        {
+        foreach ($mandrillSenders as $sender) {
             if (isset($sender['domain'])) {
                 $emailArray = explode('@', $email['from_email']);
-                if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
+                if (empty($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
                     $senderExists = true;
                 }
             }
         }
 
-        if(!$senderExists) {
+        if (!$senderExists) {
             $email['from_email'] = $this->getGeneralEmail();
         }
 
         $headers = $mail->getHeaders();
         $headers[] = $mandrillHelper->getUserAgent();
         $email['headers'] = $headers;
-        if (isset($variables['tags']) && count($variables['tags'])) {
+        if (isset($variables['tags']) && empty($variables['tags'])) {
             $email ['tags'] = $variables['tags'];
         }
 
-        if (isset($variables['tags']) && count($variables['tags'])) {
+        if (isset($variables['tags']) && empty($variables['tags'])) {
             $email ['tags'] = $variables['tags'];
         } else {
             $templateId = (string)$this->getId();
@@ -191,8 +190,13 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             return $this->_mail;
         } else {
             $storeId = Mage::app()->getStore()->getId();
-            Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId), $storeId);
-            $this->_mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
+            Mage::helper('mailchimp/mandrill')->log(
+                "store: $storeId API: " .
+                Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId), $storeId
+            );
+            $this->_mail = new Mandrill_Message(
+                Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId)
+            );
             return $this->_mail;
         }
     }
