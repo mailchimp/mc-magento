@@ -34,10 +34,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_NameTest extends PHPUnit_F
 
         $backendNameMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
-        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope)->willReturn($realScope);
-        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($realScope['scope_id'], $realScope['scope'])->willReturn(true);
+        $helperMock->expects($this->once())->method('getRealScopeForConfig')
+            ->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope)->willReturn($realScope);
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')
+            ->with($realScope['scope_id'], $realScope['scope'])->willReturn(true);
 
-        $helperMock->expects($this->once())->method('getMCStoreName')->with($scopeId, $scope, true)->willReturn($storeName);
+        $helperMock->expects($this->once())->method('getMCStoreName')
+            ->with($scopeId, $scope, true)->willReturn($storeName);
 
         $helperMock->expects($this->once())->method('changeName')->with($storeName, $scopeId, $scope);
 
