@@ -32,8 +32,10 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApi', 'getGeneralList', 'getMCStoreName', 'getConfigValueForScope', 'getStoreDomain',
-                'getStoreLanguageCode', 'getStoreTimeZone', 'getStorePhone', 'getMageApp'))
+            ->setMethods(
+                array('getApi', 'getGeneralList', 'getMCStoreName', 'getConfigValueForScope', 'getStoreDomain',
+                'getStoreLanguageCode', 'getStoreTimeZone', 'getStorePhone', 'getMageApp')
+            )
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -76,7 +78,8 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         );
 
         $helperMock->expects($this->once())->method('getStoreDomain')->with($scopeId, $scope)->willReturn($storeDomain);
-        $helperMock->expects($this->once())->method('getStoreLanguageCode')->with($scopeId, $scope)->willReturn($primaryLocale);
+        $helperMock->expects($this->once())->method('getStoreLanguageCode')
+            ->with($scopeId, $scope)->willReturn($primaryLocale);
         $helperMock->expects($this->once())->method('getStoreTimeZone')->with($scopeId, $scope)->willReturn($timeZone);
         $helperMock->expects($this->once())->method('getStorePhone')->with($scopeId, $scope)->willReturn($storePhone);
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
@@ -84,13 +87,18 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $mageAppMock->expects($this->once())->method('getLocale')->willReturn($localeMock);
 
         $localeMock->expects($this->once())->method('currency')->with($currencyCode)->willReturnSelf();
-        $localeMock->expects($this->once())->method('getSymbol')->willReturn($currencySymbol)->willReturn($currencySymbol);
+        $localeMock->expects($this->once())->method('getSymbol')
+            ->willReturn($currencySymbol)->willReturn($currencySymbol);
 
         $apiMock->expects($this->once())->method('getEcommerce')->willReturn($ecommerceMock);
 
         $ecommerceMock->expects($this->once())->method('getStores')->willReturn($ecommerceStoresMock);
 
-        $ecommerceStoresMock->expects($this->once())->method('add')->with($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmailAddress, $currencySymbol, $primaryLocale, $timeZone, $storePhone)->willReturn($response);
+        $ecommerceStoresMock->expects($this->once())->method('add')
+            ->with(
+                $mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain,
+                $storeEmailAddress, $currencySymbol, $primaryLocale, $timeZone, $storePhone
+            )->willReturn($response);
 
         $apiStoresMock->createMailChimpStore($mailChimpStoreId, null, $scopeId, $scope);
     }
@@ -151,12 +159,14 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $ecommerceStoresMock->expects($this->once())->method('delete')->with($mailChimpStoreId);
 
         $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
-        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
+        $coreResourceMock->expects($this->once())->method('getConnection')
+            ->with($connectionType)->willReturn($dbAdapterInterfaceMock);
 
         $apiStoresMock->expects($this->once())->method('getSyncBatchesResource')->willReturn($syncBatchesResourceMock);
         $syncBatchesResourceMock->expects($this->once())->method('getMainTable')->willReturn($tableName);
 
-        $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($tableName, $setCondition, $whereCondition);
+        $dbAdapterInterfaceMock->expects($this->once())->method('update')
+            ->with($tableName, $setCondition, $whereCondition);
 
         $apiStoresMock->deleteMailChimpStore($mailChimpStoreId, $scopeId, $scope);
     }
@@ -196,7 +206,8 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailChimpStoreId);
+        $helperMock->expects($this->once())->method('getMCStoreId')
+            ->with($scopeId, $scope)->willReturn($mailChimpStoreId);
 
         $apiMock->expects($this->once())->method('getEcommerce')->willReturn($ecommerceMock);
         $ecommerceMock->expects($this->once())->method('getStores')->willReturn($ecommerceStoresMock);
@@ -232,12 +243,16 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailChimpStoreId);
+        $helperMock->expects($this->once())->method('getMCStoreId')
+            ->with($scopeId, $scope)->willReturn($mailChimpStoreId);
 
-        $apiStoresMock->expects($this->once())->method('getStoreConnectedSiteData')->with($apiMock, $mailChimpStoreId)->willReturn($response);
+        $apiStoresMock->expects($this->once())->method('getStoreConnectedSiteData')
+            ->with($apiMock, $mailChimpStoreId)->willReturn($response);
 
-        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)->willReturn($realScope);
-        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, $realScope['scope_id'], $realScope['scope']);
+        $helperMock->expects($this->once())->method('getRealScopeForConfig')
+            ->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)->willReturn($realScope);
+        $helperMock->expects($this->once())->method('saveMailchimpConfig')
+            ->with($configValues, $realScope['scope_id'], $realScope['scope']);
 
         $return = $apiStoresMock->getMCJsUrl($scopeId, $scope);
 
