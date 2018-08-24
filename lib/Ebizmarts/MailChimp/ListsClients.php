@@ -14,9 +14,9 @@ class MailChimp_ListsClients extends MailChimp_Abstract
 {
     /**
      * @param $listId               The unique id for the list.
-     * @param null                                            $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
+     * @param null       $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
      *                                                                       with dot notation.
-     * @param null                                            $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     * @param null      $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
      *                                                                       with dot notation.
      * @return mixed
      * @throws MailChimp_Error
@@ -25,9 +25,11 @@ class MailChimp_ListsClients extends MailChimp_Abstract
     public function getTop($listId,$fields=null,$excludeFields=null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         return $this->_master->call('lists/'.$listId.'/clients', $_params, Ebizmarts_MailChimp::GET);
     }
