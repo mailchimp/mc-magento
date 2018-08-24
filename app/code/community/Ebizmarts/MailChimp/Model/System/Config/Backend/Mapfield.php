@@ -10,7 +10,8 @@
  * @date:     8/4/16 5:56 PM
  * @file:     Apikey.php
  */
-class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield extends Mage_Adminhtml_Model_System_Config_Backend_Serialized_Array
+class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield extends
+    Mage_Adminhtml_Model_System_Config_Backend_Serialized_Array
 {
     protected function _afterLoad()
     {
