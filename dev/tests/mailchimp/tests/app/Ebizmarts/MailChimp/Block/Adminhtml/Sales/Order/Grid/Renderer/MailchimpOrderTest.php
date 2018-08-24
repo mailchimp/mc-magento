@@ -5,7 +5,8 @@
  * Time: 3:49 PM
  */
 
-class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrderTest extends PHPUnit_Framework_TestCase
+class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrderTest extends
+    PHPUnit_Framework_TestCase
 {
 
     /**
@@ -43,11 +44,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $storeId = 1;
         $status = $syncedData['synced_status'];
 
-        if ($status){
+        if ($status) {
             $assertStatus = '<div style ="color:green">Yes</div>';
-        } elseif ($orderId && $status === null){
+        } elseif ($orderId && $status === null) {
             $assertStatus = '<div style ="color:#ed6502">Processing</div>';
-        } elseif ($status === null){
+        } elseif ($status === null) {
            $assertStatus = '<div style ="color:mediumblue">In queue</div>';
         } else {
             $assertStatus = '<div style ="color:red">No</div>';
@@ -55,7 +56,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 
         $orderMock = $this->_orderMock;
 
-        $blockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder::class)
+        $blockMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder::class)
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper', 'makeApiOrders'))
             ->getMock();
@@ -80,14 +82,16 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $helperMock->expects($this->once())->method('getMCStoreId')->with($storeId)->willReturn($mailchimpStoreId);
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 
-        $modelMock->expects($this->once())->method('getSyncedOrder')->with($orderId, $mailchimpStoreId)->willReturn($syncedData);
+        $modelMock->expects($this->once())->method('getSyncedOrder')->with($orderId, $mailchimpStoreId)
+            ->willReturn($syncedData);
 
         $result = $blockMock->render($orderMock);
 
         $this->assertEquals($assertStatus, $result);
     }
 
-    public function renderDataProvider(){
+    public function renderDataProvider()
+    {
 
         return array(
             array(array('synced_status' => 1, 'order_id' => 1)),
