@@ -149,7 +149,8 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @throws MailChimp_HttpError
      */
     public function edit($listId, $name, $contact, $permissionRemainder, $emailTypeOption, $useArchiveBar = null,
-                         $campaignDefaults = null, $notifyOnSubscribe = null, $notifyOnUnsubscribe = null, $visibility = null
+                         $campaignDefaults = null, $notifyOnSubscribe = null, $notifyOnUnsubscribe = null,
+                         $visibility = null
     )
     {
 
