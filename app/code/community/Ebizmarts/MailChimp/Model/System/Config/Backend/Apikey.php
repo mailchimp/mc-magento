@@ -17,13 +17,21 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Apikey extends Mage_Core_M
         $helper = $this->makeHelper();
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
-        $isNewApiKeyForSameAccount = $helper->isNewApiKeyForSameAccount($this->getOldValue(), $this->getValue(), $scopeId, $scope);
-        $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
+        $isNewApiKeyForSameAccount = $helper->isNewApiKeyForSameAccount(
+            $this
+            ->getOldValue(), $this->getValue(), $scopeId, $scope
+        );
+        $thisScopeHasMCStoreId = $helper
+            ->getIfConfigExistsForScope(
+                Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID,
+                $scopeId, $scope
+            );
 
         if ($this->isValueChanged() && !$this->getValue()) {
             $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
             $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
-            $message = $helper->__('Please note the extension has been disabled due to the lack of an api key or list configured.');
+            $message = $helper
+                ->__('Please note the extension has been disabled due to the lack of an api key or list configured.');
             $this->getAdminSession()->addWarning($message);
         }
 
