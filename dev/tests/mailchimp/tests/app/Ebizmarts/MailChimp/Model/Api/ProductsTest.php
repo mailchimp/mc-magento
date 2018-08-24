@@ -30,7 +30,11 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             'method' => 'POST',
             'path' => "/ecommerce/stores/$mailchimpStoreId/products",
             'operation_id' => self::BATCH_ID,
-            'body' => '{"id":"906","title":"test Prod","url":"http:\/\/127.0.0.1\/mcmagento-1937\/test-prod.html","published_at_foreign":"","description":"Test","type":"Default Category","vendor":"Default Category","handle":"","variants":[{"id":"906","title":"test Prod","url":"http:\/\/127.0.0.1\/mcmagento-1937\/test-prod.html","published_at_foreign":"","sku":"testprod","price":10,"inventory_quantity":1000,"backorders":"0","visibility":"Catalog, Search"}]}'
+            'body' => '{"id":"906","title":"test Prod","url":"http:\/\/127.0.0.1\/mcmagento-1937\/test-prod.html",
+            "published_at_foreign":"","description":"Test","type":"Default Category","vendor":"Default Category",
+            "handle":"","variants":[{"id":"906","title":"test Prod",
+            "url":"http:\/\/127.0.0.1\/mcmagento-1937\/test-prod.html","published_at_foreign":"","sku":"testprod",
+            "price":10,"inventory_quantity":1000,"backorders":"0","visibility":"Catalog, Search"}]}'
         );
         $date = '2018-02-13 15:14:28';
 
@@ -50,24 +54,32 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
+            ->setMethods(
+                array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
                 'shouldSendProductUpdate', 'getChildrenIdsForConfigurable', 'makeProductChildrenCollection',
-                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData'))
+                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData')
+            )
             ->getMock();
 
         $productsApiMock->expects($this->once())->method("isProductFlatTableEnabled")->willReturn(false);
 
-        $productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')->with($magentoStoreId)->willReturn($productCollection);
-        $productsApiMock->expects($this->once())->method('joinMailchimpSyncData')->with($productCollection, $mailchimpStoreId);
+        $productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')
+            ->with($magentoStoreId)->willReturn($productCollection);
+        $productsApiMock->expects($this->once())->method('joinMailchimpSyncData')
+            ->with($productCollection, $mailchimpStoreId);
 
-        $productsApiMock->expects($this->once())->method('makeBatchId')->with($magentoStoreId)->willReturn(self::BATCH_ID);
+        $productsApiMock->expects($this->once())->method('makeBatchId')->with($magentoStoreId)
+            ->willReturn(self::BATCH_ID);
 
         $products [] = $productMock;
         $productCollection->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($products));
 
-        $productsApiMock->expects($this->once())->method('shouldSendProductUpdate')->with($magentoStoreId, $productMock)->willReturn(false);
-        $productsApiMock->expects($this->once())->method('_buildNewProductRequest')->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn($productData);
-        $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId);
+        $productsApiMock->expects($this->once())->method('shouldSendProductUpdate')
+            ->with($magentoStoreId, $productMock)->willReturn(false);
+        $productsApiMock->expects($this->once())->method('_buildNewProductRequest')
+            ->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn($productData);
+        $productsApiMock->expects($this->once())->method('_updateSyncData')
+            ->with($productMock->getId(), $mailchimpStoreId);
 
 
         $return = $productsApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
@@ -143,14 +155,19 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
         $productsApiMock->expects($this->once())->method('getParentId')->with($childId)->willReturn($parentId);
-        $productsApiMock->expects($this->once())->method('getProductWithAttributesById')->willReturn($productResourceCollectionMock);
-        $productsApiMock->expects($this->once())->method('getUrlByPath')->with($path, $magentoStoreId)->willReturn($url);
+        $productsApiMock->expects($this->once())->method('getProductWithAttributesById')
+            ->willReturn($productResourceCollectionMock);
+        $productsApiMock->expects($this->once())->method('getUrlByPath')
+            ->with($path, $magentoStoreId)->willReturn($url);
 
-        $productResourceCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator(array()));
+        $productResourceCollectionMock->expects($this->once())->method("getIterator")
+            ->willReturn(new ArrayIterator(array()));
 
-        $mailChimpHelperMock->expects($this->once())->method('getProductResourceModel')->willReturn($productResourceMock);
+        $mailChimpHelperMock->expects($this->once())->method('getProductResourceModel')
+            ->willReturn($productResourceMock);
 
-        $productResourceMock->expects($this->once())->method('getAttributeRawValue')->with($parentId, 'url_path', $magentoStoreId)->willReturn($path);
+        $productResourceMock->expects($this->once())->method('getAttributeRawValue')
+            ->with($parentId, 'url_path', $magentoStoreId)->willReturn($path);
 
         $return = $productsApiMock->getNotVisibleProductUrl($childId, $magentoStoreId);
 
@@ -177,7 +194,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->expects($this->once())->method('getParentId')->with($childId)->willReturn($parentId);
         $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
 
-        $mailChimpHelperMock->expects($this->once())->method('getImageUrlById')->with($parentId, $magentoStoreId)->willReturn($imageUrl);
+        $mailChimpHelperMock->expects($this->once())->method('getImageUrlById')
+            ->with($parentId, $magentoStoreId)->willReturn($imageUrl);
 
         $return = $productsApiMock->getParentImageUrl($childId, $magentoStoreId);
 
@@ -212,7 +230,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $categoryCollectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Category_Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addAttributeToSelect', 'setStoreId', 'addAttributeToFilter', 'addAttributeToSort', 'getIterator'))
+            ->setMethods(
+                array('addAttributeToSelect', 'setStoreId', 'addAttributeToFilter', 'addAttributeToSort',
+                'getIterator')
+            )
             ->getMock();
 
         $categoryMockOne = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
@@ -234,7 +255,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $categoryMockGeneric->expects($this->once())->method('getCollection')->willReturn($categoryCollectionMock);
 
         $categoryCollectionMock->expects($this->once())->method('setStoreId')->with($magentoStoreId)->willReturnSelf();
-        $categoryCollectionMock->expects($this->once())->method('addAttributeToSelect')->with(array('name'))->willReturnSelf();
+        $categoryCollectionMock->expects($this->once())->method('addAttributeToSelect')
+            ->with(array('name'))->willReturnSelf();
         $categoryCollectionMock->expects($this->exactly(2))->method('addAttributeToFilter')->withConsecutive(
             array('is_active', array('eq' => '1')),
             array('entity_id', array('in' => $catArray))
@@ -252,7 +274,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $categories[] = $categoryMockOne;
         $categories[] = $categoryMockTwo;
-        $categoryCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($categories));
+        $categoryCollectionMock->expects($this->once())->method("getIterator")
+            ->willReturn(new ArrayIterator($categories));
 
         $categoryMockOne->expects($this->once())->method('getName')->willReturn('catO');
         $categoryMockTwo->expects($this->once())->method('getName')->willReturn('catR');
@@ -275,8 +298,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $itemTwoSyncDelta = '2018-03-14 15:03:35';
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('makeBatchId', '_updateSyncData', 'loadProductById', 'getMailChimpHelper',
-                'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest'))
+            ->setMethods(
+                array('makeBatchId', '_updateSyncData', 'loadProductById', 'getMailChimpHelper',
+                'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest')
+            )
             ->getMock();
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
@@ -324,7 +349,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             $groupedProductId,
             $oldProductId,
             $newProductId
-            );
+        );
 
         $productsApiMock->expects($this->exactly(3))->method('loadProductById')->withConsecutive(
             array($groupedProductId),
@@ -344,7 +369,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
 
-        $helperMock->expects($this->once())->method('getEcommMinSyncDateFlag')->with($magentoStoreId)->willReturn($ecomSyncDateFlag);
+        $helperMock->expects($this->once())->method('getEcommMinSyncDateFlag')->with($magentoStoreId)
+            ->willReturn($ecomSyncDateFlag);
         $helperMock->expects($this->exactly(3))->method('getEcommerceSyncDataItem')->withConsecutive(
             array($groupedProductId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId),
             array($oldProductId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId),
@@ -375,19 +401,22 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             false
         );
 
-        $syncDataItemMock->expects($this->exactly(2))->method('getMailchimpSyncModified')->willReturnOnConsecutiveCalls(
-            1,
-            0
-        );
+        $syncDataItemMock->expects($this->exactly(2))->method('getMailchimpSyncModified')
+            ->willReturnOnConsecutiveCalls(
+                1,
+                0
+            );
 
         $syncDataItemMock->expects($this->exactly(2))->method('getMailchimpSyncDelta')->willReturnOnConsecutiveCalls(
             $itemOneSyncDelta,
             $itemTwoSyncDelta
         );
 
-        $productsApiMock->expects($this->once())->method('_buildUpdateProductRequest')->with($productMock, $batchId, $mailchimpStoreId, $magentoStoreId)->willReturn(array());
+        $productsApiMock->expects($this->once())->method('_buildUpdateProductRequest')
+            ->with($productMock, $batchId, $mailchimpStoreId, $magentoStoreId)->willReturn(array());
 
-        $productsApiMock->expects($this->once())->method('_buildNewProductRequest')->with($productMock, $batchId, $mailchimpStoreId, $magentoStoreId)->willReturn(array());
+        $productsApiMock->expects($this->once())->method('_buildNewProductRequest')
+            ->with($productMock, $batchId, $mailchimpStoreId, $magentoStoreId)->willReturn(array());
 
         $productsApiMock->expects($this->exactly(3))->method('_updateSyncData')->withConsecutive(
             array($groupedProductId, $mailchimpStoreId),
