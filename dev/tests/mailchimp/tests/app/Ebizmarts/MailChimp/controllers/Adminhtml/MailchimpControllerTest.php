@@ -5,19 +5,19 @@ require_once BP . DS . 'app/code/community/Ebizmarts/MailChimp/controllers/Admin
 class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var Ebizmarts_MailChimp_Adminhtml_MailchimpController $mailchimpController
+     * @var Ebizmarts_MailChimp_Adminhtml_MailchimpController $_mailchimpController
      */
-    private $mailchimpController;
+    private $_mailchimpController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->mailchimpController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimpController::class);
+        $this->_mailchimpController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimpController::class);
     }
 
     public function tearDown()
     {
-        $this->mailchimpController = null;
+        $this->_mailchimpController = null;
     }
 
     public function testResendSubscribersAction()
@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $scopeId = 1;
         $result = 1;
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -61,7 +61,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
