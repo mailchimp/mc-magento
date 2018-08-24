@@ -800,7 +800,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $mailchimpStoreId = md5($this->getMCStoreName($scopeId, $scope) . '_' . $date);
             //create store in mailchimp
             try {
-                $response = $this->getApiStores()->createMailChimpStore($mailchimpStoreId, $listId, $scopeId, $scope);
+                $response = $this->getApiStores()->createMailChimpStore($mailchimpStoreId, $scopeId, $scope, $listId);
                 //save in config
                 $configValues = array(
                     array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $mailchimpStoreId),
