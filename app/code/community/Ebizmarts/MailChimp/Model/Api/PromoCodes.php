@@ -118,7 +118,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     $counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving the information.');
-                    $this->_updateSyncData($codeId, $mailchimpStoreId, Varien_Date::now(), $error);
+                    $this->_updateSyncData($codeId, $mailchimpStoreId, $this->makeCurrentDate(), $error);
                     continue;
                 }
             } catch (Exception $e) {
@@ -218,7 +218,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      * @param null $deletedRelatedId
      * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($codeId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $token = null, $saveOnlyIfexists = false, $deletedRelatedId = null, $allowBatchRemoval = true)
+    protected function _updateSyncData($codeId, $mailchimpStoreId, $syncDelta = null,
+                                       $syncError = null, $syncModified = 0, $syncDeleted = null,
+                                       $token = null, $saveOnlyIfexists = false, $deletedRelatedId = null,
+                                       $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $codeId,
@@ -381,7 +384,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     protected function setCodeWithParentError($mailchimpStoreId, $ruleId, $codeId)
     {
         $error = Mage::helper('mailchimp')->__('Parent rule with id ' . $ruleId . ' has not been correctly sent.');
-        $this->_updateSyncData($codeId, $mailchimpStoreId, Varien_Date::now(), $error);
+        $this->_updateSyncData($codeId, $mailchimpStoreId, $this->makeCurrentDate(), $error);
     }
 
     /**
@@ -406,5 +409,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     protected function isPromoRule()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function makeCurrentDate()
+    {
+        return Mage::getSingleton('core/date')->gmtDate();
     }
 }
