@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @return mixed
      * @throws Exception
      */
-    public function createMailChimpStore($mailChimpStoreId, $scopeId, $scope, $listId = null)
+    public function createMailChimpStore($mailChimpStoreId, $listId = null, $scopeId, $scope)
     {
         $helper = $this->makeHelper();
         if (!$listId) {
@@ -80,7 +80,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $helper->logError($e->getFriendlyMessage());
             }
         } else {
-            Mage::throwException('You don\'t have any lists configured in MailChimp');
+            throw new Exception('You don\'t have any lists configured in MailChimp');
         }
     }
 
