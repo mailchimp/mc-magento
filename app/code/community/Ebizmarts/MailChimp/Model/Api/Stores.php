@@ -38,10 +38,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $storeDomain = $helper->getStoreDomain($scopeId, $scope);
                 if (strpos($storeEmail, 'example.com') !== false) {
                     $storeEmail = null;
-                    Mage::throwException('Please, change the general email in Store Email Addresses/General Contact');
+                    $exceptionMessage = 'Please, change the general email in Store Email Addresses/General Contact';
+                    Mage::throwException($helper->__($exceptionMessage));
                 }
 
-                $currencyCode = $helper->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
+                $currencyCode = $helper->getConfigValueForScope($this->pathCurrencyDefault(), $scopeId, $scope);
                 $isSyncing = true;
                 $primaryLocale = $helper->getStoreLanguageCode($scopeId, $scope);
                 $timeZone = $helper->getStoreTimeZone($scopeId, $scope);
@@ -67,7 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $helper->logError($e->getFriendlyMessage());
             }
         } else {
-            Mage::throwException('You don\'t have any lists configured in MailChimp');
+            Mage::throwException($helper->__('You don\'t have any lists configured in MailChimp'));
         }
     }
 
@@ -137,7 +138,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             if (isset($response['connected_site']['site_script']['url'])) {
                 $url = $response['connected_site']['site_script']['url'];
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
-                $arr = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
+                $arr = $helper->getRealScopeForConfig($this->pathGeneralList(), $scopeId, $scope);
                 $realScope = $arr;
                 $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
                 return $url;
@@ -188,5 +189,21 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     protected function getSyncBatchesResource()
     {
         return Mage::getResourceModel('mailchimp/synchbatches');
+    }
+
+    /**
+     * @return string
+     */
+    protected function pathCurrencyDefault()
+    {
+        return Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT;
+    }
+
+    /**
+     * @return string
+     */
+    protected function pathGeneralList()
+    {
+        return Ebizmarts_MailChimp_Model_Config::GENERAL_LIST;
     }
 }
