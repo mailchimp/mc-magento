@@ -222,7 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 if (!$variant) {
                     continue;
                 }
-            } elseif ($item->getProductType() == $this->typBundle() || $item->getProductType() == $this->typGrouped()) {
+            } elseif ($item->getProductType() == $this->typeBundle() || $item->getProductType() == $this->typeGrouped()) {
                 continue;
             } else {
                 $variant = $productId;
@@ -752,7 +752,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * @return string
      */
-    protected function typBundle()
+    protected function typeBundle()
     {
         return Mage_Catalog_Model_Product_Type::TYPE_BUNDLE;
     }
@@ -760,7 +760,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * @return string
      */
-    protected function typGrouped()
+    protected function typeGrouped()
     {
         return Mage_Catalog_Model_Product_Type::TYPE_GROUPED;
     }
