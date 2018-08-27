@@ -189,10 +189,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         if ($this->_mail) {
             return $this->_mail;
         } else {
+            $mandrillHelper = $this->makeMandrillHelper();
             $storeId = Mage::app()->getStore()->getId();
-            $storeConfig = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId);
-            $this->makeMandrillHelper()->log("store: $storeId API: " . $storeConfig, $storeId);
-            $this->_mail = new Mandrill_Message($storeConfig);
+            $mandrillApiKey = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId);
+            $mandrillHelper->log($mandrillHelper->__("store: %s API: ", $storeId) . $mandrillApiKey, $storeId);
+            $this->_mail = new Mandrill_Message($mandrillApiKey);
             return $this->_mail;
         }
     }
