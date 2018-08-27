@@ -418,7 +418,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $totalAmountSpent = (int)$order->getGrandTotal();
         foreach ($orderCollection as $customerOrder) {
             $totalOrders++;
-            $totalAmountSpent += ($customerOrder->getGrandTotal() - $customerOrder->getTotalRefunded() - $customerOrder->getTotalCanceled());
+            $customerOrderRefundedCanceled = ($customerOrder->getTotalRefunded() + $customerOrder->getTotalCanceled());
+            $totalAmountSpent += ($customerOrder->getGrandTotal() - $customerOrderRefundedCanceled);
         }
 
         $data["customer"]["orders_count"] = (int)$totalOrders;
@@ -540,7 +541,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param bool $saveOnlyIfexists
      * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
+    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null,
+                                       $syncError = null, $syncModified = 0, $syncedFlag = null,
+                                       $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData($orderId, $this->isOrder(), $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists, null, $allowBatchRemoval);
@@ -698,7 +701,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Mage_SalesRule_Model_Coupon
      */
     protected function makeSalesRuleCoupon()
     {
@@ -706,7 +709,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Mage_SalesRule_Model_Rule
      */
     protected function makeSalesRule()
     {
@@ -763,7 +766,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function makeApiCustomers()
     {
@@ -771,7 +774,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Mage_Directory_Model_Country
      */
     protected function makeCountry()
     {
@@ -787,7 +790,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function makeApiProducts()
     {
