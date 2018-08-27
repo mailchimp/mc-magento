@@ -13,23 +13,30 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
-    private $mcHelper;
+    private $_mcHelper;
 
     public function __construct()
     {
-        $this->mcHelper = Mage::helper('mailchimp');
+        $this->_mcHelper = Mage::helper('mailchimp');
     }
 
     public function createBatchJson($listId, $storeId, $limit)
     {
-        $helper = $this->mcHelper;
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
-        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+        $helper = $this->_mcHelper;
+        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::
+            GENERAL_SUBMINSYNCDATEFLAG, $storeId
+        );
+        $thisScopeHasList = $helper->getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::
+            GENERAL_LIST, $storeId
+        );
 
         $subscriberArray = array();
         if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
             $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
-            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
+            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
+                Mage::getSingleton('core/date')));
             $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
         }
 
@@ -93,7 +100,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     protected function _buildSubscriberData($subscriber)
     {
-        $helper = $this->mcHelper;
+        $helper = $this->_mcHelper;
         $storeId = $subscriber->getStoreId();
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
@@ -114,7 +121,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     public function getMergeVars($subscriber)
     {
-        $helper = $this->mcHelper;
+        $helper = $this->_mcHelper;
         $storeId = $subscriber->getStoreId();
         $mapFields = $helper->getMapFields($storeId);
         $maps = unserialize($mapFields);
@@ -125,7 +132,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->getData();
         $mergeVars = array();
         $subscriberEmail = $subscriber->getSubscriberEmail();
-        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
+        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->
+        load($subscriber->getCustomerId());
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
@@ -160,9 +168,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     break;
                                 case 'group_id':
                                     if ($customer->getData($attributeCode)) {
-                                        $group_id = (int)$customer->getData($attributeCode);
+                                        $groupId = (int)$customer->getData($attributeCode);
                                         $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
-                                        $eventValue = $mergeVars[$key] = $customerGroup[$group_id];
+                                        $eventValue = $mergeVars[$key] = $customerGroup[$groupId];
                                     } else {
                                         $eventValue = $mergeVars[$key] = 'NOT LOGGED IN';
                                     }
@@ -193,7 +201,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     $eventValue = $mergeVars[$key] = $storeId;
                                     break;
                                 case 'website_id':
-                                    $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+                                    $websiteId = Mage::getModel('core/store')->load($storeId)->
+                                    getWebsiteId();
                                     $eventValue = $mergeVars[$key] = $websiteId;
                                     break;
                                 case 'created_in':
@@ -202,7 +211,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     break;
                                 case 'dob':
                                     if ($customer->getData($attributeCode)) {
-                                        $eventValue = $mergeVars[$key] = date("m/d", strtotime($customer->getData($attributeCode)));
+                                        $eventValue = $mergeVars[$key] = date(
+                                            "m/d", strtotime(
+                                                $customer->
+                                                getData($attributeCode)
+                                            )
+                                        );
                                     }
                                     break;
                                 default:
@@ -256,7 +270,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             if ($address) {
                                 $countryCode = $address->getCountry();
                                 if ($countryCode) {
-                                    $countryName = Mage::getModel('directory/country')->loadByCode($countryCode)->getName();
+                                    $countryName = Mage::getModel('directory/country')->
+                                    loadByCode($countryCode)->getName();
                                     $eventValue = $mergeVars[$key] = $countryName;
                                 }
                             }
@@ -324,7 +339,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
         $isAdmin = Mage::app()->getStore()->isAdmin();
-        $helper = $this->mcHelper;
+        $helper = $this->_mcHelper;
         $storeId = $subscriber->getStoreId();
         $subscriptionEnabled = $helper->isSubscriptionEnabled($storeId);
         if ($subscriptionEnabled) {
@@ -342,8 +357,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
-                    $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
-                    null, $language, null, null
+                    $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus,
+                    $mergeVars, null, $language, null, null
                 );
                 $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
                 $subscriber->setData("mailchimp_sync_error", "");
@@ -354,7 +369,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         try {
                             $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars);
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNCONFIRMED);
-                            $message = $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
+                            $message = $helper->__(
+                                'To begin receiving the newsletter, you must first confirm your
+                             subscription'
+                            );
                             Mage::getSingleton('core/session')->addWarning($message);
                         } catch (MailChimp_Error $e) {
                             $helper->logError($e->getFriendlyMessage());
@@ -436,7 +454,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     public function deleteSubscriber($subscriber)
     {
-        $helper = $this->mcHelper;
+        $helper = $this->_mcHelper;
         $storeId = $subscriber->getStoreId();
         $listId = $helper->getGeneralList($storeId);
         try {
@@ -455,9 +473,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     public function update($emailAddress, $storeId)
     {
-        $helper = $this->mcHelper;
+        $helper = $this->_mcHelper;
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
-        if ($subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $subscriber->getMailchimpSyncDelta() != $helper->getSubMinSyncDateFlag($storeId)) {
+        if ($subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $subscriber->
+            getMailchimpSyncDelta() != $helper->getSubMinSyncDateFlag($storeId)) {
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         }
@@ -494,7 +513,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if ($address->getCountry()) {
-                $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+                $addressData["country"] = Mage::getModel('directory/country')->loadByCode(
+                    $address->
+                    getCountry()
+                )->getName();
             }
         }
         return $addressData;
