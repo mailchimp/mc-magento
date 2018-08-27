@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                         }
 
                         unset($mailer);
-                        $message->setProcessedAt(Varien_Date::formatDate(true));
+                        $message->setProcessedAt(Mage::getSingleton('core/date'));
                         $message->save();
                     } catch (Exception $e) {
                         Mage::logException($e);
