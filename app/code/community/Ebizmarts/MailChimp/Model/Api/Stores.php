@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @return mixed
      * @throws Exception
      */
-    public function createMailChimpStore($mailChimpStoreId, $listId = null, $scopeId, $scope)
+    public function createMailChimpStore($mailChimpStoreId, $scopeId, $scope, $listId = null)
     {
         $helper = $this->makeHelper();
         if (!$listId) {
@@ -34,20 +34,33 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $api = $helper->getApi($scopeId, $scope);
 
                 $storeName = $helper->getMCStoreName($scopeId, $scope);
-                $storeEmail = $helper->getConfigValueForScope('trans_email/ident_general/email', $scopeId, $scope);
+                $storeEmail = $helper->getConfigValueForScope(
+                    'trans_email/ident_general/email',
+                    $scopeId, $scope
+                );
                 $storeDomain = $helper->getStoreDomain($scopeId, $scope);
                 if (strpos($storeEmail, 'example.com') !== false) {
                     $storeEmail = null;
-                    throw new Exception('Please, change the general email in Store Email Addresses/General Contact');
+                    Mage::throwException(
+                        'Please, change the general email in Store Email Addresses/General
+                     Contact'
+                    );
                 }
 
-                $currencyCode = $helper->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
+                $currencyCode = $helper->getConfigValueForScope(
+                    Mage_Directory_Model_Currency::
+                    XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope
+                );
                 $isSyncing = true;
                 $primaryLocale = $helper->getStoreLanguageCode($scopeId, $scope);
                 $timeZone = $helper->getStoreTimeZone($scopeId, $scope);
                 $storePhone = $helper->getStorePhone($scopeId, $scope);
                 $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
-                $response = $api->getEcommerce()->getStores()->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone);
+                $response = $api->getEcommerce()->getStores()->add(
+                    $mailChimpStoreId, $listId, $storeName,
+                    $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol,
+                    $primaryLocale, $timeZone, $storePhone
+                );
                 return $response;
 
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
@@ -55,13 +68,19 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             } catch (MailChimp_Error $e) {
                 $adminSession = Mage::getSingleton('adminhtml/session');
                 if (strstr($e->getFriendlyMessage(), 'A store with the domain')) {
-                    $errorMessage = $helper->__('A MailChimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
+                    $errorMessage = $helper->__(
+                        'A MailChimp store with the same domain already exists in this account.
+                     You need to have a different URLs for each scope you set up the ecommerce data.
+                      Possible solutions '
+                    ) . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/
+                      seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/
+                      configuration/url-secure-unsecure.html'>HERE</a>";
                     $adminSession->addError($errorMessage);
                 }
                 $helper->logError($e->getFriendlyMessage());
             }
         } else {
-            throw new Exception('You don\'t have any lists configured in MailChimp');
+            Mage::throwException('You don\'t have any lists configured in MailChimp');
         }
     }
 
@@ -131,7 +150,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             if (isset($response['connected_site']['site_script']['url'])) {
                 $url = $response['connected_site']['site_script']['url'];
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
-                $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
+                $realScope = $helper->getRealScopeForConfig(
+                    Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+                    $scopeId, $scope
+                );
                 $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
                 return $url;
             }
