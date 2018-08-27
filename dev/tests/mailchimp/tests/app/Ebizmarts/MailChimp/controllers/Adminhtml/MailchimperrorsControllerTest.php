@@ -12,13 +12,13 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
     public function setUp()
     {
         Mage::app('default');
-        $this->mailchimperrorsController = $this
+        $this->_mailchimperrorsController = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController::class);
     }
 
     public function tearDown()
     {
-        $this->mailchimperrorsController = null;
+        $this->_mailchimperrorsController = null;
     }
 
     public function testDownloadresponseAction()
