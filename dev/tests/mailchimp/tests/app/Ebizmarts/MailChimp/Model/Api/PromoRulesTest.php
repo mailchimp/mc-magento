@@ -82,8 +82,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->with($promoRuleMock)->willReturn($promoRuleData);
 
         $return = $promoRulesApiMock->getNewPromoRule(
-            self::PROMORULE_ID, self::BATCH_ID,
-            $mailchimpStoreId, $magentoStoreId
+            self::PROMORULE_ID,
+            $mailchimpStoreId,
+            $magentoStoreId
         );
 
         $this->assertEquals(4, count($return));
