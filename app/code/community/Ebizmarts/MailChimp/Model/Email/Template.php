@@ -95,7 +95,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         foreach ($mandrillSenders as $sender) {
             if (isset($sender['domain'])) {
                 $emailArray = explode('@', $email['from_email']);
-                if (empty($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
+                if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
                     $senderExists = true;
                 }
             }
@@ -108,11 +108,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $headers = $mail->getHeaders();
         $headers[] = $mandrillHelper->getUserAgent();
         $email['headers'] = $headers;
-        if (isset($variables['tags']) && empty($variables['tags'])) {
+        if (isset($variables['tags']) && !empty($variables['tags'])) {
             $email ['tags'] = $variables['tags'];
         }
 
-        if (isset($variables['tags']) && empty($variables['tags'])) {
+        if (isset($variables['tags']) && !empty($variables['tags'])) {
             $email ['tags'] = $variables['tags'];
         } else {
             $templateId = (string)$this->getId();
