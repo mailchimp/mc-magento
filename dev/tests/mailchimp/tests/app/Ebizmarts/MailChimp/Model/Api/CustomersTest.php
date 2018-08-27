@@ -69,8 +69,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             'orders_count' => 0,
             'total_spent' => 0
         );
-        $customerJson = '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",
-        "last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}';
+        $customerJson = '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName","last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}';
         $operationData = array(
             'method' => 'PUT',
             'path' => '/ecommerce/stores/00ee7808cc513ee772f209d63c034f1f/customers/142',
@@ -159,8 +158,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
         $this->customersApiMock->expects($this->once())->method('_buildCustomerData')
             ->with($customerMock)->willReturn($customerData);
-        $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')
-            ->with($customerJson)->willReturn($operationData);
+        $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')->with($customerJson)
+            ->willReturn($operationData);
 
         $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
 
