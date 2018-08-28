@@ -41,9 +41,9 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($listId, $status, $emailAddress, $emailType=null, $mergeFields=null, $interests=null,
-        $language=null, $vip=null, $location=null, $ipOpt=null
-    ) 
+    public function add($listId, $status, $emailAddress, $emailType = null, $mergeFields = null, $interests = null,
+                        $language = null, $vip = null, $location = null, $ipOpt = null
+    )
     {
 
         $_params = array('status'=>$status, 'email_address' => $emailAddress);
@@ -95,10 +95,20 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $emailType=null,
-        $status=null, $sinceTimpestampOpt=null, $beforeTimestampOpt=null,$sinceLastChanged=null,
-        $beforeLastChanged=null, $uniqueEmailId=null
-    ) 
+    public function getAll(
+        $listId,
+        $fields=null,
+        $excludeFields=null,
+        $count=null,
+        $offset=null,
+        $emailType=null,
+        $status=null,
+        $sinceTimpestampOpt=null,
+        $beforeTimestampOpt=null,
+        $sinceLastChanged=null,
+        $beforeLastChanged=null,
+        $uniqueEmailId=null
+    )
     {
 
         $_params = array();
@@ -179,7 +189,7 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
      */
     public function update($listId, $subscriberHash, $emailType=null, $status=null, $mergeFields=null, $interests=null,
         $language=null, $vip=null, $location=null
-    ) 
+    )
     {
 
         $_params = array();
@@ -229,7 +239,7 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
      */
     public function addOrUpdate($listId, $subscriberHash, $emailAddress, $statusIfNew, $emailType=null, $status=null,
         $mergeFields=null, $interests=null, $language=null, $vip=null, $location=null
-    ) 
+    )
     {
 
         $_params = array('status_if_new'=>$statusIfNew,'email_address'=>$emailAddress);
