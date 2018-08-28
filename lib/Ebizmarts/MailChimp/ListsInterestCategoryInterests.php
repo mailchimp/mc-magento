@@ -84,7 +84,7 @@ class MailChimp_ListInterestCategoryInterests extends MailChimp_Abstract
      */
     public function modify($listId, $interestCategoryId, $interestId, $name, $_listId = null, $subscriberCount = null,
                            $displayOrder = null
-    ) 
+    )
     {
 
         $_params = array('name'=>$name);
