@@ -58,7 +58,7 @@ class Mandrill_Message extends Mandrill_Mandrill
         $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
         $encoding = Zend_Mime::ENCODING_BASE64,
         $filename = null
-    ) 
+    )
     {
         $mp = new Zend_Mime_Part($body);
         $mp->encoding = $encoding;
