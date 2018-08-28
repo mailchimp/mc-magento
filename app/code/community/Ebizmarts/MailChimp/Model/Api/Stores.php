@@ -48,7 +48,20 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $timeZone = $helper->getStoreTimeZone($scopeId, $scope);
                 $storePhone = $helper->getStorePhone($scopeId, $scope);
                 $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
-                $response = $api->getEcommerce()->getStores()->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone);
+                $response = $api->getEcommerce()->getStores()->add(
+                    $mailChimpStoreId,
+                    $listId,
+                    $storeName,
+                    $currencyCode,
+                    $isSyncing,
+                    'Magento',
+                    $storeDomain,
+                    $storeEmail,
+                    $currencySymbol,
+                    $primaryLocale,
+                    $timeZone,
+                    $storePhone
+                );
                 return $response;
 
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
