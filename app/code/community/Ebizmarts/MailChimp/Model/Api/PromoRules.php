@@ -140,7 +140,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $deletedPromoRules = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
         $deletedPromoRules->getSelect()->where(
             "mailchimp_store_id = '" . $mailchimpStoreId . "' AND type = '" .
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . "' AND (mailchimp_sync_modified = 
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . "' AND (mailchimp_sync_modified =
             1 OR mailchimp_sync_deleted = 1)"
         );
         $deletedPromoRules->getSelect()->limit($this->getBatchLimitFromConfig());
