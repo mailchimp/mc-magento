@@ -53,8 +53,17 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($listId, $fields = null, $excludeFields = null, $count = null, $offset = null, $type = null,
-                           $sinceCreatedAt = null, $beforeCreatedAt = null, $sinceUpdatedAt = null, $beforeUpdatedAt = null
+    public function getAll(
+        $listId,
+        $fields = null,
+        $excludeFields = null,
+        $count = null,
+        $offset = null,
+        $type = null,
+        $sinceCreatedAt = null,
+        $beforeCreatedAt = null,
+        $sinceUpdatedAt = null,
+        $beforeUpdatedAt = null
     )
     {
 
