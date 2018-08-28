@@ -27,9 +27,19 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId,$productId,$id,$title,$url=null,$sku=null,$price=null,$inventoryQuantity=null,
-        $imageUrl=null,$backorders=null,$visibility=null
-    ) 
+    public function add(
+        $storeId,
+        $productId,
+        $id,
+        $title,
+        $url = null,
+        $sku = null,
+        $price = null,
+        $inventoryQuantity = null,
+        $imageUrl = null,
+        $backorders = null,
+        $visibility = null
+    )
     {
 
         $_params=array('id'=>$id,'title'=>$title);
@@ -135,7 +145,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      */
     public function modify($storeId,$productId,$variantId,$title=null,$url=null,$sku=null,$price=null,
         $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
-    ) 
+    )
     {
 
         $_params=array();
@@ -184,7 +194,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      */
     public function addOrModify($storeId,$productId,$variantId,$title,$url=null,$sku=null,$price=null,
         $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
-    ) 
+    )
     {
 
         $_params=array('id'=>$variantId,'title'=>$title);
