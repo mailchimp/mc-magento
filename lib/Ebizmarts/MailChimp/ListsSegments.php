@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mailchimp-lib Magento Component
  *
@@ -17,44 +18,44 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      */
     public $segmentMembers;
 
-    public function getInformation($listId, $fields=null)
+    public function getInformation($listId, $fields = null)
     {
         $_params = array();
         if ($fields) {
             $_params['fields'] = $fields;
         }
-        return $this->_master->call('lists/'.$listId.'/segments', $_params, MailChimp::GET);
+        return $this->_master->call('lists/' . $listId . '/segments', $_params, MailChimp::GET);
     }
 
     /**
      * @param $listId                   The unique id for the list.
-     * @param null                                                $fields          A comma-separated list of fields to
+     * @param null $fields A comma-separated list of fields to
      *                                                            return. Reference parameters of sub-objects
      *                                                                             with dot notation.
-     * @param null                                                $excludeFields   A comma-separated list of fields to
+     * @param null $excludeFields A comma-separated list of fields to
      *                                                            exclude. Reference parameters of sub-objects
      *                                                                             with dot notation.
-     * @param null                                                $count           The number of records to return.
-     * @param null                                                $offset          The number of records from a
+     * @param null $count The number of records to return.
+     * @param null $offset The number of records from a
      *                                                            collection to skip. Iterating over large
      *                                                                             collections with this parameter can
      *                                                                             be slow.
-     * @param null                                                $type            Limit results based on segment type.
-     * @param null                                                $sinceCreatedAt  Restrict results to segments created
+     * @param null $type Limit results based on segment type.
+     * @param null $sinceCreatedAt Restrict results to segments created
      *                                                            after the set time.
-     * @param null                                                $beforeCreatedAt Restrict results to segments created
+     * @param null $beforeCreatedAt Restrict results to segments created
      *                                                            before the set time.
-     * @param null                                                $sinceUpdatedAt  Restrict results to segments update
+     * @param null $sinceUpdatedAt Restrict results to segments update
      *                                                            after the set time.
-     * @param null                                                $beforeUpdatedAt Restrict results to segments update
+     * @param null $beforeUpdatedAt Restrict results to segments update
      *                                                            before the set time.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $type=null,
-        $sinceCreatedAt=null, $beforeCreatedAt=null, $sinceUpdatedAt=null, $beforeUpdatedAt=null
-    ) 
+    public function getAll($listId, $fields = null, $excludeFields = null, $count = null, $offset = null, $type = null,
+                           $sinceCreatedAt = null, $beforeCreatedAt = null, $sinceUpdatedAt = null, $beforeUpdatedAt = null
+    )
     {
 
         $_params = array();
@@ -85,7 +86,7 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
         if ($beforeUpdatedAt) {
             $_params['before_updated_at'] = $beforeUpdatedAt;
         }
-        return $this->_master->call('lists/'.$listId.'/segments', $_params, MailChimp::GET);
+        return $this->_master->call('lists/' . $listId . '/segments', $_params, MailChimp::GET);
     }
 
     /**
@@ -97,55 +98,56 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      */
     public function get($listId, $segmentId)
     {
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, null, MailChimp::GET);
+        return $this->_master->call('lists/' . $listId . '/segments/' . $segmentId, null, MailChimp::GET);
     }
 
     /**
      * @param $listId                   The unique id for the list.
      * @param $name                     The name of the segment.
-     * @param null                                                $staticSegment An array of emails to be used for a
+     * @param null $staticSegment An array of emails to be used for a
      *                                                              static segment. Any emails provided that are
      *                                                                           not present on the list will be
      *                                                              ignored. Passing an empty array will create a
      *                                                                           static segment without any subscribers.
      *                                                              This field cannot be provided with the
      *                                                                           options field.
-     * @param null                                                $options
+     * @param null $options
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($listId, $name, $staticSegment=null, $options=null)
+    public function add($listId, $name, $staticSegment = null, $options = null)
     {
-        $_params = array('name'=>$name);
+        $_params = array('name' => $name);
         if ($staticSegment) {
             $_params['static_segment'] = $staticSegment;
         }
         if ($options) {
             $_params['options'] = $options;
         }
-        return $this->_master->call('lists/'.$listId.'/segments', $_params, MailChimp::POST);
+        return $this->_master->call('lists/' . $listId . '/segments', $_params, MailChimp::POST);
     }
+
     /**
      * @param $listId                   The unique id for the list.
      * @param $segmentId                The unique id for the segment.
      * @param $name                     The name of the segment.
-     * @param null                                                   $staticSegment An array of emails to be used for a
+     * @param null $staticSegment An array of emails to be used for a
      *                                                                  static segment. Any emails provided that are
      *                                                                  not present on the list will be ignored. Passing
      *                                                                  an empty array will create a static segment
      *                                                                  without any subscribers. This field cannot be
      *                                                                  provided with the options field.
-     * @param null                                                   $options
+     * @param null $options
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($listId, $segmentId, $name, $staticSegment=null, $options=null)
+    public function modify($listId, $segmentId, $name, $staticSegment = null, $options = null)
     {
         $_params = array();
         if ($name) {
-            $_params['name'] =$name;
+            $_params['name'] = $name;
         }
         if ($staticSegment) {
             $_params['static_segment'] = $staticSegment;
@@ -153,7 +155,7 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
         if ($options) {
             $_params['options'] = $options;
         }
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, $_params, MailChimp::PATCH);
+        return $this->_master->call('lists/' . $listId . '/segments/' . $segmentId, $_params, MailChimp::PATCH);
     }
 
     /**
@@ -165,6 +167,6 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      */
     public function delete($listId, $segmentId)
     {
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, null, MailChimp::DELETE);
+        return $this->_master->call('lists/' . $listId . '/segments/' . $segmentId, null, MailChimp::DELETE);
     }
 }
