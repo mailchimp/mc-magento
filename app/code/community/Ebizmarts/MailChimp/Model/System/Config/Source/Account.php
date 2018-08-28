@@ -179,7 +179,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     );
                 $newStoreText = $helper
                     ->__(
-                        'You can create a new MailChimp store for this scope by configuring a new list for 
+                        'You can create a new MailChimp store for this scope by configuring a new list for
                     this scope.'
                     );
                 $returnArray = array_merge(
