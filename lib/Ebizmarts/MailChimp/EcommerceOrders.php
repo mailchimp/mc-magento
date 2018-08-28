@@ -40,10 +40,23 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId, $id, $customer, $currencyCode, $orderTotal, $lines, $campaignId =null,
-        $financialStatus=null, $fullfillmentStatus=null, $taxTotal=null, $processedAtForeign=null,
-        $cancelledAtForeign=null, $updateAtForeign=null, $shippingAddress=null, $billingAddress=null
-    ) 
+    public function add(
+        $storeId,
+        $id,
+        $customer,
+        $currencyCode,
+        $orderTotal,
+        $lines,
+        $campaignId = null,
+        $financialStatus = null,
+        $fullfillmentStatus = null,
+        $taxTotal = null,
+        $processedAtForeign = null,
+        $cancelledAtForeign = null,
+        $updateAtForeign = null,
+        $shippingAddress = null,
+        $billingAddress = null
+    )
     {
 
         $_params=array('id'=>$id, 'customer'=>$customer, 'currency_code'=>$currencyCode, 'order_total'=>$orderTotal,
@@ -162,7 +175,7 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
         $fullfillmentStatus=null, $currencyCode=null, $orderTotal=null, $taxTotal=null,
         $processedAtForeign=null,$cancelledAtForeign=null, $updateAtForeign=null,
         $shippingAddress=null, $billingAddress=null, $lines=null
-    ) 
+    )
     {
 
         $_params = array();
