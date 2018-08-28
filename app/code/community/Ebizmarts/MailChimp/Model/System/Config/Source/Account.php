@@ -147,9 +147,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         ->_accountDetails['store_name'] . ':';
                 if ($this->_accountDetails['store_sync_flag'] && !$this
                         ->_accountDetails['store_sync_date'] && !$helper->getResendEnabled(
-                        $scopeArray['scope_id'],
-                        $scopeArray['scope']
-                    )) {
+                            $scopeArray['scope_id'],
+                            $scopeArray['scope']
+                        )) {
                     $syncValue = self::IN_PROGRESS;
                 } else {
                     $syncData = $this->_accountDetails['store_sync_date'];
