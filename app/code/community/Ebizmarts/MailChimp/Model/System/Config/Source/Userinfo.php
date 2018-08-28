@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
 
                     array('value' => 3, 'label' => $helper->__(
                         '<strong>Backlog</strong>: %s %s', $this
-                        ->_accountDetails['backlog'], "<small>the number of emails that are queued for delivery due to 
+                        ->_accountDetails['backlog'], "<small>the number of emails that are queued for delivery due to
                                                 exceeding your monthly or hourly quotas</small>"
                     ))
                 );
