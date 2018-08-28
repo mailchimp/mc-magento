@@ -82,8 +82,8 @@ class MailChimp_ListInterestCategoryInterests extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($listId, $interestCategoryId, $interestId, $name, $_listId=null, $subscriberCount=null,
-        $displayOrder=null
+    public function modify($listId, $interestCategoryId, $interestId, $name, $_listId = null, $subscriberCount = null,
+                           $displayOrder = null
     ) 
     {
 
