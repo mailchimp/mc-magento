@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mailchimp-lib Magento Component
  *
@@ -17,13 +18,13 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @param $productId                The id for the product of a store.
      * @param $id                       A unique identifier for the product variant.
      * @param $title                    The title of a product variant.
-     * @param null   $url               The URL for a product variant.
-     * @param null   $sku               The stock keeping unit (SKU) of a product variant.
-     * @param null  $price              The price of a product variant.
-     * @param null   $inventoryQuantity The inventory quantity of a product variant.
-     * @param null   $imageUrl          The image URL for a product variant.
-     * @param null   $backorders        The backorders of a product variant.
-     * @param null   $visibility        The visibility of a product variant.
+     * @param null $url The URL for a product variant.
+     * @param null $sku The stock keeping unit (SKU) of a product variant.
+     * @param null $price The price of a product variant.
+     * @param null $inventoryQuantity The inventory quantity of a product variant.
+     * @param null $imageUrl The image URL for a product variant.
+     * @param null $backorders The backorders of a product variant.
+     * @param null $visibility The visibility of a product variant.
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
@@ -42,7 +43,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
     )
     {
 
-        $_params=array('id'=>$id,'title'=>$title);
+        $_params = array('id' => $id, 'title' => $title);
         if ($url) {
             $_params['url'] = $url;
         }
@@ -64,28 +65,28 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
         if ($visibility) {
             $_params['visibility'] = $visibility;
         }
-        $url = '/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
+        $url = '/ecommerce/stores/' . $storeId . '/products/' . $productId . '/variants';
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::POST);
     }
 
     /**
      * @param $storeId             The store id.
      * @param $productId           The id for the product of a store.
-     * @param null  $fields        A comma-separated list of fields to return. Reference parameters of sub-objects with
+     * @param null $fields A comma-separated list of fields to return. Reference parameters of sub-objects with
      *                             dot notation.
-     * @param null                 $excludeFields A comma-separated list of fields to exclude. Reference parameters
+     * @param null $excludeFields A comma-separated list of fields to exclude. Reference parameters
      *                             of sub-objects
      *                             with dot notation.
-     * @param null                 $count         The number of records to return.
-     * @param null                 $offset        The number of records from a collection to skip.
+     * @param null $count The number of records to return.
+     * @param null $offset The number of records from a collection to skip.
      *                             Iterating over large collections
      *                             with this parameter can be slow.
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($storeId,$productId,$fields=null,$excludeFields=null,$count=null,$offset=null)
+    public function getAll($storeId, $productId, $fields = null, $excludeFields = null, $count = null, $offset = null)
     {
-        $_params=array();
+        $_params = array();
         if ($fields) {
             $_params['fields'] = $fields;
         }
@@ -99,7 +100,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
         if ($offset) {
             $_params['offset'] = $offset;
         }
-        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
+        $url = 'ecommerce/stores/' . $storeId . '/products/' . $productId . '/variants';
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }
 
@@ -107,24 +108,24 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @param $storeId             The store id.
      * @param $productId           The id for the product of a store.
      * @param $variantId           The id for the product variant.
-     * @param null  $fields        A comma-separated list of fields to return. Reference parameters of sub-objects with
+     * @param null $fields A comma-separated list of fields to return. Reference parameters of sub-objects with
      *                             dot notation.
-     * @param null                 $excludeFields A comma-separated list of fields to exclude. Reference parameters
+     * @param null $excludeFields A comma-separated list of fields to exclude. Reference parameters
      *                             of sub-objects
      *                             with dot notation.
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function get($storeId,$productId,$variantId,$fields=null,$excludeFields=null)
+    public function get($storeId, $productId, $variantId, $fields = null, $excludeFields = null)
     {
-        $_params=array();
+        $_params = array();
         if ($fields) {
             $_params['fields'] = $fields;
         }
         if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
-        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $url = 'ecommerce/stores/' . $storeId . '/products/' . $productId . '/variants/' . $variantId;
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }
 
@@ -132,23 +133,23 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @param $storeId                  The store id.
      * @param $productId                The id for the product of a store.
      * @param $variantId                The id for the product variant.
-     * @param null   $title             The title of a product variant.
-     * @param null   $url               The URL for a product variant.
-     * @param null   $sku               The stock keeping unit (SKU) of a product variant.
-     * @param null   $price             The price of a product variant.
-     * @param null   $inventoryQuantity The inventory quantity of a product variant.
-     * @param null   $imageUrl          The image URL for a product variant.
-     * @param null   $backorders        The backorders of a product variant.
-     * @param null   $visibility        The visibility of a product variant.
+     * @param null $title The title of a product variant.
+     * @param null $url The URL for a product variant.
+     * @param null $sku The stock keeping unit (SKU) of a product variant.
+     * @param null $price The price of a product variant.
+     * @param null $inventoryQuantity The inventory quantity of a product variant.
+     * @param null $imageUrl The image URL for a product variant.
+     * @param null $backorders The backorders of a product variant.
+     * @param null $visibility The visibility of a product variant.
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($storeId,$productId,$variantId,$title=null,$url=null,$sku=null,$price=null,
-        $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
+    public function modify($storeId, $productId, $variantId, $title = null, $url = null, $sku = null, $price = null,
+                           $inventoryQuantity = null, $imageUrl = null, $backorders = null, $visibility = null
     )
     {
 
-        $_params=array();
+        $_params = array();
         if ($title) {
             $_params['title'] = $title;
         }
@@ -173,7 +174,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
         if ($visibility) {
             $_params['visibility'] = $visibility;
         }
-        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $url = 'ecommerce/stores/' . $storeId . '/products/' . $productId . '/variants/' . $variantId;
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::PATCH);
     }
 
@@ -182,22 +183,22 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @param $productId                The id for the product of a store.
      * @param $variantId                The id for the product variant.
      * @param $title                    The title of a product variant.
-     * @param null   $url               The URL for a product variant.
-     * @param null   $sku               The stock keeping unit (SKU) of a product variant.
-     * @param null   $price             The price of a product variant.
-     * @param null   $inventoryQuantity The inventory quantity of a product variant.
-     * @param null   $imageUrl          The image URL for a product variant.
-     * @param null   $backorders        The backorders of a product variant.
-     * @param null   $visibility        The visibility of a product variant.
+     * @param null $url The URL for a product variant.
+     * @param null $sku The stock keeping unit (SKU) of a product variant.
+     * @param null $price The price of a product variant.
+     * @param null $inventoryQuantity The inventory quantity of a product variant.
+     * @param null $imageUrl The image URL for a product variant.
+     * @param null $backorders The backorders of a product variant.
+     * @param null $visibility The visibility of a product variant.
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function addOrModify($storeId,$productId,$variantId,$title,$url=null,$sku=null,$price=null,
-        $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
+    public function addOrModify($storeId, $productId, $variantId, $title, $url = null, $sku = null, $price = null,
+                                $inventoryQuantity = null, $imageUrl = null, $backorders = null, $visibility = null
     )
     {
 
-        $_params=array('id'=>$variantId,'title'=>$title);
+        $_params = array('id' => $variantId, 'title' => $title);
         if ($url) {
             $_params['url'] = $url;
         }
@@ -219,9 +220,10 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
         if ($visibility) {
             $_params['visibility'] = $visibility;
         }
-        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $url = 'ecommerce/stores/' . $storeId . '/products/' . $productId . '/variants/' . $variantId;
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::PUT);
     }
+
     /**
      * @param $storeId                  The store id.
      * @param $productId                The id for the product of a store.
@@ -229,9 +231,9 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function delete($storeId,$productId,$variantId)
+    public function delete($storeId, $productId, $variantId)
     {
-        $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
+        $url = 'ecommerce/stores/' . $storeId . '/products/' . $productId . '/variants/' . $variantId;
         $this->_master->call($url, null, Ebizmarts_MailChimp::DELETE);
     }
 }
