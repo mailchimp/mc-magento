@@ -29,9 +29,18 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId, $id, $emailAddress, $optInStatus, $company=null, $firstName=null, $lastName=null,
-        $ordersCount=null, $totalSpent=null, $address=null
-    ) 
+    public function add(
+        $storeId,
+        $id,
+        $emailAddress,
+        $optInStatus,
+        $company = null,
+        $firstName = null,
+        $lastName = null,
+        $ordersCount = null,
+        $totalSpent = null,
+        $address = null
+    )
     {
 
         $_params = array('id'=>$id,'email_address'=>$emailAddress,'opt_in_status'=>$optInStatus);
@@ -152,7 +161,7 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      */
     public function modify($storeId, $customerId, $optInStatus=null, $company=null, $firstName=null, $lastName=null,
         $ordersCount=null, $totalSpent=null, $address=null
-    ) 
+    )
     {
 
         $_params = array();
@@ -200,7 +209,7 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      */
     public function addOrModify($storeId, $customerId, $emailAddress, $optInStatus, $company=null, $firstName=null,
         $lastName=null, $ordersCount=null, $totalSpent=null, $address=null
-    ) 
+    )
     {
 
         $_params = array('id'=>$customerId,'email_address'=>$emailAddress,'opt_in_status'=>$optInStatus);
