@@ -35,9 +35,19 @@ class MailChimp_EcommerceProducts extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId, $id, $title, $variants, $handle=null, $url=null, $description=null, $type=null,
-        $vendor=null, $imageUrl=null, $publishedAtForeign=null
-    ) 
+    public function add(
+        $storeId,
+        $id,
+        $title,
+        $variants,
+        $handle = null,
+        $url = null,
+        $description = null,
+        $type = null,
+        $vendor = null,
+        $imageUrl = null,
+        $publishedAtForeign = null
+    )
     {
 
         $_params=array('id'=>$id,'title'=>$title,'variants'=>$variants);
