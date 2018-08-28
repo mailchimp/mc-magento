@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $thisScopeHasList = $helper->getIfConfigExistsForScope($this->getGeneralList(), $storeId);
 
         $subscriberArray = array();
-        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
+        if (($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag) || !$helper->getSubMinSyncDateFlag($storeId)) {
             $realScope = $helper->getRealScopeForConfig($this->getGeneralList(), $storeId);
             $configValues = array(array($this->subMinSyncDateFlag(), $this->getDate()));
             $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
@@ -67,20 +67,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $subscriberJson = json_encode($data);
             } catch (Exception $e) {
                 //json encode failed
-                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed";
+                $errorMessage = 'Subscriber ' . $subscriber->getSubscriberId() . ' json encode failed';
                 $helper->logError($errorMessage);
             }
 
             if (!empty($subscriberJson)) {
-                $subscriberArray[$counter]['method'] = "PUT";
-                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+                $subscriberArray[$counter]['method'] = 'PUT';
+                $subscriberArray[$counter]['path'] = '/lists/' . $listId . '/members/' . $md5HashEmail;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
                 $subscriberArray[$counter]['body'] = $subscriberJson;
 
                 //update subscribers delta
-                $subscriber->setData("mailchimp_sync_delta", $this->getDate());
-                $subscriber->setData("mailchimp_sync_error", "");
-                $subscriber->setData("mailchimp_sync_modified", 0);
+                $subscriber->setData('mailchimp_sync_delta', $this->getDate());
+                $subscriber->setData('mailchimp_sync_error', '');
+                $subscriber->setData('mailchimp_sync_modified', 0);
                 $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
                 $subscriber->save();
             }
@@ -96,18 +96,18 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->_mcHelper;
         $storeId = $subscriber->getStoreId();
         $data = array();
-        $data["email_address"] = $subscriber->getSubscriberEmail();
+        $data['email_address'] = $subscriber->getSubscriberEmail();
         $mergeVars = $this->getMergeVars($subscriber);
         if ($mergeVars) {
-            $data["merge_fields"] = $mergeVars;
+            $data['merge_fields'] = $mergeVars;
         }
 
         $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus());
-        $data["status_if_new"] = $status;
+        $data['status_if_new'] = $status;
         if ($subscriber->getMailchimpSyncModified()) {
-            $data["status"] = $status;
+            $data['status'] = $status;
         }
-        $data["language"] = $helper->getStoreLanguageCode($storeId);
+        $data['language'] = $helper->getStoreLanguageCode($storeId);
 
         return $data;
     }
@@ -125,7 +125,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->getData();
         $mergeVars = array();
         $subscriberEmail = $subscriber->getSubscriberEmail();
-        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
+        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load(
+            $subscriber->getCustomerId()
+        );
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
@@ -144,7 +146,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 case 'default_shipping':
                                     $address = $customer->getPrimaryAddress($attributeCode);
                                     $addressData = $this->getAddressData($address);
-                                    if (!(empty($addressData))) {
+                                    if (!empty($addressData)) {
                                         $eventValue = $mergeVars[$key] = $addressData;
                                     }
                                     break;
@@ -202,7 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     break;
                                 case 'dob':
                                     if ($customer->getData($attributeCode)) {
-                                        $date = date("m/d", strtotime($customer->getData($attributeCode)));
+                                        $date = date('m/d', strtotime($customer->getData($attributeCode)));
                                         $eventValue = $mergeVars[$key] = $date;
                                     }
                                     break;
@@ -348,9 +350,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $newStatus, null, $forceStatus, $mergeVars, null,
                     $language, null, null
                 );
-                $subscriber->setData("mailchimp_sync_delta", $this->getDate());
-                $subscriber->setData("mailchimp_sync_error", "");
-                $subscriber->setData("mailchimp_sync_modified", 0);
+                $subscriber->setData('mailchimp_sync_delta', $this->getDate());
+                $subscriber->setData('mailchimp_sync_error', '');
+                $subscriber->setData('mailchimp_sync_modified', 0);
             } catch (MailChimp_Error $e) {
                 if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
@@ -479,28 +481,28 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($address) {
             $street = $address->getStreet();
             if (count($street) > 1) {
-                $addressData["addr1"] = $street[0];
-                $addressData["addr2"] = $street[1];
+                $addressData['addr1'] = $street[0];
+                $addressData['addr2'] = $street[1];
             } else {
                 if (!empty($street[0])) {
-                    $addressData["addr1"] = $street[0];
+                    $addressData['addr1'] = $street[0];
                 }
             }
 
             if ($address->getCity()) {
-                $addressData["city"] = $address->getCity();
+                $addressData['city'] = $address->getCity();
             }
 
             if ($address->getRegion()) {
-                $addressData["state"] = $address->getRegion();
+                $addressData['state'] = $address->getRegion();
             }
 
             if ($address->getPostcode()) {
-                $addressData["zip"] = $address->getPostcode();
+                $addressData['zip'] = $address->getPostcode();
             }
 
             if ($address->getCountry()) {
-                $addressData["country"] = $this->getDirCountry()->loadByCode($address->getCountry())->getName();
+                $addressData['country'] = $this->getDirCountry()->loadByCode($address->getCountry())->getName();
             }
         }
         return $addressData;
