@@ -273,4 +273,108 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock->markAsDeleted(self::PROMORULE_ID);
     }
+
+    /**
+     * @dataProvider ruleHasMissingInformationProvider
+     */
+    public function testRuleHasMissingInformation($providerData)
+    {
+        $result = $this->invokeMethod(
+            new Ebizmarts_MailChimp_Model_Api_PromoRules,
+            'ruleHasMissingInformation',
+            array($providerData['params'])
+        );
+
+        $this->assertEquals($providerData['expected'], $result);
+    }
+
+    public function ruleHasMissingInformationProvider()
+    {
+        return array(
+            array(
+                'all null' => array(
+                    'params'   => array(
+                        'amount'     => null,
+                        'descrption' => null,
+                        'id'         => null
+                    ),
+                    'expected' => true,
+                ),
+                'amount null' => array(
+                    'params'   => array(
+                        'amount'     => null,
+                        'descrption' => 'desc',
+                        'id'         => 'id'
+                    ),
+                    'expected' => true,
+                ),
+                'description null' => array(
+                    'params'   => array(
+                        'amount'     => 'amount value',
+                        'descrption' => null,
+                        'id'         => 'id'
+                    ),
+                    'expected' => true,
+                ),
+                'id null' => array(
+                    'params'   => array(
+                        'amount'     => 'amount value',
+                        'descrption' => 'desc',
+                        'id'         => null
+                    ),
+                    'expected' => true,
+                ),
+                'none null' => array(
+                    'params'   => array(
+                        'amount'     => 'amount value',
+                        'descrption' => 'desc',
+                        'id'         => 'id'
+                    ),
+                    'expected' => false,
+                ),
+                'amount and id null' => array(
+                    'params'   => array(
+                        'amount'     => null,
+                        'descrption' => 'desc',
+                        'id'         => null
+                    ),
+                    'expected' => true,
+                ),
+                'amount only not null' => array(
+                    'params'   => array(
+                        'amount'     => 'amount value',
+                        'descrption' => null,
+                        'id'         => null
+                    ),
+                    'expected' => true,
+                ),
+                'id only not null' => array(
+                    'params'   => array(
+                        'amount'     => null,
+                        'descrption' => null,
+                        'id'         => 'id value'
+                    ),
+                    'expected' => true,
+                )
+            )
+        );
+    }
+
+    /**
+     * Call protected/private method of a class.
+     *
+     * @param object &$object    Instantiated object that we will run method on.
+     * @param string $methodName Method name to call
+     * @param array  $parameters Array of parameters to pass into method.
+     *
+     * @return mixed Method return.
+     */
+    public function invokeMethod(&$object, $methodName, array $parameters = array())
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $parameters);
+    }
 }
