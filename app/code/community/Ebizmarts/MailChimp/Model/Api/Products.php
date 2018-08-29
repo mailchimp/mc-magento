@@ -12,17 +12,17 @@
 class Ebizmarts_MailChimp_Model_Api_Products
 {
     const BATCH_LIMIT = 100;
-    private $_parentImageUrl = null;
-    private $_parentId = null;
-    private $_parentUrl = null;
-    private $_parentPrice = null;
-    private $_visibility = null;
+    protected $_parentImageUrl;
+    protected $_parentId;
+    protected $_parentUrl;
+    protected $_parentPrice;
+    protected $_visibility;
     /** @var Mage_Catalog_Model_Product_Type_Configurable */
-    private $_productTypeConfigurable;
+    protected $_productTypeConfigurable;
 
-    private $_mailchimpHelper;
-    private $_visibilityOptions;
-    private $_productTypeConfigurableResource;
+    protected $_mailchimpHelper;
+    protected $_visibilityOptions;
+    protected $_productTypeConfigurableResource;
     public static $noChildrenIds = array(0 => array());
 
     public function __construct()
@@ -388,31 +388,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $allowBatchRemoval
         );
     }
-
-/*
-        public function buildProductDataRemoval($product, $batchId, $mailchimpStoreId)
-        {
-
-            return array();
-
-            $productdata = array();
-
-            $parentIds = $this->makeCatalogProductType()->getParentIdsByChild($product->getId());
-
-            if (empty($parentIds)) {
-                $parentIds = array($product->getId());
-            }
-
-            //add or update variant
-            //        foreach ($parentIds as $parentId) {
-            //            $productdata['method'] = "DELETE";
-            //            $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" .
-            //                                      $parentId . '/variants/' . $data['id'];
-            //            $productdata['operation_id'] = $batchId . '_' . $parentId;
-            //        }
-            return $productdata;
-       }
-       */
 
     /**
      * @param $magentoStoreId
