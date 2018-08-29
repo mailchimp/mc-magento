@@ -362,7 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     {
         $isNotCompatible = null;
 
-        if ($data['target'] === null || $data['type'] === null){
+        if ($data['target'] === null || $data['type'] === null) {
             $isNotCompatible = true;
         } else {
             $isNotCompatible = false;
@@ -379,7 +379,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     {
         $hasMissingInformation = null;
 
-        if ($data['amount'] === null || $data['description'] === null || $data['id'] === null){
+        if ($data['amount'] === null || $data['description'] === null || $data['id'] === null) {
             $hasMissingInformation = true;
         } else {
             $hasMissingInformation = false;
