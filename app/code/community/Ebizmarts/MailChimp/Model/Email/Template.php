@@ -12,7 +12,7 @@
  */
 class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model_Email_TemplateBase
 {
-    protected $_mail = null;
+    protected $_mail;
 
     /**
      * @param array|string $email
