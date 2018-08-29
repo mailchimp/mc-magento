@@ -17,14 +17,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    private $_mailchimpHelper;
-    private $_optInConfiguration;
-    private $_optInStatusForStore;
-    private $_locale;
-    private $_directoryRegionModel;
-    private $_magentoStoreId;
-    private $_mailchimpStoreId;
-    private $_batchId;
+    protected $_mailchimpHelper;
+    protected $_optInConfiguration;
+    protected $_optInStatusForStore;
+    protected $_locale;
+    protected $_directoryRegionModel;
+    protected $_magentoStoreId;
+    protected $_mailchimpStoreId;
+    protected $_batchId;
 
     public function __construct()
     {
