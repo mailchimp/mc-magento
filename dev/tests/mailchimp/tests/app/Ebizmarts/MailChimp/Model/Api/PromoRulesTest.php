@@ -221,20 +221,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
     public function testGetNewPromoRuleWithError($promoRuleData)
     {
-        return;
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $magentoStoreId = 1;
         $ruleName = $promoRuleData['title'];
         $ruleSimpleAction = 'by_percent';
         $ruleIsActive = true;
         $error = $promoRuleData['error'];
-
-        $data = $promoRuleData;
-        $data['description'] = ($promoRuleData['description'] ? $promoRuleData['description'] : $promoRuleData['title']);
-        unset($data['countDesc']);
-        unset($data['countName']);
-        unset($data['error']);
-        Mage::log($data, null, 'testPRL4.log', true);
 
         $promoRulesApiMock = $this->promoRulesApiMock
             ->disableOriginalConstructor()
@@ -256,8 +248,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $promoRulesApiMock->expects($this->once())->method('getMailChimpDiscountAmount')->with($promoRuleMock)->willReturn($promoRuleData['amount']);
         $promoRulesApiMock->expects($this->once())->method('getMailChimpType')->with($ruleSimpleAction)->willReturn($promoRuleData['type']);
         $promoRulesApiMock->expects($this->once())->method('getMailChimpTarget')->with($ruleSimpleAction)->willReturn($promoRuleData['target']);
-        $promoRulesApiMock->expects($this->once())->method('ruleIsNotCompatible')->with($data)->willReturn(true);
-        $promoRulesApiMock->expects($this->exactly($promoRuleData['countMissing']))->method('ruleHasMissingInformation')->with($data)->willReturn(true);
+        $promoRulesApiMock->expects($this->once())->method('ruleIsNotCompatible')->with($promoRuleData['ruleNotCompatibleParamCheck'])->willReturn($promoRuleData['isNotCompatible']);
+        $promoRulesApiMock->expects($this->exactly($promoRuleData['countMissing']))->method('ruleHasMissingInformation')->with($promoRuleData['ruleHasMissingParamCheck'])->willReturn(true);
 
         $promoRuleMock->expects($this->once())->method('getRuleId')->willReturn(self::PROMORULE_ID);
         $promoRuleMock->expects($this->exactly($promoRuleData['countName']))->method('getName')->willReturn($ruleName);
@@ -273,26 +265,27 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $this->assertEquals(0, count($return));
     }
 
-//    public function getNewPromoRuleWithErrorDataProvider()
-//    {
-//        return array(
-//            array(array('amount' => 0, 'type' => null, 'target' => 'per_item', 'error' => 'The rule type is not supported by the MailChimp schema.', 'isNotCompatible' => true)),
-//            array(array('amount' => 1, 'type' => 'fixed', 'target' => null, 'error' => 'The rule type is not supported by the MailChimp schema.', 'isNotCompatible' => true)),
-//            array(array('amount' => null, 'type' => 'percentage', 'target' => 'total', 'error' => 'There is required information by the MailChimp schema missing.', 'isNotCompatible' => false))
-//        );
-//
-//    }
-
     public function getNewPromoRuleWithErrorDataProvider()
     {
         return array(
-            array(
-            'no type' =>
-                    array(
+            'no type' => array(
+                array(
+                    'id' => self::PROMORULE_ID,
+                    'countDesc' => 2,
+                    'countName' => 1,
+                    'countMissing' => 0,
+                    'amount' => 0,
+                    'title' => 'test promo',
+                    'description' => 'testdesc',
+                    'starts_at' => '2018-08-08',
+                    'ends_at' => '2018-08-15',
+                    'type' => null,
+                    'target' => 'total',
+                    'enabled' => true,
+                    'error' => 'The rule type is not supported by the MailChimp schema.',
+                    'isNotCompatible' => true,
+                    'ruleHasMissingParamCheck' => array(
                         'id' => self::PROMORULE_ID,
-                        'countDesc' => 2,
-                        'countName' => 1,
-                        'countMissing' => 0,
                         'amount' => 0,
                         'title' => 'test promo',
                         'description' => 'testdesc',
@@ -301,11 +294,21 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                         'type' => null,
                         'target' => 'total',
                         'enabled' => true,
-                        'error' => 'The rule type is not supported by the MailChimp schema.'
-                    )),
-             array(
-             'no target' =>
-                    array(
+                    ),
+                    'ruleNotCompatibleParamCheck' => array(
+                        'id' => self::PROMORULE_ID,
+                        'amount' => 0,
+                        'title' => 'test promo',
+                        'description' => 'testdesc',
+                        'starts_at' => '2018-08-08',
+                        'ends_at' => '2018-08-15',
+                        'type' => null,
+                        'target' => 'total',
+                        'enabled' => true,
+                    )
+                )),
+            'no target' =>
+                array(array(
                     'id' => self::PROMORULE_ID,
                     'amount' => 1,
                     'title' => 'test promo',
@@ -316,27 +319,63 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                     'type' => 'fixed',
                     'target' => null,
                     'enabled' => true,
-                    'error' => 'The rule type is not supported by the MailChimp schema.'
-                 )
-                 ),
-             array(
-             'description empty' =>
-                    array(
+                    'error' => 'The rule type is not supported by the MailChimp schema.',
+                    'isNotCompatible' => true,
+                    'ruleHasMissingParamCheck' => array(
+                        'id' => self::PROMORULE_ID,
+                        'amount' => 1,
+                        'title' => 'test promo',
+                        'description' => 'testdesc',
+                        'type' => 'fixed',
+                        'target' => null,
+                        'enabled' => true,
+                    ),
+                    'ruleNotCompatibleParamCheck' => array(
+                        'id' => self::PROMORULE_ID,
+                        'amount' => 1,
+                        'title' => 'test promo',
+                        'description' => 'testdesc',
+                        'type' => 'fixed',
+                        'target' => null,
+                        'enabled' => true,
+                    )
+                )
+                ),
+            'no amount' => array(
+                array(
+                    'id' => self::PROMORULE_ID,
+                    'amount' => null,
+                    'title' => 'test promo',
+                    'countDesc' => 1,
+                    'countName' => 2,
+                    'countMissing' => 1,
+                    'description' => null,
+                    'type' => 'percentage',
+                    'target' => 'total',
+                    'enabled' => true,
+                    'error' => 'There is required information by the MailChimp schema missing.',
+                    'isNotCompatible' => false,
+                    'ruleHasMissingParamCheck' => array(
                         'id' => self::PROMORULE_ID,
                         'amount' => null,
                         'title' => 'test promo',
-                        'countDesc' => 1,
-                        'countName' => 2,
-                        'countMissing' => 1,
-                        'description' => null,
+                        'description' => 'test promo',
                         'type' => 'percentage',
                         'target' => 'total',
                         'enabled' => true,
-                        'error' => 'There is required information by the MailChimp schema missing.'
-                        )
-                          )
-                    );
-
+                    ),
+                    'ruleNotCompatibleParamCheck' => array(
+                        'id' => self::PROMORULE_ID,
+                        'amount' => null,
+                        'title' => 'test promo',
+                        'description' => 'test promo',
+                        'type' => 'percentage',
+                        'target' => 'total',
+                        'enabled' => true,
+                    )
+                )
+            )
+        );
     }
 
     public function testMakePromoRulesCollection()
@@ -401,5 +440,4 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock->markAsDeleted(self::PROMORULE_ID);
     }
-
 }
