@@ -13,7 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
-    private $_mcHelper;
+    protected $_mcHelper;
 
     public function __construct()
     {
