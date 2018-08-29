@@ -230,20 +230,20 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
             if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == '') {
                 $itemCount++;
-                $data["lines"][] = array(
-                    "id" => (string)$itemCount,
-                    "product_id" => $productId,
-                    "product_variant_id" => $variant,
-                    "quantity" => (int)$item->getQtyOrdered(),
-                    "price" => $item->getPrice(),
-                    "discount" => abs($item->getDiscountAmount())
+                $data['lines'][] = array(
+                    'id' => (string)$itemCount,
+                    'product_id' => $productId,
+                    'product_variant_id' => $variant,
+                    'quantity' => (int)$item->getQtyOrdered(),
+                    'price' => $item->getPrice(),
+                    'discount' => abs($item->getDiscountAmount())
                 );
             }
         }
 
         if (!$itemCount) {
             unset($data['lines']);
-            return "";
+            return '';
         }
 
         //customer data
