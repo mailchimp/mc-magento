@@ -626,7 +626,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $orderId;
                 $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                 $batchArray[$this->_counter]['body'] = '';
-                ++$this->_counter;
+                $this->_counter += 1;
 
                 //Create order
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
