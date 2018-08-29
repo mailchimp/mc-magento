@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                         }
 
                         unset($mailer);
-                        $message->setProcessedAt(Mage::getSingleton('core/date')->gmtDate());
+                        $message->setProcessedAt($this->getCurrentDate());
                         $message->save();
                     } catch (Exception $e) {
                         Mage::logException($e);
@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                 } else {
                     $parameters = new Varien_Object($message->getMessageParameters());
                     if ($parameters->getReturnPathEmail() !== null) {
-                        $mailTransport = new Zend_Mail_Transport_Sendmail("-f" . $parameters->getReturnPathEmail());
+                        $mailTransport = new Zend_Mail_Transport_Sendmail('-f' . $parameters->getReturnPathEmail());
                         Zend_Mail::setDefaultTransport($mailTransport);
                     }
 
@@ -148,7 +148,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     }
 
                     unset($mailer);
-                    $message->setProcessedAt(Mage::getSingleton('core/date')->gmtDate());
+                    $message->setProcessedAt($this->getCurrentDate());
                     $message->save();
                 }
             }
@@ -171,5 +171,13 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
         Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . $apiKey, $storeId);
         $mail = new Mandrill_Message($apiKey);
         return $mail;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrentDate()
+    {
+        return Mage::getSingleton('core/date')->gmtDate();
     }
 }
