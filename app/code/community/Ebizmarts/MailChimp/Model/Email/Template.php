@@ -230,7 +230,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     protected function getSendersDomains($mail)
     {
-        $mandrillSenders = arrray();
+        $mandrillSenders = array();
         try {
             $mandrillSenders = $mail->senders->domains();
         } catch (Exception $e) {
