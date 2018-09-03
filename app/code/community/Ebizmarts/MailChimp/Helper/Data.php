@@ -1144,7 +1144,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
             //Always set modified value to 0 when saving sync delta or errors.
             $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
-            if ($syncDeleted) {
+            if ($syncDeleted !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
             }
             if ($token) {
