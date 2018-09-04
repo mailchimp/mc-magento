@@ -72,10 +72,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        list($mailchimpTableName, $batchArray, $deletedProducts) = $this->getDeletedProductsCollection();
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $deletedProducts = $this->getProductResourceCollection();
 
         $this->joinMailchimpSyncDataDeleted($mailchimpStoreId, $deletedProducts, $mailchimpTableName);
 
+        $batchArray = array();
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
         foreach ($deletedProducts as $product) {
@@ -900,16 +902,5 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $deletedProducts->getSelect()->where("m4m.mailchimp_sync_error = ''");
 
         $deletedProducts->getSelect()->limit($this->getBatchLimitFromConfig());
-    }
-
-    /**
-     * @return array
-     */
-    protected function getDeletedProductsCollection(): array
-    {
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-        $batchArray = array();
-        $deletedProducts = $this->getProductResourceCollection();
-        return array($mailchimpTableName, $batchArray, $deletedProducts);
     }
 }
