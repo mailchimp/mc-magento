@@ -399,70 +399,120 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
     }
 
-//    /**
-//     * @param array $deletedProductData
-//     * @dataProvider createDeletedProductsBatchJsonDataProvider
-//     */
+    /**
+     * @param array $deletedProductData
+     * @dataProvider createDeletedProductsBatchJsonDataProvider
+     */
 
-        public function testCreateDeletedProductsBatchJson()
-        {
-            $magentoStoreId = 0;
-            $mailchimpStoreId = 'dasds231231312';
-            $products = array();
-            $productData = array(
-                'method' => 'DELETE',
-                'path' => "/ecommerce/stores/924e0fe20c38fb503ef268f02d426699/products/4",
-                'operation_id' => 'storeid-1_PRO_2018-09-03-18-30-35-12572900_4',
-            );
+    public function testCreateDeletedProductsBatchJson($deletedProductData)
+    {
+        $magentoStoreId = 0;
+        $mailchimpStoreId = 'dasds231231312';
+        $products = array();
+        $childrenIds = array(1, 2, 3);
 
-            $childrenIds = array(1,2,3);
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
+                'makeBatchId', '_updateSyncData', 'isSimpleProduct', 'isConfigurableProduct', 'makeProductChildrenCollection',
+                'getConfigurableChildrenIds', 'isVirtualProduct', 'isDownloadableProduct'))
+            ->getMock();
 
-            $productsApiMock = $this->productsApiMock
-                ->setMethods(array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
-                    'makeBatchId', '_updateSyncData', 'isSimpleProduct'))
-                ->getMock();
-
-            $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
-                ->disableOriginalConstructor()
-                ->setMethods(
-                    array(
-                        'getId'
-                    )
+        $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(
+                array(
+                    'getId'
                 )
-                ->getMock();
+            )
+            ->getMock();
 
-            $productCollection = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+        $productCollection = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-            $productsApiMock->expects($this->once())->method('getProductResourceCollection')->willReturn($productCollection);
-            $productsApiMock->expects($this->once())->method('joinMailchimpSyncDataDeleted')->with($mailchimpStoreId, $productCollection);
-            $productsApiMock->expects($this->once())->method('makeBatchId')->with($magentoStoreId)->willReturn(self::BATCH_ID);
+        $childrenProductCollection = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-            $products [] = $productMock;
-            $productCollection->expects($this->once())->method('getIterator')->willReturn(new ArrayIterator($products));
+        $productsApiMock->expects($this->once())->method('getProductResourceCollection')->willReturn($productCollection);
+        $productsApiMock->expects($this->once())->method('joinMailchimpSyncDataDeleted')->with($mailchimpStoreId, $productCollection);
+        $productsApiMock->expects($this->once())->method('makeBatchId')->with($magentoStoreId)->willReturn(self::BATCH_ID);
 
-            $productsApiMock->expects($this->once())->method('isSimpleProduct')->with($productMock);
-            $productsApiMock->expects($this->any())->method('isConfigurableProduct')->with($productMock);
-            $productsApiMock->expects($this->any())->method('makeProductChildrenCollection')->with($magentoStoreId)->willReturn($productCollection);
-            $productsApiMock->expects($this->any())->method('getConfigurableChildrenIds')->with($productMock)->willReturn($childrenIds);
+        $products [] = $productMock;
+        $productCollection->expects($this->exactly(1))->method('getIterator')->willReturn(new ArrayIterator($products));
 
-            $collection [] = $childrenIds;
-            $productCollection->expects($this->once())->method('getIterator')->willReturn(new ArrayIterator($collection));
+        $productsApiMock->expects($this->once())->method('isSimpleProduct')->with($productMock)->willReturn($deletedProductData['isSimpleProduct']);
+        $productsApiMock->expects($this->exactly($deletedProductData['countConfigurable']))->method('isConfigurableProduct')->with($productMock)->willReturn($deletedProductData['isConfigurableProduct']);
+        $productsApiMock->expects($this->exactly($deletedProductData['countChildrenCollection']))->method('makeProductChildrenCollection')->with($magentoStoreId)->willReturn($childrenProductCollection);
+        $productsApiMock->expects($this->exactly($deletedProductData['countChildrenIds']))->method('getConfigurableChildrenIds')->with($productMock)->willReturn($childrenIds);
 
-            $productsApiMock->expects($this->any())->method('isVirtualProduct')->with($productMock);
-            $productsApiMock->expects($this->any())->method('isDownloadableProduct')->with($productMock);
+        $collection [] = $childrenIds;
+        $childrenProductCollection->expects($this->exactly($deletedProductData['countChildrenIterator']))->method('getIterator')->willReturn(new ArrayIterator($collection));
 
-            $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
+        $productsApiMock->expects($this->exactly($deletedProductData['countVirtual']))->method('isVirtualProduct')->with($productMock)->willReturn($deletedProductData['isVirtual']);
+        $productsApiMock->expects($this->exactly($deletedProductData['countDownloadable']))->method('isDownloadableProduct')->with($productMock)->willReturn($deletedProductData['isDownloadable']);
 
-            $productsApiMock->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
+        $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
 
-        }
+        $productsApiMock->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
 
-//    public function createDeletedProductsBatchJsonDataProvider()
-//    {
-//        return array(
-//
-//        );
-//    }
+    }
+
+    public function createDeletedProductsBatchJsonDataProvider()
+    {
+        return array(
+            'Simple Product' => array(
+                array(
+                    'isSimpleProduct' => true,
+                    'countConfigurable' => 0,
+                    'countChildrenCollection' => 0,
+                    'countChildrenIds' => 0,
+                    'countVirtual' => 0,
+                    'countDownloadable' => 0,
+                    'countChildrenIterator' => 0
+                )),
+
+            'Configurable Product' => array(
+                array(
+                    'isSimpleProduct' => false,
+                    'isConfigurableProduct' => true,
+                    'countConfigurable' => 1,
+                    'countChildrenCollection' => 1,
+                    'countChildrenIds' => 1,
+                    'countVirtual' => 0,
+                    'countDownloadable' => 0,
+                    'countChildrenIterator' => 1
+                )
+            ),
+            'Virtual Product' => array(
+                array(
+                    'isSimpleProduct' => false,
+                    'isConfigurableProduct' => false,
+                    'isVirtual' => true,
+                    'countConfigurable' => 1,
+                    'countChildrenCollection' => 0,
+                    'countChildrenIds' => 0,
+                    'countVirtual' => 1,
+                    'countDownloadable' => 0,
+                    'countChildrenIterator' => 0
+                )),
+
+            'Downloadable Product' => array(
+                array(
+                    'isSimpleProduct' => false,
+                    'isConfigurableProduct' => false,
+                    'isVirtual' => false,
+                    'isDownloadable' => true,
+                    'countConfigurable' => 1,
+                    'countChildrenCollection' => 0,
+                    'countChildrenIds' => 0,
+                    'countVirtual' => 1,
+                    'countDownloadable' => 1,
+                    'countChildrenIterator' => 0
+                ))
+
+        );
+
+    }
+
 }
