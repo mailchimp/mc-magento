@@ -1,0 +1,24 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function createwebhook() {
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method: 'get',
+            onSuccess: function (transport) {
+
+                if (transport.responseText == 1) {
+                    alert('The webhook was created')
+                }
+                else {
+                    alert('There was an error on webhook creation')
+                }
+            },
+            onFailure: function () {
+                alert('Something went wrong.')
+            }
+        });
+    }
+    //]]>
+</script>
+
+
+<?php echo $this->getButtonHtml(); ?>
