@@ -49,7 +49,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
             $assertStatus = '<div style ="color:green">Yes</div>';
         } elseif ($orderId && $status === null){
             $assertStatus = '<div style ="color:#ed6502">Processing</div>';
-        } elseif ($status === null && $orderDate >= $firstDate){
+        } elseif ($status === null && $orderDate > $firstDate){
            $assertStatus = '<div style ="color:mediumblue">In queue</div>';
         } else {
             $assertStatus = '<div style ="color:red">No</div>';
