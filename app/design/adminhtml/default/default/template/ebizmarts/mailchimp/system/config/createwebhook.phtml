@@ -4,12 +4,11 @@
         new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
             method: 'get',
             onSuccess: function (transport) {
-
-                if (transport.responseText == 1) {
-                    alert('The webhook was created')
+                if (transport.responseText == true) {
+                    alert('The webhook was created successfully')
                 }
                 else {
-                    alert('There was an error on webhook creation')
+                    alert(transport.responseText)
                 }
             },
             onFailure: function () {

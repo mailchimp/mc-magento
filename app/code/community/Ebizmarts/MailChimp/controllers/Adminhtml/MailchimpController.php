@@ -38,15 +38,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
         $listId = $helper->getGeneralList($scopeId);
-        $success = 1;
-        try {
-            $helper->createNewWebhook($scopeId, $scope, $listId);
-        } catch(Exception $e)
-        {
-            $success = 0;
-        }
 
-        $mageApp->getResponse()->setBody($success);
+        $message = $helper->createNewWebhook($scopeId, $scope, $listId);
+
+        $mageApp->getResponse()->setBody($message);
     }
 
 

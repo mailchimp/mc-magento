@@ -81,8 +81,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $paramScopeId = 'scope_id';
         $scope = 'stores';
         $scopeId = 1;
-        $result = 1;
         $listId = 'ca841a1103';
+        $message = 1;
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
@@ -124,10 +124,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
                 $scopeId
             );
 
-        $helperMock->expects($this->once())->method('createNewWebhook')->with($scopeId, $scope, $listId);
+        $helperMock->expects($this->once())->method('createNewWebhook')->with($scopeId, $scope, $listId)->willReturn($message);
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
-        $responseMock->expects($this->once())->method('setBody')->with($result);
+        $responseMock->expects($this->once())->method('setBody')->with($message);
 
         $mailchimpControllerMock->createWebhookAction();
     }
