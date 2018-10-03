@@ -2233,7 +2233,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $this->saveMailchimpConfig($configValues, $scopeId, $scope);
                     return true;
                 } else {
-                    return 'The webhook already exists.';
+                    return $this->__('The webhook already exists.');
             }
             } catch (MailChimp_Error $e) {
                 $errorMessage = $e->getFriendlyMessage();
@@ -2243,7 +2243,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: ' . $hookUrl . ' is accessible externally to allow the webhook creation.';
                     $this->logError($errorMessage);
                 }
-                return $errorMessage;
+                return $this->__($errorMessage);
             } catch (Exception $e) {
                 $this->logError($e->getMessage());
             }

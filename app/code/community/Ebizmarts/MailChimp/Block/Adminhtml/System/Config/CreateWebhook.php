@@ -39,9 +39,18 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateWebhook
     /**
      * @return string
      */
-    public function getMessage()
+    public function getSuccessMessage()
     {
-        $message = 'You are about to create a webhook';
+        $message = 'The webhook was created successfully.';
+        return $this->helper('mailchimp')->__($message);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFailureMessage()
+    {
+        $message = 'Something went wrong.';
         return $this->helper('mailchimp')->__($message);
     }
 

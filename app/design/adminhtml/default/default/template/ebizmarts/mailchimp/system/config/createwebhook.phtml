@@ -5,14 +5,14 @@
             method: 'get',
             onSuccess: function (transport) {
                 if (transport.responseText == true) {
-                    alert('The webhook was created successfully')
+                    alert('<?php echo $this->getSuccessMessage() ?>')
                 }
                 else {
                     alert(transport.responseText)
                 }
             },
             onFailure: function () {
-                alert('Something went wrong.')
+                alert('<?php echo $this->getFailureMessage() ?>')
             }
         });
     }
