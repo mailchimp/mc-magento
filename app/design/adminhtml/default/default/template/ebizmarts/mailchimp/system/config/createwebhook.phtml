@@ -1,0 +1,23 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function createwebhook() {
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method: 'get',
+            onSuccess: function (transport) {
+                if (transport.responseText == true) {
+                    alert('<?php echo $this->getSuccessMessage() ?>')
+                }
+                else {
+                    alert(transport.responseText)
+                }
+            },
+            onFailure: function () {
+                alert('<?php echo $this->getFailureMessage() ?>')
+            }
+        });
+    }
+    //]]>
+</script>
+
+
+<?php echo $this->getButtonHtml(); ?>
