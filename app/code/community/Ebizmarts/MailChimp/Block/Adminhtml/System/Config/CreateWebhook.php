@@ -41,8 +41,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateWebhook
      */
     public function getSuccessMessage()
     {
+        $helper = $this->makeHelper();
         $message = 'The webhook was created successfully.';
-        return $this->helper('mailchimp')->__($message);
+        return $helper->__($message);
     }
 
     /**
@@ -50,8 +51,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateWebhook
      */
     public function getFailureMessage()
     {
+        $helper = $this->makeHelper();
         $message = 'Something went wrong.';
-        return $this->helper('mailchimp')->__($message);
+        return $helper->__($message);
     }
 
     public function getAjaxCheckUrl()
