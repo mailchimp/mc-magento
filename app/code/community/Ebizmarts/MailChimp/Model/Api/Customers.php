@@ -44,11 +44,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $collectionIds = array_unique(array_merge($frontEndCollection->getAllIds(), $adminCollection->getAllIds()));
 
-        $collection = $this->getCustomerResourceCollection()
-            ->addFieldToFilter('entity_id', array('in' => $collectionIds))
-            ->addAttributeToSelect('*');
+        $collection = $this->getCustomerResourceCollection();
+        $collection->addFieldToFilter('entity_id', array('in' => $collectionIds))
+                   ->addAttributeToSelect('*');
 
         $this->joinMailchimpSyncData($collection);
+
+        $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
         $customerArray = array();
 
