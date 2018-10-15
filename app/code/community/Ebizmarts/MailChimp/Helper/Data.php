@@ -1555,7 +1555,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if (!$url) {
                 $url = $this->getApiStores()->getMCJsUrl($storeId, 'stores');
             }
-            $script = '<script type="text/javascript" src="' . $url . '" async></script>';
+            $script = '<script type="text/javascript" src="' . $url . '" defer></script>';
         }
         return $script;
     }
@@ -2179,6 +2179,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * Returns true on successful creation, or error message if it fails
+     */
     public function createNewWebhook($scopeId, $scope, $listId)
     {
         $hookUrl = $this->getWebhookUrl();
@@ -2228,15 +2231,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $newWebhookId = $newWebhook['id'];
                     $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
                     $this->saveMailchimpConfig($configValues, $scopeId, $scope);
-
-                }
+                    return true;
+                } else {
+                    return $this->__('The webhook already exists.');
+            }
             } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage());
+                $errorMessage = $e->getFriendlyMessage();
+                $this->logError($errorMessage);
                 $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
                 if ($e->getMailchimpDetails() == $textToCompare) {
                     $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: ' . $hookUrl . ' is accessible externally to allow the webhook creation.';
                     $this->logError($errorMessage);
                 }
+                return $this->__($errorMessage);
             } catch (Exception $e) {
                 $this->logError($e->getMessage());
             }
