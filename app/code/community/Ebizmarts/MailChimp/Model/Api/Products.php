@@ -377,7 +377,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
                 $this->_updateSyncData($productId, $mailchimpStoreId);
             } elseif (!$syncDelta || $syncDelta < $syncDateFlag) {
-                $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
+                $productRequest = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
+                if (count($productRequest) > 0) {
+                    $data[] = $productRequest;
+                }
                 $this->_updateSyncData($productId, $mailchimpStoreId);
             }
         }
