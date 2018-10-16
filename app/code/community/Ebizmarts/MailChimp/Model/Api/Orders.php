@@ -410,7 +410,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             )
             ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()));
         $totalOrders = 0;
-        $totalAmountSpent = (int)$order->getGrandTotal();
+        $totalAmountSpent = 0;
         foreach ($orderCollection as $customerOrder) {
             $totalOrders++;
             $totalAmountSpent += ($customerOrder->getGrandTotal() - $customerOrder->getTotalRefunded() - $customerOrder->getTotalCanceled());
