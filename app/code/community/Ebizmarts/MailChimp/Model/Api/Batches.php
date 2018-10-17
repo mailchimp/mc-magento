@@ -195,6 +195,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper->handleResendDataBefore();
         foreach ($stores as $store) {
             $storeId = $store->getId();
+            if(!$this->_ping($storeId)) {
+                $helper->logError('MailChimp API is down or no internet connection');
+                return;
+            }
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 $this->_getResults($storeId);
                 $this->_sendEcommerceBatch($storeId);
@@ -208,6 +212,23 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $syncedDateArray = $this->addSyncValueToArray($storeId, $syncedDateArray);
         }
         $this->handleSyncingValue($syncedDateArray);
+    }
+
+    /**
+     * Check if Mailchimp API is available
+     * @param $storeId
+     * @return boolean
+     */
+    protected function _ping($storeId)
+    {
+        $helper = $this->getHelper();
+        try {
+            $api = $helper->getApi($storeId);
+            $api->root->info();
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
     }
 
     /**
