@@ -196,7 +196,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         foreach ($stores as $store) {
             $storeId = $store->getId();
             if(!$this->_ping($storeId)) {
-                $helper->logError('MailChimp API is down or no internet connection');
+                $helper->logError('Could not connect to MailChimp: API is down, incorrect, or no internet connection');
                 return;
             }
             if ($helper->isEcomSyncDataEnabled($storeId)) {
