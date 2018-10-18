@@ -182,6 +182,17 @@
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only.]]></comment>
                         </webhook_active>
+                        <magento_mail>
+                            <label>Use Magento emails</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>61</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <comment><![CDATA[If you enable this Magento confirmation email will be sent for subscribers instead of Mailchimp email.]]></comment>
+                        </magento_mail>
                         <webhook_delete translate="label comment">
                             <label>Webhooks Delete action</label>
                             <frontend_type>select</frontend_type>

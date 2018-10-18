@@ -649,8 +649,15 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $observerMock->addColumnToSalesOrderGridCollection($eventObserverMock);
     }
 
-    public function testHandleSubscriber()
+    /**
+     * @param array $data
+     * @dataProvider handleSubscriberDataProvider
+     */
+
+    public function testHandleSubscriber($data)
     {
+        $setImportMode = $data['setImportMode'];
+        $magentoMail = $data['magentoMail'];
         $storeId = 1;
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
@@ -667,7 +674,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('isSubscriptionEnabled', 'isEcomSyncDataEnabledInAnyScope',
-                'isSubscriptionConfirmationEnabled'))
+                'isSubscriptionConfirmationEnabled', 'getConfigValueForScope'))
             ->getMock();
 
         $eventMock = $this->getMockBuilder(Varien_Event::class)
@@ -701,19 +708,28 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $subscriberMock->expects($this->once())->method('getStatus')->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
 
         $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)->willReturn(true);
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId)->willReturn($magentoMail);
 
         $subscriberMock->expects($this->once())->method('setStatus')->with(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
 
         $observerMock->expects($this->once())->method('addSuccessIfRequired')->with($helperMock);
         $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
 
-        $subscriberMock->expects($this->once())->method('setImportMode')->with(true);
+        $subscriberMock->expects($this->exactly($setImportMode))->method('setImportMode')->with(true);
 
         $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
 
         $apiSubscriberMock->expects($this->once())->method('updateSubscriber')->with($subscriberMock, true);
 
         $observerMock->handleSubscriber($eventObserverMock);
+    }
+
+    public function handleSubscriberDataProvider()
+    {
+        return array(
+            array(array('magentoMail' => 0, 'setImportMode' => 1)),
+            array(array('magentoMail' => 1, 'setImportMode' => 0))
+        );
     }
 
     /**

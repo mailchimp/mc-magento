@@ -147,7 +147,9 @@ class Ebizmarts_MailChimp_Model_Observer
                     $this->addSuccessIfRequired($helper);
                 }
                 $apiSubscriber = $this->makeApiSubscriber();
-                $subscriber->setImportMode(true);
+                if($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1){
+                    $subscriber->setImportMode(true);
+                }
                 $this->createEmailCookie($subscriber);
 
                 if ($statusChanged) {
