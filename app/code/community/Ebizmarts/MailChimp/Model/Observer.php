@@ -141,26 +141,27 @@ class Ebizmarts_MailChimp_Model_Observer
             $isEnabled = $helper->isSubscriptionEnabled($storeId);
             if ($isEnabled) {
                 $statusChanged = $subscriber->getIsStatusChanged();
-                //Override Magento status to always send double opt-in confirmation.
-                if($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
-                    $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
-                    $this->addSuccessIfRequired($helper);
-                }
                 $apiSubscriber = $this->makeApiSubscriber();
                 if($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1){
-                    $subscriber->setImportMode(true);
+                    //Override Magento status to always send double opt-in confirmation.
+                    if($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
+                        $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+                        $this->addSuccessIfRequired($helper);
                 }
-                $this->createEmailCookie($subscriber);
+                    $subscriber->setImportMode(true);
 
-                if ($statusChanged) {
-                    $apiSubscriber->updateSubscriber($subscriber, true);
-                } else {
-                    $origData = $subscriber->getOrigData();
+                    $this->createEmailCookie($subscriber);
 
-                    if (is_array($origData) && isset($origData['subscriber_status'])
-                        && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
-                    ) {
+                    if ($statusChanged) {
                         $apiSubscriber->updateSubscriber($subscriber, true);
+                    } else {
+                        $origData = $subscriber->getOrigData();
+
+                        if (is_array($origData) && isset($origData['subscriber_status'])
+                            && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
+                        ) {
+                            $apiSubscriber->updateSubscriber($subscriber, true);
+                        }
                     }
                 }
             }
