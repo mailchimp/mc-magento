@@ -145,6 +145,27 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
     /**
      * @return array
      */
+    protected function getDeletedProductArray()
+    {
+        return array(
+            array(
+                'method' => 'DELETE',
+                'path' => '/ecommerce/stores/ef3bf57fb9bd695a02b7f7c7fb0d2db5/products/1',
+                'operation_id' => 'storeid-1_PRO_2018-09-03-18-30-35-12572900_1',
+                'body' => ''
+            ),
+            array(
+                'method' => 'DELETE',
+                'path' => '/ecommerce/stores/ef3bf57fb9bd695a02b7f7c7fb0d2db5/products/4',
+                'operation_id' => 'storeid-1_PRO_2018-09-03-18-30-35-12572900_4',
+                'body' => ''
+            )
+        );
+    }
+
+    /**
+     * @return array
+     */
     protected function getCustomerArray()
     {
         return array(
@@ -169,12 +190,26 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         ));
     }
 
-    public function testHandleEcommerceBatches()
+    /**
+     * @param array $data
+     * @dataProvider handleEcommerceBatchesDataProvider
+     */
+
+    public function testHandleEcommerceBatches($data)
     {
+        $apiStatus = $data['mailchimp_api_status'];
+        $ecomEnabled = $data['isEcomSyncDataEnabled'];
+        $getResults = $data['_getResults'];
+        $sendEcommerceBatch = $data['_sendEcommerceBatch'];
+        $handleResendDataAfter = $data['handleResendDataAfter'];
+        $addSyncToValueArray = $data['addSyncValueToArray'];
+        $getIterator = $data['getIterator'];
+        $getId = $data['getId'];
+
         $storeId = 1;
         $apiBatchesMock = $this->apiBatchesMock
             ->disableOriginalConstructor()
-            ->setMethods(array('getHelper', '_getResults', '_sendEcommerceBatch', 'addSyncValueToArray', 'handleSyncingValue', 'getStores'))
+            ->setMethods(array('getHelper', '_getResults', '_sendEcommerceBatch', 'addSyncValueToArray', 'handleSyncingValue', 'getStores', '_ping'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -195,20 +230,31 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $stores[] = $storeMock;
 
         $syncedArray = array();
-        $storeMock->expects($this->exactly(2))->method('getId')->willReturn($storeId);
-        $storeArrayMock->expects($this->exactly(2))->method("getIterator")->willReturn(new ArrayIterator($stores));
+        $storeMock->expects($this->exactly($getId))->method('getId')->willReturn($storeId);
+        $storeArrayMock->expects($this->exactly($getIterator))->method("getIterator")->willReturn(new ArrayIterator($stores));
 
         $helperMock->expects($this->once())->method('handleResendDataBefore');
-        $helperMock->expects($this->once())->method('handleResendDataAfter');
-        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
+        $helperMock->expects($this->exactly($handleResendDataAfter))->method('handleResendDataAfter');
+        $helperMock->expects($this->exactly($ecomEnabled))->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 
         $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $apiBatchesMock->expects($this->once())->method('getStores')->willReturn($storeArrayMock);
-        $apiBatchesMock->expects($this->once())->method('_getResults')->with($storeId);
-        $apiBatchesMock->expects($this->once())->method('_sendEcommerceBatch')->with($storeId);
-        $apiBatchesMock->expects($this->once())->method('addSyncValueToArray')->with($storeId, $syncedArray)->willReturn($syncedArray);
+        $apiBatchesMock->expects($this->exactly($getResults))->method('_getResults')->with($storeId);
+        $apiBatchesMock->expects($this->exactly($sendEcommerceBatch))->method('_sendEcommerceBatch')->with($storeId);
+        $apiBatchesMock->expects($this->exactly($addSyncToValueArray))->method('addSyncValueToArray')->with($storeId, $syncedArray)->willReturn($syncedArray);
+        $apiBatchesMock->expects($this->once())->method('_ping')->with($storeId)->willReturn($apiStatus);
 
         $apiBatchesMock->handleEcommerceBatches();
+    }
+
+    public function handleEcommerceBatchesDataProvider(){
+
+        return array(
+            array(array('mailchimp_api_status' => true, 'isEcomSyncDataEnabled' => 1, '_getResults' => 1, '_sendEcommerceBatch' => 1, 'handleResendDataAfter' => 1, 'addSyncValueToArray' => 1,
+                'getIterator' => 2, 'getId' => 2)),
+            array(array('mailchimp_api_status' => false, 'isEcomSyncDataEnabled' => 0, '_getResults' => 0, '_sendEcommerceBatch' => 0, 'handleResendDataAfter' => 0, 'addSyncValueToArray' => 0,
+                'getIterator' => 1, 'getId' => 1))
+        );
     }
 
     public function testSendEcommerceBatch()
@@ -222,6 +268,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $customerArray = $this->getCustomerArray();
 
         $productsArray = $this->getProductArray();
+
+        $deletedProductsArray = $this->getDeletedProductArray();
 
         $cartsArray = $this->getCartArray();
 
@@ -239,6 +287,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
         $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
         $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
+        $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
 
         $batchJson = json_encode($batchArray);
 
@@ -267,7 +316,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('createBatchJson'))
+            ->setMethods(array('createBatchJson', 'createDeletedProductsBatchJson'))
             ->getMock();
 
 
@@ -318,6 +367,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchesMock->expects($this->once())->method('getApiProducts')->willReturn($apiProductsMock);
         $apiProductsMock->expects($this->once())->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($productsArray);
+        $apiProductsMock->expects($this->once())->method('createDeletedProductsBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($deletedProductsArray);
 
         $apiBatchesMock->expects($this->once())->method('getApiCarts')->willReturn($apiCartsMock);
         $apiCartsMock->expects($this->once())->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($cartsArray);
