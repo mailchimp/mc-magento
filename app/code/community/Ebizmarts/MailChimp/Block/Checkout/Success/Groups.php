@@ -148,7 +148,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         $type = $category['type'];
 
         if ($type == 'dropdown') {
-            $options[''] = '-- Select Group --';
+            $options[''] = $this->__('-- Select Group --');
         }
         return $options;
     }

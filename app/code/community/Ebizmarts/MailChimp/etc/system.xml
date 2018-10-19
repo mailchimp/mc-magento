@@ -141,7 +141,7 @@
                             <show_in_store>1</show_in_store>
                         </interest_in_success>
                         <interest_before>
-                            <label>Add html code before the interest groups are displayed</label>
+                            <label translate="label">Add html code before the interest groups are displayed</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -153,7 +153,7 @@
                                 <interest_categories>1</interest_categories>
                             </depends>
                         </interest_before>
-                        <interest_after>
+                        <interest_after translate="label">
                             <label>Add html code after the interest groups are displayed</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>51</sort_order>
@@ -166,7 +166,7 @@
                                 <interest_categories>1</interest_categories>
                             </depends>
                         </interest_after>
-                        <subscriber_batch_amount>
+                        <subscriber_batch_amount translate="label">
                             <label>Subscriber amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_batchLimit</source_model>
@@ -207,7 +207,7 @@
                             <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
                         </create_fields>
                         <create_webhook>
-                            <label>Create Webhook</label>
+                            <label translate="label comment">Create Webhook</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_createWebhook</frontend_model>
                             <sort_order>58</sort_order>
@@ -217,7 +217,7 @@
                             <comment><![CDATA[Click this button to create the webhook manually, it will only work if the webhook doesn't already exist.]]></comment>
                         </create_webhook>
                         <webhook_active>
-                            <label>Enable Two Way Sync</label>
+                            <label translate="label comment">Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <backend_model>mailchimp/system_config_backend_twowaysync</backend_model>
@@ -260,7 +260,7 @@
                     </fields>
                 </general>
                 <ecommerce>
-                    <label>Ecommerce</label>
+                    <label translate="label comment">Ecommerce</label>
                     <sort_order>200</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
