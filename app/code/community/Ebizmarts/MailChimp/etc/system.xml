@@ -206,6 +206,16 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
                         </create_fields>
+                        <create_webhook>
+                            <label>Create Webhook</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>mailchimp/adminhtml_system_config_createWebhook</frontend_model>
+                            <sort_order>58</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Click this button to create the webhook manually, it will only work if the webhook doesn't already exist.]]></comment>
+                        </create_webhook>
                         <webhook_active>
                             <label>Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
