@@ -49,6 +49,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $this->optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
 
+        $subscriber = Mage::getModel('newsletter/subscriber');
+
         $counter = 0;
         foreach ($customersCollection as $customer) {
             $data = $this->_buildCustomerData($customer);
@@ -58,6 +60,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
             } else {
                 $this->logCouldNotEncodeCustomerError($customer);
+            }
+
+            if ($this->optInStatusForStore && !$subscriber->loadByEmail($customer->getEmail())){
+                $subscriber->subscribe($customer->getEmail());
             }
 
             $counter++;
@@ -88,7 +94,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
-        $data["opt_in_status"] = $this->optInStatusForStore;
 
         $data["orders_count"] = (int)$customer->getOrdersCount();
         $data["total_spent"] = (float)$customer->getTotalSpent();
