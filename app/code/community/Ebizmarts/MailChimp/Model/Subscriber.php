@@ -40,10 +40,11 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
     //Force double-opt in for registered customers if "Need to Confirm" is enabled
     public function subscribe($email)
     {
+        if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)) {
             $this->loadByEmail($email);
             $customerSession = Mage::getSingleton('customer/session');
 
-            if(!$this->getId()) {
+            if (!$this->getId()) {
                 $this->setSubscriberConfirmCode($this->randomSequence());
             }
 
@@ -59,7 +60,7 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
                 || $this->getStatus() == self::STATUS_NOT_ACTIVE
             ) {
                 if ($isConfirmNeed === true) {
-                        $this->setStatus(self::STATUS_NOT_ACTIVE);
+                    $this->setStatus(self::STATUS_NOT_ACTIVE);
                 } else {
                     $this->setStatus(self::STATUS_SUBSCRIBED);
                 }
@@ -90,5 +91,9 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
             } catch (Exception $e) {
                 throw new Exception($e->getMessage());
             }
+        } else {
+            return parent::subscribe($email);
+        }
+
     }
 }
