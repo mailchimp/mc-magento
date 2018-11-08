@@ -241,7 +241,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             array(
                 array('attribute' => 'store_id', 'eq' => $magentoStoreId),
                 array('attribute' => 'mailchimp_store_view', 'eq' => $magentoStoreId),
-            )
+            ), null, 'left'
         );
 
         $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
