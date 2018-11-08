@@ -29,26 +29,6 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_GroupsTest extends PHPUnit_Fram
         $this->_block->setLayout($layout);
     }
 
-    public function testRenderGroups()
-    {
-        $category = array();
-
-        $groupsMock = $this->_groupsMock
-            ->disableOriginalConstructor()
-            ->setMethods(array('createObject', 'addGroupOptions', 'getElementHtml'))
-            ->getMock();
-
-        $objectMock = $this->getMockBuilder(Varien_Data_Form_Element_Checkboxes::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $groupsMock->expects($this->once())->method('createObject')->with($category)->willReturn($objectMock);
-        $groupsMock->expects($this->once())->method('addGroupOptions')->with($category, $objectMock);
-        $groupsMock->expects($this->once())->method('getElementHtml')->with($category, $objectMock);
-
-        $groupsMock->renderGroups($category);
-    }
-
     public function testGetInterest()
     {
         $interest = array();
