@@ -10,5 +10,5 @@
  */
 class Ebizmarts_MailChimp_Block_Checkout_Success_DropdownGroups extends Ebizmarts_MailChimp_Block_Checkout_Success_Groups
 {
-    
+
 }
