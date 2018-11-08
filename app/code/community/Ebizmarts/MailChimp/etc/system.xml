@@ -148,7 +148,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
                             <depends>
                                 <interest_categories>1</interest_categories>
                             </depends>
@@ -161,7 +160,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
                             <depends>
                                 <interest_categories>1</interest_categories>
                             </depends>

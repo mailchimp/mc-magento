@@ -55,7 +55,11 @@
     <checkout_onepage_success>
         <reference name="content">
             <block type="mailchimp/checkout_success_groups" name="mailchimp.checkout.success"
-                   template="ebizmarts/mailchimp/checkout/success/groups.phtml"/>
+                   template="ebizmarts/mailchimp/checkout/success/groups.phtml">
+                <block type="mailchimp/checkout_success_checkboxGroups" name="mailchimp.checkout.success.checkboxes" template="ebizmarts/mailchimp/checkout/success/checkbox_groups.phtml"/>
+                <block type="mailchimp/checkout_success_radioGroups" name="mailchimp.checkout.success.radio" template="ebizmarts/mailchimp/checkout/success/radio_groups.phtml"/>
+                <block type="mailchimp/checkout_success_dropdownGroups" name="mailchimp.checkout.success.dropdown" template="ebizmarts/mailchimp/checkout/success/dropdown_groups.phtml"/>
+            </block>
         </reference>
     </checkout_onepage_success>
     <!-- Checkout -->
