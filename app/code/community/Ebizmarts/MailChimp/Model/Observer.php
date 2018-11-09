@@ -142,16 +142,18 @@ class Ebizmarts_MailChimp_Model_Observer
             if ($isEnabled) {
                 $statusChanged = $subscriber->getIsStatusChanged();
                 $apiSubscriber = $this->makeApiSubscriber();
-                if($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1){
-                    //Override Magento status to always send double opt-in confirmation.
-                    if($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
-                        $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
-                        $this->addSuccessIfRequired($helper);
+
+                //Override Magento status to always send double opt-in confirmation.
+                if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
+                    $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+                    $this->addSuccessIfRequired($helper);
                 }
                     $subscriber->setImportMode(true);
 
                     $this->createEmailCookie($subscriber);
 
+                if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
+                    //Use MailChimp emails
                     if ($statusChanged) {
                         $apiSubscriber->updateSubscriber($subscriber, true);
                     } else {
@@ -163,6 +165,12 @@ class Ebizmarts_MailChimp_Model_Observer
                             $apiSubscriber->updateSubscriber($subscriber, true);
                         }
                     }
+                } else {
+                    //Use Magento emails, setImportMode to false to allow email to be sent, set back to true so subscribe() function doesn't send it again
+                    $subscriber->setImportMode(false);
+                    $subscriber->sendConfirmationRequestEmail();
+                    $subscriber->setImportMode(true);
+
                 }
             }
         }
