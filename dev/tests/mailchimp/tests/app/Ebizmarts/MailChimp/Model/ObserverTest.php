@@ -661,6 +661,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $magentoMail = $data['magentoMail'];
          $updateSubscriber = $data['updateSubscriber'];
         $storeId = 1;
+        $sendConfirmationRequestEmail = $data['sendConfirmationRequestEmail'];
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->disableOriginalConstructor()
@@ -687,7 +688,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getSubscriberSource', 'getStoreId', 'getIsStatusChanged', 'getStatus', 'setStatus',
-                'setImportMode', 'getOrigData', 'getSubscriberStatus'))
+                'setImportMode', 'getOrigData', 'getSubscriberStatus', 'sendConfirmationRequestEmail'))
             ->getMock();
 
         $apiSubscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
@@ -723,6 +724,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             array(true)
         );
 
+        $subscriberMock->expects($this->exactly($sendConfirmationRequestEmail))->method('sendConfirmationRequestEmail')->willReturn($subscriberMock);
+
         $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
 
         $apiSubscriberMock->expects($this->exactly($updateSubscriber))->method('updateSubscriber')->with($subscriberMock, true);
@@ -733,8 +736,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     public function handleSubscriberDataProvider()
     {
         return array(
-            array(array('magentoMail' => 0, 'setImportMode' => 1, 'updateSubscriber' => 1, 'getStoreId' => 1)),
-            array(array('magentoMail' => 1, 'setImportMode' => 3, 'updateSubscriber' => 0, 'getStoreId' => 5))
+            array(array('magentoMail' => 0, 'setImportMode' => 1, 'updateSubscriber' => 1, 'getStoreId' => 1, 'sendConfirmationRequestEmail' => 0)),
+            array(array('magentoMail' => 1, 'setImportMode' => 3, 'updateSubscriber' => 0, 'getStoreId' => 1, 'sendConfirmationRequestEmail' => 1))
         );
     }
 
