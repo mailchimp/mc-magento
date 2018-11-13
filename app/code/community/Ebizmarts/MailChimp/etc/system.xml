@@ -323,7 +323,7 @@
                         </order_batch_amount>
                     </fields>
                 </ecommerce>
-                <emailcatcher>
+                <!--<emailcatcher>
                     <label>Catch email</label>
                     <sort_order>400</sort_order>
                     <frontend_type>text</frontend_type>
@@ -472,7 +472,7 @@
                             </depends>
                         </popup_insist>
                     </fields>
-                </emailcatcher>
+                </emailcatcher>-->
                 <abandonedcart>
                     <label>Abandoned Cart</label>
                     <sort_order>500</sort_order>

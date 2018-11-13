@@ -60,4 +60,7 @@ $attribute->setData("used_in_forms", $used_in_forms)
 ;
 $attribute->save();
 
+Mage::helper('mailchimp')->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, 0)), 0, 'default');
+
+
 $installer->endSetup();
