@@ -3,7 +3,7 @@
 <config>
     <tabs>
         <mailchimp translate="label" module="mailchimp">
-            <label><![CDATA[MailChimp]]></label>
+            <label><![CDATA[Mailchimp]]></label>
             <sort_order>400</sort_order>
         </mailchimp>
     </tabs>
@@ -21,7 +21,7 @@
         </general>
         <mailchimp translate="label" module="mailchimp">
             <class>mailchimp-section</class>
-            <label>MailChimp Configuration</label>
+            <label>Mailchimp Configuration</label>
             <header_css>mailchimp-header</header_css>
             <tab>mailchimp</tab>
             <sort_order>100</sort_order>
@@ -37,7 +37,7 @@
                     <show_in_store>1</show_in_store>
                 </hint>
                 <general translate="label comment">
-                    <label>MailChimp integration by ebizmarts</label>
+                    <label>Mailchimp integration by ebizmarts</label>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -108,7 +108,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list.]]></comment>
+                            <comment><![CDATA[Synchronize Magento's General Subscription List with this Mailchimp list.]]></comment>
                         </list>
                         <reset_list translate="label comment">
                             <label></label>
@@ -148,17 +148,17 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected MailChimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
+                            <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected Mailchimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
                         </map_fields>
                         <create_fields translate="label comment">
-                            <label>Create Merge Fields on MailChimp</label>
+                            <label>Create Merge Fields on Mailchimp</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_createMergeFields</frontend_model>
                             <sort_order>57</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
+                            <comment><![CDATA[Click this button to create the above fields on the selected Mailchimp list.]]></comment>
                         </create_fields>
                         <webhook_active>
                             <label>Enable Two Way Sync</label>
@@ -170,7 +170,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only.]]></comment>
+                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to Mailchimp only.]]></comment>
                         </webhook_active>
                         <webhook_delete translate="label comment">
                             <label>Webhooks Delete action</label>
