@@ -227,8 +227,6 @@ class Ebizmarts_MailChimp
         curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT,  $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_TIMEOUT, $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_USERPWD, "noname:".$this->_apiKey);
-        curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($this->_ch, CURLOPT_SSL_VERIFYPEER, false);
 
         $this->root                                         = new MailChimp_Root($this);
         $this->authorizedApps                               = new MailChimp_AuthorizedApps($this);
