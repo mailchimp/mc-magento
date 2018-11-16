@@ -35,6 +35,8 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_MIGRATE_FROM_1164     = 'mailchimp/general/migrate_from_1164';
     const GENERAL_MIGRATE_LAST_ORDER_ID = 'mailchimp/general/migrate_last_order_id';
     const GENERAL_SUBSCRIBER_AMOUNT     = 'mailchimp/general/subscriber_batch_amount';
+    const GENERAL_TIME_OUT              = 'mailchimp/general/connection_timeout';
+
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
     const ECOMMERCE_CUSTOMERS_OPTIN     = 'mailchimp/ecommerce/customers_optin';
