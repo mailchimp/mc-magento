@@ -60,4 +60,6 @@ $attribute->setData("used_in_forms", $used_in_forms)
 ;
 $attribute->save();
 
+$installer->deleteConfigData(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP);
+
 $installer->endSetup();

@@ -431,7 +431,7 @@
             </mailchimp_process_webhook_data>
             <mailchimp_delete_webhook_processed>
                 <schedule>
-                    <cron_expr>0 0 * * *</cron_expr>
+                    <cron_expr>0 */1 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>mailchimp/cron::deleteWebhookRequests</model>
