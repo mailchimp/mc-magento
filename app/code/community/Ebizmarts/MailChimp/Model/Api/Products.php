@@ -567,7 +567,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductVariantData($product, $magentoStoreId)
     {
         $data = array();
-        $data["sku"] = $product->getSku();
+        $data["sku"] = $product->getSku() ? $product->getSku() : '';
 
         $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
         if ($price) {
