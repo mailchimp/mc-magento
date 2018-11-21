@@ -11,6 +11,8 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Batches
 {
+    const SEND_PROMO_ENABLED = 1;
+
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
@@ -320,17 +322,19 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-                //promo rule operations
-                $apiPromoRules = $this->getApiPromoRules();
-                $promoRulesArray = $apiPromoRules->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
-                //promo code operations
-                $apiPromoCodes = $this->getApiPromoCodes();
-                $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
-//                //deleted product operations
-                $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
+                if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
+                    //promo rule operations
+                    $apiPromoRules = $this->getApiPromoRules();
+                    $promoRulesArray = $apiPromoRules->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
+                    //promo code operations
+                    $apiPromoCodes = $this->getApiPromoCodes();
+                    $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
+                    //deleted product operations
+                    $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
+                }
                 $batchJson = null;
                 $batchResponse = null;
 
