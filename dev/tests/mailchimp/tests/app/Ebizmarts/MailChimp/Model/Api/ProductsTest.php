@@ -400,6 +400,52 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     }
 
     /**
+     * @param array $data
+     * @dataProvider createDeletedProductsBatchJsonDataProvider
+     */
+
+    public function testGetProductVariantData($data)
+    {
+        $magentoStoreId = 1;
+        $sku = $data['sku'];
+        $price = 100;
+        $qty = 500;
+        $backOrders = 0;
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('getMailChimpProductPrice', 'getVisibility'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSku', 'getQty', 'getBackorders'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())->method('getMailChimpProductPrice')->with($productMock, $magentoStoreId)->willReturn($price);
+//        $productsApiMock->expects($this->once())->method('getVisibility')->with()
+
+        $productMock->expects($this->once())->method('getSku')->willReturn($sku);
+        $productMock->expects($this->once())->method('getQty')->willReturn($qty);
+        $productMock->expects($this->once())->method('getBackorders')->willReturn($backOrders);
+
+        $this->invokeMethod(
+            $productsApiMock,
+            'getProductVariantData',
+            array($productMock, $magentoStoreId)
+        );
+
+    }
+
+    public function getProductVariantDataDataProvider()
+    {
+        return array(
+            array(array('sku' => 'PAK001')),
+            array(array('sku' => null))
+        );
+    }
+
+    /**
      * @param array $deletedProductData
      * @dataProvider createDeletedProductsBatchJsonDataProvider
      */
@@ -513,6 +559,24 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         );
 
+    }
+
+    /**
+     * Call protected/private method of a class.
+     *
+     * @param object &$object    Instantiated object that we will run method on.
+     * @param string $methodName Method name to call
+     * @param array  $parameters Array of parameters to pass into method.
+     *
+     * @return mixed Method return.
+     */
+    public function invokeMethod(&$object, $methodName, array $parameters = array())
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $parameters);
     }
 
 }
