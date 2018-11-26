@@ -909,7 +909,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param string $visibility Visibility.
      * @return int or null
      */
-    private function getVisibility($visibility)
+    protected function getVisibility($visibility)
     {
         if (array_key_exists($visibility, $this->visibilityOptions)) {
             return $this->visibilityOptions[$visibility];

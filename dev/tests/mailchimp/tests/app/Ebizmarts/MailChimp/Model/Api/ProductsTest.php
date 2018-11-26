@@ -401,7 +401,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
     /**
      * @param array $data
-     * @dataProvider createDeletedProductsBatchJsonDataProvider
+     * @dataProvider getProductVariantDataDataProvider
      */
 
     public function testGetProductVariantData($data)
@@ -411,10 +411,13 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $price = 100;
         $qty = 500;
         $backOrders = 0;
+        $propertyVisibilityName = '_visibility';
+        $propertyVisibilityValue = $data['propertyVisibilityValue'];
+        $visibilityOptions = $data['visibilityOptions'];
+        $finalSku = $data['finalSku'];
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('getMailChimpProductPrice', 'getVisibility'))
-            ->disableOriginalConstructor()
+            ->setMethods(array('getMailChimpProductPrice'))
             ->getMock();
 
         $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
@@ -422,26 +425,57 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->setMethods(array('getSku', 'getQty', 'getBackorders'))
             ->getMock();
 
+
         $productsApiMock->expects($this->once())->method('getMailChimpProductPrice')->with($productMock, $magentoStoreId)->willReturn($price);
-//        $productsApiMock->expects($this->once())->method('getVisibility')->with()
 
         $productMock->expects($this->once())->method('getSku')->willReturn($sku);
         $productMock->expects($this->once())->method('getQty')->willReturn($qty);
         $productMock->expects($this->once())->method('getBackorders')->willReturn($backOrders);
 
-        $this->invokeMethod(
+        $return = $this->invokeMethod(
             $productsApiMock,
             'getProductVariantData',
-            array($productMock, $magentoStoreId)
+            array($productMock, $magentoStoreId, $propertyVisibilityName, $propertyVisibilityValue)
         );
 
+        $this->assertEquals($visibilityOptions, $return['visibility']);
+        $this->assertSame($finalSku, $return['sku']);
     }
 
     public function getProductVariantDataDataProvider()
     {
         return array(
-            array(array('sku' => 'PAK001')),
-            array(array('sku' => null))
+            'Not Visible Individually' => array(
+                array(
+                    'sku' => 'PAK001',
+                    'finalSku' => 'PAK001',
+                    'propertyVisibilityValue' => 1,
+                    'visibilityOptions' => 'Not Visible Individually'
+                )),
+
+            'Catalog' => array(
+                array(
+                    'sku' => null,
+                    'finalSku' => '',
+                    'propertyVisibilityValue' => 2,
+                    'visibilityOptions' => 'Catalog'
+                )),
+
+            'Search' => array(
+                array(
+                    'sku' => 'PAK002',
+                    'finalSku' => 'PAK002',
+                    'propertyVisibilityValue' => 3,
+                    'visibilityOptions' => 'Search'
+                )),
+
+            'Catalog Search' => array(
+                array(
+                    'sku' => null,
+                    'finalSku' => '',
+                    'propertyVisibilityValue' => 4,
+                    'visibilityOptions' => 'Catalog, Search'
+                ))
         );
     }
 
@@ -572,9 +606,16 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
      */
     public function invokeMethod(&$object, $methodName, array $parameters = array())
     {
+        $propertyName = $parameters[2];
+        $propertyValue = $parameters[3];
+
         $reflection = new \ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
+
+        $reflectionProperty = $reflection->getParentClass()->getProperty($propertyName);
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($object, $propertyValue);
 
         return $method->invokeArgs($object, $parameters);
     }
