@@ -54,6 +54,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_ORDER_AMOUNT        = 'mailchimp/ecommerce/order_batch_amount';
     const ECOMMERCE_IMAGE_SIZE          = 'mailchimp/ecommerce/image_size';
     const ECOMMERCE_SYNC_DATE           = 'mailchimp/ecommerce/sync_date';
+    const ECOMMERCE_SEND_PROMO          = 'mailchimp/ecommerce/send_promo';
 
     const IMAGE_SIZE_DEFAULT            = 'image';
     const IMAGE_SIZE_SMALL              = 'small_image';

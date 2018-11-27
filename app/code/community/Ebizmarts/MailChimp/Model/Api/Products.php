@@ -567,7 +567,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductVariantData($product, $magentoStoreId)
     {
         $data = array();
-        $data["sku"] = $product->getSku();
+        $sku = $product->getSku();
+        $data["sku"] = $sku ? $sku : '';
 
         $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
         if ($price) {
@@ -578,7 +579,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["inventory_quantity"] = (int)$product->getQty();
         $data["backorders"] = (string)$product->getBackorders();
 
-        $data["visibility"] = $this->visibilityOptions[$this->_visibility];
+        $data["visibility"] = $this->getVisibility($this->_visibility);
 
         return $data;
     }
@@ -902,5 +903,18 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $deletedProducts->getSelect()->where("m4m.mailchimp_sync_error = ''");
 
         $deletedProducts->getSelect()->limit($this->getBatchLimitFromConfig());
+    }
+
+    /**
+     * @param string $visibility Visibility.
+     * @return int or null
+     */
+    protected function getVisibility($visibility)
+    {
+        if (array_key_exists($visibility, $this->visibilityOptions)) {
+            return $this->visibilityOptions[$visibility];
+        }
+
+        return null;
     }
 }
