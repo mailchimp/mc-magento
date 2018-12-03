@@ -3254,7 +3254,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $interestGroup = $this->getInterestGroupModel();
         $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
         if ($interestGroup->getId()) {
-            $groups = unserialize($interestGroup->getGroupdata());
+            $groups = $this->arrayDecode($interestGroup->getGroupdata());
             foreach ($groups as $key => $value) {
                 if (isset($interest[$key])) {
                     if (is_array($value)) {
@@ -3280,6 +3280,29 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
         return $interest;
+    }
+
+
+    /**
+     * Format array to save in database.
+     *
+     * @param $array
+     * @return string
+     */
+    protected function arrayEncode($array)
+    {
+        return json_encode($array);
+    }
+
+    /**
+     * Set database encoded array to normal array
+     *
+     * @param $encodedArray
+     * @return mixed
+     */
+    protected function arrayDecode($encodedArray)
+    {
+        return json_decode($encodedArray, true);
     }
 
     /**
@@ -3316,7 +3339,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $interestGroup->setCustomerId($customerId);
         }
         if ($groups) {
-            $interestGroup->setGroupdata(serialize($groups));
+            $encodedGroups = $this->arrayEncode($groups);
+            $interestGroup->setGroupdata($encodedGroups);
         }
         //Avoid creating a new entry if no groupData available. (Customer creation)
         if ($interestGroup->getGroupdata()) {
