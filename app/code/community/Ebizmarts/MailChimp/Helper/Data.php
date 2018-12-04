@@ -1329,11 +1329,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $curStore = $this->getCurrentStoreId();
             $this->setCurrentStore($magentoStoreId);
-            $upperCaseImage = $this->getImageFunctionName($imageSize);
-            $imageUrl = $productModel->$upperCaseImage();
+            if ($configImageSize == 3){
+                $imageUrl = $this->getImageUrl($productModel, $imageSize);
+            } else {
+                $upperCaseImage = $this->getImageFunctionName($imageSize);
+                $imageUrl = $productModel->$upperCaseImage();
+            }
             $this->setCurrentStore($curStore);
         }
         return $imageUrl;
+    }
+
+    public function getImageUrl($productModel, $imageSize)
+    {
+        return (string)$this->_getImageHelper()->init($productModel, $imageSize);
     }
 
     /**
