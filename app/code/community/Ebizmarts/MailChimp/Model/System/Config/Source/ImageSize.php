@@ -12,6 +12,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_ImageSize
     const BASE = 0;
     const SMALL = 1;
     const THUMBNAIL = 2;
+    const ORIGINAL = 3;
 
 
     /**
@@ -25,8 +26,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_ImageSize
         return array(
             array('value' => self::BASE, 'label' => $helper->__('Base')),
             array('value' => self::SMALL, 'label' => $helper->__('Small')),
-            array('value' => self::THUMBNAIL, 'label' => $helper->__('Thumbnail'))
-
+            array('value' => self::THUMBNAIL, 'label' => $helper->__('Thumbnail')),
+            array('value' => self::ORIGINAL, 'label' => $helper->__('Original'))
         );
     }
 }
