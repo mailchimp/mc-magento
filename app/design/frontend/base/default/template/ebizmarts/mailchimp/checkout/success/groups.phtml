@@ -6,16 +6,14 @@ $interest = $block->getInterest();
     <?php echo $block->getMessageBefore() ?>
 <form class="form" action="<?php echo $block->getFormUrl() ?>" method="get" id="mailchimp-groups">
     <fieldset class="fieldset">
-        <?php foreach($interest as $i):
-            $this->setCurrentInterest($i); ?>
+        <?php foreach($interest as $i): ?>
             <div class="field">
                 <label class="label" for="<?php echo $i['interest']['id'] ?>">
                     <span><?php echo $i['interest']['title'] ?></span>
                 </label>
                 <div class="control">
                     <div class="fields">
-                        <?php $this->getChild($blockName = "mailchimp.checkout.success.".$i['interest']['type'])->setCurrentInterest($i);
-                        echo $this->getChildHtml($blockName, false);?>
+                        <?php echo $this->getLayout()->createBlock('mailchimp/group_type', 'mailchimp.group.type', array('interests' => $i))->toHtml(); ?>
                     </div>
                 </div>
             </div>

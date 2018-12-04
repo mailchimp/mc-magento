@@ -3220,21 +3220,24 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         $api = $this->getApi($storeId);
         $listId = $this->getGeneralList($storeId);
-        $apiInterestCategory = $api->getLists()->getInterestCategory();
-        $allInterest = $apiInterestCategory->getAll($listId);
-        foreach ($allInterest['categories'] as $item) {
-            if (in_array($item['id'], $interest)) {
-                $rc[$item['id']]['interest'] = array('id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']);
+        try {
+            $apiInterestCategory = $api->getLists()->getInterestCategory();
+            $allInterest = $apiInterestCategory->getAll($listId);
+            foreach ($allInterest['categories'] as $item) {
+                if (in_array($item['id'], $interest)) {
+                    $rc[$item['id']]['interest'] = array('id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']);
+                }
             }
-        }
-        $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
-        foreach ($interest as $interestId) {
-            $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
-            foreach ($mailchimpInterest['interests'] as $mi) {
-                $rc[$mi['category_id']]['category'][$mi['display_order']] = array('id' => $mi['id'], 'name' => $mi['name'], 'checked' => false);
+            $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
+            foreach ($interest as $interestId) {
+                $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
+                foreach ($mailchimpInterest['interests'] as $mi) {
+                    $rc[$mi['category_id']]['category'][$mi['display_order']] = array('id' => $mi['id'], 'name' => $mi['name'], 'checked' => false);
+                }
             }
+        } catch (MailChimp_Error $e) {
+            $this->logError($e->getFriendlyMessage());
         }
-
         return $rc;
     }
 

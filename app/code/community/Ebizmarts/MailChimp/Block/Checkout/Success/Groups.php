@@ -82,17 +82,4 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     {
         return $this->helper;
     }
-
-    /**
-     * @return mixed
-     */
-    protected function getCurrentInterest()
-    {
-        return $this->_currentIntesrest;
-    }
-
-    protected function setCurrentInterest($interest)
-    {
-        $this->_currentIntesrest = $interest;
-    }
 }
