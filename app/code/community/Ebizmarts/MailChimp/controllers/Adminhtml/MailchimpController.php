@@ -47,6 +47,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     protected function _isAllowed()
     {
+        $acl = null;
         switch ($this->getRequest()->getActionName()) {
         case 'resendSubscribers':
             $acl = 'system/config/mailchimp';
