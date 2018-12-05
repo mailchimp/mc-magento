@@ -373,22 +373,32 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->createWebhookIfRequired($scopeId, $scope);
     }
 
-    public function testGetImageUrlById()
+    /**
+     * @param array $data
+     * @dataProvider testGetImageUrlByIdDataProvider
+     */
+
+    public function testGetImageUrlById($data)
     {
         $productId = 1;
         $magentoStoreId = 1;
         $defaultStoreId = 0;
-        $imageSize = 'image';
-        $upperCaseImage = 'getImageUrl';
+        $imageSize = $data['imageSize'];
+        $upperCaseImage = $data['method'];
+        $imageUrl = $data['imageUrl'];
+        $configImageSize = $data['configImageSize'];
+        $getImageFunctionName = $data['getImageFunctionName'];
+        $upperCaseImageTimes = $data['methodTimes'];
+        $localGetImageUrl = $data['localGetImageUrl'];
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId', 'setCurrentStore', 'getImageFunctionName'))
+            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId', 'setCurrentStore', 'getImageFunctionName', 'getImageUrl'))
             ->getMock();
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('setData', 'getImageUrl'))
+            ->setMethods(array('setData', 'getImageUrl', 'getThumbnailUrl', 'getSmallImageUrl'))
             ->getMock();
 
         $productResourceModelMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
@@ -402,22 +412,40 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('getProductResourceModel')->willReturn($productResourceModelMock);
         $helperMock->expects($this->once())->method('getProductModel')->willReturn($productModelMock);
-        $helperMock->expects($this->once())->method('getImageSize')->with($magentoStoreId)->willReturn($imageSize);
+        $helperMock->expects($this->once())->method('getImageSize')->with($magentoStoreId)->willReturn($configImageSize);
+        $helperMock->expects($this->exactly($localGetImageUrl))->method('getImageUrl')->with($productModelMock, $imageSize)->willReturn($imageUrl);
 
         $productResourceModelMock->expects($this->once())->method('getAttributeRawValue')->with($productId, $imageSize, $magentoStoreId)->willReturn($imageModelMock);
 
         $productModelMock->expects($this->once())->method('setData')->with($imageSize, $imageModelMock);
-        $productModelMock->expects($this->once())->method('getImageUrl')->willReturn('ImageUrl');
-
+        $productModelMock->expects($this->exactly($upperCaseImageTimes))->method($upperCaseImage)->willReturn($imageUrl);
         $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn($defaultStoreId);
 
         $helperMock->expects($this->exactly(2))->method('setCurrentStore')->withConsecutive(array($magentoStoreId), array($defaultStoreId));
 
-        $helperMock->expects($this->once())->method('getImageFunctionName')->with($imageSize)->willReturn($upperCaseImage);
+        $helperMock->expects($this->exactly($getImageFunctionName))->method('getImageFunctionName')->with($imageSize)->willReturn($upperCaseImage);
 
         $return = $helperMock->getImageUrlById($productId, $magentoStoreId);
 
-        $this->assertEquals($return, 'ImageUrl');
+        $this->assertEquals($return, $imageUrl);
+    }
+
+    public function testGetImageUrlByIdDataProvider()
+    {
+        return array(
+            array(array('imageSize' => 'image', 'method' => 'getImageUrl', 'configImageSize' => 0,
+                'getImageFunctionName' => 1, 'imageUrl' => 'ImageUrl', 'getImageUrl', 'methodTimes' => 1,
+            'localGetImageUrl' => 0)),
+            array(array('imageSize' => 'small_image', 'method' => 'getSmallImageUrl', 'configImageSize' => 1,
+                'getImageFunctionName' => 1, 'imageUrl' => 'SmallImageUrl', 'methodTimes' => 1,
+            'localGetImageUrl' => 0)),
+            array(array('imageSize' => 'thumbnail', 'method' => 'getThumbnailUrl', 'configImageSize' => 2,
+                'getImageFunctionName' => 1, 'imageUrl' => 'ThumbnailUrl', 'methodTimes' => 1,
+                'localGetImageUrl' => 0)),
+            array(array('imageSize' => 'image', 'method' => 'getImageUrl', 'configImageSize' => 3,
+                'getImageFunctionName' => 0, 'imageUrl' => 'ImageUrl', 'methodTimes' => 0,
+                'localGetImageUrl' => 1))
+        );
     }
 
     public function testGetImageFunctionName()
