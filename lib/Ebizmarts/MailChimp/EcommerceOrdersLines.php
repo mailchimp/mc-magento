@@ -29,7 +29,7 @@ class MailChimp_EcommerceOrdersLines extends MailChimp_Abstract
         $_params=array('id'=>$id,'product_id'=>$productId,'product_variant_id'=>$productVariantId,'quantity'=>$quantity,
             'price'=>$price);
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines';
-        return $this->_master->call($url, $_params, MailChimp::POST);
+        return $this->_master->call($url, $_params, Ebizmarts_MailChimp::POST);
     }
 
     /**
@@ -58,7 +58,7 @@ class MailChimp_EcommerceOrdersLines extends MailChimp_Abstract
         if($offset) { $_params['offset'] = $offset;
         }
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines';
-        return $this->_master->call($url, $_params, MailChimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }
 
     /**
@@ -81,7 +81,7 @@ class MailChimp_EcommerceOrdersLines extends MailChimp_Abstract
         if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
         }
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
-        return $this->_master->call($url, $_params, MailChimp::GET);
+        return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }
 
     /**
@@ -108,7 +108,7 @@ class MailChimp_EcommerceOrdersLines extends MailChimp_Abstract
         if($price) { $_params['price'] = $price;
         }
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
-        return $this->_master->call($url, $_params, MailChimp::PATCH);
+        return $this->_master->call($url, $_params, Ebizmarts_MailChimp::PATCH);
     }
 
     /**
@@ -122,6 +122,6 @@ class MailChimp_EcommerceOrdersLines extends MailChimp_Abstract
     public function delete($storeId,$orderId,$lineId)
     {
         $url = '/ecommerce/stores/'.$storeId.'/orders/'.$orderId.'/lines/'.$lineId;
-        return $this->_master->call($url, null, MailChimp::DELETE);
+        return $this->_master->call($url, null, Ebizmarts_MailChimp::DELETE);
     }
 }
