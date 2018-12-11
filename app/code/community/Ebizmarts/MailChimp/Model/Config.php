@@ -23,7 +23,6 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_MCISSYNCING           = 'mailchimp/general/is_syicing';
     const GENERAL_ECOMMMINSYNCDATEFLAG  = 'mailchimp/general/mcminsyncdateflag';
     const GENERAL_SUBMINSYNCDATEFLAG    = 'mailchimp/general/subminsyncdateflag';
-    const GENERAL_MCSTORE_RESETED       = 'mailchimp/general/mcstore_reset';
     const GENERAL_TWO_WAY_SYNC          = 'mailchimp/general/webhook_active';
     const GENERAL_UNSUBSCRIBE           = 'mailchimp/general/webhook_delete';
     const GENERAL_WEBHOOK_ID            = 'mailchimp/general/webhook_id';
@@ -36,6 +35,8 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_MIGRATE_FROM_1164     = 'mailchimp/general/migrate_from_1164';
     const GENERAL_MIGRATE_LAST_ORDER_ID = 'mailchimp/general/migrate_last_order_id';
     const GENERAL_SUBSCRIBER_AMOUNT     = 'mailchimp/general/subscriber_batch_amount';
+    const GENERAL_TIME_OUT              = 'mailchimp/general/connection_timeout';
+
 
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
     const ECOMMERCE_CUSTOMERS_OPTIN     = 'mailchimp/ecommerce/customers_optin';
@@ -45,7 +46,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_PRODUCT_LAST_ID     = 'mailchimp/ecommerce/product_last_id';
     const ECOMMERCE_ORDER_LAST_ID       = 'mailchimp/ecommerce/order_last_id';
     const ECOMMERCE_CART_LAST_ID        = 'mailchimp/ecommerce/cart_last_id';
-    const ECOMMERCE_PCD_LAST_ID        = 'mailchimp/ecommerce/pcd_last_id';
+    const ECOMMERCE_PCD_LAST_ID         = 'mailchimp/ecommerce/pcd_last_id';
     const ECOMMERCE_RESEND_ENABLED      = 'mailchimp/ecommerce/resend_enabled';
     const ECOMMERCE_RESEND_TURN         = 'mailchimp/ecommerce/resend_turn';
     const ECOMMERCE_CUSTOMER_AMOUNT     = 'mailchimp/ecommerce/customer_batch_amount';
@@ -53,6 +54,7 @@ class Ebizmarts_MailChimp_Model_Config
     const ECOMMERCE_ORDER_AMOUNT        = 'mailchimp/ecommerce/order_batch_amount';
     const ECOMMERCE_IMAGE_SIZE          = 'mailchimp/ecommerce/image_size';
     const ECOMMERCE_SYNC_DATE           = 'mailchimp/ecommerce/sync_date';
+    const ECOMMERCE_SEND_PROMO          = 'mailchimp/ecommerce/send_promo';
 
     const IMAGE_SIZE_DEFAULT            = 'image';
     const IMAGE_SIZE_SMALL              = 'small_image';

@@ -4,6 +4,7 @@ function getCampaign() {
     var mc_cid = null;
     var campaign = null;
     var isMailchimp = false;
+    var mc_eid = null;
     for (var i = 0; i < urlparams.length; i++) {
         var param = urlparams[i].split('=');
         var key = param[0];
@@ -26,6 +27,9 @@ function getCampaign() {
             if (campaignValue.length == 10)
             campaign = campaignValue;
         }
+        if (key == 'mc_eid') {
+            mc_eid = val;
+        }
     }
     if (mc_cid) {
         Mage.Cookies.set('mailchimp_campaign_id', mc_cid);
@@ -37,6 +41,9 @@ function getCampaign() {
     var landingPage = Mage.Cookies.get('mailchimp_landing_page');
     if (!landingPage) {
         Mage.Cookies.set('mailchimp_landing_page', location);
+    }
+    if (mc_eid) {
+        Mage.Cookies.set('mailchimp_email_id', mc_eid);
     }
 }
 

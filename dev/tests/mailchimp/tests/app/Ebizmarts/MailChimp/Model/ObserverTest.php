@@ -570,7 +570,14 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     {
         $addColumnConfig = 1;
         $scopeId = 0;
-        $orderTableName = 'sales_flat_order';
+        $fromCond = array(
+            'main_table' => array(
+                'joinType' => 'from',
+                'schema' => '',
+                'tableName' => 'sales_flat_order_grid',
+                'joinCondition' => ''
+            )
+        );
         $mcTableName = 'mailchimp_ecommerce_sync_data';
         $condition = 'mc.related_id=main_table.entity_id AND type = '.Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $direction = 'ASC';
@@ -592,12 +599,12 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $orderGridCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Grid_Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addFilterToMap', 'getSelect', 'getTable', 'addOrder'))
+            ->setMethods(array('getSelect', 'getTable', 'addOrder'))
             ->getMock();
 
         $selectMock = $this->getMockBuilder(Varien_Db_Select::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('joinLeft', 'group'))
+            ->setMethods(array('joinLeft', 'group', 'getPart'))
             ->getMock();
 
         $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
@@ -617,8 +624,10 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $eventObserverMock->expects($this->once())->method('getOrderGridCollection')->willReturn($orderGridCollectionMock);
 
-        $orderGridCollectionMock->expects($this->once())->method('addFilterToMap')->with('store_id', 'main_table.store_id');
         $orderGridCollectionMock->expects($this->once())->method('getSelect')->willReturn($selectMock);
+
+        $selectMock->expects($this->once())->method('getPart')->with(Zend_Db_Select::FROM)->willReturn($fromCond);
+
         $orderGridCollectionMock->expects($this->once())->method('getTable')->with('mailchimp/ecommercesyncdata')->willReturn($mcTableName);
 
         $selectMock->expects($this->once())->method('joinLeft')->with(array('mc' => $mcTableName), $condition, array('mc.mailchimp_synced_flag', 'mc.id'));
@@ -639,4 +648,206 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock->addColumnToSalesOrderGridCollection($eventObserverMock);
     }
+
+    public function testHandleSubscriber()
+    {
+        $storeId = 1;
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getCoreResource', 'getRegistry', 'removeRegistry', 'createEmailCookie',
+                'makeApiSubscriber', 'addSuccessIfRequired'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isSubscriptionEnabled', 'isEcomSyncDataEnabledInAnyScope',
+                'isSubscriptionConfirmationEnabled'))
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriber'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriberSource', 'getStoreId', 'getIsStatusChanged', 'getStatus', 'setStatus',
+                'setImportMode', 'getOrigData', 'getSubscriberStatus'))
+            ->getMock();
+
+        $apiSubscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('updateSubscriber'))
+            ->getMock();
+
+        $eventObserverMock->expects($this->once())->method('getEvent')->willReturn($eventMock);
+
+        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $eventMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn(null);
+        $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
+
+        $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
+        $subscriberMock->expects($this->once())->method('getStatus')->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+
+        $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)->willReturn(true);
+
+        $subscriberMock->expects($this->once())->method('setStatus')->with(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+
+        $observerMock->expects($this->once())->method('addSuccessIfRequired')->with($helperMock);
+        $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
+
+        $subscriberMock->expects($this->once())->method('setImportMode')->with(true);
+
+        $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
+
+        $apiSubscriberMock->expects($this->once())->method('updateSubscriber')->with($subscriberMock, true);
+
+        $observerMock->handleSubscriber($eventObserverMock);
+    }
+
+    /**
+     * @param array $cookieData
+     * @dataProvider loadCustomerToQuoteDataProvider
+     */
+
+    public function testLoadCustomerToQuote($cookieData){
+
+        $storeId = 1;
+        $ecomSyncEnabled = 1;
+        $abandonedCartEnabled = 1;
+        $isLoggedIn = 0;
+        $actionName = $cookieData['actionName'];
+        $emailCookie = 'keller%2Bpopup%40ebizmarts.com';
+        $mcEidCookie = 'f7e95531fb';
+        $customerEmail = 'customer@ebizmarts.com';
+        $email = 'keller@ebizmarts.com';
+        $campaignId = 'gf45f4gg';
+        $landingCookie = 'http%3A//127.0.0.1/MASTER1939m4m/%3Fmc_cid%3Dgf45f4gg%26mc_eid%3D7dgasydg';
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getQuote'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'isCustomerLoggedIn', 'getRequestActionName', 'getEmailFromPopUp', 'getEmailFromMcEid', 'getEmailCookie', 'getMcEidCookie', '_getCampaignCookie',
+                '_getLandingCookie'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isEcomSyncDataEnabled', 'isAbandonedCartEnabled'))
+            ->getMock();
+
+        $quoteMock = $this->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStoreId', 'getCustomerEmail', 'setCustomerEmail', 'setMailchimpCampaignId', 'setMailchimpLandingPage'))
+            ->getMock();
+
+        $eventObserverMock->expects($this->once())->method('getEvent')->willReturn($eventMock);
+        $eventMock->expects($this->once())->method('getQuote')->willReturn($quoteMock);
+        $quoteMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn($ecomSyncEnabled);
+        $helperMock->expects($this->once())->method('isAbandonedCartEnabled')->with($storeId)->willReturn($abandonedCartEnabled);
+        $observerMock->expects($this->once())->method('isCustomerLoggedIn')->willReturn($isLoggedIn);
+        $observerMock->expects($this->once())->method('getRequestActionName')->willReturn($actionName);
+        $observerMock->expects($this->once())->method('getEmailCookie')->willReturn($emailCookie);
+        $observerMock->expects($this->once())->method('getMcEidCookie')->willReturn($mcEidCookie);
+        $observerMock->expects($this->any())->method('getEmailFromPopUp')->with($emailCookie)->willReturn($email);
+        $observerMock->expects($this->any())->method('getEmailFromMcEid')->with($storeId, $mcEidCookie)->willReturn($email);
+        $quoteMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
+        $quoteMock->expects($this->once())->method('setCustomerEmail')->with($email);
+        $observerMock->expects($this->once())->method('_getCampaignCookie')->willReturn($campaignId);
+        $quoteMock->expects($this->once())->method('setMailchimpCampaignId')->with($campaignId);
+        $observerMock->expects($this->once())->method('_getLandingCookie')->willReturn($landingCookie);
+        $quoteMock->expects($this->once())->method('setMailchimpLandingPage')->with($landingCookie);
+
+        $observerMock->loadCustomerToQuote($eventObserverMock);
+
+    }
+
+    public function loadCustomerToQuoteDataProvider()
+    {
+
+        return array(
+            array(array('actionName' => 'saveOrder')),
+            array(array('actionName' => 'savePayment')),
+            array(array('actionName' => 'saveShippingMethod')),
+            array(array('actionName' => 'saveBilling')),
+            array(array('actionName' => null))
+        );
+    }
+
+    public function testItemCancel()
+    {
+        $isBundle = false;
+        $isConf = false;
+        $isEcomEnabled = 1;
+        $storeId = 1;
+        $productId = 1;
+        $mailchimpStoreId = '6167259961c475fef8523e39ef1784e8';
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getItem'))
+            ->getMock();
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'makeApiProduct', 'isBundleItem', 'isConfigurableItem'))
+            ->getMock();
+
+        $itemMock = $this->getMockBuilder(Mage_Sales_Model_Order_Item::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStoreId', 'getProductId'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isEcomSyncDataEnabled', 'getMCStoreId'))
+            ->getMock();
+
+        $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('update'))
+            ->getMock();
+
+        $observerMock->expects($this->once())->method('getEvent')->willReturn($eventObserverMock);
+        $eventObserverMock->expects($this->once())->method('getItem')->willReturn($itemMock);
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $itemMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn($isEcomEnabled);
+        $mailchimpObserverMock->expects($this->once())->method('makeApiProduct')->willReturn($apiProductsMock);
+        $mailchimpObserverMock->expects($this->once())->method('isBundleItem')->with($itemMock)->willReturn($isBundle);
+        $mailchimpObserverMock->expects($this->once())->method('isConfigurableItem')->with($itemMock)->willReturn($isConf);
+        $itemMock->expects($this->once())->method('getProductId')->willReturn($productId);
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($storeId)->willReturn($mailchimpStoreId);
+        $apiProductsMock->expects($this->once())->method('update')->with($productId, $mailchimpStoreId);
+
+        $mailchimpObserverMock->itemCancel($observerMock);
+    }
 }
+

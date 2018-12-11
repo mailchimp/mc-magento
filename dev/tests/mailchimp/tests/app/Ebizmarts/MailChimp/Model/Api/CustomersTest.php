@@ -77,7 +77,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock = $this->customersApiMock->setMethods(
             array('makeBatchId', 'joinMailchimpSyncData', 'makeCustomersNotSentCollection', 'getOptin',
                 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
-                '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId'
+                '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId', 'getCustomerResourceCollection'
             )
         )
             ->getMock();
@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->assertEquals($operationData['body'], $return[0]['body']);
     }
 
-    public function testMakeCustomersNotSentCollection()
+    public function testMakeCustomersNotSentCollectionTotal()
     {
         $this->customersApiMock = $this->customersApiMock->setMethods(
             array(
@@ -146,7 +146,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->disableOriginalConstructor()
             ->getMock();
         $customersResourceCollectionMock->expects($this->exactly(2))->method('getSelect')->willReturn($dbSelectMock);
-        $customersResourceCollectionMock->expects($this->once())->method('addNameToSelect');
+        $customersResourceCollectionMock->expects($this->exactly(1))->method('addNameToSelect');
 
         $this->customersApiMock->expects($this->once())->method('getCustomerResourceCollection')
             ->willReturn($customersResourceCollectionMock);
@@ -155,8 +155,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock->expects($this->once())->method('joinSalesData');
         $this->customersApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
 
-        $collection = $this->customersApiMock->makeCustomersNotSentCollection();
+        $collectionFrontEnd = $this->customersApiMock->makeCustomersNotSentCollection();
 
-        $this->assertInstanceOf("Mage_Customer_Model_Resource_Customer_Collection", $collection);
+        $this->assertInstanceOf("Mage_Customer_Model_Resource_Customer_Collection", $collectionFrontEnd);
     }
 }
