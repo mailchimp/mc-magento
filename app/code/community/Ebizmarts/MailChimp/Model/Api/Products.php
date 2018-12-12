@@ -835,10 +835,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     protected function getProductPrice($productId, $magentoStoreId)
     {
-        $helper = $this->getMailChimpHelper();
-        $rc = $helper->getProductResourceModel();
-        $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
-        return $price;
+        /** @var Mage_Catalog_Model_Product $product */
+        $product = Mage::getModel('catalog/product')->setStoreId($magentoStoreId)->load($productId);
+        return (float)$product->getFinalPrice();
     }
 
     /**
