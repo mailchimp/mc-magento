@@ -133,11 +133,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $modifiedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
         foreach ($modifiedCarts as $cart) {
             $cartId = $cart->getEntityId();
-            $allCarts[$this->_counter]['method'] = 'DELETE';
-            $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
-            $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
-            $allCarts[$this->_counter]['body'] = '';
-            $this->_counter += 1;
             /**
              * @var $customer Mage_Customer_Model_Customer
              */
@@ -172,8 +167,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
             if ($cartJson != "") {
-                $allCarts[$this->_counter]['method'] = 'POST';
-                $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+                $allCarts[$this->_counter]['method'] = 'PATCH';
+                $allCarts[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts'.$cartId;
                 $allCarts[$this->_counter]['operation_id'] = $this->_batchId . '_' . $cartId;
                 $allCarts[$this->_counter]['body'] = $cartJson;
                 $this->_counter += 1;
