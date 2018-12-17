@@ -970,6 +970,60 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->saveLastItemsSent($scopeId, $scope);
     }
 
+    /**
+     * @param $data
+     * @dataProvider scopeDataProvider
+     */
+    public function testIsEcomSyncDataEnabledWithStoreId($data)
+    {
+        $scopeId = $data['scopeId'];
+        $scope = $data['scope'];
+        $isStoreCreation = $data['isStoreCreation'];
+        $mcStoreId = 'a1s2d3f4g5h6j7k8l9p0';
+
+        $expectedResult = true;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isSubscriptionEnabled', 'isEcommerceEnabled', 'getMCStoreId'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(true);
+        $helperMock->expects($this->once())->method('isEcommerceEnabled')->with($scopeId, $scope)->willReturn(true);
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mcStoreId);
+
+        $result = $helperMock->isEcomSyncDataEnabled($scopeId, $scope, $isStoreCreation);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function scopeDataProvider()
+    {
+
+        return array(
+            array(array('scopeId' => 1, 'scope' => 'stores', 'isStoreCreation' => false)),
+            array(array('scopeId' => 1, 'scope' => 'stores', 'isStoreCreation' => true)),
+            array(array('scopeId' => 1, 'scope' => 'websites', 'isStoreCreation' => false)),
+            array(array('scopeId' => 0, 'scope' => 'admin', 'isStoreCreation' => false)),
+        );
+    }
+
+    public function testIsEcomSyncDataEnabledWithStoreIdNull()
+    {
+        $scopeId = null;
+        $scope = null;
+        $isStoreCreation = false;
+        $expectedResult = false;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $helperMock->isEcomSyncDataEnabled($scopeId, $scope, $isStoreCreation);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
     public function testGetListInterestCategories()
     {
         $scopeId = 1;
