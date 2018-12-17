@@ -63,4 +63,6 @@ try {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
+$installer->deleteConfigData(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP);
+
 $installer->endSetup();

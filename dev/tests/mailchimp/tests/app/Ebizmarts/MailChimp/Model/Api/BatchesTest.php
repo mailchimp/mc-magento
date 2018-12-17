@@ -257,13 +257,21 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         );
     }
 
-    public function testSendEcommerceBatch()
+    /**
+     * @param array $data
+     * @dataProvider sendEcommerceBatchDataProvider
+     */
+
+    public function testSendEcommerceBatch($data)
     {
         $mailchimpStoreId = 'ef3bf57fb9bd695a02b7f7c7fb0d2db5';
         $magentoStoreId = 1;
         $syncingFlag = '2018-02-01 00:00:00';
         $ecomSyncDateFlag = '2018-02-02 00:00:00';
         $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1));
+        $sendPromo = $data['sendPromo'];
+        $batchArray = array();
+        $batchArray['operations'] = $data['batchArray'];
 
         $customerArray = $this->getCustomerArray();
 
@@ -279,15 +287,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $promoCodesArray = $this->getPromoCodeArray();
 
-        //merge arrays and encode
-        $batchArray = array();
-        $batchArray['operations'] = $customerArray;
-        $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
-        $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
-        $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-        $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
-        $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
-        $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
+        //encode merged arrays
 
         $batchJson = json_encode($batchArray);
 
@@ -305,7 +305,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getMCStoreId', 'getEcommMinSyncDateFlag', 'isEcomSyncDataEnabled', 'getApi',
-                'getMCIsSyncing', 'logRequest', 'validateDate', 'saveMailchimpConfig'))
+                'getMCIsSyncing', 'logRequest', 'validateDate', 'saveMailchimpConfig', 'getPromoConfig'))
             ->getMock();
 
         $apiCustomersMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Customers::class)
@@ -375,13 +375,14 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiBatchesMock->expects($this->once())->method('getApiOrders')->willReturn($apiOrdersMock);
         $apiOrdersMock->expects($this->once())->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($ordersArray);
 
-        $apiBatchesMock->expects($this->once())->method('getApiPromoRules')->willReturn($apiPromoRulesMock);
-        $apiPromoRulesMock->expects($this->once())->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($promoRulesArray);
+        $apiBatchesMock->expects($this->exactly($sendPromo))->method('getApiPromoRules')->willReturn($apiPromoRulesMock);
+        $apiPromoRulesMock->expects($this->exactly($sendPromo))->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($promoRulesArray);
 
-        $apiBatchesMock->expects($this->once())->method('getApiPromoCodes')->willReturn($apiPromoCodesMock);
-        $apiPromoCodesMock->expects($this->once())->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($promoCodesArray);
+        $apiBatchesMock->expects($this->exactly($sendPromo))->method('getApiPromoCodes')->willReturn($apiPromoCodesMock);
+        $apiPromoCodesMock->expects($this->exactly($sendPromo))->method('createBatchJson')->with($mailchimpStoreId, $magentoStoreId)->willReturn($promoCodesArray);
 
         $helperMock->expects($this->once())->method('getApi')->with($magentoStoreId)->willReturn($apiMock);
+        $helperMock->expects($this->once())->method('getPromoConfig')->with($magentoStoreId)->willReturn($sendPromo);
 
         $apiMock->expects($this->once())->method('getBatchOperation')->willReturn($apiBatchOperationMock);
         $apiBatchOperationMock->expects($this->once())->method('add')->with($batchJson)->willReturn($batchResponse);
@@ -403,6 +404,31 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
 
         $apiBatchesMock->_sendEcommerceBatch($magentoStoreId);
+    }
+
+    //merge batch arrays including or excluding promo rules/promo codes based on the setting
+    public function sendEcommerceBatchDataProvider()
+    {
+        $batchArray = array();
+
+        return array(
+            array(array('sendPromo' => 0,
+                'customerArray' => $batchArray['operations'] = $this->getCustomerArray(),
+                'productsArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getProductArray()),
+                'cartsArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getCartArray()),
+                'ordersArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getOrderArray()),
+                'deletedProductsArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getDeletedProductArray()),
+                'batchArray' => $batchArray['operations'])),
+            array(array('sendPromo' => 1,
+                'customerArray' => $batchArray['operations'] = $this->getCustomerArray(),
+                'productsArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getProductArray()),
+                'cartsArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getCartArray()),
+                'ordersArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getOrderArray()),
+                'promoRulesArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getPromoRuleArray()),
+                'promoCodesArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getPromoCodeArray()),
+                'deletedProductsArray' => $batchArray['operations'] = array_merge($batchArray['operations'], $this->getDeletedProductArray()),
+                'batchArray' => $batchArray['operations'])),
+        );
     }
 
     public function testGetResults()

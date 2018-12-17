@@ -202,7 +202,7 @@ class Ebizmarts_MailChimp
         $this->_root = rtrim($this->_root, '/') . '/';
 
         if (!isset($opts['timeout']) || !is_int($opts['timeout'])) {
-            $opts['timeout'] = 600;
+            $opts['timeout'] = 20;
         }
 
         if (isset($opts['debug'])) {
@@ -224,7 +224,7 @@ class Ebizmarts_MailChimp
 
         curl_setopt($this->_ch, CURLOPT_HEADER, false);
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT,  $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_TIMEOUT, $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_USERPWD, "noname:".$this->_apiKey);
 

@@ -394,6 +394,7 @@
                 <customer_map_fields><![CDATA[a:11:{i:0;a:3:{s:5:"label";s:18:"Shipping Telephone";s:5:"value";s:18:"shipping_telephone";s:10:"field_type";s:4:"text";}i:1;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:2;a:3:{s:5:"label";s:15:"Billing Company";s:5:"value";s:15:"billing_company";s:10:"field_type";s:4:"text";}i:3;a:3:{s:5:"label";s:16:"Shipping Company";s:5:"value";s:16:"shipping_company";s:10:"field_type";s:4:"text";}i:4;a:3:{s:5:"label";s:17:"Billing Telephone";s:5:"value";s:17:"billing_telephone";s:10:"field_type";s:4:"text";}i:5;a:3:{s:5:"label";s:15:"Billing Country";s:5:"value";s:15:"billing_country";s:10:"field_type";s:4:"text";}i:6;a:3:{s:5:"label";s:16:"Shipping Country";s:5:"value";s:16:"shipping_country";s:10:"field_type";s:4:"text";}i:7;a:3:{s:5:"label";s:15:"Billing ZipCode";s:5:"value";s:15:"billing_zipcode";s:10:"field_type";s:4:"text";}i:8;a:3:{s:5:"label";s:16:"Shipping ZipCode";s:5:"value";s:16:"shipping_zipcode";s:10:"field_type";s:4:"text";}i:9;a:3:{s:5:"label";s:21:"Last Date Of Purchase";s:5:"value";s:3:"dop";s:10:"field_type";s:4:"date";}i:10;a:3:{s:5:"label";s:10:"Store Code";s:5:"value";s:10:"store_code";s:10:"field_type";s:4:"text";}}]]></customer_map_fields>
                 <order_grid>3</order_grid>
                 <subscriber_batch_amount>200</subscriber_batch_amount>
+                <connection_timeout>20</connection_timeout>
             </general>
             <ecommerce>
                 <customer_batch_amount>100</customer_batch_amount>
@@ -450,7 +451,7 @@
             </mailchimp_process_webhook_data>
             <mailchimp_delete_webhook_processed>
                 <schedule>
-                    <cron_expr>0 0 * * *</cron_expr>
+                    <cron_expr>0 */1 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>mailchimp/cron::deleteWebhookRequests</model>
