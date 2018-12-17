@@ -149,7 +149,7 @@
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <depends>
-                                <interest_categories>1</interest_categories>
+                                <interest_in_success>1</interest_in_success>
                             </depends>
                         </interest_before>
                         <interest_after translate="label">
@@ -161,7 +161,7 @@
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
                             <depends>
-                                <interest_categories>1</interest_categories>
+                                <interest_in_success>1</interest_in_success>
                             </depends>
                         </interest_after>
                         <subscriber_batch_amount translate="label">

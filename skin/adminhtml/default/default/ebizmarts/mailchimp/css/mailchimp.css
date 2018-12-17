@@ -102,3 +102,7 @@ div.mailchimp-notice {
 .mailchimp-image {
     margin: 0 0 4px 10px;
 }
+
+textarea#mailchimp_general_interest_before, textarea#mailchimp_general_interest_after {
+    height: 5em;
+}
