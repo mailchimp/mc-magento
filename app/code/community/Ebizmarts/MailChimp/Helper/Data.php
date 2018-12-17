@@ -3304,7 +3304,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $array
      * @return string
      */
-    protected function arrayEncode($array)
+    public function arrayEncode($array)
     {
         return json_encode($array);
     }
@@ -3315,7 +3315,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $encodedArray
      * @return mixed
      */
-    protected function arrayDecode($encodedArray)
+    public function arrayDecode($encodedArray)
     {
         return json_decode($encodedArray, true);
     }

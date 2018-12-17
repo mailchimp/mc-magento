@@ -1193,12 +1193,16 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $interestNameTwo = 'Group Two Name';
         $displayOrderTwo = 2;
         $interest = array(1 => array('category' => array($displayOrderOne => array('id' => $interestIdOne, 'name' => $interestNameOne, 'checked' => false), $displayOrderTwo => array('id' => $interestIdTwo, 'name' => $interestNameTwo, 'checked' => false))));
-        $groupData = 'a:2:{s:10:"bc15dbe6a5";a:1:{s:10:"d6b7541ee7";s:10:"d6b7541ee7";}s:10:"2a2f23d671";s:10:"36c250eeff";}';
+        $encodedGroupData = '{"bc15dbe6a5":{"d6b7541ee7":"d6b7541ee7"},"2a2f23d671":"36c250eeff"}';
+        $groupData = array(
+            'bc15dbe6a5' => array('d6b7541ee7' => 'd6b7541ee7'),
+            '2a2f23d671' => '36c250eeff'
+        );
         $expectedResult = $interest;
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getInterest', 'getInterestGroupModel', 'getLocalInterestCategories'))
+            ->setMethods(array('getInterest', 'getInterestGroupModel', 'getLocalInterestCategories', 'arrayDecode'))
             ->getMock();
 
         $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
@@ -1211,7 +1215,9 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $interestGroupMock->expects($this->once())->method('getByRelatedIdStoreId')->with($customerId, $subscriberId, $storeId)->willReturnSelf();
         $interestGroupMock->expects($this->once())->method('getId')->willReturn($interestGroupId);
-        $interestGroupMock->expects($this->once())->method('getGroupdata')->willReturn($groupData);
+        $interestGroupMock->expects($this->once())->method('getGroupdata')->willReturn($encodedGroupData);
+
+        $helperMock->expects($this->once())->method('arrayDecode')->with($encodedGroupData)->willReturn($groupData);
 
         $result = $helperMock->getInterestGroups($customerId, $subscriberId, $storeId);
 

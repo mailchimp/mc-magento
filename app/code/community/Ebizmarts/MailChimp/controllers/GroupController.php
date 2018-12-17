@@ -16,6 +16,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
 {
     public function indexAction()
     {
+        $helper = $this->getHelper();
         $order = $this->getSessionLastRealOrder();
         $session = $this->getCoreSession();
         $interestGroup = $this->getInterestGroupModel();
@@ -34,7 +35,8 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
             }
             $subscriberId = $subscriber->getSubscriberId();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-            $interestGroup->setGroupdata(serialize($params));
+            $encodedGroups = $helper->arrayEncode($params);
+            $interestGroup->setGroupdata($encodedGroups);
             $interestGroup->setSubscriberId($subscriberId);
             $interestGroup->setCustomerId($customerId);
             $interestGroup->setStoreId($storeId);
@@ -45,7 +47,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
 
             $session->addSuccess($this->__('Thanks for share your interest with us.'));
         } catch (Exception $e) {
-            $this->getHelper()->logError($e->getMessage());
+            $helper->logError($e->getMessage());
             $session->addWarning($this->__('Something went wrong with the interests subscription. Please go to the account subscription menu to subscriber to the interests successfully.'));
         }
         $this->_redirect('/');
