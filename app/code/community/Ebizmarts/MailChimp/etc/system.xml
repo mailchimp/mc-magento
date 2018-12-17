@@ -140,7 +140,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </interest_in_success>
-                        <interest_before>
+                        <interest_success_before>
                             <label translate="label">Add html code before the interest groups are displayed</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>50</sort_order>
@@ -151,8 +151,8 @@
                             <depends>
                                 <interest_in_success>1</interest_in_success>
                             </depends>
-                        </interest_before>
-                        <interest_after translate="label">
+                        </interest_success_before>
+                        <interest_success_after translate="label">
                             <label>Add html code after the interest groups are displayed</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>51</sort_order>
@@ -163,7 +163,7 @@
                             <depends>
                                 <interest_in_success>1</interest_in_success>
                             </depends>
-                        </interest_after>
+                        </interest_success_after>
                         <subscriber_batch_amount translate="label">
                             <label>Subscriber amount to be sent per run</label>
                             <frontend_type>select</frontend_type>

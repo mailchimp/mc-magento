@@ -13,7 +13,7 @@ $i = $this->getCurrentInterest();
                title="<?php echo $c['name'] ?>"
             <?php if($c['checked']) { echo 'checked';} ?>
         />
-        <label class="field label"><?php echo $c['name']?></label>
+        <label for="<?php echo 'mailchimp_group_'.$c['id'] ?>" class="field label"><?php echo $c['name']?></label>
     </li>
 <?php endforeach; ?>
 </ul>

@@ -50,13 +50,15 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     public function getMessageBefore()
     {
         $storeId = $this->storeId;
-        return $this->getMailChimpHelper()->getCheckoutSuccessHtmlBefore($storeId);
+        $message = $this->getMailChimpHelper()->getCheckoutSuccessHtmlBefore($storeId);
+        return $message;
     }
 
     public function getMessageAfter()
     {
         $storeId = $this->storeId;
-        return $this->getMailChimpHelper()->getCheckoutSuccessHtmlAfter($storeId);
+        $message = $this->getMailChimpHelper()->getCheckoutSuccessHtmlAfter($storeId);
+        return $message;
     }
 
     /**
