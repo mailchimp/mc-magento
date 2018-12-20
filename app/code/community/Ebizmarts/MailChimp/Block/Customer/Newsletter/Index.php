@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Checkout subscribe checkbox block renderer
+ * Customer account subscribe interest groups block renderer
  *
  * @category   Ebizmarts
  * @package    Ebizmarts_MageMonkey

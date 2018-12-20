@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Checkout subscribe checkbox block renderer
+ * Checkout subscribe interest groups block renderer
  *
  * @category   Ebizmarts
  * @package    Ebizmarts_MailChimp

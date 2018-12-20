@@ -133,7 +133,7 @@ class Ebizmarts_MailChimp_Model_Observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function SubscriberSaveBefore(Varien_Event_Observer $observer)
+    public function subscriberSaveBefore(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
         $storeId = $subscriber->getStoreId();
@@ -161,7 +161,7 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param Varien_Event_Observer $observer
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function SubscriberSaveAfter(Varien_Event_Observer $observer)
+    public function subscriberSaveAfter(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
         $storeId = $subscriber->getStoreId();
