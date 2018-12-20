@@ -9,7 +9,7 @@ env:
   global:
     - COMPOSER_BIN_DIR=~/bin
     - CODE_EXTENSIONS=phtml,php,js,css
-    - MAGENTO_ARCHIVE=magento-1.9.2.4-2016-02-23-06-07-06.tar.bz2
+    - MAGENTO_ARCHIVE=magento-1.9.4.0.tar.bz2
     - MAGENTO_ROOT=$TRAVIS_BUILD_DIR/magento
   matrix:
     - TEST_SUITE=marketplace_review
