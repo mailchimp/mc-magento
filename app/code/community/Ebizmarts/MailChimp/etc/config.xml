@@ -31,7 +31,7 @@
                 <observers>
                     <mailchimp_subscribe_observer>
                         <class>mailchimp/observer</class>
-                        <method>SubscriberSaveBefore</method>
+                        <method>subscriberSaveBefore</method>
                     </mailchimp_subscribe_observer>
                 </observers>
             </newsletter_subscriber_save_before>
@@ -39,7 +39,7 @@
                 <observers>
                     <mailchimp_subscribe_after_observer>
                         <class>mailchimp/observer</class>
-                        <method>SubscriberSaveAfter</method>
+                        <method>subscriberSaveAfter</method>
                     </mailchimp_subscribe_after_observer>
                 </observers>
             </newsletter_subscriber_save_after>
