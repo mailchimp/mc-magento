@@ -18,7 +18,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        $this->_categories = $helper->getListInterestCategories($scopeArray['scope_id'], $scopeArray['scope']);
+        if ($helper->isSubscriptionEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+            $this->_categories = $helper->getListInterestCategories($scopeArray['scope_id'], $scopeArray['scope']);
+        }
     }
 
     /**
