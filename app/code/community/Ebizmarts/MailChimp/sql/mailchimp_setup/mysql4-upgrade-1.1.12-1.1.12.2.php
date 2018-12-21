@@ -36,28 +36,33 @@ $setup->addAttribute("customer", "mailchimp_store_view",  array(
 
 ));
 
-$attribute   = Mage::getSingleton("eav/config")->getAttribute("customer", "mailchimp_store_view");
+try {
+    $attribute = Mage::getSingleton("eav/config")->getAttribute("customer", "mailchimp_store_view");
 
 
-$setup->addAttributeToGroup(
-    $entityTypeId,
-    $attributeSetId,
-    $attributeGroupId,
-    'mailchimp_store_view',
-    '999'  //sort_order
-);
+    $setup->addAttributeToGroup(
+        $entityTypeId,
+        $attributeSetId,
+        $attributeGroupId,
+        'mailchimp_store_view',
+        '999'  //sort_order
+    );
 
-$used_in_forms=array();
+    $used_in_forms = array();
 
-$used_in_forms[]="adminhtml_customer";
+    $used_in_forms[] = "adminhtml_customer";
 
-$attribute->setData("used_in_forms", $used_in_forms)
-    ->setData("is_used_for_customer_segment", true)
-    ->setData("is_system", 0)
-    ->setData("is_user_defined", 1)
-    ->setData("is_visible", 1)
-    ->setData("sort_order", 100)
-;
-$attribute->save();
+    $attribute->setData("used_in_forms", $used_in_forms)
+        ->setData("is_used_for_customer_segment", true)
+        ->setData("is_system", 0)
+        ->setData("is_user_defined", 1)
+        ->setData("is_visible", 1)
+        ->setData("sort_order", 100);
+    $attribute->save();
+} catch (Exception $e) {
+    Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
+}
+
+$installer->deleteConfigData(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP);
 
 $installer->endSetup();

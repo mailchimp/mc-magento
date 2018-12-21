@@ -3,7 +3,7 @@
 <config>
     <tabs>
         <mailchimp translate="label" module="mailchimp">
-            <label><![CDATA[MailChimp]]></label>
+            <label><![CDATA[Mailchimp]]></label>
             <sort_order>400</sort_order>
         </mailchimp>
     </tabs>
@@ -21,7 +21,7 @@
         </general>
         <mailchimp translate="label" module="mailchimp">
             <class>mailchimp-section</class>
-            <label>MailChimp Configuration</label>
+            <label>Mailchimp Configuration</label>
             <header_css>mailchimp-header</header_css>
             <tab>mailchimp</tab>
             <sort_order>100</sort_order>
@@ -37,7 +37,7 @@
                     <show_in_store>1</show_in_store>
                 </hint>
                 <general translate="label comment">
-                    <label>MailChimp integration by ebizmarts</label>
+                    <label>Mailchimp integration by ebizmarts</label>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -85,7 +85,7 @@
                         <reset_errors translate="label comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
-                            <sort_order>45</sort_order>
+                            <sort_order>42</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -93,7 +93,7 @@
                         <resend_subscriber translate="label comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resendSubscribers</frontend_model>
-                            <sort_order>46</sort_order>
+                            <sort_order>44</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -103,24 +103,68 @@
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_list</source_model>
                             <backend_model>mailchimp/system_config_backend_list</backend_model>
-                            <sort_order>50</sort_order>
+                            <sort_order>45</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[Synchronize Magento's General Subscription List with this MailChimp list.]]></comment>
+                            <comment><![CDATA[Synchronize Magento's General Subscription List with this Mailchimp list.]]></comment>
                         </list>
                         <reset_list translate="label comment">
                             <label></label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetList</frontend_model>
-                            <sort_order>52</sort_order>
+                            <sort_order>46</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Warning, read the manual before change the list.]]></comment>
                         </reset_list>
-                        <subscriber_batch_amount>
+                        <interest_categories translate="label comment">
+                            <label>Interest Categories</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>mailchimp/system_config_source_customerGroup</source_model>
+                            <sort_order>48</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
+                        </interest_categories>
+                        <interest_in_success translate="label">
+                            <label>Interest groups in checkout success</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>49</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </interest_in_success>
+                        <interest_success_before>
+                            <label translate="label">Add html code before the interest groups are displayed</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <depends>
+                                <interest_in_success>1</interest_in_success>
+                            </depends>
+                        </interest_success_before>
+                        <interest_success_after translate="label">
+                            <label>Add html code after the interest groups are displayed</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>51</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <can_be_empty>1</can_be_empty>
+                            <depends>
+                                <interest_in_success>1</interest_in_success>
+                            </depends>
+                        </interest_success_after>
+                        <subscriber_batch_amount translate="label">
                             <label>Subscriber amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_batchLimit</source_model>
@@ -128,13 +172,23 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment></comment>
+                            <comment><![CDATA[Don't touch this value]]></comment>
                         </subscriber_batch_amount>
+                        <connection_timeout>
+                            <label>Connection timeout (in secs)</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>mailchimp/system_config_source_connectionTimeout</source_model>
+                            <sort_order>54</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Don't touch this value]]></comment>
+                        </connection_timeout>
                         <checkout_subscribe translate="label comment">
                             <label>Subscribe On Checkout</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_checkoutsubscribe</source_model>
-                            <sort_order>54</sort_order>
+                            <sort_order>55</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -144,24 +198,24 @@
                             <label>Customer Fields Mapping</label>
                             <frontend_model>mailchimp/adminhtml_system_config_form_field_mapfields</frontend_model>
                             <backend_model>mailchimp/system_config_backend_mapfield</backend_model>
-                            <sort_order>55</sort_order>
+                            <sort_order>56</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected MailChimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
+                            <comment><![CDATA[This is required in order to tell the extensions what customer attributes should be sent to your selected Mailchimp list. <a target="_blank" href="http://wiki.ebizmarts.com/m4m-merge-fields">See recommended configuration here.</a>]]></comment>
                         </map_fields>
                         <create_fields translate="label comment">
-                            <label>Create Merge Fields on MailChimp</label>
+                            <label>Create Merge Fields on Mailchimp</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_createMergeFields</frontend_model>
                             <sort_order>57</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Click this button to create the above fields on the selected MailChimp list.]]></comment>
+                            <comment><![CDATA[Click this button to create the above fields on the selected Mailchimp list.]]></comment>
                         </create_fields>
                         <create_webhook>
-                            <label>Create Webhook</label>
+                            <label translate="label comment">Create Webhook</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_createWebhook</frontend_model>
                             <sort_order>58</sort_order>
@@ -171,7 +225,7 @@
                             <comment><![CDATA[Click this button to create the webhook manually, it will only work if the webhook doesn't already exist.]]></comment>
                         </create_webhook>
                         <webhook_active>
-                            <label>Enable Two Way Sync</label>
+                            <label translate="label comment">Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <backend_model>mailchimp/system_config_backend_twowaysync</backend_model>
@@ -180,7 +234,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to MailChimp only.]]></comment>
+                            <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to Mailchimp only.]]></comment>
                         </webhook_active>
                         <magento_mail>
                             <label>Use Magento emails</label>
@@ -225,7 +279,7 @@
                     </fields>
                 </general>
                 <ecommerce>
-                    <label>Ecommerce</label>
+                    <label translate="label comment">Ecommerce</label>
                     <sort_order>200</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
@@ -254,7 +308,7 @@
                                 <active>1</active>
                             </depends>
                         </customers_optin>
-			<image_size translate="label">
+			            <image_size translate="label">
                             <label>Select product image size to send</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_imageSize</source_model>
@@ -279,6 +333,18 @@
                                 <active>1</active>
                             </depends>
                         </firstdate>
+                        <send_promo translate="label">
+                            <label>Send Promo Rules and Promo Codes</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>215</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </send_promo>
                         <reset_ecommerce_data translate="label comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetEcommerceData</frontend_model>
@@ -334,156 +400,6 @@
                         </order_batch_amount>
                     </fields>
                 </ecommerce>
-                <emailcatcher>
-                    <label>Catch email</label>
-                    <sort_order>400</sort_order>
-                    <frontend_type>text</frontend_type>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <popup_general translate="label comment">
-                            <label>Catch Email on Popup</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>410</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Create popup when customer access the site for the first time to catch email to use later on Abandoned Cart mailing.]]></comment>
-                        </popup_general>
-                        <popup_heading translate="label comment">
-                            <label>Popup Heading</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>420</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[This field can be empty.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_heading>
-                        <popup_text translate="label comment">
-                            <label>Popup Message</label>
-                            <frontend_type>textarea</frontend_type>
-                            <sort_order>430</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[This field can be empty.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_text>
-                        <popup_fname translate="label">
-                            <label>Ask for first name on popup</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>440</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_fname>
-                        <popup_lname translate="label">
-                            <label>Ask for last name on popup</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>450</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_lname>
-                        <popup_width translate="label comment">
-                            <label>Popup Width</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>460</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[This is a percentage of the window width.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_width>
-                        <popup_height translate="label comment">
-                            <label>Popup Height</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>470</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[This is a percentage of the window height.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_height>
-                        <popup_subscription translate="label comment">
-                            <label>Subscribe guest customer</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>480</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment><![CDATA[When email confirmed on popup subscribe customer to newsletter.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_subscription>
-                        <popup_cancel translate="label comment">
-                            <label>Customer can close Popup</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                            <sort_order>490</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Popup can be closed without giving an email.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                            </depends>
-                        </popup_cancel>
-                        <popup_cookie_time translate="label comment">
-                            <label>When popup cancelled show again after</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>500</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment><![CDATA[This field is in days.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                                <popup_cancel>1</popup_cancel>
-                            </depends>
-                        </popup_cookie_time>
-                        <popup_insist translate="label comment">
-                            <label>Limit of times popup will get shown</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>510</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment><![CDATA[If customer doesn't confirm popup, it will be shown this many times each time the customer reload the page.]]></comment>
-                            <depends>
-                                <popup_general>1</popup_general>
-                                <popup_cancel>1</popup_cancel>
-                            </depends>
-                        </popup_insist>
-                    </fields>
-                </emailcatcher>
                 <abandonedcart>
                     <label>Abandoned Cart</label>
                     <sort_order>500</sort_order>

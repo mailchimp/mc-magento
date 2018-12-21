@@ -41,6 +41,7 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_INTEREST_SUCCESS_AFTER    = 'mailchimp/general/interest_success_after';
     const GENERAL_MAGENTO_MAIL              = 'mailchimp/general/magento_mail';
 
+
     const ECOMMERCE_ACTIVE              = 'mailchimp/ecommerce/active';
     const ECOMMERCE_CUSTOMERS_OPTIN     = 'mailchimp/ecommerce/customers_optin';
     const ECOMMERCE_FIRSTDATE           = 'mailchimp/ecommerce/firstdate';

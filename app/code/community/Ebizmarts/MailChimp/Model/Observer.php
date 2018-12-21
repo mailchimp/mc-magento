@@ -202,8 +202,9 @@ class Ebizmarts_MailChimp_Model_Observer
                 $apiSubscriber->updateSubscriber($subscriber, true);
             }
         }
-
+      
         return $observer;
+
     }
 
     /**
@@ -1029,6 +1030,7 @@ class Ebizmarts_MailChimp_Model_Observer
                     'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
                     'class' => 'ajax'
                 ));
+
             }
         }
         return $observer;
