@@ -308,6 +308,14 @@ class Ebizmarts_MailChimp
         return $this->batchOperation;
     }
 
+    /**
+     * @return MailChimp_Lists
+     */
+    public function getLists()
+    {
+        return $this->lists;
+    }
+
     public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
     {
         $paramsOrig = $params;
