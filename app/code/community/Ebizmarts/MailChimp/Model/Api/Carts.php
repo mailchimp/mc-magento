@@ -165,7 +165,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $this->_updateSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
-            Mage::log($allCarts, null, 'ebizmartsAllCarts.log', true);
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
