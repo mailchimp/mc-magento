@@ -20,6 +20,57 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $this->mailchimpController = null;
     }
 
+    public function testIndexAction()
+    {
+        $customerId = 1;
+        $type = 'mailchimp/adminhtml_customer_edit_tab_mailchimp';
+        $name = 'admin.customer.mailchimp';
+        $result = '<body></body>';
+
+        $mailchimpControllerMock = $this->mailchimpController
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRequest', 'getResponse', 'getLayout', 'getHtml'))
+            ->getMock();
+
+        $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getParam'))
+            ->getMock();
+
+        $responseMock = $this->getMockBuilder(Mage_Core_Controller_Response_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setBody'))
+            ->getMock();
+
+        $layoutMock = $this->getMockBuilder(Mage_Core_Model_Layout::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('createBlock'))
+            ->getMock();
+
+        $blockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setCustomerId', 'setUseAjax', 'toHtml'))
+            ->getMock();
+
+        $mailchimpControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
+
+        $requestMock->expects($this->once())->method('getParam')->with('id')->willReturn($customerId);
+
+        $mailchimpControllerMock->expects($this->once())->method('getLayout')->willReturn($layoutMock);
+
+        $layoutMock->expects($this->once())->method('createBlock')->with($type, $name)->willReturn($blockMock);
+
+        $blockMock->expects($this->once())->method('setCustomerId')->with($customerId)->willReturnSelf();
+        $blockMock->expects($this->once())->method('setUseAjax')->with(true)->willReturnSelf();
+
+        $mailchimpControllerMock->expects($this->once())->method('getHtml')->with($blockMock)->willReturn($result);
+
+        $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
+        $responseMock->expects($this->once())->method('setBody')->with($result);
+
+        $mailchimpControllerMock->indexAction();
+    }
+
     public function testResendSubscribersAction()
     {
         $paramScope = 'scope';
