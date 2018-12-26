@@ -204,7 +204,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
       
         return $observer;
-
     }
 
     /**
