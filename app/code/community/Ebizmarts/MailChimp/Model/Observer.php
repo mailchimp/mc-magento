@@ -202,7 +202,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $apiSubscriber->updateSubscriber($subscriber, true);
             }
         }
-      
+
         return $observer;
     }
 
