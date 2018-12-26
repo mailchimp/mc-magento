@@ -202,6 +202,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $stores[] = $storeMock;
 
         $eventObserverMock->expects($this->once())->method('getStore')->willReturn($storeMock);
+
         $storeMock->expects($this->once())->method('getId')->willReturn($storeId);
 
         $observerMock->expects($this->once())->method('changeStoreNameIfModuleEnabled')->with($storeId);
