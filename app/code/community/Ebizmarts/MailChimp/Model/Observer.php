@@ -198,8 +198,10 @@ class Ebizmarts_MailChimp_Model_Observer
 
                 $this->createEmailCookie($subscriber);
 
-                $apiSubscriber = $this->makeApiSubscriber();
-                $apiSubscriber->updateSubscriber($subscriber, true);
+                if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
+                    $apiSubscriber = $this->makeApiSubscriber();
+                    $apiSubscriber->updateSubscriber($subscriber, true);
+                }
             }
         }
 
