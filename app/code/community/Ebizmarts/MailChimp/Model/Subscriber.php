@@ -36,4 +36,17 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
             return parent::sendConfirmationSuccessEmail();
         }
     }
+
+    public function confirm($code)
+    {
+        if($this->getCode()==$code) {
+            $this->setStatus(self::STATUS_SUBSCRIBED)
+                ->setIsStatusChanged(true)
+                ->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE)
+                ->save();
+            return true;
+        }
+
+        return false;
+    }
 }

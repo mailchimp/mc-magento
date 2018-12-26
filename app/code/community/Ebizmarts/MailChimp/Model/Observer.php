@@ -165,12 +165,6 @@ class Ebizmarts_MailChimp_Model_Observer
                             $apiSubscriber->updateSubscriber($subscriber, true);
                         }
                     }
-                } else {
-                    //Use Magento emails, setImportMode to false to allow email to be sent, set back to true so subscribe() function doesn't send it again
-                    $subscriber->setImportMode(false);
-                    $subscriber->sendConfirmationRequestEmail();
-                    $subscriber->setImportMode(true);
-
                 }
             }
         }
@@ -201,6 +195,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
                     $apiSubscriber = $this->makeApiSubscriber();
                     $apiSubscriber->updateSubscriber($subscriber, true);
+                } else {
+                    $subscriber->setImportMode(false);
                 }
             }
         }
