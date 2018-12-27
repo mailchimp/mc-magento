@@ -72,8 +72,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $customerId = 1;
         $stringIsActive = 'is_active';
         $stringStoreId = 'store_id';
-        $stringCustomerEmail = 'customer_email';
-        $arrayAddFieldToFilterCustomerEmail = array('eq' => $customerEmailAddressByCart);
         $arrayAddFieldToFilter = array('eq' => 1);
         $arrayAddFieldToFilterStoreId = array('eq' => $magentoStoreId);
         $where = "m4m.mailchimp_sync_deleted = 0
@@ -284,7 +282,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $stringUpdated = 'main_table.updated_at';
         $addFieldToFilterUpdated = array('from' => '');
 
-        // pronto
         $cartsApiMock = $this->cartsApiMock->setMethods(
             array(
                 'getHelper',
@@ -353,12 +350,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getSize', 'addFieldToFilter'))
             ->getMock();
-
-//        $varienFilterMock = $this
-//            ->getMockBuilder(Varien_Data_Collection_Db::class)
-//            ->disableOriginalConstructor()
-//            ->setMethods(array('addFieldToFilter'))
-//            ->getMock();
 
         $cartsApiMock->expects($this->once())
             ->method('getHelper')
@@ -507,11 +498,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 array($stringCustomerEmailMainTable, $addFieldToFilterOrderCollection),
                 array($stringUpdated, $addFieldToFilterUpdated)
             );
-
-//        $varienFilterMock->expects($this->once())
-//            ->method('addFieldToFilter')
-//            ->with($stringUpdated, $addFieldToFilterUpdated);
-
 
         $cartsApiMock->_getNewQuotes($mailchimpStoreId, $magentoStoreId);
     }
