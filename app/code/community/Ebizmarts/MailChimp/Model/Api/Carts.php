@@ -28,6 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        /** @var Ebizmarts_MailChimp_Helper_Data $helper */
         $helper = $this->getHelper();
         $allCarts = array();
         if (!$helper->isAbandonedCartEnabled($magentoStoreId)) {
@@ -629,7 +630,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return string
+     * @return Return the batchId for the batchJson of the carts. string
      */
     public function getBatchId()
     {
@@ -645,13 +646,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return null
+     * @return MD5 of the cart. string
      */
     public function getToken()
     {
         return $this->_token;
     }
 
+    /**
+     * @param $token
+     */
     public function setToken($token)
     {
 
@@ -659,7 +663,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return mixed
+     * @return Returns first date of abandoned cart if exists. string|null
      */
     protected function getFirstDate()
     {
@@ -667,7 +671,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return Object
+     * @return Mage_Sales_Model_Resource_Order_Collection
      */
     protected function getOrderCollection()
     {
