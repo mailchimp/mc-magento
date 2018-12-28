@@ -56,11 +56,113 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
     }
 
+    public function testGetConvertedQuotes ()
+    {
+        $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
+        $magentoStoreId = 1;
+        $mailchimpTableName = 'mailchimp_ecommerce_sync_data';
+        $batchLimitFromConfig = 100;
+        $customerEmailAddressByCart = 'luciaines@ebizmarts.com';
+        $counter = 0;
+        $alreadySentCartId = 2;
+        $cartJson = '{"id":"692","customer":{"id":"GUEST-2018-11-30-20-00-07-96938700","email_address":"luciaines@ebizmarts.com","opt_in_status":false,"first_name":"Lucia","last_name":"en el checkout","address":{"address1":"asdf","city":"asd","postal_code":"212312","country":"Tajikistan","country_code":"TJ"}},"campaign_id":"482d28ee12","checkout_url":"http:\/\/f3364930.ngrok.io\/mailchimp\/cart\/loadquote\?id=692&token=ec4f79b2e4677d2edc5bf78c934e5794","currency_code":"USD","order_total":"1700.0000","tax_total":0,"lines":[{"id":"1","product_id":"425","product_variant_id":"310","quantity":5,"price":"1700.0000"}]}';
+        $cartId = 1;
+        $token = 'ec4f79b2e4677d2edc5bf78c934e5794';
+        $stringIsActive = 'is_active';
+        $stringStoreId = 'store_id';
+        $arrayAddFieldToFilter = array('eq' => 0);
+        $arrayAddFieldToFilterStoreId = array('eq' => $magentoStoreId);
+
+
+        $cartsApiMock = $this->cartsApiMock->setMethods(array(
+            'getMailchimpEcommerceDataTableName',
+            'getQuoteCollection',
+            'getBatchLimitFromConfig',
+            '_getAllCartsByEmail',
+            'getCounter',
+            'getBatchId',
+            '_updateSyncData',
+            'setCounter'
+        ))
+            ->getMock();
+
+        $quoteResoureceCollectionMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addFieldToFilter', 'getSelect', 'getIterator'))
+            ->getMock();
+
+        $varienSelectMock = $this
+            ->getMockBuilder(Varien_Db_Select::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('joinLeft', 'where', 'limit'))
+            ->getMock();
+
+        $cartModelMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEntityId', 'getCustomerEmail'))
+            ->getMock();
+
+        $cartsApiMock->expects($this->once())
+            ->method('getMailchimpEcommerceDataTableName')
+            ->willReturn($mailchimpTableName);
+        $cartsApiMock->expects($this->once())
+            ->method('getQuoteCollection')
+            ->willReturn($quoteResoureceCollectionMock);
+        $cartsApiMock->expects($this->once())
+            ->method('getBatchLimitFromConfig')
+            ->willReturn($batchLimitFromConfig);
+        $cartsApiMock->expects($this->once())
+            ->method('_getAllCartsByEmail')
+            ->willReturn($customerEmailAddressByCart);
+        $cartsApiMock->expects($this->exactly(2))
+            ->method('getCounter')
+            ->willReturnOnConsecutiveCalls(
+                $counter,
+                $counter
+            );
+        $cartsApiMock->expects($this->once())
+            ->method('getBatchId')
+            ->willReturn(self::BATCH_ID);
+        $cartsApiMock->expects($this->exactly(2))
+            ->method('_updateSyncData')
+            ->withConsecutive(
+                array($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1),
+                array($cartId, $mailchimpStoreId,  null, null, null, null, null, $token)
+            );
+        $cartsApiMock->expects($this->exactly(2))
+            ->method('setCounter')
+            ->withConsecutive(
+                array($counter + 1),
+                array($counter + 1)
+            );
+
+        $quoteResoureceCollectionMock->expects($this->exactly(2))
+            ->method('addFieldToFilter')
+            ->withConsecutive(
+                array($stringIsActive, $arrayAddFieldToFilter),
+                array($stringStoreId, $arrayAddFieldToFilterStoreId)
+            );
+        $quoteResoureceCollectionMock->expects($this->exactly(3))
+            ->method('getSelect')
+            ->willReturnOnConsecutiveCalls(
+                $varienSelectMock,
+                $varienSelectMock,
+                $varienSelectMock
+            );
+        $quoteResoureceCollectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($cartModelMock)));
+
+        $cartsApiMock->_getConvertedQuotes($mailchimpStoreId, $magentoStoreId);
+    }
+
     public function testGetModifiedQuotes()
     {
         $mcTableName = 'mailchimp_ecommerce_sync_data';
         $batchLimitFromConfig = 100;
-        $magentoStoreId = 0;
+        $magentoStoreId = 1;
         $webSiteIdFromMagentoStoreId = 0;
         $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
         $customerEmailAddressByCart = 'luciaines@ebizmarts.com';
@@ -72,8 +174,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $customerId = 1;
         $stringIsActive = 'is_active';
         $stringStoreId = 'store_id';
-        $stringCustomerEmail = 'customer_email';
-        $arrayAddFieldToFilterCustomerEmail = array('eq' => $customerEmailAddressByCart);
         $arrayAddFieldToFilter = array('eq' => 1);
         $arrayAddFieldToFilterStoreId = array('eq' => $magentoStoreId);
         $where = "m4m.mailchimp_sync_deleted = 0
@@ -248,5 +348,259 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn($alreadySentCartId);
 
         $cartsApiMock->_getModifiedQuotes($mailchimpStoreId, $magentoStoreId);
+    }
+
+    public function testGetNewQuotes()
+    {
+        $existFirstDate = '2018-11-30';
+        $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
+        $batchLimitFromConfig = 100;
+        $alreadySentCartId = 2;
+        $cartId = 1;
+        $customerId = 1;
+        $token = 'ec4f79b2e4677d2edc5bf78c934e5794';
+        $magentoStoreId = 2;
+        $webSiteIdFromMagentoStoreId = 0;
+        $customerEmailAddressByCart = 'luciaines@ebizmarts.com';
+        $customerEmailAddress = '';
+        $counter = 0;
+        $allCarts = array(array('method' => 'DELETE', 'path' => '/ecommerce/stores/'.$mailchimpStoreId.'/carts/'. $alreadySentCartId, 'operation_id' => self::BATCH_ID . '_' . $alreadySentCartId, 'body' => ''));
+        $cartJson = '{"id":"692","customer":{"id":"GUEST-2018-11-30-20-00-07-96938700","email_address":"luciaines@ebizmarts.com","opt_in_status":false,"first_name":"Lucia","last_name":"en el checkout","address":{"address1":"asdf","city":"asd","postal_code":"212312","country":"Tajikistan","country_code":"TJ"}},"campaign_id":"482d28ee12","checkout_url":"http:\/\/f3364930.ngrok.io\/mailchimp\/cart\/loadquote\?id=692&token=ec4f79b2e4677d2edc5bf78c934e5794","currency_code":"USD","order_total":"1700.0000","tax_total":0,"lines":[{"id":"1","product_id":"425","product_variant_id":"310","quantity":5,"price":"1700.0000"}]}';
+        $stringIsActive = 'is_active';
+        $stringStoreId = 'store_id';
+        $stringCustomerEmail = 'customer_email';
+        $stringItemsCount = 'items_count';
+        $stringUpdatedAt = 'updated_at';
+        $arrayAddFieldToFilterUpdatedAt = array('gt' => $existFirstDate);
+        $arrayAddFieldToFilterItemsCount = array('gt' => 0);
+        $arrayAddFieldToFilterCustomerEmail = array('notnull' => true);
+        $arrayAddFieldToFilter = array('eq' => 1);
+        $arrayAddFieldToFilterStoreId = array('eq' => $magentoStoreId);
+        $where = "m4m.mailchimp_sync_delta IS NULL";
+        $allVisbleItems = array('item');
+        $sizeOrderCollection = 0;
+        $addFieldToFilterOrderCollection = array('eq' => 'luciaines@ebizmarts.com');
+        $stringCustomerEmailMainTable = 'main_table.customer_email';
+        $stringUpdated = 'main_table.updated_at';
+        $addFieldToFilterUpdated = array('from' => '');
+
+        $cartsApiMock = $this->cartsApiMock->setMethods(
+            array(
+                'getHelper',
+                'getQuoteCollection',
+                'getFirstDate',
+                'joinMailchimpSyncDataWithoutWhere',
+                'getBatchLimitFromConfig',
+                '_updateSyncData',
+                'getCustomerModel',
+                'getWebSiteIdFromMagentoStoreId',
+                '_getAllCartsByEmail',
+                'getCounter',
+                'getBatchId',
+                'setCounter',
+                'addProductNotSentData',
+                '_makeCart',
+                'setToken',
+                'getToken',
+                'getOrderCollection'
+            ))
+            ->getMock();
+
+        $helperMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->setMethods(array('addResendFilter'))
+            ->getMock();
+
+        $newCartsCollectionMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addFieldToFilter', 'getSelect', 'getIterator'))
+            ->getMock();
+
+        $varienSelectMock = $this
+            ->getMockBuilder(Varien_Db_Select::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('where', 'limit'))
+            ->getMock();
+
+        $customerModelMock = $this
+            ->getMockBuilder(Mage_Customer_Model_Customer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setWebsiteId', 'loadByEmail', 'getEmail'))
+            ->getMock();
+
+        $quoteByEmailResoureceCollectionMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('clear', 'getIterator'))
+            ->getMock();
+
+        $cartModelMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEntityId', 'getCustomerEmail', 'getCustomerId', 'getAllVisibleItems'))
+            ->getMock();
+
+        $cartByEmailModelMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEntityId'))
+            ->getMock();
+
+        $orderCollectionMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSize', 'addFieldToFilter'))
+            ->getMock();
+
+        $cartsApiMock->expects($this->once())
+            ->method('getHelper')
+            ->willReturn($helperMock);
+        $cartsApiMock->expects($this->once())
+            ->method('getQuoteCollection')
+            ->willReturn($newCartsCollectionMock);
+        $cartsApiMock->expects($this->exactly(2))
+            ->method('getFirstDate')
+            ->willReturnOnConsecutiveCalls(
+            $existFirstDate,
+            $existFirstDate
+        );
+        $cartsApiMock->expects($this->once())
+            ->method('joinMailchimpSyncDataWithoutWhere')
+            ->with($newCartsCollectionMock, $mailchimpStoreId);
+        $cartsApiMock->expects($this->once())
+            ->method('getBatchLimitFromConfig')
+            ->willReturn($batchLimitFromConfig);
+        $cartsApiMock->expects($this->exactly(2))
+            ->method('_updateSyncData')
+            ->withConsecutive(
+                array($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1),
+                array($cartId, $mailchimpStoreId,  null, null, null, null, null, $token)
+            );
+        $cartsApiMock->expects($this->once())
+            ->method('getCustomerModel')
+            ->willReturn($customerModelMock);
+        $cartsApiMock->expects($this->once())
+            ->method('getWebSiteIdFromMagentoStoreId')
+            ->with($magentoStoreId)
+            ->willReturn($webSiteIdFromMagentoStoreId);
+        $cartsApiMock->expects($this->once())
+            ->method('_getAllCartsByEmail')
+            ->with($customerEmailAddressByCart,$mailchimpStoreId, $magentoStoreId)
+            ->willReturn($quoteByEmailResoureceCollectionMock);
+        $cartsApiMock->expects($this->exactly(4))
+            ->method('getCounter')
+            ->willReturnOnConsecutiveCalls(
+                $counter,
+                $counter,
+                $counter,
+                $counter
+            );
+        $cartsApiMock->expects($this->once())
+            ->method('getBatchId')
+            ->willReturn(self::BATCH_ID);
+        $cartsApiMock->expects($this->exactly(2))
+            ->method('setCounter')
+            ->withConsecutive(
+                array($counter + 1),
+                array($counter + 1)
+            );
+        $cartsApiMock->expects($this->once())
+            ->method('addProductNotSentData')
+            ->with($mailchimpStoreId, $magentoStoreId, $cartModelMock, $allCarts)
+            ->willReturn($allCarts);
+        $cartsApiMock->expects($this->once())
+            ->method('_makeCart')
+            ->with($cartModelMock, $mailchimpStoreId, $magentoStoreId)
+            ->willReturn($cartJson);
+        $cartsApiMock->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+        $cartsApiMock->expects($this->once())
+            ->method('setToken')
+            ->with(null);
+        $cartsApiMock->expects($this->once())
+        ->method('getOrderCollection')
+        ->willReturn($orderCollectionMock);
+
+        $helperMock->expects($this->once())
+            ->method('addResendFilter')
+            ->with($newCartsCollectionMock, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
+
+        $newCartsCollectionMock->expects($this->exactly(5))
+            ->method('addFieldToFilter')
+            ->withConsecutive(
+                array($stringIsActive, $arrayAddFieldToFilter),
+                array($stringCustomerEmail, $arrayAddFieldToFilterCustomerEmail),
+                array($stringItemsCount, $arrayAddFieldToFilterItemsCount),
+                array($stringStoreId, $arrayAddFieldToFilterStoreId),
+                array($stringUpdatedAt, $arrayAddFieldToFilterUpdatedAt)
+            );
+        $newCartsCollectionMock->expects($this->exactly(2))
+            ->method('getSelect')
+            ->willReturnOnConsecutiveCalls(
+                $varienSelectMock,
+                $varienSelectMock
+            );
+        $newCartsCollectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($cartModelMock)));
+
+        $varienSelectMock->expects($this->once())
+            ->method('where')
+            ->with($where);
+        $varienSelectMock->expects($this->once())
+            ->method('limit')
+            ->with($batchLimitFromConfig);
+
+        $customerModelMock->expects($this->once())
+            ->method('setWebsiteId')
+            ->with($webSiteIdFromMagentoStoreId);
+        $customerModelMock->expects($this->once())
+            ->method('loadByEmail')
+            ->with($customerEmailAddressByCart);
+        $customerModelMock->expects($this->once())
+            ->method('getEmail')
+            ->willReturn($customerEmailAddress);
+
+        $quoteByEmailResoureceCollectionMock->expects($this->once())
+            ->method('clear');
+        $quoteByEmailResoureceCollectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($cartByEmailModelMock)));
+
+        $cartModelMock->expects($this->exactly(4))
+            ->method('getCustomerEmail')
+            ->willReturnOnConsecutiveCalls(
+                $customerEmailAddressByCart,
+                $customerEmailAddressByCart,
+                $customerEmailAddressByCart,
+                $customerEmailAddressByCart
+            );
+        $cartModelMock->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn($cartId);
+        $cartModelMock->expects($this->once())
+            ->method('getCustomerId')
+            ->willReturn($customerId);
+        $cartModelMock->expects($this->once())
+            ->method('getAllVisibleItems')
+            ->willReturn($allVisbleItems);
+
+        $cartByEmailModelMock->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn($alreadySentCartId);
+
+        $orderCollectionMock->expects($this->once())
+            ->method('getSize')
+            ->willReturn($sizeOrderCollection);
+        $orderCollectionMock->expects($this->exactly(2))
+            ->method('addFieldToFilter')
+            ->withConsecutive(
+                array($stringCustomerEmailMainTable, $addFieldToFilterOrderCollection),
+                array($stringUpdated, $addFieldToFilterUpdated)
+            );
+
+        $cartsApiMock->_getNewQuotes($mailchimpStoreId, $magentoStoreId);
     }
 }
