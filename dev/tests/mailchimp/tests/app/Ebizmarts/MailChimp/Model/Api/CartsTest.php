@@ -64,6 +64,145 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->createBatchJson(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
     }
 
+    public function testGetConvertedQuotes ()
+   {
+       $mailchimpTableName = 'mailchimp_ecommerce_sync_data';
+       $token = 'ec4f79b2e4677d2edc5bf78c934e5794';
+       $arrayAddFieldToFilter = array('eq' => 0);
+       $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
+       $where = "m4m.mailchimp_sync_deleted = 0";
+       $arrayTableName = array('m4m' => $mailchimpTableName);
+       $conditionSelect = "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
+            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+       $m4m = array('m4m.*');
+
+       $cartsApiMock = $this->cartsApiMock->setMethods(array(
+           'getMailchimpEcommerceDataTableName',
+           'getQuoteCollection',
+           'getBatchLimitFromConfig',
+           '_getAllCartsByEmail',
+           'getCounter',
+           'getBatchId',
+           '_updateSyncData',
+           'setCounter'
+       ))
+           ->getMock();
+
+       $quoteResoureceCollectionMock = $this
+           ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
+           ->disableOriginalConstructor()
+           ->setMethods(array('addFieldToFilter', 'getSelect', 'getIterator'))
+           ->getMock();
+
+       $varienSelectMock = $this
+           ->getMockBuilder(Varien_Db_Select::class)
+           ->disableOriginalConstructor()
+           ->setMethods(array('joinLeft', 'where', 'limit'))
+           ->getMock();
+
+       $cartModelMock = $this
+           ->getMockBuilder(Mage_Sales_Model_Quote::class)
+           ->disableOriginalConstructor()
+           ->setMethods(array('getEntityId', 'getCustomerEmail'))
+           ->getMock();
+
+       $quoteByEmailResoureceCollectionMock = $this
+           ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
+           ->disableOriginalConstructor()
+           ->setMethods(array('clear', 'getIterator'))
+           ->getMock();
+
+       $cartByEmailModelMock = $this
+           ->getMockBuilder(Mage_Sales_Model_Quote::class)
+           ->disableOriginalConstructor()
+           ->setMethods(array('getEntityId'))
+           ->getMock();
+
+       $cartsApiMock->expects($this->once())
+           ->method('getMailchimpEcommerceDataTableName')
+           ->willReturn($mailchimpTableName);
+       $cartsApiMock->expects($this->once())
+           ->method('getQuoteCollection')
+           ->willReturn($quoteResoureceCollectionMock);
+       $cartsApiMock->expects($this->once())
+           ->method('getBatchLimitFromConfig')
+           ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
+       $cartsApiMock->expects($this->once())
+           ->method('_getAllCartsByEmail')
+           ->with(self::CUSTOMER_EMAIL_BY_CART, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID)
+           ->willReturn($quoteByEmailResoureceCollectionMock);
+       $cartsApiMock->expects($this->exactly(4))
+           ->method('getCounter')
+           ->willReturnOnConsecutiveCalls(
+               self::COUNTER,
+               self::COUNTER,
+               self::COUNTER,
+               self::COUNTER
+           );
+       $cartsApiMock->expects($this->once())
+           ->method('getBatchId')
+           ->willReturn(self::BATCH_ID);
+       $cartsApiMock->expects($this->exactly(2))
+           ->method('_updateSyncData')
+           ->withConsecutive(
+               array(self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, 1),
+               array(self::CART_ID, self::MAILCHIMP_STORE_ID,  null, null, null, null, 1)
+           );
+       $cartsApiMock->expects($this->exactly(2))
+           ->method('setCounter')
+           ->withConsecutive(
+               array(self::COUNTER + 1),
+               array(self::COUNTER + 1)
+           );
+
+       $quoteResoureceCollectionMock->expects($this->exactly(2))
+           ->method('addFieldToFilter')
+           ->withConsecutive(
+               array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId),
+               array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter)
+           );
+       $quoteResoureceCollectionMock->expects($this->exactly(3))
+           ->method('getSelect')
+           ->willReturnOnConsecutiveCalls(
+               $varienSelectMock,
+               $varienSelectMock,
+               $varienSelectMock
+           );
+       $quoteResoureceCollectionMock->expects($this->once())
+           ->method('getIterator')
+           ->willReturn(new ArrayIterator(array($cartModelMock)));
+
+       $varienSelectMock->expects($this->once())
+           ->method('joinLeft')
+           ->with($arrayTableName, $conditionSelect, $m4m);
+       $varienSelectMock->expects($this->once())
+           ->method('where')
+           ->with($where);
+       $varienSelectMock->expects($this->once())
+           ->method('limit')
+           ->with(self::BATCH_LIMIT_FROM_CONFIG);
+
+       $cartModelMock->expects($this->once())
+           ->method('getCustomerEmail')
+           ->willReturnOnConsecutiveCalls(self::CUSTOMER_EMAIL_BY_CART);
+        $cartModelMock->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn(self::CART_ID);
+
+       $quoteByEmailResoureceCollectionMock->expects($this->once())
+           ->method('clear');
+
+       $quoteByEmailResoureceCollectionMock->expects($this->once())
+           ->method('getIterator')
+           ->willReturn(new ArrayIterator(array($cartByEmailModelMock)));
+
+       $cartByEmailModelMock->expects($this->once())
+           ->method('getEntityId')
+           ->willReturn(self::ALREADY_SENT_CART_ID);
+
+       $cartsApiMock->_getConvertedQuotes(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
+   }
+
     public function testGetModifiedQuotes()
     {
         $mcTableName = 'mailchimp_ecommerce_sync_data';
