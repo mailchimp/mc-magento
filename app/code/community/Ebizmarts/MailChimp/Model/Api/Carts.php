@@ -155,7 +155,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                         $allCarts[$counter]['body'] = '';
                         $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
-                        $this->setCounter($this->getCounter()+1);
+                        $this->setCounter($this->getCounter() + 1);
                     }
                 }
 
