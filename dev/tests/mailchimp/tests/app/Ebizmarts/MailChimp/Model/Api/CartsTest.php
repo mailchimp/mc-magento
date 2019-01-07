@@ -537,7 +537,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_deleted = 0
         AND m4m.mailchimp_sync_delta < updated_at";
-        $whereGetAllCartsByEmail = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $arrayTableName = array('m4m' => $mcTableName);
         $conditionSelect = "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
             AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
