@@ -216,7 +216,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $customerModelMock = $this->customerModelMockSetWebSiteIdLoadByEmail();
         $this->customerModelMockGetEmail($customerModelMock, $customerEmailAddress);
 
-        $cartsApiMock = $this->cartsApiMockModifiedQuotesGuestCustomer($newCartsCollectionMock, $customerModelMock);
+        $cartsApiMock = $this->cartsApiMockModifiedQuotesGuestCustomer($mcTableName, $newCartsCollectionMock, $customerModelMock);
 
         $cartsApiMock->_getModifiedQuotes(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
     }
@@ -1251,11 +1251,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $mcTableName
      * @param $newCartsCollectionMock
      * @param $customerModelMock
      * @return mixed
      */
-    protected function cartsApiMockModifiedQuotesGuestCustomer($newCartsCollectionMock, $customerModelMock)
+    protected function cartsApiMockModifiedQuotesGuestCustomer($mcTableName, $newCartsCollectionMock, $customerModelMock)
     {
         $cartsApiMock = $this->cartsApiMock->setMethods(
             array(
@@ -1265,7 +1266,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getCustomerModel',
                 'getWebSiteIdFromMagentoStoreId',
                 'getBatchId',
-                'getOrderCollection'
+                'getOrderCollection',
+                'getMailchimpEcommerceDataTableName'
             ))
             ->getMock();
         $cartsApiMock->expects($this->once())
@@ -1287,6 +1289,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())
             ->method('getBatchId')
             ->willReturn(self::BATCH_ID);
+        $cartsApiMock->expects($this->once())
+            ->method('getMailchimpEcommerceDataTableName')
+            ->willReturn($mcTableName);
         return $cartsApiMock;
     }
 
