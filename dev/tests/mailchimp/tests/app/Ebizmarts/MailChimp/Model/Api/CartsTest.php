@@ -59,6 +59,22 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->createBatchJson(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
     }
 
+    public function testCreateBatchJsonisAbandonedCartDisabled()
+    {
+        $cartsApiMock = $this->cartsApiMock
+            ->setMethods(array('getHelper'))
+            ->getMock();
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isAbandonedCartEnabled'))
+            ->getMock();
+
+        $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $helperMock->expects($this->once())->method('isAbandonedCartEnabled')->with(self::MAGENTO_STORE_ID)->willReturn(false);
+
+        $cartsApiMock->createBatchJson(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
+    }
+
     public function testGetConvertedQuotes ()
     {
         $mailchimpTableName = 'mailchimp_ecommerce_sync_data';
@@ -1522,5 +1538,65 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             );
 
         $cartsApiMock->_getNewQuotes(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
+    }
+
+    public function testGetAllCartsByEmail()
+    {
+        $mailchimpTableName = 'm4m';
+        $stringIsActive = 'is_active';
+        $arrayAddToFilterIsActive = array('eq' => 1);
+        $stringStoreId = 'store_id';
+        $arrayAddToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
+        $stringCustomerId = 'customer_email';
+        $arrayAddToFilterCustomerId = array('eq' => self::CUSTOMER_EMAIL_BY_CART);
+        $arrayMailchimpTableName = array('m4m' => $mailchimpTableName);
+        $condition = "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
+            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $m4m = array('m4m.*');
+        $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+
+        $cartsApiMock = $this->cartsApiMock
+            ->setMethods(array('getMailchimpEcommerceDataTableName', 'getQuoteCollection'))
+            ->getMock();
+        $newCartsCollectionMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addFieldToFilter', 'getSelect'))
+            ->getMock();
+        $varienSelectMock = $this
+            ->getMockBuilder(Varien_Db_Select::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('where', 'joinLeft'))
+            ->getMock();
+
+        $cartsApiMock->expects($this->once())
+            ->method('getMailchimpEcommerceDataTableName')
+            ->willReturn($mailchimpTableName);
+        $cartsApiMock->expects($this->once())
+            ->method('getQuoteCollection')
+            ->willReturn($newCartsCollectionMock);
+
+        $newCartsCollectionMock->expects($this->exactly(3))
+            ->method('addFieldToFilter')
+            ->withConsecutive(
+                array($stringIsActive, $arrayAddToFilterIsActive),
+                array($stringStoreId, $arrayAddToFilterStoreId),
+                array($stringCustomerId, $arrayAddToFilterCustomerId)
+            );
+        $newCartsCollectionMock->expects($this->exactly(2))
+            ->method('getSelect')
+            ->willReturnOnConsecutiveCalls(
+                $varienSelectMock,
+                $varienSelectMock
+            );
+
+        $varienSelectMock->expects($this->once())
+            ->method('joinLeft')
+            ->with($arrayMailchimpTableName, $condition, $m4m);
+        $varienSelectMock->expects($this->once())
+            ->method('where')
+            ->with($where);
+
+        $cartsApiMock->_getAllCartsByEmail(self::CUSTOMER_EMAIL_BY_CART, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
     }
 }
