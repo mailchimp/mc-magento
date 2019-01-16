@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.1.14](https://github.com/mailchimp/mc-magento/tree/HEAD) (2019-01-16)
+## [1.1.14](https://github.com/mailchimp/mc-magento/tree/1.1.14) (2019-01-16)
 
 [Full Changelog](https://github.com/mailchimp/mc-magento/compare/1.1.13...1.1.14)
 
