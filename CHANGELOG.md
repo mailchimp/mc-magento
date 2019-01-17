@@ -1,11 +1,26 @@
 # Change Log
 
-## [1.1.13](https://github.com/mailchimp/mc-magento/tree/HEAD) (2018-12-11)
+## [1.1.14](https://github.com/mailchimp/mc-magento/tree/1.1.14) (2019-01-16)
 
+[Full Changelog](https://github.com/mailchimp/mc-magento/compare/1.1.13...1.1.14)
+
+**Implemented enhancements:**
+
+- Replace old MailChimp logo with the new one. [\#839](https://github.com/mailchimp/mc-magento/issues/839)
+- create a reference to the Mailchimp tutorials [\#847](https://github.com/mailchimp/mc-magento/pull/847) ([hans2103](https://github.com/hans2103))
+
+**Fixed bugs:**
+
+- Orders belonging to deleted stores do not show correct syncing status under "synced to MailChimp" column [\#840](https://github.com/mailchimp/mc-magento/issues/840)
+
+## [1.1.13](https://github.com/mailchimp/mc-magento/tree/1.1.13) (2018-12-11)
 [Full Changelog](https://github.com/mailchimp/mc-magento/compare/1.1.12...1.1.13)
 
 **Implemented enhancements:**
 
+- Send subscription confirmation email via Magento [\#793](https://github.com/mailchimp/mc-magento/issues/793)
+- Order confirmation email is bypassing Aschroder\_SMTPPro [\#673](https://github.com/mailchimp/mc-magento/issues/673)
+- Add support for List Groups [\#514](https://github.com/mailchimp/mc-magento/issues/514)
 - Add option to not send Promo Codes and Promo Rules [\#824](https://github.com/mailchimp/mc-magento/issues/824)
 - Run webhook delete process more often for highly active stores. [\#818](https://github.com/mailchimp/mc-magento/issues/818)
 - Change "MailChimp" appearances for "Mailchimp" [\#817](https://github.com/mailchimp/mc-magento/issues/817)
@@ -21,7 +36,6 @@
 - No Double Opt-in Option for MailChimp for Magento [\#727](https://github.com/mailchimp/mc-magento/issues/727)
 - Capitalization at Newsletter top menu [\#718](https://github.com/mailchimp/mc-magento/issues/718)
 - Add translations file. [\#689](https://github.com/mailchimp/mc-magento/issues/689)
-- Order confirmation email is bypassing Aschroder\_SMTPPro [\#673](https://github.com/mailchimp/mc-magento/issues/673)
 - Remove disabled products to aovid using them in promotions. [\#582](https://github.com/mailchimp/mc-magento/issues/582)
 - Send customers created in the backend [\#527](https://github.com/mailchimp/mc-magento/issues/527)
 - Send most recently created promo codes first [\#736](https://github.com/mailchimp/mc-magento/pull/736) ([Leland](https://github.com/Leland))
@@ -29,22 +43,23 @@
 
 **Fixed bugs:**
 
-- When MailChimp site is down failures occur in the extension. [\#815](https://github.com/mailchimp/mc-magento/issues/815)
 - Growing DB Table `mailchimp\_webhook\_request` [\#812](https://github.com/mailchimp/mc-magento/issues/812)
+- Total spent for customers sent incorrectly [\#791](https://github.com/mailchimp/mc-magento/issues/791)
+- Error Report when Export Orders CSV or Excel [\#732](https://github.com/mailchimp/mc-magento/issues/732)
+- Upgrade to 1.1.2 : You cannot define a correlation name 'mc' more than once [\#725](https://github.com/mailchimp/mc-magento/issues/725)
+- When MailChimp site is down failures occur in the extension. [\#815](https://github.com/mailchimp/mc-magento/issues/815)
 - Customer batch limit not working [\#806](https://github.com/mailchimp/mc-magento/issues/806)
 - Change asynchronous execution of MailChimp JavaScript to deferred execution [\#804](https://github.com/mailchimp/mc-magento/issues/804)
 - Show correct status for orders previous to first date [\#797](https://github.com/mailchimp/mc-magento/issues/797)
-- Total spent for customers sent incorrectly [\#791](https://github.com/mailchimp/mc-magento/issues/791)
 - Promo Rules with discount = 0 not syncing [\#777](https://github.com/mailchimp/mc-magento/issues/777)
 - Resend Ecommerce Data not working [\#773](https://github.com/mailchimp/mc-magento/issues/773)
 - Items marked with deleted\_related\_id incorrectly. [\#757](https://github.com/mailchimp/mc-magento/issues/757)
 - Incorrect store domain when setting up at website level. [\#754](https://github.com/mailchimp/mc-magento/issues/754)
 - Send products with no description available [\#747](https://github.com/mailchimp/mc-magento/issues/747)
-- Error Report when Export Orders CSV or Excel [\#732](https://github.com/mailchimp/mc-magento/issues/732)
 - Synced status not reporting correctly in orders grid [\#726](https://github.com/mailchimp/mc-magento/issues/726)
-- Upgrade to 1.1.2 : You cannot define a correlation name 'mc' more than once [\#725](https://github.com/mailchimp/mc-magento/issues/725)
 - Clear mail object after sending message [\#719](https://github.com/mailchimp/mc-magento/issues/719)
 - Token expiration in carts [\#714](https://github.com/mailchimp/mc-magento/issues/714)
+- Add campaignCatcher.js file only if ecommerce is enabled. [\#698](https://github.com/mailchimp/mc-magento/issues/698)
 - New Subscribers have no language in MC [\#695](https://github.com/mailchimp/mc-magento/issues/695)
 - Set subcribers correct language in mailchimp during signup \#729 [\#730](https://github.com/mailchimp/mc-magento/pull/730) ([ljay79](https://github.com/ljay79))
 
@@ -63,7 +78,6 @@
 
 **Fixed bugs:**
 
-- Add campaignCatcher.js file only if ecommerce is enabled. [\#698](https://github.com/mailchimp/mc-magento/issues/698)
 - Problem when updating customer email that is not subscribed [\#700](https://github.com/mailchimp/mc-magento/issues/700)
 - STORECODE contains name of the store instead of code of the store [\#697](https://github.com/mailchimp/mc-magento/issues/697)
 - Use store url with store code [\#691](https://github.com/mailchimp/mc-magento/issues/691)
