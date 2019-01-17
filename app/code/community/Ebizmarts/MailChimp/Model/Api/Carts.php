@@ -585,7 +585,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         return $this->_token;
     }
     /**
-     * @param $token
+     * @param string $token
      */
     public function setToken($token)
     {
