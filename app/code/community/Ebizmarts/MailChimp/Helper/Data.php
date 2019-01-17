@@ -12,6 +12,10 @@
  */
 class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    const DEFAULT_SIZE      = '0';
+    const SMALL_SIZE        = '1';
+    const THUMBNAIL_SIZE    = '2';
+    const ORIGINAL_SIZE     = '3';
 
     /**
      * All MailChimp available language codes
@@ -1313,23 +1317,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $productModel = $this->getProductModel();
         $configImageSize = $this->getImageSize($magentoStoreId);
         switch ($configImageSize) {
-            case 0:
+            case self::DEFAULT_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
-            case 1:
+            case self::SMALL_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_SMALL;
                 break;
-            case 2:
+            case self::THUMBNAIL_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_THUMBNAIL;
                 break;
-            case 3:
+            case self::ORIGINAL_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
             default:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
         }
-
         $productImage = $productResourceModel->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
         $productModel->setData($imageSize, $productImage);
 
@@ -1338,14 +1341,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $curStore = $this->getCurrentStoreId();
             $this->setCurrentStore($magentoStoreId);
-            if ($configImageSize == 3){
-                $imageUrl = $this->getImageUrl($productModel, $imageSize);
+            if ($configImageSize == self::ORIGINAL_SIZE){
+                $imageUrl = $this->getOriginalPath($productImage);
             } else {
                 $upperCaseImage = $this->getImageFunctionName($imageSize);
                 $imageUrl = $productModel->$upperCaseImage();
             }
             $this->setCurrentStore($curStore);
         }
+
         return $imageUrl;
     }
 
@@ -3425,5 +3429,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getCurrentDateTime()
     {
         return Mage::getModel('core/date')->date('d-m-Y H:i:s');
+    }
+
+    /**
+     * @param $productImage
+     * @return string
+     */
+    protected function getOriginalPath($productImage)
+    {
+        return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $productImage;
     }
 }
