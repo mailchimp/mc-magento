@@ -3432,6 +3432,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Return original path for the imageURL (not the catched one)
+     *
      * @param $productImage
      * @return string
      */
