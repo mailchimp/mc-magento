@@ -230,7 +230,13 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     protected function getSendersDomains($mail)
     {
-        return $mail->senders->domains();
+        $mandrillSenders = array();
+        try {
+            $mandrillSenders = $mail->senders->domains();
+        } catch (Exception $e) {
+            Mage::log($e->getMessage(), null, 'Mandrill.log', true);
+        }
+        return $mandrillSenders;
     }
 
     /**
@@ -240,7 +246,13 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     protected function sendMail($email, $mail)
     {
-        return $mail->messages->send($email);
+        $mailSent = false;
+        try {
+            $mailSent = $mail->messages->send($email);
+        } catch (Exception $e) {
+            Mage::log($e->getMessage(), null, 'Mandrill.log', true);
+        }
+        return $mailSent;
     }
 
     /**
