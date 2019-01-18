@@ -620,4 +620,45 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         return $method->invokeArgs($object, $parameters);
     }
 
+    public function testUpdate()
+    {
+        $parentIdArray = array(282, 283, 284, 510, 511, 878, 880, 881);
+        $productId = 877;
+        $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('getAllParentIds', '_updateSyncData'))
+            ->getMock();
+
+        $productIdArrayMock = $this->getMockBuilder(ArrayObject::class)
+            ->setMethods(array('getIterator'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())
+            ->method('getAllParentIds')
+            ->with($productId)
+            ->willReturn($productIdArrayMock);
+
+
+        $productIdArrayMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator($parentIdArray));
+
+        $productsApiMock->expects($this->exactly(9))
+            ->method('_updateSyncData')
+            ->withConsecutive(
+                array($parentIdArray[0], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[1], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[2], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[3], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[4], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[5], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[6], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($parentIdArray[7], $mailchimpStoreId, null, null, 1, null, null, true, false),
+                array($productId, $mailchimpStoreId, null, null, 1, null, null, true, false)
+            );
+
+        $productsApiMock->update($productId, $mailchimpStoreId);
+    }
+
 }

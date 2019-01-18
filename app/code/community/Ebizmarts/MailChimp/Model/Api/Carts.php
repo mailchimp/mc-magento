@@ -11,14 +11,13 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Carts
 {
-
     const BATCH_LIMIT = 100;
 
     protected $_firstDate;
     protected $_counter;
     protected $_batchId;
-    protected $_api = null;
 
+    protected $_api = null;
     protected $_token = null;
 
     /**
@@ -174,7 +173,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
-                $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts'.$cartId;
+                $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/'.$cartId;
                 $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                 $allCarts[$counter]['body'] = $cartJson;
                 $this->setCounter($this->getCounter()+1);
@@ -283,7 +282,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param  $magentoStoreId
      * @return object
      */
-    protected function _getAllCartsByEmail($email, $mailchimpStoreId, $magentoStoreId)
+    public function getAllCartsByEmail($email, $mailchimpStoreId, $magentoStoreId)
     {
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $allCartsForEmail = $this->getQuoteCollection();
@@ -630,7 +629,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return Return the batchId for the batchJson of the carts. string
+     * Return the batchId for the batchJson of the carts.
+     *
+     * @return string
      */
     public function getBatchId()
     {
@@ -646,15 +647,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return MD5 of the cart. string
+     * Token for cart validation.
+     *
+     * @return string|null
      */
     public function getToken()
     {
         return $this->_token;
     }
-
     /**
-     * @param $token
+     * @param string $token
      */
     public function setToken($token)
     {
@@ -663,7 +665,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @return Returns first date of abandoned cart if exists. string|null
+     * Returns first date of abandoned cart if exists.
+     *
+     * @return string|null
      */
     protected function getFirstDate()
     {
@@ -678,3 +682,4 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         return Mage::getResourceModel('sales/order_collection');
     }
 }
+

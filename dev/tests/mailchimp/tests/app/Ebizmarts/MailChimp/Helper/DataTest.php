@@ -373,22 +373,29 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->createWebhookIfRequired($scopeId, $scope);
     }
 
-    public function testGetImageUrlById()
+    /**
+     * @param array $data
+     * @dataProvider testGetImageUrlByIdDataProvider
+     */
+
+    public function testGetReSizedImageUrlById($data)
     {
         $productId = 1;
         $magentoStoreId = 1;
         $defaultStoreId = 0;
-        $imageSize = 'image';
-        $upperCaseImage = 'getImageUrl';
+        $imageSize = $data['imageSize'];
+        $imageUrl = 'http://magento.com/catalog/product/image.jpg';
+        $configImageSize = $data['configImageSize'];
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId', 'setCurrentStore', 'getImageFunctionName'))
+            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
+                'setCurrentStore', 'getImageUrl', 'getImageUrlForSize'))
             ->getMock();
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('setData', 'getImageUrl'))
+            ->setMethods(array('setData', 'getImageUrl', 'getThumbnailUrl', 'getSmallImageUrl'))
             ->getMock();
 
         $productResourceModelMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
@@ -402,22 +409,76 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('getProductResourceModel')->willReturn($productResourceModelMock);
         $helperMock->expects($this->once())->method('getProductModel')->willReturn($productModelMock);
-        $helperMock->expects($this->once())->method('getImageSize')->with($magentoStoreId)->willReturn($imageSize);
+        $helperMock->expects($this->once())->method('getImageSize')->with($magentoStoreId)->willReturn($configImageSize);
 
         $productResourceModelMock->expects($this->once())->method('getAttributeRawValue')->with($productId, $imageSize, $magentoStoreId)->willReturn($imageModelMock);
 
         $productModelMock->expects($this->once())->method('setData')->with($imageSize, $imageModelMock);
-        $productModelMock->expects($this->once())->method('getImageUrl')->willReturn('ImageUrl');
 
         $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn($defaultStoreId);
-
         $helperMock->expects($this->exactly(2))->method('setCurrentStore')->withConsecutive(array($magentoStoreId), array($defaultStoreId));
 
-        $helperMock->expects($this->once())->method('getImageFunctionName')->with($imageSize)->willReturn($upperCaseImage);
+        $helperMock->expects($this->once())->method('getImageUrlForSize')->with($imageSize, $productModelMock)->willReturn($imageUrl);
 
         $return = $helperMock->getImageUrlById($productId, $magentoStoreId);
 
-        $this->assertEquals($return, 'ImageUrl');
+        $this->assertEquals($return, $imageUrl);
+    }
+
+    public function testGetImageUrlByIdDataProvider()
+    {
+        return array(
+            array(array('imageSize' => Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT, 'configImageSize' => Ebizmarts_MailChimp_Helper_Data::DEFAULT_SIZE)),
+            array(array('imageSize' => Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_SMALL, 'configImageSize' => Ebizmarts_MailChimp_Helper_Data::SMALL_SIZE)),
+            array(array('imageSize' => Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_THUMBNAIL, 'configImageSize' => Ebizmarts_MailChimp_Helper_Data::THUMBNAIL_SIZE))
+        );
+    }
+
+    public function testGetOriginalImageUrlById()
+    {
+        $productId = 1;
+        $magentoStoreId = 1;
+        $defaultStoreId = 0;
+        $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
+        $imageUrl = 'http://magento.com/catalog/product/image.jpg';
+        $configImageSize = Ebizmarts_MailChimp_Helper_Data::ORIGINAL_SIZE;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
+                'setCurrentStore', 'getImageUrl', 'getOriginalPath'))
+            ->getMock();
+
+        $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setData', 'getImageUrl', 'getThumbnailUrl', 'getSmallImageUrl'))
+            ->getMock();
+
+        $productResourceModelMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAttributeRawValue'))
+            ->getMock();
+
+        $imageModelMock = $this->getMockBuilder(Mage_Media_Model_Image::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getProductResourceModel')->willReturn($productResourceModelMock);
+        $helperMock->expects($this->once())->method('getProductModel')->willReturn($productModelMock);
+        $helperMock->expects($this->once())->method('getImageSize')->with($magentoStoreId)->willReturn($configImageSize);
+
+        $productResourceModelMock->expects($this->once())->method('getAttributeRawValue')->with($productId, $imageSize, $magentoStoreId)->willReturn($imageModelMock);
+
+        $productModelMock->expects($this->once())->method('setData')->with($imageSize, $imageModelMock);
+
+        $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn($defaultStoreId);
+        $helperMock->expects($this->exactly(2))->method('setCurrentStore')->withConsecutive(array($magentoStoreId), array($defaultStoreId));
+
+        $helperMock->expects($this->once())->method('getOriginalPath')->with($imageModelMock)->willReturn($imageUrl);
+
+        $return = $helperMock->getImageUrlById($productId, $magentoStoreId);
+
+        $this->assertEquals($return, $imageUrl);
     }
 
     public function testGetImageFunctionName()
