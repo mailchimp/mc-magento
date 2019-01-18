@@ -226,4 +226,17 @@ class MailChimp_ListsMembers extends MailChimp_Abstract
     {
         return $this->_master->call('lists/'.$listId.'/members/'.$subscriberHash, null, Ebizmarts_MailChimp::DELETE);
     }
+
+
+    /**
+     * @param $listId               The unique id for the list.
+     * @param $mcEidCookie          The email id that comes with the link in the campaign email
+     * @return mixed
+     * @throws MailChimp_Error
+     * @throws MailChimp_HttpError
+     */
+    public function getEmailByMcEid($listId,$mcEidCookie)
+    {
+        return $this->_master->call('lists/'.$listId.'/members?unique_email_id='.$mcEidCookie, null, Ebizmarts_MailChimp::GET);
+    }
 }

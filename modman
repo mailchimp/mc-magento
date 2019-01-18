@@ -5,6 +5,7 @@ app/design/adminhtml/default/default/template/ebizmarts/mailchimp    app/design/
 app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml      app/design/frontend/base/default/layout/ebizmarts/mailchimp.xml
 app/design/frontend/base/default/template/ebizmarts/mailchimp        app/design/frontend/base/default/template/ebizmarts/mailchimp
 app/etc/modules/Ebizmarts_MailChimp.xml                              app/etc/modules/Ebizmarts_MailChimp.xml
+app/locale/en_US/Ebizmarts_MailChimp.csv                             app/locale/en_US/Ebizmarts_MailChimp.csv
 dev/tests/mailchimp/                                                 dev/tests/mailchimp/
 js/ebizmarts/mailchimp                                               js/ebizmarts/mailchimp
 lib/Ebizmarts/MailChimp.php                                          lib/Ebizmarts/MailChimp.php

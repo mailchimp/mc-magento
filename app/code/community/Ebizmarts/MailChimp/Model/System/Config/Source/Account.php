@@ -33,6 +33,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     const NO_STORE_TEXT_KEY = 20;
     const NEW_STORE_TEXT_KEY = 21;
     const STORE_MIGRATION_TEXT_KEY = 30;
+    const IN_PROGRESS = 1;
+    const FINISHED = 2;
 
     /**
      * Set AccountDetails on class property if not already set
@@ -71,11 +73,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                             $totalCarts = $api->ecommerce->carts->getAll($mcStoreId, 'total_items');
                             $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
                         } catch (MailChimp_Error $e) {
-                            if ($helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+                            if ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
                                 $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                                 if ($listId) {
                                     $helper->createStore($listId, $scopeArray['scope_id'], $scopeArray['scope']);
-                                    $message = $helper->__('Looks like your MailChimp store was deleted. A new one has been created.');
+                                    $message = $helper->__('Looks like your MailChimp store was deleted. Attempting to create a new one.');
                                     Mage::getSingleton('adminhtml/session')->addWarning($message);
                                 }
                             }
@@ -131,18 +133,18 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $totalOrders = $totalOrdersText . ' ' . $this->_accountDetails['total_orders'];
                 $totalCartsText = $helper->__('  Total Carts:');
                 $totalCarts = $totalCartsText . ' ' . $this->_accountDetails['total_carts'];
-                $title = $helper->__('Ecommerce Data uploaded to MailChimp store ' . $this->_accountDetails['store_name'] . ':');
+                $title = $helper->__('Ecommerce Data uploaded to Mailchimp store ') . $this->_accountDetails['store_name'] . ':';
                 if ($this->_accountDetails['store_sync_flag'] && !$this->_accountDetails['store_sync_date'] && !$helper->getResendEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
-                    $syncValue = 'In Progress';
+                    $syncValue = self::IN_PROGRESS;
                 } else {
                     $syncData = $this->_accountDetails['store_sync_date'];
                     if ($helper->validateDate($syncData)) {
                         $syncValue = $syncData;
                     } else {
-                        $syncValue = 'Finished';
+                        $syncValue = self::FINISHED;
                     }
                 }
-                $syncLabel = $helper->__('Initial sync: ' . $syncValue);
+                $syncLabel = $helper->__('Initial sync') . ': ' . $syncValue;
                 $returnArray = array_merge(
                     $returnArray,
                     array(

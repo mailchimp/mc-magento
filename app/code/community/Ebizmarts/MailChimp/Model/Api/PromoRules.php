@@ -196,6 +196,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             null,
             null,
             $saveOnlyIfexists,
+            null,
             $allowBatchRemoval
         );
     }
@@ -217,12 +218,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $data['description'] = ($promoRule->getDescription()) ? $promoRule->getDescription() : $promoRule->getName();
 
         $fromDate = $promoRule->getFromDate();
-        if ($fromDate) {
+        if ($fromDate !== null) {
             $data['starts_at'] = $fromDate;
         }
 
         $toDate = $promoRule->getToDate();
-        if ($toDate) {
+        if ($toDate !== null) {
             $data['ends_at'] = $toDate;
         }
 
@@ -233,11 +234,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
 
         $data['enabled'] = (bool)$promoRule->getIsActive();
 
-        if (!$data['target'] || !$data['type']) {
+        if ($this->ruleIsNotCompatible($data)) {
             $error = 'The rule type is not supported by the MailChimp schema.';
         }
 
-        if (!$error && (!$data['amount'] || !$data['description'] || !$data['id'])) {
+        if (!$error && $this->ruleHasMissingInformation($data)) {
             $error = 'There is required information by the MailChimp schema missing.';
         }
 
@@ -351,5 +352,39 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     protected function getCoreResource()
     {
         return Mage::getSingleton('core/resource');
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    protected function ruleIsNotCompatible($data)
+    {
+        $isNotCompatible = null;
+
+        if ($data['target'] === null || $data['type'] === null) {
+            $isNotCompatible = true;
+        } else {
+            $isNotCompatible = false;
+        }
+
+        return $isNotCompatible;
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    protected function ruleHasMissingInformation($data)
+    {
+        $hasMissingInformation = null;
+
+        if ($data['amount'] === null || $data['description'] === null || $data['id'] === null) {
+            $hasMissingInformation = true;
+        } else {
+            $hasMissingInformation = false;
+        }
+
+        return $hasMissingInformation;
     }
 }

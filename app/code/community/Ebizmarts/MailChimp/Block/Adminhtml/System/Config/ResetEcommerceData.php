@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetEcommerceData
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         if ($helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            $label = $helper->__('Reset MailChimp Store');
+            $label = $helper->__('Reset Mailchimp Store');
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(

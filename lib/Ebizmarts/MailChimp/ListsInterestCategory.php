@@ -18,6 +18,14 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
     public $interests;
 
     /**
+     * @return MailChimp_ListInterestCategoryInterests
+     */
+    public function getInterests()
+    {
+        return $this->interests;
+    }
+
+    /**
      * @param $listId             The unique id for the list.
      * @param $title              The text description of this category. This field appears on signup forms and is
      *                            often phrased as a question.

@@ -13,6 +13,7 @@
 class Ebizmarts_MailChimp_Model_Observer
 {
 
+    const PRODUCT_IS_DISABLED = 2;
 
     /**
      * @return Mage_Core_Model_Resource
@@ -110,7 +111,7 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function saveConfig(Varien_Event_Observer $observer)
     {
-        $post = Mage::app()->getRequest()->getPost();
+        $post = $this->getRequest()->getPost();
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
 
@@ -125,27 +126,33 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
-     * Handle subscription change (subscribe/unsubscribe)
+     * Handle confirmation emails and subscription to Mailchimp
      *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
+     * @throws Mage_Core_Exception
      */
-    public function handleSubscriber(Varien_Event_Observer $observer)
+    public function subscriberSaveBefore(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
+        $storeId = $subscriber->getStoreId();
         $helper = $this->makeHelper();
-        if ($subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
-            $isEnabled = $helper->isSubscriptionEnabled($subscriber->getStoreId());
-            if ($isEnabled) {
-                $apiSubscriber = $this->makeApiSubscriber();
-                $subscriber->setImportMode(true);
-                if (!Mage::getSingleton('customer/session')->isLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
-                    Mage::getModel('core/cookie')->set(
-                        'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
-                    );
-                }
+        $isEnabled = $helper->isSubscriptionEnabled($storeId);
 
-                if (true === $subscriber->getIsStatusChanged()) {
+        if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+            $statusChanged = $subscriber->getIsStatusChanged();
+            $apiSubscriber = $this->makeApiSubscriber();
+
+            //Override Magento status to always send double opt-in confirmation.
+            if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
+                $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+                $this->addSuccessIfRequired($helper);
+            }
+            $subscriber->setImportMode(true);
+
+            if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
+                //Use MailChimp emails
+                if ($statusChanged) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
                     $origData = $subscriber->getOrigData();
@@ -156,6 +163,38 @@ class Ebizmarts_MailChimp_Model_Observer
                         $apiSubscriber->updateSubscriber($subscriber, true);
                     }
                 }
+            }
+        }
+
+        return $observer;
+    }
+
+    /**
+     * Handle interest groups for subscriber and allow Magento email to be sent if configured that way.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function subscriberSaveAfter(Varien_Event_Observer $observer)
+    {
+        $subscriber = $observer->getEvent()->getSubscriber();
+        $storeId = $subscriber->getStoreId();
+        $helper = $this->makeHelper();
+        $isEnabled = $helper->isSubscriptionEnabled($storeId);
+
+        if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+            $params = $this->getRequest()->getParams();
+            $helper->saveInterestGroupData($params, $storeId, null, $subscriber);
+
+            $this->createEmailCookie($subscriber);
+
+            if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
+                $apiSubscriber = $this->makeApiSubscriber();
+                $apiSubscriber->updateSubscriber($subscriber, true);
+            } else {
+                $subscriber->setImportMode(false);
             }
         }
 
@@ -222,40 +261,49 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
-    public function customerSaveBefore(Varien_Event_Observer $observer)
+    public function customerSaveAfter(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
+        $origEmail = $customer->getOrigData('email');
+        $customerEmail = $customer->getEmail();
         $storeId = $customer->getStoreId();
+        // if customer was created in admin, use store id selected for Mailchimp.
+        if (!$storeId) {
+            $storeId = $customer->getMailchimpStoreView();
+        }
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
+        $params = $this->getRequest()->getParams();
 
         if ($isEnabled) {
+            $customerId = $customer->getId();
+            $subscriberEmail = ($origEmail) ? $origEmail : $customerEmail;
+            $subscriber = $this->handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId);
             $apiSubscriber = $this->makeApiSubscriber();
-            $origEmail = $customer->getOrigData('email');
-            $customerEmail = $customer->getEmail();
             if ($origEmail) {
                 // check if customer has changed email address
                 if ($origEmail != $customerEmail) {
-                    $subscriberModel = $this->getSubscriberModel();
-                    $subscriber = $subscriberModel->loadByEmail($origEmail);
                     if ($subscriber->getId()) {
                         // unsubscribe old email address
                         $apiSubscriber->deleteSubscriber($subscriber);
+
+                        // subscribe new email address
+                        $subscriberModel = $this->getSubscriberModel();
+                        $subscriber = $subscriberModel->loadByCustomer($customer);
+                        $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
+                        $subscriber->save();
+
                     }
-
-                    // subscribe new email address
-                    $subscriber = $subscriberModel->loadByCustomer($customer);
-                    $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
-
-                    $apiSubscriber->updateSubscriber($subscriber, true);
                 }
             }
-            //update subscriber data if a subscriber with the same email address exists
-            $apiSubscriber->update($customerEmail, $storeId);
+            //update subscriber data if a subscriber with the same email address exists and was not affected.
+            if (!$origEmail || $origEmail == $customerEmail) {
+                $apiSubscriber->update($customerEmail, $storeId);
+            }
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 //update mailchimp ecommerce data for that customer
-                $this->makeApiCustomer()->update($customer->getId(), $storeId);
+                $this->makeApiCustomer()->update($customerId, $storeId);
             }
         }
 
@@ -303,7 +351,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $email = $order->getCustomerEmail();
                 $subscriber = $helper->loadListSubscriber($post, $email);
                 if ($subscriber) {
-                    if(!$subscriber->getCustomerId()) {
+                    if (!$subscriber->getCustomerId()) {
                         $subscriber->setSubscriberFirstname($order->getCustomerFirstname());
                         $subscriber->setSubscriberLastname($order->getCustomerLastname());
                     }
@@ -491,7 +539,6 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
 
-
     public function addColumnToSalesOrderGridCollection(Varien_Event_Observer $observer)
     {
 
@@ -500,8 +547,13 @@ class Ebizmarts_MailChimp_Model_Observer
         $ecommEnabledAnyScope = $helper->isEcomSyncDataEnabledInAnyScope();
         if ($ecommEnabledAnyScope && $addColumnConfig) {
             $collection = $observer->getOrderGridCollection();
-            $collection->addFilterToMap('store_id', 'main_table.store_id');
             $select = $collection->getSelect();
+            $fromClause = $select->getPart(Zend_Db_Select::FROM);
+            //check if mc alias is already defined, avoids possible conflicts
+            if (array_key_exists('mc', $fromClause)) {
+                return;
+            }
+
             $adapter = $this->getCoreResource()->getConnection('core_write');
             $select->joinLeft(array('mc' => $collection->getTable('mailchimp/ecommercesyncdata')), $adapter->quoteInto('mc.related_id=main_table.entity_id AND type = ?', Ebizmarts_MailChimp_Model_Config::IS_ORDER), array('mc.mailchimp_synced_flag', 'mc.id'));
             $select->group("main_table.entity_id");
@@ -526,23 +578,25 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $isEcomEnabled = $helper->isEcomSyncDataEnabled($storeId);
         $isAbandonedCartEnabled = $helper->isAbandonedCartEnabled($storeId);
+        $email = null;
 
-        if (!Mage::getSingleton('customer/session')->isLoggedIn()
+        if (!$this->isCustomerLoggedIn()
             && $isEcomEnabled && $isAbandonedCartEnabled
         ) {
-            $action = Mage::app()->getRequest()->getActionName();
+            $action = $this->getRequestActionName();
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
-            if (Mage::getModel('core/cookie')->get('email')
-                && Mage::getModel('core/cookie')->get('email') != 'none' && !$onCheckout
+            $emailCookie = $this->getEmailCookie();
+            $mcEidCookie = $this->getMcEidCookie();
+            if ($emailCookie && $emailCookie != 'none' && !$onCheckout
             ) {
-                $emailCookie = Mage::getModel('core/cookie')->get('email');
-                $emailCookieArr = explode('/', $emailCookie);
-                $email = $emailCookieArr[0];
-                $email = str_replace(' ', '+', $email);
-                if ($quote->getCustomerEmail() != $email) {
-                    $quote->setCustomerEmail($email);
-                }
+                $email = $this->getEmailFromPopUp($emailCookie);
+            } elseif ($mcEidCookie) {
+                $email = $this->getEmailFromMcEid($storeId, $mcEidCookie);
+            }
+
+            if ($quote->getCustomerEmail() != $email && $email !== null) {
+                $quote->setCustomerEmail($email);
             }
         }
 
@@ -674,8 +728,14 @@ class Ebizmarts_MailChimp_Model_Observer
             $ecommEnabled = $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']);
 
             if ($ecommEnabled) {
-                $apiProduct->update($product->getId(), $mailchimpStoreId);
+                if ($product->getStatus() == self::PRODUCT_IS_DISABLED) {
+                    $apiProduct->updateDisabledProducts($product->getId(), $mailchimpStoreId);
+                } else {
+                    $apiProduct->update($product->getId(), $mailchimpStoreId);
+                }
             }
+
+
         }
 
         return $observer;
@@ -761,6 +821,34 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
+     * @param $emailCookie
+     * @return mixed
+     */
+    protected function getEmailFromPopUp($emailCookie)
+    {
+        $emailCookieArr = explode('/', $emailCookie);
+        $email = $emailCookieArr[0];
+        $email = str_replace(' ', '+', $email);
+        return $email;
+    }
+
+    /**
+     * @param $helper
+     * @param $storeId
+     * @param $mcEidCookie
+     * @return mixed
+     */
+    protected function getEmailFromMcEid($storeId, $mcEidCookie)
+    {
+        $helper = $this->makeHelper();
+        $mailchimpApi = $helper->getApi($storeId);
+        $listId = $helper->getGeneralList($storeId);
+        $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
+        $email = $listMember['members'][0]['email_address'];
+        return $email;
+    }
+
+    /**
      * @param $order
      */
     protected function handleOrderUpdate($order)
@@ -797,7 +885,7 @@ class Ebizmarts_MailChimp_Model_Observer
     public function secondaryCouponsDelete(Varien_Event_Observer $observer)
     {
         $promoCodesApi = $this->makeApiPromoCode();
-        $params = Mage::app()->getRequest()->getParams();
+        $params = $this->getRequest()->getParams();
         if (isset($params['ids']) && isset($params['id'])) {
             $promoRuleId = $params['id'];
             $promoCodeIds = $params['ids'];
@@ -884,5 +972,132 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function removeRegistry()
     {
         return Mage::unregister('sort_column_dir');
+    }
+
+    /**
+     * Add success message if subscribing from customer account.
+     *
+     * @param $helper
+     */
+    protected function addSuccessIfRequired($helper)
+    {
+        $request = Mage::app()->getRequest();
+        $module = $request->getControllerModule();
+        $module_controller = $request->getControllerName();
+        $module_controller_action = $request->getActionName();
+        $fullActionName = $module . '_' . $module_controller . '_' . $module_controller_action;
+        if (strstr($fullActionName, 'Mage_Newsletter_manage_save')) {
+            Mage::getSingleton('customer/session')->addSuccess($helper->__('Confirmation request has been sent.'));
+        }
+    }
+
+    /**
+     * @param $subscriber
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function createEmailCookie($subscriber)
+    {
+        if (!$this->isCustomerLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
+            Mage::getModel('core/cookie')->set(
+                'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
+            );
+        }
+    }
+
+    public function addCustomerTab(Varien_Event_Observer $observer)
+    {
+        $block = $observer->getEvent()->getBlock();
+        $helper = $this->makeHelper();
+        // add tab in customer edit page
+        if ($block instanceof Mage_Adminhtml_Block_Customer_Edit_Tabs) {
+            $customerId = (int)$this->getRequest()->getParam('id');
+            $customer = Mage::getModel('customer/customer')->load($customerId);
+            $storeId = $customer->getStoreId();
+            //If the customer was created in the admin panel use the store view selected for MailChimp.
+            if (!$storeId) {
+                $storeId = $customer->getMailchimpStoreView();
+            }
+            if ($helper->getLocalInterestCategories($storeId) && ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type'))) {
+                $block->addTab('mailchimp', array(
+                    'label' => $helper->__('MailChimp'),
+                    'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
+                    'class' => 'ajax'
+                ));
+
+            }
+        }
+        return $observer;
+    }
+
+    protected function getRequest()
+    {
+        return Mage::app()->getRequest();
+    }
+
+    /**
+     * Handle frontend customer interest groups only if is not subscribed and all admin customer groups.
+     *
+     * @param $subscriberEmail
+     * @param $params
+     * @param $storeId
+     * @param null $customerId
+     * @return Mage_Newsletter_Model_Subscriber
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId = null)
+    {
+        $helper = $this->makeHelper();
+        $subscriberModel = $this->getSubscriberModel();
+        $subscriber = $subscriberModel->loadByEmail($subscriberEmail);
+        if ($subscriber->getId()) {
+            $helper->saveInterestGroupData($params, $storeId, $customerId, $subscriber);
+        } elseif (isset($params['customer_id'])) {
+            $groups = $helper->getInterestGroupsIfAvailable($params);
+            if ($groups) {
+                $helper->saveInterestGroupData($params, $storeId, $customerId);
+                Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+            }
+        } else {
+            if (!$helper->isAdmin()) {
+                //save frontend groupdata when customer is not subscribed.
+                $helper->saveInterestGroupData($params, $storeId, $customerId);
+            }
+            Mage::getSingleton('adminhtml/session')->addError($helper->__('Something went wrong when trying to save the interest group data. The customer must be subscribed for this change to apply.'));
+        }
+        return $subscriber;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getEmailCookie()
+    {
+        $emailCookie = Mage::getModel('core/cookie')->get('email');
+        return $emailCookie;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getMcEidCookie()
+    {
+        $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+        return $mcEidCookie;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function isCustomerLoggedIn()
+    {
+        return Mage::getSingleton('customer/session')->isLoggedIn();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getRequestActionName()
+    {
+        return $this->getRequest()->getActionName();
     }
 }
