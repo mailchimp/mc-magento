@@ -1344,8 +1344,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($configImageSize == self::ORIGINAL_SIZE){
                 $imageUrl = $this->getOriginalPath($productImage);
             } else {
-                $upperCaseImage = $this->getImageFunctionName($imageSize);
-                $imageUrl = $productModel->$upperCaseImage();
+                $imageUrl = $this->getImageUrlForSize($imageSize, $productModel);
             }
             $this->setCurrentStore($curStore);
         }
@@ -1373,6 +1372,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $functionName = $this->setFunctionName($upperCaseImage);
 
         return $functionName;
+    }
+
+    /**
+     * @param $imageSize
+     * @param $productModel
+     * @return string
+     */
+    protected function getImageUrlForSize($imageSize, $productModel)
+    {
+        $upperCaseImage = (string)$this->getImageFunctionName($imageSize);
+        $imageUrl = $productModel->$upperCaseImage();
+        return $imageUrl;
     }
 
     /**
