@@ -327,6 +327,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     public function update($productId, $mailchimpStoreId)
     {
+        $parentIdArray = $this->getAllParentIds($productId);
+        foreach ($parentIdArray as $parentId) {
+            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+        }
         $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true, false);
     }
 
@@ -755,11 +759,21 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getParentId($childId)
     {
         $parentId = null;
-        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+        $parentIds = $this->getAllParentIds($childId);
         if (count($parentIds)) {
             $parentId = $parentIds[0];
         }
         return $parentId;
+    }
+
+    /**
+     * @param $childId
+     * @return mixed
+     */
+    protected function getAllParentIds($childId)
+    {
+        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+        return $parentIds;
     }
 
     /**
