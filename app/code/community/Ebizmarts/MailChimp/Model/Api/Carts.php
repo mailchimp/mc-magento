@@ -79,7 +79,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         foreach ($convertedCarts as $cart) {
             $cartId = $cart->getEntityId();
             // we need to delete all the carts associated with this email
-            $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail(), $mailchimpStoreId, $magentoStoreId);
+            $allCartsForEmail = $this->getAllCartsByEmail($cart->getCustomerEmail(), $mailchimpStoreId, $magentoStoreId);
             foreach ($allCartsForEmail as $cartForEmail) {
                 $alreadySentCartId = $cartForEmail->getEntityId();
                 $counter = $this->getCounter();
@@ -144,7 +144,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer->setWebsiteId($this->getWebSiteIdFromMagentoStoreId($magentoStoreId));
             $customer->loadByEmail($cart->getCustomerEmail());
             if ($customer->getEmail() != $cart->getCustomerEmail()) {
-                $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail(), $mailchimpStoreId, $magentoStoreId);
+                $allCartsForEmail = $this->getAllCartsByEmail($cart->getCustomerEmail(), $mailchimpStoreId, $magentoStoreId);
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $alreadySentCartId = $cartForEmail->getEntityId();
                     $counter = $this->getCounter();
@@ -231,7 +231,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer->setWebsiteId($this->getWebSiteIdFromMagentoStoreId($magentoStoreId));
             $customer->loadByEmail($cart->getCustomerEmail());
             if ($customer->getEmail() != $cart->getCustomerEmail()) {
-                $allCartsForEmail = $this->_getAllCartsByEmail($cart->getCustomerEmail(), $mailchimpStoreId, $magentoStoreId);
+                $allCartsForEmail = $this->getAllCartsByEmail($cart->getCustomerEmail(), $mailchimpStoreId, $magentoStoreId);
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $counter = $this->getCounter();
                     $alreadySentCartId = $cartForEmail->getEntityId();
