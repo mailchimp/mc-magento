@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
 
         $this->addColumn(
             'mailchimp', array(
-            'label' => $helper->__('MailChimp'),
+            'label' => $helper->__('Mailchimp'),
             'style' => 'width:120px',
             )
         );

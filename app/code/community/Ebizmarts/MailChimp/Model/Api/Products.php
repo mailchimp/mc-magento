@@ -327,6 +327,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     public function update($productId, $mailchimpStoreId)
     {
+        $parentIdArray = $this->getAllParentIds($productId);
+        foreach ($parentIdArray as $parentId) {
+            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+        }
         $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true, false);
     }
 
@@ -567,7 +571,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductVariantData($product, $magentoStoreId)
     {
         $data = array();
-        $data["sku"] = $product->getSku();
+        $sku = $product->getSku();
+        $data["sku"] = $sku ? $sku : '';
 
         $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
         if ($price) {
@@ -578,7 +583,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["inventory_quantity"] = (int)$product->getQty();
         $data["backorders"] = (string)$product->getBackorders();
 
-        $data["visibility"] = $this->visibilityOptions[$this->_visibility];
+        $data["visibility"] = $this->getVisibility($this->_visibility);
 
         return $data;
     }
@@ -754,11 +759,21 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getParentId($childId)
     {
         $parentId = null;
-        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+        $parentIds = $this->getAllParentIds($childId);
         if (count($parentIds)) {
             $parentId = $parentIds[0];
         }
         return $parentId;
+    }
+
+    /**
+     * @param $childId
+     * @return mixed
+     */
+    protected function getAllParentIds($childId)
+    {
+        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+        return $parentIds;
     }
 
     /**
@@ -902,5 +917,18 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $deletedProducts->getSelect()->where("m4m.mailchimp_sync_error = ''");
 
         $deletedProducts->getSelect()->limit($this->getBatchLimitFromConfig());
+    }
+
+    /**
+     * @param string $visibility Visibility.
+     * @return int or null
+     */
+    protected function getVisibility($visibility)
+    {
+        if (array_key_exists($visibility, $this->visibilityOptions)) {
+            return $this->visibilityOptions[$visibility];
+        }
+
+        return null;
     }
 }

@@ -1,0 +1,36 @@
+<?php
+$block = $this;
+$interest = $block->getInterest();
+?>
+<p>
+    <?php echo $block->getMessageBefore() ?>
+<form class="form" action="<?php echo $block->getFormUrl() ?>" method="get" id="mailchimp-groups">
+    <fieldset class="fieldset">
+        <?php foreach($interest as $i): ?>
+            <div class="field">
+                <label class="label" for="<?php echo $i['interest']['id'] ?>">
+                    <span><?php echo $i['interest']['title'] ?></span>
+                </label>
+                <div class="control">
+                    <div class="fields">
+                        <?php echo $this->getLayout()->createBlock('mailchimp/group_type', 'mailchimp.group.type', array('interests' => $i))->toHtml(); ?>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </fieldset>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="submit"
+                    class="action primary button"
+                    title="<?php echo $block->escapeHtml(__('Subscribe to more detailed newsletters')) ?>"
+                    style="margin-top: 10px; margin-bottom: 10px;"
+            >
+                <span><?php echo __('Subscribe to more detailed newsletters') ?></span>
+            </button>
+        </div>
+    </div>
+</form>
+<?php echo $block->getMessageAfter() ?>
+
+</p>

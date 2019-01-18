@@ -12,6 +12,10 @@
  */
 class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    const DEFAULT_SIZE      = '0';
+    const SMALL_SIZE        = '1';
+    const THUMBNAIL_SIZE    = '2';
+    const ORIGINAL_SIZE     = '3';
 
     /**
      * All MailChimp available language codes
@@ -592,12 +596,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isEcomSyncDataEnabled($scopeId, $scope = null, $isStoreCreation = false)
     {
-        $subscriptionEnabled = $this->isSubscriptionEnabled($scopeId, $scope);
-        $ecommerceEnabled = $this->isEcommerceEnabled($scopeId, $scope);
-        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+        //If store id does not exist return false. (For deleted stores i.e.: order grid synced status)
+        if ($scopeId === null) {
+            $ret = false;
+        } else {
+            $subscriptionEnabled = $this->isSubscriptionEnabled($scopeId, $scope);
+            $ecommerceEnabled = $this->isEcommerceEnabled($scopeId, $scope);
+            $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
 
-        $ret = (!is_null($mailchimpStoreId) || $isStoreCreation)
-            && $subscriptionEnabled && $ecommerceEnabled;
+            $ret = (!is_null($mailchimpStoreId) || $isStoreCreation)
+                && $subscriptionEnabled && $ecommerceEnabled;
+        }
+
         return $ret;
     }
 
@@ -1063,7 +1073,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $apiKey = $this->getApiKey($scopeId, $scope);
         $api = null;
         if ($apiKey != null && $apiKey != "") {
-            $api = new Ebizmarts_MailChimp($apiKey, null, 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
+            $timeOut = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_TIME_OUT, $scopeId, $scope);
+            $api = new Ebizmarts_MailChimp($apiKey, array('timeout'=>$timeOut), 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         } else {
             $e = new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
             $this->logError($e->getTraceAsString());
@@ -1306,20 +1317,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $productModel = $this->getProductModel();
         $configImageSize = $this->getImageSize($magentoStoreId);
         switch ($configImageSize) {
-            case 0:
+            case self::DEFAULT_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
-            case 1:
+            case self::SMALL_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_SMALL;
                 break;
-            case 2:
+            case self::THUMBNAIL_SIZE:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_THUMBNAIL;
+                break;
+            case self::ORIGINAL_SIZE:
+                $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
             default:
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
         }
-
         $productImage = $productResourceModel->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
         $productModel->setData($imageSize, $productImage);
 
@@ -1328,11 +1341,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $curStore = $this->getCurrentStoreId();
             $this->setCurrentStore($magentoStoreId);
-            $upperCaseImage = $this->getImageFunctionName($imageSize);
-            $imageUrl = $productModel->$upperCaseImage();
+            if ($configImageSize == self::ORIGINAL_SIZE){
+                $imageUrl = $this->getOriginalPath($productImage);
+            } else {
+                $imageUrl = $this->getImageUrlForSize($imageSize, $productModel);
+            }
             $this->setCurrentStore($curStore);
         }
+
         return $imageUrl;
+    }
+
+    public function getImageUrl($productModel, $imageSize)
+    {
+        return (string)$this->_getImageHelper()->init($productModel, $imageSize);
     }
 
     /**
@@ -1350,6 +1372,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $functionName = $this->setFunctionName($upperCaseImage);
 
         return $functionName;
+    }
+
+    /**
+     * @param $imageSize
+     * @param $productModel
+     * @return string
+     */
+    protected function getImageUrlForSize($imageSize, $productModel)
+    {
+        $upperCaseImage = (string)$this->getImageFunctionName($imageSize);
+        $imageUrl = $productModel->$upperCaseImage();
+        return $imageUrl;
     }
 
     /**
@@ -1465,7 +1499,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Mage_Core_Model_Website
      */
     protected function getCoreWebsite()
     {
@@ -2819,8 +2853,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getStoreLanguageCode($scopeId, $scope = 'stores')
     {
-        $isAdmin        = Mage::app()->getStore()->isAdmin();
-        $userLangCode   = Mage::app()->getLocale()->getLocaleCode();
+        $isAdmin = $this->isAdmin();
+        $userLangCode = Mage::app()->getLocale()->getLocaleCode();
         if ($isAdmin || '' == $lang = $this->_lang2MCLanguage($userLangCode)) {
             // IS Admin OR if users lang is not supported, try store views default locale
             $userLangCode = $this->getConfigValueForScope(Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE, $scopeId, $scope);
@@ -3138,5 +3172,284 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function isSubscriptionConfirmationEnabled($scopeId, $scope = 'stores')
     {
         return (bool)$this->getConfigValueForScope(Mage_Newsletter_Model_Subscriber::XML_PATH_CONFIRMATION_FLAG, $scopeId, $scope);
+    }
+
+    public function getPromoConfig($scopeId, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SEND_PROMO, $scopeId, $scope);
+    }
+
+
+    public function getListInterestCategories($scopeId, $scope = 'stores')
+    {
+        $interestGroupsArray = array();
+        $api = $this->getApi($scopeId, $scope);
+        $listId = $this->getGeneralList($scopeId, $scope);
+        try {
+            $interestCategories = $api->getLists()->getInterestCategory()->getAll($listId, 'categories');
+            foreach ($interestCategories['categories'] as $interestCategory) {
+                $interestGroupsArray[] = array(
+                    'id' => $interestCategory['id'],
+                    'title' => $interestCategory['title'],
+                    'type' => $interestCategory['type']
+                );
+            }
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
+        return $interestGroupsArray;
+    }
+
+    public function getListInterestGroups($scopeId, $scope = 'stores')
+    {
+        $interestGroupsArray = array();
+        $api = $this->getApi($scopeId, $scope);
+        $listId = $this->getGeneralList($scopeId, $scope);
+        try {
+            $apiInterestCategory = $api->getLists()->getInterestCategory();
+            $interestCategories = $apiInterestCategory->getAll($listId, 'categories');
+            foreach ($interestCategories['categories'] as $interestCategory) {
+                $interestGroups = $apiInterestCategory->getInterests()->getAll($listId, $interestCategory['id']);
+                $groups = array();
+                foreach ($interestGroups['interests'] as $interestGroup) {
+                    $groups[$interestGroup['id']] = $interestGroup['name'];
+                }
+                $interestGroupsArray[] = array(
+                    'id' => $interestCategory['id'],
+                    'title' => $interestCategory['title'],
+                    'type' => $interestCategory['type'],
+                    'groups' => $groups
+                );
+            }
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
+        return $interestGroupsArray;
+    }
+
+    public function getLocalInterestCategories($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_CATEGORIES, $scopeId, $scope);
+    }
+
+    public function getCheckoutSuccessHtmlBefore($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_BEFORE, $scopeId, $scope);
+    }
+
+    public function getCheckoutSuccessHtmlAfter($scopeId, $scope = 'stores')
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_AFTER, $scopeId, $scope);
+    }
+
+    /**
+     * @param $storeId
+     * @return array
+     * @throws MailChimp_Error
+     */
+    public function getInterest($storeId)
+    {
+        $rc = array();
+        $interest = $this->getLocalInterestCategories($storeId);
+        if ($interest != '') {
+            $interest = explode(",", $interest);
+
+        } else {
+            $interest = array();
+        }
+        $api = $this->getApi($storeId);
+        $listId = $this->getGeneralList($storeId);
+        try {
+            $apiInterestCategory = $api->getLists()->getInterestCategory();
+            $allInterest = $apiInterestCategory->getAll($listId);
+            foreach ($allInterest['categories'] as $item) {
+                if (in_array($item['id'], $interest)) {
+                    $rc[$item['id']]['interest'] = array('id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']);
+                }
+            }
+            $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
+            foreach ($interest as $interestId) {
+                $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
+                foreach ($mailchimpInterest['interests'] as $mi) {
+                    $rc[$mi['category_id']]['category'][$mi['display_order']] = array('id' => $mi['id'], 'name' => $mi['name'], 'checked' => false);
+                }
+            }
+        } catch (MailChimp_Error $e) {
+            $this->logError($e->getFriendlyMessage());
+        }
+        return $rc;
+    }
+
+    /**
+     * @param $customerId
+     * @param $subscriberId
+     * @param $storeId
+     * @param null $interest
+     * @return array|null
+     * @throws MailChimp_Error
+     */
+    public function getInterestGroups($customerId, $subscriberId, $storeId, $interest = null)
+    {
+        if (!$interest) {
+            $interest = $this->getInterest($storeId);
+        }
+        $interestGroup = $this->getInterestGroupModel();
+        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+        if ($interestGroup->getId()) {
+            $groups = $this->arrayDecode($interestGroup->getGroupdata());
+            foreach ($groups as $key => $value) {
+                if (isset($interest[$key])) {
+                    if (is_array($value)) {
+                        foreach ($value as $groupId) {
+                            foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                                if ($gvalue['id'] == $groupId) {
+                                    $interest[$key]['category'][$gkey]['checked'] = true;
+                                } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
+                                    $interest[$key]['category'][$gkey]['checked'] = false;
+                                }
+                            }
+                        }
+                    } else {
+                        foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                            if ($gvalue['id'] == $value) {
+                                $interest[$key]['category'][$gkey]['checked'] = true;
+                            } else {
+                                $interest[$key]['category'][$gkey]['checked'] = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $interest;
+    }
+
+
+    /**
+     * Format array to save in database.
+     *
+     * @param $array
+     * @return string
+     */
+    public function arrayEncode($array)
+    {
+        return json_encode($array);
+    }
+
+    /**
+     * Set database encoded array to normal array
+     *
+     * @param $encodedArray
+     * @return mixed
+     */
+    public function arrayDecode($encodedArray)
+    {
+        return json_decode($encodedArray, true);
+    }
+
+    /**
+     * @param $params
+     * @param $storeId
+     * @param null $customerId
+     * @param null $subscriber
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function saveInterestGroupData($params, $storeId, $customerId = null, $subscriber = null)
+    {
+        $groups = $this->getInterestGroupsIfAvailable($params);
+        if (!$customerId) {
+            $customerSession = $this->getCustomerSession();
+            if ($this->isAdmin()) {
+                $customerId = $params['customer_id'];
+            } elseif ($customerSession->isLoggedIn()) {
+                $customerData = $customerSession->getCustomer();
+                $customerId = $customerData->getId();
+            }
+        }
+        $subscriberId = null;
+        if ($subscriber) {
+            $subscriberId = $subscriber->getSubscriberId();
+        }
+        $interestGroup = $this->getInterestGroupModel();
+        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+        $origSubscriberId = $interestGroup->getSubscriberId();
+        $origCustomerId = $interestGroup->getCustomerId();
+        if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
+            $interestGroup->setSubscriberId($subscriberId);
+        }
+        if (!$origCustomerId || $customerId && $origCustomerId != $customerId) {
+            $interestGroup->setCustomerId($customerId);
+        }
+        if ($groups) {
+            $encodedGroups = $this->arrayEncode($groups);
+            $interestGroup->setGroupdata($encodedGroups);
+        }
+        //Avoid creating a new entry if no groupData available. (Customer creation)
+        if ($interestGroup->getGroupdata()) {
+            if ($storeId) {
+                $interestGroup->setStoreId($storeId);
+            }
+            $interestGroup->setUpdatedAt($this->getCurrentDateTime());
+            $interestGroup->save();
+        }
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     */
+    public function getInterestGroupsIfAvailable($params)
+    {
+        $groups = null;
+        if (isset($params['customer']) && isset($params['customer']['interestgroup'])) {
+            $groups = $params['customer']['interestgroup'];
+        } elseif (isset($params['group'])) {
+            $groups = $params['group'];
+        }
+        return $groups;
+    }
+
+    /**
+     * @return bool
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function isAdmin()
+    {
+        return Mage::app()->getStore()->isAdmin();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Interestgroup
+     */
+    protected function getInterestGroupModel()
+    {
+        return Mage::getModel('mailchimp/interestgroup');
+    }
+
+    /**
+     * @return Mage_Customer_Model_Session
+     */
+    protected function getCustomerSession()
+    {
+        return Mage::getSingleton('customer/session');
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getCurrentDateTime()
+    {
+        return Mage::getModel('core/date')->date('d-m-Y H:i:s');
+    }
+
+    /**
+     * Return original path for the imageURL (not the catched one)
+     *
+     * @param $productImage
+     * @return string
+     */
+    protected function getOriginalPath($productImage)
+    {
+        return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $productImage;
     }
 }

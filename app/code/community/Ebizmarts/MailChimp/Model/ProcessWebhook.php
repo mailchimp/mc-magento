@@ -263,20 +263,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     public function deleteProcessed()
     {
-        $to= Mage::app()->getLocale()->date()->sub(30,Zend_Date::DAY);
-        $to=$to->toString('yyyy-MM-dd');
-
-        $collection = Mage::getModel('mailchimp/webhookrequest')->getCollection()
-            ->addFieldToFilter('processed', 1)
-            ->addFieldToFilter('fired_at', array(
-                'lt'=>$to
-            ));
-            $collection->getSelect()->limit(self::BATCH_LIMIT);
-
-        foreach ($collection as $row) {
-            $row->delete();
-        }
-
+        $helper = $this->getHelper();
+        $resource = $helper->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/webhookrequest');
+        $where = array("fired_at < NOW() - INTERVAL 30 DAY AND processed = 1");
+        $connection->delete($tableName, $where);
     }
 
 }
