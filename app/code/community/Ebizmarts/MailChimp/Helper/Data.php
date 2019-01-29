@@ -1574,6 +1574,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Return html code for adding the MailChimp javascript.
      *
      * @return string
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function getMCJs()
     {
@@ -1582,14 +1584,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $storeId = $this->getMageApp()->getStore()->getId();
         if ($this->isEcomSyncDataEnabled($storeId)) {
             $currentUrl = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId);
+
             if ($this->areJsUrlAndListScopesEqual($storeId)) {
                 $url = $currentUrl;
             }
 
-            if (!$url) {
-                $url = $this->getApiStores()->getMCJsUrl($storeId, 'stores');
+            if ($url !== null) {
+                $script = '<script type="text/javascript" src="' . $url . '" defer></script>';
             }
-            $script = '<script type="text/javascript" src="' . $url . '" defer></script>';
         }
         return $script;
     }
@@ -2952,6 +2954,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Returns true if the js URL belongs to the same scope as where the list has been configured.
+     *
      * @param $storeId
      * @return bool
      */
