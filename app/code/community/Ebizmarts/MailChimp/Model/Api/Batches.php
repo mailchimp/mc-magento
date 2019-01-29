@@ -197,10 +197,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper->handleResendDataBefore();
         foreach ($stores as $store) {
             $storeId = $store->getId();
-            if ($helper->isEcomSyncDataEnabled($storeId) && $this->_ping($storeId)) {
+            $isEcommerceEnabled = $helper->isEcomSyncDataEnabled($storeId);
+            $ping = $this->_ping($storeId);
+            if ($isEcommerceEnabled && $ping) {
                 $this->_getResults($storeId);
                 $this->_sendEcommerceBatch($storeId);
-            } else if ($helper->isEcomSyncDataEnabled($storeId) && !$this->_ping($storeId)) {
+            } else if ($isEcommerceEnabled && !$ping) {
                 $helper->logError('Could not connect to MailChimp: Make sure the API Key is correct and there is an internet connection');
                 return;
             }
