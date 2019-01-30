@@ -15,9 +15,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     const BATCH_LIMIT = 50;
     const BATCH_LIMIT_ONLY_ORDERS = 500;
     const PAID = 'paid';
-    const PARTIALLY_PAID = 'parially_paid';
+    const PARTIALLY_PAID = 'partially_paid';
     const SHIPPED = 'shipped';
-    const PARTIALLY_SHIPPED = 'parially_shipped';
+    const PARTIALLY_SHIPPED = 'partially_shipped';
     const PENDING = 'pending';
     const REFUNDED = 'refunded';
     const PARTIALLY_REFUNDED = 'partially_refunded';
