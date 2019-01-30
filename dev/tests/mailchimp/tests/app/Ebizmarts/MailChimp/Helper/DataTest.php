@@ -1359,4 +1359,42 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->saveInterestGroupData($params, $storeId, null, $subscriberMock);
     }
+
+    public function testGetMCJs()
+    {
+        $storeId = 1;
+        $jsUrl = 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/dffd1d29fea0323354a9caa32.js';
+
+        $expectedResult = '<script type="text/javascript" src="' . $jsUrl . '" defer></script>';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'getConfigValueForScope',
+                'areJsUrlAndListScopesEqual'))
+            ->getMock();
+
+        $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
+
+        $storeMock = $this->getMockBuilder(Mage_Core_Model_Store::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getId'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
+
+        $mageAppMock->expects($this->once())->method('getStore')->willReturn($storeMock);
+
+        $storeMock->expects($this->once())->method('getId')->willReturn($storeId);
+
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId)->willReturn($jsUrl);
+        $helperMock->expects($this->once())->method('areJsUrlAndListScopesEqual')->with($storeId)->willReturn(true);
+
+        $result = $helperMock->getMCJs();
+
+        $this->assertEquals($expectedResult, $result);
+    }
 }
