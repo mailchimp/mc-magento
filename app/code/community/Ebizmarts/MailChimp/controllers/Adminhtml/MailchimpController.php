@@ -64,8 +64,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         switch ($this->getRequest()->getActionName()) {
         case 'index':
         case 'resendSubscribers':
-            $acl = 'system/config/mailchimp';
-            break;
         case 'createWebhook':
             $acl = 'system/config/mailchimp';
             break;
