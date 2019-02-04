@@ -3294,38 +3294,42 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getInterestGroups($customerId, $subscriberId, $storeId, $interest = null)
     {
-        if (!$interest) {
-            $interest = $this->getInterest($storeId);
-        }
-        $interestGroup = $this->getInterestGroupModel();
-        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-        if ($interestGroup->getId()) {
-            $groups = $this->arrayDecode($interestGroup->getGroupdata());
-            foreach ($groups as $key => $value) {
-                if (isset($interest[$key])) {
-                    if (is_array($value)) {
-                        foreach ($value as $groupId) {
-                            foreach ($interest[$key]['category'] as $gkey => $gvalue) {
-                                if ($gvalue['id'] == $groupId) {
-                                    $interest[$key]['category'][$gkey]['checked'] = true;
-                                } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
-                                    $interest[$key]['category'][$gkey]['checked'] = false;
+        if ($this->isSubscriptionEnabled($storeId)) {
+            if (!$interest) {
+                $interest = $this->getInterest($storeId);
+            }
+            $interestGroup = $this->getInterestGroupModel();
+            $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+            if ($interestGroup->getId()) {
+                $groups = $this->arrayDecode($interestGroup->getGroupdata());
+                foreach ($groups as $key => $value) {
+                    if (isset($interest[$key])) {
+                        if (is_array($value)) {
+                            foreach ($value as $groupId) {
+                                foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                                    if ($gvalue['id'] == $groupId) {
+                                        $interest[$key]['category'][$gkey]['checked'] = true;
+                                    } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
+                                        $interest[$key]['category'][$gkey]['checked'] = false;
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        foreach ($interest[$key]['category'] as $gkey => $gvalue) {
-                            if ($gvalue['id'] == $value) {
-                                $interest[$key]['category'][$gkey]['checked'] = true;
-                            } else {
-                                $interest[$key]['category'][$gkey]['checked'] = false;
+                        } else {
+                            foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                                if ($gvalue['id'] == $value) {
+                                    $interest[$key]['category'][$gkey]['checked'] = true;
+                                } else {
+                                    $interest[$key]['category'][$gkey]['checked'] = false;
+                                }
                             }
                         }
                     }
                 }
             }
+            return $interest;
+        } else {
+            return array();
         }
-        return $interest;
     }
 
 

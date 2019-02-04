@@ -1263,7 +1263,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getInterest', 'getInterestGroupModel', 'getLocalInterestCategories', 'arrayDecode'))
+            ->setMethods(array('getInterest', 'getInterestGroupModel', 'getLocalInterestCategories', 'arrayDecode', 'isSubscriptionEnabled'))
             ->getMock();
 
         $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
@@ -1271,6 +1271,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getByRelatedIdStoreId', 'getId', 'getGroupdata'))
             ->getMock();
 
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
         $helperMock->expects($this->once())->method('getInterest')->with($storeId)->willReturn($interest);
         $helperMock->expects($this->once())->method('getInterestGroupModel')->willReturn($interestGroupMock);
 
@@ -1279,6 +1280,25 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $interestGroupMock->expects($this->once())->method('getGroupdata')->willReturn($encodedGroupData);
 
         $helperMock->expects($this->once())->method('arrayDecode')->with($encodedGroupData)->willReturn($groupData);
+
+        $result = $helperMock->getInterestGroups($customerId, $subscriberId, $storeId);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function testGetInterestGroupsIsSubscriptionDisabled ()
+    {
+        $customerId = 1;
+        $subscriberId = 1;
+        $storeId = 1;
+        $expectedResult = array();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isSubscriptionEnabled'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(false);
 
         $result = $helperMock->getInterestGroups($customerId, $subscriberId, $storeId);
 
