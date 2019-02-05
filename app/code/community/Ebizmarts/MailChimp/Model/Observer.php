@@ -141,29 +141,13 @@ class Ebizmarts_MailChimp_Model_Observer
 
         if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $statusChanged = $subscriber->getIsStatusChanged();
-            $apiSubscriber = $this->makeApiSubscriber();
 
             //Override Magento status to always send double opt-in confirmation.
             if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                 $this->addSuccessIfRequired($helper);
             }
-            $subscriber->setImportMode(true);
-
-            if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
-                //Use MailChimp emails
-                if ($statusChanged) {
-                    $apiSubscriber->updateSubscriber($subscriber, true);
-                } else {
-                    $origData = $subscriber->getOrigData();
-
-                    if (is_array($origData) && isset($origData['subscriber_status'])
-                        && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
-                    ) {
-                        $apiSubscriber->updateSubscriber($subscriber, true);
-                    }
-                }
-            }
+//            $subscriber->setImportMode(true);
         }
 
         return $observer;
@@ -190,9 +174,20 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $this->createEmailCookie($subscriber);
 
-            if ($helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $storeId) != 1) {
+            if ($helper->isUseMagentoEmailsEnabled($storeId) != 1) {
+                Mage::log('estoy en subscriberSaveAfter', null, 'ebizmartsSubscriberSaveAfter.log', true);
                 $apiSubscriber = $this->makeApiSubscriber();
-                $apiSubscriber->updateSubscriber($subscriber, true);
+                if ($subscriber->getIsStatusChanged()) {
+                    $apiSubscriber->updateSubscriber($subscriber, true);
+                } else {
+                    $origData = $subscriber->getOrigData();
+
+                    if (is_array($origData) && isset($origData['subscriber_status'])
+                        && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
+                    ) {
+                        $apiSubscriber->updateSubscriber($subscriber, true);
+                    }
+                }
             } else {
                 $subscriber->setImportMode(false);
             }
@@ -298,6 +293,7 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             //update subscriber data if a subscriber with the same email address exists and was not affected.
             if (!$origEmail || $origEmail == $customerEmail) {
+                Mage::log('estoy en customerSaveAfter', null, 'ebizmartsCustomerSaveAfter.log', true);
                 $apiSubscriber->update($customerEmail, $storeId);
             }
 
