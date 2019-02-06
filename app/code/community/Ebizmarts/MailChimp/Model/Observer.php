@@ -147,7 +147,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                 $this->addSuccessIfRequired($helper);
             }
-//            $subscriber->setImportMode(true);
+
         }
 
         return $observer;
@@ -175,7 +175,6 @@ class Ebizmarts_MailChimp_Model_Observer
             $this->createEmailCookie($subscriber);
 
             if ($helper->isUseMagentoEmailsEnabled($storeId) != 1) {
-                Mage::log('estoy en subscriberSaveAfter', null, 'ebizmartsSubscriberSaveAfter.log', true);
                 $apiSubscriber = $this->makeApiSubscriber();
                 if ($subscriber->getIsStatusChanged()) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
@@ -293,7 +292,6 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             //update subscriber data if a subscriber with the same email address exists and was not affected.
             if (!$origEmail || $origEmail == $customerEmail) {
-                Mage::log('estoy en customerSaveAfter', null, 'ebizmartsCustomerSaveAfter.log', true);
                 $apiSubscriber->update($customerEmail, $storeId);
             }
 
