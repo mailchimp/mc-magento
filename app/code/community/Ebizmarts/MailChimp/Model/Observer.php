@@ -143,7 +143,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $statusChanged = $subscriber->getIsStatusChanged();
 
             //Override Magento status to always send double opt-in confirmation.
-            if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId)) {
+            if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED && $helper->isSubscriptionConfirmationEnabled($storeId) && !$helper->isUseMagentoEmailsEnabled($storeId)) {
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                 $this->addSuccessIfRequired($helper);
             }
@@ -1052,11 +1052,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
             }
         } else {
-            if (!$helper->isAdmin()) {
-                //save frontend groupdata when customer is not subscribed.
-                $helper->saveInterestGroupData($params, $storeId, $customerId);
-            }
-            Mage::getSingleton('adminhtml/session')->addError($helper->__('Something went wrong when trying to save the interest group data. The customer must be subscribed for this change to apply.'));
+            //save frontend groupdata when customer is not subscribed.
+            $helper->saveInterestGroupData($params, $storeId, $customerId);
         }
         return $subscriber;
     }
