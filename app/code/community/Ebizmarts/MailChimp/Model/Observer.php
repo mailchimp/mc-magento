@@ -1052,11 +1052,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
             }
         } else {
-            if (!$helper->isAdmin()) {
-                //save frontend groupdata when customer is not subscribed.
-                $helper->saveInterestGroupData($params, $storeId, $customerId);
-            }
-            Mage::getSingleton('adminhtml/session')->addError($helper->__('Something went wrong when trying to save the interest group data. The customer must be subscribed for this change to apply.'));
+            //save frontend groupdata when customer is not subscribed.
+            $helper->saveInterestGroupData($params, $storeId, $customerId);
         }
         return $subscriber;
     }
