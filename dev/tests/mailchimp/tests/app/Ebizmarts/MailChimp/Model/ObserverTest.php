@@ -673,7 +673,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     public function testSubscriberSaveBefore($data)
     {
         $getStoreId = $data['getStoreId'];
-        $subscriberUpdatedAmount = $data['subscriberUpdatedAmount'];
         $storeId = 1;
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
