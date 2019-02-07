@@ -280,6 +280,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     *
+     * @param $scopeId
+     * @return bool | returns true if useMagentoEmails is enabled
+     */
+    public function isUseMagentoEmailsEnabled ($scopeId)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $scopeId);
+    }
+
+    /**
      * Return if module is enabled and list selected for given scope.
      *
      * @param  $scopeId

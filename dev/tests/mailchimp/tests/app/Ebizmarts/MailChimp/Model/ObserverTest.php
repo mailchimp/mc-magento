@@ -673,6 +673,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     public function testSubscriberSaveBefore($data)
     {
         $getStoreId = $data['getStoreId'];
+        $subscriberUpdatedAmount = $data['subscriberUpdatedAmount'];
         $storeId = 1;
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
@@ -711,9 +712,9 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
 
-        $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
-
         $subscriberMock->expects($this->once())->method('getStatus')->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+
+        $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
 
         $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)->willReturn(true);
 

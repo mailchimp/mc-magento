@@ -176,11 +176,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($helper->isUseMagentoEmailsEnabled($storeId) != 1) {
                 $apiSubscriber = $this->makeApiSubscriber();
-
                 if ($subscriber->getIsStatusChanged()) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
                     $origData = $subscriber->getOrigData();
+
                     if (is_array($origData) && isset($origData['subscriber_status'])
                         && $origData['subscriber_status'] != $subscriber->getSubscriberStatus()
                     ) {
@@ -190,7 +190,6 @@ class Ebizmarts_MailChimp_Model_Observer
             } else {
                 $subscriber->setImportMode(false);
             }
-            
         }
 
         return $observer;
