@@ -943,5 +943,119 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $mailchimpObserverMock->itemCancel($observerMock);
     }
+
+    public function testHandleCustomerGroupsIsSubscribed()
+    {
+        $params = array();
+        $storeId = 1;
+        $customerId = 15;
+        $subscriberEmail = 'luciaines+testHandelCustomerGroups@ebizmarts.com';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getSubscriberModel'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('saveInterestGroupData'))
+            ->getMock();
+
+        $subbscriberModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
+            ->setMethods(array('loadByEmail'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
+            ->setMethods(array('getId'))
+            ->getMock();
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $mailchimpObserverMock->expects($this->once())->method('getSubscriberModel')->willReturn($subbscriberModelMock);
+
+        $helperMock->expects($this->once())->method('saveInterestGroupData')->with($params, $storeId, $customerId, $subscriberMock);
+
+        $subbscriberModelMock->expects($this->once())->method('loadByEmail')->with($subscriberEmail)->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getId')->willReturn(true);
+
+        $mailchimpObserverMock->handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId);
+    }
+
+    public function testHandleCustomerGroupsIsNotSubcribedFromAdmin()
+    {
+        $customerId = 15;
+        $subscriberEmail = 'luciaines+testHandelCustomerGroups@ebizmarts.com';
+        $params = array('form_key' => 'Pm5pxh17N9Z9AINN', 'customer_id' => $customerId, 'group' => array('e939299a7d' => 'e939299a7d', '3dd23446e4' => '3dd23446e4', 'a6c3c332bf' => 'a6c3c332bf'));
+        $storeId = 1;
+        $groups = array('d46296f47c' => array ('3dd23446e4' => '3dd23446e4', 'a6c3c332bf' => 'a6c3c332bf'));
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getSubscriberModel', 'getWarningMessageAdminHtmlSession'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('saveInterestGroupData', 'getInterestGroupsIfAvailable'))
+            ->getMock();
+
+        $subbscriberModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
+            ->setMethods(array('loadByEmail'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
+            ->setMethods(array('getId'))
+            ->getMock();
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $mailchimpObserverMock->expects($this->once())->method('getSubscriberModel')->willReturn($subbscriberModelMock);
+        $mailchimpObserverMock->expects($this->once())->method('getWarningMessageAdminHtmlSession')->with($helperMock);
+
+        $helperMock->expects($this->once())->method('saveInterestGroupData')->with($params, $storeId, $customerId);
+        $helperMock->expects($this->once())->method('getInterestGroupsIfAvailable')->with($params)->willReturn($groups);
+
+        $subbscriberModelMock->expects($this->once())->method('loadByEmail')->with($subscriberEmail)->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getId')->willReturn(false);
+
+        $mailchimpObserverMock->handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId);
+    }
+
+    public function testHandleCustomerGroupsIsNotSubcribedFromFrontEnd()
+    {
+        $params = array();
+        $storeId = 1;
+        $customerId = 15;
+        $subscriberEmail = 'luciaines+testHandelCustomerGroups@ebizmarts.com';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getSubscriberModel'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('saveInterestGroupData'))
+            ->getMock();
+
+        $subbscriberModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
+            ->setMethods(array('loadByEmail'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
+            ->setMethods(array('getId'))
+            ->getMock();
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $mailchimpObserverMock->expects($this->once())->method('getSubscriberModel')->willReturn($subbscriberModelMock);
+
+        $helperMock->expects($this->once())->method('saveInterestGroupData')->with($params, $storeId, $customerId);
+
+        $subbscriberModelMock->expects($this->once())->method('loadByEmail')->with($subscriberEmail)->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getId')->willReturn(false);
+
+        $mailchimpObserverMock->handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId);
+    }
 }
 
