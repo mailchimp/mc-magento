@@ -1038,7 +1038,7 @@ class Ebizmarts_MailChimp_Model_Observer
      * @return Mage_Newsletter_Model_Subscriber
      * @throws Mage_Core_Model_Store_Exception
      */
-    protected function handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId = null)
+    public function handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId = null)
     {
         $helper = $this->makeHelper();
         $subscriberModel = $this->getSubscriberModel();
@@ -1049,7 +1049,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $groups = $helper->getInterestGroupsIfAvailable($params);
             if ($groups) {
                 $helper->saveInterestGroupData($params, $storeId, $customerId);
-                Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+                $this->getWarningMessageAdminHtmlSession($helper);
             }
         } else {
             //save frontend groupdata when customer is not subscribed.
@@ -1090,5 +1090,14 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getRequestActionName()
     {
         return $this->getRequest()->getActionName();
+    }
+
+    /**
+     * @param $helper
+     * @return mixed
+     */
+    protected function getWarningMessageAdminHtmlSession($helper)
+    {
+        return Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
     }
 }
