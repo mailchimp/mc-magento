@@ -464,10 +464,9 @@ class Ebizmarts_MailChimp_Model_Observer
             $order = $block->getOrder();
             $storeId = $order->getStoreId();
             $helper = $this->makeHelper();
-            $addColumnConfig = $helper->getMonkeyInGrid($storeId);
             $ecommEnabled = $helper->isEcomSyncDataEnabled($storeId);
 
-            if ($ecommEnabled && $addColumnConfig) {
+            if ($ecommEnabled) {
                 $transport = $observer->getTransport();
                 if ($transport) {
                     $html = $transport->getHtml();
