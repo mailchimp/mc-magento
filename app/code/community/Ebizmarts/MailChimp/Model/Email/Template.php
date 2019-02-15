@@ -182,15 +182,15 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function getMail()
     {
-        $storeId = Mage::app()->getStore()->getId();
+        $email_config = $this->getDesignConfig();
+        $storeId = (integer) $email_config->getStore();
         if (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId)) {
             return parent::getMail();
         }
 
-        if ($this->_mail) {
+        if ($this->_mail && (!Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $storeId))) {
             return $this->_mail;
         } else {
-            $storeId = Mage::app()->getStore()->getId();
             Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId), $storeId);
             $this->_mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
             return $this->_mail;
