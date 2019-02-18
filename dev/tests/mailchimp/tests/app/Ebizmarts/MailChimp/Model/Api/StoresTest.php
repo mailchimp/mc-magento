@@ -205,7 +205,7 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $apiStoresMock->modifyName($name, $scopeId, $scope);
     }
 
-    public function testGetMCJsUrl()
+    public function testRetrieveAndSaveMCJsUrlInConfig()
     {
         $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $scopeId = 1;
@@ -239,8 +239,8 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)->willReturn($realScope);
         $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, $realScope['scope_id'], $realScope['scope']);
 
-        $return = $apiStoresMock->getMCJsUrl($scopeId, $scope);
+        $return = $apiStoresMock->retrieveAndSaveMCJsUrlInConfig($scopeId, $scope);
 
-        $this->assertEquals($MCJsUrl, $return);
+        $this->assertEquals(true, $return);
     }
 }

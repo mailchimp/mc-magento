@@ -17,6 +17,9 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
     protected $_generalList = array();
     protected $_form;
     protected $_api;
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     protected $helper;
     protected $storeId;
 
@@ -115,8 +118,6 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         $storeId = $this->storeId;
         $helper = $this->helper;
         $listId = $helper->getGeneralList($storeId);
-
-        //@Todo add support for intetest groups
 
         return $listId;
     }

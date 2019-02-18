@@ -115,13 +115,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     }
 
     /**
-     * Returns URL from MailChimp store data
+     * Retrieve store data and save the MCJs URL for the correct scope in config table.
      *
      * @param  $scopeId
      * @param  $scope
      * @return mixed
      */
-    public function getMCJsUrl($scopeId, $scope)
+    public function retrieveAndSaveMCJsUrlInConfig($scopeId, $scope)
     {
         $helper = $this->makeHelper();
         try {
@@ -133,14 +133,19 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
                 $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
                 $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
-                return $url;
+                return true;
+            } else {
+                return false;
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
+            return false;
         } catch (MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
+            return false;
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
+            return false;
         }
     }
 

@@ -252,7 +252,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         return array(
             array(array('mailchimp_api_status' => true, 'isEcomSyncDataEnabled' => 1, '_getResults' => 1, '_sendEcommerceBatch' => 1, 'handleResendDataAfter' => 1, 'addSyncValueToArray' => 1,
                 'getIterator' => 2, 'getId' => 2)),
-            array(array('mailchimp_api_status' => false, 'isEcomSyncDataEnabled' => 0, '_getResults' => 0, '_sendEcommerceBatch' => 0, 'handleResendDataAfter' => 0, 'addSyncValueToArray' => 0,
+            array(array('mailchimp_api_status' => false, 'isEcomSyncDataEnabled' => 1, '_getResults' => 0, '_sendEcommerceBatch' => 0, 'handleResendDataAfter' => 0, 'addSyncValueToArray' => 0,
                 'getIterator' => 1, 'getId' => 1))
         );
     }
