@@ -1057,5 +1057,59 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $mailchimpObserverMock->handleCustomerGroups($subscriberEmail, $params, $storeId, $customerId);
     }
+
+    public function testAddOrderViewMonkey()
+    {
+        $html = '';
+        $storeId = 1;
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->setMethods(array('makeHelper'))
+            -> getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->setMethods(array('isEcomSyncDataEnabled'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->setMethods(array('getBlock', 'getTransport'))
+            ->getMock();
+
+        $blockMock = $this->getMockBuilder(Mage_Core_Block_Abstract::class)
+            ->setMethods(array('getNameInLayout', 'getOrder', 'getChild'))
+            ->getMock();
+
+        $transportMock = $this->getMockBuilder(Varien_Event::class)
+            ->setMethods(array('getHtml', 'setHtml'))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->setMethods(array('getStoreId'))
+            ->getMock();
+
+        $childMock = $this->getMockBuilder(Mage_Core_Helper_String::class)
+            ->setMethods(array('toHtml'))
+            ->getMock();
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
+
+        $observerMock->expects($this->once())->method('getBlock')->willReturn($blockMock);
+        $observerMock->expects($this->once())->method('getTransport')->willReturn($transportMock);
+
+        $blockMock->expects($this->once())->method('getNameInLayout')->willReturn('order_info');
+        $blockMock->expects($this->once())->method('getOrder')->willReturn($orderMock);
+        $blockMock->expects($this->once())->method('getChild')->with('mailchimp.order.info.monkey.block')->willReturn($childMock);
+
+        $transportMock->expects($this->once())->method('getHtml')->willReturn($html);
+        $transportMock->expects($this->once())->method('setHtml')->with($html);
+
+        $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
+
+        $childMock->expects($this->once())->method('toHtml')->willReturn($html);
+
+        $mailchimpObserverMock->addOrderViewMonkey($observerMock);
+    }
 }
 
