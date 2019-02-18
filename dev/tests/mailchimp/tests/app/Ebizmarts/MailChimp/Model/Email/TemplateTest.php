@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
 
         $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getDesignConfig', 'isMandrillEnabled'))
+            ->setMethods(array('getDesignConfig', 'isMandrillEnabled', 'createMandrillMessage'))
             ->getMock();
 
         $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
@@ -97,6 +97,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
+        $templateMock->expects($this->once())->method('createMandrillMessage')->with($storeId);
         $templateMock->expects($this->once())->method('isMandrillEnabled')->with($storeId)->willReturnOnConsecutiveCalls(
             true,
             true
