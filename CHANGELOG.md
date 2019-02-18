@@ -1,7 +1,27 @@
 # Change Log
 
-## [1.1.14](https://github.com/mailchimp/mc-magento/tree/1.1.14) (2019-01-16)
+## [1.1.15](https://github.com/mailchimp/mc-magento/tree/1.1.15) (2019-02-18)
 
+[Full Changelog](https://github.com/mailchimp/mc-magento/compare/1.1.14...1.1.15)
+
+**Implemented enhancements:**
+
+- Catch exception if mandrill api is not available [\#859](https://github.com/mailchimp/mc-magento/issues/859)
+- Add subscription option on order success page [\#770](https://github.com/mailchimp/mc-magento/issues/770)
+
+**Fixed bugs:**
+
+- Subscribers status doesn't change to subscribed if double opt-in is activated using Magento email through Mandrill  [\#874](https://github.com/mailchimp/mc-magento/issues/874)
+- Multiple confirmation email from Mailchimp after group subscription [\#873](https://github.com/mailchimp/mc-magento/issues/873)
+- Undefined variable: acl [\#871](https://github.com/mailchimp/mc-magento/issues/871)
+- Spelling error in order status sent to mailchimp [\#868](https://github.com/mailchimp/mc-magento/issues/868)
+- Subscription fails when one store view is disabled with the API key in blank [\#867](https://github.com/mailchimp/mc-magento/issues/867)
+- The program fails when set up the extension in one store view and disable another store view leaving the API key in blank  [\#863](https://github.com/mailchimp/mc-magento/issues/863)
+- Avoid real time calls to Mailchimp API in case it's down [\#862](https://github.com/mailchimp/mc-magento/issues/862)
+- If connection ping fails for one store it cancels the entire process [\#846](https://github.com/mailchimp/mc-magento/issues/846)
+- 1.1.12 "Display on order grid" also hides Ebizmarts\_MailChimp\_Block\_Adminhtml\_Sales\_Order\_View\_Info\_Monkey [\#826](https://github.com/mailchimp/mc-magento/issues/826)
+
+## [1.1.14](https://github.com/mailchimp/mc-magento/tree/1.1.14) (2019-01-16)
 [Full Changelog](https://github.com/mailchimp/mc-magento/compare/1.1.13...1.1.14)
 
 **Implemented enhancements:**
@@ -11,6 +31,8 @@
 
 **Fixed bugs:**
 
+- Flag parent as modified when child product is modified  [\#848](https://github.com/mailchimp/mc-magento/issues/848)
+- Change modified abandoned carts sending method from DELETE -\> POST to PATCH [\#836](https://github.com/mailchimp/mc-magento/issues/836)
 - Orders belonging to deleted stores do not show correct syncing status under "synced to MailChimp" column [\#840](https://github.com/mailchimp/mc-magento/issues/840)
 
 ## [1.1.13](https://github.com/mailchimp/mc-magento/tree/1.1.13) (2018-12-11)
@@ -18,6 +40,8 @@
 
 **Implemented enhancements:**
 
+- Add option to send unresized product images to Mailchimp [\#834](https://github.com/mailchimp/mc-magento/issues/834)
+- Optimize deletion of processed webhooks [\#832](https://github.com/mailchimp/mc-magento/issues/832)
 - Send subscription confirmation email via Magento [\#793](https://github.com/mailchimp/mc-magento/issues/793)
 - Order confirmation email is bypassing Aschroder\_SMTPPro [\#673](https://github.com/mailchimp/mc-magento/issues/673)
 - Add support for List Groups [\#514](https://github.com/mailchimp/mc-magento/issues/514)
