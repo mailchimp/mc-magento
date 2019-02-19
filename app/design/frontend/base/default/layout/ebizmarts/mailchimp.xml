@@ -40,7 +40,7 @@
             <block name="customer.form.newsletter.extra"
                    type="mailchimp/customer_newsletter_index"
                    template="ebizmarts/mailchimp/customer/newsletter/index.phtml">
-                <block type="mailchimp/group_types" name="mailchimp.group.types" template="ebizmarts/mailchimp/group/types.phtml"/>
+                <block type="mailchimp/group_type" name="mailchimp.group.types" template="ebizmarts/mailchimp/group/types.phtml"/>
             </block>
         </reference>
     </newsletter_manage_index>
@@ -57,7 +57,7 @@
         <reference name="content">
             <block type="mailchimp/checkout_success_groups" name="mailchimp.checkout.success"
                    template="ebizmarts/mailchimp/checkout/success/groups.phtml">
-                <block type="mailchimp/group_types" name="mailchimp.group.types" template="ebizmarts/mailchimp/group/types.phtml"/>
+                <block type="mailchimp/group_type" name="mailchimp.group.types" template="ebizmarts/mailchimp/group/types.phtml"/>
             </block>
         </reference>
     </checkout_onepage_success>
