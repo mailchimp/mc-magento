@@ -81,4 +81,52 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
 
         $templateMock->send($email, $name, $variables);
     }
+
+    public function testGetMailCreateNewMandrillEmail()
+    {
+        $storeId = 1;
+
+        $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDesignConfig', 'isMandrillEnabled', 'createMandrillMessage'))
+            ->getMock();
+
+        $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
+
+        $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
+        $templateMock->expects($this->once())->method('createMandrillMessage')->with($storeId);
+        $templateMock->expects($this->once())->method('isMandrillEnabled')->with($storeId)->willReturnOnConsecutiveCalls(
+            true,
+            true
+        );
+
+        $varienObjectMock->expects($this->once())->method('getStore')->willReturn($storeId);
+
+        $templateMock->getMail();
+    }
+
+    public function testGetMailMandrillEmailDisabled()
+    {
+        $storeId = 1;
+
+        $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDesignConfig', 'isMandrillEnabled'))
+            ->getMock();
+
+        $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
+
+        $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
+        $templateMock->expects($this->once())->method('isMandrillEnabled')->with($storeId)->willReturn(false);
+
+        $varienObjectMock->expects($this->once())->method('getStore')->willReturn($storeId);
+
+        $templateMock->getMail();
+    }
 }
