@@ -11,6 +11,12 @@
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
+    // Initial Sync
+    const SYNC_FLAG_LABEL = 0;
+
+    // In Progress | Finished | date
+    const SYNC_FLAG_STATUS = 1;
+
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
         $firstErrorKey = Ebizmarts_MailChimp_Model_System_Config_Source_Account::NO_STORE_TEXT_KEY;
@@ -42,7 +48,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
      */
     protected function getSyncFlagDataArray($dat)
     {
-        $textArray = explode(':', $dat['label']);
+        $textArray = explode(': ', $dat['label']);
+        //textArray indexes = 0 -> label / 1 -> status
         $textArray = $this->fixTimeTextIfNecessary($textArray);
         return $textArray;
     }
@@ -55,14 +62,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
     protected function getSyncFlagDataHtml($dat, $html)
     {
         $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
-        if (!strstr($syncFlagDataArray[1], $this->__('In Progress'))) {
-            if (strstr($syncFlagDataArray[1], $this->__('Finished'))) {
-                $html .= "<li>{$syncFlagDataArray[0]} : <span style='color:forestgreen;font-weight: bold;'>{$syncFlagDataArray[1]}</span></li>";
+        if ($syncFlagDataArray[self::SYNC_FLAG_STATUS] != Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS) {
+            if ($syncFlagDataArray[self::SYNC_FLAG_STATUS] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED) {
+                $html .= "<li>{$syncFlagDataArray[self::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
             } else {
-                $html .= "<li>{$syncFlagDataArray[0]} : <span style='color:forestgreen;font-weight: bold;'>" . $this->__('Finished at ') . "$syncFlagDataArray[1]</span></li>";
+                $html .= "<li>{$syncFlagDataArray[self::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>" . $this->__('Finished at %s', $syncFlagDataArray[self::SYNC_FLAG_STATUS]) . "</span></li>";
             }
         } else {
-            $html .= "<li>{$syncFlagDataArray[0]} : <span style='color:#ed6502;font-weight: bold;'>{$syncFlagDataArray[1]}</span></li>";
+            $html .= "<li>{$syncFlagDataArray[self::SYNC_FLAG_LABEL]} : <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
         }
         return $html;
     }

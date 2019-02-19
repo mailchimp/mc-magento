@@ -36,11 +36,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $this->mailchimpStoreId = $mailchimpStoreId;
-        $this->magentoStoreId = $magentoStoreId;
+        $this->setMailchimpStoreId($mailchimpStoreId);
+        $this->setMagentoStoreId($magentoStoreId);
 
-        $collection = $this->makeCustomersNotSentCollection();
-        $this->joinMailchimpSyncData($collection);
+        $customersCollection = $this->makeCustomersNotSentCollection();
+
+        $this->joinMailchimpSyncData($customersCollection);
 
         $customerArray = array();
 
@@ -48,16 +49,23 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $this->optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
 
-        $counter = 0;
-        foreach ($collection as $customer) {
-            $data = $this->_buildCustomerData($customer);
+        $subscriber = $this->getSubscriberModel();
 
+        $counter = 0;
+        foreach ($customersCollection as $customer) {
+            $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
-                $this->_updateSyncData($customer->getId(), $mailchimpStoreId, Varien_Date::now());
+                $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
             } else {
                 $this->logCouldNotEncodeCustomerError($customer);
+            }
+
+            $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();
+
+            if ($this->optInStatusForStore && !$isSubscribed){
+                $subscriber->subscribe($customer->getEmail());
             }
 
             $counter++;
@@ -88,10 +96,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
-        $data["opt_in_status"] = $this->optInStatusForStore;
 
         $data["orders_count"] = (int)$customer->getOrdersCount();
         $data["total_spent"] = (float)$customer->getTotalSpent();
+        $data["opt_in_status"] = false;
 
         $data += $this->getCustomerAddressData($customer);
 
@@ -166,7 +174,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function update($customerId, $storeId)
     {
         $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
-        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true);
+        $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true, false);
     }
 
     public function createGuestCustomer($guestId, $order)
@@ -208,10 +216,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param int|null $syncModified
      * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
-        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
+        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists, null, $allowBatchRemoval);
     }
 
     /**
@@ -234,8 +243,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         /**
          * @var Mage_Customer_Model_Resource_Customer_Collection $collection
          */
+        //Load customers from the front-end or admin
         $collection = $this->getCustomerResourceCollection();
-        $collection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
+        $collection->addAttributeToFilter(
+            array(
+                array('attribute' => 'store_id', 'eq' => $magentoStoreId),
+                array('attribute' => 'mailchimp_store_view', 'eq' => $magentoStoreId),
+            ), null, 'left'
+        );
 
         $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
 
@@ -408,4 +423,30 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             )
         );
     }
+
+    /**
+     * @param $mailchimpStoreId
+     */
+    protected function setMailchimpStoreId($mailchimpStoreId)
+    {
+        $this->mailchimpStoreId = $mailchimpStoreId;
+    }
+
+    /**
+     * @param $magentoStoreId
+     */
+    protected function setMagentoStoreId($magentoStoreId)
+    {
+        $this->magentoStoreId = $magentoStoreId;
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getSubscriberModel()
+    {
+        $subscriber = Mage::getModel('newsletter/subscriber');
+        return $subscriber;
+    }
+
 }

@@ -47,15 +47,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
         foreach ($collection as $product) {
-            if ($product->getMailchimpSyncDeleted()) {
-                $batchArray = array_merge($this->buildProductDataRemoval($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
-                $counter = count($batchArray);
-            }
 
             if ($this->shouldSendProductUpdate($magentoStoreId, $product)) {
                 $batchArray = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = count($batchArray);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId);
                 continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
@@ -66,12 +62,67 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $counter++;
 
                 //update product delta
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($product->getId(), $mailchimpStoreId);
             } else {
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
             }
         }
         return $batchArray;
+    }
+
+    public function createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId)
+    {
+        $deletedProducts = $this->getProductResourceCollection();
+
+        $this->joinMailchimpSyncDataDeleted($mailchimpStoreId, $deletedProducts);
+
+        $batchArray = array();
+        $batchId = $this->makeBatchId($magentoStoreId);
+        $counter = 0;
+        foreach ($deletedProducts as $product) {
+
+            $data = $this->_buildDeleteProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
+
+            if (!empty($data)) {
+                $batchArray[$counter] = $data;
+                $counter++;
+            }
+            $this->_updateSyncData($product->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
+
+        }
+        return $batchArray;
+    }
+
+    protected function _buildDeleteProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
+    {
+        $variantProducts = array();
+        if ($this->isSimpleProduct($product)) {
+            $variantProducts[] = $product;
+        } else if ($this->isConfigurableProduct($product)) {
+            $variantProducts[] = $product;
+
+            $collection = $this->makeProductChildrenCollection($magentoStoreId);
+
+            $childProducts = $this->getConfigurableChildrenIds($product);
+            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
+
+            foreach ($collection as $childProduct) {
+                $variantProducts[] = $childProduct;
+            }
+
+        } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
+            $variantProducts[] = $product;
+        } else {
+            //@TODO bundle
+            return array();
+        }
+
+        $data = array();
+        $data['method'] = "DELETE";
+        $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $product->getId();
+        $data['operation_id'] = $batchId . '_' . $product->getId();
+
+        return $data;
     }
 
     protected function _buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
@@ -100,7 +151,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
         try {
-            $body = json_encode($bodyData);
+            $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
         } catch (Exception $e) {
             //json encode failed
             $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
@@ -140,7 +191,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     }
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
                     try {
-                        $body = json_encode($bodyData);
+                        $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
                     } catch (Exception $e) {
                         //json encode failed
                         $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
@@ -175,7 +226,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
         try {
-            $body = json_encode($bodyData);
+            $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
         } catch (Exception $e) {
             //json encode failed
             $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
@@ -195,10 +246,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $data = array();
 
+        $productId = $product->getId();
+        $helper = $this->getMailChimpHelper();
+        $rc = $helper->getProductResourceModel();
         //data applied for both root and varient products
-        $data["id"] = $product->getId();
-        $data["title"] = ($product->getName()) ? $product->getName() : $product->getDefaultName();
-        $this->_visibility = ($product->getVisibility()) ? $product->getVisibility() : $product->getDefaultVisibility();
+        $data["id"] = $productId;
+        $data["title"] = $rc->getAttributeRawValue($productId, 'name', $magentoStoreId);
+        $this->_visibility = $rc->getAttributeRawValue($productId, 'visibility', $magentoStoreId);
         $url = null;
         if (!$this->currentProductIsVisible()) {
             $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
@@ -222,9 +276,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($isVariant) {
             $data += $this->getProductVariantData($product, $magentoStoreId);
         } else {
-            //this is for a root product
-            if ($product->getDescription() || $product->getDefaultDescription()) {
-                $data["description"] = ($product->getDescription()) ? $product->getDescription() : $product->getDefaultDescription();
+            $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
+            if (is_string($description)) {
+                $data["description"] = $description;
             }
 
             //mailchimp product type and vendor (magento category)
@@ -247,7 +301,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = ((float)$product->getPrice()) ? (float)$product->getPrice() : (float)$product->getDefaultPrice();
+                $price = $rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -273,8 +327,25 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     public function update($productId, $mailchimpStoreId)
     {
-        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true);
+        $parentIdArray = $this->getAllParentIds($productId);
+        foreach ($parentIdArray as $parentId) {
+            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+        }
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true, false);
     }
+
+
+    /**
+     * Get stores to update and call update function after product is disabled.
+     *
+     * @param $productId
+     * @param $mailchimpStoreId
+     */
+    public function updateDisabledProducts($productId, $mailchimpStoreId)
+    {
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 0, 1, null, true, false);
+    }
+
 
     /**
      * Return products belonging to an order or a cart in a valid format to be sent to MailChimp.
@@ -289,24 +360,32 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data = array();
         $batchId = $this->makeBatchId($magentoStoreId);
         $items = $order->getAllVisibleItems();
+        $helper = $this->getMailChimpHelper();
+        $syncDateFlag = $helper->getEcommMinSyncDateFlag($magentoStoreId);
         foreach ($items as $item) {
-            $product = Mage::getModel('catalog/product')->load($item->getProductId());
-            $productSyncData = $this->getMailChimpHelper()->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-            if ($product->getId() != $item->getProductId() || $this->isBundleProduct($product) || $this->isGroupedProduct($product)) {
-                if ($product->getId()) {
-                    $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
+            $itemProductId = $item->getProductId();
+            $product = $this->loadProductById($itemProductId);
+            $productId = $product->getId();
+            $productSyncData = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+            if ($productId != $itemProductId || $this->isBundleProduct($product) || $this->isGroupedProduct($product)) {
+                if ($productId) {
+                    $this->_updateSyncData($productId, $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
                 }
                 continue;
             }
 
-            if ($productSyncData->getMailchimpSyncModified() && $productSyncData->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId)) {
+            $syncModified = $productSyncData->getMailchimpSyncModified();
+            $syncDelta = $productSyncData->getMailchimpSyncDelta();
+
+            if ($syncModified && $syncDelta > $syncDateFlag) {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
-            } elseif (!$productSyncData->getMailchimpSyncDelta() || $productSyncData->getMailchimpSyncDelta() < Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId)) {
+                $this->_updateSyncData($productId, $mailchimpStoreId);
+            } elseif (!$syncDelta || $syncDelta < $syncDateFlag) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
-                $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate());
+                $this->_updateSyncData($productId, $mailchimpStoreId);
             }
         }
+
         return $data;
     }
 
@@ -321,8 +400,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param int|null $syncDeleted
      * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $productId,
@@ -334,30 +414,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $syncDeleted,
             null,
             $syncedFlag,
-            $saveOnlyIfexists
+            $saveOnlyIfexists,
+            null,
+            $allowBatchRemoval
         );
-    }
-
-    public function buildProductDataRemoval($product, $batchId, $mailchimpStoreId)
-    {
-        //@Todo handle product removal
-        return array();
-
-        $productdata = array();
-
-        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
-
-        if (empty($parentIds)) {
-            $parentIds = array($product->getId());
-        }
-
-        //add or update variant
-        //        foreach ($parentIds as $parentId) {
-        //            $productdata['method'] = "DELETE";
-        //            $productdata['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $parentId . '/variants/' . $data['id'];
-        //            $productdata['operation_id'] = $batchId . '_' . $parentId;
-        //        }
-        return $productdata;
     }
 
     /**
@@ -387,11 +447,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $this->joinQtyAndBackorders($collection);
 
-        $this->joinCategoryId($collection);
-
-        $this->joinProductAttributes($collection, $magentoStoreId);
-
-        $collection->getSelect()->group("e.entity_id");
         $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
         return $collection;
@@ -484,29 +539,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * @param $collection
-     * @param $magentoStoreId
-     */
-    public function joinProductAttributes($collection, $magentoStoreId)
-    {
-        $attributeCodes = array("name", "visibility", "description", "price");
-        $config = Mage::getSingleton("eav/config");
-        foreach ($attributeCodes as $_code) {
-            $attributeName = $config->getAttribute("catalog_product", $_code);
-
-            $collection->joinField(
-                $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
-                '{{table}}.store_id = ' . $magentoStoreId . ' AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
-            );
-
-            $collection->joinField(
-                'default_' . $_code, $attributeName->getBackendTable(), 'value', 'entity_id = entity_id',
-                '{{table}}.store_id = 0 AND {{table}}.attribute_id = ' . $attributeName->getId(), 'left'
-            );
-        }
-    }
-
-    /**
-     * @param $collection
      */
     public function joinQtyAndBackorders($collection)
     {
@@ -532,17 +564,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $collection
-     */
-    public function joinCategoryId($collection)
-    {
-        $collection->joinField(
-            'category_id', 'catalog/category_product', 'category_id', 'product_id = entity_id', null,
-            'left'
-        );
-    }
-
-    /**
      * @param $product
      * @param $magentoStoreId
      * @return mixed
@@ -550,7 +571,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getProductVariantData($product, $magentoStoreId)
     {
         $data = array();
-        $data["sku"] = $product->getSku();
+        $sku = $product->getSku();
+        $data["sku"] = $sku ? $sku : '';
 
         $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
         if ($price) {
@@ -561,7 +583,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["inventory_quantity"] = (int)$product->getQty();
         $data["backorders"] = (string)$product->getBackorders();
 
-        $data["visibility"] = $this->visibilityOptions[$this->_visibility];
+        $data["visibility"] = $this->getVisibility($this->_visibility);
 
         return $data;
     }
@@ -706,19 +728,20 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $url;
     }
 
-    protected function getProductCategories($product, $magentoStoreId)
+    public function getProductCategories($product, $magentoStoreId)
     {
-        $categoryIds = $product->getCategoryIds();
+        $categoryIds = $product->getResource()->getCategoryIds($product);
         $categoryNames = array();
         $categoryName = null;
         if (is_array($categoryIds) && count($categoryIds)) {
             /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
-            $collection = Mage::getModel('catalog/category')->getCollection();
+            $collection = $this->makeCatalogCategory()->getCollection();
             $collection->addAttributeToSelect(array('name'))
                 ->setStoreId($magentoStoreId)
                 ->addAttributeToFilter('is_active', array('eq' => '1'))
                 ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
-                ->addAttributeToSort('level', 'asc');
+                ->addAttributeToSort('level', 'asc')
+                ->addAttributeToSort('name', 'asc');
 
             /* @var $category Mage_Catalog_Model_Category */
             foreach ($collection as $category) {
@@ -736,11 +759,21 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getParentId($childId)
     {
         $parentId = null;
-        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+        $parentIds = $this->getAllParentIds($childId);
         if (count($parentIds)) {
             $parentId = $parentIds[0];
         }
         return $parentId;
+    }
+
+    /**
+     * @param $childId
+     * @return mixed
+     */
+    protected function getAllParentIds($childId)
+    {
+        $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($childId);
+        return $parentIds;
     }
 
     /**
@@ -847,5 +880,55 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function getCurrentDate()
     {
         return Varien_Date::now();
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function makeCatalogCategory()
+    {
+        return Mage::getModel('catalog/category');
+    }
+
+    /**
+     * @param $productId
+     * @return Mage_Catalog_Model_Product
+     */
+    protected function loadProductById($productId)
+    {
+        return Mage::getModel('catalog/product')->load($productId);
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @param $deletedProducts
+     * @param $mailchimpTableName
+     */
+    protected function joinMailchimpSyncDataDeleted($mailchimpStoreId, $deletedProducts)
+    {
+        $mailchimpTableName = $this->getSyncDataTableName();
+        $deletedProducts->getSelect()->joinLeft(
+            array('m4m' => $mailchimpTableName),
+            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "'
+            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+            array('m4m.*')
+        );
+        $deletedProducts->getSelect()->where("m4m.mailchimp_sync_deleted = 1");
+        $deletedProducts->getSelect()->where("m4m.mailchimp_sync_error = ''");
+
+        $deletedProducts->getSelect()->limit($this->getBatchLimitFromConfig());
+    }
+
+    /**
+     * @param string $visibility Visibility.
+     * @return int or null
+     */
+    protected function getVisibility($visibility)
+    {
+        if (array_key_exists($visibility, $this->visibilityOptions)) {
+            return $this->visibilityOptions[$visibility];
+        }
+
+        return null;
     }
 }

@@ -15,9 +15,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     const BATCH_LIMIT = 50;
     const BATCH_LIMIT_ONLY_ORDERS = 500;
     const PAID = 'paid';
-    const PARTIALLY_PAID = 'parially_paid';
+    const PARTIALLY_PAID = 'partially_paid';
     const SHIPPED = 'shipped';
-    const PARTIALLY_SHIPPED = 'parially_shipped';
+    const PARTIALLY_SHIPPED = 'partially_shipped';
     const PENDING = 'pending';
     const REFUNDED = 'refunded';
     const PARTIALLY_REFUNDED = 'partially_refunded';
@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                     //update order delta
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
+                    $this->_updateSyncData($orderId, $mailchimpStoreId);
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
@@ -136,7 +136,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                     $batchArray[$this->_counter]['body'] = $orderJson;
                     //update order delta
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now());
+                    $this->_updateSyncData($orderId, $mailchimpStoreId);
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
@@ -410,7 +410,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             )
             ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()));
         $totalOrders = 0;
-        $totalAmountSpent = (int)$order->getGrandTotal();
+        $totalAmountSpent = 0;
         foreach ($orderCollection as $customerOrder) {
             $totalOrders++;
             $totalAmountSpent += ($customerOrder->getGrandTotal() - $customerOrder->getTotalRefunded() - $customerOrder->getTotalCanceled());
@@ -519,7 +519,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
             $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
-            $this->_updateSyncData($orderId, $mailchimpStoreId, null, null, 1, null, true);
+            $this->_updateSyncData($orderId, $mailchimpStoreId, null, null, 1, null, true, false);
         }
     }
 
@@ -533,11 +533,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param int|null $syncModified
      * @param int|null $syncedFlag
      * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false)
+    protected function _updateSyncData($orderId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists);
+        $helper->saveEcommerceSyncData($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists, null, $allowBatchRemoval);
     }
 
     /**

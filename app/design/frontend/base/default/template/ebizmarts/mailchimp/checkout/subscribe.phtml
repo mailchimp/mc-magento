@@ -32,19 +32,11 @@ $generalList = $this->getGeneralList();
                 value: subscribeValue + element.readAttribute('value'),
                 type: "hidden"
             });
-//            var listValue = new Element('input', {
-//                name: element.readAttribute('name'),
-//                id: "subscribe-" + element.readAttribute('value'),
-//                value: element.readAttribute('value'),
-//                type: "hidden"
-//            });
             try {
                 Element.insert(Form.findFirstElement(payment.form), inputer);
-//                Element.insert(Form.findFirstElement(payment.form), listValue);
 
             } catch (notelem) {
                 $("co-payment-form").insert(inputer);
-//                $("co-payment-form").insert(listValue);
             }
         } else {
             var arrCheckedLists = checkedLists.split(',');
@@ -86,8 +78,7 @@ $generalList = $this->getGeneralList();
                                                                              value="<?php echo $generalList; ?>"
                                                                              title="<?php echo $generalList; ?>"
                                                                              class="mailchimp-list-subscriber"/>
-                <label style="padding-left: 6px;"
-                       for="mailchimp-trigger"><?php echo $this->__('General Subscription'); ?></label>
+                <label for="mailchimp-trigger"><?php echo $this->__('General Subscription'); ?></label>
             </li>
         </ul>
     </div>

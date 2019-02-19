@@ -53,6 +53,11 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
+                $adminSession = Mage::getSingleton('adminhtml/session');
+                if (strstr($e->getFriendlyMessage(), 'A store with the domain')) {
+                    $errorMessage = $helper->__('A MailChimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
+                    $adminSession->addError($errorMessage);
+                }
                 $helper->logError($e->getFriendlyMessage());
             }
         } else {
@@ -110,13 +115,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     }
 
     /**
-     * Returns URL from MailChimp store data
+     * Retrieve store data and save the MCJs URL for the correct scope in config table.
      *
      * @param  $scopeId
      * @param  $scope
      * @return mixed
      */
-    public function getMCJsUrl($scopeId, $scope)
+    public function retrieveAndSaveMCJsUrlInConfig($scopeId, $scope)
     {
         $helper = $this->makeHelper();
         try {
@@ -128,14 +133,19 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
                 $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope);
                 $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
-                return $url;
+                return true;
+            } else {
+                return false;
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
+            return false;
         } catch (MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
+            return false;
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
+            return false;
         }
     }
 

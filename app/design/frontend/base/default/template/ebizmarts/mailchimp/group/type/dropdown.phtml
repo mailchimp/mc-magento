@@ -1,0 +1,15 @@
+<?php
+$block = $this;
+$i = $this->getCurrentInterest();
+?>
+<div class="field no-label">
+    <select class="field"
+            name="group[<?php echo $i['interest']['id'] ?>]"
+            id="<?php echo 'mailchimp_group_'.$i['interest']['id'] ?>"
+            title="<?php echo $i['interest']['title'] ?>">
+        <option value=""></option>
+        <?php foreach($i['category'] as $c): ?>
+            <option value="<?php echo $c['id']?>" <?php if($c['checked']) { echo 'selected'; } ?>><?php echo $c['name'] ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
