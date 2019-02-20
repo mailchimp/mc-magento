@@ -3470,4 +3470,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $productImage;
     }
+
+    /**
+     *
+     * @param int $scopeId
+     * @param string $scope
+     * @return bool \ return true if image cache was flushed
+     * @throws Mage_Core_Exception
+     */
+    public function isImageCacheFlushed($scopeId = 0, $scope = 'default')
+    {
+        return (bool)$this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, $scopeId, $scope);
+    }
 }

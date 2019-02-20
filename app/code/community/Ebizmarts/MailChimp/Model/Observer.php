@@ -899,23 +899,6 @@ class Ebizmarts_MailChimp_Model_Observer
         return $observer;
     }
 
-    public function frontInitBefore(Varien_Event_Observer $observer)
-    {
-        $helper = $this->makeHelper();
-        if ($helper->wasProductImageCacheFlushed()) {
-            try {
-                $this->markProductsAsModified();
-            } catch (Exception $e) {
-                $helper->logError($e->getMessage());
-            }
-            $config = $this->getConfig();
-            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
-            $config->cleanCache();
-        }
-
-        return $observer;
-    }
-
     protected function markProductsAsModified()
     {
         $tableName = $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
