@@ -66,6 +66,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $success = 0;
         try {
             $helper->resetMCEcommerceData($scopeId, $scope, false);
+            $helper->setFlushMagentoCacheAfterResendEcommerceData();
             $success = 1;
         } catch(MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
