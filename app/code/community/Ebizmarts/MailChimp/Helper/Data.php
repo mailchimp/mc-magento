@@ -833,7 +833,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
             } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                $this->getAdminSession()->addError($e->getMessage());
             }
         }
     }
@@ -3481,6 +3481,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function isImageCacheFlushed($scopeId = 0, $scope = 'default')
     {
         return (bool)$this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, $scopeId, $scope);
+    }
+
+    public function isImageCacheFulhedAddWarning()
+    {
+        $message = 'Image cache has been flushed please resend the products in order to update image url.';
+        $this->getAdminSession()->addWarning($message);
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    public function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
     }
 
     public function setFlushMagentoCacheAfterResendEcommerceData()
