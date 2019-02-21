@@ -13,13 +13,31 @@
 class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_Block_Template
 {
 
+    public function getMessageNotification()
+    {
+        $helper = $this->makeHelper();
+        if ($helper->isImageCacheFlushed() && $helper->isEcomSyncDataEnabledInAnyScope()) {
+            $message = '<strong style=color:red>Important: </strong>'.
+                '<span>Image cache has been flushed please resend the products in order to update image URL <a href="#" onclick="resendecommerce(); location.reload">Resend ecommerce data</a></span>';
+            return $message;
+        }
+    }
+
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         $helper = $this->makeHelper();
-        if ($helper->isImageCacheFlushed() && $helper->isEcommerceEnabled(0)) {
-            $message = '<strong style=color:red>Important: </strong>'. '<span> Please resend ecommerce data, to be sure that all the product data is up to date in <strong>Mailchimp</strong> </span>';
-            return $message;
-        }
+        $message = 'Are you sure you want to delete the local data in order to send all items again?\nAutomations will work normally but the synchronization process for the old data will take longer than resetting the MailChimp store.';
+        return $helper->__($message);
+    }
+
+    public function getAjaxCheckUrl()
+    {
+        $helper = $this->makeHelper();
+
+        return $helper->getUrlForNotification();
     }
 
     /**

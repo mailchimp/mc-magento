@@ -3499,14 +3499,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getUrlForNotification()
     {
+        $this->deleteFlushMagentoCacheFlag();
         $scopeArray = $this->getCurrentScope();
-        $this->setFlushMagentoCacheAfterResendEcommerceData();
         $url = Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']));
-        Mage::log($url, null, 'ebizmartsURL.log', true);
         return $url;
     }
 
-    public function setFlushMagentoCacheAfterResendEcommerceData()
+    /**
+     * delete flag from image cache flush after resend ecommerce data
+     */
+    public function deleteFlushMagentoCacheFlag()
     {
         $config = $this->getConfig();
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);

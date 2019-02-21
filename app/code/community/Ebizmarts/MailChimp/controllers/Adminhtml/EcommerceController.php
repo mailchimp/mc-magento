@@ -110,7 +110,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             break;
         }
 
-        return Mage::getSingleton('admin/session')->isAllowed($acl);
+        return $this->getAdminSession()->isAllowed($acl);
     }
 
     /**
@@ -119,5 +119,13 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('admin/session');
     }
 }
