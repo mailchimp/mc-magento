@@ -169,7 +169,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMageApp', 'resetMCEcommerceData', 'setFlushMagentoCacheAfterResendEcommerceData'))
+            ->setMethods(array('getMageApp', 'resetMCEcommerceData'))
             ->getMock();
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
@@ -202,7 +202,6 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
             );
 
         $helperMock->expects($this->once())->method('resetMCEcommerceData')->with($scopeId, $scope, false);
-        $helperMock->expects($this->once())->method('setFlushMagentoCacheAfterResendEcommerceData');
 
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 

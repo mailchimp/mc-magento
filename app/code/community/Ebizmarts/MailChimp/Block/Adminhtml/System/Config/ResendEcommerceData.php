@@ -57,8 +57,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
     public function getAjaxCheckUrl()
     {
         $helper = $this->makeHelper();
-        $scopeArray = $helper->getCurrentScope();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']));
+
+        return $helper->getUrlForNotification();
     }
 
     /**
