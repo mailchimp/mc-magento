@@ -1078,5 +1078,32 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $mailchimpObserverMock->addOrderViewMonkey($observerMock);
     }
+
+    public function testCleanProductImagesCacheAfter()
+    {
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
+        $default = 'default';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->setMethods(array('makeHelper'))
+            -> getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->setMethods(array('saveMailchimpConfig', 'isImageCacheFulhedAddWarning'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->setMethods(array())
+            ->getMock();
+
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, 0, $default);
+        $helperMock->expects($this->once())->method('isImageCacheFulhedAddWarning');
+
+        $mailchimpObserverMock->cleanProductImagesCacheAfter($observerMock);
+
+    }
 }
 
