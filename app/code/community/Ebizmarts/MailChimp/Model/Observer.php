@@ -893,8 +893,10 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function cleanProductImagesCacheAfter(Varien_Event_Observer $observer)
     {
+        $helper = $this->makeHelper();
         $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
-        $this->makeHelper()->saveMailchimpConfig($configValues, 0, 'default');
+        $helper->saveMailchimpConfig($configValues, 0, 'default');
+        $helper->isImageCacheFulhedAddWarning();
 
         return $observer;
     }
