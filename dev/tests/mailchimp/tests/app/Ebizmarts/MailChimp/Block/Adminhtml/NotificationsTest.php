@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest  extends PHPUnit_Fra
         $this->_block = new Ebizmarts_MailChimp_Block_Adminhtml_Notifications;
         $this->_helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isImageCacheFlushed', 'isEcomSyncDataEnabledInAnyScope'))
+            ->setMethods(array('isImageCacheFlushed', 'isEcomSyncDataEnabledInAnyScope', 'getUrlForNotification'))
             ->getMock();
 
         /* We are required to set layouts before we can do anything with blocks */
@@ -44,5 +44,35 @@ class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest  extends PHPUnit_Fra
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabledInAnyScope')->willReturn(true);
 
         $blockMock->getMessageNotification();
+    }
+
+    public function testGetMessage()
+    {
+        $helperMock = $this->_helperMock;
+
+        $blockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Notifications::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper'))
+            ->getMock();
+
+        $blockMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $blockMock->getMessage();
+    }
+
+    public function testGetAjaxCheckURL()
+    {
+        $helperMock = $this->_helperMock;
+
+        $blockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Notifications::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper'))
+            ->getMock();
+
+        $blockMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('getUrlForNotification');
+
+        $blockMock->getAjaxCheckUrl();
     }
 }
