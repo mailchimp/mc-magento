@@ -3483,9 +3483,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return (bool)$this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, $scopeId, $scope);
     }
 
-    public function isImageCacheFulhedAddWarning()
+    /**
+     * @param $message \ add a warning with the message that receive as param
+     */
+    public function addAdminWarning($message)
     {
-        $message = 'Image cache has been flushed please resend the products in order to update image URL.';
         $this->getAdminSession()->addWarning($message);
     }
 
