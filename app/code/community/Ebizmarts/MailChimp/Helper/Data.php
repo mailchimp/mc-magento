@@ -3485,7 +3485,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function isImageCacheFulhedAddWarning()
     {
-        $message = 'Image cache has been flushed please resend the products in order to update image url.';
+        $message = 'Image cache has been flushed please resend the products in order to update image URL.';
         $this->getAdminSession()->addWarning($message);
     }
 
