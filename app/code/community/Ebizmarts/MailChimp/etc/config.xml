@@ -141,14 +141,6 @@
                     </mailchimp_clean_catalog_images_cache_after>
                 </observers>
             </clean_catalog_images_cache_after>
-            <controller_front_init_before>
-                <observers>
-                    <mailchimp_controller_front_init_before>
-                        <class>mailchimp/observer</class>
-                        <method>frontInitBefore</method>
-                    </mailchimp_controller_front_init_before>
-                </observers>
-            </controller_front_init_before>
         </events>
         <models>
             <mailchimp>

@@ -833,7 +833,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
                 $this->saveMailchimpConfig($configValues, $scopeId, $scope);
             } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                $this->getAdminSession()->addError($e->getMessage());
             }
         }
     }
@@ -3469,5 +3469,51 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getOriginalPath($productImage)
     {
         return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'catalog/product' . $productImage;
+    }
+
+    /**
+     *
+     * @param int $scopeId
+     * @param string $scope
+     * @return bool \ return true if image cache was flushed
+     * @throws Mage_Core_Exception
+     */
+    public function isImageCacheFlushed($scopeId = 0, $scope = 'default')
+    {
+        return (bool)$this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, $scopeId, $scope);
+    }
+
+    /**
+     * @param $message \ add a warning with the message that receive as param
+     */
+    public function addAdminWarning($message)
+    {
+        $this->getAdminSession()->addWarning($message);
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    public function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
+    }
+
+    public function getUrlForNotification()
+    {
+        $this->deleteFlushMagentoCacheFlag();
+        $scopeArray = $this->getCurrentScope();
+        $url = Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']));
+        return $url;
+    }
+
+    /**
+     * delete flag from image cache flush after resend ecommerce data
+     */
+    public function deleteFlushMagentoCacheFlag()
+    {
+        $config = $this->getConfig();
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
+        $config->cleanCache();
     }
 }

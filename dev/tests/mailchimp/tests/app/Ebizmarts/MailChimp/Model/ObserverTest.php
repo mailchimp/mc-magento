@@ -102,39 +102,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         return $eventObserverMock;
     }
 
-    public function testFrontInitBefore()
-    {
-        $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'markProductsAsModified', 'getConfig'))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('wasProductImageCacheFlushed'))
-            ->getMock();
-
-        $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('deleteConfig', 'cleanCache'))
-            ->getMock();
-
-        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $modelMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-        $modelMock->expects($this->once())->method('markProductsAsModified');
-        $modelMock->expects($this->once())->method('getConfig')->willReturn($configMock);
-
-        $helperMock->expects($this->once())->method('wasProductImageCacheFlushed')->willReturn(1);
-
-        $configMock->expects($this->once())->method('deleteConfig')->with(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
-        $configMock->expects($this->once())->method('cleanCache');
-
-        $modelMock->frontInitBefore($eventObserverMock);
-    }
-
     public function testChangeStoreGroupName()
     {
         $storeId = 1;
@@ -1110,6 +1077,34 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $childMock->expects($this->once())->method('toHtml')->willReturn($html);
 
         $mailchimpObserverMock->addOrderViewMonkey($observerMock);
+    }
+
+    public function testCleanProductImagesCacheAfter()
+    {
+        $message = 'Image cache has been flushed please resend the products in order to update image URL.';
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
+        $default = 'default';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->setMethods(array('makeHelper'))
+            -> getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->setMethods(array('saveMailchimpConfig', 'addAdminWarning'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->setMethods(array())
+            ->getMock();
+
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, 0, $default);
+        $helperMock->expects($this->once())->method('addAdminWarning')->with($message);
+
+        $mailchimpObserverMock->cleanProductImagesCacheAfter($observerMock);
+
     }
 }
 
