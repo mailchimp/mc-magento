@@ -1081,6 +1081,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
     public function testCleanProductImagesCacheAfter()
     {
+        $message = 'Image cache has been flushed please resend the products in order to update image URL.';
         $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
         $default = 'default';
 
@@ -1089,7 +1090,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             -> getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->setMethods(array('saveMailchimpConfig', 'isImageCacheFulhedAddWarning'))
+            ->setMethods(array('saveMailchimpConfig', 'addAdminWarning'))
             ->getMock();
 
         $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
@@ -1100,7 +1101,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, 0, $default);
-        $helperMock->expects($this->once())->method('isImageCacheFulhedAddWarning');
+        $helperMock->expects($this->once())->method('addAdminWarning')->with($message);
 
         $mailchimpObserverMock->cleanProductImagesCacheAfter($observerMock);
 

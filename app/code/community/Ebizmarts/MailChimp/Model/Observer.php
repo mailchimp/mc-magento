@@ -893,10 +893,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function cleanProductImagesCacheAfter(Varien_Event_Observer $observer)
     {
+        $message = 'Image cache has been flushed please resend the products in order to update image URL.';
         $helper = $this->makeHelper();
         $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
         $helper->saveMailchimpConfig($configValues, 0, 'default');
-        $helper->isImageCacheFulhedAddWarning();
+        $helper->addAdminWarning($message);
 
         return $observer;
     }
