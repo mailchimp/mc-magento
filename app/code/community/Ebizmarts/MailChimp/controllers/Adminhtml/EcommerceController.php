@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     }
 
     /**
-     * @return Mage_Core_Model_Abstract
+     * @return Mage_Adminhtml_Model_Session
      */
     protected function getAdminSession()
     {
