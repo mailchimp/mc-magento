@@ -235,7 +235,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                         $optionValue =  $attr->getSource()->getOptionText($attrValue);
                                         $eventValue = $mergeVars[$key] = $optionValue;
                                     } elseif ($attrValue) {
-                                        $eventValue = $mergeVars[$key] = $customer->getData($attributeCode);
+                                        $eventValue = $mergeVars[$key] = $attrValue;
                                     }
                                     break;
                             }
