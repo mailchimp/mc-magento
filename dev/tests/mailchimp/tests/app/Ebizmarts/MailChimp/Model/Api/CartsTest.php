@@ -1599,4 +1599,96 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsApiMock->getAllCartsByEmail(self::CUSTOMER_EMAIL_BY_CART, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);
     }
+
+    public function testGetCustomer()
+    {
+        $firstName = 'test';
+        $lastName = 'test';
+        $street = array(
+            'address1' => 'test',
+            'address2' => 'test'
+        );
+        $city = 'test';
+        $region = 'test';
+        $optinStatus = false;
+        $company = 'test';
+        $regionCode = 'test';
+        $postCode = 'test';
+        $country = 'test';
+        $cartsApiMock = $this->cartsApiMock
+            ->setMethods(array('getApiCustomersOptIn', 'getCountryModel'))
+            ->getMock();
+
+        $cartModelMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCustomerFirstname', 'getCustomerLastname', 'getBillingAddress'))
+            ->getMock();
+
+        $billingAddressMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Order_Address::class)
+            ->setMethods(array('getStreet', 'getCity', 'getRegion', 'getRegionCode', 'getPostcode', 'getCountry', 'getCompany'))
+            ->getMock();
+
+        $cartsApiMock->expects($this->once())
+            ->method('getApiCustomersOptIn')
+            ->with(self::MAGENTO_STORE_ID)
+            ->willReturn($optinStatus);
+        $cartsApiMock->expects($this->once())
+            ->method('getCountryModel')
+            ->with($billingAddressMock)
+            ->willReturn($country);
+
+        $cartModelMock->expects($this->once())
+            ->method('getCustomerFirstname')
+            ->willReturn($firstName);
+        $cartModelMock->expects($this->once())
+            ->method('getCustomerLastname')
+            ->willReturn($lastName);
+        $cartModelMock->expects($this->once())
+            ->method('getBillingAddress')
+            ->willReturn($billingAddressMock);
+
+        $billingAddressMock->expects($this->once())
+            ->method('getStreet')
+            ->willReturn($street);
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getCity')
+            ->willReturnOnConsecutiveCalls(
+                $city,
+                $city
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getRegion')
+            ->willReturnOnConsecutiveCalls(
+                $region,
+                $region
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getRegionCode')
+            ->willReturnOnConsecutiveCalls(
+                $regionCode,
+                $regionCode
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getPostcode')
+            ->willReturnOnConsecutiveCalls(
+                $postCode,
+                $postCode
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getCountry')
+            ->willReturnOnConsecutiveCalls(
+                $country,
+                $country
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getCompany')
+            ->willReturnOnConsecutiveCalls(
+                $company,
+                $company
+            );
+
+        $cartsApiMock->_getCustomer($cartModelMock, self::MAGENTO_STORE_ID);
+    }
 }
