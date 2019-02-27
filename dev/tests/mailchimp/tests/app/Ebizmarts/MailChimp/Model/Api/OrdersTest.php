@@ -240,11 +240,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ))
             ->getMock();
 
-        $commentCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Status_History_Collection::class)
+        $commentCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Invoice_Comment_Collection::class)
             ->setMethods(array('getIterator'))
             ->getMock();
 
-        $commentModelMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Status_History::class)
+        $commentModelMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Invoice_Comment::class)
             ->setMethods(array('getCreatedAt'))
             ->getMock();
 
