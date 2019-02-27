@@ -138,4 +138,333 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $this->assertEquals($result, array('synced_status' => 1, 'order_id' => 1));
     }
 
+    public function testGeneratePOSTPayload()
+    {
+        $mailchimpStoreId = '44a100c71040d4ec27fd707d7c667114';
+        $magentoStoreId = '1';
+        $orderIncrementId = 100;
+        $campaignId = 'b6asda8q5';
+        $mailchimpLandingPage = 'test';
+        $currencyCode = 'test';
+        $baseGrandTotal = 200;
+        $baseTaxAmount = 0;
+        $taxTotal = 0;
+        $baseDiscountAmount = 0;
+        $baseShippingAmount = 5;
+        $shippingTotal = 0;
+        $dataPromo = '';
+        $statusArray = array('financial_status' => '', 'fulfillment_status' => '');
+        $orderCancelDate = '2017-05-18';
+        $processedAtForeign = '2017-05-18';
+        $updatedAtForeign = '2017-05-18';
+        $productId = 15;
+        $isTypeProduct = true;
+        $options = array('simple_sku' => 'sku-test');
+        $sku = 'sku-test';
+        $variant = 1;
+        $mailchimpSyncError = '';
+        $customerEmail = 'test@ebizmarts.com';
+        $optInStatus = false;
+        $orderUrl = 'test';
+        $customerFirstName = 'testFirstName';
+        $customerLastName = 'testLastName';
+        $billingAddressStreet = array('address1' => 'address1', 'address2' => 'address2');
+        $billingAddressCity = 'test';
+        $billingAddressRegion = 'test';
+        $billingAddressRegionCode = 'test';
+        $billingAddressPostCode = 'test';
+        $billingAddressCountry = 'test';
+        $billingAddressName = 'test';
+        $billingAddressCompany = 'test';
+        $countryName = 'test';
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEcommerceSyncDataItem'))
+            ->getMock();
+
+        $ordersApiMock = $this->ordersApiMock
+            ->setMethods(array(
+                'returnZeroIfNull',
+                'getPromoData',
+                '_getMailChimpStatus',
+                'isOrderCanceled',
+                'isTheOrderCommentCanceled',
+                'isTypeProduct',
+                'getHelper',
+                'isItemConfigurable',
+                'getModelProduct',
+                'getCustomerModel',
+                'getStoreModelFromMagentoStoreId',
+                'getCountryModelNameFromBillingAddress',
+                'getCountryModelNameFromShippingAddress'
+            ))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+                'getIncrementId',
+                'getMailchimpCampaignId',
+                'getMailchimpLandingPage',
+                'getStoreCurrencyCode',
+                'getBaseGrandTotal',
+                'getBaseTaxAmount',
+                'getBaseDiscountAmount',
+                'getBaseShippingAmount',
+                'getCreatedAt',
+                'getUpdatedAt',
+                'getStatusHistoryCollection',
+                'getAllVisibleItems',
+                'getCustomerEmail',
+                'getId',
+                'getCustomerFirstname',
+                'getCustomerLastname',
+                'getBillingAddress',
+                'getShippingAddress'
+            ))
+            ->getMock();
+
+        $commentCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Status_History_Collection::class)
+            ->setMethods(array('getIterator'))
+            ->getMock();
+
+        $commentModelMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Status_History::class)
+            ->setMethods(array('getCreatedAt'))
+            ->getMock();
+
+        $itemsOrderCollection = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item_Collection::class)
+            ->setMethods(array('getIterator'))
+            ->getMock();
+
+        $itemOrderMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item::class)
+            ->setMethods(array('getProductId', 'getProductOptions', 'getQtyOrdered', 'getPrice', 'getDiscountAmount'))
+            ->getMock();
+
+        $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
+            ->setMethods(array('getIdBySku'))
+            ->getMock();
+
+        $productSyncDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Synchbatches::class)
+            ->setMethods(array('getMailchimpSyncDelta', 'getMailchimpSyncError'))
+            ->getMock();
+
+        $customerModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Customers::class)
+            ->setMethods(array('getOptin'))
+            ->getMock();
+
+        $storeMock = $this->getMockBuilder(Mage_Core_Model_Resource_Store::class)
+            ->setMethods(array('getUrl'))
+            ->getMock();
+
+        $billingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
+            ->setMethods(array(
+                'getStreet',
+                'getCity',
+                'getRegion',
+                'getRegionCode',
+                'getPostcode',
+                'getCountry',
+                'getName',
+                'getCompany'
+            ))
+            ->getMock();
+
+        $shippingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
+            ->setMethods(array(
+                'getStreet',
+                'getCity',
+                'getRegion',
+                'getRegionCode',
+                'getPostcode',
+                'getCountry',
+                'getName',
+                'getCompany'
+            ))
+            ->getMock();
+
+        $orderMock->expects($this->once())->method('getIncrementId')->willReturn($orderIncrementId);
+        $orderMock->expects($this->exactly(2))
+            ->method('getMailchimpCampaignId')
+            ->willReturnOnConsecutiveCalls(
+                $campaignId,
+                $campaignId
+            );
+        $orderMock->expects($this->exactly(2))
+            ->method('getMailchimpLandingPage')
+            ->willReturnOnConsecutiveCalls(
+                $mailchimpLandingPage,
+                $mailchimpLandingPage
+            );
+        $orderMock->expects($this->once())->method('getStoreCurrencyCode')->willReturn($currencyCode);
+        $orderMock->expects($this->once())->method('getBaseGrandTotal')->willReturn($baseGrandTotal);
+        $orderMock->expects($this->once())->method('getBaseTaxAmount')->willReturn($baseTaxAmount);
+        $orderMock->expects($this->once())->method('getBaseDiscountAmount')->willReturn($baseDiscountAmount);
+        $orderMock->expects($this->once())->method('getBaseShippingAmount')->willReturn($baseShippingAmount);
+        $orderMock->expects($this->once())
+            ->method('getCreatedAt')
+            ->willReturn($processedAtForeign);
+        $orderMock->expects($this->once())->method('getUpdatedAt')->willReturn($updatedAtForeign);
+        $orderMock->expects($this->once())->method('getStatusHistoryCollection')->willReturn($commentCollectionMock);
+        $orderMock->expects($this->once())->method('getAllVisibleItems')->willReturn($itemsOrderCollection);
+        $orderMock->expects($this->exactly(2))
+            ->method('getCustomerEmail')
+            ->willReturnOnConsecutiveCalls(
+                $customerEmail,
+                $customerEmail
+            );
+        $orderMock->expects($this->once())->method('getId')->willReturn($orderIncrementId);
+        $orderMock->expects($this->exactly(2))
+            ->method('getCustomerFirstname')
+            ->willReturnOnConsecutiveCalls(
+                $customerFirstName,
+                $customerFirstName
+            );
+        $orderMock->expects($this->exactly(2))
+            ->method('getCustomerLastname')
+            ->willReturnOnConsecutiveCalls(
+                $customerLastName,
+                $customerLastName
+            );
+        $orderMock->expects($this->once())->method('getBillingAddress')->willReturn($billingAddressMock);
+        $orderMock->expects($this->once())->method('getShippingAddress')->willReturn($shippingAddressMock);
+
+        $ordersApiMock->expects($this->exactly(2))
+            ->method('returnZeroIfNull')
+            ->withConsecutive(
+                array($baseTaxAmount),
+                array($baseShippingAmount)
+            )
+            ->willReturnOnConsecutiveCalls(
+                $taxTotal,
+                $shippingTotal
+            );
+        $ordersApiMock->expects($this->once())->method('getPromoData')->with($orderMock)->willReturn($dataPromo);
+        $ordersApiMock->expects($this->once())->method('_getMailChimpStatus')->with($orderMock)->willReturn($statusArray);
+        $ordersApiMock->expects($this->once())->method('isOrderCanceled')->willReturn(true);
+        $ordersApiMock->expects($this->once())->method('isTheOrderCommentCanceled')->willReturn(true);
+        $ordersApiMock->expects($this->once())->method('isTypeProduct')->willReturn($isTypeProduct);
+        $ordersApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $ordersApiMock->expects($this->once())->method('isItemConfigurable')->willReturn(true);
+        $ordersApiMock->expects($this->once())->method('getModelProduct')->willReturn($productModelMock);
+        $ordersApiMock->expects($this->once())->method('getCustomerModel')->willReturn($customerModelMock);
+        $ordersApiMock->expects($this->once())->method('getStoreModelFromMagentoStoreId')->with($magentoStoreId)->willReturn($storeMock);
+        $ordersApiMock->expects($this->once())->method('getCountryModelNameFromBillingAddress')->with($billingAddressMock)->willReturn($countryName);
+        $ordersApiMock->expects($this->once())->method('getCountryModelNameFromShippingAddress')->with($shippingAddressMock)->willReturn($countryName);
+
+        $commentCollectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($commentModelMock)));
+
+        $commentModelMock->expects($this->once())->method('getCreatedAt')->willReturn($orderCancelDate);
+
+        $itemsOrderCollection->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($itemOrderMock)));
+
+        $itemOrderMock->expects($this->once())->method('getProductId')->willReturn($productId);
+        $itemOrderMock->expects($this->once())->method('getProductOptions')->willReturn($options);
+
+        $productModelMock->expects($this->once())->method('getIdBySku')->with($sku)->willReturn($variant);
+
+        $helperMock->expects($this->once())->method('getEcommerceSyncDataItem')->with($productId, $isTypeProduct, $mailchimpStoreId)->willReturn($productSyncDataMock);
+
+        $productSyncDataMock->expects($this->once())->method('getMailchimpSyncDelta')->willReturn(true);
+        $productSyncDataMock->expects($this->once())->method('getMailchimpSyncError')->willReturn($mailchimpSyncError);
+
+        $customerModelMock->expects($this->once())->method('getOptin')->willReturn($optInStatus);
+
+        $storeMock->expects($this->once())->method('getUrl')->willReturn($orderUrl);
+
+        $billingAddressMock->expects($this->once())->method('getStreet')->willReturn($billingAddressStreet);
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getCity')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressCity,
+                $billingAddressCity
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getRegion')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressRegion,
+                $billingAddressRegion
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getRegionCode')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressRegionCode,
+                $billingAddressRegionCode
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getPostcode')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressPostCode,
+                $billingAddressPostCode
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getCountry')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressCountry,
+                $billingAddressCountry
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressName,
+                $billingAddressName
+            );
+        $billingAddressMock->expects($this->exactly(2))
+            ->method('getCompany')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressCompany,
+                $billingAddressCompany
+            );
+
+        $shippingAddressMock->expects($this->once())->method('getStreet')->willReturn($billingAddressStreet);
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressName,
+                $billingAddressName
+            );
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getCity')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressCity,
+                $billingAddressCity
+            );
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getRegion')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressRegion,
+                $billingAddressRegion
+            );
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getRegionCode')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressRegionCode,
+                $billingAddressRegionCode
+            );
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getPostcode')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressPostCode,
+                $billingAddressPostCode
+            );
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getCountry')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressCountry,
+                $billingAddressCountry
+            );
+        $shippingAddressMock->expects($this->exactly(2))
+            ->method('getCompany')
+            ->willReturnOnConsecutiveCalls(
+                $billingAddressCompany,
+                $billingAddressCompany
+            );
+
+        $ordersApiMock->GeneratePOSTPayload($orderMock, $mailchimpStoreId, $magentoStoreId);
+    }
+
 }
