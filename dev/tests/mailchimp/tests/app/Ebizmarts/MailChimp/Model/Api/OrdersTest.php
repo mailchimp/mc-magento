@@ -177,6 +177,20 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $billingAddressName = 'test';
         $billingAddressCompany = 'test';
         $countryName = 'test';
+        $shippingAddressStreet = array('address1' => 'address1', 'address2' => 'address2');
+        $shippingAddressCity = 'test';
+        $shippingAddressRegion = 'test';
+        $shippingAddressRegionCode = 'test';
+        $shippingAddressPostCode = 'test';
+        $shippingAddressCountry = 'test';
+        $shippingAddressName = 'test';
+        $grandTotal = 12;
+        $totalRefund = 0;
+        $totalCanceled = 0;
+        $state = 'state';
+        $arraySate = array(array('neq' => 'canceled'), array('neq' => 'closed'));
+        $customerEmailString = 'customer_email';
+        $arrayCustomerEmail = array('eq' => $customerEmail);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -197,7 +211,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getCustomerModel',
                 'getStoreModelFromMagentoStoreId',
                 'getCountryModelNameFromBillingAddress',
-                'getCountryModelNameFromShippingAddress'
+                'getCountryModelNameFromShippingAddress',
+                'getResourceModelOrderCollection'
             ))
             ->getMock();
 
@@ -283,7 +298,18 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ))
             ->getMock();
 
-        $orderMock->expects($this->once())->method('getIncrementId')->willReturn($orderIncrementId);
+        $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getIterator', 'addFieldToFilter', 'addAttributeToFilter'))
+            ->getMock();
+
+        $orderModelMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order::class)
+            ->setMethods(array('getGrandTotal', 'getTotalRefunded', 'getTotalCanceled'))
+            ->getMock();
+
+        $orderMock->expects($this->once())
+            ->method('getIncrementId')
+            ->willReturn($orderIncrementId);
         $orderMock->expects($this->exactly(2))
             ->method('getMailchimpCampaignId')
             ->willReturnOnConsecutiveCalls(
@@ -296,24 +322,43 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $mailchimpLandingPage,
                 $mailchimpLandingPage
             );
-        $orderMock->expects($this->once())->method('getStoreCurrencyCode')->willReturn($currencyCode);
-        $orderMock->expects($this->once())->method('getBaseGrandTotal')->willReturn($baseGrandTotal);
-        $orderMock->expects($this->once())->method('getBaseTaxAmount')->willReturn($baseTaxAmount);
-        $orderMock->expects($this->once())->method('getBaseDiscountAmount')->willReturn($baseDiscountAmount);
-        $orderMock->expects($this->once())->method('getBaseShippingAmount')->willReturn($baseShippingAmount);
+        $orderMock->expects($this->once())
+            ->method('getStoreCurrencyCode')
+            ->willReturn($currencyCode);
+        $orderMock->expects($this->once())
+            ->method('getBaseGrandTotal')
+            ->willReturn($baseGrandTotal);
+        $orderMock->expects($this->once())
+            ->method('getBaseTaxAmount')
+            ->willReturn($baseTaxAmount);
+        $orderMock->expects($this->once())
+            ->method('getBaseDiscountAmount')
+            ->willReturn($baseDiscountAmount);
+        $orderMock->expects($this->once())
+            ->method('getBaseShippingAmount')
+            ->willReturn($baseShippingAmount);
         $orderMock->expects($this->once())
             ->method('getCreatedAt')
             ->willReturn($processedAtForeign);
-        $orderMock->expects($this->once())->method('getUpdatedAt')->willReturn($updatedAtForeign);
-        $orderMock->expects($this->once())->method('getStatusHistoryCollection')->willReturn($commentCollectionMock);
-        $orderMock->expects($this->once())->method('getAllVisibleItems')->willReturn($itemsOrderCollection);
-        $orderMock->expects($this->exactly(2))
+        $orderMock->expects($this->once())
+            ->method('getUpdatedAt')
+            ->willReturn($updatedAtForeign);
+        $orderMock->expects($this->once())
+            ->method('getStatusHistoryCollection')
+            ->willReturn($commentCollectionMock);
+        $orderMock->expects($this->once())
+            ->method('getAllVisibleItems')
+            ->willReturn($itemsOrderCollection);
+        $orderMock->expects($this->exactly(3))
             ->method('getCustomerEmail')
             ->willReturnOnConsecutiveCalls(
                 $customerEmail,
+                $customerEmail,
                 $customerEmail
             );
-        $orderMock->expects($this->once())->method('getId')->willReturn($orderIncrementId);
+        $orderMock->expects($this->once())
+            ->method('getId')
+            ->willReturn($orderIncrementId);
         $orderMock->expects($this->exactly(2))
             ->method('getCustomerFirstname')
             ->willReturnOnConsecutiveCalls(
@@ -326,8 +371,12 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $customerLastName,
                 $customerLastName
             );
-        $orderMock->expects($this->once())->method('getBillingAddress')->willReturn($billingAddressMock);
-        $orderMock->expects($this->once())->method('getShippingAddress')->willReturn($shippingAddressMock);
+        $orderMock->expects($this->once())
+            ->method('getBillingAddress')
+            ->willReturn($billingAddressMock);
+        $orderMock->expects($this->once())
+            ->method('getShippingAddress')
+            ->willReturn($shippingAddressMock);
 
         $ordersApiMock->expects($this->exactly(2))
             ->method('returnZeroIfNull')
@@ -339,44 +388,98 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $taxTotal,
                 $shippingTotal
             );
-        $ordersApiMock->expects($this->once())->method('getPromoData')->with($orderMock)->willReturn($dataPromo);
-        $ordersApiMock->expects($this->once())->method('_getMailChimpStatus')->with($orderMock)->willReturn($statusArray);
-        $ordersApiMock->expects($this->once())->method('isOrderCanceled')->willReturn(true);
-        $ordersApiMock->expects($this->once())->method('isTheOrderCommentCanceled')->willReturn(true);
-        $ordersApiMock->expects($this->once())->method('isTypeProduct')->willReturn($isTypeProduct);
-        $ordersApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-        $ordersApiMock->expects($this->once())->method('isItemConfigurable')->willReturn(true);
-        $ordersApiMock->expects($this->once())->method('getModelProduct')->willReturn($productModelMock);
-        $ordersApiMock->expects($this->once())->method('getCustomerModel')->willReturn($customerModelMock);
-        $ordersApiMock->expects($this->once())->method('getStoreModelFromMagentoStoreId')->with($magentoStoreId)->willReturn($storeMock);
-        $ordersApiMock->expects($this->once())->method('getCountryModelNameFromBillingAddress')->with($billingAddressMock)->willReturn($countryName);
-        $ordersApiMock->expects($this->once())->method('getCountryModelNameFromShippingAddress')->with($shippingAddressMock)->willReturn($countryName);
+        $ordersApiMock->expects($this->once())
+            ->method('getPromoData')
+            ->with($orderMock)
+            ->willReturn($dataPromo);
+        $ordersApiMock->expects($this->once())
+            ->method('_getMailChimpStatus')
+            ->with($orderMock)
+            ->willReturn($statusArray);
+        $ordersApiMock->expects($this->once())
+            ->method('isOrderCanceled')
+            ->willReturn(true);
+        $ordersApiMock->expects($this->once())
+            ->method('isTheOrderCommentCanceled')
+            ->willReturn(true);
+        $ordersApiMock->expects($this->once())
+            ->method('isTypeProduct')
+            ->willReturn($isTypeProduct);
+        $ordersApiMock->expects($this->once())
+            ->method('getHelper')
+            ->willReturn($helperMock);
+        $ordersApiMock->expects($this->once())
+            ->method('isItemConfigurable')
+            ->willReturn(true);
+        $ordersApiMock->expects($this->once())
+            ->method('getModelProduct')
+            ->willReturn($productModelMock);
+        $ordersApiMock->expects($this->once())
+            ->method('getCustomerModel')
+            ->willReturn($customerModelMock);
+        $ordersApiMock->expects($this->once())
+            ->method('getStoreModelFromMagentoStoreId')
+            ->with($magentoStoreId)
+            ->willReturn($storeMock);
+        $ordersApiMock->expects($this->once())
+            ->method('getCountryModelNameFromBillingAddress')
+            ->with($billingAddressMock)
+            ->willReturn($countryName);
+        $ordersApiMock->expects($this->once())
+            ->method('getCountryModelNameFromShippingAddress')
+            ->with($shippingAddressMock)
+            ->willReturn($countryName);
+        $ordersApiMock->expects($this->once())
+            ->method('getResourceModelOrderCollection')
+            ->willReturn($orderCollectionMock);
 
         $commentCollectionMock->expects($this->once())
             ->method('getIterator')
             ->willReturn(new ArrayIterator(array($commentModelMock)));
 
-        $commentModelMock->expects($this->once())->method('getCreatedAt')->willReturn($orderCancelDate);
+        $commentModelMock->expects($this->once())
+            ->method('getCreatedAt')
+            ->willReturn($orderCancelDate);
 
         $itemsOrderCollection->expects($this->once())
             ->method('getIterator')
             ->willReturn(new ArrayIterator(array($itemOrderMock)));
 
-        $itemOrderMock->expects($this->once())->method('getProductId')->willReturn($productId);
-        $itemOrderMock->expects($this->once())->method('getProductOptions')->willReturn($options);
+        $itemOrderMock->expects($this->once())
+            ->method('getProductId')
+            ->willReturn($productId);
+        $itemOrderMock->expects($this->once())
+            ->method('getProductOptions')
+            ->willReturn($options);
 
-        $productModelMock->expects($this->once())->method('getIdBySku')->with($sku)->willReturn($variant);
+        $productModelMock->expects($this->once())
+            ->method('getIdBySku')
+            ->with($sku)
+            ->willReturn($variant);
 
-        $helperMock->expects($this->once())->method('getEcommerceSyncDataItem')->with($productId, $isTypeProduct, $mailchimpStoreId)->willReturn($productSyncDataMock);
+        $helperMock->expects($this->once())
+            ->method('getEcommerceSyncDataItem')
+            ->with($productId, $isTypeProduct, $mailchimpStoreId)
+            ->willReturn($productSyncDataMock);
 
-        $productSyncDataMock->expects($this->once())->method('getMailchimpSyncDelta')->willReturn(true);
-        $productSyncDataMock->expects($this->once())->method('getMailchimpSyncError')->willReturn($mailchimpSyncError);
+        $productSyncDataMock->expects($this->once())
+            ->method('getMailchimpSyncDelta')
+            ->willReturn(true);
+        $productSyncDataMock->expects($this->once())
+            ->method('getMailchimpSyncError')
+            ->willReturn($mailchimpSyncError);
 
-        $customerModelMock->expects($this->once())->method('getOptin')->willReturn($optInStatus);
+        $customerModelMock->expects($this->once())
+            ->method('getOptin')
+            ->willReturn($optInStatus);
 
-        $storeMock->expects($this->once())->method('getUrl')->willReturn($orderUrl);
+        $storeMock->expects($this->once())
+            ->method('getUrl')
+            ->willReturn($orderUrl);
 
-        $billingAddressMock->expects($this->once())->method('getStreet')->willReturn($billingAddressStreet);
+        $billingAddressMock->expects($this->once())
+            ->method('getStreet')
+            ->willReturn($billingAddressStreet);
         $billingAddressMock->expects($this->exactly(2))
             ->method('getCity')
             ->willReturnOnConsecutiveCalls(
@@ -420,49 +523,68 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $billingAddressCompany
             );
 
-        $shippingAddressMock->expects($this->once())->method('getStreet')->willReturn($billingAddressStreet);
+        $shippingAddressMock->expects($this->once())
+            ->method('getStreet')
+            ->willReturn($shippingAddressStreet);
         $shippingAddressMock->expects($this->exactly(2))
             ->method('getName')
             ->willReturnOnConsecutiveCalls(
-                $billingAddressName,
-                $billingAddressName
+                $shippingAddressName,
+                $shippingAddressName
             );
         $shippingAddressMock->expects($this->exactly(2))
             ->method('getCity')
             ->willReturnOnConsecutiveCalls(
-                $billingAddressCity,
-                $billingAddressCity
+                $shippingAddressCity,
+                $shippingAddressCity
             );
         $shippingAddressMock->expects($this->exactly(2))
             ->method('getRegion')
             ->willReturnOnConsecutiveCalls(
-                $billingAddressRegion,
-                $billingAddressRegion
+                $shippingAddressRegion,
+                $shippingAddressRegion
             );
         $shippingAddressMock->expects($this->exactly(2))
             ->method('getRegionCode')
             ->willReturnOnConsecutiveCalls(
-                $billingAddressRegionCode,
-                $billingAddressRegionCode
+                $shippingAddressRegionCode,
+                $shippingAddressRegionCode
             );
         $shippingAddressMock->expects($this->exactly(2))
             ->method('getPostcode')
             ->willReturnOnConsecutiveCalls(
-                $billingAddressPostCode,
-                $billingAddressPostCode
+                $shippingAddressPostCode,
+                $shippingAddressPostCode
             );
         $shippingAddressMock->expects($this->exactly(2))
             ->method('getCountry')
             ->willReturnOnConsecutiveCalls(
-                $billingAddressCountry,
-                $billingAddressCountry
+                $shippingAddressCountry,
+                $shippingAddressCountry
             );
-        $shippingAddressMock->expects($this->exactly(2))
-            ->method('getCompany')
-            ->willReturnOnConsecutiveCalls(
-                $billingAddressCompany,
-                $billingAddressCompany
-            );
+
+
+        $orderCollectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($orderModelMock)));
+        $orderCollectionMock->expects($this->once())
+            ->method('addFieldToFilter')
+            ->with($state, $arraySate)
+            ->willReturnSelf();
+        $orderCollectionMock->expects($this->once())
+            ->method('addAttributeToFilter')
+            ->with($customerEmailString, $arrayCustomerEmail)
+            ->willReturnSelf();
+
+        $orderModelMock->expects($this->once())
+            ->method('getGrandTotal')
+            ->willReturn($grandTotal);
+        $orderModelMock->expects($this->once())
+            ->method('getTotalRefunded')
+            ->willReturn($totalRefund);
+        $orderModelMock->expects($this->once())
+            ->method('getTotalCanceled')
+            ->willReturn($totalCanceled);
 
         $ordersApiMock->GeneratePOSTPayload($orderMock, $mailchimpStoreId, $magentoStoreId);
     }
