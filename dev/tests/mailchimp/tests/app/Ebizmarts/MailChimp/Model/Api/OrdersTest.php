@@ -191,6 +191,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $arraySate = array(array('neq' => 'canceled'), array('neq' => 'closed'));
         $customerEmailString = 'customer_email';
         $arrayCustomerEmail = array('eq' => $customerEmail);
+        $qtyOrdered = 2;
+        $price = 210;
+        $discountAmount = 0;
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -245,6 +248,13 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $itemOrderMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item::class)
             ->setMethods(array('getProductId', 'getProductOptions', 'getQtyOrdered', 'getPrice', 'getDiscountAmount'))
             ->getMock();
+
+        $items = array();
+        $items[] = $itemOrderMock;
+        $items[] = $itemOrderMock;
+        $items[] = $itemOrderMock;
+        $items[] = $itemOrderMock;
+        $items[] = $itemOrderMock;
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
             ->setMethods(array('getIdBySku'))
@@ -427,6 +437,15 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $itemOrderMock->expects($this->once())
             ->method('getProductOptions')
             ->willReturn($options);
+        $itemOrderMock->expects($this->once())
+            ->method('getQtyOrdered')
+            ->willReturn($qtyOrdered);
+        $itemOrderMock->expects($this->once())
+            ->method('getPrice')
+            ->willReturn($price);
+        $itemOrderMock->expects($this->once())
+            ->method('getDiscountAmount')
+            ->willReturn($discountAmount);
 
         $productModelMock->expects($this->once())
             ->method('getIdBySku')
