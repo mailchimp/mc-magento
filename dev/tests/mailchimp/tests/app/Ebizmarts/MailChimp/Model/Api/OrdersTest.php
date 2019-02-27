@@ -242,19 +242,14 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $itemsOrderCollection = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getIterator'))
             ->getMock();
 
-        $itemOrderMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item::class)
+        $itemOrderMock = $this->getMockBuilder(Mage_Sales_Model_Order_Item::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getProductId', 'getProductOptions', 'getQtyOrdered', 'getPrice', 'getDiscountAmount'))
             ->getMock();
-
-        $items = array();
-        $items[] = $itemOrderMock;
-        $items[] = $itemOrderMock;
-        $items[] = $itemOrderMock;
-        $items[] = $itemOrderMock;
-        $items[] = $itemOrderMock;
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
             ->setMethods(array('getIdBySku'))
