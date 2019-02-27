@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
-                $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
+                $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "PATCH";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $incrementId;
@@ -157,10 +157,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @param  $order
      * @param  $mailchimpStoreId
      * @param  $magentoStoreId
-     * @param  $isModifiedOrder
      * @return string
      */
-    protected function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, $isModifiedOrder = false)
+    public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
         $data = array();
@@ -190,14 +189,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (isset($statusArray['fulfillment_status'])) {
             $data['fulfillment_status'] = $statusArray['fulfillment_status'];
         }
-
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['updated_at_foreign'] = $order->getUpdatedAt();
-        if ($order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
+        if ($this->isOrderCanceled($order)) {
             $orderCancelDate = null;
             $commentCollection = $order->getStatusHistoryCollection();
             foreach ($commentCollection as $comment) {
-                if ($comment->getStatus() === Mage_Sales_Model_Order::STATE_CANCELED) {
+                if ($this->isTheOrderCommentCanceled($comment)) {
                     $orderCancelDate = $comment->getCreatedAt();
                 }
             }
@@ -213,11 +211,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $itemCount = 0;
         foreach ($items as $item) {
             $productId = $item->getProductId();
-            $productSyncData = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
-            if ($item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            $isTypeProduct = $this->isTypeProduct();
+            $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
+            if ($this->isItemConfigurable($item)) {
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
-                $variant = Mage::getModel('catalog/product')->getIdBySku($sku);
+                $variant = $this->getModelProduct()->getIdBySku($sku);
                 if (!$variant) {
                     continue;
                 }
@@ -246,55 +245,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer data
-        try {
-            $api = $helper->getApi($magentoStoreId);
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $helper->logError($e->getMessage());
-            return "";
-        }
-        if ((bool)$order->getCustomerIsGuest()) {
-            try {
-                $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $order->getCustomerEmail());
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-            }
-            if (isset($customers['total_items']) && $customers['total_items'] > 0) {
-                $customerId = $customers['customers'][0]['id'];
-            } else {
-                $customerId = "GUEST-" . $helper->getDateMicrotime();
-            }
-            $data["customer"] = array(
-                "id" => $customerId,
-            );
-            if (!$isModifiedOrder) {
-                $data["customer"]["email_address"] = $order->getCustomerEmail();
-                $data["customer"]["opt_in_status"] = false;
-            }
-        } else {
-            $data["customer"] = array(
-                "id" => ($order->getCustomerId()) ? $order->getCustomerId() : "CUSTOMER-" . $helper->getDateMicrotime()
-            );
-            if (!$isModifiedOrder) {
-                $custEmailAddr = $order->getCustomerEmail();
-                try {
-                    $customer = $api->ecommerce->customers->get($mailchimpStoreId, $order->getCustomerId(), 'email_address');
-                    if (isset($customer['email_address'])) {
-                        $custEmailAddr = $customer['email_address'];
-                    }
-                } catch (MailChimp_Error $e) {
-                    $err = $e->getMailchimpTitle();
-                    if (!preg_match('/Resource Not Found for Api Call/', $err)) {
-                        $msg = "Failed to lookup e-commerce customer via ID " . $order->getCustomerId();
-                        $helper->logError($msg . ': ' . $e->getFriendlyMessage());
-                    }
-                }
+        $data["customer"]["id"] = md5($order->getCustomerEmail());
+        $data["customer"]["email_address"] = $order->getCustomerEmail();
+        $data["customer"]["opt_in_status"] = $this->getCustomerModel()->getOptin($magentoStoreId);
 
-                $data["customer"]["email_address"] = ($custEmailAddr) ? $custEmailAddr : $order->getCustomerEmail();
-                $data["customer"]["opt_in_status"] = Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId);
-            }
-        }
-
-        $store = Mage::getModel('core/store')->load($magentoStoreId);
+        $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);
         $data['order_url'] = $store->getUrl(
             'sales/order/view/', array(
                 'order_id' => $order->getId(),
@@ -339,7 +294,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
 
             if ($billingAddress->getCountry()) {
-                $countryName = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+                $countryName = $this->getCountryModelNameFromBillingAddress($billingAddress);
                 $address["country"] = $data['billing_address']["country"] = $countryName;
                 $address["country_code"] = $data['billing_address']["country_code"] = $billingAddress->getCountry();
             }
@@ -390,7 +345,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
 
             if ($shippingAddress->getCountry()) {
-                $data['shipping_address']['country'] = Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName();
+                $data['shipping_address']['country'] = $this->getCountryModelNameFromShippingAddress($shippingAddress);
                 $data['shipping_address']['country_code'] = $shippingAddress->getCountry();
             }
 
@@ -491,7 +446,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
         }
 
-        if (!$mailChimpFinancialStatus && $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED) {
+        if (!$mailChimpFinancialStatus && $this->isOrderCanceled($order)) {
             $mailChimpFinancialStatus = self::CANCELED;
         }
 
@@ -586,7 +541,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $this->_counter += 1;
 
                 //Create order
-                $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId, true);
+                $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
                     $batchArray[$this->_counter]['method'] = "POST";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
@@ -722,5 +677,83 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         return array('synced_status' => $mailchimpSyncedFlag, 'order_id' => $mailchimpOrderId);
 
+    }
+
+    /**
+     * @param $order
+     * @return bool
+     */
+    protected function isOrderCanceled($order)
+    {
+        return $order->getState() == Mage_Sales_Model_Order::STATE_CANCELED;
+    }
+
+    /**
+     * @param $comment
+     * @return bool
+     */
+    protected function isTheOrderCommentCanceled($comment)
+    {
+        return $comment->getStatus() === Mage_Sales_Model_Order::STATE_CANCELED;
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function isItemConfigurable($item)
+    {
+        return $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getModelProduct()
+    {
+        return Mage::getModel('catalog/product');
+    }
+
+    /**
+     * @return string
+     */
+    protected function isTypeProduct()
+    {
+        return Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
+    }
+
+    /**
+     * @return false|Ebizmarts_MailChimp_Model_Api_Customers
+     */
+    protected function getCustomerModel()
+    {
+        return Mage::getModel('mailchimp/api_customers');
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getStoreModelFromMagentoStoreId($magentoStoreId)
+    {
+        return Mage::getModel('core/store')->load($magentoStoreId);
+    }
+
+    /**
+     * @param $billingAddress
+     * @return mixed
+     */
+    protected function getCountryModelNameFromBillingAddress($billingAddress)
+    {
+        return Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+    }
+
+    /**
+     * @param $shippingAddress
+     * @return mixed
+     */
+    protected function getCountryModelNameFromShippingAddress($shippingAddress)
+    {
+        return Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName();
     }
 }
