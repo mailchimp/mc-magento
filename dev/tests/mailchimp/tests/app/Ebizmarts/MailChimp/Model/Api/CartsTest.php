@@ -319,7 +319,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             );
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID, true)
+            ->with($cartModelMock, self::MAGENTO_STORE_ID, true)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('addProductNotSentData')
@@ -615,7 +615,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->with(self::COUNTER + 1);
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID, true)
+            ->with($cartModelMock, self::MAGENTO_STORE_ID, true)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('addProductNotSentData')
@@ -823,7 +823,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn($allCarts);
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID)
+            ->with($cartModelMock, self::MAGENTO_STORE_ID)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('getToken')
@@ -1458,7 +1458,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn($allCarts);
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID)
+            ->with($cartModelMock, self::MAGENTO_STORE_ID)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('setToken')
@@ -1615,6 +1615,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $regionCode = 'test';
         $postCode = 'test';
         $country = 'test';
+
         $cartsApiMock = $this->cartsApiMock
             ->setMethods(array('getApiCustomersOptIn', 'getCountryModel'))
             ->getMock();
@@ -1690,5 +1691,130 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             );
 
         $cartsApiMock->_getCustomer($cartModelMock, self::MAGENTO_STORE_ID);
+    }
+
+    public function testMakeCart()
+    {
+        $checkoutUrl = 'test';
+        $isModified = false;
+        $mailchimpCampaignId = 'qwe123erq';
+        $quoteCurrencyCode = 'test';
+        $grandTotal = 21;
+        $simpleProductString = 'simple_product';
+        $productId = 1;
+        $productQty = 1;
+        $productPrice = 210;
+        $variantId = 12;
+
+        $cartsApiMock = $this->cartsApiMock->setMethods(array(
+            '_getCustomer',
+            '_getCheckoutUrl',
+            'isProductTypeConfigurable'
+        ))
+            ->getMock();
+
+        $customerModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Customers::class)
+            ->setMethods(array())
+            ->getMock();
+
+        $cartModelMock = $this
+            ->getMockBuilder(Mage_Sales_Model_Quote::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+                'getMailchimpCampaignId',
+                'getEntityId',
+                'getQuoteCurrencyCode',
+                'getGrandTotal',
+                'getAllVisibleItems'
+            ))
+            ->getMock();
+
+        $itemsMockCollection = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Item_Collection::class)
+        ->disableOriginalConstructor()
+        ->setMethods(array('getIterator'))
+        ->getMock();
+
+        $itemMock = $this->getMockBuilder(Mage_Sales_Model_Quote_Item::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getProductType', 'getOptionByCode', 'getProductId', 'getQty', 'getRowTotal'))
+            ->getMock();
+
+        $optionByCodeMock = $this->getMockBuilder(Mage_Sales_Model_Quote_Item_Option::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getProduct'))
+            ->getMock();
+
+        $variantMock = $this->getMockBuilder(Mage_Sales_Model_Quote_Item::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getId'))
+            ->getMock();
+
+        $cartsApiMock->expects($this->once())
+            ->method('_getCustomer')
+            ->with($cartModelMock, self::MAGENTO_STORE_ID)
+            ->willReturn($customerModelMock);
+        $cartsApiMock->expects($this->once())
+            ->method('_getCheckoutUrl')
+            ->with($cartModelMock, $isModified)
+            ->willReturn($checkoutUrl);
+        $cartsApiMock->expects($this->once())
+            ->method('isProductTypeConfigurable')
+            ->with($itemMock)
+            ->willReturn(true);
+
+        $cartModelMock->expects($this->once())
+            ->method('getMailchimpCampaignId')
+            ->willReturn($mailchimpCampaignId);
+        $cartModelMock->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn(self::CART_ID);
+        $cartModelMock->expects($this->once())
+            ->method('getQuoteCurrencyCode')
+            ->willReturn($quoteCurrencyCode);
+        $cartModelMock->expects($this->once())
+            ->method('getGrandTotal')
+            ->willReturn($grandTotal);
+        $cartModelMock->expects($this->once())
+            ->method('getAllVisibleItems')
+            ->willReturn($itemsMockCollection);
+
+        $itemsMockCollection->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($itemMock)));
+
+        $itemMock->expects($this->exactly(2))
+            ->method('getProductType')
+            ->willReturnOnConsecutiveCalls(
+                'grouped',
+                'bundle'
+            );
+        $itemMock->expects($this->exactly(2))
+            ->method('getOptionByCode')
+            ->withConsecutive(
+                array($simpleProductString),
+                array($simpleProductString)
+            )->willReturnOnConsecutiveCalls(
+                $optionByCodeMock,
+                $optionByCodeMock
+            );
+        $itemMock->expects($this->once())
+            ->method('getProductId')
+            ->willReturn($productId);
+        $itemMock->expects($this->once())
+            ->method('getQty')
+            ->willReturn($productQty);
+        $itemMock->expects($this->once())
+            ->method('getRowTotal')
+            ->willReturn($productPrice);
+
+        $optionByCodeMock->expects($this->once())
+            ->method('getProduct')
+            ->willReturn($variantMock);
+
+        $variantMock->expects($this->once())
+            ->method('getId')
+            ->willReturn($variantId);
+
+        $cartsApiMock->_makeCart($cartModelMock, self::MAGENTO_STORE_ID, $isModified);
     }
 }
