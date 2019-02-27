@@ -203,7 +203,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getPromoData',
                 '_getMailChimpStatus',
                 'isOrderCanceled',
-                'isTheOrderCommentCanceled',
                 'isTypeProduct',
                 'getHelper',
                 'isItemConfigurable',
@@ -229,7 +228,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getBaseShippingAmount',
                 'getCreatedAt',
                 'getUpdatedAt',
-                'getStatusHistoryCollection',
                 'getAllVisibleItems',
                 'getCustomerEmail',
                 'getId',
@@ -238,14 +236,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getBillingAddress',
                 'getShippingAddress'
             ))
-            ->getMock();
-
-        $commentCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Invoice_Comment_Collection::class)
-            ->setMethods(array('getIterator'))
-            ->getMock();
-
-        $commentModelMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Invoice_Comment::class)
-            ->setMethods(array('getCreatedAt'))
             ->getMock();
 
         $itemsOrderCollection = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item_Collection::class)
@@ -344,9 +334,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getUpdatedAt')
             ->willReturn($updatedAtForeign);
         $orderMock->expects($this->once())
-            ->method('getStatusHistoryCollection')
-            ->willReturn($commentCollectionMock);
-        $orderMock->expects($this->once())
             ->method('getAllVisibleItems')
             ->willReturn($itemsOrderCollection);
         $orderMock->expects($this->exactly(3))
@@ -398,10 +385,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->willReturn($statusArray);
         $ordersApiMock->expects($this->once())
             ->method('isOrderCanceled')
-            ->willReturn(true);
-        $ordersApiMock->expects($this->once())
-            ->method('isTheOrderCommentCanceled')
-            ->willReturn(true);
+            ->willReturn(false);
         $ordersApiMock->expects($this->once())
             ->method('isTypeProduct')
             ->willReturn($isTypeProduct);
@@ -432,14 +416,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())
             ->method('getResourceModelOrderCollection')
             ->willReturn($orderCollectionMock);
-
-        $commentCollectionMock->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new ArrayIterator(array($commentModelMock)));
-
-        $commentModelMock->expects($this->once())
-            ->method('getCreatedAt')
-            ->willReturn($orderCancelDate);
 
         $itemsOrderCollection->expects($this->once())
             ->method('getIterator')
