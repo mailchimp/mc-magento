@@ -169,7 +169,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
+            $cartJson = $this->_makeCart($cart, $magentoStoreId, true);
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
@@ -255,7 +255,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
+            $cartJson = $this->_makeCart($cart, $magentoStoreId);
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'POST';
@@ -302,12 +302,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
     /**
      * @param $cart
-     * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @param $isModified
      * @return string
      */
-    protected function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
+    public function _makeCart($cart, $magentoStoreId, $isModified = false)
     {
         $helper = $this->getHelper();
         $campaignId = $cart->getMailchimpCampaignId();
@@ -336,7 +335,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 continue;
             }
 
-            if ($item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            if ($this->isProductTypeConfigurable($item)) {
                 $variant = null;
                 if ($item->getOptionByCode('simple_product')) {
                     $variant = $item->getOptionByCode('simple_product')->getProduct();
@@ -652,6 +651,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function getCountryModel($billingAddress)
     {
         return Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function isProductTypeConfigurable($item)
+    {
+        return $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
     }
 }
 
