@@ -58,7 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
-        $modifiedOrders = Mage::getResourceModel('sales/order_collection');
+        $modifiedOrders = $this->getResourceModelOrderCollection();
         // select orders for the current Magento store id
         $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
@@ -107,7 +107,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $helper = $this->getHelper();
         $batchArray = array();
-        $newOrders = Mage::getResourceModel('sales/order_collection');
+        $newOrders = $this->getResourceModelOrderCollection();
         // select carts for the current Magento store id
         $newOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $helper->addResendFilter($newOrders, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
@@ -355,7 +355,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer orders data
-        $orderCollection = Mage::getResourceModel('sales/order_collection')
+        $orderCollection = $this->getResourceModelOrderCollection()
             ->addFieldToFilter(
                 'state',
                 array(
@@ -513,7 +513,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
         $config = array();
-        $orderCollection = Mage::getResourceModel('sales/order_collection');
+        $orderCollection = $this->getResourceModelOrderCollection();
         // select carts for the current Magento store id
         $orderCollection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         if ($lastId) {
@@ -755,5 +755,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function getCountryModelNameFromShippingAddress($shippingAddress)
     {
         return Mage::getModel('directory/country')->loadByCode($shippingAddress->getCountry())->getName();
+    }
+
+    /**
+     * @return Mage_Sales_Model_Resource_Order_Collection
+     */
+    protected function getResourceModelOrderCollection()
+    {
+        return Mage::getResourceModel('sales/order_collection');
     }
 }
