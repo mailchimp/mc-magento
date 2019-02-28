@@ -3518,17 +3518,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return bool \ return true if in the config is enabled include the taxes in the price of the products.
+     * @return bool \ return true if is enabled include the taxes in the price of the products.
      * @throws Mage_Core_Exception
      */
     public function isIncludeTaxesEnabled()
     {
-        $includeTaxesEnabled = false;
         $includeTaxesConfig = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDING_TAXES, 0);
-        if ($includeTaxesConfig == Ebizmarts_MailChimp_Model_System_Config_Source_IncludingTaxes::YES) {
-            $includeTaxesEnabled = true;
-        }
 
-        return $includeTaxesEnabled;
+        return (bool)$includeTaxesConfig;
     }
 }
