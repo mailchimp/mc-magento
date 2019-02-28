@@ -3516,4 +3516,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
         $config->cleanCache();
     }
+
+    /**
+     * @return bool \ return true if in the config is enabled include the taxes in the price of the products.
+     * @throws Mage_Core_Exception
+     */
+    public function isIncludeTaxesEnabled()
+    {
+        $includeTaxesEnabled = false;
+        $includeTaxesConfig = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDING_TAXES, 0);
+        if ($includeTaxesConfig == Ebizmarts_MailChimp_Model_System_Config_Source_IncludingTaxes::YES) {
+            $includeTaxesEnabled = true;
+        }
+
+        return $includeTaxesEnabled;
+    }
 }
