@@ -92,7 +92,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function _buildCustomerData($customer)
     {
         $data = array();
-        $data["id"] = $customer->getId();
+        $data["id"] = md5($this->getCustomerEmail($customer));
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
@@ -175,19 +175,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
         $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true, false);
-    }
-
-    public function createGuestCustomer($guestId, $order)
-    {
-        $guestCustomer = Mage::getModel('customer/customer')->setId($guestId);
-        foreach ($order->getData() as $key => $value) {
-            $keyArray = explode('_', $key);
-            if ($value && isset($keyArray[0]) && $keyArray[0] == 'customer') {
-                $guestCustomer->{'set' . ucfirst($keyArray[1])}($value);
-            }
-        }
-
-        return $guestCustomer;
     }
 
     public function getOptin($magentoStoreId)
