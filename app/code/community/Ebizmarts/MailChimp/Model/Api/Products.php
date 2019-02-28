@@ -301,7 +301,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = $this->getMailchimpFinalPrice($magentoStoreId, $rc, $productId);
+                $price = $this->getMailchimpFinalPrice($rc, $productId, $magentoStoreId);
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -851,7 +851,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $helper = $this->getMailChimpHelper();
         $rc = $helper->getProductResourceModel();
-        $price = $this->getMailchimpFinalPrice($magentoStoreId, $rc, $productId);
+        $price = $this->getMailchimpFinalPrice($rc, $productId, $magentoStoreId);
         return $price;
     }
 
@@ -941,7 +941,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @return float \ return the price of the product
      * @throws Mage_Core_Exception
      */
-    protected function getMailchimpFinalPrice($magentoStoreId, $rc, $productId)
+    protected function getMailchimpFinalPrice($rc, $productId, $magentoStoreId)
     {
         $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
         $helper = $this->getMailChimpHelper();
