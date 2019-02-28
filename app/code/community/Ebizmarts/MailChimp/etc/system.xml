@@ -320,7 +320,7 @@
                                 <active>1</active>
                             </depends>
                         </image_size>
-                        <include_taxes>
+                        <include_taxes translate="label">
                             <label>Include Taxes</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_includingTaxes</source_model>
