@@ -15,9 +15,18 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_IncludingTaxes
      */
     public function toOptionArray()
     {
+        $helper = $this->getHelper();
         return array(
-            array('value' => 0, 'label' => Mage::helper('mailchimp')->__('No')),
-            array('value' => 1, 'label' => Mage::helper('mailchimp')->__('Yes'))
+            array('value' => 0, 'label' => $helper->__('No')),
+            array('value' => 1, 'label' => $helper->__('Yes'))
         );
+    }
+
+    /**
+     * @return Mage_Core_Helper_Abstract
+     */
+    protected function getHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }
