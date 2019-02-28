@@ -3523,8 +3523,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isIncludeTaxesEnabled()
     {
-        $includeTaxesConfig = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDING_TAXES, 0);
-
-        return (bool)$includeTaxesConfig;
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDE_TAXES, 0, 'default');
     }
 }
