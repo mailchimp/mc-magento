@@ -8,9 +8,6 @@
 
 class Ebizmarts_MailChimp_Model_System_Config_Source_IncludingTaxes
 {
-    const YES = 1;
-    const NO = 0;
-
     /**
      * Options getter
      *
@@ -18,10 +15,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_IncludingTaxes
      */
     public function toOptionArray()
     {
-        $helper = Mage::helper('mailchimp');
         return array(
-            array('value' => self::YES, 'label' => $helper->__('Yes')),
-            array('value' => self::NO, 'label' => $helper->__('No'))
+            array('value' => 'yes', 'label' => Mage::helper('mailchimp')->__('Yes')),
+            array('value' => 'no', 'label' => Mage::helper('mailchimp')->__('No'))
         );
     }
 }
