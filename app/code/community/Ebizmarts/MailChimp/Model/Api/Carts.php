@@ -169,7 +169,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
+            $cartJson = $this->_makeCart($cart, $magentoStoreId, true);
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
@@ -255,7 +255,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
+            $cartJson = $this->_makeCart($cart, $magentoStoreId);
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'POST';
@@ -302,18 +302,17 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
     /**
      * @param $cart
-     * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @param $isModified
      * @return string
      */
-    protected function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
+    public function _makeCart($cart, $magentoStoreId, $isModified = false)
     {
         $helper = $this->getHelper();
         $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
-        $customer = $this->_getCustomer($cart, $mailchimpStoreId, $magentoStoreId);
+        $customer = $this->_getCustomer($cart, $magentoStoreId);
         if (empty($customer)) {
             return "";
         }
@@ -336,7 +335,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 continue;
             }
 
-            if ($item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            if ($this->isProductTypeConfigurable($item)) {
                 $variant = null;
                 if ($item->getOptionByCode('simple_product')) {
                     $variant = $item->getOptionByCode('simple_product')->getProduct();
@@ -412,58 +411,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param  $magentoStoreId
      * @return array
      */
-    protected function _getCustomer($cart, $mailchimpStoreId, $magentoStoreId)
+    public function _getCustomer($cart, $magentoStoreId)
     {
-        $helper = $this->getHelper();
-        $customer = array();
-        try {
-            $api = $helper->getApi($magentoStoreId);
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $helper->logError($e->getMessage());
-            return $customer;
-        }
-
-        if ($cart->getCustomerId()) {
-            try {
-                $customer = $api->ecommerce->customers->get($mailchimpStoreId, $cart->getCustomerId(), 'email_address');
-            } catch (MailChimp_Error $e) {
-                $err = $e->getMailchimpTitle();
-                if (!preg_match('/Resource Not Found for Api Call/', $err)) {
-                    $msg = "Failed to lookup e-commerce customer via ID " . $cart->getCustomerId();
-                    $helper->logError($msg . ': ' . $e->getFriendlyMessage());
-                }
-            }
-            $custEmailAddr = null;
-            if (isset($customer['email_address'])) {
-                $custEmailAddr = $customer['email_address'];
-            }
-            $customer = array(
-                "id" => $cart->getCustomerId(),
-                "email_address" => ($custEmailAddr) ? $custEmailAddr : $cart->getCustomerEmail(),
-                "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
-            );
-        } else {
-            try {
-                $customers = $api->ecommerce->customers->getByEmail($mailchimpStoreId, $cart->getCustomerEmail());
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-            }
-
-            if (isset($customers['total_items']) && $customers['total_items'] > 0) {
-                $customer = array(
-                    'id' => $customers['customers'][0]['id'],
-                    "email_address" => $cart->getCustomerEmail(),
-                    "opt_in_status" => false
-                );
-            } else {
-                $date = $helper->getDateMicrotime();
-                $customer = array(
-                    "id" => ($cart->getCustomerId()) ? $cart->getCustomerId() : "GUEST-" . $date,
-                    "email_address" => $cart->getCustomerEmail(),
-                    "opt_in_status" => Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId)
-                );
-            }
-        }
+        $customer = array(
+            "id" => md5($cart->getCustomerEmail()),
+            "email_address" => $cart->getCustomerEmail(),
+            "opt_in_status" => $this->getApiCustomersOptIn($magentoStoreId)
+        );
 
         $firstName = $cart->getCustomerFirstname();
         if ($firstName) {
@@ -504,7 +458,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
 
             if ($billingAddress->getCountry()) {
-                $address['country'] = Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+                $address['country'] = $this->getCountryModel($billingAddress);
                 $address['country_code'] = $billingAddress->getCountry();
             }
 
@@ -517,7 +471,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if ($billingAddress->getCompany()) {
             $customer["company"] = $billingAddress->getCompany();
         }
-
         return $customer;
     }
 
@@ -680,6 +633,33 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function getOrderCollection()
     {
         return Mage::getResourceModel('sales/order_collection');
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @return mixed
+     */
+    protected function getApiCustomersOptIn($magentoStoreId)
+    {
+        return Mage::getModel('mailchimp/api_customers')->getOptin($magentoStoreId);
+    }
+
+    /**
+     * @param $billingAddress
+     * @return mixed
+     */
+    protected function getCountryModel($billingAddress)
+    {
+        return Mage::getModel('directory/country')->loadByCode($billingAddress->getCountry())->getName();
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function isProductTypeConfigurable($item)
+    {
+        return $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
     }
 }
 
