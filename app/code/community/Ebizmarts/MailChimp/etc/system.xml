@@ -328,7 +328,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[If you enable this the taxes of the products will be including on the price to send to Mailchimp]]></comment>
+                            <comment>
+                                <model>mailchimp/adminhtml_includetaxes_comment</model>
+                            </comment>
                         </include_taxes>
                         <firstdate translate="label">
                             <label>First date</label>
