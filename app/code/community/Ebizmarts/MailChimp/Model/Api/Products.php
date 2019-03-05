@@ -40,6 +40,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 ->setConfig(Mage_Catalog_Helper_Category_Flat::XML_PATH_IS_ENABLED_FLAT_CATALOG_CATEGORY, 0)
                 ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
         }
+        $this->_markSpecialPrices($mailchimpStoreId, $magentoStoreId);
         $collection = $this->makeProductsNotSentCollection($magentoStoreId);
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId);
         $batchArray = array();
@@ -301,7 +302,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = $this->getMailchimpFinalPrice($rc, $productId, $magentoStoreId);
+                $price = $this->getMailchimpFinalPrice($product);
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -442,7 +443,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
-        $collection->addStoreFilter($magentoStoreId);
+        $collection->addStoreFilter($magentoStoreId)->addFinalPrice();
         $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
         $this->joinQtyAndBackorders($collection);
@@ -829,7 +830,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (!$this->currentProductIsVisible()) {
             $parentId = $this->getParentId($product->getId());
             if ($parentId) {
-                $price = $this->getProductPrice($parentId, $magentoStoreId);
+                $price = $this->getProductPrice($product, $magentoStoreId);
             }
         } else {
             if ($this->_parentPrice) {
@@ -847,11 +848,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $this->_visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
     }
 
-    protected function getProductPrice($productId, $magentoStoreId)
+    protected function getProductPrice($product, $magentoStoreId)
     {
         $helper = $this->getMailChimpHelper();
         $rc = $helper->getProductResourceModel();
-        $price = $this->getMailchimpFinalPrice($rc, $productId, $magentoStoreId);
+        $price = $this->getMailchimpFinalPrice($product);
         return $price;
     }
 
@@ -935,21 +936,83 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * Return price with tax if setting enabled.
      *
-     * @param $magentoStoreId
-     * @param $rc
-     * @param $productId
+     * @param $product
      * @return float \ return the price of the product
      * @throws Mage_Core_Exception
      */
-    protected function getMailchimpFinalPrice($rc, $productId, $magentoStoreId)
+    protected function getMailchimpFinalPrice($product)
     {
-        $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
         $helper = $this->getMailChimpHelper();
-        if ($helper->isIncludeTaxesEnabled()) {
-            $_product = $this->loadProductById($productId);
-            $price = Mage::helper('tax')->getPrice($_product, $_product->getFinalPrice());
-        }
+        $price = Mage::helper('tax')->getPrice($product, $product->getFinalPrice(), $helper->isIncludeTaxesEnabled());
 
         return $price;
+    }
+
+    /**
+     * Sync to mailchimp the special price of the products
+     *
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     */
+    protected function _markSpecialPrices($mailchimpStoreId, $magentoStoreId)
+    {
+        /**
+         * get the products with current special price that are not synced and mark it as modified
+         */
+        $collection = $this->getProductResourceCollection();
+        $collection->addStoreFilter($magentoStoreId);
+        $collection->addAttributeToFilter(
+              'special_price', array('date' => true, 'left')
+        )->addAttributeToFilter(
+              'special_from_date',
+              array('or'=> array(
+                0 => array('date' => true, 'to' => date('Y-m-d', time()).' 23:59:59'),
+                1 => array('is' => new Zend_Db_Expr('null')))
+              ), 'left'
+        )->addAttributeToFilter(
+              'special_to_date',
+              array('or'=> array(
+                0 => array('date' => true, 'from' => date('Y-m-d', time()).' 00:00:00'),
+                1 => array('is' => new Zend_Db_Expr('null')))
+              ), 'left'
+        );
+
+        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+
+        $collection->getSelect()->joinLeft(
+            array('m4m' => $mailchimpTableName),
+            "m4m.type = 'PRO' and m4m.related_id = e.entity_id AND m4m.mailchimp_sync_modified = 0 ".$collection->getConnection()->quoteInto(" AND  m4m.mailchimp_store_id = ?", $mailchimpStoreId) ." and m4m.mailchimp_sync_delta <  at_special_from_date.value"
+        );
+        $collection->getSelect()->where('m4m.mailchimp_sync_delta is not null');
+        foreach ($collection as $item) {
+            $this->update($item->getEntityId(), $mailchimpStoreId);
+            Mage::log('estoy actualizando el final price', null, 'ebizmartsProductsMark.log', true);
+        }
+
+        /**
+         * get the products that was synced when it have special price and have no more special price
+         */
+        $collection2 = $this->getProductResourceCollection();
+        $collection2->addStoreFilter($magentoStoreId);
+        $collection2->addAttributeToFilter(
+          'special_price', array('date' => true, 'left')
+        )->addAttributeToFilter(
+              'special_to_date',
+              array('or'=> array(
+                0 => array('date' => true, 'from' => date('Y-m-d', time()).' 00:00:00'),
+                1 => array('is' => new Zend_Db_Expr('null')))
+              ), 'left'
+        );
+
+        $collection2->getSelect()->joinLeft(
+            array('m4m' => $mailchimpTableName),
+            "m4m.type = 'PRO' and m4m.related_id = e.entity_id and m4m.mailchimp_sync_modified = 0 ".$collection2->getConnection()->quoteInto(" AND  m4m.mailchimp_store_id = ?", $mailchimpStoreId) ." and m4m.mailchimp_sync_delta < at_special_to_date.value",
+            array()
+        );
+        $collection2->getSelect()->where('m4m.mailchimp_sync_delta is not null');
+        foreach ($collection2 as $item) {
+            $this->update($item->getEntityId(), $mailchimpStoreId);
+            Mage::log('estoy actualizando el final price to', null, 'ebizmartsProductsMark.log', true);
+        }
     }
 }
