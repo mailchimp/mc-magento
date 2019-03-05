@@ -52,11 +52,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->productsApiMock
             ->setMethods(array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
                 'shouldSendProductUpdate', 'getChildrenIdsForConfigurable', 'makeProductChildrenCollection',
-                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData'))
+                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData', '_markSpecialPrices'))
             ->getMock();
 
         $productsApiMock->expects($this->once())->method("isProductFlatTableEnabled")->willReturn(false);
 
+        $productsApiMock->expects($this->once())->method('_markSpecialPrices')->with($mailchimpStoreId, $magentoStoreId);
         $productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')->with($magentoStoreId)->willReturn($productCollection);
         $productsApiMock->expects($this->once())->method('joinMailchimpSyncData')->with($productCollection, $mailchimpStoreId);
 
