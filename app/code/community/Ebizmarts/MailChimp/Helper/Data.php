@@ -318,6 +318,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param $scopeId
+     * @param null $scope
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
+    public function getWebhookDeleteAction($scopeId, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $scopeId, $scope);
+    }
+
+    /**
      * Get local store_id value of the MC store for given scope.
      *
      * @param  $scopeId
@@ -1254,7 +1265,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpScope = null;
         $mailChimpStoreId = $this->getMCStoreId($storeId);
-        $mailchimpScope = $this->getScopeByMailChimpStoreId($mailChimpStoreId);
+        $mailchimpScope = $this->getFirstScopeFromConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $mailChimpStoreId);
         return $mailchimpScope;
     }
 
@@ -2144,10 +2155,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Return the customer model for the given subscriber email
      * address for magento stores subscribed to the given Mailchimp List ID.
-     *
-     * @param   string $listId Mailchimp list ID
-     * @param   string $email Subscriber email address.
-     * @returns Mage_Customer_Model_Customer|null $customer
+     * @param $listId
+     * @param $email
+     * @return Mage_Customer_Model_Customer|null
      */
     public function loadListCustomer($listId, $email)
     {
@@ -2280,7 +2290,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     return true;
                 } else {
                     return $this->__('The webhook already exists.');
-            }
+                }
             } catch (MailChimp_Error $e) {
                 $errorMessage = $e->getFriendlyMessage();
                 $this->logError($errorMessage);
@@ -3030,12 +3040,32 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Will return the first scope it finds,from core_config_data.
+     *
+     * @param $path
+     * @param $value
+     * @return array|null
+     */
+    public function getFirstScopeFromConfig($path, $value)
+    {
+        $mailchimpScope = null;
+        $collection = Mage::getResourceModel('core/config_data_collection')
+            ->addFieldToFilter('path', array('eq' => $path ))
+            ->addFieldToFilter('value', array('eq' => $value));
+        if ($collection->getSize()) {
+            $configEntry = $collection->getFirstItem();
+            $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
+        }
+        return $mailchimpScope;
+    }
+
+    /**
      * @param $mailchimpStoreId
      * @return Ebizmarts_MailChimp|null
      */
     public function getApiByMailChimpStoreId($mailchimpStoreId)
     {
-        $scopeArray = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
+        $scopeArray = $this->getFirstScopeFromConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $mailchimpStoreId);
         try {
             $api = $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
             return $api;
