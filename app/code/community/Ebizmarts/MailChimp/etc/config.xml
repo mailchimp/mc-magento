@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.15</version>
+            <version>1.1.15.1</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
             <version>1.1.15</version>
@@ -307,14 +307,14 @@
             </updates>
         </layout>
         <translate>
-        <modules>
-            <Ebizmarts_MailChimp>
-                <files>
-                    <default>Ebizmarts_MailChimp.csv</default>
-                </files>
-            </Ebizmarts_MailChimp>
-        </modules>
-    </translate>
+            <modules>
+                <Ebizmarts_MailChimp>
+                    <files>
+                        <default>Ebizmarts_MailChimp.csv</default>
+                    </files>
+                </Ebizmarts_MailChimp>
+            </modules>
+        </translate>
         <events>
             <core_block_abstract_prepare_layout_after>
                 <observers>

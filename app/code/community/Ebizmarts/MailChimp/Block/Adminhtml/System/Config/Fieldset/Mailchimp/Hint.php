@@ -42,15 +42,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
     }
     public function getStoresUrl()
     {
-        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimpadmin/getStores');
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getStores');
     }
     public function getListUrl()
     {
-        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimpadmin/getList');
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getList');
     }
     public function getInfoUrl()
     {
-        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimpadmin/getInfo');
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getInfo');
     }
 }
-

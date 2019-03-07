@@ -116,10 +116,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $scopeArray = $helper->getCurrentScope();
 
         if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            $helper->removeEcommerceSyncData($scopeArray['scope_id'], $scopeArray['scope']);
             $helper->resetCampaign($scopeArray['scope_id'], $scopeArray['scope']);
-            $helper->clearErrorGrid($scopeArray['scope_id'], $scopeArray['scope'], true);
-            $helper->deleteStore($scopeArray['scope_id'], $scopeArray['scope']);
         }
 
         return $observer;

@@ -20,7 +20,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $scope = $this->getScope();
         $valueChanged = $this->isValueChanged();
         $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
-        $storeDeleted = false;
 
         $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($scopeId, $scope);
         $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
@@ -39,22 +38,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
             $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
         }
 
-        if (isset($groups['ecommerce']['fields']['active']) && isset($groups['ecommerce']['fields']['active']['value'])) {
-            $ecommerceActive = $groups['ecommerce']['fields']['active']['value'];
-        } else {
-            $ecommerceActive = $helper->isEcommerceEnabled($scopeId, $scope);
-        }
-
         if ($apiKey && $valueChanged && $thisScopeHasMCStoreId) {
-            $helper->removeEcommerceSyncData($scopeId, $scope);
             $helper->resetCampaign($scopeId, $scope);
-            $helper->clearErrorGrid($scopeId, $scope, true);
-            $helper->deleteStore($scopeId, $scope);
-            $storeDeleted = true;
-        }
-
-        if ($apiKey && $moduleIsActive && $ecommerceActive && $this->getValue() && ($storeDeleted || !$thisScopeHasMCStoreId)) {
-            $helper->createStore($this->getValue(), $scopeId, $scope);
         }
 
         if ($apiKey && $moduleIsActive && $valueChanged) {

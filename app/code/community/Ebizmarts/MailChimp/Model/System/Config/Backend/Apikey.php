@@ -30,10 +30,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Apikey extends Mage_Core_M
 
         if (($valueChanged && !$isNewApiKeyForSameAccount || !$this->getValue()) && $thisScopeHasMCStoreId) {
             $helper = $this->makeHelper();
-            $helper->removeEcommerceSyncData($scope, $scope);
             $helper->resetCampaign($scopeId, $scope);
-            $helper->clearErrorGrid($scopeId, $scope, true);
-            $helper->deleteStore($scope, $scope);
         }
     }
 
