@@ -229,8 +229,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     }
                                     break;
                                 default:
-                                    if ($customer->getData($attributeCode)) {
-                                        $eventValue = $mergeVars[$key] = $customer->getData($attributeCode);
+                                    $attrValue = $customer->getData($attributeCode);
+                                    if ($attribute['frontend_input']=='select' && $attrValue) {
+                                        $attr = $customer->getResource()->getAttribute($attributeCode);
+                                        $optionValue =  $attr->getSource()->getOptionText($attrValue);
+                                        $eventValue = $mergeVars[$key] = $optionValue;
+                                    } elseif ($attrValue) {
+                                        $eventValue = $mergeVars[$key] = $attrValue;
                                     }
                                     break;
                             }

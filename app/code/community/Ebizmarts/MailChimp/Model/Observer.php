@@ -890,25 +890,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function cleanProductImagesCacheAfter(Varien_Event_Observer $observer)
     {
-        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
-        $this->makeHelper()->saveMailchimpConfig($configValues, 0, 'default');
-
-        return $observer;
-    }
-
-    public function frontInitBefore(Varien_Event_Observer $observer)
-    {
+        $message = 'Image cache has been flushed please resend the products in order to update image URL.';
         $helper = $this->makeHelper();
-        if ($helper->wasProductImageCacheFlushed()) {
-            try {
-                $this->markProductsAsModified();
-            } catch (Exception $e) {
-                $helper->logError($e->getMessage());
-            }
-            $config = $this->getConfig();
-            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 'default', 0);
-            $config->cleanCache();
-        }
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::PRODUCT_IMAGE_CACHE_FLUSH, 1));
+        $helper->saveMailchimpConfig($configValues, 0, 'default');
+        $helper->addAdminWarning($message);
 
         return $observer;
     }

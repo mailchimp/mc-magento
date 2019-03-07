@@ -301,7 +301,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = $rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
+                $price = $this->getMailchimpFinalPrice($rc, $productId, $magentoStoreId);
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -851,7 +851,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $helper = $this->getMailChimpHelper();
         $rc = $helper->getProductResourceModel();
-        $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
+        $price = $this->getMailchimpFinalPrice($rc, $productId, $magentoStoreId);
         return $price;
     }
 
@@ -930,5 +930,26 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         return null;
+    }
+
+    /**
+     * Return price with tax if setting enabled.
+     *
+     * @param $magentoStoreId
+     * @param $rc
+     * @param $productId
+     * @return float \ return the price of the product
+     * @throws Mage_Core_Exception
+     */
+    protected function getMailchimpFinalPrice($rc, $productId, $magentoStoreId)
+    {
+        $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
+        $helper = $this->getMailChimpHelper();
+        if ($helper->isIncludeTaxesEnabled()) {
+            $_product = $this->loadProductById($productId);
+            $price = Mage::helper('tax')->getPrice($_product, $_product->getFinalPrice());
+        }
+
+        return $price;
     }
 }

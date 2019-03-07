@@ -45,23 +45,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
     }
 
     /**
-     * @return string
-     */
-    public function getMessage()
-    {
-        $helper = $this->makeHelper();
-        $message = 'Are you sure you want to delete the local data in order to send all items again?\nAutomations will work normally but the synchronization process for the old data will take longer than resetting the MailChimp store.';
-        return $helper->__($message);
-    }
-
-    public function getAjaxCheckUrl()
-    {
-        $helper = $this->makeHelper();
-        $scopeArray = $helper->getCurrentScope();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']));
-    }
-
-    /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function makeHelper()
