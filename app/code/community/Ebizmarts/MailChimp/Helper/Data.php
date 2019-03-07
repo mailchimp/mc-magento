@@ -1277,13 +1277,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $configValues
      * @param $scopeId
      * @param $scope
+     * @param bool $cleanCache
      */
-    public function saveMailchimpConfig($configValues, $scopeId, $scope)
+    public function saveMailchimpConfig($configValues, $scopeId, $scope, $cleanCache = true)
     {
         foreach ($configValues as $configValue) {
             $this->getConfig()->saveConfig($configValue[0], $configValue[1], $scope, $scopeId);
         }
-        $this->getConfig()->cleanCache();
+
+        if ($cleanCache) {
+            $this->getConfig()->cleanCache();
+        }
     }
 
     /**

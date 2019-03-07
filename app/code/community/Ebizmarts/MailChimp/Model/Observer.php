@@ -114,9 +114,11 @@ class Ebizmarts_MailChimp_Model_Observer
         $post = $this->getRequest()->getPost();
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-
-        if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            $helper->resetCampaign($scopeArray['scope_id'], $scopeArray['scope']);
+        if (isset($post['groups']['general']['fields']['list']['inherit']) && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
+            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope'])));
+            $helper->saveMailchimpConfig($configValue, $scopeArray['scope_id'], $scopeArray['scope'], false);
+            $message = $helper->__('The list configuration was not changed. There is a Mailchimp store configured for this scope.');
+            $this->getAdminSession()->addError($message);
         }
 
         return $observer;
@@ -144,7 +146,6 @@ class Ebizmarts_MailChimp_Model_Observer
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                 $this->addSuccessIfRequired($helper);
             }
-
         }
 
         return $observer;
@@ -1081,5 +1082,13 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getWarningMessageAdminHtmlSession($helper)
     {
         return Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
     }
 }
