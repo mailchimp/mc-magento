@@ -36,26 +36,6 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $mageApp->getResponse()->setBody($success);
     }
 
-    public function resetEcommerceDataAction()
-    {
-        $helper = $this->makeHelper();
-        $mageApp = $helper->getMageApp();
-        $request = $mageApp->getRequest();
-        $scope = $request->getParam('scope');
-        $scopeId = $request->getParam('scope_id');
-        $success = 0;
-        try {
-            $helper->resetMCEcommerceData($scopeId, $scope, true);
-            $success = 1;
-        } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch(Exception $e) {
-            $helper->logError($e->getMessage());
-        }
-
-        $mageApp->getResponse()->setBody($success);
-    }
-
     public function resendEcommerceDataAction()
     {
         $helper = $this->makeHelper();
@@ -65,7 +45,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scopeId = $request->getParam('scope_id');
         $success = 0;
         try {
-            $helper->resetMCEcommerceData($scopeId, $scope, false);
+            $helper->resendMCEcommerceData($scopeId, $scope);
             $success = 1;
         } catch(MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());

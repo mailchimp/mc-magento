@@ -19,7 +19,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
         $valueChanged = $this->isValueChanged();
-        $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
 
         $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($scopeId, $scope);
         $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
@@ -36,10 +35,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         {
             $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
             $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
-        }
-
-        if ($apiKey && $valueChanged && $thisScopeHasMCStoreId) {
-            $helper->resetCampaign($scopeId, $scope);
         }
 
         if ($apiKey && $moduleIsActive && $valueChanged) {
