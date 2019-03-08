@@ -555,13 +555,22 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * This function will perform the join of the collection with the table mailchimp_ecommerce_sync_data when the program
+     * creates the batch json to send the product data to mailchimp or to mark the products with an active special price
+     *
      * @param $collection
      * @param $mailchimpStoreId
      */
-    protected function joinMailchimpSyncData($collection, $mailchimpStoreId)
+    public function joinMailchimpSyncData($collection, $mailchimpStoreId, $isForSpecialPrice = false)
     {
-        $this->joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId);
-        $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
+        $whereCreateBatchJson = "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1";
+        $whereMarkSpecialPrice = new Zend_Db_Expr("((at_special_from_date.value <= '" . date('Y-m-d', time()) . " 23:59:59' AND m4m.mailchimp_sync_delta <  at_special_from_date.value) OR (at_special_to_date.value < '" . date('Y-m-d', time()) . "  00:00:00' AND m4m.mailchimp_sync_delta <  at_special_to_date.value) AND mailchimp_sync_delta IS NOT NULL)");
+        $this->joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice);
+        if ($isForSpecialPrice) {
+            $collection->getSelect()->where($whereMarkSpecialPrice);
+        } else {
+            $collection->getSelect()->where($whereCreateBatchJson);
+        }
     }
 
     /**
@@ -642,9 +651,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $collection
      * @param $mailchimpStoreId
      */
-    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId)
+    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice)
     {
         $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
+        if ($isForSpecialPrice) {
+            $joinCondition = $joinCondition . "' AND m4m.mailchimp_sync_modified = 0 ";
+        }
         $mailchimpTableName = $this->getSyncDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
@@ -954,7 +966,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $mailchimpStoreId
      * @param $magentoStoreId
      */
-    protected function _markSpecialPrices($mailchimpStoreId, $magentoStoreId)
+    public function _markSpecialPrices($mailchimpStoreId, $magentoStoreId)
     {
         /**
          * get the products with current special price that are not synced and mark it as modified
@@ -964,7 +976,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $collection->addStoreFilter($magentoStoreId);
 
         $collection->addAttributeToFilter(
-            'special_price', array('notnull' => true)
+            'special_price',
+            array('notnull' => true),
+            'left'
         )->addAttributeToFilter(
             'special_from_date',
             array('notnull' => true),
@@ -975,17 +989,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         );
 
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-        $collection->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "' AND m4m.mailchimp_sync_modified = 0 ".$collection->getConnection()->quoteInto(" AND  m4m.mailchimp_store_id = ?", $mailchimpStoreId)
-        );
-
-        $collection->getSelect()->where(new Zend_Db_Expr("((at_special_from_date.value <= '". date('Y-m-d', time()) ." 23:59:59' AND m4m.mailchimp_sync_delta <  at_special_from_date.value) OR (at_special_to_date.value < '" . date('Y-m-d', time()) ."  00:00:00' AND m4m.mailchimp_sync_delta <  at_special_to_date.value) AND mailchimp_sync_delta IS NOT NULL)"));
+        $this->joinMailchimpSyncData($collection, $mailchimpStoreId, true);
 
         foreach ($collection as $item) {
-            $this->_updateSyncData($item->getEntityId(), $mailchimpStoreId, null, null, 1, null, null, true, false);
+            $this->update($item->getEntityId(), $mailchimpStoreId);
         }
 
     }
+
 }
