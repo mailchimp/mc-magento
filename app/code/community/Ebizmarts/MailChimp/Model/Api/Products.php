@@ -958,61 +958,34 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         /**
          * get the products with current special price that are not synced and mark it as modified
+         * get the products that was synced when it have special price and have no more special price
          */
         $collection = $this->getProductResourceCollection();
         $collection->addStoreFilter($magentoStoreId);
+
         $collection->addAttributeToFilter(
-              'special_price', array('date' => true, 'left')
+            'special_price', array('notnull' => true)
         )->addAttributeToFilter(
-              'special_from_date',
-              array('or'=> array(
-                0 => array('date' => true, 'to' => date('Y-m-d', time()).' 23:59:59'),
-                1 => array('is' => new Zend_Db_Expr('null')))
-              ), 'left'
+            'special_from_date',
+            array('notnull' => true),
+            'left'
         )->addAttributeToFilter(
-              'special_to_date',
-              array('or'=> array(
-                0 => array('date' => true, 'from' => date('Y-m-d', time()).' 00:00:00'),
-                1 => array('is' => new Zend_Db_Expr('null')))
-              ), 'left'
+            'special_to_date',
+            array('notnull' => true),
+            'left'
         );
 
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-
         $collection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.type = 'PRO' and m4m.related_id = e.entity_id AND m4m.mailchimp_sync_modified = 0 ".$collection->getConnection()->quoteInto(" AND  m4m.mailchimp_store_id = ?", $mailchimpStoreId) ." and m4m.mailchimp_sync_delta <  at_special_from_date.value"
+            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "' AND m4m.mailchimp_sync_modified = 0 ".$collection->getConnection()->quoteInto(" AND  m4m.mailchimp_store_id = ?", $mailchimpStoreId)
         );
-        $collection->getSelect()->where('m4m.mailchimp_sync_delta is not null');
+
+        $collection->getSelect()->where(new Zend_Db_Expr("((at_special_from_date.value <= '". date('Y-m-d', time()) ." 23:59:59' AND m4m.mailchimp_sync_delta <  at_special_from_date.value) OR (at_special_to_date.value < '" . date('Y-m-d', time()) ."  00:00:00' AND m4m.mailchimp_sync_delta <  at_special_to_date.value) AND mailchimp_sync_delta IS NOT NULL)"));
+
         foreach ($collection as $item) {
-            $this->update($item->getEntityId(), $mailchimpStoreId);
-            Mage::log('estoy actualizando el final price', null, 'ebizmartsProductsMark.log', true);
+            $this->_updateSyncData($item->getEntityId(), $mailchimpStoreId, null, null, 1, null, null, true, false);
         }
 
-        /**
-         * get the products that was synced when it have special price and have no more special price
-         */
-        $collection2 = $this->getProductResourceCollection();
-        $collection2->addStoreFilter($magentoStoreId);
-        $collection2->addAttributeToFilter(
-          'special_price', array('date' => true, 'left')
-        )->addAttributeToFilter(
-              'special_to_date',
-              array('or'=> array(
-                0 => array('date' => true, 'from' => date('Y-m-d', time()).' 00:00:00'),
-                1 => array('is' => new Zend_Db_Expr('null')))
-              ), 'left'
-        );
-
-        $collection2->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.type = 'PRO' and m4m.related_id = e.entity_id and m4m.mailchimp_sync_modified = 0 ".$collection2->getConnection()->quoteInto(" AND  m4m.mailchimp_store_id = ?", $mailchimpStoreId) ." and m4m.mailchimp_sync_delta < at_special_to_date.value",
-            array()
-        );
-        $collection2->getSelect()->where('m4m.mailchimp_sync_delta is not null');
-        foreach ($collection2 as $item) {
-            $this->update($item->getEntityId(), $mailchimpStoreId);
-            Mage::log('estoy actualizando el final price to', null, 'ebizmartsProductsMark.log', true);
-        }
     }
 }
