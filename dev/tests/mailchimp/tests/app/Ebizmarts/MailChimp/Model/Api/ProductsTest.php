@@ -675,7 +675,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $arraySpecialFromDate = array('notnull' => true);
         $joinTypeSpecialFromDate = 'left';
         $stringSpecialToDate = 'special_to_date';
-        $arraySpecialToDate = array('notnull' => true);
+        $arraySpecialToDate = null;
         $joinTypeSpecialToDate = 'left';
 
         $productsApiMock = $this->productsApiMock
