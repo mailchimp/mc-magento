@@ -655,7 +655,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         if ($isForSpecialPrice) {
-            $joinCondition = $joinCondition . "' AND m4m.mailchimp_sync_modified = 0 ";
+            $joinCondition = $joinCondition . "AND m4m.mailchimp_sync_modified = 0";
         }
         $mailchimpTableName = $this->getSyncDataTableName();
         $collection->getSelect()->joinLeft(
@@ -990,6 +990,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
         );
 
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId, true);
+
+        Mage::log((string)$collection->getSelect(), null, 'ebizmarts_markSpecialPrices.log', true);
 
         foreach ($collection as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
