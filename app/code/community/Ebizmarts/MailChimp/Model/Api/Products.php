@@ -985,13 +985,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_to_date',
-            array('notnull' => true),
+            null,
             'left'
         );
 
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId, true);
-
-        Mage::log((string)$collection->getSelect(), null, 'ebizmarts_markSpecialPrices.log', true);
 
         foreach ($collection as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
