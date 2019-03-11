@@ -1417,4 +1417,58 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals($expectedResult, $result);
     }
+
+    public function testIsMailchimpEcommerceTableEmpty()
+    {
+        $scopeId = 0;
+        $scope = 'default';
+        $mailchimpStoreId = 'fafa8fb814a3c94c03efafc544d8bce2';
+        $collectionSize = 0;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMCStoreId', 'getModelMailchimpEcommerceSyncData'))
+            ->getMock();
+
+        $collectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addStoreFilter', 'getSize'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
+        $helperMock->expects($this->once())->method('getModelMailchimpEcommerceSyncData')->willReturn($collectionMock);
+
+        $collectionMock->expects($this->once())->method('addStoreFilter')->with($mailchimpStoreId)->willReturnSelf();
+        $collectionMock->expects($this->once())->method('getSize')->willReturn($collectionSize);
+
+        $helperMock->isMailchimpEcommerceTableEmpty($scopeId, $scope);
+
+    }
+
+    public function testIsNotMailchimpEcommerceTableEmpty()
+    {
+        $scopeId = 0;
+        $scope = 'default';
+        $mailchimpStoreId = 'fafa8fb814a3c94c03efafc544d8bce2';
+        $collectionSize = 210;
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMCStoreId', 'getModelMailchimpEcommerceSyncData'))
+            ->getMock();
+
+        $collectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addStoreFilter', 'getSize'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
+        $helperMock->expects($this->once())->method('getModelMailchimpEcommerceSyncData')->willReturn($collectionMock);
+
+        $collectionMock->expects($this->once())->method('addStoreFilter')->with($mailchimpStoreId)->willReturnSelf();
+        $collectionMock->expects($this->once())->method('getSize')->willReturn($collectionSize);
+
+        $helperMock->isMailchimpEcommerceTableEmpty($scopeId, $scope);
+
+    }
 }
