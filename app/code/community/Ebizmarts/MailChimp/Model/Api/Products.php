@@ -40,6 +40,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 ->setConfig(Mage_Catalog_Helper_Category_Flat::XML_PATH_IS_ENABLED_FLAT_CATALOG_CATEGORY, 0)
                 ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
         }
+        $this->_markSpecialPrices($mailchimpStoreId, $magentoStoreId);
         $collection = $this->makeProductsNotSentCollection($magentoStoreId);
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId);
         $batchArray = array();
@@ -301,7 +302,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
-                $price = $rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
+                $price = $this->getMailchimpFinalPrice($product);
                 if ($price) {
                     $this->_parentPrice = $price;
                 }
@@ -442,7 +443,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
-        $collection->addStoreFilter($magentoStoreId);
+        $collection->addStoreFilter($magentoStoreId)->addFinalPrice();
         $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
         $this->joinQtyAndBackorders($collection);
@@ -554,13 +555,22 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * This function will perform the join of the collection with the table mailchimp_ecommerce_sync_data when the program
+     * creates the batch json to send the product data to mailchimp or to mark the products with an active special price
+     *
      * @param $collection
      * @param $mailchimpStoreId
      */
-    protected function joinMailchimpSyncData($collection, $mailchimpStoreId)
+    public function joinMailchimpSyncData($collection, $mailchimpStoreId, $isForSpecialPrice = false)
     {
-        $this->joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId);
-        $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
+        $whereCreateBatchJson = "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1";
+        $whereMarkSpecialPrice = new Zend_Db_Expr("((at_special_from_date.value <= '" . date('Y-m-d', time()) . " 23:59:59' AND m4m.mailchimp_sync_delta <  at_special_from_date.value) OR (at_special_to_date.value < '" . date('Y-m-d', time()) . "  00:00:00' AND m4m.mailchimp_sync_delta <  at_special_to_date.value) AND mailchimp_sync_delta IS NOT NULL)");
+        $this->joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice);
+        if ($isForSpecialPrice) {
+            $collection->getSelect()->where($whereMarkSpecialPrice);
+        } else {
+            $collection->getSelect()->where($whereCreateBatchJson);
+        }
     }
 
     /**
@@ -641,9 +651,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $collection
      * @param $mailchimpStoreId
      */
-    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId)
+    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice)
     {
         $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
+        if ($isForSpecialPrice) {
+            $joinCondition = $joinCondition . "AND m4m.mailchimp_sync_modified = 0";
+        }
         $mailchimpTableName = $this->getSyncDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
@@ -829,7 +842,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (!$this->currentProductIsVisible()) {
             $parentId = $this->getParentId($product->getId());
             if ($parentId) {
-                $price = $this->getProductPrice($parentId, $magentoStoreId);
+                $price = $this->getProductPrice($product, $magentoStoreId);
             }
         } else {
             if ($this->_parentPrice) {
@@ -847,11 +860,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $this->_visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
     }
 
-    protected function getProductPrice($productId, $magentoStoreId)
+    protected function getProductPrice($product, $magentoStoreId)
     {
         $helper = $this->getMailChimpHelper();
         $rc = $helper->getProductResourceModel();
-        $price = (float)$rc->getAttributeRawValue($productId, 'price', $magentoStoreId);
+        $price = $this->getMailchimpFinalPrice($product);
         return $price;
     }
 
@@ -931,4 +944,57 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         return null;
     }
+
+    /**
+     * Return price with tax if setting enabled.
+     *
+     * @param $product
+     * @return float \ return the price of the product
+     * @throws Mage_Core_Exception
+     */
+    protected function getMailchimpFinalPrice($product)
+    {
+        $helper = $this->getMailChimpHelper();
+        $price = Mage::helper('tax')->getPrice($product, $product->getFinalPrice(), $helper->isIncludeTaxesEnabled());
+
+        return $price;
+    }
+
+    /**
+     * Sync to mailchimp the special price of the products
+     *
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     */
+    public function _markSpecialPrices($mailchimpStoreId, $magentoStoreId)
+    {
+        /**
+         * get the products with current special price that are not synced and mark it as modified
+         * get the products that was synced when it have special price and have no more special price
+         */
+        $collection = $this->getProductResourceCollection();
+        $collection->addStoreFilter($magentoStoreId);
+
+        $collection->addAttributeToFilter(
+            'special_price',
+            array('notnull' => true),
+            'left'
+        )->addAttributeToFilter(
+            'special_from_date',
+            array('notnull' => true),
+            'left'
+        )->addAttributeToFilter(
+            'special_to_date',
+            null,
+            'left'
+        );
+
+        $this->joinMailchimpSyncData($collection, $mailchimpStoreId, true);
+
+        foreach ($collection as $item) {
+            $this->update($item->getEntityId(), $mailchimpStoreId);
+        }
+
+    }
+
 }
