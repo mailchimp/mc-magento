@@ -42,13 +42,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
 
     public function toOptionArray()
     {
-        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
         $mcStores = $this->getMCStores();
 
         if (isset($mcStores['stores'])) {
             $stores[] = array('value' => '', 'label' => $helper->__('--- Select a MailChimp Store ---'));
-            Mage::log($stores, null, 'ebizmarts.log', true);
             foreach ($mcStores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
                     if($store['list_id']=='') {
