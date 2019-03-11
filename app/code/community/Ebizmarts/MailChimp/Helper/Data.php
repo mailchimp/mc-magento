@@ -3536,7 +3536,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $isMailchimpEcommerceTableEmpty = false;
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $collection = $this->getModelMailchimpEcommerceSyncData()->getCollection();
-        $collection->addStoreFilter($mailchimpStoreId);
+        $collection->addAttributeToFilter(
+            'mailchimp_store_id',
+            array('eq' => $mailchimpStoreId));
+
+        Mage::log((string)$collection->getSelect(), null, 'ebizmartsIsMailchimpEcommerceTableEmpty.log', true);
+
         if (!$collection->getSize()) {
             $isMailchimpEcommerceTableEmpty = true;
         }
