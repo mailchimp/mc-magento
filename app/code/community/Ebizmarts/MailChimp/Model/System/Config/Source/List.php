@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
      * @access protected
      * @var    array Email lists for given API key
      */
-    protected $_lists = null;
+    protected $_lists = array();
 
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
@@ -33,7 +33,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     {
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        if ($this->_lists == null) {
+        if (empty($this->_lists)) {
             $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
             if ($apiKey) {
                 try {
@@ -65,20 +65,20 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
         $helper = $this->getHelper();
         $scopeArray = $helper->getCurrentScope();
         $lists = array();
-        $listId = $helper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeArray['scope_id'], $scopeArray['scope']);
-        if (is_array($this->_lists)) {
-            foreach ($this->_lists['lists'] as $list) {
+        $listId = $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+        $mcLists = $this->getMCLists();
+        if (isset($mcLists['lists'])) {
+            foreach ($mcLists['lists'] as $list) {
                 if($listId == $list['id']) {
                     $memberCount = $list['stats']['member_count'];
                     $memberText = $helper->__('members');
                     $label = $list['name'] . ' (' . $memberCount . ' ' . $memberText . ')';
-                    $lists [] = array('value' => $list['id'], 'label' => $label);
+                    $lists[] = array('value' => $list['id'], 'label' => $label);
                 }
             }
         } else {
-            $lists [] = array('value' => '', 'label' => $helper->__('--- No data ---'));
+            $lists[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
-
         return $lists;
     }
 
@@ -96,6 +96,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return array|mixed
+     */
+    protected function getMCLists()
+    {
+        return $this->_lists;
     }
 
 }

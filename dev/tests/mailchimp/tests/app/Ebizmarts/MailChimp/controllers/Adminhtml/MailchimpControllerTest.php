@@ -182,4 +182,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock->createWebhookAction();
     }
+
+    public function testGetStoresAction()
+    {
+
+    }
 }

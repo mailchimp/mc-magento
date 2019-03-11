@@ -14,7 +14,7 @@
 
 class Ebizmarts_MailChimp_Model_System_Config_Source_Store
 {
-    protected $_stores = null;
+    protected $_stores = array();
 
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
@@ -25,12 +25,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
     {
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        if ($this->_stores == null) {
+        if (empty($this->_stores)) {
             $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
             if ($apiKey) {
                 try {
                     $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
-                    $this->_stores = $api->ecommerce->stores->get(null, null, null, 100);
+                    $this->_stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                     $helper->logError($e->getMessage());
                 } catch(MailChimp_Error $e) {
@@ -42,12 +42,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
 
     public function toOptionArray()
     {
+        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
-        $stores = array();
+        $mcStores = $this->getMCStores();
 
-        if (is_array($this->_stores)) {
+        if (isset($mcStores['stores'])) {
             $stores[] = array('value' => '', 'label' => $helper->__('--- Select a MailChimp Store ---'));
-            foreach ($this->_stores['stores'] as $store) {
+            Mage::log($stores, null, 'ebizmarts.log', true);
+            foreach ($mcStores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
                     if($store['list_id']=='') {
                         continue;
@@ -62,19 +64,33 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
                 }
             }
         } else {
-            $stores [] = array('value' => '', 'label' => $helper->__('--- No data ---'));
+            $stores[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
-
         return $stores;
     }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
     protected function getHelper()
     {
         return $this->_helper;
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return null
+     */
+    protected function getMCStores()
+    {
+        return $this->_stores;
     }
 
 }

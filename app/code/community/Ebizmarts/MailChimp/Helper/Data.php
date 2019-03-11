@@ -3466,10 +3466,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getAllApiKeys()
     {
         $ret = array();
-        $stores = Mage::app()->getStores();
-        foreach ($stores as $store) {
+        $stores = $this->getMageApp()->getStores();
+        foreach ($stores as $storeId => $store) {
             try {
-                $apiKey = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY, $store);
+                $apiKey = $this->getApiKey($storeId);
                 if (!isset($ret[$apiKey])) {
                     $ret[$apiKey] = $apiKey;
                 }

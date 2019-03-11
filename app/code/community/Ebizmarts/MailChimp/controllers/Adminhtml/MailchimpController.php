@@ -12,6 +12,19 @@
  */
 class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_Controller_Action
 {
+    const USERNAME_KEY = 0;
+    const TOTAL_ACCOUNT_SUB_KEY = 1;
+    const TOTAL_LIST_SUB_KEY = 2;
+    const STORENAME_KEY = 10;
+    const SYNC_LABEL_KEY = 11;
+    const TOTAL_CUS_KEY = 12;
+    const TOTAL_PRO_KEY = 13;
+    const TOTAL_ORD_KEY = 14;
+    const TOTAL_QUO_KEY = 15;
+    const NO_STORE_TEXT_KEY = 20;
+    const NEW_STORE_TEXT_KEY = 21;
+    const STORE_MIGRATION_TEXT_KEY = 30;
+
     public function indexAction()
     {
         $customerId = (int) $this->getRequest()->getParam('id');
@@ -60,7 +73,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     public function getStoresAction()
     {
         $apiKey = $this->getRequest()->getParam('apikey');
-        $helper = Mage::helper('mailchimp');
+        $helper = $this->makeHelper();
         $data = array();
         try {
             $api = $helper->getApiByKey($apiKey);
@@ -87,17 +100,18 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody($jsonData);
     }
+
     public function getListAction()
     {
         $apiKey = $this->getRequest()->getParam('apikey');
         $storeId = $this->getRequest()->getParam('storeid');
-        $helper = Mage::helper('mailchimp');
+        $helper = $this->makeHelper();
         $data = "";
         try {
             $api = $helper->getApiByKey($apiKey);
-            $store = $api->ecommerce->stores->get($storeId);
+            $store = $api->getEcommerce()->getStores()->get($storeId);
             $listId = $store['list_id'];
-            $list = $api->lists->getLists($listId);
+            $list = $api->getLists()->getLists($listId);
             $data=['id'=>$list['id'], 'name' => $list['name']];
         } catch (Exception $e) {
 
@@ -106,19 +120,21 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody($jsonData);
     }
+
     public function getInfoAction()
     {
         $apiKey = $this->getRequest()->getParam('apikey');
         $storeId = $this->getRequest()->getParam('storeid');
-        $helper = Mage::helper('mailchimp');
+        $helper = $this->makeHelper();
         $data = array();
         try {
             $api = $helper->getApiByKey($apiKey);
-            $data = $api->root->info('account_name,total_subscribers');
+            $data = $api->getRoot()->info('account_name,total_subscribers');
 
-            $storeData = $api->ecommerce->stores->get($storeId, 'name,is_syncing,list_id');
+            $apiEcommerce = $api->getEcommerce();
+            $storeData = $apiEcommerce->getStores()->get($storeId, 'name,is_syncing,list_id');
 
-            $listData = $api->lists->getLists($storeData['list_id'], 'stats');
+            $listData = $api->getLists()->getLists($storeData['list_id'], 'stats');
 
             $data['list_subscribers'] = $listData['stats']['member_count'];
 
@@ -128,13 +144,13 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
             //Keep both values for backward compatibility
             $data['store_sync_flag'] = $storeData['is_syncing'];
             $data['store_sync_date'] = $this->_getDateSync($storeId);
-            $totalCustomers = $api->ecommerce->customers->getAll($storeId, 'total_items');
+            $totalCustomers = $apiEcommerce->getCustomers()->getAll($storeId, 'total_items');
             $data['total_customers'] = $totalCustomers['total_items'];
-            $totalProducts = $api->ecommerce->products->getAll($storeId, 'total_items');
+            $totalProducts = $apiEcommerce->getProducts()->getAll($storeId, 'total_items');
             $data['total_products'] = $totalProducts['total_items'];
-            $totalOrders = $api->ecommerce->orders->getAll($storeId, 'total_items');
+            $totalOrders = $apiEcommerce->getOrders()->getAll($storeId, 'total_items');
             $data['total_orders'] = $totalOrders['total_items'];
-            $totalCarts = $api->ecommerce->carts->getAll($storeId, 'total_items');
+            $totalCarts = $apiEcommerce->getCarts()->getAll($storeId, 'total_items');
             $data['total_carts'] = $totalCarts['total_items'];
 
 

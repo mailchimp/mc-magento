@@ -16,8 +16,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $this->loadLayout()
             ->_setActiveMenu('newsletter')
             ->_addBreadcrumb(Mage::helper('mailchimp')->__('Newsletter'), Mage::helper('mailchimp')->__('MailChimp Store'));
+
         return $this;
     }
+
     public function indexAction()
     {
         $this->_loadStores();
@@ -33,7 +35,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     {
         $this->loadLayout(false);
         $this->renderLayout();
-    }    protected function _isAllowed()
+    }
+
+    protected function _isAllowed()
     {
         $acl = '';
         switch ($this->getRequest()->getActionName()) {
@@ -46,6 +50,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);
     }
+
     protected function _initStore($idFieldName = 'id')
     {
         $this->_title($this->__('MailChimp Stores'))->_title($this->__('Manage MailChimp Stores'));
@@ -68,27 +73,28 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $mailchimpStore = Mage::getModel('mailchimp/stores')->load($id);
         Mage::register('current_mailchimpstore', $mailchimpStore);
 
-
         $this->_initAction()
             ->_addBreadcrumb($id ? Mage::helper('mailchimp')->__('Edit Store') :  Mage::helper('mailchimp')->__('New Store'), $id ?  Mage::helper('mailchimp')->__('Edit Store') :  Mage::helper('mailchimp')->__('New Store'))
             ->_addContent($this->getLayout()->createBlock('mailchimp/adminhtml_mailchimpstores_edit')->setData('action', $this->getUrl('*/*/save')))
             ->renderLayout();
-
-
     }
+
     public function newAction()
     {
-
         $this->_forward('edit');
     }
+
     public function saveAction()
     {
         $isPost = $this->getRequest()->getPost();
+
         if($isPost) {
             $this->_updateMailchimp($isPost);
         }
+
         $this->_redirect('*/*/index');
     }
+
     protected function _updateMailchimp($formData)
     {
         $api = Mage::helper('mailchimp')->getApiByKey($formData['apikey']);
@@ -148,20 +154,22 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
             );
             $formData['storeid'] = $mailchimpStoreId;
         }
-        return $formData['storeid'];
 
+        return $formData['storeid'];
     }
+
     protected function _loadStores()
     {
-        $resource = Mage::getSingleton('core/resource');
-        $connection = $resource->getConnection('core_write');
-        $tableName = $resource->getTableName('mailchimp/stores');
-        $connection->delete($tableName);
         /**
          * @var $helper Ebizmarts_MailChimp_Helper_Data
          */
         $helper = Mage::helper('mailchimp');
         $allApiKeys = $helper->getAllApiKeys();
+        $resource = Mage::getSingleton('core/resource');
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/stores');
+        $connection->delete($tableName);
+
         foreach($allApiKeys as $apiKey) {
             try {
                 $api = $helper->getApiByKey($apiKey);
@@ -209,31 +217,36 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
                 }
             }
         }
-
     }
+
     public function getstoresAction()
     {
         $apiKey = $this->getRequest()->getParam('apikey');
         $helper = Mage::helper('mailchimp');
-        $data = array();
+
         try {
             $api = $helper->getApiByKey($apiKey);
             $lists = $api->lists->getLists();
             $data = array();
+
             foreach ($lists['lists'] as $list) {
                 $data[$list['id']] = array('id' => $list['id'], 'name' => $list['name']);
             }
+
             $jsonData = json_encode($data);
         } catch(Exception $e) {
 
         }
+
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody($jsonData);
     }
+
     public function deleteAction()
     {
         $id = $this->getRequest()->getParam('id');
         $store = Mage::getModel('mailchimp/stores')->load($id);
+
         if($store->getId()) {
             try {
                 $api = Mage::helper('mailchimp')->getApiByKey($store->getApikey());
@@ -242,6 +255,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
             }
         }
+
         $this->_redirect('*/*/index');
     }
 }

@@ -544,6 +544,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             'Simple Product' => array(
                 array(
                     'isSimpleProduct' => true,
+                    'isConfigurableProduct' => false,
+                    'isVirtual' => false,
+                    'isDownloadable' => false,
                     'countConfigurable' => 0,
                     'countChildrenCollection' => 0,
                     'countChildrenIds' => 0,
@@ -556,6 +559,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                 array(
                     'isSimpleProduct' => false,
                     'isConfigurableProduct' => true,
+                    'isVirtual' => false,
+                    'isDownloadable' => false,
                     'countConfigurable' => 1,
                     'countChildrenCollection' => 1,
                     'countChildrenIds' => 1,
@@ -569,6 +574,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     'isSimpleProduct' => false,
                     'isConfigurableProduct' => false,
                     'isVirtual' => true,
+                    'isDownloadable' => false,
                     'countConfigurable' => 1,
                     'countChildrenCollection' => 0,
                     'countChildrenIds' => 0,

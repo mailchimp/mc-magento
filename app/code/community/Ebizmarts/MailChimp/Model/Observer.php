@@ -1006,6 +1006,9 @@ class Ebizmarts_MailChimp_Model_Observer
         return $observer;
     }
 
+    /**
+     * @return Mage_Core_Controller_Request_Http
+     */
     protected function getRequest()
     {
         return Mage::app()->getRequest();
