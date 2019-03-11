@@ -1418,63 +1418,28 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function testIsMailchimpEcommerceTableEmpty()
+    public function testHandleDeleteMigrationConfigData()
     {
-        $scopeId = 0;
-        $scope = 'default';
-        $mailchimpStoreId = 'fafa8fb814a3c94c03efafc544d8bce2';
-        $collectionSize = 0;
-        $stringMailchimpStoreId = 'mailchimp_store_id';
-        $arrayMailchimpStoreId = array('eq' => $mailchimpStoreId);
+        $arrayMigrationConfigData = array('115' => true, '116' => true, '1164' => true);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getModelMailchimpEcommerceSyncData'))
+            ->setMethods(array('delete115MigrationConfigData', 'delete116MigrationConfigData', 'delete1164MigrationConfigData', 'getConfig'))
             ->getMock();
 
-        $collectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
+        $modelConfigMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addAttributeToFilter', 'getSize', 'getCollection'))
+            ->setMethods(array('cleanCache'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getModelMailchimpEcommerceSyncData')->willReturn($collectionMock);
+        $helperMock->expects($this->once())->method('delete115MigrationConfigData');
+        $helperMock->expects($this->once())->method('delete116MigrationConfigData');
+        $helperMock->expects($this->once())->method('delete1164MigrationConfigData');
+        $helperMock->expects($this->once())->method('getConfig')->willReturn($modelConfigMock);
 
-        $collectionMock->expects($this->once())->method('getCollection')->willReturnSelf();
-        $collectionMock->expects($this->once())->method('addAttributeToFilter')->with($stringMailchimpStoreId, $arrayMailchimpStoreId)->willReturnSelf();
-        $collectionMock->expects($this->once())->method('getSize')->willReturn($collectionSize);
+        $modelConfigMock->expects($this->once())->method('cleanCache');
 
-        $helperMock->isMailchimpEcommerceTableEmpty($scopeId, $scope);
-
-    }
-
-    public function testIsNotMailchimpEcommerceTableEmpty()
-    {
-        $scopeId = 0;
-        $scope = 'default';
-        $mailchimpStoreId = 'fafa8fb814a3c94c03efafc544d8bce2';
-        $collectionSize = 210;
-        $stringMailchimpStoreId = 'mailchimp_store_id';
-        $arrayMailchimpStoreId = array('eq' => $mailchimpStoreId);
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getModelMailchimpEcommerceSyncData'))
-            ->getMock();
-
-        $collectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addAttributeToFilter', 'getSize', 'getCollection'))
-            ->getMock();
-
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getModelMailchimpEcommerceSyncData')->willReturn($collectionMock);
-
-        $collectionMock->expects($this->once())->method('getCollection')->willReturnSelf();
-        $collectionMock->expects($this->once())->method('addAttributeToFilter')->with($stringMailchimpStoreId, $arrayMailchimpStoreId)->willReturnSelf();
-        $collectionMock->expects($this->once())->method('getSize')->willReturn($collectionSize);
-
-        $helperMock->isMailchimpEcommerceTableEmpty($scopeId, $scope);
+        $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
 
     }
 }

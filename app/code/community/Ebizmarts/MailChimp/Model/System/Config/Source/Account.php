@@ -168,7 +168,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 );
             }
 
-            if (!$helper->migrationFinished() && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']) && $helper->isMailchimpEcommerceTableEmpty($scopeArray['scope_id'], $scopeArray['scope'])) {
+            if (!$helper->migrationFinished() && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
                 $storeMigrationText = $helper->__('The store data is currently being migrated to the new version. This process might take a while depending on the amount of data in Magento.');
                 $returnArray = array_merge(
                     $returnArray,
