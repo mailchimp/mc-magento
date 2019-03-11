@@ -3526,11 +3526,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDE_TAXES, 0, 'default');
     }
 
+    /**
+     * @param $scopeId
+     * @param $scope
+     * @return bool \ return true if the table Mailchimp_EcommerceSyncData is empty.
+     */
     public function isMailchimpEcommerceTableEmpty($scopeId, $scope)
     {
         $isMailchimpEcommerceTableEmpty = false;
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        $collection = $this->getModelMailchimpEcommerceSyncData();
+        $collection = $this->getModelMailchimpEcommerceSyncData()->getCollection();
         $collection->addStoreFilter($mailchimpStoreId);
         if (!$collection->getSize()) {
             $isMailchimpEcommerceTableEmpty = true;

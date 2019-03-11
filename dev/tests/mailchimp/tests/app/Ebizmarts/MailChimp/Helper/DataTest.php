@@ -1432,12 +1432,13 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $collectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addStoreFilter', 'getSize'))
+            ->setMethods(array('addStoreFilter', 'getSize', 'getCollection'))
             ->getMock();
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
         $helperMock->expects($this->once())->method('getModelMailchimpEcommerceSyncData')->willReturn($collectionMock);
 
+        $collectionMock->expects($this->once())->method('getCollection')->willReturnSelf();
         $collectionMock->expects($this->once())->method('addStoreFilter')->with($mailchimpStoreId)->willReturnSelf();
         $collectionMock->expects($this->once())->method('getSize')->willReturn($collectionSize);
 
@@ -1459,12 +1460,13 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $collectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addStoreFilter', 'getSize'))
+            ->setMethods(array('addStoreFilter', 'getSize', 'getCollection'))
             ->getMock();
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
         $helperMock->expects($this->once())->method('getModelMailchimpEcommerceSyncData')->willReturn($collectionMock);
 
+        $collectionMock->expects($this->once())->method('getCollection')->willReturnSelf();
         $collectionMock->expects($this->once())->method('addStoreFilter')->with($mailchimpStoreId)->willReturnSelf();
         $collectionMock->expects($this->once())->method('getSize')->willReturn($collectionSize);
 
