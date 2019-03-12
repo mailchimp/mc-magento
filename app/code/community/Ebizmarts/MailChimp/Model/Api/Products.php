@@ -650,6 +650,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * @param $collection
      * @param $mailchimpStoreId
+     * @param bool $isForSpecialPrice
      */
     public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice = false)
     {
