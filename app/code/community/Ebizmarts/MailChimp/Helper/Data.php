@@ -1901,6 +1901,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Delete config data for migration from 1.1.5.
+     */
+    protected function delete115MigrationConfigData()
+    {
+        $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 'default', 0);
+    }
+
+    /**
      * Helper function for data migration from version 1.1.5.
      *
      * @param  $collection
@@ -1997,7 +2005,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
-
     /**
      * Update Order ids to the Increment id in MailChimp.
      *
@@ -2068,6 +2075,35 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $arrayMigrationConfigData = array('115' => false, '116' => false, '1164' => true);
             $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
         }
+    }
+
+    /**
+     * Delete config data for migration from 1.1.6.4.
+     */
+    protected function delete1164MigrationConfigData()
+    {
+        $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 'default', 0);
+    }
+
+    /**
+     * @param $arrayMigrationConfigData
+     */
+    public function handleDeleteMigrationConfigData($arrayMigrationConfigData)
+    {
+        foreach ($arrayMigrationConfigData as $migrationConfigData => $value) {
+            if ($migrationConfigData == '115' && $value) {
+                $this->delete115MigrationConfigData();
+            }
+
+            if ($migrationConfigData == '116' && $value) {
+                $this->delete116MigrationConfigData();
+            }
+
+            if ($migrationConfigData == '1164' && $value) {
+                $this->delete1164MigrationConfigData();
+            }
+        }
+        $this->getConfig()->cleanCache();
     }
 
     /**
@@ -3534,42 +3570,5 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getModelMailchimpEcommerceSyncData()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
-    }
-
-    /**
-     * Delete config data for migration from 1.1.5.
-     */
-    protected function delete115MigrationConfigData()
-    {
-        $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 'default', 0);
-    }
-
-    /**
-     * Delete config data for migration from 1.1.6.4.
-     */
-    protected function delete1164MigrationConfigData()
-    {
-        $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 'default', 0);
-    }
-
-    /**
-     * @param $arrayMigrationConfigData
-     */
-    public function handleDeleteMigrationConfigData($arrayMigrationConfigData)
-    {
-        foreach ($arrayMigrationConfigData as $migrationConfigData => $value) {
-            if ($migrationConfigData == '115' && $value) {
-                $this->delete115MigrationConfigData();
-            }
-
-            if ($migrationConfigData == '116' && $value) {
-                $this->delete116MigrationConfigData();
-            }
-
-            if ($migrationConfigData == '1164' && $value) {
-                $this->delete1164MigrationConfigData();
-            }
-        }
-        $this->getConfig()->cleanCache();
     }
 }
