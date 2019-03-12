@@ -184,6 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (isset($statusArray['fulfillment_status'])) {
             $data['fulfillment_status'] = $statusArray['fulfillment_status'];
         }
+        $data['currency_code'] = $order->getStoreCurrencyCode();
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['updated_at_foreign'] = $order->getUpdatedAt();
         if ($this->isOrderCanceled($order)) {
@@ -199,13 +200,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $data['cancelled_at_foreign'] = $orderCancelDate;
             }
 
-            $data['currency_code'] = 0;
             $data['order_total'] = 0;
             $data['tax_total'] = 0;
             $data['discount_total'] = 0;
             $data['shipping_total'] = 0;
         } else {
-            $data['currency_code'] = $order->getStoreCurrencyCode();
             $data['order_total'] = $order->getBaseGrandTotal();
             $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
             $data['discount_total'] = abs($order->getBaseDiscountAmount());
