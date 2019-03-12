@@ -172,11 +172,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data['landing_site'] = $order->getMailchimpLandingPage();
         }
 
-        $data['currency_code'] = $order->getStoreCurrencyCode();
-        $data['order_total'] = $order->getBaseGrandTotal();
-        $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
-        $data['discount_total'] = abs($order->getBaseDiscountAmount());
-        $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
         $dataPromo = $this->getPromoData($order);
         if ($dataPromo !== null) {
             $data['promos'] = $dataPromo;
@@ -203,6 +198,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             if ($orderCancelDate) {
                 $data['cancelled_at_foreign'] = $orderCancelDate;
             }
+
+            $data['currency_code'] = 0;
+            $data['order_total'] = 0;
+            $data['tax_total'] = 0;
+            $data['discount_total'] = 0;
+            $data['shipping_total'] = 0;
+        } else {
+            $data['currency_code'] = $order->getStoreCurrencyCode();
+            $data['order_total'] = $order->getBaseGrandTotal();
+            $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
+            $data['discount_total'] = abs($order->getBaseDiscountAmount());
+            $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
         }
 
         $data['lines'] = array();

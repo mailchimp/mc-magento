@@ -154,7 +154,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $shippingTotal = 0;
         $dataPromo = '';
         $statusArray = array('financial_status' => '', 'fulfillment_status' => '');
-        $orderCancelDate = '2017-05-18';
         $processedAtForeign = '2017-05-18';
         $updatedAtForeign = '2017-05-18';
         $productId = 15;
