@@ -52,11 +52,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->productsApiMock
             ->setMethods(array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
                 'shouldSendProductUpdate', 'getChildrenIdsForConfigurable', 'makeProductChildrenCollection',
-                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData'))
+                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest', '_updateSyncData', '_markSpecialPrices'))
             ->getMock();
 
         $productsApiMock->expects($this->once())->method("isProductFlatTableEnabled")->willReturn(false);
 
+        $productsApiMock->expects($this->once())->method('_markSpecialPrices')->with($mailchimpStoreId, $magentoStoreId);
         $productsApiMock->expects($this->once())->method('makeProductsNotSentCollection')->with($magentoStoreId)->willReturn($productCollection);
         $productsApiMock->expects($this->once())->method('joinMailchimpSyncData')->with($productCollection, $mailchimpStoreId);
 
@@ -102,7 +103,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->disableOriginalConstructor()
             ->getMock();
         $productResourceCollectionMock->expects($this->once())->method('getSelect')->willReturn($dbSelectMock);
-        $productResourceCollectionMock->expects($this->once())->method('addStoreFilter');
+        $productResourceCollectionMock->expects($this->once())->method('addStoreFilter')->willReturnSelf();
+        $productResourceCollectionMock->expects($this->once())->method('addFinalPrice')->willReturnSelf();
 
         $this->productsApiMock->expects($this->once())->method('getProductResourceCollection')
             ->willReturn($productResourceCollectionMock);
@@ -667,4 +669,141 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->update($productId, $mailchimpStoreId);
     }
 
+    public function testMarkSpecialPrices()
+    {
+        $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
+        $magentoStoreId = 1;
+        $entityId = 145;
+        $stringSpecialPrice = 'special_price';
+        $arraySpecialPrice = array('notnull' => true);
+        $joinTypeSpecialPrice = 'left';
+        $stringSpecialFromDate = 'special_from_date';
+        $arraySpecialFromDate = array('notnull' => true);
+        $joinTypeSpecialFromDate = 'left';
+        $stringSpecialToDate = 'special_to_date';
+        $arraySpecialToDate = null;
+        $joinTypeSpecialToDate = 'left';
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('getProductResourceCollection', 'update', 'joinMailchimpSyncData'))
+            ->getMock();
+
+        $collectiontMock = $this
+            ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+            ->disableOriginalConstructor('addStoreFilter', 'addAttributeToFilter', 'getIterator')
+            ->getMock();
+
+        $itemMock = $this
+            ->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEntityId'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())
+            ->method('getProductResourceCollection')
+            ->willReturn($collectiontMock);
+        $productsApiMock->expects($this->once())
+            ->method('update')
+            ->with($entityId, $mailchimpStoreId);
+        $productsApiMock->expects($this->once())
+            ->method('joinMailchimpSyncData')
+            ->with($collectiontMock, $mailchimpStoreId, true);
+
+        $collectiontMock->expects($this->once())
+            ->method('addStoreFilter')
+            ->with($magentoStoreId)
+            ->willReturnSelf();
+        $collectiontMock->expects($this->exactly(3))
+            ->method('addAttributeToFilter')
+            ->withConsecutive(
+                array($stringSpecialPrice, $arraySpecialPrice, $joinTypeSpecialPrice),
+                array($stringSpecialFromDate, $arraySpecialFromDate, $joinTypeSpecialFromDate),
+                array($stringSpecialToDate, $arraySpecialToDate, $joinTypeSpecialToDate)
+            )->willReturnOnConsecutiveCalls(
+                $collectiontMock,
+                $collectiontMock,
+                $collectiontMock
+            );
+        $collectiontMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator(array($itemMock)));
+
+        $itemMock->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn($entityId);
+
+        $productsApiMock->_markSpecialPrices($mailchimpStoreId, $magentoStoreId);
+    }
+
+    public function testJoinMailchimpSyncDataMarkSpecialPrice()
+    {
+        $mailchimpStoreId = '';
+        $isForSpecialPrice = true;
+        $whereMarkSpecialPrice = "((at_special_from_date.value <= '" . date('Y-m-d', time()) . " 23:59:59' AND m4m.mailchimp_sync_delta <  at_special_from_date.value) OR (at_special_to_date.value < '" . date('Y-m-d', time()) . "  00:00:00' AND m4m.mailchimp_sync_delta <  at_special_to_date.value) AND mailchimp_sync_delta IS NOT NULL)";
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('joinMailchimpSyncDataWithoutWhere'))
+            ->getMock();
+
+        $collectiontMock = $this
+            ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+            ->disableOriginalConstructor(array('getSelect'))
+            ->getMock();
+
+        $varienSelectMock = $this
+            ->getMockBuilder(Varien_Db_Select::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('where'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())
+            ->method('joinMailchimpSyncDataWithoutWhere')
+            ->with($collectiontMock, $mailchimpStoreId, $isForSpecialPrice);
+
+        $collectiontMock->expects($this->once())
+            ->method('getSelect')
+            ->willReturn($varienSelectMock);
+
+        $varienSelectMock->expects($this->once())
+            ->method('where')
+            ->with($whereMarkSpecialPrice);
+
+        $productsApiMock->joinMailchimpSyncData($collectiontMock, $mailchimpStoreId, $isForSpecialPrice);
+    }
+
+    public function testJoinMailchimpSyncDataCreateBatchJson()
+    {
+        $mailchimpStoreId = '';
+        $isForSpecialPrice = false;
+        $whereCreateBatchJson = "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1";
+
+        $productsApiMock = $this->productsApiMock
+            ->setMethods(array('joinMailchimpSyncDataWithoutWhere'))
+            ->getMock();
+
+        $collectiontMock = $this
+            ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
+            ->disableOriginalConstructor(array('getSelect'))
+            ->getMock();
+
+        $varienSelectMock = $this
+            ->getMockBuilder(Varien_Db_Select::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('where'))
+            ->getMock();
+
+        $productsApiMock->expects($this->once())
+            ->method('joinMailchimpSyncDataWithoutWhere')
+            ->with($collectiontMock, $mailchimpStoreId, $isForSpecialPrice);
+
+        $collectiontMock->expects($this->once())
+            ->method('getSelect')
+            ->willReturn($varienSelectMock);
+
+        $varienSelectMock->expects($this->once())
+            ->method('where')
+            ->with($whereCreateBatchJson);
+
+        $productsApiMock->joinMailchimpSyncData($collectiontMock, $mailchimpStoreId, $isForSpecialPrice);
+    }
 }

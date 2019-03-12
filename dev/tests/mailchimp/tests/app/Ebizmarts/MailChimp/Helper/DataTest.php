@@ -1436,4 +1436,29 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->getAllApiKeys();
     }
+
+    public function testHandleDeleteMigrationConfigData()
+    {
+        $arrayMigrationConfigData = array('115' => true, '116' => true, '1164' => true);
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('delete115MigrationConfigData', 'delete116MigrationConfigData', 'delete1164MigrationConfigData', 'getConfig'))
+            ->getMock();
+
+        $modelConfigMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('cleanCache'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('delete115MigrationConfigData');
+        $helperMock->expects($this->once())->method('delete116MigrationConfigData');
+        $helperMock->expects($this->once())->method('delete1164MigrationConfigData');
+        $helperMock->expects($this->once())->method('getConfig')->willReturn($modelConfigMock);
+
+        $modelConfigMock->expects($this->once())->method('cleanCache');
+
+        $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
+
+    }
 }
