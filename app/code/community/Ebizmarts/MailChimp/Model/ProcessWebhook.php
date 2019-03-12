@@ -13,6 +13,9 @@
 class Ebizmarts_MailChimp_Model_ProcessWebhook
 {
     const BATCH_LIMIT = 200;
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     private $helper;
     /**
      * Webhooks request url path
@@ -27,6 +30,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $this->helper = Mage::helper('mailchimp');
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
     protected function getHelper()
     {
         return $this->helper;
@@ -196,7 +202,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-    protected function _profile(array $data)
+    public function _profile(array $data)
     {
         $helper = $this->getHelper();
         $listId = $data['list_id'];
@@ -238,16 +244,17 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                      * Mailchimp subscriber not currently in magento newsletter subscribers.
                      * Get mailchimp subscriber status and add missing newsletter subscriber.
                      */
-                    $api = $helper->getApi($subscriber->getStoreId());
+                    $scopeArray = $helper->getFirstScopeFromConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $listId);
+                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
                     try {
                         $subscriber->setSubscriberFirstname($fname);
                         $subscriber->setSubscriberLastname($lname);
                         $md5HashEmail = md5(strtolower($email));
-                        $member = $api->lists->members->get($listId, $md5HashEmail, null, null);
+                        $member = $api->getLists()->getMembers()->get($listId, $md5HashEmail, null, null);
                         if ($member['status'] == 'subscribed') {
                             $helper->subscribeMember($subscriber);
                         } elseif ($member['status'] == 'unsubscribed') {
-                            if (!Mage::getStoreConfig("mailchimp/general/webhook_delete", $subscriber->getStoreId())) {
+                            if (!$helper->getWebhookDeleteAction($subscriber->getStoreId())) {
                                 $helper->unsubscribeMember($subscriber);
                             }
                         }
@@ -256,6 +263,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     } catch (Exception $e) {
                         $helper->logError($e->getMessage());
                     }
+
                 }
             }
         }
