@@ -59,6 +59,13 @@ class MailChimp_Lists extends MailChimp_Abstract
     }
 
     /**
+     * @return MailChimp_ListsMembers
+     */
+    public function getMembers()
+    {
+        return $this->members;
+    }
+    /**
      * @param $name
      * @param $contact
      *          company *   (The company name for the list)
