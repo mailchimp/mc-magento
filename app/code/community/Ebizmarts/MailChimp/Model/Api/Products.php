@@ -650,8 +650,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * @param $collection
      * @param $mailchimpStoreId
+     * @param bool $isForSpecialPrice
      */
-    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice)
+    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId, $isForSpecialPrice = false)
     {
         $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         if ($isForSpecialPrice) {
