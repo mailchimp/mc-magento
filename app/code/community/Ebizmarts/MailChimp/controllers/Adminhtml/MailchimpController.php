@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -27,7 +28,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function indexAction()
     {
-        $customerId = (int) $this->getRequest()->getParam('id');
+        $customerId = (int)$this->getRequest()->getParam('id');
         if ($customerId) {
             $block = $this->getLayout()
                 ->createBlock('mailchimp/adminhtml_customer_edit_tab_mailchimp', 'admin.customer.mailchimp')
@@ -46,10 +47,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
         $success = 1;
+
         try {
             $helper->resendSubscribers($scopeId, $scope);
-        } catch(Exception $e)
-        {
+        } catch (Exception $e) {
             $success = 0;
         }
 
@@ -75,58 +76,80 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $apiKey = $this->getRequest()->getParam('apikey');
         $helper = $this->makeHelper();
         $data = array();
+
         try {
             $api = $helper->getApiByKey($apiKey);
-            $stores = $api->ecommerce->stores->get(null, null, null, 100);
-            $data[] = ['id'=>'', 'name'=>'--- Select a MailChimp Store ---'];
+            $stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);
+            $data[] = array('id' => '', 'name' => '--- Select a MailChimp Store ---');
             foreach ($stores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
-                    if($store['list_id']=='') {
+                    if ($store['list_id'] == '') {
                         continue;
                     }
-                    if(isset($store['connected_site'])) {
+                    if (isset($store['connected_site'])) {
                         $label = $store['name'];
                     } else {
-                        $label = $store['name'].' (Warning: not connected)';
+                        $label = $store['name'] . ' (Warning: not connected)';
                     }
 
-                    $data[] = ['id'=> $store['id'], 'name' => $label];
+                    $data[] = array('id' => $store['id'], 'name' => $label);
                 }
             }
-        } catch(Exception $e) {
-            $data = ['error'=>1];
+
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $data = array('error' => 1, 'message' => $e->getMessage());
+            $helper->logError($e->getMessage());
+        } catch (MailChimp_Error $e) {
+            $data = array('error' => 1, 'message' => $e->getFriendlyMessage());
+            $helper->logError($e->getFriendlyMessage());
+        } catch (Exception $e) {
+            $data = array('error' => 1, 'message' => $e->getMessage());
+            $helper->logError($e->getMessage());
         }
+
         $jsonData = json_encode($data);
-        $this->getResponse()->setHeader('Content-type', 'application/json');
-        $this->getResponse()->setBody($jsonData);
+        $response = $this->getResponse();
+        $response->setHeader('Content-type', 'application/json');
+        $response->setBody($jsonData);
     }
 
     public function getListAction()
     {
-        $apiKey = $this->getRequest()->getParam('apikey');
-        $storeId = $this->getRequest()->getParam('storeid');
+        $request = $this->getRequest();
+        $apiKey = $request->getParam('apikey');
+        $storeId = $request->getParam('storeid');
         $helper = $this->makeHelper();
-        $data = "";
+
         try {
             $api = $helper->getApiByKey($apiKey);
             $store = $api->getEcommerce()->getStores()->get($storeId);
             $listId = $store['list_id'];
             $list = $api->getLists()->getLists($listId);
-            $data=['id'=>$list['id'], 'name' => $list['name']];
+            $data = array('id' => $list['id'], 'name' => $list['name']);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $data = array('error' => 1, 'message' => $e->getMessage());
+            $helper->logError($e->getMessage());
+        } catch (MailChimp_Error $e) {
+            $data = array('error' => 1, 'message' => $e->getFriendlyMessage());
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-
+            $data = array('error' => 1, 'message' => $e->getMessage());
+            $helper->logError($e->getMessage());
         }
+
         $jsonData = json_encode($data);
-        $this->getResponse()->setHeader('Content-type', 'application/json');
-        $this->getResponse()->setBody($jsonData);
+        $response = $this->getResponse();
+        $response->setHeader('Content-type', 'application/json');
+        $response->setBody($jsonData);
     }
 
     public function getInfoAction()
     {
-        $apiKey = $this->getRequest()->getParam('apikey');
-        $storeId = $this->getRequest()->getParam('storeid');
+        $request = $this->getRequest();
+        $apiKey = $request->getParam('apikey');
+        $storeId = $request->getParam('storeid');
         $helper = $this->makeHelper();
-        $data = array();
+
         try {
             $api = $helper->getApiByKey($apiKey);
             $data = $api->getRoot()->info('account_name,total_subscribers');
@@ -137,7 +160,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
             $listData = $api->getLists()->getLists($storeData['list_id'], 'stats');
 
             $data['list_subscribers'] = $listData['stats']['member_count'];
-
 
             $data['store_exists'] = true;
             $data['store_name'] = $storeData['name'];
@@ -153,16 +175,24 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
             $totalCarts = $apiEcommerce->getCarts()->getAll($storeId, 'total_items');
             $data['total_carts'] = $totalCarts['total_items'];
 
-
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $data = array('error' => 1, 'message' => $e->getMessage());
+            $helper->logError($e->getMessage());
+        } catch (MailChimp_Error $e) {
+            $data = array('error' => 1, 'message' => $e->getFriendlyMessage());
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-
+            $data = array('error' => 1, 'message' => $e->getMessage());
+            $helper->logError($e->getMessage());
         }
 
-        $jsonData = json_encode($this->_makeValues($data,$helper));
-        $this->getResponse()->setHeader('Content-type', 'application/json');
-        $this->getResponse()->setBody($jsonData);
+        $jsonData = json_encode($this->_makeValues($data, $helper));
+        $response = $this->getResponse();
+        $response->setHeader('Content-type', 'application/json');
+        $response->setBody($jsonData);
 
     }
+
     protected function _makeValues($data, $helper)
     {
         $totalAccountSubscribersText = $helper->__('Total Account Subscribers:');
