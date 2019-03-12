@@ -82,7 +82,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
     }
 
 
-    public function testWwebhookProfileSubscriberNotExistsMemberSubscribed(){
+    public function testWebhookProfileSubscriberNotExistsMemberSubscribed(){
         $data = array();
         $listId = $data['list_id'] = 'e4ef38998b';
         $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
@@ -168,7 +168,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $processWebhookMock->_profile($data);
     }
 
-    public function testWwebhookProfileSubscriberNotExistsMemberUnsubscribed(){
+    public function testWebhookProfileSubscriberNotExistsMemberUnsubscribed(){
         $data = array();
         $listId = $data['list_id'] = 'e4ef38998b';
         $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
