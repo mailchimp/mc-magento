@@ -58,7 +58,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
                         $label = $store['name'].' (Warning: not connected)';
                     }
 
-                    $stores[] = ['value'=> $store['id'], 'label' => $label];
+                    $stores[] = array('value'=> $store['id'], 'label' => $label);
                 }
             }
         } else {

@@ -95,7 +95,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     {
         $helper = $this->getMailchimpHelper();
         $api = $helper->getApiByKey($formData['apikey']);
-        $address = [];
+        $address = array();
         $address['address1'] = $formData['address_address_one'];
         $address['address2'] = $formData['address_address_two'];
         $address['city'] = $formData['address_city'];
