@@ -164,8 +164,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         $data = array();
         $data['id'] = $order->getIncrementId();
-        if ($order->getMailchimpCampaignId()) {
-            $data['campaign_id'] = $order->getMailchimpCampaignId();
+        $mailchimpCampaignId = $order->getMailchimpCampaignId();
+        if ($this->shouldSendCampaignId($mailchimpCampaignId)) {
+            $data['campaign_id'] = $mailchimpCampaignId;
         }
 
         if ($order->getMailchimpLandingPage()) {
@@ -763,5 +764,38 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function getResourceModelOrderCollection()
     {
         return Mage::getResourceModel('sales/order_collection');
+    }
+
+    /**
+     * @param $mailchimpCampaignId
+     * @return bool \ return true if the campaign is from the current list.
+     * @throws Exception
+     */
+    public function shouldSendCampaignId($mailchimpCampaignId)
+    {
+        $isCampaigFromCurrentList = false;
+        if ($mailchimpCampaignId) {
+            $helper = $this->getHelper();
+            $scopeArray = $helper->getCurrentScope();
+            $listId = $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+            try {
+                $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+                if ($apiKey) {
+                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+                    $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
+                    if (isset($campaignData['recipients']['list_id']) && $campaignData['recipients']['list_id'] == $listId) {
+                        $isCampaigFromCurrentList = true;
+                    }
+                }
+            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                $helper->logError($e->getMessage());
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage());
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage());
+            }
+        }
+
+        return $isCampaigFromCurrentList;
     }
 }
