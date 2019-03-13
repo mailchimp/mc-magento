@@ -214,7 +214,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getStoreModelFromMagentoStoreId',
                 'getCountryModelNameFromBillingAddress',
                 'getCountryModelNameFromShippingAddress',
-                'getResourceModelOrderCollection'
+                'getResourceModelOrderCollection',
+                'shouldSendCampaignId'
             ))
             ->getMock();
 
@@ -305,12 +306,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $orderMock->expects($this->once())
             ->method('getIncrementId')
             ->willReturn($orderIncrementId);
-        $orderMock->expects($this->exactly(2))
+        $orderMock->expects($this->once())
             ->method('getMailchimpCampaignId')
-            ->willReturnOnConsecutiveCalls(
-                $campaignId,
-                $campaignId
-            );
+            ->willReturn($campaignId);
         $orderMock->expects($this->exactly(2))
             ->method('getMailchimpLandingPage')
             ->willReturnOnConsecutiveCalls(
@@ -384,6 +382,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getPromoData')
             ->with($orderMock)
             ->willReturn($dataPromo);
+        $ordersApiMock->expects($this->once())
+            ->method('shouldSendCampaignId')
+            ->with($campaignId)
+            ->willReturn(true);
         $ordersApiMock->expects($this->once())
             ->method('_getMailChimpStatus')
             ->with($orderMock)
@@ -577,6 +579,69 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->willReturn($totalCanceled);
 
         $ordersApiMock->GeneratePOSTPayload($orderMock, $mailchimpStoreId, $magentoStoreId);
+    }
+
+    public function testShouldSendCampaignId()
+    {
+        $mailchimpCampaignId = 'ddf1830cf9';
+        $scopeArray = array('scope_id' => 0, 'scope' => 'default');
+        $listId = 'c7ce5a3c4e';
+        $apiKey = 'asdasdqweqweqwedasd484848asd15';
+        $campaignData = array('recipients' => array('list_id' => $listId, 'list_is_active' => 1, 'list_name' => 'test'));
+
+        $ordersApiMock = $this->ordersApiMock
+            ->setMethods(array('getHelper'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+                'getCurrentScope',
+                'getGeneralList',
+                'getApiKey',
+                'getApi'))
+            ->getMock();
+
+        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCampaign'))
+            ->getMock();
+
+        $campaignMock = $this->getMockBuilder(MailChimp_Campaigns::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('get'))
+            ->getMock();
+
+        $ordersApiMock->expects($this->once())
+            ->method('getHelper')
+            ->willReturn($helperMock);
+
+        $helperMock->expects($this->once())
+            ->method('getCurrentScope')
+            ->willReturn($scopeArray);
+        $helperMock->expects($this->once())
+            ->method('getGeneralList')
+            ->with($scopeArray['scope_id'], $scopeArray['scope'])
+            ->willReturn($listId);
+        $helperMock->expects($this->once())
+            ->method('getApiKey')
+            ->with($scopeArray['scope_id'], $scopeArray['scope'])
+            ->willReturn($apiKey);
+        $helperMock->expects($this->once())
+            ->method('getApi')
+            ->with($scopeArray['scope_id'], $scopeArray['scope'])
+            ->willReturn($apiMock);
+
+        $apiMock->expects($this->once())
+            ->method('getCampaign')
+            ->willReturn($campaignMock);
+
+        $campaignMock->expects($this->once())
+            ->method('get')
+            ->with($mailchimpCampaignId, 'recipients')
+            ->willReturn($campaignData);
+
+        $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId);
     }
 
 }
