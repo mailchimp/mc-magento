@@ -11,12 +11,6 @@
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
-    // Initial Sync
-    const SYNC_FLAG_LABEL = 0;
-
-    // In Progress | Finished | date
-    const SYNC_FLAG_STATUS = 1;
-
     protected function _getElementHtml(Varien_Data_Form_Element_Abstract $element)
     {
         $firstErrorKey = Ebizmarts_MailChimp_Model_System_Config_Source_Account::NO_STORE_TEXT_KEY;
@@ -44,54 +38,21 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
 
     /**
      * @param $dat
-     * @return array
-     */
-    protected function getSyncFlagDataArray($dat)
-    {
-        $textArray = explode(': ', $dat['label']);
-        //textArray indexes = 0 -> label / 1 -> status
-        $textArray = $this->fixTimeTextIfNecessary($textArray);
-        return $textArray;
-    }
-
-    /**
-     * @param $dat
      * @param $html
      * @return string
      */
     protected function getSyncFlagDataHtml($dat, $html)
     {
-        $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
-        if ($syncFlagDataArray[self::SYNC_FLAG_STATUS] != Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS) {
-            if ($syncFlagDataArray[self::SYNC_FLAG_STATUS] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED) {
-                $html .= "<li>{$syncFlagDataArray[self::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
-            } else {
-                $html .= "<li>{$syncFlagDataArray[self::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>" . $this->__('Finished at %s', $syncFlagDataArray[self::SYNC_FLAG_STATUS]) . "</span></li>";
-            }
-        } else {
-            $html .= "<li>{$syncFlagDataArray[self::SYNC_FLAG_LABEL]} : <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
-        }
+        $helper = $this->makeHelper();
+        $html = $helper->getSyncFlagDataHtml($dat, $html);
         return $html;
     }
 
     /**
-     * @param $textArray
-     * @return bool
+     * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function isDate($textArray)
+    protected function makeHelper()
     {
-        return count($textArray) == 4;
-    }
-
-    /**
-     * @param $textArray
-     * @return array
-     */
-    protected function fixTimeTextIfNecessary($textArray)
-    {
-        if ($this->isDate($textArray)) {
-            $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
-        }
-        return $textArray;
+        return Mage::helper('mailchimp');
     }
 }

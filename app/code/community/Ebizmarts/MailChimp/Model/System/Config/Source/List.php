@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MailChimp For Magento
  *
@@ -27,29 +28,42 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
 
 
     /**
-     * Load lists and store on class property
+     * Ebizmarts_MailChimp_Model_System_Config_Source_List constructor.
+     * @param $params
+     * @throws Exception
      */
-    public function __construct()
+    public function __construct($params)
     {
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         if (empty($this->_lists)) {
-            $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+            $apiKey = (empty($params)) ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']) : $params['api_key'];
             if ($apiKey) {
                 try {
-                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
-                    $this->_lists = $api->lists->getLists(null, 'lists', null, 100);
+                    $api = $helper->getApiByKey($apiKey);
+
+                    //Add filter to only show the lists for the selected store when MC store selected.
+                    if (!empty($params) && $params['mailchimp_store_id'] != "") {
+                        $mcStore = $api->getEcommerce()->getStores()->get($params['mailchimp_store_id'], 'list_id');
+                        if (isset($mcStore['list_id'])) {
+                            $listId = $mcStore['list_id'];
+                            $this->_lists['lists'][0] = $api->getLists()->getLists($listId);
+                        }
+                    } else {
+                        $this->_lists = $api->getLists()->getLists(null, 'lists', null, 100);
+                    }
+
                     if (isset($this->_lists['lists']) && count($this->_lists['lists']) == 0) {
                         $apiKeyArray = explode('-', $apiKey);
                         $anchorUrl = 'https://' . $apiKeyArray[1] . '.admin.mailchimp.com/lists/new-list/';
                         $htmlAnchor = '<a target="_blank" href="' . $anchorUrl . '">' . $anchorUrl . '</a>';
-                        $message = 'Please create a list at '. $htmlAnchor;
+                        $message = 'Please create a list at ' . $htmlAnchor;
                         Mage::getSingleton('adminhtml/session')->addWarning($message);
                     }
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                     $helper->logError($e->getMessage());
-                } catch(MailChimp_Error $e) {
-                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+                } catch (MailChimp_Error $e) {
+                    $helper->logError($e->getFriendlyMessage());
                 }
             }
         }
@@ -63,18 +77,15 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     public function toOptionArray()
     {
         $helper = $this->getHelper();
-        $scopeArray = $helper->getCurrentScope();
         $lists = array();
-        $listId = $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
         $mcLists = $this->getMCLists();
         if (isset($mcLists['lists'])) {
+            $lists[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp List ---'));
             foreach ($mcLists['lists'] as $list) {
-                if($listId == $list['id']) {
-                    $memberCount = $list['stats']['member_count'];
-                    $memberText = $helper->__('members');
-                    $label = $list['name'] . ' (' . $memberCount . ' ' . $memberText . ')';
-                    $lists[] = array('value' => $list['id'], 'label' => $label);
-                }
+                $memberCount = $list['stats']['member_count'];
+                $memberText = $helper->__('members');
+                $label = $list['name'] . ' (' . $memberCount . ' ' . $memberText . ')';
+                $lists[] = array('value' => $list['id'], 'label' => $label);
             }
         } else {
             $lists[] = array('value' => '', 'label' => $helper->__('--- No data ---'));

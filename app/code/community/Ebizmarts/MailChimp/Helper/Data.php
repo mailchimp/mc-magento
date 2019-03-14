@@ -2455,13 +2455,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $configAssociatedToScope = Mage::registry('mailchimp_' . $configName . '_exists_for_scope_' . $scope . '_' . $scopeId);
         if ($configAssociatedToScope === null) {
             $configAssociatedToScope = false;
-            $numEntries = Mage::getResourceModel('core/config_data_collection')
+            $collection = Mage::getResourceModel('core/config_data_collection')
                 ->addFieldToFilter('path', array('eq' => $configPath))
                 ->addFieldToFilter('scope', array('eq' => $scope))
-                ->addFieldToFilter('scope_id', array('eq' => $scopeId))
-                ->getSize();
-            if ($numEntries) {
-                $configAssociatedToScope = true;
+                ->addFieldToFilter('scope_id', array('eq' => $scopeId));
+            if ($collection->getSize()) {
+                foreach ($collection as $config) {
+                    if ($config->getValue() !== null) {
+                        $configAssociatedToScope = true;
+                    }
+                }
             }
             Mage::register('mailchimp_' . $configName . '_exists_for_scope_' . $scope . '_' . $scopeId, $configAssociatedToScope);
         }
@@ -3610,5 +3613,58 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getModelMailchimpEcommerceSyncData()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
+    }
+
+    /**
+     * @param $dat
+     * @param $string
+     * @return string
+     */
+    public function getSyncFlagDataHtml($dat, $string)
+    {
+        $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
+        if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS] != Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS) {
+            if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED) {
+                $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
+            } else {
+                $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>" . $this->__('Finished at %s', $syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]) . "</span></li>";
+            }
+        } else {
+            $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
+        }
+        return $string;
+    }
+
+    /**
+     * @param $dat
+     * @return array
+     */
+    protected function getSyncFlagDataArray($dat)
+    {
+        $textArray = explode(': ', $dat['label']);
+        //textArray indexes = 0 -> label / 1 -> status
+        $textArray = $this->fixTimeTextIfNecessary($textArray);
+        return $textArray;
+    }
+
+    /**
+     * @param $textArray
+     * @return array
+     */
+    protected function fixTimeTextIfNecessary($textArray)
+    {
+        if ($this->isDate($textArray)) {
+            $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
+        }
+        return $textArray;
+    }
+
+    /**
+     * @param $textArray
+     * @return bool
+     */
+    protected function isDate($textArray)
+    {
+        return count($textArray) == 4;
     }
 }

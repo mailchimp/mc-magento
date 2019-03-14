@@ -13,19 +13,6 @@
  */
 class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_Controller_Action
 {
-    const USERNAME_KEY = 0;
-    const TOTAL_ACCOUNT_SUB_KEY = 1;
-    const TOTAL_LIST_SUB_KEY = 2;
-    const STORENAME_KEY = 10;
-    const SYNC_LABEL_KEY = 11;
-    const TOTAL_CUS_KEY = 12;
-    const TOTAL_PRO_KEY = 13;
-    const TOTAL_ORD_KEY = 14;
-    const TOTAL_QUO_KEY = 15;
-    const NO_STORE_TEXT_KEY = 20;
-    const NEW_STORE_TEXT_KEY = 21;
-    const STORE_MIGRATION_TEXT_KEY = 30;
-
     public function indexAction()
     {
         $customerId = (int)$this->getRequest()->getParam('id');
@@ -73,70 +60,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getStoresAction()
     {
-        $apiKey = $this->getRequest()->getParam('apikey');
-        $helper = $this->makeHelper();
-        $data = array();
+        $apiKey = $this->getRequest()->getParam('api_key');
 
-        try {
-            $api = $helper->getApiByKey($apiKey);
-            $stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);
-            $data[] = array('id' => '', 'name' => '--- Select a MailChimp Store ---');
-            foreach ($stores['stores'] as $store) {
-                if ($store['platform'] == 'Magento') {
-                    if ($store['list_id'] == '') {
-                        continue;
-                    }
-                    if (isset($store['connected_site'])) {
-                        $label = $store['name'];
-                    } else {
-                        $label = $store['name'] . ' (Warning: not connected)';
-                    }
-
-                    $data[] = array('id' => $store['id'], 'name' => $label);
-                }
-            }
-
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $data = array('error' => 1, 'message' => $e->getMessage());
-            $helper->logError($e->getMessage());
-        } catch (MailChimp_Error $e) {
-            $data = array('error' => 1, 'message' => $e->getFriendlyMessage());
-            $helper->logError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $data = array('error' => 1, 'message' => $e->getMessage());
-            $helper->logError($e->getMessage());
-        }
-
-        $jsonData = json_encode($data);
-        $response = $this->getResponse();
-        $response->setHeader('Content-type', 'application/json');
-        $response->setBody($jsonData);
-    }
-
-    public function getListAction()
-    {
-        $request = $this->getRequest();
-        $apiKey = $request->getParam('apikey');
-        $storeId = $request->getParam('storeid');
-        $helper = $this->makeHelper();
-
-        try {
-            $api = $helper->getApiByKey($apiKey);
-            $store = $api->getEcommerce()->getStores()->get($storeId);
-            $listId = $store['list_id'];
-            $list = $api->getLists()->getLists($listId);
-            $data = array('id' => $list['id'], 'name' => $list['name']);
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $data = array('error' => 1, 'message' => $e->getMessage());
-            $helper->logError($e->getMessage());
-        } catch (MailChimp_Error $e) {
-            $data = array('error' => 1, 'message' => $e->getFriendlyMessage());
-            $helper->logError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $data = array('error' => 1, 'message' => $e->getMessage());
-            $helper->logError($e->getMessage());
-        }
-
+        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_Store', array('api_key' => $apiKey))->toOptionArray();
         $jsonData = json_encode($data);
         $response = $this->getResponse();
         $response->setHeader('Content-type', 'application/json');
@@ -145,107 +71,38 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getInfoAction()
     {
-        $request = $this->getRequest();
-        $apiKey = $request->getParam('apikey');
-        $storeId = $request->getParam('storeid');
         $helper = $this->makeHelper();
+        $request = $this->getRequest();
+        $mcStoreId = $request->getParam('mailchimp_store_id');
+        $apiKey = $request->getParam('api_key');
 
-        try {
-            $api = $helper->getApiByKey($apiKey);
-            $data = $api->getRoot()->info('account_name,total_subscribers');
-
-            $apiEcommerce = $api->getEcommerce();
-            $storeData = $apiEcommerce->getStores()->get($storeId, 'name,is_syncing,list_id');
-
-            $listData = $api->getLists()->getLists($storeData['list_id'], 'stats');
-
-            $data['list_subscribers'] = $listData['stats']['member_count'];
-
-            $data['store_exists'] = true;
-            $data['store_name'] = $storeData['name'];
-            //Keep both values for backward compatibility
-            $data['store_sync_flag'] = $storeData['is_syncing'];
-            $data['store_sync_date'] = $this->_getDateSync($storeId);
-            $totalCustomers = $apiEcommerce->getCustomers()->getAll($storeId, 'total_items');
-            $data['total_customers'] = $totalCustomers['total_items'];
-            $totalProducts = $apiEcommerce->getProducts()->getAll($storeId, 'total_items');
-            $data['total_products'] = $totalProducts['total_items'];
-            $totalOrders = $apiEcommerce->getOrders()->getAll($storeId, 'total_items');
-            $data['total_orders'] = $totalOrders['total_items'];
-            $totalCarts = $apiEcommerce->getCarts()->getAll($storeId, 'total_items');
-            $data['total_carts'] = $totalCarts['total_items'];
-
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $data = array('error' => 1, 'message' => $e->getMessage());
-            $helper->logError($e->getMessage());
-        } catch (MailChimp_Error $e) {
-            $data = array('error' => 1, 'message' => $e->getFriendlyMessage());
-            $helper->logError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $data = array('error' => 1, 'message' => $e->getMessage());
-            $helper->logError($e->getMessage());
+        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_Account', array('api_key' => $apiKey, 'mailchimp_store_id' => $mcStoreId))->toOptionArray();
+        foreach ($data as $key => $element) {
+            $liElement = '';
+            if ($element['value'] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY) {
+                $liElement = $helper->getSyncFlagDataHtml($element, $liElement);
+                $data[$key]['label'] = $liElement;
+            }
         }
-
-        $jsonData = json_encode($this->_makeValues($data, $helper));
+        $jsonData = json_encode($data);
         $response = $this->getResponse();
         $response->setHeader('Content-type', 'application/json');
         $response->setBody($jsonData);
 
     }
 
-    protected function _makeValues($data, $helper)
+    public function getListAction()
     {
-        $totalAccountSubscribersText = $helper->__('Total Account Subscribers:');
-        $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $data['total_subscribers'];
-        $totalListSubscribers = null;
-        if (isset($data['list_subscribers'])) {
-            $totalListSubscribersText = $helper->__('Total List Subscribers:');
-            $totalListSubscribers = $totalListSubscribersText . ' ' . $data['list_subscribers'];
-        }
-        $username = $helper->__('Username:') . ' ' . $data['account_name'];
-        $returnArray = array(
-            array('value' => self::USERNAME_KEY, 'label' => $username),
-            array('value' => self::TOTAL_ACCOUNT_SUB_KEY, 'label' => $totalAccountSubscribers)
-        );
-        if ($totalListSubscribers) {
-            $returnArray[] = array('value' => self::TOTAL_LIST_SUB_KEY, 'label' => $totalListSubscribers);
-        }
-        if ($data['store_exists']) {
-            $totalCustomersText = $helper->__('  Total Customers:');
-            $totalCustomers = $totalCustomersText . ' ' . $data['total_customers'];
-            $totalProductsText = $helper->__('  Total Products:');
-            $totalProducts = $totalProductsText . ' ' . $data['total_products'];
-            $totalOrdersText = $helper->__('  Total Orders:');
-            $totalOrders = $totalOrdersText . ' ' . $data['total_orders'];
-            $totalCartsText = $helper->__('  Total Carts:');
-            $totalCarts = $totalCartsText . ' ' . $data['total_carts'];
-            $title = $helper->__('Ecommerce Data uploaded to MailChimp store ' . $data['store_name'] . ':');
-            if ($data['store_sync_flag'] && !$data['store_sync_date']) {
-                $syncValue = 'In Progress';
-            } else {
-                $syncData = $data['store_sync_date'];
-                if ($helper->validateDate($syncData)) {
-                    $syncValue = $syncData;
-                } else {
-                    $syncValue = 'Finished';
-                }
-            }
-            $syncLabel = $helper->__('Initial sync: ' . $syncValue);
+        $request = $this->getRequest();
+        $apiKey = $request->getParam('api_key');
+        $mcStoreId = $request->getParam('mailchimp_store_id');
 
-            $returnArray = array_merge(
-                $returnArray,
-                array(
-                    array('value' => self::STORENAME_KEY, 'label' => $title),
-                    array('value' => self::SYNC_LABEL_KEY, 'label' => $syncLabel),
-                    array('value' => self::TOTAL_CUS_KEY, 'label' => $totalCustomers),
-                    array('value' => self::TOTAL_PRO_KEY, 'label' => $totalProducts),
-                    array('value' => self::TOTAL_ORD_KEY, 'label' => $totalOrders),
-                    array('value' => self::TOTAL_QUO_KEY, 'label' => $totalCarts)
-                )
-            );
+        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_List', array('api_key' => $apiKey, 'mailchimp_store_id' => $mcStoreId))->toOptionArray();
 
-        }
-        return $returnArray;
+        $jsonData = json_encode($data);
+        $response = $this->getResponse();
+        $response->setHeader('Content-type', 'application/json');
+        $response->setBody($jsonData);
     }
 
     protected function _getDateSync($mailchimpStoreId)

@@ -21,20 +21,26 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
      */
     protected $_helper;
 
-    public function __construct()
+    /**
+     * Ebizmarts_MailChimp_Model_System_Config_Source_Store constructor.
+     * @param $params
+     * @throws Exception
+     */
+    public function __construct($params)
     {
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         if (empty($this->_stores)) {
-            $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+            $apiKey = (empty($params)) ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']) : $params['api_key'];
+
             if ($apiKey) {
                 try {
-                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+                    $api = $helper->getApiByKey($apiKey);
                     $this->_stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                     $helper->logError($e->getMessage());
                 } catch(MailChimp_Error $e) {
-                    Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+                    $helper->logError($e->getMessage());
                 }
             }
         }
@@ -46,7 +52,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
         $mcStores = $this->getMCStores();
 
         if (isset($mcStores['stores'])) {
-            $stores[] = array('value' => '', 'label' => $helper->__('--- Select a MailChimp Store ---'));
+            $stores[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp Store ---'));
             foreach ($mcStores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
                     if($store['list_id']=='') {
