@@ -20,6 +20,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /** @var Mage_Catalog_Model_Product_Type_Configurable */
     private $productTypeConfigurable;
 
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     private $mailchimpHelper;
     private $visibilityOptions;
     private $productTypeConfigurableResource;
@@ -35,8 +38,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $helper = $this->mailchimpHelper;
+        $oldStore = $helper->getMageApp()->getStore()->getId();
+        $helper->getMageApp()->setCurrentStore($magentoStoreId);
+
         if ($this->isProductFlatTableEnabled()) {
-            Mage::app()->getStore($magentoStoreId)
+            $helper->getMageApp()->getStore($magentoStoreId)
                 ->setConfig(Mage_Catalog_Helper_Category_Flat::XML_PATH_IS_ENABLED_FLAT_CATALOG_CATEGORY, 0)
                 ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
         }
@@ -68,6 +75,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
             }
         }
+        $helper->getMageApp()->setCurrentStore($oldStore);
         return $batchArray;
     }
 
@@ -443,7 +451,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
-        $collection->addStoreFilter($magentoStoreId)->addFinalPrice();
+        $collection->addFinalPrice();
+        $collection->addStoreFilter($magentoStoreId);
         $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
         $this->joinQtyAndBackorders($collection);
