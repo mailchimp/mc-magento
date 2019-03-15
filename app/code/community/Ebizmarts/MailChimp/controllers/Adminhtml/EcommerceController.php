@@ -30,7 +30,6 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             $helper->resetErrors($scopeId, $scope);
         } catch(Exception $e)
         {
-            $helper->logError($e->getMessage());
             $success = 0;
         }
 
