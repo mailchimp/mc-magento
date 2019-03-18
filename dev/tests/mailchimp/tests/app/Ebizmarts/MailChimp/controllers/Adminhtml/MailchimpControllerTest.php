@@ -358,4 +358,51 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock->getListAction();
     }
+
+    public function testGetInterestAction()
+    {
+        $apiKeyParam = 'api_key';
+        $apiKey = 'a1s2d3f4g5h6j7k8l9z1x2c3v4v4-us1';
+        $listIdParam = 'list_id';
+        $listId = 'a1s2d3f4g5';
+
+        $data = array(
+            array('value' => 'bc15dbe6a5', 'label' => 'Checkboxes'),
+            array('value' => '2a2f23d671', 'label' => 'DropDown')
+        );
+        $jsonData = '[{"value":"bc15dbe6a5","label":"Checkboxes"},{"value":"2a2f23d671","label":"DropDown"}]';
+
+        $mailchimpControllerMock = $this->mailchimpController
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRequest', 'getSourceInterestOptions', 'getResponse'))
+            ->getMock();
+
+        $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getParam'))
+            ->getMock();
+
+        $responseMock = $this->getMockBuilder(Mage_Core_Controller_Response_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setHeader', 'setBody'))
+            ->getMock();
+
+        $mailchimpControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
+
+        $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
+            array($apiKeyParam),
+            array($listIdParam)
+        )->willReturnOnConsecutiveCalls(
+            $apiKey,
+            $listId
+        );
+
+        $mailchimpControllerMock->expects($this->once())->method('getSourceInterestOptions')->with($apiKey, $listId)->willReturn($data);
+        $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
+
+        $responseMock->expects($this->once())->method('setHeader')->with('Content-type', 'application/json');
+        $responseMock->expects($this->once())->method('setBody')->with($jsonData);
+
+        $mailchimpControllerMock->getInterestAction();
+    }
 }
