@@ -36,10 +36,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_ListTest extends PHPUnit_Fr
             ->getMock();
 
         $listMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-
-        $helperMock->expects($this->once())->method('getCurrentScope')->willReturn($scopeArray);
-        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
-
         $listMock->expects($this->once())->method('getMCLists')->willReturn($mcLists);
 
         $expectedResult = array(array(

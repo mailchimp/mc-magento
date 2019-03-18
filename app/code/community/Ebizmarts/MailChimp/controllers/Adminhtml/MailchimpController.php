@@ -62,7 +62,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     {
         $apiKey = $this->getRequest()->getParam('api_key');
 
-        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_Store', array('api_key' => $apiKey))->toOptionArray();
+        $data = $this->getSourceStoreOptions($apiKey);
+
         $jsonData = json_encode($data);
         $response = $this->getResponse();
         $response->setHeader('Content-type', 'application/json');
@@ -76,7 +77,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $mcStoreId = $request->getParam('mailchimp_store_id');
         $apiKey = $request->getParam('api_key');
 
-        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_Account', array('api_key' => $apiKey, 'mailchimp_store_id' => $mcStoreId))->toOptionArray();
+        $data = $this->getSourceAccountInfoOptions($apiKey, $mcStoreId);
         foreach ($data as $key => $element) {
             $liElement = '';
             if ($element['value'] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY) {
@@ -97,7 +98,21 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $apiKey = $request->getParam('api_key');
         $mcStoreId = $request->getParam('mailchimp_store_id');
 
-        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_List', array('api_key' => $apiKey, 'mailchimp_store_id' => $mcStoreId))->toOptionArray();
+        $data = $this->getSourceListOptions($apiKey, $mcStoreId);
+
+        $jsonData = json_encode($data);
+        $response = $this->getResponse();
+        $response->setHeader('Content-type', 'application/json');
+        $response->setBody($jsonData);
+    }
+
+    public function getInterestAction()
+    {
+        $request = $this->getRequest();
+        $apiKey = $request->getParam('api_key');
+        $listId = $request->getParam('list_id');
+
+        $data = Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup', array('api_key' => $apiKey, 'list_id' => $listId))->toOptionArray();
 
         $jsonData = json_encode($data);
         $response = $this->getResponse();
@@ -120,6 +135,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
             case 'getStores':
             case 'getList':
             case 'getInfo':
+            case 'getInterest':
                 $acl = 'system/config/mailchimp';
                 break;
         }
@@ -142,5 +158,34 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     protected function getHtml($block)
     {
         return $block->toHtml();
+    }
+
+    /**
+     * @param $apiKey
+     * @return Ebizmarts_MailChimp_Model_System_Config_Source_Store
+     */
+    protected function getSourceStoreOptions($apiKey)
+    {
+        return Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_Store', array('api_key' => $apiKey))->toOptionArray();
+    }
+
+    /**
+     * @param $apiKey
+     * @param $mcStoreId
+     * @return mixed
+     */
+    protected function getSourceAccountInfoOptions($apiKey, $mcStoreId)
+    {
+        return Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_Account', array('api_key' => $apiKey, 'mailchimp_store_id' => $mcStoreId))->toOptionArray();
+    }
+
+    /**
+     * @param $apiKey
+     * @param $mcStoreId
+     * @return mixed
+     */
+    protected function getSourceListOptions($apiKey, $mcStoreId)
+    {
+        return Mage::getModel('Ebizmarts_MailChimp_Model_System_Config_Source_List', array('api_key' => $apiKey, 'mailchimp_store_id' => $mcStoreId))->toOptionArray();
     }
 }

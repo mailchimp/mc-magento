@@ -74,4 +74,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
     {
         return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getInfo');
     }
+
+    /**
+     * @return mixed
+     */
+    public function getInterestUrl()
+    {
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getInterest');
+    }
 }

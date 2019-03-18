@@ -1064,17 +1064,16 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function testGetListInterestCategories()
+    public function testGetListInterestCategoriesByKeyAndList()
     {
-        $scopeId = 1;
-        $scope = 'stores';
+        $apiKey = 'a1s2d3f4g5h6j7k8l9p0z1x2c3v4b5-us1';
         $listId = 'a1s2d3f4g5';
         $interestCategoryId = 1;
         $categoriesResponse = array('categories' => array(array('id' => $interestCategoryId, 'title' => 'Category Title', 'type' => 'checkbox')));
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApi', 'getGeneralList'))
+            ->setMethods(array('getApiByKey'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -1092,8 +1091,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getAll'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
-        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
+        $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
 
         $apiMock->expects($this->once())->method('getLists')->willReturn($apiListsMock);
 
@@ -1101,7 +1099,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $apiListsInterestCategoryMock->expects($this->once())->method('getAll')->with($listId, 'categories')->willReturn($categoriesResponse);
 
-        $helperMock->getListInterestCategories($scopeId, $scope);
+        $helperMock->getListInterestCategoriesByKeyAndList($apiKey, $listId);
     }
 
     public function testGetListInterestGroups()

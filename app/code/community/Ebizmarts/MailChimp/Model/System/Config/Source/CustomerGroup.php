@@ -12,15 +12,17 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     protected $_categories = null;
 
     /**
-     * Load lists and store on class property
+     * Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup constructor.
+     * @param $params
      */
-    public function __construct()
+    public function __construct($params)
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        if ($helper->isSubscriptionEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
-            $this->_categories = $helper->getListInterestCategories($scopeArray['scope_id'], $scopeArray['scope']);
-        }
+        $apiKey = (!empty($params)) ? $params['api_key'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+        $listId = (!empty($params)) ? $params['list_id'] : $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+
+        $this->_categories = $helper->getListInterestCategoriesByKeyAndList($apiKey, $listId);
     }
 
     /**
@@ -32,7 +34,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     {
         $groups = array();
         $helper = $this->makeHelper();
-        if (is_array($this->_categories)) {
+        if (!empty($this->_categories)) {
             foreach ($this->_categories as $category) {
                 $groups[] = array('value'=> $category['id'], 'label' => $category['title']);
             }

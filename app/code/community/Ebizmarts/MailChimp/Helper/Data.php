@@ -3080,7 +3080,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpScope = null;
         $collection = Mage::getResourceModel('core/config_data_collection')
-            ->addFieldToFilter('path', array('eq' => $path ))
+            ->addFieldToFilter('path', array('eq' => $path))
             ->addFieldToFilter('value', array('eq' => $value));
         if ($collection->getSize()) {
             $configEntry = $collection->getFirstItem();
@@ -3253,13 +3253,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SEND_PROMO, $scopeId, $scope);
     }
 
-
-    public function getListInterestCategories($scopeId, $scope = 'stores')
+    /**
+     * @param $apiKey
+     * @param $listId
+     * @return array
+     */
+    public function getListInterestCategoriesByKeyAndList($apiKey, $listId)
     {
         $interestGroupsArray = array();
-        $api = $this->getApi($scopeId, $scope);
-        $listId = $this->getGeneralList($scopeId, $scope);
         try {
+            $api = $this->getApiByKey($apiKey);
             $interestCategories = $api->getLists()->getInterestCategory()->getAll($listId, 'categories');
             foreach ($interestCategories['categories'] as $interestCategory) {
                 $interestGroupsArray[] = array(
@@ -3268,6 +3271,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     'type' => $interestCategory['type']
                 );
             }
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $this->logError($e->getMessage());
+        } catch (MailChimp_Error $e) {
+            $this->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
