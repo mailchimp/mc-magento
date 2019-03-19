@@ -675,7 +675,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $arraySpecialFromDate = array('notnull' => true);
         $joinTypeSpecialFromDate = 'left';
         $stringSpecialToDate = 'special_to_date';
-        $arraySpecialToDate = array(array('notnull' => true), array('null' => true));
         $joinTypeSpecialToDate = 'left';
 
         $productsApiMock = $this->productsApiMock
@@ -684,7 +683,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $collectiontMock = $this
             ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
-            ->disableOriginalConstructor('addStoreFilter', 'addAttributeToFilter', 'getIterator')
+            ->disableOriginalConstructor('addStoreFilter', 'addAttributeToFilter', 'getIterator', 'addAttributeToSelect')
             ->getMock();
 
         $itemMock = $this
@@ -707,17 +706,19 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method('addStoreFilter')
             ->with($magentoStoreId)
             ->willReturnSelf();
-        $collectiontMock->expects($this->exactly(3))
+        $collectiontMock->expects($this->exactly(2))
             ->method('addAttributeToFilter')
             ->withConsecutive(
                 array($stringSpecialPrice, $arraySpecialPrice, $joinTypeSpecialPrice),
-                array($stringSpecialFromDate, $arraySpecialFromDate, $joinTypeSpecialFromDate),
-                array($stringSpecialToDate, $arraySpecialToDate, $joinTypeSpecialToDate)
+                array($stringSpecialFromDate, $arraySpecialFromDate, $joinTypeSpecialFromDate)
             )->willReturnOnConsecutiveCalls(
-                $collectiontMock,
                 $collectiontMock,
                 $collectiontMock
             );
+        $collectiontMock->expects($this->once())
+            ->method('addAttributeToSelect')
+            ->with($stringSpecialToDate, $joinTypeSpecialToDate)
+            ->willReturnSelf();
         $collectiontMock->expects($this->once())
             ->method('getIterator')
             ->willReturn(new ArrayIterator(array($itemMock)));

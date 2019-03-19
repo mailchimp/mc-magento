@@ -993,9 +993,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'special_from_date',
             array('notnull' => true),
             'left'
-        )->addAttributeToFilter(
+        )->addAttributeToSelect(
             'special_to_date',
-            array(array('notnull' => true), array('null' => true)),
             'left'
         );
 
@@ -1004,7 +1003,5 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
         }
-
     }
-
 }
