@@ -165,7 +165,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data = array();
         $data['id'] = $order->getIncrementId();
         $mailchimpCampaignId = $order->getMailchimpCampaignId();
-        if ($this->shouldSendCampaignId($mailchimpCampaignId)) {
+        if ($this->shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId)) {
             $data['campaign_id'] = $mailchimpCampaignId;
         }
 
@@ -771,17 +771,16 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      * @return bool \ return true if the campaign is from the current list.
      * @throws Exception
      */
-    public function shouldSendCampaignId($mailchimpCampaignId)
+    public function shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId)
     {
         $isCampaigFromCurrentList = false;
         if ($mailchimpCampaignId) {
             $helper = $this->getHelper();
-            $scopeArray = $helper->getCurrentScope();
-            $listId = $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+            $listId = $helper->getGeneralList($magentoStoreId);
             try {
-                $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+                $apiKey = $helper->getApiKey($magentoStoreId);
                 if ($apiKey) {
-                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+                    $api = $helper->getApi($magentoStoreId);
                     $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
                     if (isset($campaignData['recipients']['list_id']) && $campaignData['recipients']['list_id'] == $listId) {
                         $isCampaigFromCurrentList = true;
