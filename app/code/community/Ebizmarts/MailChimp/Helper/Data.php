@@ -3445,7 +3445,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $groups = $this->getInterestGroupsIfAvailable($params);
         if (!$customerId) {
             $customerSession = $this->getCustomerSession();
-            if ($this->isAdmin()) {
+            if (isset($params['customer_id']) && $this->isAdmin()) {
                 $customerId = $params['customer_id'];
             } elseif ($customerSession->isLoggedIn()) {
                 $customerData = $customerSession->getCustomer();
@@ -3460,10 +3460,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
         $origSubscriberId = $interestGroup->getSubscriberId();
         $origCustomerId = $interestGroup->getCustomerId();
-        if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
+        if (!$origSubscriberId || ($subscriberId && $origSubscriberId != $subscriberId)) {
             $interestGroup->setSubscriberId($subscriberId);
         }
-        if (!$origCustomerId || $customerId && $origCustomerId != $customerId) {
+        if (!$origCustomerId || ($customerId && $origCustomerId != $customerId)) {
             $interestGroup->setCustomerId($customerId);
         }
         if ($groups) {
