@@ -681,7 +681,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $arraySpecialFromDate = array('notnull' => true);
         $joinTypeSpecialFromDate = 'left';
         $stringSpecialToDate = 'special_to_date';
-        $arraySpecialToDate = null;
         $joinTypeSpecialToDate = 'left';
 
         $productsApiMock = $this->productsApiMock
@@ -690,7 +689,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $collectiontMock = $this
             ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
-            ->disableOriginalConstructor('addStoreFilter', 'addAttributeToFilter', 'getIterator')
+            ->disableOriginalConstructor('addStoreFilter', 'addAttributeToFilter', 'getIterator', 'addAttributeToSelect')
             ->getMock();
 
         $itemMock = $this
@@ -713,17 +712,19 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method('addStoreFilter')
             ->with($magentoStoreId)
             ->willReturnSelf();
-        $collectiontMock->expects($this->exactly(3))
+        $collectiontMock->expects($this->exactly(2))
             ->method('addAttributeToFilter')
             ->withConsecutive(
                 array($stringSpecialPrice, $arraySpecialPrice, $joinTypeSpecialPrice),
-                array($stringSpecialFromDate, $arraySpecialFromDate, $joinTypeSpecialFromDate),
-                array($stringSpecialToDate, $arraySpecialToDate, $joinTypeSpecialToDate)
+                array($stringSpecialFromDate, $arraySpecialFromDate, $joinTypeSpecialFromDate)
             )->willReturnOnConsecutiveCalls(
-                $collectiontMock,
                 $collectiontMock,
                 $collectiontMock
             );
+        $collectiontMock->expects($this->once())
+            ->method('addAttributeToSelect')
+            ->with($stringSpecialToDate, $joinTypeSpecialToDate)
+            ->willReturnSelf();
         $collectiontMock->expects($this->once())
             ->method('getIterator')
             ->willReturn(new ArrayIterator(array($itemMock)));
@@ -739,7 +740,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         $mailchimpStoreId = '';
         $isForSpecialPrice = true;
-        $whereMarkSpecialPrice = "((at_special_from_date.value <= '" . date('Y-m-d', time()) . " 23:59:59' AND m4m.mailchimp_sync_delta <  at_special_from_date.value) OR (at_special_to_date.value < '" . date('Y-m-d', time()) . "  00:00:00' AND m4m.mailchimp_sync_delta <  at_special_to_date.value) AND mailchimp_sync_delta IS NOT NULL)";
+        $whereMarkSpecialPrice = "((IF(at_special_from_date.value_id > 0, at_special_from_date.value, at_special_from_date_default.value) <= '" . date('Y-m-d', time()) . " 23:59:59' AND m4m.mailchimp_sync_delta <  IF(at_special_from_date.value_id > 0, at_special_from_date.value, at_special_from_date_default.value)) OR (IF(at_special_to_date.value_id > 0, at_special_to_date.value, at_special_to_date_default.value) < '" . date('Y-m-d', time()) . "  00:00:00' AND m4m.mailchimp_sync_delta <  IF(at_special_to_date.value_id > 0, at_special_to_date.value, at_special_to_date_default.value)) AND mailchimp_sync_delta IS NOT NULL)";
 
         $productsApiMock = $this->productsApiMock
             ->setMethods(array('joinMailchimpSyncDataWithoutWhere'))
