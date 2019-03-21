@@ -3715,10 +3715,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function saveInterestGroupData($params, $storeId, $customerId = null, $subscriber = null)
     {
-        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
-        Mage::log($params, null, 'ebizmarts.log', true);
-        $i = new Exception();
-        Mage::log($i->getTraceAsString(), null, 'ebizmarts.log', true);
         $groups = $this->getInterestGroupsIfAvailable($params);
         if (!$customerId) {
             $customerSession = $this->getCustomerSession();

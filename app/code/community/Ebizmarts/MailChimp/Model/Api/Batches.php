@@ -299,7 +299,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function _sendEcommerceBatch($magentoStoreId)
     {
-        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         try {
