@@ -316,6 +316,14 @@ class Ebizmarts_MailChimp
         return $this->lists;
     }
 
+    /**
+     * @return MailChimp_Campaigns
+     */
+    public function getCampaign()
+    {
+        return $this->campaigns;
+    }
+
     public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
     {
         $paramsOrig = $params;
