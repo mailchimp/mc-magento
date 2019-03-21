@@ -27,6 +27,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected $_counter;
     protected $_batchId;
     protected $_api = null;
+    protected $_listsCampaignIds = array();
 
     /**
      * Set the request for orders to be created on MailChimp
@@ -773,28 +774,39 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      */
     public function shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId)
     {
-        $isCampaigFromCurrentList = false;
+        $isCampaingFromCurrentList = false;
         if ($mailchimpCampaignId) {
             $helper = $this->getHelper();
             $listId = $helper->getGeneralList($magentoStoreId);
             try {
                 $apiKey = $helper->getApiKey($magentoStoreId);
                 if ($apiKey) {
-                    $api = $helper->getApi($magentoStoreId);
-                    $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
-                    if (isset($campaignData['recipients']['list_id']) && $campaignData['recipients']['list_id'] == $listId) {
-                        $isCampaigFromCurrentList = true;
+                    if (isset($this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId])) {
+                        $isCampaingFromCurrentList = $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId];
+                    } else {
+                        $api = $helper->getApi($magentoStoreId);
+                        $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
+                        if (isset($campaignData['recipients']['list_id']) && $campaignData['recipients']['list_id'] == $listId) {
+                            $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
+                        } else {
+                            $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
+                        }
                     }
+
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
                 $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
+                $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
                 $helper->logError($e->getFriendlyMessage());
             } catch (Exception $e) {
+                $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
                 $helper->logError($e->getMessage());
             }
         }
 
-        return $isCampaigFromCurrentList;
+        return $isCampaingFromCurrentList;
     }
+
 }
