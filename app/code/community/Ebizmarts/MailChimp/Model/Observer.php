@@ -106,21 +106,61 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Handle save of System -> Configuration, section <mailchimp>
      *
-     * @param  Varien_Event_Observer $observer
+     * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
+     * @throws Mage_Core_Exception
      */
-    public function saveConfig(Varien_Event_Observer $observer)
+    public function saveConfigBefore(Varien_Event_Observer $observer)
     {
-        $post = $this->getRequest()->getPost();
-        $helper = $this->makeHelper();
-        $scopeArray = $helper->getCurrentScope();
-        if (isset($post['groups']['general']['fields']['list']['inherit']) && $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope'])));
-            $helper->saveMailchimpConfig($configValue, $scopeArray['scope_id'], $scopeArray['scope'], false);
-            $message = $helper->__('The list configuration was not changed. There is a Mailchimp store configured for this scope.');
-            $this->getAdminSession()->addError($message);
-        }
+        $config = $observer->getObject();
+        if ($config->getSection() == "mailchimp") {
+            $configData = $config->getData();
+            $configDataChanged = false;
+            $helper = $this->makeHelper();
+            $scopeArray = $helper->getCurrentScope();
+            $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : '';
+            $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
+            $apiKey = (isset($configData['groups']['general']['fields']['apikey']['value'])) ? $configData['groups']['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
 
+            // If ecommerce data section is enabled only allow inheriting both entries (list and MC Store) at the same time.
+            if ((!isset($configData['groups']['general']['fields']['list']['inherit']) || !isset($configData['groups']['general']['fields']['storeid']['inherit'])) && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+                if (isset($configData['groups']['general']['fields']['list']['inherit'])) {
+                    unset($configData['groups']['general']['fields']['list']['inherit']);
+                    $mcStoreListId = $helper->getListIdByApiKeyAndMCStoreId($apiKey, $mailchimpStoreId);
+                    $previouslyConfiguredListId = $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+                    $listId = (!empty($previouslyConfiguredListId)) ? $previouslyConfiguredListId : $mcStoreListId;
+                    $configData['groups']['general']['fields']['list']['value'] = $listId;
+                    $configDataChanged = true;
+                    $message = $helper->__('The list configuration was automatically modified to show the list associated to the selected Mailchimp store.');
+                    $this->getAdminSession()->addWarning($message);
+                } elseif (isset($configData['groups']['general']['fields']['storeid']['inherit'])) {
+                    unset($configData['groups']['general']['fields']['storeid']['inherit']);
+                    $configData['groups']['general']['fields']['storeid']['value'] = $oldMailchimpStoreId;
+                    $configDataChanged = true;
+                    $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp list configured for this scope. Both must be set to inherit at the same time.');
+                    $this->getAdminSession()->addError($message);
+                }
+                if ($configDataChanged) {
+                    $observer->getObject()->setData($configData);
+                }
+            } else {
+                if ($mailchimpStoreId !== null && $mailchimpStoreId != '' && $mailchimpStoreId != $oldMailchimpStoreId) {
+                    $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
+                    $isSyncing = $helper->getMCIsSyncing($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
+                    $helper->deleteConfiguredMCStoreLocalData($scopeArray['scope_id'], $scopeArray['scope']);
+                    $configValues = array();
+                    if ($ecommMinSyncDate === null) {
+                        $configValues[] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", Varien_Date::now());
+                    }
+                    if ($isSyncing === null) {
+                        $configValues[] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", true);
+                    }
+                    if (!empty($configValues)) {
+                        $helper->saveMailchimpConfig($configValues, 0, 'default');
+                    }
+                }
+            }
+        }
         return $observer;
     }
 
@@ -480,8 +520,9 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Add column to associate orders in grid gained from MailChimp campaigns and automations.
      *
-     * @param  $observer
-     * @return mixed
+     * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     * @throws Mage_Core_Exception
      */
     public function addColumnToSalesOrderGrid(Varien_Event_Observer $observer)
     {
@@ -730,59 +771,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
-    }
-
-    /**
-     * Catch Magento store group change event and call changeName function for the relevant stores.
-     *
-     * @param Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     */
-    public function changeStoreGroupName(Varien_Event_Observer $observer)
-    {
-        $stores = $observer->getGroup()->getStores();
-
-        foreach ($stores as $store) {
-            $storeId = $store->getId();
-            $this->changeStoreNameIfModuleEnabled($storeId);
-        }
-
-        return $observer;
-    }
-
-    /**
-     * @param Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     */
-    public function changeStoreName(Varien_Event_Observer $observer)
-    {
-        $storeId = $observer->getStore()->getId();
-
-        $this->changeStoreNameIfModuleEnabled($storeId);
-
-        return $observer;
-    }
-
-    /**
-     * @param $storeId
-     */
-    public function changeStoreNameIfModuleEnabled($storeId)
-    {
-        $helper = $this->makeHelper();
-        $mailchimpStoreId = $helper->getMCStoreId($storeId);
-
-        if ($mailchimpStoreId) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
-            if ($realScope['scope_id'] == $storeId && $realScope['scope'] == 'stores') {
-                $ecomEnabled = $helper->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
-                if ($ecomEnabled) {
-                    if (!$helper->isUsingConfigStoreName($realScope['scope_id'], $realScope['scope'])) {
-                        $storeName = $helper->getMCStoreName($realScope['scope_id'], $realScope['scope']);
-                        $helper->changeName($storeName, $realScope['scope_id'], $realScope['scope']);
-                    }
-                }
-            }
-        }
     }
 
     /**

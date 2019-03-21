@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
             $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
             $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
             $message = $helper->__('Please add an api key and select a list before enabling the extension.');
-            $this->getAdminSession()->addError($message);
+            $helper->getAdminSession()->addError($message);
         }
     }
 

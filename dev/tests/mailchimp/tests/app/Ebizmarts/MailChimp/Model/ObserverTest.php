@@ -177,37 +177,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $observerMock->changeStoreName($eventObserverMock);
     }
 
-    public function testChangeStoreNameIfModuleEnabled()
-    {
-        $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $scopeId = 1;
-        $scope = 'stores';
-        $realScope = array('scope_id' => $scopeId, 'scope' => $scope);
-        $storeName = 'storeName';
-
-        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper'))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getRealScopeForConfig', 'isEcomSyncDataEnabled',
-                'isUsingConfigStoreName', 'getMCStoreName', 'changeName'))
-            ->getMock();
-
-        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId)->willReturn($mailChimpStoreId);
-        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId)->willReturn($realScope);
-        $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($realScope['scope_id'], $realScope['scope'])->willReturn(true);
-        $helperMock->expects($this->once())->method('isUsingConfigStoreName')->with($realScope['scope_id'], $realScope['scope'])->willReturn(false);
-        $helperMock->expects($this->once())->method('getMCStoreName')->with($realScope['scope_id'], $realScope['scope'])->willReturn($storeName);
-        $helperMock->expects($this->once())->method('changeName')->with($storeName, $realScope['scope_id'], $realScope['scope']);
-
-        $observerMock->changeStoreNameIfModuleEnabled($scopeId);
-    }
-
     public function testHandleSubscriberDeletion()
     {
         $storeId = 1;

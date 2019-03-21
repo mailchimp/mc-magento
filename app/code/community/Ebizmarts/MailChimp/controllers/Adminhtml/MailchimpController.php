@@ -13,6 +13,7 @@
  */
 class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_Controller_Action
 {
+
     public function indexAction()
     {
         $customerId = (int)$this->getRequest()->getParam('id');
@@ -121,11 +122,19 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $response->setBody($jsonData);
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
     protected function _getDateSync($mailchimpStoreId)
     {
         return $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
     }
 
+    /**
+     * @return mixed
+     */
     protected function _isAllowed()
     {
         $acl = null;

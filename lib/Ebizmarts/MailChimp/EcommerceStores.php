@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mailchimp-lib Magento Component
  *
@@ -10,7 +11,7 @@
  * @date:     4/29/16 4:08 PM
  * @file:     EcommerceStores.php
  */
-class MailChimp_EcommerceStore  extends MailChimp_Abstract
+class MailChimp_EcommerceStore extends MailChimp_Abstract
 {
     /**
      * @param $id              The unique identifier for the store
@@ -31,28 +32,37 @@ class MailChimp_EcommerceStore  extends MailChimp_Abstract
      * @throws MailChimp_Error
      */
     public function add($id, $listId, $name, $currencyCode, $isSyncing, $platform = null, $domain = null,
-        $emailAddress = null, $moneyFormat = null, $primaryLocale=null, $timezone = null,$phone=null,
-        $address=null
-    ) {
-
-        $_params = array('id'=>$id,'list_id'=>$listId,'name'=>$name,'currency_code'=>$currencyCode);
-        if($platform) { $_params['platform'] = $platform;
+                        $emailAddress = null, $moneyFormat = null, $primaryLocale = null, $timezone = null, $phone = null,
+                        $address = null
+    )
+    {
+        $_params = array('id' => $id, 'list_id' => $listId, 'name' => $name, 'currency_code' => $currencyCode);
+        if ($platform) {
+            $_params['platform'] = $platform;
         }
-        if($domain) { $_params['domain'] = $domain;
+        if ($domain) {
+            $_params['domain'] = $domain;
         }
-        if($emailAddress) { $_params['email_address'] = $emailAddress;
+        if ($emailAddress) {
+            $_params['email_address'] = $emailAddress;
         }
-        if($isSyncing) { $_params['is_syncing'] = $isSyncing;
+        if ($isSyncing) {
+            $_params['is_syncing'] = $isSyncing;
         }
-        if($moneyFormat) { $_params['money_format'] = $moneyFormat;
+        if ($moneyFormat) {
+            $_params['money_format'] = $moneyFormat;
         }
-        if($primaryLocale) { $_params['primary_locale'] = $primaryLocale;
+        if ($primaryLocale) {
+            $_params['primary_locale'] = $primaryLocale;
         }
-        if($timezone) { $_params['timezone'] = $timezone;
+        if ($timezone) {
+            $_params['timezone'] = $timezone;
         }
-        if($phone) { $_params['phone'] = $phone;
+        if ($phone) {
+            $_params['phone'] = $phone;
         }
-        if($address) {  $_params['address'] = $address;
+        if ($address) {
+            $_params['address'] = $address;
         }
         return $this->_master->call('ecommerce/stores', $_params, Ebizmarts_MailChimp::POST);
     }
@@ -69,19 +79,23 @@ class MailChimp_EcommerceStore  extends MailChimp_Abstract
      * @return mixed
      * @throws MailChimp_Error
      */
-    public function get($id=null,$fields=null,$excludeFields=null,$count=null,$offset=null)
+    public function get($id = null, $fields = null, $excludeFields = null, $count = null, $offset = null)
     {
-        $_params=array();
-        if($fields) { $_params['fields'] = $fields;
+        $_params = array();
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
         if ($id) {
-            return $this->_master->call('ecommerce/stores/'.$id, $_params, Ebizmarts_MailChimp::GET);
+            return $this->_master->call('ecommerce/stores/' . $id, $_params, Ebizmarts_MailChimp::GET);
         } else {
             return $this->_master->call('ecommerce/stores', $_params, Ebizmarts_MailChimp::GET);
         }
@@ -89,6 +103,7 @@ class MailChimp_EcommerceStore  extends MailChimp_Abstract
 
     /**
      * @param $storeId         The store id.
+     * @param $name            The store name.
      * @param $platform        The e-commerce platform of the store.
      * @param $domain          The store domain.
      * @param $emailAddress    The email address for the store.
@@ -103,33 +118,45 @@ class MailChimp_EcommerceStore  extends MailChimp_Abstract
      * @throws MailChimp_Error
      */
     public function edit($storeId, $name = null, $platform = null, $domain = null, $isSyncing = null, $emailAddress = null, $currencyCode = null,
-        $moneyFormat = null, $primaryLocale=null, $timezone = null, $phone=null, $address=null
-    ) {
+                         $moneyFormat = null, $primaryLocale = null, $timezone = null, $phone = null, $address = null
+    )
+    {
 
-        $_params=array();
-        if($name) { $_params['name'] = $name;
+        $_params = array();
+        if ($name) {
+            $_params['name'] = $name;
         }
-        if($platform) { $_params['platform'] = $platform;
+        if ($platform) {
+            $_params['platform'] = $platform;
         }
-        if($domain) { $_params['domain'] = $domain;
+        if ($domain) {
+            $_params['domain'] = $domain;
         }
-        if($emailAddress) { $_params['email_address'] = $emailAddress;
+        if ($emailAddress) {
+            $_params['email_address'] = $emailAddress;
         }
-        if($currencyCode) {  $_params['currency_code'] = $currencyCode;
+        if ($currencyCode) {
+            $_params['currency_code'] = $currencyCode;
         }
-        if($isSyncing !== null) { $_params['is_syncing'] = $isSyncing;
+        if ($isSyncing !== null) {
+            $_params['is_syncing'] = $isSyncing;
         }
-        if($moneyFormat) { $_params['money_format'] = $moneyFormat;
+        if ($moneyFormat) {
+            $_params['money_format'] = $moneyFormat;
         }
-        if($primaryLocale) { $_params['primary_locale'] = $primaryLocale;
+        if ($primaryLocale) {
+            $_params['primary_locale'] = $primaryLocale;
         }
-        if($timezone) { $_params['timezone'] = $timezone;
+        if ($timezone) {
+            $_params['timezone'] = $timezone;
         }
-        if($phone) { $_params['phone'] = $phone;
+        if ($phone) {
+            $_params['phone'] = $phone;
         }
-        if($address) {  $_params['address'] = $address;
+        if ($address) {
+            $_params['address'] = $address;
         }
-        return $this->_master->call('ecommerce/stores/'.$storeId, $_params, Ebizmarts_MailChimp::PATCH);
+        return $this->_master->call('ecommerce/stores/' . $storeId, $_params, Ebizmarts_MailChimp::PATCH);
     }
 
     /**
@@ -139,6 +166,6 @@ class MailChimp_EcommerceStore  extends MailChimp_Abstract
      */
     public function delete($storeId)
     {
-        return $this->_master->call('ecommerce/stores/'.$storeId, null, Ebizmarts_MailChimp::DELETE);
+        return $this->_master->call('ecommerce/stores/' . $storeId, null, Ebizmarts_MailChimp::DELETE);
     }
 }

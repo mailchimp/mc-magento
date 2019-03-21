@@ -161,50 +161,6 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $apiStoresMock->deleteMailChimpStore($mailChimpStoreId, $scopeId, $scope);
     }
 
-    public function testModifyName()
-    {
-        $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $scopeId = 1;
-        $scope = 'stores';
-        $name = 'New Name';
-
-        $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper'))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getApi', 'getMCStoreId', 'getRealScopeForConfig'))
-            ->getMock();
-
-        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerce'))
-            ->getMock();
-
-        $ecommerceMock = $this->getMockBuilder(MailChimp_Ecommerce::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getStores'))
-            ->getMock();
-
-        $ecommerceStoresMock = $this->getMockBuilder(MailChimp_EcommerceStore::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('edit'))
-            ->getMock();
-
-        $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-
-        $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailChimpStoreId);
-
-        $apiMock->expects($this->once())->method('getEcommerce')->willReturn($ecommerceMock);
-        $ecommerceMock->expects($this->once())->method('getStores')->willReturn($ecommerceStoresMock);
-        $ecommerceStoresMock->expects($this->once())->method('edit')->with($mailChimpStoreId, $name);
-
-        $apiStoresMock->modifyName($name, $scopeId, $scope);
-    }
-
     public function testRetrieveAndSaveMCJsUrlInConfig()
     {
         $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';

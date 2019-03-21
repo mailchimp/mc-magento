@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.15.1</version>
+            <version>1.1.15.2</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
             <version>1.1.15</version>
@@ -11,22 +11,6 @@
     </modules>
     <global>
         <events>
-            <store_group_save>
-                <observers>
-                    <mailchimp_change_store_name>
-                        <class>mailchimp/observer</class>
-                        <method>changeStoreGroupName</method>
-                    </mailchimp_change_store_name>
-                </observers>
-            </store_group_save>
-            <store_edit>
-                <observers>
-                    <mailchimp_change_store_name>
-                        <class>mailchimp/observer</class>
-                        <method>changeStoreName</method>
-                    </mailchimp_change_store_name>
-                </observers>
-            </store_edit>
             <newsletter_subscriber_save_before>
                 <observers>
                     <mailchimp_subscribe_observer>
@@ -344,14 +328,14 @@
                     </mailchimp_add_synced_to_order_grid_collection>
                 </observers>
             </sales_order_grid_collection_load_before>
-            <admin_system_config_changed_section_mailchimp>
+            <model_config_data_save_before>
                 <observers>
                     <mailchimp_save_config>
                         <class>mailchimp/observer</class>
-                        <method>saveConfig</method>
+                        <method>saveConfigBefore</method>
                     </mailchimp_save_config>
                 </observers>
-            </admin_system_config_changed_section_mailchimp>
+            </model_config_data_save_before>
             <adminhtml_block_html_before>
                 <observers>
                     <mailchimp_alter_newsletter_grid>

@@ -49,7 +49,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $product) {
 
-            if ($this->shouldSendProductUpdate($magentoStoreId, $product)) {
+            if ($this->shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)) {
                 $batchArray = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = count($batchArray);
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId);
@@ -362,7 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = $this->makeBatchId($magentoStoreId);
         $items = $order->getAllVisibleItems();
         $helper = $this->getMailChimpHelper();
-        $syncDateFlag = $helper->getEcommMinSyncDateFlag($magentoStoreId);
+        $syncDateFlag = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
             $product = $this->loadProductById($itemProductId);
@@ -473,15 +473,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @param $product
      * @return bool
+     * @throws Mage_Core_Exception
      */
-    protected function shouldSendProductUpdate($magentoStoreId, $product)
+    protected function shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)
     {
         $helper = $this->getMailChimpHelper();
         $resendTurn = $helper->getResendTurn($magentoStoreId);
-        return !$resendTurn && $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $product->getMailchimpSyncError() == '';
+        return !$resendTurn && $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId) && $product->getMailchimpSyncError() == '';
     }
 
     /**

@@ -1,11 +1,11 @@
 function loadStores() {
-    var $apiKey = $('apikey').value;
+    var apiKey = $('apikey').value;
     $("listid").select('option').each(function (i) {
         i.remove();
     });
     new Ajax.Request(GET_STORES_URL, {
             method: 'get',
-            parameters: {apikey:$apiKey},
+            parameters: {api_key:apiKey},
             onComplete: function (transport) {
                 var json = transport.responseText.evalJSON();
                 $H(json).each(function (item) {
