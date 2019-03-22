@@ -13,6 +13,7 @@
 class Ebizmarts_MailChimp_Model_Observer
 {
 
+    const PRODUCT_IS_ENABLED = 1;
     const PRODUCT_IS_DISABLED = 2;
 
     /**
@@ -713,22 +714,30 @@ class Ebizmarts_MailChimp_Model_Observer
         $product = $observer->getEvent()->getProduct();
         $helper = $this->makeHelper();
         $apiProduct = $this->makeApiProduct();
-        $mailchimpStoreIdsArray = $helper->getAllMailChimpStoreIds();
 
-        foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
+        $stores = $helper->getMageApp()->getStores();
+        foreach ($stores as $storeId => $store) {
 
-            $scopeArray = $this->getScopeArrayFromString($scopeData);
-            $ecommEnabled = $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']);
+            $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
             if ($ecommEnabled) {
-                if ($product->getStatus() == self::PRODUCT_IS_DISABLED) {
-                    $apiProduct->updateDisabledProducts($product->getId(), $mailchimpStoreId);
+
+                $mailchimpStoreId = $helper->getMCStoreId($storeId);
+
+                $status = $this->makeApiProductStatus()->getProductStatus($product->getId(), $storeId);
+                if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
+                    $dataProduct = $helper->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                    $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                    Mage::log($isMarkedAsDeleted, null, 'productSavebefore', true);
+                    if ($isMarkedAsDeleted) {
+                        $dataProduct->delete();
+                    } else {
+                        $apiProduct->update($product->getId(), $mailchimpStoreId);
+                    }
                 } else {
-                    $apiProduct->update($product->getId(), $mailchimpStoreId);
+                    $apiProduct->updateDisabledProducts($product->getId(), $mailchimpStoreId);
                 }
             }
-
-
         }
 
         return $observer;
@@ -1084,5 +1093,13 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getWarningMessageAdminHtmlSession($helper)
     {
         return Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Product_Status
+     */
+    protected function makeApiProductStatus()
+    {
+        return Mage::getModel('catalog/product_status');
     }
 }
