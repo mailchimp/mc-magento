@@ -716,7 +716,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiProduct = $this->makeApiProduct();
 
         $stores = $helper->getMageApp()->getStores();
-        foreach ($stores as $storeId => $store) {
+        foreach ($stores as $storeId) {
 
             $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
@@ -728,7 +728,6 @@ class Ebizmarts_MailChimp_Model_Observer
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
                     $dataProduct = $helper->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
-                    Mage::log($isMarkedAsDeleted, null, 'productSavebefore', true);
                     if ($isMarkedAsDeleted) {
                         $dataProduct->delete();
                     } else {

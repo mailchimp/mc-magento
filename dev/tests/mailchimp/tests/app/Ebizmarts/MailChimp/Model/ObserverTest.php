@@ -1106,5 +1106,119 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpObserverMock->cleanProductImagesCacheAfter($observerMock);
 
     }
+
+    public function testProductSaveBefore()
+    {
+        $productId = 907;
+        $type = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
+        $mailchimpStoreId = '19d457ff95f1f1e710b502f35041e05f';
+        $ecommEnabled = true;
+        $storeId = 1;
+        $isMarkedAsDeleted = 1;
+        $storesIds = array(1);
+        $status = array($productId => 1);
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->setMethods(array('makeHelper', 'makeApiProduct', 'makeApiProductStatus'))
+            -> getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->setMethods(array('getMageApp', 'isEcommerceEnabled', 'getEcommerceSyncDataItem', 'getMCStoreId'))
+            ->getMock();
+
+        $productMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
+            ->setMethods(array('getId'))
+            ->getMock();
+
+        $productApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
+            ->setMethods(array())
+            ->getMock();
+
+        $mageCoreModelAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+            ->setMethods(array('getStores'))
+            ->getMock();
+
+        $dataProductMock = $this->getMockBuilder(Varien_Db_Select::class)
+            ->setMethods(array('delete', 'getMailchimpSyncDeleted'))
+            ->getMock();
+
+        $productStatusMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Status::class)
+            ->setMethods(array('getProductStatus'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $storesMock = $this->getMockBuilder(ArrayObject::class)
+            ->setMethods(array('getIterator'))
+            ->getMock();
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getProduct'))
+            ->getMock();
+
+        $mailchimpObserverMock->expects($this->once())
+            ->method('makeHelper')
+            ->willReturn($helperMock);
+        $mailchimpObserverMock->expects($this->once())
+            ->method('makeApiProduct')
+            ->willReturn($productApiMock);
+        $mailchimpObserverMock->expects($this->once())
+            ->method('makeApiProductStatus')
+            ->willReturn($productStatusMock);
+
+        $observerMock->expects($this->once())
+            ->method('getEvent')
+            ->willReturn($eventObserverMock);
+
+        $eventObserverMock->expects($this->once())
+            ->method('getProduct')
+            ->willReturn($productMock);
+
+        $productStatusMock->expects($this->once())
+            ->method('getProductStatus')
+            ->with($productId, $storeId)
+            ->willReturn($status);
+
+        $helperMock->expects($this->once())
+            ->method('getMageApp')
+            ->willReturn($mageCoreModelAppMock);
+        $helperMock->expects($this->once())
+            ->method('isEcommerceEnabled')
+            ->willReturn($ecommEnabled);
+        $helperMock->expects($this->once())
+            ->method('getEcommerceSyncDataItem')
+            ->with($productId, $type, $mailchimpStoreId)
+            ->willReturn($dataProductMock);
+        $helperMock->expects($this->once())
+            ->method('getMCStoreId')
+            ->with($storeId)
+            ->willReturn($mailchimpStoreId);
+
+        $dataProductMock->expects($this->once())
+            ->method('getMailchimpSyncDeleted')
+            ->willReturn($isMarkedAsDeleted);
+        $dataProductMock->expects($this->once())
+            ->method('delete');
+
+        $mageCoreModelAppMock->expects($this->once())
+            ->method('getStores')
+            ->willReturn($storesMock);
+
+        $storesMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator($storesIds));
+
+        $productMock->expects($this->exactly(3))
+            ->method('getId')
+            ->willReturnOnConsecutiveCalls(
+                $productId,
+                $productId,
+                $productId);
+
+        $mailchimpObserverMock->productSaveBefore($observerMock);
+    }
 }
 
