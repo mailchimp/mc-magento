@@ -1138,7 +1138,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getStores'))
             ->getMock();
 
-        $dataProductMock = $this->getMockBuilder(Varien_Db_Select::class)
+        $dataProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->setMethods(array('delete', 'getMailchimpSyncDeleted'))
             ->getMock();
 
