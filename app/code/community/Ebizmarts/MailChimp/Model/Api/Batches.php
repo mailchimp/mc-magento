@@ -632,7 +632,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
 
                     if (strstr($errorDetails, 'already exists')) {
-                        $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, null, null, 0, true);
+                        $this->setItemAsModified($helper, $mailchimpStoreId, $id, $type);
                         continue;
                     }
                     $error = $response->title . " : " . $response->detail;
@@ -809,5 +809,24 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function getCurrentDate()
     {
         return Varien_Date::now();
+    }
+
+    /**
+     * @param $helper
+     * @param $mailchimpStoreId
+     * @param $id
+     * @param $type
+     */
+    protected function setItemAsModified($helper, $mailchimpStoreId, $id, $type)
+    {
+        $isMarkedAsDeleted = null;
+        if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
+            $dataProduct = $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+            $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+        }
+
+        if (!$isMarkedAsDeleted || $dataProduct->getMailchimpSyncError() != Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+            $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, 0, null, 0, true);
+        }
     }
 }
