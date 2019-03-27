@@ -28,6 +28,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     private $productTypeConfigurableResource;
     public static $noChildrenIds = array(0 => array());
 
+    const PRODUCT_DISABLED_IN_MAGENTO = 'This product was deleted because it is disabled in Magento.';
+
     public function __construct()
     {
         $this->productTypeConfigurable = Mage::getModel('catalog/product_type_configurable');
@@ -96,7 +98,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $batchArray[$counter] = $data;
                 $counter++;
             }
-            $this->_updateSyncData($product->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
+            $this->_updateSyncData($product->getId(), $mailchimpStoreId, null, self::PRODUCT_DISABLED_IN_MAGENTO, null, null, 0);
 
         }
         return $batchArray;
@@ -338,9 +340,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $parentIdArray = $this->getAllParentIds($productId);
         foreach ($parentIdArray as $parentId) {
-            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, 0, null, true, false);
         }
-        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, 0, null, true, false);
     }
 
 
@@ -385,13 +387,18 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             $syncModified = $productSyncData->getMailchimpSyncModified();
             $syncDelta = $productSyncData->getMailchimpSyncDelta();
+            $syncError = $productSyncData->getMailchimpSyncError();
 
-            if ($syncModified && $syncDelta > $syncDateFlag) {
+            if ($syncModified && $syncDelta > $syncDateFlag && $syncError == '') {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
                 $this->_updateSyncData($productId, $mailchimpStoreId);
-            } elseif (!$syncDelta || $syncDelta < $syncDateFlag) {
+            } elseif (!$syncDelta || $syncDelta < $syncDateFlag || $syncError != '') {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
-                $this->_updateSyncData($productId, $mailchimpStoreId);
+                if ($syncError != self::PRODUCT_DISABLED_IN_MAGENTO) {
+                    $this->_updateSyncData($productId, $mailchimpStoreId);
+                } else {
+                    $this->_updateSyncData($productId, $mailchimpStoreId, null, ' ', 0, 1, false, true);
+                }
             }
         }
 
