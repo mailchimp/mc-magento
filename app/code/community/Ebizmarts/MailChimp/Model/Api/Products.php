@@ -327,6 +327,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_parentUrl = null;
             }
         }
+
         return $data;
     }
 
@@ -394,10 +395,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($productId, $mailchimpStoreId);
             } elseif (!$syncDelta || $syncDelta < $syncDateFlag || $syncError != '') {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
+                // avoid update for disabled products to prevent send the product as modified
                 if ($syncError != self::PRODUCT_DISABLED_IN_MAGENTO) {
                     $this->_updateSyncData($productId, $mailchimpStoreId);
-                } else {
-                    $this->_updateSyncData($productId, $mailchimpStoreId, null, ' ', 0, 1, false, true);
                 }
             }
         }
@@ -418,7 +418,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param bool $saveOnlyIfexists
      * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
+    public function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $productId,

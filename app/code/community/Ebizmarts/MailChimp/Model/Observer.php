@@ -365,7 +365,12 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
 
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
-                $this->makeApiProduct()->update($item->getProductId(), $mailchimpStoreId);
+                $productId = $item->getProductId();
+                $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                if (!$isMarkedAsDeleted) {
+                    $this->makeApiProduct()->update($productId, $mailchimpStoreId);
+                }
             }
         }
 
@@ -709,7 +714,7 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
-    public function productSaveBefore(Varien_Event_Observer $observer)
+    public function productSaveAfter(Varien_Event_Observer $observer)
     {
         $product = $observer->getEvent()->getProduct();
         $helper = $this->makeHelper();
@@ -724,7 +729,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
-                $status = $this->makeApiProductStatus()->getProductStatus($product->getId(), $storeId);
+                $status = $this->getCatalogProductStatusModel()->getProductStatus($product->getId(), $storeId);
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
                     $dataProduct = $helper->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
@@ -1097,7 +1102,7 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * @return Mage_Catalog_Model_Product_Status
      */
-    protected function makeApiProductStatus()
+    protected function getCatalogProductStatusModel()
     {
         return Mage::getModel('catalog/product_status');
     }

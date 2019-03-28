@@ -334,9 +334,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
                 }
-                    //deleted product operations
-                    $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
+                //deleted product operations
+                $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
+                $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
                 $batchJson = null;
                 $batchResponse = null;
 

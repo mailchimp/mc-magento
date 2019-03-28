@@ -229,7 +229,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $variant = $productId;
             }
 
-            if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == '') {
+            $productSyncError = $productSyncData->getMailchimpSyncError();
+            if ($productSyncError == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
                 $data["lines"][] = array(
                     "id" => (string)$itemCount,
@@ -239,6 +240,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "price" => $item->getPrice(),
                     "discount" => abs($item->getDiscountAmount())
                 );
+
+                if ($productSyncError) {
+                    // update disabled products to remove the product from mailchimp after sending the order
+                    Mage::getModel('mailchimp/api_products')->_updateSyncData($productId, $mailchimpStoreId, null, ' ', 0, 1, false, true);
+                }
             }
         }
 
