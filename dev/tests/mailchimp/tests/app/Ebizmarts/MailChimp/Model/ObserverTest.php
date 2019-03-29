@@ -13,6 +13,11 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $scope = 'stores';
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $mailchimpStoreIdsArray = array('stores_1' => $mailchimpStoreId);
+        $isMarkedAsDeleted = 0;
+        $type = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
+        $productId1 = 12;
+        $productId2 = 34;
+
         /**
          * @var \Ebizmarts_MailChimp_Model_Observer $modelMock
          */
@@ -28,12 +33,16 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getAllMailChimpStoreIds', 'isEcommerceEnabled'))
+            ->setMethods(array('getAllMailChimpStoreIds', 'isEcommerceEnabled', 'getEcommerceSyncDataItem'))
             ->getMock();
 
         $eventMock = $this->getMockBuilder(Varien_Event::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getProductIds'))
+            ->getMock();
+
+        $dataProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
+            ->setMethods(array('getMailchimpSyncDeleted'))
             ->getMock();
 
         $eventMock->expects($this->once())->method('getProductIds')->willReturn(array(12, 34));
@@ -43,10 +52,23 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock->expects($this->once())->method('getAllMailChimpStoreIds')->willReturn($mailchimpStoreIdsArray);
         $helperMock->expects($this->once())->method('isEcommerceEnabled')->with($scopeId, $scope)->willReturn(true);
+        $helperMock->expects($this->exactly(2))->method('getEcommerceSyncDataItem')
+            ->withConsecutive(
+                array($productId1, $type, $mailchimpStoreId),
+                array($productId2, $type, $mailchimpStoreId)
+            )->willReturnOnConsecutiveCalls(
+                $dataProductMock,
+                $dataProductMock
+            );
 
         $apiProductsMock->expects($this->exactly(2))->method('update')->withConsecutive(
-            array(12, $mailchimpStoreId),
-            array(34, $mailchimpStoreId)
+            array($productId1, $mailchimpStoreId),
+            array($productId2, $mailchimpStoreId)
+        );
+
+        $dataProductMock->expects($this->exactly(2))->method('getMailchimpSyncDeleted')->willReturnOnConsecutiveCalls(
+            $isMarkedAsDeleted,
+            $isMarkedAsDeleted
         );
 
         $eventObserverMock = $this->makeEventObserverMock($eventMock, 1);
@@ -881,6 +903,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $storeId = 1;
         $productId = 1;
         $mailchimpStoreId = '6167259961c475fef8523e39ef1784e8';
+        $isMarkedAsDeleted = 0;
+        $type = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
 
         $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->disableOriginalConstructor()
@@ -904,12 +928,16 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isEcomSyncDataEnabled', 'getMCStoreId'))
+            ->setMethods(array('isEcomSyncDataEnabled', 'getMCStoreId', 'getEcommerceSyncDataItem'))
             ->getMock();
 
         $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
             ->setMethods(array('update'))
+            ->getMock();
+
+        $dataProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
+            ->setMethods(array('getMailchimpSyncDeleted'))
             ->getMock();
 
         $observerMock->expects($this->once())->method('getEvent')->willReturn($eventObserverMock);
@@ -923,6 +951,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $itemMock->expects($this->once())->method('getProductId')->willReturn($productId);
         $helperMock->expects($this->once())->method('getMCStoreId')->with($storeId)->willReturn($mailchimpStoreId);
         $apiProductsMock->expects($this->once())->method('update')->with($productId, $mailchimpStoreId);
+        $helperMock->expects($this->once())->method('getEcommerceSyncDataItem')->with($productId, $type, $mailchimpStoreId)->willReturn($dataProductMock);
+        $dataProductMock->expects($this->once())->method('getMailchimpSyncDeleted')->willReturn($isMarkedAsDeleted);
 
         $mailchimpObserverMock->itemCancel($observerMock);
     }

@@ -639,7 +639,12 @@ class Ebizmarts_MailChimp_Model_Observer
                     continue;
                 }
 
-                $apiProduct->update($item->getProductId(), $mailchimpStoreId);
+                $productId = $item->getProductId();
+                $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                if (!$isMarkedAsDeleted) {
+                    $apiProduct->update($productId, $mailchimpStoreId);
+                }
             }
 
             $apiOrder->update($order->getEntityId(), $storeId);
@@ -673,7 +678,12 @@ class Ebizmarts_MailChimp_Model_Observer
                     continue;
                 }
 
-                $apiProduct->update($item->getProductId(), $mailchimpStoreId);
+                $productId = $item->getProductId();
+                $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                if (!$isMarkedAsDeleted) {
+                    $apiProduct->update($productId, $mailchimpStoreId);
+                }
             }
 
             $apiOrder->update($order->getEntityId(), $storeId);
@@ -700,8 +710,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
-            if (!$this->isBundleItem($item) && !$this->isConfigurableItem($item)) {
-                $apiProduct->update($item->getProductId(), $mailchimpStoreId);
+            $productId = $item->getProductId();
+            $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+            $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+            if (!$this->isBundleItem($item) && !$this->isConfigurableItem($item) && !$isMarkedAsDeleted) {
+                $apiProduct->update($productId, $mailchimpStoreId);
             }
         }
 
@@ -818,7 +831,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($ecommEnabled) {
                 foreach ($productIds as $productId) {
-                    $apiProduct->update($productId, $mailchimpStoreId);
+                    $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                    $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                    if (!$isMarkedAsDeleted) {
+                        $apiProduct->update($productId, $mailchimpStoreId);
+                    }
                 }
             }
         }
