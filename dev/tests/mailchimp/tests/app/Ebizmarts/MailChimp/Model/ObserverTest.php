@@ -1107,7 +1107,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
     }
 
-    public function testProductSaveBefore()
+    public function testProductSaveAfter()
     {
         $productId = 907;
         $type = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
@@ -1119,7 +1119,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $status = array($productId => 1);
 
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
-            ->setMethods(array('makeHelper', 'makeApiProduct', 'makeApiProductStatus'))
+            ->setMethods(array('makeHelper', 'makeApiProduct', 'getCatalogProductStatusModel'))
             -> getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -1166,7 +1166,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->method('makeApiProduct')
             ->willReturn($productApiMock);
         $mailchimpObserverMock->expects($this->once())
-            ->method('makeApiProductStatus')
+            ->method('getCatalogProductStatusModel')
             ->willReturn($productStatusMock);
 
         $observerMock->expects($this->once())
@@ -1218,7 +1218,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
                 $productId,
                 $productId);
 
-        $mailchimpObserverMock->productSaveBefore($observerMock);
+        $mailchimpObserverMock->productSaveAfter($observerMock);
     }
 }
 
