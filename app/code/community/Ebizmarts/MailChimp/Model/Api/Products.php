@@ -11,6 +11,8 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Products
 {
+    const PRODUCT_IS_ENABLED = 1;
+    const PRODUCT_IS_DISABLED = 2;
     const BATCH_LIMIT = 100;
     private $_parentImageUrl = null;
     private $_parentId = null;
@@ -388,15 +390,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             $syncModified = $productSyncData->getMailchimpSyncModified();
             $syncDelta = $productSyncData->getMailchimpSyncDelta();
-            $syncError = $productSyncData->getMailchimpSyncError();
+            $isProductEnabled = $this->isProductEnabled($productId);
 
-            if ($syncModified && $syncDelta > $syncDateFlag && $syncError == '') {
+            if ($syncModified && $syncDelta > $syncDateFlag && $isProductEnabled) {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
                 $this->_updateSyncData($productId, $mailchimpStoreId);
-            } elseif (!$syncDelta || $syncDelta < $syncDateFlag || $syncError != '') {
+            } elseif (!$syncDelta || $syncDelta < $syncDateFlag || !$isProductEnabled) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
                 // avoid update for disabled products to prevent send the product as modified
-                if ($syncError != self::PRODUCT_DISABLED_IN_MAGENTO) {
+                if ($isProductEnabled) {
                     $this->_updateSyncData($productId, $mailchimpStoreId);
                 }
             }
@@ -1010,5 +1012,35 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
         }
+    }
+
+    /**
+     * @param $productId
+     * @return bool | return true if the product is enabled in Magento.
+     */
+    public function isProductEnabled($productId)
+    {
+        $isProductEnabled = false;
+        $helper = $this->getMailChimpHelper();
+
+        $stores = $helper->getMageApp()->getStores();
+        foreach ($stores as $storeId) {
+
+            $status = $this->getCatalogProductStatusModel()->getProductStatus($productId, $storeId);
+            if ($status[$productId] == self::PRODUCT_IS_ENABLED) {
+                $isProductEnabled = true;
+            } else {
+                $isProductEnabled = false;
+            }
+        }
+        return $isProductEnabled;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Product_Status
+     */
+    protected function getCatalogProductStatusModel()
+    {
+        return Mage::getModel('catalog/product_status');
     }
 }
