@@ -36,6 +36,7 @@
 "This is required in order to tell the extensions what customer attributes should be sent to your selected Mailchimp list. <a target=""_blank"" href=""http://wiki.ebizmarts.com/m4m-merge-fields"">See recommended configuration here.</a>","This is required in order to tell the extensions what customer attributes should be sent to your selected Mailchimp list. <a target=""_blank"" href=""http://wiki.ebizmarts.com/m4m-merge-fields"">See recommended configuration here.</a>"
 "If this is set to ""No"", the synchronization will be from Magento's newsletter to Mailchimp only.","If this is set to ""No"", the synchronization will be from Magento's newsletter to Mailchimp only."
 "File is {{base_dir}}/var/log/Mailchimp_Errors.log","File is {{base_dir}}/var/log/Mailchimp_Errors.log"
+"Thanks for sharing your interest with us.","Thanks for sharing your interest with us."
 
 ;Ecommerce settings
 "Subscribe all customers to the newsletter","Subscribe all customers to the newsletter"
