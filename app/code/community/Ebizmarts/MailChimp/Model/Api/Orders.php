@@ -243,7 +243,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 if ($productSyncError) {
                     // update disabled products to remove the product from mailchimp after sending the order
-                    Mage::getModel('mailchimp/api_products')->_updateSyncData($productId, $mailchimpStoreId, null, ' ', 0, 1, false, true);
+                    Mage::getModel('mailchimp/api_products')->updateDisabledProducts($productId, $mailchimpStoreId);
                 }
             }
         }
