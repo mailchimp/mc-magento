@@ -169,7 +169,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $magentoStoreId, true);
+            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
@@ -255,7 +255,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
-            $cartJson = $this->_makeCart($cart, $magentoStoreId);
+            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
             if ($cartJson != "") {
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'POST';
@@ -306,7 +306,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param $isModified
      * @return string
      */
-    public function _makeCart($cart, $magentoStoreId, $isModified = false)
+    public function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
     {
         $helper = $this->getHelper();
         $campaignId = $cart->getMailchimpCampaignId();
@@ -330,6 +330,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $items = $cart->getAllVisibleItems();
         $itemCount = 0;
         foreach ($items as $item) {
+            $productId = $item->getProductId();
+            $isTypeProduct = $this->isTypeProduct();
+            $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
             $line = array();
             if ($item->getProductType() == 'bundle' || $item->getProductType() == 'grouped') {
                 continue;
@@ -351,13 +354,21 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
 
             //id can not be 0 so we add 1 to $itemCount before setting the id.
-            $itemCount++;
-            $line['id'] = (string)$itemCount;
-            $line['product_id'] = $item->getProductId();
-            $line['product_variant_id'] = $variantId;
-            $line['quantity'] = (int)$item->getQty();
-            $line['price'] = $item->getRowTotal();
-            $lines[] = $line;
+            $productSyncError = $productSyncData->getMailchimpSyncError();
+            if ($productSyncError == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
+                $itemCount++;
+                $line['id'] = (string)$itemCount;
+                $line['product_id'] = $item->getProductId();
+                $line['product_variant_id'] = $variantId;
+                $line['quantity'] = (int)$item->getQty();
+                $line['price'] = $item->getRowTotal();
+                $lines[] = $line;
+
+                if ($productSyncError) {
+                    // update disabled products to remove the product from mailchimp after sending the order
+                    Mage::getModel('mailchimp/api_products')->updateDisabledProducts($productId, $mailchimpStoreId);
+                }
+            }
         }
 
         $jsonData = "";
@@ -660,6 +671,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function isProductTypeConfigurable($item)
     {
         return $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
+    }
+
+    /**
+     * @return string
+     */
+    protected function isTypeProduct()
+    {
+        return Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
     }
 }
 
