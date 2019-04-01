@@ -595,7 +595,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($scopeId === 0) {
                 $where = "mailchimp_sync_error != ''";
             } else {
-                $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
+                $where = array("mailchimp_store_id = ? AND mailchimp_sync_error != ''" => $mailchimpStoreId);
             }
         } else {
             $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
