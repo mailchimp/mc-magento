@@ -1725,7 +1725,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             'isProductTypeConfigurable',
             'getApiCustomersOptIn',
             'getCountryModel',
-            'getHelper'
+            'getHelper',
+            'getApiProducts'
         ))
             ->getMock();
 
@@ -1736,6 +1737,11 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $productSyncDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->setMethods(array('getMailchimpSyncError'))
+            ->getMock();
+
+        $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('updateDisabledProducts'))
             ->getMock();
 
         $cartModelMock = $this
@@ -1797,6 +1803,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())
             ->method('getHelper')
             ->willReturn($helperMock);
+        $cartsApiMock->expects($this->once())
+            ->method('getApiProducts')
+            ->willReturn($apiProductsMock);
 
         $helperMock->expects($this->once())
             ->method('getEcommerceSyncDataItem')
@@ -1805,6 +1814,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $productSyncDataMock->expects($this->once())
             ->method('getMailchimpSyncError')
             ->willReturn($mailchimpSyncError);
+
+        $apiProductsMock->expects($this->once())
+            ->method('updateDisabledProducts')
+            ->with($productId, self::MAILCHIMP_STORE_ID);
 
         $cartModelMock->expects($this->once())
             ->method('getCustomerFirstname')
