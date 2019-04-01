@@ -319,7 +319,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             );
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAGENTO_STORE_ID, true)
+            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID, true)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('addProductNotSentData')
@@ -615,7 +615,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->with(self::COUNTER + 1);
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAGENTO_STORE_ID, true)
+            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID, true)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('addProductNotSentData')
@@ -823,7 +823,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn($allCarts);
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAGENTO_STORE_ID)
+            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('getToken')
@@ -1458,7 +1458,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn($allCarts);
         $cartsApiMock->expects($this->once())
             ->method('_makeCart')
-            ->with($cartModelMock, self::MAGENTO_STORE_ID)
+            ->with($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID)
             ->willReturn($cartJson);
         $cartsApiMock->expects($this->once())
             ->method('setToken')
@@ -1718,13 +1718,24 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $regionCode = 'test';
         $postCode = 'test';
         $country = 'test';
+        $mailchimpSyncError = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
 
         $cartsApiMock = $this->cartsApiMock->setMethods(array(
             '_getCheckoutUrl',
             'isProductTypeConfigurable',
             'getApiCustomersOptIn',
-            'getCountryModel'
+            'getCountryModel',
+            'getHelper'
         ))
+            ->getMock();
+
+        $helperMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->setMethods(array('getEcommerceSyncDataItem'))
+            ->getMock();
+
+        $productSyncDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Synchbatches::class)
+            ->setMethods(array('getMailchimpSyncError'))
             ->getMock();
 
         $cartModelMock = $this
@@ -1783,6 +1794,17 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('isProductTypeConfigurable')
             ->with($itemMock)
             ->willReturn(true);
+        $cartsApiMock->expects($this->once())
+            ->method('getHelper')
+            ->willReturn($helperMock);
+
+        $helperMock->expects($this->once())
+            ->method('getEcommerceSyncDataItem')
+            ->willReturn($productSyncDataMock);
+
+        $productSyncDataMock->expects($this->once())
+            ->method('getMailchimpSyncError')
+            ->willReturn($mailchimpSyncError);
 
         $cartModelMock->expects($this->once())
             ->method('getCustomerFirstname')
@@ -1886,6 +1908,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 $company
             );
 
-        $cartsApiMock->_makeCart($cartModelMock, self::MAGENTO_STORE_ID, $isModified);
+        $cartsApiMock->_makeCart($cartModelMock, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID, $isModified);
     }
 }

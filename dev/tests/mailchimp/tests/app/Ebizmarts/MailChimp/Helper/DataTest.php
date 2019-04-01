@@ -619,7 +619,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
         $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
+        $where = array("mailchimp_store_id = ? AND mailchimp_sync_error != ''" => $mailchimpStoreId);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()

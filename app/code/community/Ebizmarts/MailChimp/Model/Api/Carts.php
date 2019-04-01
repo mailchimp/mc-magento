@@ -358,7 +358,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             if ($productSyncError == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
                 $line['id'] = (string)$itemCount;
-                $line['product_id'] = $item->getProductId();
+                $line['product_id'] = $productId;
                 $line['product_variant_id'] = $variantId;
                 $line['quantity'] = (int)$item->getQty();
                 $line['price'] = $item->getRowTotal();
