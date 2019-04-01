@@ -1718,7 +1718,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $regionCode = 'test';
         $postCode = 'test';
         $country = 'test';
-        $mailchimpSyncError = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
+        $isProductEnabled = false;
 
         $cartsApiMock = $this->cartsApiMock->setMethods(array(
             '_getCheckoutUrl',
@@ -1741,7 +1741,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $apiProductsMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('updateDisabledProducts'))
+            ->setMethods(array('updateDisabledProducts', 'isProductEnabled'))
             ->getMock();
 
         $cartModelMock = $this
@@ -1818,6 +1818,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $apiProductsMock->expects($this->once())
             ->method('updateDisabledProducts')
             ->with($productId, self::MAILCHIMP_STORE_ID);
+        $apiProductsMock->expects($this->once())
+            ->method('isProductEnabled')
+            ->with($productId)
+            ->willReturn($isProductEnabled);
 
         $cartModelMock->expects($this->once())
             ->method('getCustomerFirstname')

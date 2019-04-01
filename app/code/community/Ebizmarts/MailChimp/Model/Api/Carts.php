@@ -309,6 +309,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
     {
         $helper = $this->getHelper();
+        $apiProduct = $this->getApiProducts();
         $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
@@ -355,7 +356,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             //id can not be 0 so we add 1 to $itemCount before setting the id.
             $productSyncError = $productSyncData->getMailchimpSyncError();
-            if ($productSyncError == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
+            $isProductEnabled = $apiProduct->isProductEnabled($productId);
+
+            if (!$isProductEnabled || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
                 $line['id'] = (string)$itemCount;
                 $line['product_id'] = $productId;
@@ -364,9 +367,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $line['price'] = $item->getRowTotal();
                 $lines[] = $line;
 
-                if ($productSyncError) {
+                if (!$isProductEnabled) {
                     // update disabled products to remove the product from mailchimp after sending the order
-                    $this->getApiProducts()->updateDisabledProducts($productId, $mailchimpStoreId);
+                    $apiProduct->updateDisabledProducts($productId, $mailchimpStoreId);
                 }
             }
         }
