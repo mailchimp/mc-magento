@@ -1734,7 +1734,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getEcommerceSyncDataItem'))
             ->getMock();
 
-        $productSyncDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Synchbatches::class)
+        $productSyncDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->setMethods(array('getMailchimpSyncError'))
             ->getMock();
 
