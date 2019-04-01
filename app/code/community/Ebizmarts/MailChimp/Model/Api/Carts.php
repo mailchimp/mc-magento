@@ -366,7 +366,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
                 if ($productSyncError) {
                     // update disabled products to remove the product from mailchimp after sending the order
-                    Mage::getModel('mailchimp/api_products')->updateDisabledProducts($productId, $mailchimpStoreId);
+                    $this->getApiProducts()->updateDisabledProducts($productId, $mailchimpStoreId);
                 }
             }
         }
@@ -513,7 +513,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts)
     {
         $helper = $this->getHelper();
-        $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($cart, $mailchimpStoreId, $magentoStoreId);
+        $productData = $this->getApiProducts()->sendModifiedProduct($cart, $mailchimpStoreId, $magentoStoreId);
         $productDataArray = $helper->addEntriesToArray($allCarts, $productData, $this->getCounter());
         $allCarts = $productDataArray[0];
         $this->setCounter($productDataArray[1]);
@@ -679,6 +679,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function isTypeProduct()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getApiProducts()
+    {
+        return Mage::getModel('mailchimp/api_products');
     }
 }
 
