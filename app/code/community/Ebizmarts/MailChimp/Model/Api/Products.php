@@ -418,7 +418,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param bool $saveOnlyIfexists
      * @param bool $allowBatchRemoval
      */
-    public function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
+    protected function _updateSyncData($productId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncDeleted = null, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
     {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $productId,
