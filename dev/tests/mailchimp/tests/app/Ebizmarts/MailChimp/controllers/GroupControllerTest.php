@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
             '2a2f23d671' => '36c250eeff'
         );
         $currentDateTime = '2018-07-26 12:43:40';
-        $successMessage = 'Thanks for share your interest with us.';
+        $successMessage = 'Thanks for sharing your interest with us.';
 
         $groupControllerMock = $this->groupController
             ->disableOriginalConstructor()
