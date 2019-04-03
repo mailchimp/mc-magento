@@ -1,8 +1,11 @@
 <?php
 $block = $this;
 $interest = $block->getInterest();
+$helper = $block->getMailChimpHelper();
+$isEnabled = $helper->isInterestGroupEnabled();
 ?>
 <p>
+    <?php if($isEnabled): ?>
     <?php echo $block->getMessageBefore() ?>
 <form class="form" action="<?php echo $block->getFormUrl() ?>" method="get" id="mailchimp-groups">
     <fieldset class="fieldset">
@@ -32,5 +35,6 @@ $interest = $block->getInterest();
     </div>
 </form>
 <?php echo $block->getMessageAfter() ?>
+<?php endif; ?>
 
 </p>
