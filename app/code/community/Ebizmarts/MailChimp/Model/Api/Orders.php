@@ -231,7 +231,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             }
 
             $productSyncError = $productSyncData->getMailchimpSyncError();
-            $isProductEnabled = $apiProduct->isProductEnabled($productId);
+            $isProductEnabled = $apiProduct->isProductEnabled($productId, $magentoStoreId);
 
             if (!$isProductEnabled || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
@@ -820,7 +820,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function getApiProduct()
     {

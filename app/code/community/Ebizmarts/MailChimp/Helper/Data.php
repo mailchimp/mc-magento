@@ -1178,6 +1178,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
             if ($syncDeleted !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
+                if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
+                    $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+                }
             }
             if ($token) {
                 $ecommerceSyncDataItem->setData("mailchimp_token", $token);

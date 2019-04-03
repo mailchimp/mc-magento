@@ -823,9 +823,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
             $dataProduct = $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
-        }
 
-        if (!$isMarkedAsDeleted || $dataProduct->getMailchimpSyncError() != Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+            if (!$isMarkedAsDeleted || $dataProduct->getMailchimpSyncError() != Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+                $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, 0, null, 0, true);
+            } else {
+                $this->saveSyncData($id, $type, $mailchimpStoreId, null, Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO, 0, 1, null, 0, true);
+            }
+        } else {
             $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, 0, null, 0, true);
         }
     }

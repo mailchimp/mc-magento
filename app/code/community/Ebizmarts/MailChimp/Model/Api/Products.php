@@ -357,7 +357,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     public function updateDisabledProducts($productId, $mailchimpStoreId)
     {
-        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 0, 1, null, true, false);
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, '', 0, 1, null, false, false);
     }
 
 
@@ -390,7 +390,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             $syncModified = $productSyncData->getMailchimpSyncModified();
             $syncDelta = $productSyncData->getMailchimpSyncDelta();
-            $isProductEnabled = $this->isProductEnabled($productId);
+            $isProductEnabled = $this->isProductEnabled($productId, $magentoStoreId);
 
             if ($syncModified && $syncDelta > $syncDateFlag && $isProductEnabled) {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
@@ -1018,21 +1018,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $productId
      * @return bool | return true if the product is enabled in Magento.
      */
-    public function isProductEnabled($productId)
+    public function isProductEnabled($productId, $magentoStoreId)
     {
         $isProductEnabled = false;
-        $helper = $this->getMailChimpHelper();
-
-        $stores = $helper->getMageApp()->getStores();
-        foreach ($stores as $storeId) {
-
-            $status = $this->getCatalogProductStatusModel()->getProductStatus($productId, $storeId);
-            if ($status[$productId] == self::PRODUCT_IS_ENABLED) {
-                $isProductEnabled = true;
-            } else {
-                $isProductEnabled = false;
-            }
+        $status = $this->getCatalogProductStatusModel()->getProductStatus($productId, $magentoStoreId);
+        if ($status[$productId] == self::PRODUCT_IS_ENABLED) {
+            $isProductEnabled = true;
         }
+
         return $isProductEnabled;
     }
 

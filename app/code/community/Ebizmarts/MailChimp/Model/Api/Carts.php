@@ -356,7 +356,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             //id can not be 0 so we add 1 to $itemCount before setting the id.
             $productSyncError = $productSyncData->getMailchimpSyncError();
-            $isProductEnabled = $apiProduct->isProductEnabled($productId);
+            $isProductEnabled = $apiProduct->isProductEnabled($productId, $magentoStoreId);
 
             if (!$isProductEnabled || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
