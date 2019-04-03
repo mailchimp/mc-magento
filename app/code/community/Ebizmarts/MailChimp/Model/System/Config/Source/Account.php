@@ -20,7 +20,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      * @var    bool|array
      */
     protected $_accountDetails = null;
+
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     protected $helper;
+
     const USERNAME_KEY = 0;
     const TOTAL_ACCOUNT_SUB_KEY = 1;
     const TOTAL_LIST_SUB_KEY = 2;
@@ -214,7 +219,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
 
     protected function getDateSync($mailchimpStoreId)
     {
-        return $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
+        $date = $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
+        Mage::log($date, null, 'ebizmarts.log', true);
+        return $date;
     }
 
 }

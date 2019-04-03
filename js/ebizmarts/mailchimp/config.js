@@ -66,6 +66,10 @@ function loadList() {
             if (json.length) {
                 for (var i = 0; i < json.length; i++) {
                     if (json[i].value == listSelected || (json.length == 1)) {
+                        if ($('mailchimp_general_list_inherit').checked === true) {
+                            $('mailchimp_general_list_inherit').checked = false;
+                            $("mailchimp_general_list").disabled = false;
+                        }
                         var option = new Option(json[i].label, json[i].value, true, true);
                     } else {
                         var option = new Option(json[i].label, json[i].value);

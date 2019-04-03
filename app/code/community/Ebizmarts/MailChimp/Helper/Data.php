@@ -476,11 +476,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         //Delete old entry if exists particularly in this scope.
-        if ($oldSyncingFlag !== null && $this->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeId, $scope)) {
-            $config = $this->getConfig();
-            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
-            $config->cleanCache();
-        }
+//        if ($oldSyncingFlag !== null && $this->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeId, $scope)) {
+//            $config = $this->getConfig();
+//            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
+//            $config->cleanCache();
+//        }
 
         return ($syncingFlag !== null) ? $syncingFlag : $oldSyncingFlag;
     }
@@ -3265,6 +3265,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function validateDate($date, $format = 'Y-m-d H:i:s')
     {
         $d = DateTime::createFromFormat($format, $date);
+        Mage::log($d, null, 'ebizmarts.log', true);
         return $d && $d->format($format) == $date;
     }
 

@@ -44,7 +44,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
 
                     //Add filter to only show the lists for the selected store when MC store selected.
                     $mcStoreId = (!empty($params)) ? $params['mailchimp_store_id'] : $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
-                    if ($mcStoreId !== null) {
+                    if ($mcStoreId !== '') {
                         $listId = $helper->getListIdByApiKeyAndMCStoreId($apiKey, $mcStoreId);
                         if ($listId !== false) {
                             $this->_lists['lists'][0] = $api->getLists()->getLists($listId);

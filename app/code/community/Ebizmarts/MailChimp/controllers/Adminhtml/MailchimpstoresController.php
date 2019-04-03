@@ -302,7 +302,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
      */
     protected function getMailchimpHelper()
     {
-        if (get_class($this->_helper) != 'Ebizmarts_MailChimp_Helper_Data') {
+        if ($this->_helper === null) {
             $this->_helper = Mage::helper('mailchimp');
         }
 

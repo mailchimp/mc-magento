@@ -248,6 +248,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      *
      * @param $magentoStoreId
      * @param bool $isEcommerceData
+     * @throws Mage_Core_Exception
      */
     public function _getResults($magentoStoreId, $isEcommerceData = true)
     {
@@ -362,11 +363,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
                     if ($helper->validateDate($syncingFlag) && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)) {
-                        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1));
+                        //Set is syncing per scope in 1 until sync finishes.
+                        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1));
                         $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
                     } else {
                         if ($syncingFlag == 1 && $itemAmount == 0) {
-                            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", date('Y-m-d H:i:s')));
+                            //Set is syncing per scope to a date because it is not sending any more items.
+                            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, date('Y-m-d H:i:s')));
                             $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
                         }
                     }
@@ -770,9 +773,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * @param $syncedDateArray
+     * @throws Mage_Core_Exception
      */
     public function handleSyncingValue($syncedDateArray)
     {
+        Mage::log($syncedDateArray, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
         foreach ($syncedDateArray as $mailchimpStoreId => $val) {
             $magentoStoreId = key($val);
