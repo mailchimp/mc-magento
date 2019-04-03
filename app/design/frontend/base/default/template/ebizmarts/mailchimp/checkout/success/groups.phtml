@@ -2,10 +2,12 @@
 $block = $this;
 $interest = $block->getInterest();
 $helper = $block->getMailChimpHelper();
-$isEnabled = $helper->isInterestGroupEnabled();
+$mailchimpStoreIdsArray = $helper->getAllMailChimpStoreIds();
 ?>
 <p>
-    <?php if($isEnabled): ?>
+    <?php foreach($mailchimpStoreIdsArray as $scopeData): ?>
+    <?php $scopeArray = $this->getScopeArrayFromString($scopeData) ?>
+    <?php if($helper->isInterestGroupEnabled($scopeArray['scope_id'], $scopeArray['scope'])): ?>
     <?php echo $block->getMessageBefore() ?>
 <form class="form" action="<?php echo $block->getFormUrl() ?>" method="get" id="mailchimp-groups">
     <fieldset class="fieldset">
@@ -36,5 +38,6 @@ $isEnabled = $helper->isInterestGroupEnabled();
 </form>
 <?php echo $block->getMessageAfter() ?>
 <?php endif; ?>
+<?php endforeach; ?>
 
 </p>
