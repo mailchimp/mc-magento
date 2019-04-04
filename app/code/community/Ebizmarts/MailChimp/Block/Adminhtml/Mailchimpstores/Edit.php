@@ -30,6 +30,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
                 .'\', \''
                 . $this->getDeleteUrl()
                 . '\')',
+            //@Todo if store is configured in any scope add one more warning and pass $isconfigured = true for deletion process to remove configured data
         ));
     }
 

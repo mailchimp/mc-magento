@@ -147,7 +147,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 if ($mailchimpStoreId !== null && $mailchimpStoreId !== $oldMailchimpStoreId) {
                     $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                     $isSyncing = $helper->getMCIsSyncing($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
-                    $helper->deleteConfiguredMCStoreLocalData($scopeArray['scope_id'], $scopeArray['scope']);
+                    $helper->deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                     if ($ecommMinSyncDate === null) {
                         $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", Varien_Date::now()));
                         $helper->saveMailchimpConfig($configValues, 0, 'default');

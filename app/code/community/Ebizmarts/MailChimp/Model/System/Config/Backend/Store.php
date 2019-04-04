@@ -25,7 +25,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
         $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $scopeId, $scope);
 
         if ($this->isValueChanged() && $this->getValue()) {
-            $helper->deleteConfiguredMCStoreLocalData($scopeId, $scope);
+            $helper->deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope);
             if ($ecommMinSyncDate === null) {
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$mailchimpStoreId", Varien_Date::now()));
                 $helper->saveMailchimpConfig($configValues, 0, 'default');
