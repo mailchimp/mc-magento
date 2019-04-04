@@ -9,7 +9,7 @@
                     alert('The merge fields were successfully created.')
                 }
                 else {
-                    alert('There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information.')
+                    alert('<?php echo $this->getMessageForMailchimpErrorLog() ?>')
                 }
             },
             onFailure: function () {
