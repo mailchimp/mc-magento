@@ -707,7 +707,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
-    protected function isErrorLogEnabled()
+    public function isErrorLogEnabled()
     {
         $logEnabled = false;
         $logConfig = $this->getLogsEnabled();
