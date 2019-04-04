@@ -2,8 +2,8 @@
 $block = $this;
 $interest = $block->getInterest();
 $helper = $block->getMailChimpHelper();
-$scopeId = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, $this->_getStoreId());
-$scope = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $this->_getStoreId());
+$scopeId = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_ACTIVE, $this->_getStoreId());
+$scope = $this->getStoreCode($scopeId);
 ?>
 <p>
     <?php if($helper->isInterestGroupEnabled($scopeId, $scope)): ?>
