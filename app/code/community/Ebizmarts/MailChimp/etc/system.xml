@@ -44,7 +44,7 @@
                     <show_in_store>1</show_in_store>
                     <sort_order>1</sort_order>
                     <fields>
-                        <active translate="label">
+                        <active translate="label comment">
                             <label>Enabled</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -74,7 +74,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </oauth_wizard>
-                        <account_details translate="label comment">
+                        <account_details translate="label">
                             <label>Account details</label>
                             <frontend_model>mailchimp/adminhtml_system_config_account</frontend_model>
                             <source_model>Ebizmarts_MailChimp_Model_System_Config_Source_Account</source_model>
@@ -83,7 +83,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </account_details>
-                        <reset_errors translate="label comment">
+                        <reset_errors>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
                             <sort_order>42</sort_order>
@@ -91,7 +91,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </reset_errors>
-                        <resend_subscriber translate="label comment">
+                        <resend_subscriber>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resendSubscribers</frontend_model>
                             <sort_order>44</sort_order>
@@ -111,7 +111,7 @@
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[Synchronize Magento's General Subscription List with this Mailchimp list.]]></comment>
                         </list>
-                        <reset_list translate="label comment">
+                        <reset_list translate="comment">
                             <label></label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetList</frontend_model>
@@ -132,7 +132,7 @@
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[Select MailChimp categories a subscriber can join.]]></comment>
                         </interest_categories>
-                        <interest_in_success translate="label">
+                        <interest_in_success translate="label comment">
                             <label>Interest groups in checkout success</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -142,8 +142,8 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[In case no Interest groups are selected it will work as a normal subscription to the configured list]]></comment>
                         </interest_in_success>
-                        <interest_success_before>
-                            <label translate="label">Add html code before the interest groups are displayed</label>
+                        <interest_success_before translate="label">
+                            <label>Add html code before the interest groups are displayed</label>
                             <frontend_type>textarea</frontend_type>
                             <sort_order>50</sort_order>
                             <show_in_default>1</show_in_default>
@@ -166,7 +166,7 @@
                                 <interest_in_success>1</interest_in_success>
                             </depends>
                         </interest_success_after>
-                        <subscriber_batch_amount translate="label">
+                        <subscriber_batch_amount translate="label comment">
                             <label>Subscriber amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_batchLimit</source_model>
@@ -176,7 +176,7 @@
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[Don't touch this value]]></comment>
                         </subscriber_batch_amount>
-                        <connection_timeout>
+                        <connection_timeout translate="label comment">
                             <label>Connection timeout (in secs)</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_connectionTimeout</source_model>
@@ -217,7 +217,7 @@
                             <comment><![CDATA[Click this button to create the above fields on the selected Mailchimp list.]]></comment>
                         </create_fields>
                         <create_webhook>
-                            <label translate="label comment">Create Webhook</label>
+                            <label translate="comment">Create Webhook</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_createWebhook</frontend_model>
                             <sort_order>58</sort_order>
@@ -226,8 +226,8 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Click this button to create the webhook manually, it will only work if the webhook doesn't already exist.]]></comment>
                         </create_webhook>
-                        <webhook_active>
-                            <label translate="label comment">Enable Two Way Sync</label>
+                        <webhook_active translate="label comment">
+                            <label>Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <backend_model>mailchimp/system_config_backend_twowaysync</backend_model>
@@ -238,7 +238,7 @@
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[If this is set to "No", the synchronization will be from Magento's newsletter to Mailchimp only.]]></comment>
                         </webhook_active>
-                        <magento_mail>
+                        <magento_mail translate="label comment">
                             <label>Use Magento emails</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
@@ -249,7 +249,7 @@
                             <can_be_empty>1</can_be_empty>
                             <comment><![CDATA[If you enable this Magento confirmation email will be sent for subscribers instead of Mailchimp email.]]></comment>
                         </magento_mail>
-                        <webhook_delete translate="label comment">
+                        <webhook_delete translate="label">
                             <label>Webhooks Delete action</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_webhookDelete</source_model>
@@ -257,7 +257,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment></comment>
                         </webhook_delete>
                         <enable_log translate="label comment">
                             <label>Enable Log</label>
@@ -269,7 +268,7 @@
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[File is {{base_dir}}/var/log/MailChimp_Errors.log]]></comment>
                         </enable_log>
-                        <order_grid translate="label comment">
+                        <order_grid translate="label">
                             <label>Display on order grid</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_orderGrid</source_model>
@@ -280,8 +279,8 @@
                         </order_grid>
                     </fields>
                 </general>
-                <ecommerce>
-                    <label translate="label comment">Ecommerce</label>
+                <ecommerce translate="label">
+                    <label>Ecommerce</label>
                     <sort_order>200</sort_order>
                     <frontend_type>text</frontend_type>
                     <show_in_default>1</show_in_default>
@@ -334,7 +333,7 @@
                                 <model>mailchimp/adminhtml_includetaxes_comment</model>
                             </comment>
                         </include_taxes>
-                        <firstdate translate="label">
+                        <firstdate translate="label comment">
                             <label>First date</label>
                             <frontend_type>date</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_date</frontend_model>
@@ -359,7 +358,7 @@
                                 <active>1</active>
                             </depends>
                         </send_promo>
-                        <reset_ecommerce_data translate="label comment">
+                        <reset_ecommerce_data>
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetEcommerceData</frontend_model>
                             <sort_order>220</sort_order>
@@ -370,7 +369,7 @@
                                 <active>1</active>
                             </depends>
                         </reset_ecommerce_data>
-                        <resend_ecommerce_data translate="label comment">
+                        <resend_ecommerce_data translate="comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resendEcommerceData</frontend_model>
                             <sort_order>230</sort_order>
@@ -382,7 +381,7 @@
                                 <active>1</active>
                             </depends>
                         </resend_ecommerce_data>
-                        <customer_batch_amount>
+                        <customer_batch_amount translate="label">
                             <label>Customer amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_batchLimit</source_model>
@@ -390,9 +389,8 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment></comment>
                         </customer_batch_amount>
-                        <product_batch_amount>
+                        <product_batch_amount translate="label">
                             <label>Product amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_batchLimit</source_model>
@@ -400,9 +398,8 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment></comment>
                         </product_batch_amount>
-                        <order_batch_amount>
+                        <order_batch_amount translate="label">
                             <label>Order amount to be sent per run</label>
                             <frontend_type>select</frontend_type>
                             <source_model>mailchimp/system_config_source_batchLimit</source_model>
