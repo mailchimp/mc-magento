@@ -299,7 +299,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <depends>
-                                <field id="general/active">1</field>
+                                <active>1</active>
                             </depends>
                         </customers_optin>
                         <image_size translate="label">
