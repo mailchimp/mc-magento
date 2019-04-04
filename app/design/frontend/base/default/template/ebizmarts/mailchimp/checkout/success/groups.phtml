@@ -2,11 +2,9 @@
 $block = $this;
 $interest = $block->getInterest();
 $helper = $block->getMailChimpHelper();
-$scopeId = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_ACTIVE, $this->_getStoreId());
-$scope = $this->getStoreCode($scopeId);
 ?>
 <p>
-    <?php if($helper->isInterestGroupEnabled($scopeId, $scope)): ?>
+    <?php if($helper->isInterestGroupEnabled($this->_getStoreId())): ?>
     <?php echo $block->getMessageBefore() ?>
 <form class="form" action="<?php echo $block->getFormUrl() ?>" method="get" id="mailchimp-groups">
     <fieldset class="fieldset">
