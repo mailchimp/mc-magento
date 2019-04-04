@@ -3603,7 +3603,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isInterestGroupEnabled($scopeId, $scope)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_IN_SUCCESS_ACTIVE, $scopeId, $scope);
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_ACTIVE, $scopeId, $scope);
     }
 
     /**
