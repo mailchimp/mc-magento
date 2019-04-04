@@ -42,19 +42,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function getCustomersToSync()
     {
-        $websiteId = Mage::getModel('core/store')->load($this->getBatchMagentoStoreId())->getWebsiteId();
-
         $collection = $this->getCustomerResourceCollection();
-        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns($collection->getRowIdFieldName());
-        $collection->addFieldToFilter('website_id', array('eq' => $websiteId));
+        $collection->addAttributeToFilter(
+            array(
+                array('attribute' => 'store_id', 'eq' => $this->getBatchMagentoStoreId()),
+                array('attribute' => 'mailchimp_store_view', 'eq' => $this->getBatchMagentoStoreId()),
+            ), null, 'left'
+        );
         $this->joinMailchimpSyncData($collection);
-        $collection->getSelect()->limit($this->getBatchLimitFromConfig());
 
-        $customerIds = array();
-        foreach ($collection as $customer) {
-            array_push($customerIds, $customer->getId());
-        }
-        return $customerIds;
+        return $collection->getAllIds($this->getBatchLimitFromConfig());
     }
 
     /**
