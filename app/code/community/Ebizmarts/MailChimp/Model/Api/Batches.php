@@ -364,12 +364,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
                     if ($helper->validateDate($syncingFlag) && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)) {
                         //Set is syncing per scope in 1 until sync finishes.
-                        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1));
+                        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1));
                         $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
                     } else {
                         if ($syncingFlag == 1 && $itemAmount == 0) {
                             //Set is syncing per scope to a date because it is not sending any more items.
-                            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, date('Y-m-d H:i:s')));
+                            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", date('Y-m-d H:i:s')));
                             $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
                         }
                     }
@@ -777,7 +777,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function handleSyncingValue($syncedDateArray)
     {
-        Mage::log($syncedDateArray, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
         foreach ($syncedDateArray as $mailchimpStoreId => $val) {
             $magentoStoreId = key($val);
@@ -789,13 +788,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $isSyncingDate = $helper->getDateSyncFinishByMailChimpStoreId($mailchimpStoreId);
                     if (!$isSyncingDate && $mailchimpStoreId) {
                         $this->getApiStores()->editIsSyncing($api, false, $mailchimpStoreId);
-                        $scopeToEdit = $helper->getMailChimpScopeByStoreId($magentoStoreId);
-                        if ($scopeToEdit['scope'] != 'stores') {
-                            $helper->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeToEdit['scope'], $scopeToEdit['scope_id']);
-                        }
+//                        $scopeToEdit = $helper->getMailChimpScopeByStoreId($magentoStoreId);
+//                        $helper->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scopeToEdit['scope'], $scopeToEdit['scope_id']);
                         $config = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", $date));
                         $helper->saveMailchimpConfig($config, 0, 'default');
-                        $helper->createWebhookIfRequired($magentoStoreId);
                     }
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                     $helper->logError($e->getMessage());

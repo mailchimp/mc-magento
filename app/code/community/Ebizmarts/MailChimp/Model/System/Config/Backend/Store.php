@@ -26,15 +26,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
 
         if ($this->isValueChanged() && $this->getValue()) {
             $helper->deleteConfiguredMCStoreLocalData($scopeId, $scope);
-            $configValues = array();
             if ($ecommMinSyncDate === null) {
-                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$mailchimpStoreId", Varien_Date::now());
+                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$mailchimpStoreId", Varien_Date::now()));
+                $helper->saveMailchimpConfig($configValues, 0, 'default');
             }
             if ($isSyncing === null) {
-                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING."_$mailchimpStoreId", true);
-            }
-            if (!empty($configValues)) {
-                $helper->saveMailchimpConfig($configValues, 0, 'default');
+                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", true));
+                $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
             }
         }
     }

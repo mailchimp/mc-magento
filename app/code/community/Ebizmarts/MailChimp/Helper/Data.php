@@ -465,22 +465,22 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getMCIsSyncing($mailchimpStoreId, $scopeId = 0, $scope = 'stores')
     {
         $oldSyncingFlag = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeId, $scope);
-        $syncingFlag = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 0, 'default');
+        $syncingFlag = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scopeId, $scope);
 
         //Save old value in new place.
         if ($syncingFlag === null && $oldSyncingFlag !== null) {
             $configValue = array(
                 array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $oldSyncingFlag)
             );
-            $this->saveMailchimpConfig($configValue, 0, 'default');
+            $this->saveMailchimpConfig($configValue, $scopeId, $scope);
         }
 
         //Delete old entry if exists particularly in this scope.
-//        if ($oldSyncingFlag !== null && $this->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeId, $scope)) {
-//            $config = $this->getConfig();
-//            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
-//            $config->cleanCache();
-//        }
+        if ($oldSyncingFlag !== null && $this->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeId, $scope)) {
+            $config = $this->getConfig();
+            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
+            $config->cleanCache();
+        }
 
         return ($syncingFlag !== null) ? $syncingFlag : $oldSyncingFlag;
     }
@@ -501,7 +501,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $ecommMinsyncDateFlag = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", 0, 'stores');
 
         //Save old value in new place.
-        if ($ecommMinsyncDateFlag === '' && $oldEcommMinsyncDateFlag !== '') {
+        if ($ecommMinsyncDateFlag === null && $oldEcommMinsyncDateFlag !== null) {
             $configValue = array(
                 array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", $oldEcommMinsyncDateFlag)
             );
@@ -3265,7 +3265,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function validateDate($date, $format = 'Y-m-d H:i:s')
     {
         $d = DateTime::createFromFormat($format, $date);
-        Mage::log($d, null, 'ebizmarts.log', true);
         return $d && $d->format($format) == $date;
     }
 

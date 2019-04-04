@@ -177,6 +177,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     {
         $helper = $this->makeHelper();
         $config = $helper->getConfig();
+        //@Todo Delete for the actual scope that it was created.
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 'default', 0);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", 'default', 0);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", 'default', 0);

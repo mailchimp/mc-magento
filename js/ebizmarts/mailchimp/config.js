@@ -51,9 +51,12 @@ function loadInfo() {
 function loadList() {
     var storeId = $('mailchimp_general_storeid').value;
     var apiKey = $('mailchimp_general_apikey').value;
-    $("mailchimp_general_list").select('option').each(function (i) {
+    var listId = $("mailchimp_general_list");
+    listId.select('option').each(function (i) {
         if (i.selected && firstTime) {
-            listSelected = i.value;
+            if (i.value !== '') {
+                listSelected = i.value;
+            }
             firstTime = false;
         }
         i.remove();
@@ -65,16 +68,17 @@ function loadList() {
             var json = transport.responseText.evalJSON(true);
             if (json.length) {
                 for (var i = 0; i < json.length; i++) {
-                    if (json[i].value == listSelected || (json.length == 1)) {
-                        if ($('mailchimp_general_list_inherit').checked === true) {
-                            $('mailchimp_general_list_inherit').checked = false;
+                    if (json[i].value === listSelected || (json.length === 1)) {
+                        var inheritField = $('mailchimp_general_list_inherit');
+                        if (inheritField && inheritField.checked === true) {
+                            inheritField.checked = false;
                             $("mailchimp_general_list").disabled = false;
                         }
                         var option = new Option(json[i].label, json[i].value, true, true);
                     } else {
                         var option = new Option(json[i].label, json[i].value);
                     }
-                    $("mailchimp_general_list").options.add(option);
+                    listId.options.add(option);
                 }
             }
             loadInfo();

@@ -220,7 +220,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     protected function getDateSync($mailchimpStoreId)
     {
         $date = $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
-        Mage::log($date, null, 'ebizmarts.log', true);
         return $date;
     }
 

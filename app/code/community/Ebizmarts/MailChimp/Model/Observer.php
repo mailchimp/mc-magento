@@ -118,7 +118,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $configDataChanged = false;
             $helper = $this->makeHelper();
             $scopeArray = $helper->getCurrentScope();
-            $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : '';
+            $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : null;
             $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
             $apiKey = (isset($configData['groups']['general']['fields']['apikey']['value'])) ? $configData['groups']['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
 
@@ -144,19 +144,17 @@ class Ebizmarts_MailChimp_Model_Observer
                     $observer->getObject()->setData($configData);
                 }
             } else {
-                if ($mailchimpStoreId !== null && $mailchimpStoreId != '' && $mailchimpStoreId != $oldMailchimpStoreId) {
+                if ($mailchimpStoreId !== null && $mailchimpStoreId !== $oldMailchimpStoreId) {
                     $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                     $isSyncing = $helper->getMCIsSyncing($mailchimpStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
                     $helper->deleteConfiguredMCStoreLocalData($scopeArray['scope_id'], $scopeArray['scope']);
-                    $configValues = array();
                     if ($ecommMinSyncDate === null) {
-                        $configValues[] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", Varien_Date::now());
+                        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", Varien_Date::now()));
+                        $helper->saveMailchimpConfig($configValues, 0, 'default');
                     }
                     if ($isSyncing === null) {
-                        $configValues[] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", true);
-                    }
-                    if (!empty($configValues)) {
-                        $helper->saveMailchimpConfig($configValues, 0, 'default');
+                        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", true));
+                        $helper->saveMailchimpConfig($configValues, $scopeArray['scope_id'], $scopeArray['scope']);
                     }
                 }
             }
