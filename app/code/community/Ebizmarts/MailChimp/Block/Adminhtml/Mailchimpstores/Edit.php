@@ -18,8 +18,19 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         $this->_blockGroup = 'mailchimp';
 
         parent::__construct();
-//        $this->_updateButton('save', 'label', Mage::helper('mailchimp')->__('Save Store'));
-//        $this->_updateButton('delete', 'label', Mage::helper('mailchimp')->__('Delete Store'));
+
+        $this->removeButton('reset');
+        $this->updateButton('delete', null, array(
+            'label'     => Mage::helper('adminhtml')->__('Delete Store'),
+            'class'     => 'delete',
+            'onclick'   => 'deleteConfirm(\''
+                . Mage::helper('core')->jsQuoteEscape(
+                    Mage::helper('adminhtml')->__('Are you sure you want to delete this Mailchimp store?')
+                )
+                .'\', \''
+                . $this->getDeleteUrl()
+                . '\')',
+        ));
     }
 
     public function getStoreId()
