@@ -599,7 +599,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $product
      * @param $magentoStoreId
      * @param bool $isBuildUpdateProductRequest
-     * @return array | will return an array with the childs of the product passed by parameter
+     * @return array | return an array with the childs of the product passed by parameter
      */
     public function makeProductChildrenCollection($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
     {
