@@ -598,7 +598,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $where = $connection->quoteInto("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId);
             }
         } else {
-            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+            $where = $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
         }
         try {
             $connection->delete($tableName, $where);
