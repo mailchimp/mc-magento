@@ -3598,6 +3598,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param $scopeId
+     * @param $scope
+     *
+     * @return bool \ return true if is enabled show interest gruops in the checkout success.
+     * @throws Mage_Core_Exception
+     */
+    public function isInterestGroupEnabled($scopeId = 0, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_ACTIVE, $scopeId, $scope);
+    }
+
+    /**
      * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
      */
     protected function getModelMailchimpEcommerceSyncData()
