@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
                     array(
                         'id' => 'resendecommercedata_button',
                         'label' => $label,
-                        'onclick' => 'javascript:resendecommerce(); return false;',
+                        'onclick' => 'javascript:openResend(); return false;',
                         'title' => $helper->__('Resend Ecommerce Data current scope')
                     )
                 );
