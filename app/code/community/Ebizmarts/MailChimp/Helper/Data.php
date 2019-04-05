@@ -551,7 +551,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $scopeId
      * @param $scope
      */
-    public function resetMCEcommerceData($scopeId, $scope, $deleteDataInMailchimp = false)
+    public function resetMCEcommerceData($scopeId, $scope, $deleteDataInMailchimp = false, $filters = array())
     {
         $listId = $this->getGeneralList($scopeId, $scope);
         //delete store id and data from mailchimp
