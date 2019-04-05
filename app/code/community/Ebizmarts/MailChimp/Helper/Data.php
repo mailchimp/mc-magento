@@ -140,36 +140,28 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get MC store name for given scope.
-     *
      * @param $scopeId
      * @param $scope
      * @param bool $forceParentName
      * @return mixed|null|string
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
-    public function getMCStoreName($scopeId, $scope, $forceParentName = false)
+    public function getScopeName($scope)
     {
+        $scopeArray = explode('_', $scope);
         $storeName = null;
-        switch ($scope) {
+        switch ($scopeArray[0]) {
             case 'stores':
-                $storeName = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope);
-                if ($storeName == '' || $forceParentName) {
-                    $store = $this->getMageApp()->getStore($scopeId);
-                    $storeName = $store->getGroup()->getName() . ' - ' . $store->getName();
-                }
+                    $store = $this->getMageApp()->getStore($scopeArray[1]);
+                    $storeName = $store->getName();
                 break;
             case 'websites':
-                $storeName = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope);
-                if ($storeName == '' || $forceParentName) {
-                    $website = $this->getMageApp()->getWebsite($scopeId);
+                    $website = $this->getMageApp()->getWebsite($scopeArray[1]);
                     $storeName = $website->getName();
-                }
                 break;
             case 'default':
-                $storeName = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope);
-                if ($storeName == '' || $forceParentName) {
-                    $storeName = $this->getConfigValueForScope('web/unsecure/base_url', 0);
-                }
+                    $storeName = 'Default Config';
                 break;
         }
         return $storeName;
@@ -364,12 +356,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function deleteAllMCStoreData($mailchimpStoreId)
     {
+        //Delete default configurations for this store.
         $config = $this->getConfig();
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", 'default', 0);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", 'default', 0);
-        //@Todo Delete configured data if store is configured in any scope.
-        //@Todo ecommerce data and errors for this store.
+
+        //Delete local ecommerce data and errors for this store.
+        $this->removeEcommerceSyncDataByMCStore($mailchimpStoreId);
+        $this->clearErrorGridByMCStore($mailchimpStoreId);
+
+        //Delete particular scopes configuraion flags for this store
+        $scopeArratIfExist = $this->getScopeArrayIfExists($mailchimpStoreId);
+        if ($scopeArratIfExist !== false) {
+            $this->deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeArratIfExist['scope_id'], $scopeArratIfExist['scope']);
+        }
     }
 
     /**
@@ -645,15 +646,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+        $this->removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly);
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @param bool $deleteErrorsOnly
+     * @throws Mage_Core_Exception
+     */
+    protected function removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly = false)
+    {
         $resource = $this->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
         if ($deleteErrorsOnly) {
-            if ($scopeId === 0) {
-                $where = "mailchimp_sync_error != ''";
-            } else {
-                $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
-            }
+            $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
         } else {
             $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
         }
@@ -831,17 +838,37 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->handleOldErrors();
 
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+        if ($excludeSubscribers) {
+            $this->clearErrorGridByMCStore($mailchimpStoreId);
+        } else {
+            $this->clearErrorGridByStoreId($scopeId);
+        }
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     */
+    public function clearErrorGridByMCStore($mailchimpStoreId)
+    {
         $resource = $this->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/mailchimperrors');
-        if ($excludeSubscribers) {
-            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+        $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+        $connection->delete($tableName, $where);
+    }
+
+    /**
+     * @param $scopeId
+     */
+    public function clearErrorGridByStoreId($scopeId)
+    {
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/mailchimperrors');
+        if ($scopeId !== 0) {
+            $where = array("store_id = ?" => $scopeId);
         } else {
-            if ($scopeId !== 0) {
-                $where = array("store_id = ?" => $scopeId);
-            } else {
-                $where = '';
-            }
+            $where = '';
         }
         $connection->delete($tableName, $where);
     }
@@ -3980,5 +4007,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $this->logError($e->getMessage());
         }
         return $listId;
+    }
+
+    /**
+     * @param $mailchimpStoreId
+     * @return false|array
+     */
+    public function getScopeArrayIfExists($mailchimpStoreId)
+    {
+        $configuredMCStoreIds = $this->getAllMailChimpStoreIds();
+        $scopeIfExist = array_search($mailchimpStoreId, $configuredMCStoreIds);
+        $scopeArray = ($scopeIfExist !== false) ? array('scope_id' => $scopeIfExist[1], 'scope' => $scopeIfExist[0]) : false;
+        return $scopeArray;
     }
 }

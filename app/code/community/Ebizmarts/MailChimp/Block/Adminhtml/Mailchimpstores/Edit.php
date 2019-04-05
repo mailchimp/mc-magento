@@ -23,15 +23,27 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         $this->updateButton('delete', null, array(
             'label'     => Mage::helper('adminhtml')->__('Delete Store'),
             'class'     => 'delete',
-            'onclick'   => 'deleteConfirm(\''
+            'onclick'   => 'deleteMCStoreConfirm(\''
                 . Mage::helper('core')->jsQuoteEscape(
                     Mage::helper('adminhtml')->__('Are you sure you want to delete this Mailchimp store?')
                 )
                 .'\', \''
                 . $this->getDeleteUrl()
                 . '\')',
-            //@Todo if store is configured in any scope add one more warning and pass $isconfigured = true for deletion process to remove configured data
+            'sort_order' => 0
         ));
+
+        $scopeArray = $this->getScopeArrayIfExists();
+        $mcInUseMessage = $this->getMCInUseMessage($scopeArray);
+        $this->_formScripts[] = "function deleteMCStoreConfirm(message, url) {
+            if ($scopeArray !== false) {
+                if (confirm(message)) {
+                    deleteConfirm('$mcInUseMessage', url);
+                }
+            } else {
+                deleteConfirm(message, url);
+            }
+        }";
     }
 
     public function getStoreId()
@@ -54,6 +66,36 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         $headBlock = Mage::app()->getLayout()->getBlock('head');
         $headBlock->addJs('ebizmarts/mailchimp/editstores.js');
         return parent::_prepareLayout();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getMCInUseMessage($scope)
+    {
+        $helper = $this->makeHelper();
+        $scopeName = $helper->getScopeName($scope);
+        $message = "This store is currently in use for this Magento store at $scopeName scope. Do you want to proceed anyways?";
+        return $helper->__($message);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getScopeArrayIfExists()
+    {
+        $helper = $this->makeHelper();
+        $currentMCStoreId = Mage::registry('current_mailchimpstore')->getStoreid();
+        $keyIfExist = $helper->getScopeArrayIfExists($currentMCStoreId);
+        return $keyIfExist;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }
 
