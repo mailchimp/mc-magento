@@ -739,26 +739,20 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         $magentoStoreId = 1;
         $isBuildUpdateProductRequest = false;
-        $childrenIds = array(1, 2, 3);
         $stringEntity = "entity_id";
-        $type = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
+        $isParentProduct = true;
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('getProductResourceCollection', 'joinQtyAndBackorders', 'getConfigurableChildrenIds', 'getMailChimpHelper'))
+            ->setMethods(array('getConfigurableChildrenIds', 'makeProductsNotSentCollection'))
             ->getMock();
 
         $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
             ->disableOriginalConstructor()
-            ->setMethods(array("getId"))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array("addResendFilter"))
+            ->setMethods(array('getId'))
             ->getMock();
 
         $collectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
-            ->setMethods(array('addStoreFilter', 'addAttributeToFilter'))
+            ->setMethods(array('addAttributeToFilter'))
             ->getMock();
 
         $childrenProductCollection = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
@@ -766,35 +760,20 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $productsApiMock->expects($this->once())
-            ->method('getProductResourceCollection')
-            ->willReturn($collectionMock);
-        $productsApiMock->expects($this->once())
-            ->method('joinQtyAndBackorders')
-            ->with($collectionMock)
-            ->willReturnSelf();
-        $productsApiMock->expects($this->once())
             ->method('getConfigurableChildrenIds')
             ->with($productMock)
             ->willReturn($childrenProductCollection);
         $productsApiMock->expects($this->once())
-            ->method('getMailChimpHelper')
-            ->willReturn($helperMock);
+            ->method('makeProductsNotSentCollection')
+            ->with($magentoStoreId, $isParentProduct)
+            ->willReturn($collectionMock);
 
-        $collectionMock->expects($this->once())
-            ->method('addStoreFilter')
-            ->with($magentoStoreId)
-            ->willReturnSelf();
         $arrayEntity = array("in" => $childrenProductCollection);
         $collectionMock->expects($this->once())
             ->method('addAttributeToFilter')
             ->with($stringEntity, $arrayEntity)
             ->willReturnSelf();
 
-
-        $helperMock->expects($this->once())
-            ->method('addResendFilter')
-            ->with($collectionMock, $magentoStoreId, $type)
-            ->willReturnSelf();
 
         $variantProducts[] = $productMock;
 

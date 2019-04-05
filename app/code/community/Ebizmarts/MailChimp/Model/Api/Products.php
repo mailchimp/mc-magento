@@ -406,19 +406,23 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
-    public function makeProductsNotSentCollection($magentoStoreId)
+    public function makeProductsNotSentCollection($magentoStoreId, $isParentProduct = false)
     {
         /**
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
-        $collection->addFinalPrice();
+        if (!$isParentProduct) {
+            $collection->addFinalPrice();
+        }
         $collection->addStoreFilter($magentoStoreId);
         $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
         $this->joinQtyAndBackorders($collection);
 
-        $collection->getSelect()->limit($this->getBatchLimitFromConfig());
+        if (!$isParentProduct) {
+            $collection->getSelect()->limit($this->getBatchLimitFromConfig());
+        }
 
         return $collection;
     }
@@ -603,12 +607,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         /**
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
-        $collection = $this->getProductResourceCollection();
-        $collection->addStoreFilter($magentoStoreId);
-        $helper = $this->getMailChimpHelper();
-        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
-
-        $this->joinQtyAndBackorders($collection);
+        $collection = $this->makeProductsNotSentCollection($magentoStoreId, true);
 
         $childProducts = $this->getConfigurableChildrenIds($product);
         $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
