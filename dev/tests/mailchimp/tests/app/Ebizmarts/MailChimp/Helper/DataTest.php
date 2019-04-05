@@ -87,38 +87,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($helperMock->isCheckoutSubscribeEnabled($scopeId, $scope));
     }
 
-    public function testDeleteStore()
-    {
-        $scopeId = 1;
-        $scope = 'stores';
-        $mailchimpStoreId = 'a18a1a8a1aa7aja1a';
-        $apiKey = '123456789aa123456789bb123456789c-us13';
-        $listId = 'listId';
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getApiStores', 'getGeneralList', 'deleteCurrentWebhook',
-                'deleteLocalMCStoreData', 'getApiKey'))
-            ->getMock();
-
-        $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('deleteMailChimpStore'))
-            ->getMock();
-
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getApiKey')->with($scopeId, $scope)->willReturn($apiKey);
-        $helperMock->expects($this->once())->method('getApiStores')->willReturn($apiStoresMock);
-
-        $apiStoresMock->expects($this->once())->method('deleteMailChimpStore')->with($mailchimpStoreId, $scopeId, $scope);
-
-        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
-        $helperMock->expects($this->once())->method('deleteCurrentWebhook')->with($scopeId, $scope, $listId);
-        $helperMock->expects($this->once())->method('deleteLocalMCStoreData')->with($mailchimpStoreId, $scopeId, $scope);
-
-        $helperMock->deleteStore($scopeId, $scope);
-    }
-
     public function testAddResendFilter()
     {
         $storeId = 1;
@@ -163,42 +131,42 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->handleResendFinish($scopeId, $scope);
     }
 
-    public function testDeleteLocalMCStoreData()
-    {
-        $scope = 'default';
-        $scopeId = 0;
-        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getConfig'))
-            ->getMock();
-
-        $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('deleteConfig', 'cleanCache'))
-            ->getMock();
-
-        $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
-
-        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
-        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
-        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG, $scope, $scopeId);
-        $param4 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scope, $scopeId);
-        $param5 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
-        $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
-        $param7 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
-        $param8 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
-        $param9 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
-        $param10 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
-        $param11 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
-        $param12 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0);
-
-        $configMock->expects($this->exactly(12))->method('deleteConfig')->withConsecutive($param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9, $param10, $param11, $param12);
-        $configMock->expects($this->once())->method('cleanCache');
-
-        $helperMock->deleteLocalMCStoreData($mailchimpStoreId, $scopeId, $scope);
-    }
+//    public function testDeleteLocalMCStoreData()
+//    {
+//        $scope = 'default';
+//        $scopeId = 0;
+//        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
+//
+//        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getConfig'))
+//            ->getMock();
+//
+//        $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('deleteConfig', 'cleanCache'))
+//            ->getMock();
+//
+//        $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
+//
+//        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+//        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
+//        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG, $scope, $scopeId);
+//        $param4 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $scope, $scopeId);
+//        $param5 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
+//        $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
+//        $param7 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
+//        $param8 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
+//        $param9 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
+//        $param10 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
+//        $param11 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
+//        $param12 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0);
+//
+//        $configMock->expects($this->exactly(12))->method('deleteConfig')->withConsecutive($param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9, $param10, $param11, $param12);
+//        $configMock->expects($this->once())->method('cleanCache');
+//
+//        $helperMock->deleteLocalMCStoreData($mailchimpStoreId, $scopeId, $scope);
+//    }
 
     public function testGetDateSyncFinishByStoreId()
     {
@@ -798,43 +766,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($subscriberTableName, $setCondition, $where);
 
         $helperMock->resendSubscribers($scopeId, $scope);
-    }
-
-    public function testResetCampaign()
-    {
-        $scopeId = 1;
-        $scope = 'stores';
-        $connectionType = 'core_write';
-        $orderTableAlias = 'sales/order';
-        $orderTableName = 'sales_flat_order';
-        $whereString = "mailchimp_campaign_id IS NOT NULL AND (store_id = 1)";
-        $where = array($whereString);
-        $setCondition = array('mailchimp_campaign_id' => NULL);
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getCoreResource', 'makeWhereString'))
-            ->getMock();
-
-        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getConnection', 'getTableName'))
-            ->getMock();
-
-        $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
-
-
-        $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
-
-        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
-
-        $helperMock->expects($this->once())->method('makeWhereString')->with($dbAdapterInterfaceMock, $scopeId, $scope)->willReturn($whereString);
-
-        $coreResourceMock->expects($this->once())->method('getTableName')->with($orderTableAlias)->willReturn($orderTableName);
-
-        $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($orderTableName, $setCondition, $where);
-
-        $helperMock->resetCampaign($scopeId, $scope);
     }
 
     public function testSaveLastItemsSent()

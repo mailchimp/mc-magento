@@ -160,43 +160,4 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $apiStoresMock->deleteMailChimpStore($mailChimpStoreId, $scopeId, $scope);
     }
-
-    public function testRetrieveAndSaveMCJsUrlInConfig()
-    {
-        $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $scopeId = 1;
-        $scope = 'stores';
-        $MCJsUrl = 'http://mailchimpUrl.com/mc.js';
-        $response = array('connected_site' => array('site_script' => array('url' => $MCJsUrl)));
-        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $MCJsUrl));
-        $realScope = array('scope_id' => $scopeId, 'scope' => $scope);
-
-        $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getStoreConnectedSiteData'))
-            ->getMock();
-
-        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getApi', 'getMCStoreId', 'saveMailchimpConfig', 'getRealScopeForConfig'))
-            ->getMock();
-
-        $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-
-        $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailChimpStoreId);
-
-        $apiStoresMock->expects($this->once())->method('getStoreConnectedSiteData')->with($apiMock, $mailChimpStoreId)->willReturn($response);
-
-        $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)->willReturn($realScope);
-        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, $realScope['scope_id'], $realScope['scope']);
-
-        $return = $apiStoresMock->retrieveAndSaveMCJsUrlInConfig($scopeId, $scope);
-
-        $this->assertEquals(true, $return);
-    }
 }
