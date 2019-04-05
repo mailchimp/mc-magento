@@ -616,7 +616,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $collectiontMock = $this
             ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
-            ->disableOriginalConstructor('addStoreFilter', 'addAttributeToFilter', 'getIterator', 'addAttributeToSelect')
+            ->disableOriginalConstructor()
+            ->setMethods(array('addStoreFilter', 'addAttributeToFilter', 'getIterator', 'addAttributeToSelect'))
             ->getMock();
 
         $itemMock = $this
@@ -752,7 +753,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $collectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
-            ->setMethods(array('addAttributeToFilter'))
+            ->disableOriginalConstructor()
             ->getMock();
 
         $childrenProductCollection = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
@@ -774,6 +775,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->with($stringEntity, $arrayEntity)
             ->willReturnSelf();
 
+        $collectionMock->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new ArrayIterator($childrenProductCollection));
 
         $variantProducts[] = $productMock;
 
