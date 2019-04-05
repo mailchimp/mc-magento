@@ -613,7 +613,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly);
     }
 
-    public function testRemoveEcommerceSyncDataErrorsOnlyAllForStoreView()
+    public function testRemoveEcommerceSyncDataErrorsOnlyForStoreView()
     {
         $scopeId = 1;
         $scope = 'stores';
