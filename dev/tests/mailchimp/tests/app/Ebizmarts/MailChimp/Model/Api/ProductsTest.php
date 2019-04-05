@@ -275,10 +275,11 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $ecomSyncDateFlag = '2018-03-14 15:03:36';
         $itemOneSyncDelta = '2018-03-14 15:03:37';
         $itemTwoSyncDelta = '2018-03-14 15:03:35';
+        $isProductEnabled = false;
 
         $productsApiMock = $this->productsApiMock
             ->setMethods(array('makeBatchId', '_updateSyncData', 'loadProductById', 'getMailChimpHelper',
-                'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest'))
+                'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest', 'isProductEnabled'))
             ->getMock();
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
@@ -345,6 +346,16 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         );
 
         $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
+
+        $productsApiMock->expects($this->exactly(2))
+            ->method('isProductEnabled')
+            ->withConsecutive(
+                array($oldProductId),
+                array($newProductId)
+            )->willReturnOnConsecutiveCalls(
+                true,
+                true
+            );
 
         $helperMock->expects($this->once())->method('getEcommMinSyncDateFlag')->with($magentoStoreId)->willReturn($ecomSyncDateFlag);
         $helperMock->expects($this->exactly(3))->method('getEcommerceSyncDataItem')->withConsecutive(

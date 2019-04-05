@@ -1,14 +1,26 @@
 ;General Config settings
+"Mailchimp Configuration","Mailchimp Configuration"
+"Mailchimp integration by ebizmarts","Mailchimp integration by ebizmarts"
 "Enabled","Enabled"
+"By enabling this extension, you agree to <a href="https://mailchimp.com/legal/additional-terms/" target="_blank">Mailchimp's additional terms</a>.","By enabling this extension, you agree to <a href="https://mailchimp.com/legal/additional-terms/" target="_blank">Mailchimp's additional terms</a>."
 "API Key","API Key"
 "Account Details","Account Details"
 "General Subscription","General Subscription"
 "Subscriber amount to be sent per run","Subscriber amount to be sent per run"
+"Don't touch this value","Don't touch this value"
 "Subscribe On Checkout","Subscribe On Checkout"
 "Customer Fields Mapping","Customer Fields Mapping"
 "Create Merge Fields on Mailchimp","Create Merge Fields on Mailchimp"
+"Interest Categories","Interest Categories"
+"Select MailChimp categories a subscriber can join.","Select MailChimp categories a subscriber can join."
+"Interest groups in checkout success","Interest groups in checkout success"
+"In case no Interest groups are selected it will work as a normal subscription to the configured list","In case no Interest groups are selected it will work as a normal subscription to the configured list"
+"Add html code before the interest groups are displayed","Add html code before the interest groups are displayed"
+"Add html code after the interest groups are displayed","Add html code after the interest groups are displayed"
 "Enable Two Way Sync","Enable Two Way Sync"
+"If this is set to "No", the synchronization will be from Magento's newsletter to Mailchimp only.","If this is set to "No", the synchronization will be from Magento's newsletter to Mailchimp only."
 "Webhooks Delete action","Webhooks Delete action"
+"Connection timeout (in secs)","Connection timeout (in secs)"
 "Enable Log","Enable Log"
 "Display on order grid","Display on order grid"
 "Unsubscribe customers","Unsubscribe customers"
@@ -36,8 +48,13 @@
 "This is required in order to tell the extensions what customer attributes should be sent to your selected Mailchimp list. <a target=""_blank"" href=""http://wiki.ebizmarts.com/m4m-merge-fields"">See recommended configuration here.</a>","This is required in order to tell the extensions what customer attributes should be sent to your selected Mailchimp list. <a target=""_blank"" href=""http://wiki.ebizmarts.com/m4m-merge-fields"">See recommended configuration here.</a>"
 "If this is set to ""No"", the synchronization will be from Magento's newsletter to Mailchimp only.","If this is set to ""No"", the synchronization will be from Magento's newsletter to Mailchimp only."
 "File is {{base_dir}}/var/log/Mailchimp_Errors.log","File is {{base_dir}}/var/log/Mailchimp_Errors.log"
+"Thanks for sharing your interest with us.","Thanks for sharing your interest with us."
+"Click this button to create the webhook manually, it will only work if the webhook doesn't already exist.","Click this button to create the webhook manually, it will only work if the webhook doesn't already exist."
+"Use Magento emails","Use Magento emails"
+"If you enable this Magento confirmation email will be sent for subscribers instead of Mailchimp email.","If you enable this Magento confirmation email will be sent for subscribers instead of Mailchimp email."
 
 ;Ecommerce settings
+"Ecommerce","Ecommerce"
 "Subscribe all customers to the newsletter","Subscribe all customers to the newsletter"
 "Select product image size to send","Select product image size to send"
 "First date","First date"
@@ -48,6 +65,11 @@
 "This will not affect the behaviour of Automations.","This will not affect the behaviour of Automations."
 "Reset Mailchimp Store","Reset Mailchimp Store"
 "Resend Ecommerce Data","Resend Ecommerce Data"
+"Include tax in product price","Include tax in product price"
+"Send product price including tax if ","Send product price including tax if "
+"display prices","display prices"
+" are configured in the same way."," are configured in the same way."
+"Send Promo Rules and Promo Codes","Send Promo Rules and Promo Codes"
 
 ;Catch email settings
 "Catch Email on Popup","Catch Email on Popup"
@@ -71,12 +93,15 @@
 "If customer doesn't confirm popup, it will be shown this many times each time the customer reload the page.","If customer doesn't confirm popup, it will be shown this many times each time the customer reload the page."
 
 ;Abandoned Cart settings
+"Abandoned Cart","Abandoned Cart"
 "Redirect page","Redirect page"
 "Cart amount to be sent per run","Cart amount to be sent per run"
 "Carts previous than this value, will be ignored","Carts previous than this value, will be ignored"
 "Where to redirect the customer","Where to redirect the customer"
 
 ;Mandrill settings
+"Mandrill Configuration","Mandrill Configuration"
+"Mandrill integration by ebizmarts","Mandrill integration by ebizmarts"
 "Account Info","Account Info"
 "File is {{base_dir}}/var/log/Ebizmarts_Mandrill.log","File is {{base_dir}}/var/log/Ebizmarts_Mandrill.log"
 
@@ -147,3 +172,7 @@
 "A Mailchimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ","A Mailchimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions "
 "and","and"
 "Webhook Key invalid! Key Request: %s - My Key: %s","Webhook Key invalid! Key Request: %s - My Key: %s"
+"There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information.","There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information."
+"There was an error on the merge fields creation. Please enable the error logs and try again for more information.","There was an error on the merge fields creation. Please enable the error logs and try again for more information."
+"The merge fields were successfully created.","The merge fields were successfully created."
+"Something went wrong.","Something went wrong."

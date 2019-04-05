@@ -345,15 +345,15 @@
                     </mailchimp_alter_newsletter_grid>
                 </observers>
             </adminhtml_block_html_before>
-            <catalog_product_save_before>
+            <catalog_product_save_after>
                 <observers>
-                    <mailchimp_save_before_product>
+                    <mailchimp_save_after_product>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>productSaveBefore</method>
-                    </mailchimp_save_before_product>
+                        <method>productSaveAfter</method>
+                    </mailchimp_save_after_product>
                 </observers>
-            </catalog_product_save_before>
+            </catalog_product_save_after>
             <controller_action_postdispatch_adminhtml_promo_quote_couponsMassDelete>
                 <observers>
                     <mailchimp_controller_couponsMassDelete>
