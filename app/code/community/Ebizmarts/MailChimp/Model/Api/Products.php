@@ -108,32 +108,16 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     protected function _buildDeleteProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
-        $variantProducts = array();
-        if ($this->isSimpleProduct($product)) {
-            $variantProducts[] = $product;
-        } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts[] = $product;
-
-            $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-            $childProducts = $this->getConfigurableChildrenIds($product);
-            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-            foreach ($collection as $childProduct) {
-                $variantProducts[] = $childProduct;
-            }
-
-        } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
-            $variantProducts[] = $product;
-        } else {
+        if ($this->isBundleProduct($product))
+        {
             //@TODO bundle
             return array();
+        } else {
+            $data = array();
+            $data['method'] = "DELETE";
+            $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $product->getId();
+            $data['operation_id'] = $batchId . '_' . $product->getId();
         }
-
-        $data = array();
-        $data['method'] = "DELETE";
-        $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $product->getId();
-        $data['operation_id'] = $batchId . '_' . $product->getId();
 
         return $data;
     }
@@ -144,17 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($this->isSimpleProduct($product)) {
             $variantProducts[] = $product;
         } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts[] = $product;
-
-            $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-            $childProducts = $this->getConfigurableChildrenIds($product);
-            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-            foreach ($collection as $childProduct) {
-                $variantProducts[] = $childProduct;
-            }
-
+            $variantProducts = $this->makeProductChildrenCollection($product, $magentoStoreId);
         } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
             $variantProducts[] = $product;
         } else {
@@ -190,18 +164,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $productSyncDataItem = $helper->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
                     $parent = Mage::getModel('catalog/product')->load($parentId);
-                    $variantProducts[] = $parent;
-
-                    $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-                    $childProducts = $this->getConfigurableChildrenIds($parent);
-                    $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-                    foreach ($collection as $childProduct) {
-                        if ($childProduct->getId() != $product->getId()) {
-                            $variantProducts[] = $childProduct;
-                        }
-                    }
+                    $variantProducts = $this->makeProductChildrenCollection($product, $magentoStoreId, true);
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
                     try {
                         $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
@@ -221,18 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
         } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts[] = $product;
-
-            $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-            $childProducts = $this->getConfigurableChildrenIds($product);
-            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-            foreach ($collection as $childProduct) {
-                if ($childProduct->getId() != $product->getId()) {
-                    $variantProducts[] = $childProduct;
-                }
-            }
+            $variantProducts = $this->makeProductChildrenCollection($product, $magentoStoreId, true);
         } else {
             //@TODO bundle
             return array();
@@ -640,12 +592,39 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * @param $product
      * @param $magentoStoreId
-     * @return Mage_Catalog_Model_Resource_Product_Collection
+     * @param bool $isBuildUpdateProductRequest
+     * @return array | will return an array with the childs of the product passed by parameter
      */
-    protected function makeProductChildrenCollection($magentoStoreId)
+    public function makeProductChildrenCollection($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
     {
-        return $this->makeProductsNotSentCollection($magentoStoreId);
+        $variantProducts[] = $product;
+        /**
+         * @var Mage_Catalog_Model_Resource_Product_Collection $collection
+         */
+        $collection = $this->getProductResourceCollection();
+        $collection->addStoreFilter($magentoStoreId);
+        $helper = $this->getMailChimpHelper();
+        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
+
+        $this->joinQtyAndBackorders($collection);
+
+        $childProducts = $this->getConfigurableChildrenIds($product);
+        $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
+
+        foreach ($collection as $childProduct) {
+            if ($isBuildUpdateProductRequest) {
+                if ($childProduct->getId() != $product->getId()) {
+                    $variantProducts[] = $childProduct;
+                }
+            } else {
+                $variantProducts[] = $childProduct;
+            }
+        }
+
+        return $variantProducts;
+
     }
 
     /**
