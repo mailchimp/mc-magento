@@ -153,15 +153,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $storeName = null;
         switch ($scopeArray[0]) {
             case 'stores':
-                    $store = $this->getMageApp()->getStore($scopeArray[1]);
-                    $storeName = $store->getName();
+                $store = $this->getMageApp()->getStore($scopeArray[1]);
+                $storeName = $store->getName();
                 break;
             case 'websites':
-                    $website = $this->getMageApp()->getWebsite($scopeArray[1]);
-                    $storeName = $website->getName();
+                $website = $this->getMageApp()->getWebsite($scopeArray[1]);
+                $storeName = $website->getName();
                 break;
             case 'default':
-                    $storeName = 'Default Config';
+                $storeName = 'Default Config';
                 break;
         }
         return $storeName;
@@ -352,6 +352,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scope, $scopeId);
         $config->cleanCache();
+
+        $connection = $this->getCoreResource()->getConnection('core_write');
+        $resource = $this->getSyncBatchesResource();
+        $where = $connection->quoteInto("status = 'pending' AND store_id = ?", $mailchimpStoreId);
+        $connection->update($resource->getMainTable(), array('status' => 'canceled'), $where);
     }
 
     public function deleteAllMCStoreData($mailchimpStoreId)
@@ -4019,5 +4024,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $scopeIfExist = array_search($mailchimpStoreId, $configuredMCStoreIds);
         $scopeArray = ($scopeIfExist !== false) ? array('scope_id' => $scopeIfExist[1], 'scope' => $scopeIfExist[0]) : false;
         return $scopeArray;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Synchbatches
+     */
+    protected function getSyncBatchesResource()
+    {
+        return Mage::getResourceModel('mailchimp/synchbatches');
     }
 }

@@ -160,10 +160,6 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $adminSession = Mage::getSingleton('adminhtml/session');
             $adminSession->addError($errorMessage);
         }
-        $this->deleteLocalMCStoreData($mailchimpStoreId);
-        $connection = $helper->getCoreResource()->getConnection('core_write');
-        $resource = $this->getSyncBatchesResource();
-        $connection->update($resource->getMainTable(), array('status' => 'canceled'), "status = 'pending'");
 
         return $response;
     }
@@ -176,13 +172,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     protected function deleteLocalMCStoreData($mailchimpStoreId)
     {
         $helper = $this->makeHelper();
-        $config = $helper->getConfig();
-        //@Todo Delete for the actual scope that it was created.
-        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 'default', 0);
-        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId", 'default', 0);
-        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", 'default', 0);
-        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0);
-        $config->cleanCache();
+        $helper->deleteAllMCStoreData($mailchimpStoreId);
     }
 
     /**
@@ -204,13 +194,5 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
-    }
-
-    /**
-     * @return Object
-     */
-    protected function getSyncBatchesResource()
-    {
-        return Mage::getResourceModel('mailchimp/synchbatches');
     }
 }
