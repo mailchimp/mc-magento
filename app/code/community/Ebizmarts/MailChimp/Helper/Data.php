@@ -595,10 +595,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($scopeId === 0) {
                 $where = "mailchimp_sync_error != ''";
             } else {
-                $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
+                $where = $connection->quoteInto("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId);
             }
         } else {
-            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+            $where = $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
         }
         try {
             $connection->delete($tableName, $where);
@@ -1178,6 +1178,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
             if ($syncDeleted !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
+                if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
+                    $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+                }
             }
             if ($token) {
                 $ecommerceSyncDataItem->setData("mailchimp_token", $token);

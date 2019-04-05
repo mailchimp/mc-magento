@@ -13,6 +13,7 @@
 class Ebizmarts_MailChimp_Model_Observer
 {
 
+    const PRODUCT_IS_ENABLED = 1;
     const PRODUCT_IS_DISABLED = 2;
 
     /**
@@ -364,7 +365,12 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
 
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
-                $this->makeApiProduct()->update($item->getProductId(), $mailchimpStoreId);
+                $productId = $item->getProductId();
+                $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                if (!$isMarkedAsDeleted) {
+                    $this->makeApiProduct()->update($productId, $mailchimpStoreId);
+                }
             }
         }
 
@@ -633,7 +639,12 @@ class Ebizmarts_MailChimp_Model_Observer
                     continue;
                 }
 
-                $apiProduct->update($item->getProductId(), $mailchimpStoreId);
+                $productId = $item->getProductId();
+                $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                if (!$isMarkedAsDeleted) {
+                    $apiProduct->update($productId, $mailchimpStoreId);
+                }
             }
 
             $apiOrder->update($order->getEntityId(), $storeId);
@@ -667,7 +678,12 @@ class Ebizmarts_MailChimp_Model_Observer
                     continue;
                 }
 
-                $apiProduct->update($item->getProductId(), $mailchimpStoreId);
+                $productId = $item->getProductId();
+                $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                if (!$isMarkedAsDeleted) {
+                    $apiProduct->update($productId, $mailchimpStoreId);
+                }
             }
 
             $apiOrder->update($order->getEntityId(), $storeId);
@@ -694,8 +710,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
-            if (!$this->isBundleItem($item) && !$this->isConfigurableItem($item)) {
-                $apiProduct->update($item->getProductId(), $mailchimpStoreId);
+            $productId = $item->getProductId();
+            $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+            $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+            if (!$this->isBundleItem($item) && !$this->isConfigurableItem($item) && !$isMarkedAsDeleted) {
+                $apiProduct->update($productId, $mailchimpStoreId);
             }
         }
 
@@ -708,27 +727,34 @@ class Ebizmarts_MailChimp_Model_Observer
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
-    public function productSaveBefore(Varien_Event_Observer $observer)
+    public function productSaveAfter(Varien_Event_Observer $observer)
     {
         $product = $observer->getEvent()->getProduct();
         $helper = $this->makeHelper();
         $apiProduct = $this->makeApiProduct();
-        $mailchimpStoreIdsArray = $helper->getAllMailChimpStoreIds();
 
-        foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
+        $stores = $helper->getMageApp()->getStores();
+        foreach ($stores as $storeId) {
 
-            $scopeArray = $this->getScopeArrayFromString($scopeData);
-            $ecommEnabled = $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']);
+            $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
             if ($ecommEnabled) {
-                if ($product->getStatus() == self::PRODUCT_IS_DISABLED) {
-                    $apiProduct->updateDisabledProducts($product->getId(), $mailchimpStoreId);
+
+                $mailchimpStoreId = $helper->getMCStoreId($storeId);
+
+                $status = $this->getCatalogProductStatusModel()->getProductStatus($product->getId(), $storeId);
+                if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
+                    $dataProduct = $helper->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                    $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                    if ($isMarkedAsDeleted) {
+                        $dataProduct->delete();
+                    } else {
+                        $apiProduct->update($product->getId(), $mailchimpStoreId);
+                    }
                 } else {
-                    $apiProduct->update($product->getId(), $mailchimpStoreId);
+                    $apiProduct->updateDisabledProducts($product->getId(), $mailchimpStoreId);
                 }
             }
-
-
         }
 
         return $observer;
@@ -805,7 +831,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($ecommEnabled) {
                 foreach ($productIds as $productId) {
-                    $apiProduct->update($productId, $mailchimpStoreId);
+                    $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
+                    $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                    if (!$isMarkedAsDeleted) {
+                        $apiProduct->update($productId, $mailchimpStoreId);
+                    }
                 }
             }
         }
@@ -1084,5 +1114,13 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getWarningMessageAdminHtmlSession($helper)
     {
         return Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Product_Status
+     */
+    protected function getCatalogProductStatusModel()
+    {
+        return Mage::getModel('catalog/product_status');
     }
 }
