@@ -587,6 +587,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
+        //agregar un where de los filtros que se "reenviaron"
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $resource = $this->getCoreResource();
         $connection = $resource->getConnection('core_write');
@@ -878,6 +879,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function saveLastItemsSent($scopeId, $scope)
     {
+        //agregar filtro de si esta en el config antes de hacer el "getLastxxx"
         $isSyncing = $this->getMCIsSyncing($scopeId, $scope);
         if ($isSyncing != 1) {
             $customerLastId = $this->getLastCustomerSent($scopeId, $scope);
