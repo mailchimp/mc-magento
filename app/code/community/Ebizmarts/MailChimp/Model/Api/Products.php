@@ -11,6 +11,8 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Products
 {
+    const PRODUCT_IS_ENABLED = 1;
+    const PRODUCT_IS_DISABLED = 2;
     const BATCH_LIMIT = 100;
     private $_parentImageUrl = null;
     private $_parentId = null;
@@ -27,6 +29,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     private $visibilityOptions;
     private $productTypeConfigurableResource;
     public static $noChildrenIds = array(0 => array());
+
+    const PRODUCT_DISABLED_IN_MAGENTO = 'This product was deleted because it is disabled in Magento.';
 
     public function __construct()
     {
@@ -96,7 +100,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $batchArray[$counter] = $data;
                 $counter++;
             }
-            $this->_updateSyncData($product->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
+            $this->_updateSyncData($product->getId(), $mailchimpStoreId, null, self::PRODUCT_DISABLED_IN_MAGENTO, null, null, 0);
 
         }
         return $batchArray;
@@ -325,6 +329,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_parentUrl = null;
             }
         }
+
         return $data;
     }
 
@@ -338,9 +343,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $parentIdArray = $this->getAllParentIds($productId);
         foreach ($parentIdArray as $parentId) {
-            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+            $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, 0, null, true, false);
         }
-        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, null, null, true, false);
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, 0, null, true, false);
     }
 
 
@@ -352,7 +357,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     public function updateDisabledProducts($productId, $mailchimpStoreId)
     {
-        $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 0, 1, null, true, false);
+        $this->_updateSyncData($productId, $mailchimpStoreId, null, '', 0, 1, null, false, false);
     }
 
 
@@ -385,13 +390,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             $syncModified = $productSyncData->getMailchimpSyncModified();
             $syncDelta = $productSyncData->getMailchimpSyncDelta();
+            $isProductEnabled = $this->isProductEnabled($productId, $magentoStoreId);
 
-            if ($syncModified && $syncDelta > $syncDateFlag) {
+            if ($syncModified && $syncDelta > $syncDateFlag && $isProductEnabled) {
                 $data = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $data);
                 $this->_updateSyncData($productId, $mailchimpStoreId);
-            } elseif (!$syncDelta || $syncDelta < $syncDateFlag) {
+            } elseif (!$syncDelta || $syncDelta < $syncDateFlag || !$isProductEnabled) {
                 $data[] = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
-                $this->_updateSyncData($productId, $mailchimpStoreId);
+                // avoid update for disabled products to prevent send the product as modified
+                if ($isProductEnabled) {
+                    $this->_updateSyncData($productId, $mailchimpStoreId);
+                }
             }
         }
 
@@ -1003,5 +1012,28 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
         }
+    }
+
+    /**
+     * @param $productId
+     * @return bool | return true if the product is enabled in Magento.
+     */
+    public function isProductEnabled($productId, $magentoStoreId)
+    {
+        $isProductEnabled = false;
+        $status = $this->getCatalogProductStatusModel()->getProductStatus($productId, $magentoStoreId);
+        if ($status[$productId] == self::PRODUCT_IS_ENABLED) {
+            $isProductEnabled = true;
+        }
+
+        return $isProductEnabled;
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Product_Status
+     */
+    protected function getCatalogProductStatusModel()
+    {
+        return Mage::getModel('catalog/product_status');
     }
 }

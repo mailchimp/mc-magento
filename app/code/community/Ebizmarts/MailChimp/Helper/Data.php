@@ -596,10 +596,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($scopeId === 0) {
                 $where = "mailchimp_sync_error != ''";
             } else {
-                $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
+                $where = $connection->quoteInto("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId);
             }
         } else {
-            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+            $where = $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
         }
         try {
             $connection->delete($tableName, $where);
@@ -708,7 +708,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return bool
      */
-    protected function isErrorLogEnabled()
+    public function isErrorLogEnabled()
     {
         $logEnabled = false;
         $logConfig = $this->getLogsEnabled();
@@ -1180,6 +1180,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
             if ($syncDeleted !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
+                if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
+                    $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+                }
             }
             if ($token) {
                 $ecommerceSyncDataItem->setData("mailchimp_token", $token);
@@ -3445,40 +3448,40 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function saveInterestGroupData($params, $storeId, $customerId = null, $subscriber = null)
     {
         $groups = $this->getInterestGroupsIfAvailable($params);
-        if (!$customerId) {
-            $customerSession = $this->getCustomerSession();
-            if ($this->isAdmin()) {
-                $customerId = $params['customer_id'];
-            } elseif ($customerSession->isLoggedIn()) {
-                $customerData = $customerSession->getCustomer();
-                $customerId = $customerData->getId();
-            }
-        }
-        $subscriberId = null;
-        if ($subscriber) {
-            $subscriberId = $subscriber->getSubscriberId();
-        }
-        $interestGroup = $this->getInterestGroupModel();
-        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-        $origSubscriberId = $interestGroup->getSubscriberId();
-        $origCustomerId = $interestGroup->getCustomerId();
-        if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
-            $interestGroup->setSubscriberId($subscriberId);
-        }
-        if (!$origCustomerId || $customerId && $origCustomerId != $customerId) {
-            $interestGroup->setCustomerId($customerId);
-        }
         if ($groups) {
+            if (!$customerId) {
+                $customerSession = $this->getCustomerSession();
+                if ($this->isAdmin()) {
+                    $customerId = $params['customer_id'];
+                } elseif ($customerSession->isLoggedIn()) {
+                    $customerData = $customerSession->getCustomer();
+                    $customerId = $customerData->getId();
+                }
+            }
+            $subscriberId = null;
+            if ($subscriber) {
+                $subscriberId = $subscriber->getSubscriberId();
+            }
+            $interestGroup = $this->getInterestGroupModel();
+            $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+            $origSubscriberId = $interestGroup->getSubscriberId();
+            $origCustomerId = $interestGroup->getCustomerId();
+            if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
+                $interestGroup->setSubscriberId($subscriberId);
+            }
+            if (!$origCustomerId || $customerId && $origCustomerId != $customerId) {
+                $interestGroup->setCustomerId($customerId);
+            }
             $encodedGroups = $this->arrayEncode($groups);
             $interestGroup->setGroupdata($encodedGroups);
-        }
-        //Avoid creating a new entry if no groupData available. (Customer creation)
-        if ($interestGroup->getGroupdata()) {
-            if ($storeId) {
-                $interestGroup->setStoreId($storeId);
+            //Avoid creating a new entry if no groupData available. (Customer creation)
+            if ($interestGroup->getGroupdata()) {
+                if ($storeId) {
+                    $interestGroup->setStoreId($storeId);
+                }
+                $interestGroup->setUpdatedAt($this->getCurrentDateTime());
+                $interestGroup->save();
             }
-            $interestGroup->setUpdatedAt($this->getCurrentDateTime());
-            $interestGroup->save();
         }
     }
 
@@ -3594,6 +3597,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function isIncludeTaxesEnabled()
     {
         return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDE_TAXES, 0, 'default');
+    }
+
+    /**
+     * @param $scopeId
+     * @param $scope
+     *
+     * @return bool \ return true if is enabled show interest gruops in the checkout success.
+     * @throws Mage_Core_Exception
+     */
+    public function isInterestGroupEnabled($scopeId = 0, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_INTEREST_SUCCESS_ACTIVE, $scopeId, $scope);
     }
 
     /**

@@ -544,7 +544,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($result, 'getImageSizeUrl');
     }
 
-    public function testRemoveEcommerceSyncDataDeleteErrorsOnly()
+    public function testRemoveEcommerceSyncDataDeleteAll()
     {
         $scopeId = 0;
         $scope = 'default';
@@ -553,7 +553,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
         $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+        $where = "mailchimp_store_id = ".$mailchimpStoreId;
+        $whereArray = "mailchimp_store_id = ?";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -572,12 +573,14 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
         $coreResourceMock->expects($this->once())->method('getTableName')->with($mailchimpEcommTableAlias)->willReturn($mailchimpEcommTableName);
 
+        $dbAdapterInterfaceMock->expects($this->once())->method('quoteInto')->with($whereArray)->willReturn($where);
+
         $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($mailchimpEcommTableName, $where);
 
         $helperMock->removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly);
     }
 
-    public function testRemoveEcommerceSyncDataDeleteAllForDefaultScope()
+    public function testRemoveEcommerceSyncDataDeleteErrorsOnlyForDefaultScope()
     {
         $scopeId = 0;
         $scope = 'default';
@@ -610,7 +613,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly);
     }
 
-    public function testRemoveEcommerceSyncDataDeleteAllForStoreView()
+    public function testRemoveEcommerceSyncDataErrorsOnlyForStoreView()
     {
         $scopeId = 1;
         $scope = 'stores';
@@ -619,7 +622,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
         $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = array("mailchimp_store_id = ? and mailchimp_sync_error != ''" => $mailchimpStoreId);
+        $where = "mailchimp_store_id = ".$mailchimpStoreId." AND mailchimp_sync_error != ''";
+        $whereArray = "mailchimp_store_id = ? AND mailchimp_sync_error != ''";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -636,6 +640,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->WillReturn($mailchimpStoreId);
         $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
         $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
+        $dbAdapterInterfaceMock->expects($this->once())->method('quoteInto')->with($whereArray)->willReturn($where);
         $coreResourceMock->expects($this->once())->method('getTableName')->with($mailchimpEcommTableAlias)->willReturn($mailchimpEcommTableName);
 
         $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($mailchimpEcommTableName, $where);
