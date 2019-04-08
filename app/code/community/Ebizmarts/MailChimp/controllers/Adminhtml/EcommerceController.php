@@ -47,13 +47,11 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
         $filters = $this->getRequest()->getParam('filter');
-        //Add ScopeId param
-        $scope = 1;
-        $scopeId = 1;
+        $scopeArray = $helper->getCurrentScope();
         $success = 0;
 
         try {
-            $helper->resetMCEcommerceData($scopeId, $scope, false, $filters);
+            $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], false, $filters);
             $success = 1;
         } catch(MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
