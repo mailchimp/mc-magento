@@ -532,30 +532,13 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $scopeId = 0;
         $scope = 'default';
         $deleteErrorsOnly = true;
-        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $connectionType = 'core_write';
-        $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
-        $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = "mailchimp_sync_error != ''";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getCoreResource'))
+            ->setMethods(array('removeAllEcommerceSyncDataErrors'))
             ->getMock();
 
-        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getConnection', 'getTableName'))
-            ->getMock();
-
-        $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
-
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->WillReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
-        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
-        $coreResourceMock->expects($this->once())->method('getTableName')->with($mailchimpEcommTableAlias)->willReturn($mailchimpEcommTableName);
-
-        $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($mailchimpEcommTableName, $where);
+        $helperMock->expects($this->once())->method('removeAllEcommerceSyncDataErrors');
 
         $helperMock->removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly);
     }
@@ -566,15 +549,28 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $scope = 'stores';
         $deleteErrorsOnly = true;
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $connectionType = 'core_write';
-        $mailchimpEcommTableAlias = 'mailchimp/ecommercesyncdata';
-        $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
-        $where = "mailchimp_store_id = ".$mailchimpStoreId." AND mailchimp_sync_error != ''";
-        $whereArray = "mailchimp_store_id = ? AND mailchimp_sync_error != ''";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getCoreResource'))
+            ->setMethods(array('getMCStoreId', 'removeEcommerceSyncDataByMCStore'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->WillReturn($mailchimpStoreId);
+
+        $helperMock->expects($this->once())->method('removeEcommerceSyncDataByMCStore')->with($mailchimpStoreId, $deleteErrorsOnly);
+
+        $helperMock->removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly);
+    }
+
+    public function testRemoveAllEcommerceSynddataErrors()
+    {
+        $tableName = 'mailchimp_ecommerce_sync_data';
+        $tableAlias = 'mailchimp/ecommercesyncdata';
+        $where = "mailchimp_sync_error != ''";
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCoreResource', 'removeEcommerceSyncDataByMCStore'))
             ->getMock();
 
         $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
@@ -584,15 +580,45 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
 
-        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->WillReturn($mailchimpStoreId);
-        $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
-        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
-        $dbAdapterInterfaceMock->expects($this->once())->method('quoteInto')->with($whereArray)->willReturn($where);
-        $coreResourceMock->expects($this->once())->method('getTableName')->with($mailchimpEcommTableAlias)->willReturn($mailchimpEcommTableName);
+        $helperMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
 
-        $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($mailchimpEcommTableName, $where);
+        $coreResourceMock->expects($this->once())->method('getConnection')->with('core_write')->willReturn($dbAdapterInterfaceMock);
+        $coreResourceMock->expects($this->once())->method('getTableName')->with($tableAlias)->willReturn($tableName);
 
-        $helperMock->removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly);
+        $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($tableName, $where);
+
+        $helperMock->removeAllEcommerceSyncDataErrors();
+    }
+
+    public function testRemoveEcommerceSyncDataByMCStore()
+    {
+        $deleteErrorsOnly = true;
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
+        $tableName = 'mailchimp_ecommerce_sync_data';
+        $tableAlias = 'mailchimp/ecommercesyncdata';
+        $where = "mailchimp_store_id = $mailchimpStoreId AND mailchimp_sync_error != ''";
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCoreResource'))
+            ->getMock();
+
+        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConnection', 'getTableName'))
+            ->getMock();
+
+        $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
+
+        $helperMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
+
+        $coreResourceMock->expects($this->once())->method('getConnection')->with('core_write')->willReturn($dbAdapterInterfaceMock);
+        $coreResourceMock->expects($this->once())->method('getTableName')->with($tableAlias)->willReturn($tableName);
+
+        $dbAdapterInterfaceMock->expects($this->once())->method('quoteInto')->with("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId)->willReturn($where);
+        $dbAdapterInterfaceMock->expects($this->once())->method('delete')->with($tableName, $where);
+
+        $helperMock->removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly);
     }
 
     public function testClearErrorGridExcludeSubscribers()
@@ -770,6 +796,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testSaveLastItemsSent()
     {
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
         $scope = 'stores';
         $scopeId = 1;
         $customerLastId = 10;
@@ -789,11 +816,12 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCIsSyncing', 'getLastCustomerSent', 'getLastProductSent', 'getLastOrderSent',
-                'getLastCartSent', 'getLastPromoCodeSent', 'saveMailchimpConfig'))
+            ->setMethods(array('getMCStoreId', 'getMCIsSyncing', 'getLastCustomerSent', 'getLastProductSent',
+                'getLastOrderSent', 'getLastCartSent', 'getLastPromoCodeSent', 'saveMailchimpConfig'))
             ->getMock();
 
-        $helperMock->expects($this->once())->method('getMCIsSyncing')->with($scopeId, $scope)->willReturn(false);
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
+        $helperMock->expects($this->once())->method('getMCIsSyncing')->with($mailchimpStoreId, $scopeId, $scope)->willReturn(false);
         $helperMock->expects($this->once())->method('getLastCustomerSent')->with($scopeId, $scope)->willReturn($customerLastId);
         $helperMock->expects($this->once())->method('getLastProductSent')->with($scopeId, $scope)->willReturn($productLastId);
         $helperMock->expects($this->once())->method('getLastOrderSent')->with($scopeId, $scope)->willReturn($orderLastId);
@@ -1155,13 +1183,14 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $storeId = 1;
         $jsUrl = 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/dffd1d29fea0323354a9caa32.js';
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
 
         $expectedResult = '<script type="text/javascript" src="' . $jsUrl . '" defer></script>';
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'getConfigValueForScope',
-                'areJsUrlAndListScopesEqual'))
+                'retrieveAndSaveMCJsUrlInConfig', 'getMCStoreId'))
             ->getMock();
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
@@ -1180,9 +1209,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $storeMock->expects($this->once())->method('getId')->willReturn($storeId);
 
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($storeId)->willReturn($mailchimpStoreId);
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
-        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $storeId)->willReturn($jsUrl);
-        $helperMock->expects($this->once())->method('areJsUrlAndListScopesEqual')->with($storeId)->willReturn(true);
+        $helperMock->expects($this->once())->method('getConfigValueForScope')->with(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", 0, 'default')->willReturn(null);
+        $helperMock->expects($this->once())->method('retrieveAndSaveMCJsUrlInConfig')->with($storeId)->willReturn($jsUrl);
 
         $result = $helperMock->getMCJs();
 

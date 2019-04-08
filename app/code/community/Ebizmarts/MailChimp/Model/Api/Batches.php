@@ -788,8 +788,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $isSyncingDate = $helper->getDateSyncFinishByMailChimpStoreId($mailchimpStoreId);
                     if (!$isSyncingDate && $mailchimpStoreId) {
                         $this->getApiStores()->editIsSyncing($api, false, $mailchimpStoreId);
-//                        $scopeToEdit = $helper->getMailChimpScopeByStoreId($magentoStoreId);
-//                        $helper->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scopeToEdit['scope'], $scopeToEdit['scope_id']);
                         $config = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", $date));
                         $helper->saveMailchimpConfig($config, 0, 'default');
                     }

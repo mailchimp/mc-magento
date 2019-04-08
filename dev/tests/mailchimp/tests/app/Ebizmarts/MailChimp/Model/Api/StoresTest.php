@@ -10,9 +10,8 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
     public function testCreateMailChimpStore()
     {
-        $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $scopeId = 1;
-        $scope = 'stores';
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
+        $apiKey = 'z1x2c3v4b5n6m7k8l9p0-us1';
         $listId = 'listId';
         $storeName = 'Madison Island - English';
         $storeEmailAddress = 'store@email.com';
@@ -21,19 +20,51 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $timeZone = 'America/Los_Angeles';
         $storePhone = '123456789';
         $currencySymbol = '$';
-        $response = '';
         $isSyncing = true;
         $storeDomain = 'https:://localhost.com';
+        $storeEmail = 'store@email.com';
+        $address = 'address';
+        $successMessage = "The Mailchimp store was successfully created.";
+        $response = array(
+            'id' => 'a1s2d3f4g5h6j7k8l9p0',
+            'list_id' => 'a1s2d3f4g5',
+            'name' => 'Madison Island - English',
+            'platform' => 'Magento',
+            'domain' => 'domain.com',
+            'is_syncing' => false,
+            'email_address' => 'email@example.com',
+            'currency_code' => 'USD',
+            'connected_site' => array(
+                'site_foreign_id'  => 'a1s2d3f4g5h6j7k8l9p0',
+                'site_script' => array(
+                    'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js',
+                    'fragment' => '<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js");</script>'
+                ),
+            ),
+            'automations' => array(
+                'abandoned_cart' => array(
+                    'is_supported' => 1
+                ),
+                'abandoned_browse' => array(
+                    'is_supported' => 1
+                )
+            ),
+            'list_is_active' => 1,
+            'created_at' => '2016-05-26T18:30:55+00:00',
+            'updated_at' => '2019-03-04T19:53:57+00:00'
+        );
+        $configValues = array(
+            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", $response['connected_site']['site_script']['url'])
+        );
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
                 ->disableOriginalConstructor()
-                ->setMethods(array('makeHelper'))
+                ->setMethods(array('makeHelper', 'getAdminSession'))
                 ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApi', 'getGeneralList', 'getMCStoreName', 'getConfigValueForScope', 'getStoreDomain',
-                'getStoreLanguageCode', 'getStoreTimeZone', 'getStorePhone', 'getMageApp'))
+            ->setMethods(array('getDateMicrotime', 'getApiByKey', 'getMageApp', 'saveMailchimpConfig'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -61,24 +92,15 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
             ->setMethods(array('currency', 'getSymbol'))
             ->getMock();
 
+        $adminSessionMock = $this->getMockBuilder(Mage_Adminhtml_Model_Session::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addSuccess'))
+            ->getMock();
+
         $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
-        $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
-        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
-        $helperMock->expects($this->once())->method('getMCStoreName')->with($scopeId, $scope)->willReturn($storeName);
-
-        $helperMock->expects($this->exactly(2))->method('getConfigValueForScope')->withConsecutive(
-            array('trans_email/ident_general/email', $scopeId, $scope),
-            array(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope)
-        )->willReturnOnConsecutiveCalls(
-            $storeEmailAddress,
-            $currencyCode
-        );
-
-        $helperMock->expects($this->once())->method('getStoreDomain')->with($scopeId, $scope)->willReturn($storeDomain);
-        $helperMock->expects($this->once())->method('getStoreLanguageCode')->with($scopeId, $scope)->willReturn($primaryLocale);
-        $helperMock->expects($this->once())->method('getStoreTimeZone')->with($scopeId, $scope)->willReturn($timeZone);
-        $helperMock->expects($this->once())->method('getStorePhone')->with($scopeId, $scope)->willReturn($storePhone);
+        $helperMock->expects($this->once())->method('getDateMicrotime')->willReturn('2017-10-23-19-34-31-92333600');
+        $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
 
         $mageAppMock->expects($this->once())->method('getLocale')->willReturn($localeMock);
@@ -90,29 +112,31 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $ecommerceMock->expects($this->once())->method('getStores')->willReturn($ecommerceStoresMock);
 
-        $ecommerceStoresMock->expects($this->once())->method('add')->with($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmailAddress, $currencySymbol, $primaryLocale, $timeZone, $storePhone)->willReturn($response);
+        $ecommerceStoresMock->expects($this->once())->method('add')->with($mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmailAddress, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address)->willReturn($response);
 
-        $apiStoresMock->createMailChimpStore($mailChimpStoreId, null, $scopeId, $scope);
+        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, 0, 'default');
+
+        $apiStoresMock->expects($this->once())->method('getAdminSession')->willReturn($adminSessionMock);
+
+        $adminSessionMock->expects($this->once())->method('addSuccess')->with($successMessage);
+
+        $apiStoresMock->createMailChimpStore($apiKey, $listId, $storeName, $currencyCode, $storeDomain, $storeEmail, $primaryLocale, $timeZone, $storePhone, $address);
     }
 
     public function testDeleteMailChimpStore()
     {
+        $apiKey = 'z1x2c3v4b5n6m7k8l9p0-us1';
         $mailChimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $scopeId = 1;
-        $scope = 'stores';
-        $connectionType = 'core_write';
-        $setCondition = array('status' => 'canceled');
-        $whereCondition = "status = 'pending'";
-        $tableName = 'mailchimp_sync_batches';
+        $successMessage = "The Mailchimp store was successfully deleted.";
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
                 ->disableOriginalConstructor()
-                ->setMethods(array('makeHelper', 'getSyncBatchesResource'))
+                ->setMethods(array('makeHelper', 'getAdminSession'))
                 ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApi', 'getCoreResource'))
+            ->setMethods(array('getApiByKey'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -130,34 +154,26 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
             ->setMethods(array('delete'))
             ->getMock();
 
-        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+        $adminSessionMock = $this->getMockBuilder(Mage_Adminhtml_Model_Session::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getConnection'))
-            ->getMock();
-
-        $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
-
-        $syncBatchesResourceMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Mysql4_SynchBatches::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMainTable'))
+            ->setMethods(array('addSuccess'))
             ->getMock();
 
 
         $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
-        $helperMock->expects($this->once())->method('getApi')->with($scopeId, $scope)->willReturn($apiMock);
+        $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
+
         $apiMock->expects($this->once())->method('getEcommerce')->willReturn($ecommerceMock);
+
         $ecommerceMock->expects($this->once())->method('getStores')->willReturn($ecommerceStoresMock);
+
         $ecommerceStoresMock->expects($this->once())->method('delete')->with($mailChimpStoreId);
 
-        $helperMock->expects($this->once())->method('getCoreResource')->WillReturn($coreResourceMock);
-        $coreResourceMock->expects($this->once())->method('getConnection')->with($connectionType)->willReturn($dbAdapterInterfaceMock);
+        $apiStoresMock->expects($this->once())->method('getAdminSession')->willReturn($adminSessionMock);
 
-        $apiStoresMock->expects($this->once())->method('getSyncBatchesResource')->willReturn($syncBatchesResourceMock);
-        $syncBatchesResourceMock->expects($this->once())->method('getMainTable')->willReturn($tableName);
+        $adminSessionMock->expects($this->once())->method('addSuccess')->with($successMessage);
 
-        $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($tableName, $setCondition, $whereCondition);
-
-        $apiStoresMock->deleteMailChimpStore($mailChimpStoreId, $scopeId, $scope);
+        $apiStoresMock->deleteMailChimpStore($mailChimpStoreId, $apiKey);
     }
 }

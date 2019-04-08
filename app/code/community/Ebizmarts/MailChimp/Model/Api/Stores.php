@@ -47,15 +47,15 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             );
             $helper->saveMailchimpConfig($configValues, 0, 'default');
             $successMessage = $helper->__("The Mailchimp store was successfully created.");
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addSuccess($successMessage);
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         } catch (MailChimp_Error $e) {
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
             if (strstr($errorMessage, 'A store with the domain')) {
@@ -67,7 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         } catch (Exception $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         }
         return $response;
@@ -101,15 +101,15 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
             $response = $api->getEcommerce()->getStores()->edit($mailchimpStoreId, $storeName, 'Magento', $storeDomain, null, $storeEmail, $currencyCode, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
             $successMessage = $helper->__("The Mailchimp store was successfully edited.");
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addSuccess($successMessage);
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         } catch (MailChimp_Error $e) {
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
             if (strstr($errorMessage, 'A store with the domain')) {
@@ -121,7 +121,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         } catch (Exception $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         }
         return $response;
@@ -142,22 +142,22 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api = $helper->getApiByKey($apiKey);
             $response = $api->getEcommerce()->getStores()->delete($mailchimpStoreId);
             $successMessage = $helper->__("The Mailchimp store was successfully deleted.");
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addSuccess($successMessage);
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         } catch (MailChimp_Error $e) {
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         } catch (Exception $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
-            $adminSession = Mage::getSingleton('adminhtml/session');
+            $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         }
 
@@ -194,5 +194,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
     }
 }

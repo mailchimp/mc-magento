@@ -650,8 +650,28 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
-        $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        $this->removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly);
+        if ($scopeId == 0 && $deleteErrorsOnly) {
+            $this->removeAllEcommerceSyncDataErrors();
+        } else {
+            $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+            $this->removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly);
+        }
+    }
+
+    /**
+     * @throws Mage_Core_Exception
+     */
+    public function removeAllEcommerceSyncDataErrors()
+    {
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = "mailchimp_sync_error != ''";
+        try {
+            $connection->delete($tableName, $where);
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
     }
 
     /**
@@ -659,7 +679,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param bool $deleteErrorsOnly
      * @throws Mage_Core_Exception
      */
-    protected function removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly = false)
+    public function removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly = false)
     {
         $resource = $this->getCoreResource();
         $connection = $resource->getConnection('core_write');
@@ -723,7 +743,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Save error response from MailChimp's API in "MailChimp_Error.log" file.
      *
      * @param $message
-     * @throws Mage_Core_Exception
      */
     public function logError($message)
     {
@@ -737,7 +756,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param $message
      * @param null $batchId
-     * @throws Mage_Core_Exception
      */
     public function logRequest($message, $batchId = null)
     {
@@ -3955,97 +3973,5 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getModelMailchimpEcommerceSyncData()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
-    }
-
-    /**
-     * @param $dat
-     * @param $string
-     * @return string
-     */
-    public function getSyncFlagDataHtml($dat, $string)
-    {
-        $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
-        if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS] != Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS) {
-            if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED) {
-                $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
-            } else {
-                $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:forestgreen;font-weight: bold;'>" . $this->__('Finished at %s', $syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]) . "</span></li>";
-            }
-        } else {
-            $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
-        }
-        return $string;
-    }
-
-    /**
-     * @param $dat
-     * @return array
-     */
-    protected function getSyncFlagDataArray($dat)
-    {
-        $textArray = explode(': ', $dat['label']);
-        //textArray indexes = 0 -> label / 1 -> status
-        $textArray = $this->fixTimeTextIfNecessary($textArray);
-        return $textArray;
-    }
-
-    /**
-     * @param $textArray
-     * @return array
-     */
-    protected function fixTimeTextIfNecessary($textArray)
-    {
-        if ($this->isDate($textArray)) {
-            $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
-        }
-        return $textArray;
-    }
-
-    /**
-     * @param $textArray
-     * @return bool
-     */
-    protected function isDate($textArray)
-    {
-        return count($textArray) == 4;
-    }
-
-    public function getListIdByApiKeyAndMCStoreId($apiKey, $mailchimpStoreId)
-    {
-        $listId = false;
-        try {
-            $api = $this->getApiByKey($apiKey);
-            $mcStore = $api->getEcommerce()->getStores()->get($mailchimpStoreId, 'list_id');
-            if (isset($mcStore['list_id'])) {
-                $listId = $mcStore['list_id'];
-            }
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage());
-        } catch (MailChimp_Error $e) {
-            $this->logError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $this->logError($e->getMessage());
-        }
-        return $listId;
-    }
-
-    /**
-     * @param $mailchimpStoreId
-     * @return false|array
-     */
-    public function getScopeArrayIfExists($mailchimpStoreId)
-    {
-        $configuredMCStoreIds = $this->getAllMailChimpStoreIds();
-        $scopeIfExist = array_search($mailchimpStoreId, $configuredMCStoreIds);
-        $scopeArray = ($scopeIfExist !== false) ? array('scope_id' => $scopeIfExist[1], 'scope' => $scopeIfExist[0]) : false;
-        return $scopeArray;
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Synchbatches
-     */
-    protected function getSyncBatchesResource()
-    {
-        return Mage::getResourceModel('mailchimp/synchbatches');
     }
 }

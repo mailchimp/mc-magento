@@ -1046,57 +1046,76 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpObserverMock->cleanProductImagesCacheAfter($observerMock);
     }
 
-//    public function testSaveConfig()
-//    {
-//        $postArray = array('groups' => array('general' => array('fields' => array('list' => array('inherit' => true)))));
-//        $scopeArray = array('scope_id' => '1', 'scope' => 'stores');
-//        $configExistsForThisScope = true;
-//        $listId = 'a1s2d3f4g5';
-//        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $listId));
-//        $message = 'The list configuration was not changed. There is a Mailchimp store configured for this scope.';
-//
-//        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
-//            ->disableOriginalConstructor()
-//            ->setMethods(array('makeHelper', 'getRequest', 'getAdminSession'))
-//            ->getMock();
-//
-//        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-//            ->disableOriginalConstructor()
-//            ->setMethods(array('getCurrentScope', 'getIfConfigExistsForScope', 'saveMailchimpConfig', 'getGeneralList'))
-//            ->getMock();
-//
-//        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
-//            ->disableOriginalConstructor()
-//            ->setMethods(array('getPost'))
-//            ->getMock();
-//
-//        $adminSessionMock = $this->getMockBuilder(Mage_Adminhtml_Model_Session::class)
-//            ->disableOriginalConstructor()
-//            ->setMethods(array('addError'))
-//            ->getMock();
-//
-//        $mailchimpObserverMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
-//        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-//
-//        $requestMock->expects($this->once())->method('getPost')->willReturn($postArray);
-//
-//        $helperMock->expects($this->once())->method('getCurrentScope')->willReturn($scopeArray);
-//        $helperMock->expects($this->once())->method('getIfConfigExistsForScope')
-//            ->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])
-//            ->willReturn($configExistsForThisScope);
-//        $helperMock->expects($this->once())->method('getGeneralList')->willReturn($listId);
-//        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValue, $scopeArray['scope_id'], $scopeArray['scope'], false);
-//
-//        $mailchimpObserverMock->expects($this->once())->method('getAdminSession')->willReturn($adminSessionMock);
-//
-//        $adminSessionMock->expects($this->once())->method('addError')->with($message);
-//
-//        $mailchimpObserverMock->saveConfig($observerMock);
-//    }
+    public function testSaveConfigBeforeInheritList()
+    {
+        $apiKey = 'q1w2e3r4t5y6u7i8o9p0-us1';
+        $mailchimpStoreId = 'z1x2c3v4b5n6m7i8o9p0';
+        $listId = 'a1s2d3f4g5';
+        $dataArray = array('groups' => array('general' => array('fields' => array(
+            'list' => array('inherit' => true),
+            'storeid' => array('value' => $mailchimpStoreId),
+            'apikey' => array('value' => $apiKey)
+        ))));
+        $dataArrayModified = array('groups' => array('general' => array('fields' => array(
+            'list' => array('value' => $listId),
+            'storeid' => array('value' => $mailchimpStoreId),
+            'apikey' => array('value' => $apiKey)
+        ))));
+        $scopeArray = array('scope_id' => '1', 'scope' => 'stores');
+        $oldMailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
+        $storeListId = 'g5f4d3s2a1';
+        $message = 'The list configuration was automatically modified to show the list associated to the selected Mailchimp store.';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getAdminSession', 'isListXorStoreInherited'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCurrentScope', 'getIfConfigExistsForScope', 'saveMailchimpConfig', 'getGeneralList',
+                'getListIdByApiKeyAndMCStoreId', 'getMCStoreId'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getObject'))
+            ->getMock();
+
+        $configMock = $this->getMockBuilder(Mage_Adminhtml_Model_Config::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSection', 'getData', 'setData'))
+            ->getMock();
+
+        $adminSessionMock = $this->getMockBuilder(Mage_Adminhtml_Model_Session::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addError'))
+            ->getMock();
+
+
+        $observerMock->expects($this->once())->method('getObject')->willReturn($configMock);
+
+        $configMock->expects($this->once())->method('getSection')->willReturn('mailchimp');
+        $configMock->expects($this->once())->method('getData')->willReturn($dataArray);
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('getCurrentScope')->willReturn($scopeArray);
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeArray['scope_id'], $scopeArray['scope'])->willReturn($oldMailchimpStoreId);
+
+        $mailchimpObserverMock->expects($this->once())->method('isListXorStoreInherited')->with($dataArray)->willReturn(true);
+
+        $helperMock->expects($this->once())->method('getListIdByApiKeyAndMCStoreId')->with($apiKey, $mailchimpStoreId)->willReturn($storeListId);
+        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeArray['scope_id'], $scopeArray['scope'])->willReturn($listId);
+
+        $mailchimpObserverMock->expects($this->once())->method('getAdminSession')->willReturn($adminSessionMock);
+
+        $adminSessionMock->expects($this->once())->method('addError')->with($message);
+
+        $configMock->expects($this->once())->method('setData')->with($dataArrayModified);
+
+        $mailchimpObserverMock->saveConfigBefore($observerMock);
+    }
 
     public function testProductSaveAfter()
     {
@@ -1111,7 +1130,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->setMethods(array('makeHelper', 'makeApiProduct', 'getCatalogProductStatusModel'))
-            -> getMock();
+            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->setMethods(array('getMageApp', 'isEcommerceEnabled', 'getEcommerceSyncDataItem', 'getMCStoreId'))
@@ -1226,7 +1245,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->setMethods(array('makeHelper', 'makeApiProduct', 'makeApiOrder', 'isBundleItem', 'isConfigurableItem'))
-            -> getMock();
+            ->getMock();
 
         $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->setMethods(array('getEvent'))
@@ -1354,7 +1373,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->setMethods(array('makeHelper', 'makeApiProduct', 'makeApiOrder', 'isBundleItem', 'isConfigurableItem'))
-            -> getMock();
+            ->getMock();
 
         $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->setMethods(array('getEvent'))

@@ -149,7 +149,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
     public function testGetstoresAction()
     {
-        $apiKeyParam = 'apikey';
+        $apiKeyParam = 'api_key';
         $apiKey = 'a1s2d3f4g5h6j7k8l9z1x2c3v4b5-us1';
         $mcLists = array(
             'lists' => array(array(
@@ -216,7 +216,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
     {
         $idParam = 'id';
         $tableId = 1;
-        $id = 'a1s2d3f4g5h6j7k8l9p0';
+        $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
         $apiKey = 'a1s2d3f4g5h6j7k8l9p0z1x2c3v4b5-us1';
 
         $mailchimpstoresControllerMock = $this->mailchimpstoresController
@@ -231,48 +231,37 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $mailchimpStoreModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Stores::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getId', 'getApikey', 'getStoreid'))
+            ->setMethods(array('getStoreid', 'getApikey', 'getId'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApiByKey'))
+            ->setMethods(array('getApiStores', 'deleteAllMCStoreData'))
             ->getMock();
 
-        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
+        $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerce'))
-            ->getMock();
-
-        $ecommerceMock = $this->getMockBuilder(MailChimp_Ecommerce::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getStores'))
-            ->getMock();
-
-        $storesMock = $this->getMockBuilder(MailChimp_Lists::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('delete'))
+            ->setMethods(array('deleteMailChimpStore'))
             ->getMock();
 
         $mailchimpstoresControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
 
-        $requestMock->expects($this->once())->method('getParam')->with($idParam)->willReturn($id);
+        $requestMock->expects($this->once())->method('getParam')->with($idParam)->willReturn($tableId);
 
-        $mailchimpstoresControllerMock->expects($this->once())->method('loadMailchimpStore')->with($id)->willReturn($mailchimpStoreModelMock);
+        $mailchimpstoresControllerMock->expects($this->once())->method('loadMailchimpStore')->with($tableId)->willReturn($mailchimpStoreModelMock);
+
+        $mailchimpStoreModelMock->expects($this->once())->method('getStoreid')->willReturn($mailchimpStoreId);
+        $mailchimpStoreModelMock->expects($this->once())->method('getApikey')->willReturn($apiKey);
+
         $mailchimpstoresControllerMock->expects($this->once())->method('getMailchimpHelper')->willReturn($helperMock);
 
         $mailchimpStoreModelMock->expects($this->once())->method('getId')->willReturn($tableId);
-        $mailchimpStoreModelMock->expects($this->once())->method('getApikey')->willReturn($apiKey);
 
-        $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
+        $helperMock->expects($this->once())->method('getApiStores')->willReturn($apiStoresMock);
 
-        $apiMock->expects($this->once())->method('getEcommerce')->willReturn($ecommerceMock);
+        $apiStoresMock->expects($this->once())->method('deleteMailChimpStore')->with($mailchimpStoreId, $apiKey);
 
-        $ecommerceMock->expects($this->once())->method('getStores')->willReturn($storesMock);
-
-        $mailchimpStoreModelMock->expects($this->once())->method('getStoreid')->willReturn($id);
-
-        $storesMock->expects($this->once())->method('delete')->with($id);
+        $helperMock->expects($this->once())->method('deleteAllMCStoreData')->with($mailchimpStoreId);
 
         $mailchimpstoresControllerMock->expects($this->once())->method('_redirect')->with('*/*/index');
 
