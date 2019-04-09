@@ -1117,6 +1117,71 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpObserverMock->saveConfigBefore($observerMock);
     }
 
+    public function testSaveConfigBeforeInheritStore()
+    {
+        $apiKey = 'q1w2e3r4t5y6u7i8o9p0-us1';
+        $listId = 'a1s2d3f4g5';
+        $oldMailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
+        $dataArray = array('groups' => array('general' => array('fields' => array(
+            'list' => array('value' => $listId),
+            'storeid' => array('inherit' => true),
+            'apikey' => array('value' => $apiKey)
+        ))));
+        $dataArrayModified = array('groups' => array('general' => array('fields' => array(
+            'list' => array('value' => $listId),
+            'storeid' => array('value' => $oldMailchimpStoreId),
+            'apikey' => array('value' => $apiKey)
+        ))));
+        $scopeArray = array('scope_id' => '1', 'scope' => 'stores');
+        $message = 'The Mailchimp store configuration was not modified. There is a Mailchimp list configured for this scope. Both must be set to inherit at the same time.';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getAdminSession', 'isListXorStoreInherited'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCurrentScope', 'getIfConfigExistsForScope', 'saveMailchimpConfig', 'getMCStoreId'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getObject'))
+            ->getMock();
+
+        $configMock = $this->getMockBuilder(Mage_Adminhtml_Model_Config::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSection', 'getData', 'setData'))
+            ->getMock();
+
+        $adminSessionMock = $this->getMockBuilder(Mage_Adminhtml_Model_Session::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('addError'))
+            ->getMock();
+
+
+        $observerMock->expects($this->once())->method('getObject')->willReturn($configMock);
+
+        $configMock->expects($this->once())->method('getSection')->willReturn('mailchimp');
+        $configMock->expects($this->once())->method('getData')->willReturn($dataArray);
+
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $helperMock->expects($this->once())->method('getCurrentScope')->willReturn($scopeArray);
+        $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeArray['scope_id'], $scopeArray['scope'])->willReturn($oldMailchimpStoreId);
+
+        $mailchimpObserverMock->expects($this->once())->method('isListXorStoreInherited')->with($dataArray)->willReturn(true);
+
+        $mailchimpObserverMock->expects($this->once())->method('getAdminSession')->willReturn($adminSessionMock);
+
+        $adminSessionMock->expects($this->once())->method('addError')->with($message);
+
+        $configMock->expects($this->once())->method('setData')->with($dataArrayModified);
+
+        $mailchimpObserverMock->saveConfigBefore($observerMock);
+    }
+
     public function testProductSaveAfter()
     {
         $productId = 907;

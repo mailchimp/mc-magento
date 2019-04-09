@@ -1720,6 +1720,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $postCode = 'postCode';
         $country = 'country';
         $isProductEnabled = false;
+        $mailchimpSyncError = 0;
 
         $cartsApiMock = $this->cartsApiMock->setMethods(array(
             '_getCheckoutUrl',

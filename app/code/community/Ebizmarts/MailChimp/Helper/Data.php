@@ -359,6 +359,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $connection->update($resource->getMainTable(), array('status' => 'canceled'), $where);
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Model_Mysql4_SynchBatches
+     */
+    protected function getSyncBatchesResource()
+    {
+        return Mage::getResourceModel('mailchimp/synchbatches');
+    }
+
     public function deleteAllMCStoreData($mailchimpStoreId)
     {
         //Delete default configurations for this store.

@@ -41,7 +41,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api = $helper->getApiByKey($apiKey);
             $isSyncing = true;
             $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
-            $response = $api->getEcommerce()->getStores()->add($mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+            $response = $this->addStore($api, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
             $configValues = array(
                 array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", $response['connected_site']['site_script']['url'])
             );
@@ -202,5 +202,26 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     protected function getAdminSession()
     {
         return Mage::getSingleton('adminhtml/session');
+    }
+
+    /**
+     * @param $api
+     * @param $mailchimpStoreId
+     * @param $listId
+     * @param $storeName
+     * @param $currencyCode
+     * @param $isSyncing
+     * @param $storeDomain
+     * @param $storeEmail
+     * @param $currencySymbol
+     * @param $primaryLocale
+     * @param $timeZone
+     * @param $storePhone
+     * @param $address
+     * @return mixed
+     */
+    protected function addStore($api, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address)
+    {
+        return $api->getEcommerce()->getStores()->add($mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
     }
 }
