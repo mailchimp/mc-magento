@@ -33,7 +33,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
             'sort_order' => 0
         ));
 
-        $scopeArray = $this->getScopeArrayIfExists();
+        $scopeArray = $this->getScopeArrayIfValueExists();
         $mcInUseMessage = $this->getMCInUseMessage($scopeArray);
         $this->_formScripts[] = "function deleteMCStoreConfirm(message, url) {
             if ($scopeArray !== false) {
@@ -80,13 +80,16 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
     }
 
     /**
-     * @return bool
+     * @return array
      */
-    protected function getScopeArrayIfExists()
+    protected function getScopeArrayIfValueExists()
     {
         $helper = $this->makeHelper();
         $currentMCStoreId = Mage::registry('current_mailchimpstore')->getStoreid();
-        $keyIfExist = $helper->getScopeArrayIfExists($currentMCStoreId);
+        $keyIfExist = $helper->getScopeByMailChimpStoreId($currentMCStoreId);
+        if ($keyIfExist === null) {
+            $keyIfExist = 'false';
+        }
         return $keyIfExist;
     }
 

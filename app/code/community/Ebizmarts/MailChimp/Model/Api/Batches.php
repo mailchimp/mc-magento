@@ -362,12 +362,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
-                    if ($helper->validateDate($syncingFlag) && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)) {
+                    //Set is
+                    if ($syncingFlag === null && $itemAmount !== 0 || $helper->validateDate($syncingFlag) && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)) {
                         //Set is syncing per scope in 1 until sync finishes.
                         $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1));
                         $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
                     } else {
-                        if ($syncingFlag == 1 && $itemAmount == 0) {
+                        if ($syncingFlag === 1 && $itemAmount === 0) {
                             //Set is syncing per scope to a date because it is not sending any more items.
                             $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", date('Y-m-d H:i:s')));
                             $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
@@ -777,6 +778,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function handleSyncingValue($syncedDateArray)
     {
+        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
+        Mage::log($syncedDateArray, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
         foreach ($syncedDateArray as $mailchimpStoreId => $val) {
             $magentoStoreId = key($val);
