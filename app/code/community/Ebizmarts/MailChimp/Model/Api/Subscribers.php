@@ -146,9 +146,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->setEntityTypeFilter(1)
             ->addSetInfo()
             ->getData();
+
         $mergeVars = array();
         $subscriberEmail = $subscriber->getSubscriberEmail();
         $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
+
+        $lastOrder = $helper->getLastOrderByEmail($subscriberEmail);
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
@@ -167,6 +170,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 case 'default_shipping':
                                     $address = $customer->getPrimaryAddress($attributeCode);
                                     $addressData = $this->getAddressData($address);
+
+                                    if (!$addressData && $lastOrder && $lastOrder->getShippingAddress()) {
+                                        $addressData = $lastOrder->getShippingAddress();
+                                    }
+
                                     if (count($addressData)) {
                                         $eventValue = $mergeVars[$key] = $addressData;
                                     }
@@ -194,7 +202,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     $firstName = $customer->getFirstname();
 
                                     if (!$firstName) {
-                                        $firstName = $subscriber->getSubscriberFirstname();
+                                        if ($subscriber->getSubscriberFirstname()) {
+                                            $firstName = $subscriber->getSubscriberFirstname();
+                                        } elseif ($lastOrder && $lastOrder->getCustomerFirstname()) {
+                                            $firstName = $lastOrder->getCustomerFirstname();
+                                        }
                                     }
 
                                     if ($firstName) {
@@ -205,7 +217,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                     $lastName = $customer->getLastname();
 
                                     if (!$lastName) {
-                                        $lastName = $subscriber->getSubscriberLastname();
+                                        if ($subscriber->getSubscriberLastname()) {
+                                            $lastName = $subscriber->getSubscriberLastname();
+                                        } elseif ($lastOrder && $lastOrder->getCustomerLastname()) {
+                                            $lastName = $lastOrder->getCustomerLastname();
+                                        }
                                     }
 
                                     if ($lastName) {
@@ -257,6 +273,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $addr = explode('_', $customAtt);
                             $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
+                            if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
+                                $address = $lastOrder->getShippingAddress();
+                            }
+
                             if ($address) {
                                 $company = $address->getCompany();
                                 if ($company) {
@@ -269,6 +289,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $addr = explode('_', $customAtt);
                             $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
+                            if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
+                                $address = $lastOrder->getShippingAddress();
+                            }
+
                             if ($address) {
                                 $telephone = $address->getTelephone();
                                 if ($telephone) {
@@ -280,6 +304,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         case 'shipping_country':
                             $addr = explode('_', $customAtt);
                             $address = $customer->getPrimaryAddress('default_' . $addr[0]);
+
+                            if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
+                                $address = $lastOrder->getShippingAddress();
+                            }
 
                             if ($address) {
                                 $countryCode = $address->getCountry();
@@ -294,6 +322,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $addr = explode('_', $customAtt);
                             $address = $customer->getPrimaryAddress('default_' . $addr[0]);
 
+                            if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
+                                $address = $lastOrder->getShippingAddress();
+                            }
+
                             if ($address) {
                                 $zipCode = $address->getPostcode();
                                 if ($zipCode) {
@@ -302,7 +334,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             }
                             break;
                         case 'dop':
-                            $dop = $helper->getLastDateOfPurchase($subscriberEmail);
+                            $dop = $helper->getLastDateOfPurchase($subscriberEmail, $lastOrder);
                             if ($dop) {
                                 $eventValue = $mergeVars[$key] = $dop;
                             }
