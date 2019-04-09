@@ -1536,13 +1536,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param  $subscriberEmail
      * @return null
      */
-    public function getLastDateOfPurchase($subscriberEmail)
+    public function getLastDateOfPurchase($subscriberEmail, $lastOrder = null)
     {
         $lastDateOfPurchase = null;
+        if (!$lastOrder) {
+           $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
+        }
 
-        $orderCollection = $this->getOrderCollectionByCustomerEmail($subscriberEmail);
-        if ($orderCollection->getSize()) {
-            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+        if ($lastOrder) {
             $lastDateOfPurchase = $lastOrder->getCreatedAt();
         }
 
@@ -3615,5 +3616,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getModelMailchimpEcommerceSyncData()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
+    }
+
+    /**
+     * @param $email
+     * @return array | return the latest order made by the email passed by parameter if exists.
+     *
+     */
+    public function getLastOrderByEmail($email)
+    {
+        $orderCollection = $this->getOrderCollectionByCustomerEmail($email);
+        $lastOrder = array();
+        if ($orderCollection->getSize()) {
+            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+        }
+
+        return $lastOrder;
     }
 }
