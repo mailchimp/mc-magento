@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
                     if(isset($store['connected_site'])) {
                         $label = $store['name'];
                     } else {
-                        $label = $store['name'].' (Warning: not connected)';
+                        $label = $store['name'] . ' (' . $helper->__("Warning: not connected") . ')';
                     }
 
                     $stores[] = array('value'=> $store['id'], 'label' => $label);

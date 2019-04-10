@@ -64,7 +64,7 @@
                             <show_in_store>1</show_in_store>
                         </oauth_wizard>
                         <storeid translate="label comment">
-                            <label>MailChimp Store</label>
+                            <label>Mailchimp Store</label>
                             <frontend_type>select</frontend_type>
                             <source_model>Ebizmarts_MailChimp_Model_System_Config_Source_Store</source_model>
                             <backend_model>mailchimp/system_config_backend_store</backend_model>

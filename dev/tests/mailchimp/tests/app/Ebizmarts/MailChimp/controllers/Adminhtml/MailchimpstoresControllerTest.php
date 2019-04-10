@@ -81,8 +81,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
             ->getMock();
 
         $mailchimpstoresControllerMock->expects($this->exactly(2))->method('_title')->withConsecutive(
-            array('MailChimp'),
-            array('MailChimp Store')
+            array('Mailchimp'),
+            array('Mailchimp Store')
         )->willReturnOnConsecutiveCalls(
             $mailchimpstoresControllerMock,
             $mailchimpstoresControllerMock

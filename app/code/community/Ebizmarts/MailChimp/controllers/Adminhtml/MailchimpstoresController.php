@@ -22,7 +22,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     {
         $this->loadLayout()
             ->_setActiveMenu('newsletter')
-            ->_addBreadcrumb($this->__('Newsletter'), $this->__('MailChimp Store'));
+            ->_addBreadcrumb($this->__('Newsletter'), $this->__('Mailchimp Store'));
 
         return $this;
     }
@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     {
         $this->_loadStores();
         $this->_title($this->__('Newsletter'))
-            ->_title($this->__('MailChimp'));
+            ->_title($this->__('Mailchimp'));
 
         $this->loadLayout();
         $this->_setActiveMenu('newsletter/mailchimp');
@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
     protected function _initStore($idFieldName = 'id')
     {
-        $this->_title($this->__('MailChimp Stores'))->_title($this->__('Manage MailChimp Stores'));
+        $this->_title($this->__('Mailchimp Stores'))->_title($this->__('Manage Mailchimp Stores'));
 
         $storeId = (int)$this->getRequest()->getParam($idFieldName);
 
@@ -60,7 +60,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
     public function editAction()
     {
-        $this->_title($this->__('MailChimp'))->_title($this->__('MailChimp Store'));
+        $this->_title($this->__('Mailchimp'))->_title($this->__('Mailchimp Store'));
         $id = $this->getRequest()->getParam('id');
         $mailchimpStore = $this->loadMailchimpStore($id);
         $this->sessionregisterStore($mailchimpStore);

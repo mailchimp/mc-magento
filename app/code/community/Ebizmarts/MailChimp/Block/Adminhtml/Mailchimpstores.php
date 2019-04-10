@@ -19,8 +19,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores extends Mage_Adminhtml
         $this->_headerText = $this->__('Mailchimp stores');
 
         parent::__construct();
-//        $this->removeButton('add');
-
     }
 
 }
