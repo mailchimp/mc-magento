@@ -70,7 +70,7 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
             ->setMethods(array('getMapFields', 'getLastOrderByEmail'))
             ->getMock();
 
-        $collectionMock = $this->getMockBuilder(Mage_Eav_Model_Resource_Entity_Attribute_Set_Collection::class)
+        $collectionMock = $this->getMockBuilder(Mage_Eav_Model_Resource_Entity_Attribute_Collection::class)
             ->setMethods(array('setEntityTypeFilter', 'addSetInfo', 'getData'))
             ->getMock();
 
