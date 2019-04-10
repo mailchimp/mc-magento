@@ -128,7 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($this->isSimpleProduct($product)) {
             $variantProducts[] = $product;
         } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts = $this->makeProductChildrenCollection($product, $magentoStoreId);
+            $variantProducts = $this->makeProductChildrenArray($product, $magentoStoreId);
         } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
             $variantProducts[] = $product;
         } else {
@@ -164,7 +164,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $productSyncDataItem = $helper->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
                     $parent = Mage::getModel('catalog/product')->load($parentId);
-                    $variantProducts = $this->makeProductChildrenCollection($product, $magentoStoreId, true);
+                    $variantProducts = $this->makeProductChildrenArray($product, $magentoStoreId, true);
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
                     try {
                         $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
@@ -184,7 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
         } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts = $this->makeProductChildrenCollection($product, $magentoStoreId, true);
+            $variantProducts = $this->makeProductChildrenArray($product, $magentoStoreId, true);
         } else {
             //@TODO bundle
             return array();
@@ -601,7 +601,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param bool $isBuildUpdateProductRequest
      * @return array | return an array with the childs of the product passed by parameter
      */
-    public function makeProductChildrenCollection($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
+    public function makeProductChildrenArray($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
     {
         $variantProducts[] = $product;
         /**

@@ -736,7 +736,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->joinMailchimpSyncData($collectiontMock, $mailchimpStoreId, $isForSpecialPrice);
     }
 
-    public function testMakeProductChildrenCollection()
+    public function testMakeProductChildrenArray()
     {
         $magentoStoreId = 1;
         $isBuildUpdateProductRequest = false;
@@ -781,6 +781,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $variantProducts[] = $productMock;
 
-        $productsApiMock->makeProductChildrenCollection($productMock, $magentoStoreId, $isBuildUpdateProductRequest);
+        $productsApiMock->makeProductChildrenArray($productMock, $magentoStoreId, $isBuildUpdateProductRequest);
     }
 }
