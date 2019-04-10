@@ -362,12 +362,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE, 0));
+        $this->saveMailchimpConfig($configValues, $scopeId, $scope, false);
         $config->cleanCache();
 
-        $connection = $this->getCoreResource()->getConnection('core_write');
-        $resource = $this->getSyncBatchesResource();
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/synchbatches');
         $where = $connection->quoteInto("status = 'pending' AND store_id = ?", $mailchimpStoreId);
-        $connection->update($resource->getMainTable(), array('status' => 'canceled'), $where);
+        $connection->update($tableName, array('status' => 'canceled'), $where);
     }
 
     /**
