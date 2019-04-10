@@ -362,13 +362,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     $itemAmount = ($customerAmount + $productAmount + $orderAmount);
                     $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
-                    //Set is
-                    if ($syncingFlag === null && $itemAmount !== 0 || $helper->validateDate($syncingFlag) && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)) {
+                    if ($this->shouldFlagAsSyncing($magentoStoreId, $syncingFlag, $itemAmount, $helper, $mailchimpStoreId)) {
                         //Set is syncing per scope in 1 until sync finishes.
                         $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1));
                         $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
                     } else {
-                        if ($syncingFlag === 1 && $itemAmount === 0) {
+                        if ($this->shouldFlagAsSynced($syncingFlag, $itemAmount)) {
                             //Set is syncing per scope to a date because it is not sending any more items.
                             $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", date('Y-m-d H:i:s')));
                             $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
@@ -469,7 +468,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             } else {
                 break;
             }
-            $helper->createWebhookIfRequired($storeId);
         }
 
         $this->_getResults(0, false);
@@ -478,7 +476,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if ($batchResponse) {
                 $batchResponses[] = $batchResponse;
             }
-            $helper->createWebhookIfRequired(0, 'default');
         }
 
         return $batchResponses;
@@ -761,7 +758,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 if ($helper->validateDate($syncedDate)) {
                     $syncedDateArray[$mailchimpStoreId] = array($storeId => $syncedDate);
                 } else {
-                    if ((int)$syncedDate === 1) {
+                    if ((int)$syncedDate === 1 || $syncedDate === null) {
                         $syncedDateArray[$mailchimpStoreId] = array($storeId => false);
                     } elseif (!isset($syncedDateArray[$mailchimpStoreId])) {
                         $syncedDateArray[$mailchimpStoreId] = array($storeId => true);
@@ -778,8 +775,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function handleSyncingValue($syncedDateArray)
     {
-        Mage::log(__METHOD__, null, 'ebizmarts.log', true);
-        Mage::log($syncedDateArray, null, 'ebizmarts.log', true);
         $helper = $this->getHelper();
         foreach ($syncedDateArray as $mailchimpStoreId => $val) {
             $magentoStoreId = key($val);
@@ -834,5 +829,28 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         } else {
             $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 1, 0, null, 1, true);
         }
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @param $syncingFlag
+     * @param $itemAmount
+     * @param $helper
+     * @param $mailchimpStoreId
+     * @return bool
+     */
+    protected function shouldFlagAsSyncing($magentoStoreId, $syncingFlag, $itemAmount, $helper, $mailchimpStoreId)
+    {
+        return $syncingFlag === null && $itemAmount !== 0 || $helper->validateDate($syncingFlag) && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+    }
+
+    /**
+     * @param $syncingFlag
+     * @param $itemAmount
+     * @return bool
+     */
+    protected function shouldFlagAsSynced($syncingFlag, $itemAmount)
+    {
+        return ($syncingFlag === '1' || $syncingFlag === null) && $itemAmount === 0;
     }
 }

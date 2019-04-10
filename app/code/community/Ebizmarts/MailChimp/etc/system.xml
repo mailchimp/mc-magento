@@ -325,6 +325,9 @@
                             <comment>
                                 <model>mailchimp/adminhtml_includetaxes_comment</model>
                             </comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
                         </include_taxes>
                         <firstdate translate="label comment">
                             <label>First date</label>

@@ -34,9 +34,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         ));
 
         $scopeArray = $this->getScopeArrayIfValueExists();
+        if ($scopeArray !== false) {
+            $jsCondition = 'true';
+        } else {
+            $jsCondition = 'false';
+        }
         $mcInUseMessage = $this->getMCInUseMessage($scopeArray);
         $this->_formScripts[] = "function deleteMCStoreConfirm(message, url) {
-            if ($scopeArray !== false) {
+            if ($jsCondition) {
                 if (confirm(message)) {
                     deleteConfirm('$mcInUseMessage', url);
                 }
@@ -69,13 +74,20 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
     }
 
     /**
+     * @param $scope
      * @return string
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
     protected function getMCInUseMessage($scope)
     {
         $helper = $this->makeHelper();
-        $scopeName = $helper->getScopeName($scope);
-        $message = "This store is currently in use for this Magento store at $scopeName scope. Do you want to proceed anyways?";
+        if ($scope !== false) {
+            $scopeName = $helper->getScopeName($scope);
+            $message = "This store is currently in use for this Magento store at $scopeName scope. Do you want to proceed anyways?";
+        } else {
+            $message = "This store is currently in use for this Magento store. Do you want to proceed anyways?";
+        }
         return $helper->__($message);
     }
 

@@ -140,33 +140,38 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param $scopeId
-     * @param $scope
-     * @param bool $forceParentName
-     * @return mixed|null|string
+     * @param $scopeArray
+     * @return false|string
      * @throws Mage_Core_Exception
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function getScopeName($scope)
+    public function getScopeName($scopeArray)
     {
-        $scopeArray = explode('_', $scope);
-        $storeName = null;
-        switch ($scopeArray[0]) {
-            case 'stores':
-                $store = $this->getMageApp()->getStore($scopeArray[1]);
-                $storeName = $store->getName();
-                break;
-            case 'websites':
-                $website = $this->getMageApp()->getWebsite($scopeArray[1]);
-                $storeName = $website->getName();
-                break;
-            case 'default':
-                $storeName = 'Default Config';
-                break;
+        $storeName = false;
+        if(isset($scopeArray['scope'])) {
+            switch ($scopeArray['scope']) {
+                case 'stores':
+                    $store = $this->getMageApp()->getStore($scopeArray[1]);
+                    $storeName = $store->getName();
+                    break;
+                case 'websites':
+                    $website = $this->getMageApp()->getWebsite($scopeArray[1]);
+                    $storeName = $website->getName();
+                    break;
+                case 'default':
+                    $storeName = 'Default Config';
+                    break;
+            }
         }
         return $storeName;
     }
 
+    /**
+     * @param $scopeId
+     * @param $scope
+     * @return bool
+     * @throws Mage_Core_Exception
+     */
     public function isUsingConfigStoreName($scopeId, $scope)
     {
         $storeName = $this->getConfigValueForScope(Mage_Core_Model_Store::XML_PATH_STORE_STORE_NAME, $scopeId, $scope);
@@ -179,11 +184,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get store unsecure URL for given scope.
-     *
-     * @param  $scopeId
-     * @param  $scope
-     * @return mixed
+     * @param $scopeId
+     * @param $scope
+     * @return mixed|string
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function getStoreDomain($scopeId, $scope)
     {
@@ -202,7 +207,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get local store_id value of the MC store.
      *
-     * @return string
+     * @return array
+     * @throws Mage_Core_Exception
      */
     public function getStoreRelation()
     {
@@ -226,9 +232,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Get all Magento stores associated to the MailChimp store configured for the given scope.
      *
-     * @param  $scopeId
-     * @param  $scope
-     * @return null
+     * @param $scopeId
+     * @param $scope
+     * @return array|mixed
+     * @throws Mage_Core_Exception
      */
     public function getMagentoStoresForMCStoreIdByScope($scopeId, $scope)
     {
@@ -350,7 +357,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
+        foreach ($this->getAllStoresForScope($scopeId, $scope) as $storeId) {
+            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 'stores', $storeId);
+        }
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
         $config->cleanCache();
 
         $connection = $this->getCoreResource()->getConnection('core_write');
@@ -2334,20 +2345,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $customer;
-    }
-
-    /**
-     * @param $scopeId
-     * @param string $scope
-     * @throws Mage_Core_Exception
-     */
-    public function createWebhookIfRequired($scopeId, $scope = 'stores')
-    {
-        $webhookId = $this->getWebhookId($scopeId, $scope);
-        $enabled = $this->isSubscriptionEnabled($scopeId, $scope);
-        if ($enabled && !$webhookId) {
-            $this->handleWebhookChange($scopeId, $scope);
-        }
     }
 
     /**

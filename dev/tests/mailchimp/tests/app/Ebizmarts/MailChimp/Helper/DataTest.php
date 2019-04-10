@@ -322,24 +322,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->handleWebhookChange($scopeId, $scope);
     }
 
-    public function testCreateWebhookIfRequired()
-    {
-        $scopeId = 0;
-        $scope = 'default';
-        $webhookId = null;
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getWebhookId', 'handleWebhookChange', 'isSubscriptionEnabled'))
-            ->getMock();
-
-        $helperMock->expects($this->once())->method('getWebhookId')->with($scopeId, $scope)->willReturn($webhookId);
-        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(1);
-        $helperMock->expects($this->once())->method('handleWebhookChange')->with($scopeId, $scope);
-
-        $helperMock->createWebhookIfRequired($scopeId, $scope);
-    }
-
     /**
      * @param array $data
      * @dataProvider testGetImageUrlByIdDataProvider
