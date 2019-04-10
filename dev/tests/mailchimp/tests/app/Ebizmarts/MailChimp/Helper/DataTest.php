@@ -138,10 +138,15 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $where = "status = 'pending' AND store_id = $mailchimpStoreId";
         $tableName = 'mailchimp_sync_batches';
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE, 0));
+        $storeIdOne = 1;
+        $storeIdTwo = 2;
+        $storeIdThree = 3;
+        $storeIdsArray = array($storeIdOne, $storeIdTwo, $storeIdThree);
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getConfig', 'getCoreResource', 'getSyncBatchesResource'))
+            ->setMethods(array('getConfig', 'getCoreResource', 'saveMailchimpConfig', 'getAllStoresForScope'))
             ->getMock();
 
         $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
@@ -156,31 +161,33 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $dbAdapterInterfaceMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
 
-        $syncBatchesResourceModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Mysql4_SynchBatches::class)
-            ->setMethods(array('getMainTable'))
-            ->getMock();
 
+        $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, $scopeId, $scope, false);
         $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
+        $helperMock->expects($this->once())->method('getAllStoresForScope')->with($scopeId, $scope)->willReturn($storeIdsArray);
 
-        $param1 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
-        $param2 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
-        $param3 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
-        $param4 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
-        $param5 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
-        $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
-        $param7 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
-        $param8 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", $scope, $scopeId);
+        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdOne);
+        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdTwo);
+        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdThree);
+        $param4 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", $scope, $scopeId);
+        $param5 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+        $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
+        $param7 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
+        $param8 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
+        $param9 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
+        $param10 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
+        $param11 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
+        $param12 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
 
-        $configMock->expects($this->exactly(8))->method('deleteConfig')->withConsecutive($param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8);
+        $configMock->expects($this->exactly(12))->method('deleteConfig')->withConsecutive($param1, $param2, $param3, $param4, $param5, $param6, $param7, $param8, $param9, $param10, $param11, $param12);
+
         $configMock->expects($this->once())->method('cleanCache');
 
         $helperMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
 
         $coreResourceMock->expects($this->once())->method('getConnection')->with('core_write')->willReturn($dbAdapterInterfaceMock);
 
-        $helperMock->expects($this->once())->method('getSyncBatchesResource')->willReturn($syncBatchesResourceModelMock);
-
-        $syncBatchesResourceModelMock->expects($this->once())->method('getMainTable')->willReturn($tableName);
+        $coreResourceMock->expects($this->once())->method('getTableName')->willReturn($tableName);
 
         $dbAdapterInterfaceMock->expects($this->once())->method('quoteInto')->with("status = 'pending' AND store_id = ?", $mailchimpStoreId)->willReturn($where);
         $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($tableName, array('status' => 'canceled'), $where);
