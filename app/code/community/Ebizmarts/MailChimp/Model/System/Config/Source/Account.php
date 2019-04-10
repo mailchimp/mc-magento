@@ -73,8 +73,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
 
                     } catch (MailChimp_Error $e) {
                         if ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
-                            //                        $helper->deleteLocalMCStoreData($mcStoreId, $scopeArray['scope_id'], $scopeArray['scope']);
-                            $message = $helper->__('Looks like your MailChimp store was deleted. Please create a new one and associate it in order to get your Ecommerce data synced.');
+                            $message = $helper->__('Looks like your Mailchimp store was deleted. Please create a new one and associate it in order to get your Ecommerce data synced.');
                             Mage::getSingleton('adminhtml/session')->addWarning($message);
                         }
                         $this->_accountDetails['store_exists'] = false;
