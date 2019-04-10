@@ -26,14 +26,60 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
         return $this->toHtml();
     }
 
+    /**
+     * @return string
+     */
     public function getMailChimpVersion()
     {
         return (string)Mage::getConfig()->getNode('modules/Ebizmarts_MailChimp/version');
     }
 
+    /**
+     * @return mixed
+     */
     public function getMigrationFinishedStatus()
     {
         return Mage::helper('mailchimp')->migrationFinished();
     }
-}
 
+    /**
+     * @return Mage_Core_Block_Abstract
+     */
+    protected function _prepareLayout()
+    {
+        $this->getLayout()->getBlock('head')->addJs('ebizmarts/mailchimp/config.js');
+        return parent::_prepareLayout();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStoresUrl()
+    {
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getStores');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getListUrl()
+    {
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getList');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInfoUrl()
+    {
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getInfo');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInterestUrl()
+    {
+        return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getInterest');
+    }
+}
