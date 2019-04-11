@@ -424,12 +424,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         switch ($customAtt) {
             case 'billing_company':
             case 'shipping_company':
-                $addr = explode('_', $customAtt);
-                $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
-                    $address = $lastOrder->getShippingAddress();
-                }
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
 
                 if ($address) {
                     $company = $address->getCompany();
@@ -440,12 +435,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_telephone':
             case 'shipping_telephone':
-                $addr = explode('_', $customAtt);
-                $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
-                    $address = $lastOrder->getShippingAddress();
-                }
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
 
                 if ($address) {
                     $telephone = $address->getTelephone();
@@ -456,12 +446,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_country':
             case 'shipping_country':
-                $addr = explode('_', $customAtt);
-                $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
-                    $address = $lastOrder->getShippingAddress();
-                }
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
 
                 if ($address) {
                     $countryCode = $address->getCountry();
@@ -473,12 +458,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_zipcode':
             case 'shipping_zipcode':
-                $addr = explode('_', $customAtt);
-                $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                if (!$address && $lastOrder && $lastOrder->getShippingAddress()) {
-                    $address = $lastOrder->getShippingAddress();
-                }
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
 
                 if ($address) {
                     $zipCode = $address->getPostcode();
@@ -511,7 +491,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $storeId
      * @param $attribute
      * @param $subscriberEmail
-     * @return mixed
+     * @return array
      */
     protected function customerAttributes($subscriber, $attributeCode, $customer, $lastOrder, $mergeVars, $key, $storeId, $attribute)
     {
@@ -523,9 +503,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $address = $customer->getPrimaryAddress($attributeCode);
                 $addressData = $this->getAddressData($address);
 
-                if (!$addressData && $lastOrder && $lastOrder->getShippingAddress()) {
-                    $addressData = $lastOrder->getShippingAddress();
-                }
+                $addressData = $this->getAddressFromLastOrder($lastOrder, $addressData);
 
                 if (count($addressData)) {
                     $eventValue = $mergeVars[$key] = $addressData;
@@ -671,6 +649,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return Mage::getModel('customer/customer');
     }
 
+    /**
+     * @param $mageMCHelper
+     */
     protected function setMailchimpHelper($mageMCHelper)
     {
         $this->mcHelper = $mageMCHelper;
@@ -691,6 +672,35 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function unserilizeMapFields($mapFields)
     {
         return unserialize($mapFields);
+    }
+
+    /**
+     * @param $customAtt
+     * @param $customer
+     * @param $lastOrder
+     * @return array | returns an array with the address if it exists
+     */
+    protected function getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder)
+    {
+        $addr = explode('_', $customAtt);
+        $address = $customer->getPrimaryAddress('default_' . $addr[0]);
+
+        $address = $this->getAddressFromLastOrder($lastOrder, $address);
+
+        return $address;
+    }
+
+    /**
+     * @param $lastOrder
+     * @param $addressData
+     * @return array | return an array with the address from the order if exist and the addressData is empty.
+     */
+    protected function getAddressFromLastOrder($lastOrder, $addressData)
+    {
+        if (!$addressData && $lastOrder && $lastOrder->getShippingAddress()) {
+            $addressData = $lastOrder->getShippingAddress();
+        }
+        return $addressData;
     }
 
 }
