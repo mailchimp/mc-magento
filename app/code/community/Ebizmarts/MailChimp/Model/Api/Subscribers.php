@@ -141,7 +141,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $storeId = $subscriber->getStoreId();
         $mapFields = $helper->getMapFields($storeId);
-        $maps = unserialize($mapFields);
+        $maps = $this->unserilizeMapFields($mapFields);
         $websiteId = $this->getWebSiteByStoreId($storeId);
         $attrSetId = $this->getEntityAttributeCollection()
             ->setEntityTypeFilter(1)
@@ -619,6 +619,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function dispatchEventValue($customer, $subscriberEmail, $attributeCode, $eventValue)
     {
+        Mage::log($attributeCode, null, 'dispatchEvent.log', true);
         Mage::dispatchEvent(
             'mailchimp_merge_field_send_before', array(
                 'customer_id' => $customer->getId(),
@@ -682,4 +683,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         return $this->mcHelper;
     }
+
+    /**
+     * @param $mapFields
+     * @return array | returns an array of mapFields
+     */
+    protected function unserilizeMapFields($mapFields)
+    {
+        return unserialize($mapFields);
+    }
+
 }
