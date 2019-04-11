@@ -82,7 +82,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             $ruleId = $promoCode->getRuleId();
             try {
                 $promoRuleSyncData = $this->getMailChimpHelper()->getEcommerceSyncDataItem($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId);
-                if (!$promoRuleSyncData->getId() || $promoRuleSyncData->getMailchimpSyncDelta() < $helper->getEcommMinSyncDateFlag($magentoStoreId)) {
+                if (!$promoRuleSyncData->getId() || $promoRuleSyncData->getMailchimpSyncDelta() < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)) {
                     $promoRuleMailchimpData = $this->getApiPromoRules()->getNewPromoRule($ruleId, $this->_batchId, $mailchimpStoreId, $magentoStoreId);
                     if (!empty($promoRuleMailchimpData)) {
                         $batchArray[$counter] = $promoRuleMailchimpData;

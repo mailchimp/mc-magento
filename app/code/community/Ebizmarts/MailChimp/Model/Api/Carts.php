@@ -447,7 +447,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
             $address = array();
-            if ($street[0]) {
+            if (isset($street[0])) {
                 $address['address1'] = $street[0];
             }
 
