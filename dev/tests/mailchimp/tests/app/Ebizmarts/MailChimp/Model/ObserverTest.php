@@ -1225,8 +1225,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getEvent'))
             ->getMock();
 
-        $storesMock = $this->getMockBuilder(ArrayObject::class)
-            ->setMethods(array('getIterator'))
+        $storeMock = $this->getMockBuilder(ArrayObject::class)
+            ->setMethods(array())
             ->getMock();
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
@@ -1278,13 +1278,10 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $dataProductMock->expects($this->once())
             ->method('delete');
 
+        $storeArray = array($storeId => $storeMock);
         $mageCoreModelAppMock->expects($this->once())
             ->method('getStores')
-            ->willReturn($storesMock);
-
-        $storesMock->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new ArrayIterator($storesIds));
+            ->willReturn($storeArray);
 
         $productMock->expects($this->exactly(3))
             ->method('getId')
