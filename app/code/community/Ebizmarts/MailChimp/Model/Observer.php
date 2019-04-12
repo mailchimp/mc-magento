@@ -1098,4 +1098,12 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         return Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
     }
+
+    /**
+     * @return Mage_Catalog_Model_Product_Status
+     */
+    protected function getCatalogProductStatusModel()
+    {
+        return Mage::getModel('catalog/product_status');
+    }
 }
