@@ -782,7 +782,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
                     $dataProduct = $helper->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
-                    if ($isMarkedAsDeleted) {
+                    $errorMessage = $dataProduct->getMailchimpSyncError();
+                    if ($isMarkedAsDeleted || $errorMessage == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
                         $dataProduct->delete();
                     } else {
                         $apiProduct->update($product->getId(), $mailchimpStoreId);
