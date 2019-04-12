@@ -770,7 +770,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiProduct = $this->makeApiProduct();
 
         $stores = $helper->getMageApp()->getStores();
-        foreach ($stores as $storeId) {
+        foreach ($stores as $storeId => $store) {
 
             $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
