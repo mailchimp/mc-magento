@@ -770,7 +770,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiProduct = $this->makeApiProduct();
 
         $stores = $helper->getMageApp()->getStores();
-        foreach ($stores as $storeId) {
+        foreach ($stores as $storeId => $store) {
 
             $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
@@ -1097,5 +1097,13 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getWarningMessageAdminHtmlSession($helper)
     {
         return Mage::getSingleton('adminhtml/session')->addWarning($helper->__('The customer must be subscribed for this change to apply.'));
+    }
+
+    /**
+     * @return Mage_Catalog_Model_Product_Status
+     */
+    protected function getCatalogProductStatusModel()
+    {
+        return Mage::getModel('catalog/product_status');
     }
 }
