@@ -570,10 +570,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             if ($this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
                 if (!$this->getResendEnabled($scopeId, $scope)) {
-                    $this->saveLastItemsSent($scopeId, $scope);
+                    $this->saveLastItemsSent($scopeId, $scope, $filters);
                 }
-                $this->removeEcommerceSyncData($scopeId, $scope);
-                $this->clearErrorGrid($scopeId, $scope, true);
+                $this->removeEcommerceSyncData($scopeId, $scope, $filters);
+                $this->clearErrorGrid($scopeId, $scope, true, $filters);
             }
         }
     }
@@ -585,21 +585,25 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $scope
      * @param bool $deleteErrorsOnly
      */
-    public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
+    public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false, $filters = null)
     {
-        //agregar un where de los filtros que se "reenviaron"
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $resource = $this->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = array();
+
         if ($deleteErrorsOnly) {
             if ($scopeId === 0) {
-                $where = "mailchimp_sync_error != ''";
+                $where []= "mailchimp_sync_error != ''";
+                $where []= $connection->quoteInto('type IN (?)', $filters);
             } else {
-                $where = $connection->quoteInto("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId);
+                $where []= $connection->quoteInto("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId);
+                $where []= $connection->quoteInto('type IN (?)', $filters);
             }
         } else {
-            $where = $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
+            $where []= $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
+            $where []= $connection->quoteInto('type IN (?)', $filters);
         }
         try {
             $connection->delete($tableName, $where);
@@ -762,7 +766,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $scope
      * @param bool $excludeSubscribers
      */
-    public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false)
+    public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false, $filters = array())
     {
         //Make sure there are no errors without no MailChimp store id due to older versions.
         $this->handleOldErrors();
@@ -771,11 +775,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $resource = $this->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/mailchimperrors');
+        $where = array();
+
         if ($excludeSubscribers) {
-            $where = array("mailchimp_store_id = ?" => $mailchimpStoreId);
+            $where []= $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
+            $where []= $connection->quoteInto('type IN (?)', $filters);
         } else {
             if ($scopeId !== 0) {
-                $where = array("store_id = ?" => $scopeId);
+                $where []= $connection->quoteInto("store_id = ?", $scopeId);
+                $where []= $connection->quoteInto('type IN (?)', $filters);
             } else {
                 $where = '';
             }
@@ -877,23 +885,33 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
-    public function saveLastItemsSent($scopeId, $scope)
+    public function saveLastItemsSent($scopeId, $scope, $filters = array())
     {
-        //agregar filtro de si esta en el config antes de hacer el "getLastxxx"
         $isSyncing = $this->getMCIsSyncing($scopeId, $scope);
         if ($isSyncing != 1) {
-            $customerLastId = $this->getLastCustomerSent($scopeId, $scope);
-            $productLastId = $this->getLastProductSent($scopeId, $scope);
-            $orderLastId = $this->getLastOrderSent($scopeId, $scope);
-            $cartLastId = $this->getLastCartSent($scopeId, $scope);
-            $promoCodeLastId = $this->getLastPromoCodeSent($scopeId, $scope);
-
             $configValues = array();
-            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId);
-            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId);
-            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId);
-            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId);
-            $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $promoCodeLastId);
+
+            if ($this->getCustomerResendLastId() !== null && in_array('customers', $filters)) {
+                $customerLastId = $this->getLastCustomerSent($scopeId, $scope);
+                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId);
+            }
+            if ($this->getProductResendLastId() !== null && in_array('products', $filters)) {
+                $productLastId = $this->getLastProductSent($scopeId, $scope);
+                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId);
+            }
+            if ($this->getOrderResendLastId() !== null && in_array('orders', $filters)) {
+                $orderLastId = $this->getLastOrderSent($scopeId, $scope);
+                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId);
+            }
+            if ($this->getCartResendLastId() !== null && in_array('carts', $filters)) {
+                $cartLastId = $this->getLastCartSent($scopeId, $scope);
+                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId);
+            }
+            if ($this->getPromoCodeResendLastId() !== null && in_array('promo', $filters)) {
+                $promoCodeLastId = $this->getLastPromoCodeSent($scopeId, $scope);
+                $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $promoCodeLastId);
+            }
+
             $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, 1);
             $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, 1);
             $this->saveMailchimpConfig($configValues, $scopeId, $scope);
