@@ -10,7 +10,7 @@
                 resizable:false,
                 closable:true,
                 className:"magento",
-                windowClassName:"popup-window",
+                windowClassName:"resend_window",
                 title:'Resend Ecommerce Data',
                 top:50,
                 width:1000,
@@ -19,12 +19,24 @@
                 recenterAuto:false,
                 hideEffect:Element.hide,
                 showEffect:Element.show,
-                id:"browser_window",
+                id:"resend_window",
                 url: url,
                 onClose:function (param, el) {
                     location.reload();
                 }
             });
         }
+
+        function closeWindow(dialog) {
+            alert(dialog);
+            if (dialog.getContent() === 1) {
+                alert('asd');
+            }
+        }
+
+        // Event.observe('resend_window', 'change', closeWindow(this));
+        // $(openResend).ajaxSuccess(function(){
+        //     alert('asd');
+        // });
 </script>
 
