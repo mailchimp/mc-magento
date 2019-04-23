@@ -572,7 +572,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 if (!$this->getResendEnabled($scopeId, $scope)) {
                     $this->saveLastItemsSent($scopeId, $scope, $filters);
                 }
-                $this->removeEcommerceSyncData($scopeId, $scope, $filters);
+                $this->removeEcommerceSyncData($scopeId, $scope, false, $filters);
                 $this->clearErrorGrid($scopeId, $scope, true, $filters);
             }
         }

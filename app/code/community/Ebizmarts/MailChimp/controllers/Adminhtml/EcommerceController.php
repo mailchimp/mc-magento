@@ -53,33 +53,14 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 
         try {
             $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], false, $filters);
-            $success = 1;
+
+            Mage::getSingleton('core/session')->addSuccess('Ecommerce data resent succesfully');
+            $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
         } catch(MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
         } catch(Exception $e) {
             $helper->logError($e->getMessage());
         }
-
-        $mageApp->getResponse()->setBody($success);
-    }
-
-    public function resendEcommerceDataAjax()
-    {
-        $helper = $this->makeHelper();
-        $mageApp = $helper->getMageApp();
-        $request = $mageApp->getRequest();
-        $scope = $request->getParam('scope');
-        $scopeId = $request->getParam('scope_id');
-        $success = 0;
-        try {
-            $helper->resetMCEcommerceData($scopeId, $scope, false);
-            $success = 1;
-        } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch(Exception $e) {
-            $helper->logError($e->getMessage());
-        }
-
         $mageApp->getResponse()->setBody($success);
     }
 

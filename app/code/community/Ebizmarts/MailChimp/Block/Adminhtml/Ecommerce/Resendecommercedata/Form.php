@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Products",
                 'id'    => 'products',
                 'title' => "Products",
-                'value' => 'products',
+                'value' => 'PRO',
                 'required' => false
             )
         );
@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Customers",
                 'id' => 'customers',
                 'title' => 'Customers',
-                'value' => 'customers',
+                'value' => 'CUS',
                 'required' => false
             )
         );
@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Orders",
                 'id' => 'orders',
                 'title' => 'Orders',
-                'value' => 'orders',
+                'value' => 'ORD',
                 'required' => false
             )
         );
@@ -44,17 +44,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Carts",
                 'id' => 'carts',
                 'title' => 'Carts',
-                'value' => 'carts',
+                'value' => 'QUO',
                 'required' => false
             )
         );
         $fieldset->addField(
             'promo', 'checkbox', array(
                 'name' => 'filter[]',
-                'label' => "Promo Codes",
+                'label' => "Promo Rules",
                 'id' => 'promo',
-                'title' => 'Promo Codes',
-                'value' => 'promo',
+                'title' => 'Promo Rules',
+                'value' => 'PCD, PRL',
                 'required' => false
             )
         );
