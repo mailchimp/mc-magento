@@ -165,11 +165,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $attributeCode = $attribute['attribute_code'];
 
                             $mergeVars = $this->customerAttributes($subscriber, $attributeCode, $customer, $lastOrder, $mergeVars, $key, $storeId, $attribute);
+                            $eventValue = $mergeVars[$key];
                             $this->dispatchEventValue($customer, $subscriberEmail, $attributeCode, $eventValue);
                         }
                     }
                 } else {
                     $mergeVars = $this->customizedAttributes($customAtt, $customer, $lastOrder, $mergeVars, $key, $helper, $subscriberEmail, $storeId);
+                    $eventValue = $mergeVars[$key];
                     $this->dispatchEventValue($customer, $subscriberEmail, $customAtt, $eventValue);
                 }
 
