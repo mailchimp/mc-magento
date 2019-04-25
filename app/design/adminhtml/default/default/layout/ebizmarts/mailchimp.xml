@@ -22,7 +22,7 @@
             <block type="mailchimp/adminhtml_mergevars_add" name="adminhtml.mailchimp.add"></block>
         </reference>
     </adminhtml_mergevars_addmergevar>
-    <adminhtml_ecommerce_resendecommercedata>
+    <adminhtml_ecommerce_renderresendecom>
         <reference name="content">
             <update handle="default"/>
             <remove name="header"/>
@@ -32,7 +32,7 @@
             <remove name="global_notices"/>
             <block type="mailchimp/adminhtml_ecommerce_resendecommercedata" name="adminhtml.mailchimp.resend"></block>
         </reference>
-    </adminhtml_ecommerce_resendecommercedata>
+    </adminhtml_ecommerce_renderresendecom>
     <adminhtml_system_config_edit>
         <reference name="head">
             <action method="addItem">

@@ -4,7 +4,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
 {
     protected function _prepareForm()
     {
-        $form = new Varien_Data_Form(array('id' => 'edit_form', 'action' => $this->getUrl('*/*/resend'), 'method' => 'post'));
+        $form = new Varien_Data_Form(array('id' => 'edit_form', 'action' => $this->getUrl('*/*/resendEcommerceData'), 'method' => 'post'));
         $fieldset = $form->addFieldset('base_fieldset', array('legend' => Mage::helper('mailchimp')->__('Resend Data')));
 
 
@@ -15,7 +15,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'id'    => 'products',
                 'title' => "Products",
                 'value' => 'PRO',
-                'required' => false
+                'required' => false,
+                'checked'  => '1',
             )
         );
         $fieldset->addField(
@@ -25,7 +26,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'id' => 'customers',
                 'title' => 'Customers',
                 'value' => 'CUS',
-                'required' => false
+                'required' => false,
+                'checked'  => '1',
             )
         );
         $fieldset->addField(
@@ -35,7 +37,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'id' => 'orders',
                 'title' => 'Orders',
                 'value' => 'ORD',
-                'required' => false
+                'required' => false,
+                'checked'  => '1',
             )
         );
         $fieldset->addField(
@@ -45,7 +48,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'id' => 'carts',
                 'title' => 'Carts',
                 'value' => 'QUO',
-                'required' => false
+                'required' => false,
+                'checked'  => '1',
             )
         );
         $fieldset->addField(
@@ -55,7 +59,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'id' => 'promo',
                 'title' => 'Promo Rules',
                 'value' => 'PCD, PRL',
-                'required' => false
+                'required' => false,
+                'checked'  => '1',
             )
         );
 

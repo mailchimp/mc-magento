@@ -12,7 +12,7 @@
  */
 class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
 {
-    public function resendecommercedataAction()
+    public function renderresendecomAction()
     {
         $this->loadLayout();
         $this->renderLayout();
@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $mageApp->getResponse()->setBody($success);
     }
 
-    public function resendAction()
+    public function resendEcommerceDataAction()
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
@@ -51,15 +51,22 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scopeArray = $helper->getCurrentScope();
         $success = 0;
 
-        try {
-            $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], false, $filters);
-
-            Mage::getSingleton('core/session')->addSuccess('Ecommerce data resent succesfully');
+        if (is_array($filters) && empty($filters)) {
+            Mage::getSingleton('core/session')->addWarning("At least one type of eCommerce data should be selected to Resend.");
             $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
-        } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch(Exception $e) {
-            $helper->logError($e->getMessage());
+        } else {
+            try {
+                $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], false, $filters);
+
+                Mage::getSingleton('core/session')->addSuccess('Ecommerce data resent succesfully');
+                $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage());
+                Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage());
+                Mage::getSingleton('core/session')->addError($e->getMessage());
+            }
         }
         $mageApp->getResponse()->setBody($success);
     }
