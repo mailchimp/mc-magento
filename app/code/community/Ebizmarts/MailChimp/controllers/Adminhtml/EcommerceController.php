@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
         } else {
             try {
-                $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], false, $filters);
+                $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
 
                 Mage::getSingleton('core/session')->addSuccess('Ecommerce data resent succesfully');
                 $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';

@@ -60,7 +60,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $counter = 0;
         foreach ($collection as $product) {
 
-            if ($this->shouldSendProductUpdate($magentoStoreId, $product)) {
+            if ($this->shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)) {
                 $batchArray = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = count($batchArray);
                 $this->_updateSyncData($product->getId(), $mailchimpStoreId);
@@ -108,32 +108,16 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     protected function _buildDeleteProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
-        $variantProducts = array();
-        if ($this->isSimpleProduct($product)) {
-            $variantProducts[] = $product;
-        } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts[] = $product;
-
-            $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-            $childProducts = $this->getConfigurableChildrenIds($product);
-            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-            foreach ($collection as $childProduct) {
-                $variantProducts[] = $childProduct;
-            }
-
-        } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
-            $variantProducts[] = $product;
-        } else {
+        if ($this->isBundleProduct($product))
+        {
             //@TODO bundle
             return array();
+        } else {
+            $data = array();
+            $data['method'] = "DELETE";
+            $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $product->getId();
+            $data['operation_id'] = $batchId . '_' . $product->getId();
         }
-
-        $data = array();
-        $data['method'] = "DELETE";
-        $data['path'] = "/ecommerce/stores/" . $mailchimpStoreId . "/products/" . $product->getId();
-        $data['operation_id'] = $batchId . '_' . $product->getId();
 
         return $data;
     }
@@ -144,17 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if ($this->isSimpleProduct($product)) {
             $variantProducts[] = $product;
         } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts[] = $product;
-
-            $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-            $childProducts = $this->getConfigurableChildrenIds($product);
-            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-            foreach ($collection as $childProduct) {
-                $variantProducts[] = $childProduct;
-            }
-
+            $variantProducts = $this->makeProductChildrenArray($product, $magentoStoreId);
         } else if ($this->isVirtualProduct($product) || $this->isDownloadableProduct($product)) {
             $variantProducts[] = $product;
         } else {
@@ -190,18 +164,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $productSyncDataItem = $helper->getEcommerceSyncDataItem($parentId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
                     $parent = Mage::getModel('catalog/product')->load($parentId);
-                    $variantProducts[] = $parent;
-
-                    $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-                    $childProducts = $this->getConfigurableChildrenIds($parent);
-                    $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-                    foreach ($collection as $childProduct) {
-                        if ($childProduct->getId() != $product->getId()) {
-                            $variantProducts[] = $childProduct;
-                        }
-                    }
+                    $variantProducts = $this->makeProductChildrenArray($product, $magentoStoreId, true);
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
                     try {
                         $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
@@ -221,18 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
         } else if ($this->isConfigurableProduct($product)) {
-            $variantProducts[] = $product;
-
-            $collection = $this->makeProductChildrenCollection($magentoStoreId);
-
-            $childProducts = $this->getConfigurableChildrenIds($product);
-            $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
-
-            foreach ($collection as $childProduct) {
-                if ($childProduct->getId() != $product->getId()) {
-                    $variantProducts[] = $childProduct;
-                }
-            }
+            $variantProducts = $this->makeProductChildrenArray($product, $magentoStoreId, true);
         } else {
             //@TODO bundle
             return array();
@@ -375,7 +327,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = $this->makeBatchId($magentoStoreId);
         $items = $order->getAllVisibleItems();
         $helper = $this->getMailChimpHelper();
-        $syncDateFlag = $helper->getEcommMinSyncDateFlag($magentoStoreId);
+        $syncDateFlag = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
             $product = $this->loadProductById($itemProductId);
@@ -454,19 +406,23 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
-    public function makeProductsNotSentCollection($magentoStoreId)
+    public function makeProductsNotSentCollection($magentoStoreId, $isParentProduct = false)
     {
         /**
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
-        $collection->addFinalPrice();
+        if (!$isParentProduct) {
+            $collection->addFinalPrice();
+        }
         $collection->addStoreFilter($magentoStoreId);
         $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
         $this->joinQtyAndBackorders($collection);
 
-        $collection->getSelect()->limit($this->getBatchLimitFromConfig());
+        if (!$isParentProduct) {
+            $collection->getSelect()->limit($this->getBatchLimitFromConfig());
+        }
 
         return $collection;
     }
@@ -491,15 +447,17 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @param $product
      * @return bool
+     * @throws Mage_Core_Exception
      */
-    protected function shouldSendProductUpdate($magentoStoreId, $product)
+    protected function shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)
     {
         $helper = $this->getMailChimpHelper();
         $resendTurn = $helper->getResendTurn($magentoStoreId);
-        return !$resendTurn && $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > Mage::helper('mailchimp')->getEcommMinSyncDateFlag($magentoStoreId) && $product->getMailchimpSyncError() == '';
+        return !$resendTurn && $product->getMailchimpSyncModified() && $product->getMailchimpSyncDelta() && $product->getMailchimpSyncDelta() > $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId) && $product->getMailchimpSyncError() == '';
     }
 
     /**
@@ -640,12 +598,34 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * @param $product
      * @param $magentoStoreId
-     * @return Mage_Catalog_Model_Resource_Product_Collection
+     * @param bool $isBuildUpdateProductRequest
+     * @return array | return an array with the childs of the product passed by parameter
      */
-    protected function makeProductChildrenCollection($magentoStoreId)
+    public function makeProductChildrenArray($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
     {
-        return $this->makeProductsNotSentCollection($magentoStoreId);
+        $variantProducts[] = $product;
+        /**
+         * @var Mage_Catalog_Model_Resource_Product_Collection $collection
+         */
+        $collection = $this->makeProductsNotSentCollection($magentoStoreId, true);
+
+        $childProducts = $this->getConfigurableChildrenIds($product);
+        $collection->addAttributeToFilter("entity_id", array("in" => $childProducts));
+
+        foreach ($collection as $childProduct) {
+            if ($isBuildUpdateProductRequest) {
+                if ($childProduct->getId() != $product->getId()) {
+                    $variantProducts[] = $childProduct;
+                }
+            } else {
+                $variantProducts[] = $childProduct;
+            }
+        }
+
+        return $variantProducts;
+
     }
 
     /**

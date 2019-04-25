@@ -22,11 +22,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
 
         $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
         //If settings are inherited get from config.
-        if (isset($groups['ecommerce']['fields']['active']) && isset($groups['ecommerce']['fields']['active']['value'])) {
-            $ecommerceActive = $groups['ecommerce']['fields']['active']['value'];
-        } else {
-            $ecommerceActive = $helper->isEcommerceEnabled($scopeId, $scope);
-        }
         if (isset($groups['general']['fields']['list']) && isset($groups['general']['fields']['list']['value'])) {
             $listId = $groups['general']['fields']['list']['value'];
         } else {
@@ -35,12 +30,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
 
         if ($this->isValueChanged() && $this->getValue()) {
             if ($apiKey && $listId) {
-                $thisScopeHasMCStoreId = $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeId, $scope);
-
-                if ($ecommerceActive && !$thisScopeHasMCStoreId) {
-                    $helper->createStore($listId, $scopeId, $scope);
-                }
-
                 $helper->createNewWebhook($scopeId, $scope, $listId);
             } else {
                 $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));

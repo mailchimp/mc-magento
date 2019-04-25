@@ -107,23 +107,59 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Handle save of System -> Configuration, section <mailchimp>
      *
-     * @param  Varien_Event_Observer $observer
+     * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
+     * @throws Mage_Core_Exception
      */
-    public function saveConfig(Varien_Event_Observer $observer)
+    public function saveConfigBefore(Varien_Event_Observer $observer)
     {
-        $post = $this->getRequest()->getPost();
-        $helper = $this->makeHelper();
-        $scopeArray = $helper->getCurrentScope();
+        $config = $observer->getObject();
+        if ($config->getSection() == "mailchimp") {
+            $configData = $config->getData();
+            $configDataChanged = false;
+            $helper = $this->makeHelper();
+            $scopeArray = $helper->getCurrentScope();
+            $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : null;
+            $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
+            $apiKey = (isset($configData['groups']['general']['fields']['apikey']['value'])) ? $configData['groups']['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
 
-        if (isset($post['groups']['general']['fields']['list']['inherit']) && $this->makeHelper()->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            $helper->removeEcommerceSyncData($scopeArray['scope_id'], $scopeArray['scope']);
-            $helper->resetCampaign($scopeArray['scope_id'], $scopeArray['scope']);
-            $helper->clearErrorGrid($scopeArray['scope_id'], $scopeArray['scope'], true);
-            $helper->deleteStore($scopeArray['scope_id'], $scopeArray['scope']);
+            // If ecommerce data section is enabled only allow inheriting both entries (list and MC Store) at the same time.
+
+            if ($this->isListXorStoreInherited($configData)) {
+                if (isset($configData['groups']['general']['fields']['list']['inherit'])) {
+                    unset($configData['groups']['general']['fields']['list']['inherit']);
+                    $mcStoreListId = $helper->getListIdByApiKeyAndMCStoreId($apiKey, $mailchimpStoreId);
+                    $previouslyConfiguredListId = $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+                    $listId = (!empty($previouslyConfiguredListId)) ? $previouslyConfiguredListId : $mcStoreListId;
+                    $configData['groups']['general']['fields']['list']['value'] = $listId;
+                    $configDataChanged = true;
+                    $message = $helper->__('The list configuration was automatically modified to show the list associated to the selected Mailchimp store.');
+                    $this->getAdminSession()->addError($message);
+                } elseif (isset($configData['groups']['general']['fields']['storeid']['inherit'])) {
+                    unset($configData['groups']['general']['fields']['storeid']['inherit']);
+                    $configData['groups']['general']['fields']['storeid']['value'] = $oldMailchimpStoreId;
+                    $configDataChanged = true;
+                    $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp list configured for this scope. Both must be set to inherit at the same time.');
+                    $this->getAdminSession()->addError($message);
+                }
+                if ($configDataChanged) {
+                    $config->setData($configData);
+                }
+            }
         }
-
         return $observer;
+    }
+
+    /**
+     * return true if list or store is selected but the other one is inheriting.
+     *
+     * @param $configData
+     * @return bool
+     */
+    protected function isListXorStoreInherited($configData)
+    {
+        return (!isset($configData['groups']['general']['fields']['list']['inherit']) && isset($configData['groups']['general']['fields']['storeid']['value'])
+            || !isset($configData['groups']['general']['fields']['storeid']['inherit']) && isset($configData['groups']['general']['fields']['list']['value']));
     }
 
     /**
@@ -148,7 +184,6 @@ class Ebizmarts_MailChimp_Model_Observer
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                 $this->addSuccessIfRequired($helper);
             }
-
         }
 
         return $observer;
@@ -488,8 +523,9 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Add column to associate orders in grid gained from MailChimp campaigns and automations.
      *
-     * @param  $observer
-     * @return mixed
+     * @param Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     * @throws Mage_Core_Exception
      */
     public function addColumnToSalesOrderGrid(Varien_Event_Observer $observer)
     {
@@ -734,7 +770,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiProduct = $this->makeApiProduct();
 
         $stores = $helper->getMageApp()->getStores();
-        foreach ($stores as $storeId) {
+        foreach ($stores as $storeId => $store) {
 
             $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
@@ -746,7 +782,8 @@ class Ebizmarts_MailChimp_Model_Observer
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
                     $dataProduct = $helper->getEcommerceSyncDataItem($product->getId(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
-                    if ($isMarkedAsDeleted) {
+                    $errorMessage = $dataProduct->getMailchimpSyncError();
+                    if ($isMarkedAsDeleted || $errorMessage == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
                         $dataProduct->delete();
                     } else {
                         $apiProduct->update($product->getId(), $mailchimpStoreId);
@@ -758,59 +795,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
-    }
-
-    /**
-     * Catch Magento store group change event and call changeName function for the relevant stores.
-     *
-     * @param Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     */
-    public function changeStoreGroupName(Varien_Event_Observer $observer)
-    {
-        $stores = $observer->getGroup()->getStores();
-
-        foreach ($stores as $store) {
-            $storeId = $store->getId();
-            $this->changeStoreNameIfModuleEnabled($storeId);
-        }
-
-        return $observer;
-    }
-
-    /**
-     * @param Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     */
-    public function changeStoreName(Varien_Event_Observer $observer)
-    {
-        $storeId = $observer->getStore()->getId();
-
-        $this->changeStoreNameIfModuleEnabled($storeId);
-
-        return $observer;
-    }
-
-    /**
-     * @param $storeId
-     */
-    public function changeStoreNameIfModuleEnabled($storeId)
-    {
-        $helper = $this->makeHelper();
-        $mailchimpStoreId = $helper->getMCStoreId($storeId);
-
-        if ($mailchimpStoreId) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $storeId);
-            if ($realScope['scope_id'] == $storeId && $realScope['scope'] == 'stores') {
-                $ecomEnabled = $helper->isEcomSyncDataEnabled($realScope['scope_id'], $realScope['scope']);
-                if ($ecomEnabled) {
-                    if (!$helper->isUsingConfigStoreName($realScope['scope_id'], $realScope['scope'])) {
-                        $storeName = $helper->getMCStoreName($realScope['scope_id'], $realScope['scope']);
-                        $helper->changeName($storeName, $realScope['scope_id'], $realScope['scope']);
-                    }
-                }
-            }
-        }
     }
 
     /**
