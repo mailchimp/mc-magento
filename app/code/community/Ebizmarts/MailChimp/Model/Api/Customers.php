@@ -100,6 +100,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
+
+                $dataCustomer = $this->mailchimpHelper->getEcommerceSyncDataItem($customer->getId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId);
+                if ($dataCustomer->getId()) {
+                    $this->mailchimpHelper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
+                } else {
+                    $this->mailchimpHelper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
+                }
+
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
                 $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
             } else {

@@ -72,6 +72,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
+
+//                tengo que traer el data item de newsletter_subscribers
+//
+//                $dataSubscriber = $this->mailchimpHelper->getEcommerceSyncDataItem($subscriber->getSubscriberId(), Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER, $storeId);
+//                if ($dataSubscriber->getId()) {
+//                    $helper->modifyCounter(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+//                } else {
+//                    $helper->modifyCounter(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
+//                }
+
                 $subscriberArray[$counter]['method'] = "PUT";
                 $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
