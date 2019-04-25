@@ -17,6 +17,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     const THUMBNAIL_SIZE = '2';
     const ORIGINAL_SIZE = '3';
 
+    const SUB_MOD   = "SubscriberModified";
+    const SUB_NEW   = "SubscriberNew";
+    const PRO_MOD   = "ProductModified";
+    const PRO_NEW   = "ProductNew";
+    const CUS_MOD   = "CustomerModified";
+    const CUS_NEW   = "CustomerNew";
+    const ORD_MOD   = "OrderModified";
+    const ORD_NEW   = "OrderNew";
+    const QUO_MOD   = "QuoteModified";
+    const QUO_NEW   = "QuoteNew";
+
+    protected $countersEcommerce = [];
+    protected $countersSubscribers = [];
+
     /**
      * All MailChimp available language codes
      * @var array
@@ -770,6 +784,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         if ($this->isErrorLogEnabled()) {
             Mage::log($message, null, 'MailChimp_Errors.log', true);
+        }
+    }
+
+    /**
+     * Save error response from MailChimp's API in "MailChimp_Error.log" file.
+     *
+     * @param $message
+     */
+    public function logBatchStatus($message)
+    {
+        if ($this->isRequestLogEnabled()) {
+            Mage::log($message, null, 'Mailchimp_Batch_Status.log.log', true);
         }
     }
 
@@ -4058,5 +4084,57 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getModelMailchimpEcommerceSyncData()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
+    }
+
+    /**
+     * @param $index
+     * @param int $increment
+     */
+    public function modifyCounterEcommerce($index, $increment = 1)
+    {
+        if (array_key_exists($index, $this->countersEcommerce)) {
+            $this->countersEcommerce[$index] = $this->countersEcommerce[$index] + $increment;
+        } else {
+            $this->countersEcommerce[$index] = 1;
+        }
+    }
+
+    /**
+     * @param $index
+     * @param int $increment
+     */
+    public function modifyCounterSubscribers($index, $increment = 1)
+    {
+        if (array_key_exists($index, $this->countersSubscribers)) {
+            $this->countersSubscribers[$index] = $this->countersSubscribers[$index] + $increment;
+        } else {
+            $this->countersSubscribers[$index] = 1;
+        }
+    }
+
+    public function resetCountersEcommerce()
+    {
+        $this->countersEcommerce = [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCountersEcommerce()
+    {
+        return $this->countersEcommerce;
+    }
+
+    public function resetCountersSubscribers()
+    {
+        $this->countersSubscribers = [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCountersSubscribers()
+    {
+        return $this->countersSubscribers;
     }
 }
