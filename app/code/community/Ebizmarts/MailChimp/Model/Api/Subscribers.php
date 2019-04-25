@@ -429,7 +429,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($address) {
                     $company = $address->getCompany();
                     if ($company) {
-                        $eventValue = $mergeVars[$key] = $company;
+                        $mergeVars[$key] = $company;
                     }
                 }
                 break;
@@ -440,7 +440,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($address) {
                     $telephone = $address->getTelephone();
                     if ($telephone) {
-                        $eventValue = $mergeVars[$key] = $telephone;
+                        $mergeVars[$key] = $telephone;
                     }
                 }
                 break;
@@ -452,7 +452,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $countryCode = $address->getCountry();
                     if ($countryCode) {
                         $countryName = Mage::getModel('directory/country')->loadByCode($countryCode)->getName();
-                        $eventValue = $mergeVars[$key] = $countryName;
+                        $mergeVars[$key] = $countryName;
                     }
                 }
                 break;
@@ -463,20 +463,32 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($address) {
                     $zipCode = $address->getPostcode();
                     if ($zipCode) {
-                        $eventValue = $mergeVars[$key] = $zipCode;
+                        $mergeVars[$key] = $zipCode;
+                    }
+                }
+                break;
+            case 'billing_state':
+            case 'shipping_state':
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
+
+                if ($address) {
+                    $state = $address->getRegion();
+                    if ($state) {
+                        $mergeVars[$key] = $state;
                     }
                 }
                 break;
             case 'dop':
                 $dop = $helper->getLastDateOfPurchase($subscriberEmail, $lastOrder);
                 if ($dop) {
-                    $eventValue = $mergeVars[$key] = $dop;
+                    $mergeVars[$key] = $dop;
                 }
                 break;
             case 'store_code':
                 $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
-                $eventValue = $mergeVars[$key] = $storeCode;
+                $mergeVars[$key] = $storeCode;
         }
+        Mage::log($mergeVars[$key], null, 'testing.log', true);
 
         return $mergeVars;
     }
@@ -490,7 +502,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $key
      * @param $storeId
      * @param $attribute
-     * @param $subscriberEmail
      * @return array
      */
     protected function customerAttributes($subscriber, $attributeCode, $customer, $lastOrder, $mergeVars, $key, $storeId, $attribute)
@@ -506,16 +517,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $addressData = $this->getAddressFromLastOrder($lastOrder, $addressData);
 
                 if (count($addressData)) {
-                    $eventValue = $mergeVars[$key] = $addressData;
+                    $mergeVars[$key] = $addressData;
                 }
                 break;
             case 'gender':
                 if ($customer->getData($attributeCode)) {
                     $genderValue = $customer->getData($attributeCode);
                     if ($genderValue == 1) {
-                        $eventValue = $mergeVars[$key] = 'Male';
+                        $mergeVars[$key] = 'Male';
                     } elseif ($genderValue == 2) {
-                        $eventValue = $mergeVars[$key] = 'Female';
+                        $mergeVars[$key] = 'Female';
                     }
                 }
                 break;
@@ -523,9 +534,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($customer->getData($attributeCode)) {
                     $group_id = (int)$customer->getData($attributeCode);
                     $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
-                    $eventValue = $mergeVars[$key] = $customerGroup[$group_id];
+                    $mergeVars[$key] = $customerGroup[$group_id];
                 } else {
-                    $eventValue = $mergeVars[$key] = 'NOT LOGGED IN';
+                    $mergeVars[$key] = 'NOT LOGGED IN';
                 }
                 break;
             case 'firstname':
@@ -540,7 +551,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
 
                 if ($firstName) {
-                    $eventValue = $mergeVars[$key] = $firstName;
+                    $mergeVars[$key] = $firstName;
                 }
                 break;
             case 'lastname':
@@ -555,23 +566,23 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
 
                 if ($lastName) {
-                    $eventValue = $mergeVars[$key] = $lastName;
+                    $mergeVars[$key] = $lastName;
                 }
                 break;
             case 'store_id':
-                $eventValue = $mergeVars[$key] = $storeId;
+                $mergeVars[$key] = $storeId;
                 break;
             case 'website_id':
                 $websiteId = $this->getWebSiteByStoreId($storeId);
-                $eventValue = $mergeVars[$key] = $websiteId;
+                $mergeVars[$key] = $websiteId;
                 break;
             case 'created_in':
                 $storeName = Mage::getModel('core/store')->load($storeId)->getName();
-                $eventValue = $mergeVars[$key] = $storeName;
+                $mergeVars[$key] = $storeName;
                 break;
             case 'dob':
                 if ($customer->getData($attributeCode)) {
-                    $eventValue = $mergeVars[$key] = date("m/d", strtotime($customer->getData($attributeCode)));
+                    $mergeVars[$key] = date("m/d", strtotime($customer->getData($attributeCode)));
                 }
                 break;
             default:
@@ -579,9 +590,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($attribute['frontend_input'] == 'select' && $attrValue) {
                     $attr = $customer->getResource()->getAttribute($attributeCode);
                     $optionValue = $attr->getSource()->getOptionText($attrValue);
-                    $eventValue = $mergeVars[$key] = $optionValue;
+                    $mergeVars[$key] = $optionValue;
                 } elseif ($attrValue) {
-                    $eventValue = $mergeVars[$key] = $attrValue;
+                    $mergeVars[$key] = $attrValue;
                 }
                 break;
         }
@@ -597,7 +608,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function dispatchEventValue($customer, $subscriberEmail, $attributeCode, $eventValue)
     {
-        Mage::log($attributeCode, null, 'dispatchEvent.log', true);
         Mage::dispatchEvent(
             'mailchimp_merge_field_send_before', array(
                 'customer_id' => $customer->getId(),
