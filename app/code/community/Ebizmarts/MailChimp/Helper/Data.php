@@ -28,8 +28,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     const QUO_MOD   = "QuoteModified";
     const QUO_NEW   = "QuoteNew";
 
-    protected $countersEcommerce = [];
-    protected $countersSubscribers = [];
+    protected $countersEcommerce = array();
+    protected $countersSubscribers = array();
 
     /**
      * All MailChimp available language codes
@@ -4114,7 +4114,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function resetCountersEcommerce()
     {
-        $this->countersEcommerce = [];
+        $this->countersEcommerce = array();
     }
 
     /**
@@ -4127,7 +4127,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function resetCountersSubscribers()
     {
-        $this->countersSubscribers = [];
+        $this->countersSubscribers = array();
     }
 
     /**
