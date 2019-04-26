@@ -3,8 +3,8 @@
 class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_TestCase
 {
     /**
- * @var Ebizmarts_MailChimp_Model_Api_Customers
-*/
+     * @var Ebizmarts_MailChimp_Model_Api_Customers
+     */
     private $customersApiMock;
 
     public function setUp()
@@ -97,14 +97,14 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
-                ->disableOriginalConstructor()
-                ->setMethods(array('loadByEmail'))
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(array('loadByEmail'))
+            ->getMock();
 
         $subscribersMailchimpMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
-                ->disableOriginalConstructor()
-                ->setMethods(array('getSubscriberId'))
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriberId'))
+            ->getMock();
 
         $customerArray = array($customerMock);
 
@@ -124,7 +124,11 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')->with($customerJson)->willReturn($operationData);
         $subscriberMock->expects($this->once())->method('loadByEmail')->with($customerEmail)->willReturn($subscribersMailchimpMock);
         $subscribersMailchimpMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
-        $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
+        $customerMock->expects($this->exactly(2))
+            ->method('getId')
+            ->willReturnOnConsecutiveCalls(
+                $customerId,
+                $customerId);
         $customerMock->expects($this->any())->method('getEmail')->willReturn($customerEmail);
         $this->customersApiMock->expects($this->once())->method('_updateSyncData')->with($customerId, $mailchimpStoreId);
 

@@ -298,7 +298,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(
                 array('getHelper', 'getApiCustomers', 'getApiProducts',
                     'getApiCarts', 'getApiOrders', 'deleteUnsentItems', 'markItemsAsSent', 'getApiPromoRules',
-                    'getApiPromoCodes', 'getSyncBatchesModel')
+                    'getApiPromoCodes', 'getSyncBatchesModel', '_showResumeEcommerce')
             )
             ->getMock();
 
@@ -359,6 +359,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $helperMock->expects($this->once())->method('getMCStoreId')->with($magentoStoreId)->willReturn($mailchimpStoreId);
 
         $apiBatchesMock->expects($this->once())->method('deleteUnsentItems');
+
+        $apiBatchesMock->expects($this->once())->method('_showResumeEcommerce')->with($batchResponse['id']);
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($magentoStoreId)->willReturn(1);
 
@@ -503,18 +505,19 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $storeId = 1;
         $limit = 100;
         $listId = 'listId';
+        $message = 'Generate Subscribers Payload';
         $subscribersArray = $this->getSubscriberArray();
         $subscribersJson = json_encode(array('operations' => $subscribersArray));
         $batchResponse = $this->getBatchResponse();
 
         $apiBatchesMock = $this->apiBatchesMock
             ->disableOriginalConstructor()
-            ->setMethods(array('getHelper', 'getApiSubscribers', 'getSyncBatchesModel'))
+            ->setMethods(array('getHelper', 'getApiSubscribers', 'getSyncBatchesModel', '_showResumeSubscribers'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isSubscriptionEnabled', 'getGeneralList', 'getApi', 'logRequest'))
+            ->setMethods(array('isSubscriptionEnabled', 'getGeneralList', 'getApi', 'logRequest', 'logBatchStatus'))
             ->getMock();
 
         $apiSubscribersMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
@@ -539,6 +542,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
 
+        $apiBatchesMock->expects($this->once())->method('_showResumeSubscribers')->with($batchResponse['id']);
+
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
         $helperMock->expects($this->once())->method('getGeneralList')->with($storeId)->willReturn($listId);
 
@@ -553,6 +558,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiBatchOperationMock->expects($this->once())->method('add')->with($subscribersJson)->willReturn($batchResponse);
 
         $helperMock->expects($this->once())->method('logRequest')->with($subscribersJson, $batchResponse['id']);
+        $helperMock->expects($this->once())->method('logBatchStatus')->with($message);
 
         $apiBatchesMock->expects($this->once())->method('getSyncBatchesModel')->willReturn($syncBatchesMock);
 
