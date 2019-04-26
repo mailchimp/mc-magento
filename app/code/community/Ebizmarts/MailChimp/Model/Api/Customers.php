@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function __construct()
     {
-        $this->mailchimpHelper = Mage::helper('mailchimp');
+        $this->mailchimpHelper = $this->makeHelper();
         $this->optInConfiguration = array();
         $this->locale = Mage::app()->getLocale();
         $this->directoryRegionModel = Mage::getModel('directory/region');
@@ -101,7 +101,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
 
-                $helper = $this->mailchimpHelper;
+                $helper = $this->makeHelper();
                 $dataCustomer = $helper->getEcommerceSyncDataItem($customer->getId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId);
                 if ($dataCustomer->getId()) {
                     $helper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
@@ -460,6 +460,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $subscriber = Mage::getModel('newsletter/subscriber');
         return $subscriber;
+    }
+
+    /**
+     * @return Mage_Core_Helper_Abstract
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 
 }
