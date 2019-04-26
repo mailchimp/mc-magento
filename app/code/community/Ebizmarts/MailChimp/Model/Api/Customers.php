@@ -101,7 +101,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
 
-                $helper = $this->makeHelper();
+                $helper = $this->getMailChimpHelper();
                 $dataCustomer = $helper->getEcommerceSyncDataItem($customer->getId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId);
                 if ($dataCustomer->getId()) {
                     $helper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
@@ -463,11 +463,18 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @return Mage_Core_Helper_Abstract
+     * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function getMailChimpHelper()
+    {
+        return $this->mailchimpHelper;
+    }
 }

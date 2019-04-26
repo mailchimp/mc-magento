@@ -82,7 +82,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             array('getCustomersToSync', 'makeBatchId', 'makeCustomersNotSentCollection', 'getOptin',
                 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
-                'getCustomerResourceCollection', 'getSubscriberModel', 'makeHelper'
+                'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper'
             )
         )
             ->getMock();
@@ -133,7 +133,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $customerCollectionMock->expects($this->once())->method('getIterator')->willReturn(new ArrayIterator($customerArray));
         $this->customersApiMock->expects($this->once())->method('_buildCustomerData')->with($customerMock)->willReturn($customerData);
         $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')->with($customerJson)->willReturn($operationData);
-        $this->customersApiMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $this->customersApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
         $subscriberMock->expects($this->once())->method('loadByEmail')->with($customerEmail)->willReturn($subscribersMailchimpMock);
         $subscribersMailchimpMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
         $customerMock->expects($this->exactly(2))
