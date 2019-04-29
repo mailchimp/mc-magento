@@ -253,7 +253,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function _getResults($magentoStoreId, $isEcommerceData = true)
     {
         $helper = $this->getHelper();
-        $helper->resetCountersDataSentToMailchimp();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
             ->addFieldToFilter('status', array('eq' => 'pending'));
@@ -277,7 +276,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $item->save();
                             $helper->logBatchStatus('There was an error getting the result ');
                         } else {
-                            $this->processEachResponseFile($files, $batchId, $mailchimpStoreId);
+                            $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
                             $item->setStatus('completed');
                             $item->save();
                         }
@@ -291,9 +290,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     Mage::log("Error with a response: " . $e->getMessage());
                 }
             }
-
-            $this->_showResumeDataSentToMailchimp($magentoStoreId);
-            Mage::log('temrino la funcion processEachResponseFile', null, 'encontrandoError.log', true);
         }
     }
 
@@ -618,11 +614,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $batchId
      * @param $mailchimpStoreId
      */
-    protected function processEachResponseFile($files, $batchId, $mailchimpStoreId)
+    protected function processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
+            $helper->resetCountersDataSentToMailchimp();
             if ($items!==false) {
                 foreach ($items as $item) {
 
@@ -631,9 +628,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $type = $line[1];
                     $id = $line[3];
                     if ($item->status_code != 200) {
-
-
-                        $this->processStatusOfEachResponseFile($type, $helper, true);
 
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
@@ -655,6 +649,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                         if (strstr($errorDetails, 'already exists')) {
                             $this->setItemAsModified($helper, $mailchimpStoreId, $id, $type);
+                            $this->processStatusOfEachResponseFile($type, $helper, true);
                             continue;
                         }
                         $error = $response->title . " : " . $response->detail;
@@ -682,6 +677,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         }
 
                         $mailchimpErrors->save();
+                        $this->processStatusOfEachResponseFile($type, $helper, true);
                         $helper->logError($error);
                     } else {
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
@@ -693,6 +689,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
             unlink($file);
+            $this->_showResumeDataSentToMailchimp($magentoStoreId);
         }
     }
 
