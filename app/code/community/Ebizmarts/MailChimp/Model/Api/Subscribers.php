@@ -13,6 +13,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
+    /**
+     * Ebizmarts_MailChimp_Helper_Data
+     */
     private $mcHelper;
 
     public function __construct()
@@ -22,6 +25,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     public function createBatchJson($listId, $storeId, $limit)
     {
+        /**
+         * Ebizmarts_MailChimp_Helper_Data
+         */
         $helper = $this->mcHelper;
         $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
         $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
@@ -73,14 +79,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
             if (!empty($subscriberJson)) {
 
-//                tengo que traer el data item de newsletter_subscribers
-//
-//                $dataSubscriber = $this->mailchimpHelper->getEcommerceSyncDataItem($subscriber->getSubscriberId(), Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER, $storeId);
-//                if ($dataSubscriber->getId()) {
-//                    $helper->modifyCounter(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
-//                } else {
-//                    $helper->modifyCounter(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
-//                }
+                if ($subscriber->getMailchimpSyncModified()) {
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+                } else {
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+                }
 
                 $subscriberArray[$counter]['method'] = "PUT";
                 $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
@@ -573,5 +576,26 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function addError($errorMessage)
     {
         Mage::getSingleton('core/session')->addError($errorMessage);
+    }
+
+    /**
+     * @param $itemId
+     * @param $magentoStoreId
+     * @return Mage_Newsletter_Model_Subscriber \ subcriberSyncDataItem newsletter/subscriber if exists.
+     */
+    protected function getSubscriberSyncDataItem($itemId, $magentoStoreId)
+    {
+        $subscriberSyndDataItem = null;
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
+            ->addFieldToFilter('subscriber_id', array('eq' => $itemId))
+            ->addFieldToFilter('store_id', array('eq' => $magentoStoreId))
+            ->setCurPage(1)
+            ->setPageSize(1);
+
+        if ($collection->getSize()) {
+            $subscriberSyndDataItem = $collection->getFirstItem();
+        }
+
+        return $subscriberSyndDataItem;
     }
 }

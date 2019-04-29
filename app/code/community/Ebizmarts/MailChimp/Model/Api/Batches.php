@@ -307,7 +307,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         try {
             $this->deleteUnsentItems();
             if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
-                $helper->resetCountersEcommerce();
+                $helper->resetCountersSentPerBatch();
                 $batchArray = array();
                 //customer operations
                 $helper->logBatchStatus('Generate Customers Payload');
@@ -366,7 +366,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 ->setStatus($batchResponse['status']);
                             $batch->save();
                             $this->markItemsAsSent($batchResponse['id'], $mailchimpStoreId);
-                            $this->_showResumeEcommerce($batchResponse['id']);
+                            $this->_showResumeEcommerce($batchResponse['id'], $magentoStoreId);
                         }
                     }
 
@@ -464,6 +464,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _sendSubscriberBatches()
     {
         $helper = $this->getHelper();
+        $helper->resetCountersSubscribers();
         $subscriberLimit = $helper->getSubscriberAmountLimit();
         $stores = $this->getStores();
         $batchResponses = array();
@@ -504,13 +505,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         try {
             if ($helper->isSubscriptionEnabled($storeId)) {
 
-                $helper->resetCountersSubscribers();
                 $listId = $helper->getGeneralList($storeId);
 
                 $batchArray = array();
 
                 //subscriber operations
-                $helper->logBatchStatus('Generate Subscribers Payload');
                 $subscribersArray = $this->getApiSubscribers()->createBatchJson($listId, $storeId, $limit);
                 $limit -= count($subscribersArray);
 
@@ -532,7 +531,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 ->setBatchId($batchResponse['id'])
                                 ->setStatus($batchResponse['status']);
                             $batch->save();
-                            $this->_showResumeSubscribers($batchResponse['id']);
+                            $this->_showResumeSubscriber($batchResponse['id'], $storeId);
                             return array($batchResponse, $limit);
                         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                             $helper->logError($e->getMessage());
@@ -618,7 +617,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function processEachResponseFile($files, $batchId, $mailchimpStoreId)
     {
         $helper = $this->getHelper();
-        $helper->logBatchStatus('Process each file response ');
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
             if ($items!==false) {
@@ -630,7 +628,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $id = $line[3];
                     if ($item->status_code != 200) {
 
-                        $helper->logBatchStatus('There was an error in the response please check MailChimp_Errors.log');
+
+                        $this->processStatusOfEachResponseFile($type, $helper, true);
 
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
@@ -684,30 +683,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
                         if (!$syncDataItem->getMailchimpSyncModified()) {
                             $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                            $this->processStatusOfEachResponseFile($type, $helper);
                         }
-                        $helper->logBatchStatus('There response was processed correctly');
                     }
                 }
             }
-//            else {
-//                switch (json_last_error()) {
-//                    case JSON_ERROR_DEPTH:
-//                        $helper->logBatchStatus(' - Maximum stack depth exceeded');
-//                        break;
-//                    case JSON_ERROR_CTRL_CHAR:
-//                        $helper->logBatchStatus(' - Unexpected control character found');
-//                        break;
-//                    case JSON_ERROR_SYNTAX:
-//                        $helper->logBatchStatus(' - Syntax error, malformed JSON');
-//                        break;
-//                    case JSON_ERROR_NONE:
-//                        $helper->logBatchStatus(' - No errors');
-//                        break;
-//                }
-//            }
-
             unlink($file);
         }
+        $this->_showResumeDataSentToMailchimp($batchId, $mailchimpStoreId);
     }
 
     /**
@@ -911,20 +894,80 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * @param $batchId
+     * @param $storeId
+     * @throws Mage_Core_Exception
      */
-    protected function _showResumeEcommerce($batchId)
+    protected function _showResumeEcommerce($batchId, $storeId)
     {
         $helper = $this->getHelper();
-        $helper->logBatchStatus("Sent batch $batchId");
-        $helper->logBatchStatus($helper->getCountersEcommerce());
+        if (!empty($helper->getCountersSentPerBatch()) || $helper->getCountersSentPerBatch() != null) {
+            $helper->logBatchStatus("Sent batch $batchId for store $storeId");
+            $helper->logBatchQuantity($helper->getCountersSentPerBatch());
+        } else {
+            $helper->logBatchStatus("Nothing to sync for store $storeId");
+        }
     }
+
     /**
      * @param $batchId
+     * @param $storeId
+     * @throws Mage_Core_Exception
      */
-    protected function _showResumeSubscribers($batchId)
+    protected function _showResumeSubscriber($batchId, $storeId)
     {
         $helper = $this->getHelper();
-        $helper->logBatchStatus("Sent batch $batchId");
-        $helper->logBatchStatus($helper->getCountersSubscribers());
+        if (!empty($helper->getCountersSubscribers()) || $helper->getCountersSubscribers() != null) {
+            $helper->logBatchStatus("Sent batch $batchId for store $storeId");
+            $helper->logBatchQuantity($helper->getCountersSubscribers());
+        } else {
+            $helper->logBatchStatus("Nothing to sync for store $storeId");
+        }
+    }
+
+    /**
+     * @param $batchId
+     * @param $storeId
+     * @throws Mage_Core_Exception
+     */
+    protected function _showResumeDataSentToMailchimp($batchId, $storeId)
+    {
+        $helper = $this->getHelper();
+        $magentoStoreId = $helper->getMailChimpScopeByStoreId($storeId);
+        if (!empty($helper->getCountersDataSentToMailchimp()) || $helper->getCountersDataSentToMailchimp() != null) {
+            $helper->logBatchStatus("Processed batch $batchId for store $magentoStoreId");
+            $helper->logBatchQuantity($helper->getCountersDataSentToMailchimp());
+        } else {
+            $helper->logBatchStatus("Nothing was processed for store $magentoStoreId");
+        }
+    }
+
+    /**
+     * @param $type
+     * @param $helper
+     * @param bool $hasError
+     */
+    protected function processStatusOfEachResponseFile($type, $helper, $hasError = false)
+    {
+        if ($hasError) {
+            if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::PRO_NOT_SENT);
+            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::CUS_NOT_SENT);
+            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::ORD_NOT_SENT);
+            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_QUOTE) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::QUO_NOT_SENT);
+            }
+        } else {
+            if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::PRO_SENT);
+            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::CUS_SENT);
+            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::ORD_SENT);
+            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_QUOTE) {
+                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::QUO_SENT);
+            }
+        }
     }
 }

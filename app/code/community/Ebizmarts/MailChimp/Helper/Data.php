@@ -28,8 +28,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     const QUO_MOD   = "QuoteModified";
     const QUO_NEW   = "QuoteNew";
 
-    protected $countersEcommerce = array();
+    const SUB_SENT   = "SubscriberProcessed";
+    const SUB_NOT_SENT   = "SubscriberNotSent";
+    const PRO_SENT   = "ProductProcessed";
+    const PRO_NOT_SENT   = "ProductNotSent";
+    const CUS_SENT   = "CustomerProcessed";
+    const CUS_NOT_SENT   = "CustomerNotSent";
+    const ORD_SENT   = "OrderProcessed";
+    const ORD_NOT_SENT   = "OrderNotSent";
+    const QUO_SENT   = "QuoteProcessed";
+    const QUO_NOT_SENT   = "QuoteNotSent";
+
+    protected $countersSendBatch = array();
     protected $countersSubscribers = array();
+    protected $countersGetResponseBatch = array();
 
     /**
      * All MailChimp available language codes
@@ -788,14 +800,32 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Save error response from MailChimp's API in "MailChimp_Error.log" file.
+     * Save how many date was sent to Mailchimp,
+     * how many data was successfully and not sent to Mailchimp
+     * in the file "Mailchimp_Batch_Status.log"
      *
      * @param $message
+     * @throws Mage_Core_Exception
      */
     public function logBatchStatus($message)
     {
         if ($this->isRequestLogEnabled()) {
-            Mage::log($message, null, 'Mailchimp_Batch_Status.log.log', true);
+            Mage::log($message . "\n", null, 'Mailchimp_Batch_Status.log', true);
+        }
+    }
+
+    /**
+     * Save how many date was sent to Mailchimp,
+     * how many data was successfully and not sent to Mailchimp
+     * in the file "Mailchimp_Batch_Status.log"
+     *
+     * @param $message
+     * @throws Mage_Core_Exception
+     */
+    public function logBatchQuantity($message)
+    {
+        if ($this->isRequestLogEnabled()) {
+            Mage::log($message, null, 'Mailchimp_Batch_Status.log', true);
         }
     }
 
@@ -4090,13 +4120,26 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $index
      * @param int $increment
      */
-    public function modifyCounterEcommerce($index, $increment = 1)
+    public function modifyCounterSentPerBatch($index, $increment = 1)
     {
-        if (array_key_exists($index, $this->countersEcommerce)) {
-            $this->countersEcommerce[$index] = $this->countersEcommerce[$index] + $increment;
+        if (array_key_exists($index, $this->countersSendBatch)) {
+            $this->countersSendBatch[$index] = $this->countersSendBatch[$index] + $increment;
         } else {
-            $this->countersEcommerce[$index] = 1;
+            $this->countersSendBatch[$index] = 1;
         }
+    }
+
+    public function resetCountersSentPerBatch()
+    {
+        $this->countersSendBatch = array();
+    }
+
+    /**
+     * @return array
+     */
+    public function getCountersSentPerBatch()
+    {
+        return $this->countersSendBatch;
     }
 
     /**
@@ -4112,19 +4155,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
-    public function resetCountersEcommerce()
-    {
-        $this->countersEcommerce = array();
-    }
-
-    /**
-     * @return array
-     */
-    public function getCountersEcommerce()
-    {
-        return $this->countersEcommerce;
-    }
-
     public function resetCountersSubscribers()
     {
         $this->countersSubscribers = array();
@@ -4136,5 +4166,31 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCountersSubscribers()
     {
         return $this->countersSubscribers;
+    }
+
+    /**
+     * @param $index
+     * @param int $increment
+     */
+    public function modifyCounterDataSentToMailchimp($index, $increment = 1)
+    {
+        if (array_key_exists($index, $this->countersGetResponseBatch)) {
+            $this->countersGetResponseBatch[$index] = $this->countersGetResponseBatch[$index] + $increment;
+        } else {
+            $this->countersGetResponseBatch[$index] = 1;
+        }
+    }
+
+    public function resetCountersDataSentToMailchimp()
+    {
+        $this->countersGetResponseBatch = array();
+    }
+
+    /**
+     * @return array
+     */
+    public function getCountersDataSentToMailchimp()
+    {
+        return $this->countersGetResponseBatch;
     }
 }

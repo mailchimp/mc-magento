@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
 
-                    $helper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
 
                     $batchArray[$this->_counter]['method'] = "PATCH";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $incrementId;
@@ -137,7 +137,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
 
-                    $helper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
 
                     $batchArray[$this->_counter]['method'] = "POST";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';

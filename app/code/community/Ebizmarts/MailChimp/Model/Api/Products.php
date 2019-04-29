@@ -77,9 +77,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
                 $dataProduct = $helper->getEcommerceSyncDataItem($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId);
                 if ($dataProduct->getId()) {
-                    $helper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::PRO_MOD);
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::PRO_MOD);
                 } else {
-                    $helper->modifyCounterEcommerce(Ebizmarts_MailChimp_Helper_Data::PRO_NEW);
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::PRO_NEW);
                 }
 
                 //update product delta
