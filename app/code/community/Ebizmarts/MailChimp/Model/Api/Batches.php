@@ -253,6 +253,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function _getResults($magentoStoreId, $isEcommerceData = true)
     {
         $helper = $this->getHelper();
+        $helper->resetCountersDataSentToMailchimp();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
             ->addFieldToFilter('status', array('eq' => 'pending'));
@@ -265,9 +266,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         if ($enabled) {
+            $helper->logBatchStatus('Get results from Mailchimp');
             foreach ($collection as $item) {
                 try {
-                    $helper->logBatchStatus('Get results from Mailchimp');
                     $batchId = $item->getBatchId();
                     $files = $this->getBatchResponse($batchId, $magentoStoreId);
                     if (count($files)) {
@@ -290,6 +291,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     Mage::log("Error with a response: " . $e->getMessage());
                 }
             }
+
+            $this->_showResumeDataSentToMailchimp($magentoStoreId);
+            Mage::log('temrino la funcion processEachResponseFile', null, 'encontrandoError.log', true);
         }
     }
 
@@ -690,7 +694,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             }
             unlink($file);
         }
-        $this->_showResumeDataSentToMailchimp($batchId, $mailchimpStoreId);
     }
 
     /**
@@ -929,15 +932,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $storeId
      * @throws Mage_Core_Exception
      */
-    protected function _showResumeDataSentToMailchimp($batchId, $storeId)
+    protected function _showResumeDataSentToMailchimp($storeId)
     {
         $helper = $this->getHelper();
-        $magentoStoreId = $helper->getMailChimpScopeByStoreId($storeId);
         if (!empty($helper->getCountersDataSentToMailchimp()) || $helper->getCountersDataSentToMailchimp() != null) {
-            $helper->logBatchStatus("Processed batch $batchId for store $magentoStoreId");
+            $helper->logBatchStatus("Processed data sent to Mailchimp for store $storeId");
             $helper->logBatchQuantity($helper->getCountersDataSentToMailchimp());
         } else {
-            $helper->logBatchStatus("Nothing was processed for store $magentoStoreId");
+            $helper->logBatchStatus("Nothing was processed for store $storeId");
         }
     }
 
