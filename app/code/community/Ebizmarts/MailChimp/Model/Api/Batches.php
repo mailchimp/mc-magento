@@ -649,7 +649,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                         if (strstr($errorDetails, 'already exists')) {
                             $this->setItemAsModified($helper, $mailchimpStoreId, $id, $type);
-                            $this->processStatusOfEachResponseFile($type, $helper, true);
+                            $this->processStatusOfEachResponseFile($type, $helper, false);
                             continue;
                         }
                         $error = $response->title . " : " . $response->detail;

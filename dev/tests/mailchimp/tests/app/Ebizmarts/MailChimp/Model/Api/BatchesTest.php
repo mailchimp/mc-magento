@@ -472,7 +472,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $syncBatches = array();
         $syncBatches[] = $syncBatchesTwoMock;
 
-        $apiBatchesMock->expects($this->exactly(2))->method('getHelper')->willReturnOnConsecutiveCalls($helperMock, $helperMock);
+        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturnOnConsecutiveCalls($helperMock);
         $apiBatchesMock->expects($this->once())->method('getSyncBatchesModel')->willReturn($syncBatchesMock);
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($magentoStoreId)->willReturn($mailchimpStoreId);
