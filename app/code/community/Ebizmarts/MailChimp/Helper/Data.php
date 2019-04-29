@@ -650,7 +650,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $scope
      * @throws Mage_Core_Exception
      */
-    public function resendMCEcommerceData($scopeId, $scope, $filters = array())
+    public function resendMCEcommerceData($scopeId, $scope, $filters = null)
     {
 
         if ($this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
@@ -713,11 +713,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($deleteErrorsOnly) {
             $where []= $connection->quoteInto("mailchimp_store_id = ? AND mailchimp_sync_error != ''", $mailchimpStoreId);
-            $where []= $connection->quoteInto('type IN (?)', $filters);
         } else {
             $where []= $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
-            $where []= $connection->quoteInto('type IN (?)', $filters);
         }
+
+        $where []= $connection->quoteInto('type IN (?)', $filters);
+
         try {
             $connection->delete($tableName, $where);
         } catch (Exception $e) {

@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: javiergiorello
- * Date: 2019-04-02
- * Time: 09:48
- */
+
 class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata extends Mage_Adminhtml_Block_Widget_Form_Container
 {
     protected $_mode = 'resendecommercedata';

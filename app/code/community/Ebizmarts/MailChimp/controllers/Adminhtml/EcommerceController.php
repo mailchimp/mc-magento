@@ -52,14 +52,14 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $success = 0;
 
         if (is_array($filters) && empty($filters)) {
-            Mage::getSingleton('core/session')->addWarning("At least one type of eCommerce data should be selected to Resend.");
-            $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+            Mage::getSingleton('core/session')->addWarning(Mage::helper('mailchimp')->__('At least one type of eCommerce data should be selected to Resend.'));
+            $success = Mage::helper('mailchimp')->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
         } else {
             try {
-                $helper->resetMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
+                $helper->resendMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
 
-                Mage::getSingleton('core/session')->addSuccess('Ecommerce data resent succesfully');
-                $success = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+                Mage::getSingleton('core/session')->addSuccess(Mage::helper('mailchimp')->__('Ecommerce data resent succesfully'));
+                $success = Mage::helper('mailchimp')->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
             } catch (MailChimp_Error $e) {
                 $helper->logError($e->getFriendlyMessage());
                 Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
