@@ -690,7 +690,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
         $where = array();
         $where []= "mailchimp_sync_error != ''";
-        $where []= $connection->quoteInto('type IN (?)', $filters);
+
+        if ($filters !== null) {
+            $where [] = $connection->quoteInto('type IN (?)', $filters);
+        }
 
         try {
             $connection->delete($tableName, $where);
@@ -717,7 +720,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $where []= $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
         }
 
-        $where []= $connection->quoteInto('type IN (?)', $filters);
+        if ($filters !== null) {
+            $where [] = $connection->quoteInto('type IN (?)', $filters);
+        }
 
         try {
             $connection->delete($tableName, $where);
@@ -908,7 +913,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $tableName = $resource->getTableName('mailchimp/mailchimperrors');
         $where = array();
         $where []= $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
-        $where []= $connection->quoteInto('type IN (?)', $filters);
+
+        if ($filters !== null) {
+            $where [] = $connection->quoteInto('type IN (?)', $filters);
+        }
+
         $connection->delete($tableName, $where);
     }
 
@@ -924,10 +933,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($scopeId !== 0) {
             $where []= $connection->quoteInto("store_id = ?", $scopeId);
-            $where []= $connection->quoteInto('type IN (?)', $filters);
-        } else {
-            $where []= $connection->quoteInto('type IN (?)', $filters);
         }
+
+        if ($filters !== null) {
+            $where [] = $connection->quoteInto('type IN (?)', $filters);
+        }
+
         $connection->delete($tableName, $where);
     }
 
@@ -954,7 +965,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $scope
      * @throws Mage_Core_Exception
      */
-    public function saveLastItemsSent($scopeId, $scope)
+    public function saveLastItemsSent($scopeId, $scope, $filters = null)
     {
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $isSyncing = $this->getMCIsSyncing($mailchimpStoreId, $scopeId, $scope);
