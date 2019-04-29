@@ -652,7 +652,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resendMCEcommerceData($scopeId, $scope, $filters = null)
     {
-
         if ($this->getMCStoreId($scopeId, $scope) && $this->getMCStoreId($scopeId, $scope) != "") {
             if (!$this->getResendEnabled($scopeId, $scope)) {
                 $this->saveLastItemsSent($scopeId, $scope, $filters);
@@ -670,7 +669,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param bool $deleteErrorsOnly
      * @throws Mage_Core_Exception
      */
-    public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false, $filters = null)
+    public function removeEcommerceSyncData($scopeId, $scope, $filters = null)
     {
         if ($scopeId == 0 && $deleteErrorsOnly) {
             $this->removeAllEcommerceSyncDataErrors($filters);
