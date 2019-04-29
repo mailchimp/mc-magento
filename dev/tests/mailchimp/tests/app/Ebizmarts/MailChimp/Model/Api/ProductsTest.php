@@ -57,7 +57,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->setMethods(array('getEcommerceSyncDataItem', 'modifyCounterEcommerce'))
+            ->setMethods(array('getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->with($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId)
             ->willReturn($syncDataItemMock);
         $helperMock->expects($this->once())
-            ->method('modifyCounterEcommerce')
+            ->method('modifyCounterSentPerBatch')
             ->with(Ebizmarts_MailChimp_Helper_Data::PRO_MOD);
 
         $syncDataItemMock->expects($this->once())
