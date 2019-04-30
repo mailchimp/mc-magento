@@ -464,7 +464,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _sendSubscriberBatches()
     {
         $helper = $this->getHelper();
-        $helper->resetCountersSubscribers();
+
         $subscriberLimit = $helper->getSubscriberAmountLimit();
         $stores = $this->getStores();
         $batchResponses = array();
@@ -504,6 +504,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         try {
             if ($helper->isSubscriptionEnabled($storeId)) {
+
+                $helper->resetCountersSubscribers();
 
                 $listId = $helper->getGeneralList($storeId);
 
@@ -620,6 +622,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
             $helper->resetCountersDataSentToMailchimp();
+
             if ($items!==false) {
                 foreach ($items as $item) {
 
