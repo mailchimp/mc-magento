@@ -408,9 +408,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->clearErrorGridByMCStore($mailchimpStoreId);
 
         //Delete particular scopes configuraion flags for this store
-        $scopeArratIfExist = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
-        if ($scopeArratIfExist !== false) {
-            $this->deleteAllConfiguredMCStoreLocalData($mailchimpStoreId, $scopeArratIfExist['scope_id'], $scopeArratIfExist['scope']);
+        $scopeArrayIfExist = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
+        if ($scopeArrayIfExist !== false) {
+            $this->deleteAllConfiguredMCStoreLocalData($mailchimpStoreId, $scopeArrayIfExist['scope_id'], $scopeArrayIfExist['scope']);
         }
     }
 
