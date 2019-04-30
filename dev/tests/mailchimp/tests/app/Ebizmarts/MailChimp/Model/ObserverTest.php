@@ -1226,7 +1226,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $storeMock = $this->getMockBuilder(ArrayObject::class)
-            ->setMethods(array())
+            ->setMethods(array('getIterator'))
             ->getMock();
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
