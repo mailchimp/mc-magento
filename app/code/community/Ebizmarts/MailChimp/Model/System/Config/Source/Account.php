@@ -179,13 +179,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     )
                 );
             } elseif ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'], true)) {
-                $noStoreText = $helper->__('No MailChimp store was created for this scope, parent scopes might be sending data for this store anyways.');
-                $newStoreText = $helper->__('You can create a new MailChimp store for this scope by configuring a new list for this scope.');
+                $noStoreText = $helper->__('No MailChimp store was configured for this scope, parent scopes might be sending data for this store anyways.');
                 $returnArray = array_merge(
                     $returnArray,
                     array(
-                        array('value' => self::NO_STORE_TEXT_KEY, 'label' => $noStoreText),
-                        array('value' => self::NEW_STORE_TEXT_KEY, 'label' => $newStoreText)
+                        array('value' => self::NO_STORE_TEXT_KEY, 'label' => $noStoreText)
                     )
                 );
             }
