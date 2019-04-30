@@ -621,6 +621,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
+
             $helper->resetCountersDataSentToMailchimp();
 
             if ($items!==false) {
