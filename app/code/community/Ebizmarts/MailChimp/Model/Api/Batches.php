@@ -638,6 +638,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                     $error = $response->title . " : " . $response->detail;
 
+                    if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
+                        $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
+                        if ($dataProduct->getMailchimpSyncDeleted() || $dataProduct->getMailchimpSyncError() == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+                            $error = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
+                        }
+                    }
+
                     $this->saveSyncData($id, $type, $mailchimpStoreId, null, $error, 0, null, null, 0, true);
 
                     $mailchimpErrors->setType($response->type);
@@ -656,7 +663,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $mailchimpErrors->save();
                     $helper->logError($error);
                 } else {
-                    $syncDataItem = $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+                    $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
                     if (!$syncDataItem->getMailchimpSyncModified()) {
                         $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
                     }
@@ -818,7 +825,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $isMarkedAsDeleted = null;
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
-            $dataProduct = $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+            $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
 
             if (!$isMarkedAsDeleted || $dataProduct->getMailchimpSyncError() != Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
@@ -852,5 +859,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function shouldFlagAsSynced($syncingFlag, $itemAmount)
     {
         return ($syncingFlag === '1' || $syncingFlag === null) && $itemAmount === 0;
+    }
+
+    /**
+     * @param $helper
+     * @param $mailchimpStoreId
+     * @param $id
+     * @param $type
+     * @return Varien_Object
+     */
+    protected function getDataProduct($helper, $mailchimpStoreId, $id, $type)
+    {
+        return $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
     }
 }
