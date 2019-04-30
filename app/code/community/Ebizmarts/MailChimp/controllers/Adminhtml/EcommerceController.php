@@ -30,27 +30,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             $helper->resetErrors($scopeId, $scope);
         } catch(Exception $e)
         {
-            $success = 0;
-        }
-
-        $mageApp->getResponse()->setBody($success);
-    }
-
-    public function resetEcommerceDataAction()
-    {
-        $helper = $this->makeHelper();
-        $mageApp = $helper->getMageApp();
-        $request = $mageApp->getRequest();
-        $scope = $request->getParam('scope');
-        $scopeId = $request->getParam('scope_id');
-        $success = 0;
-        try {
-            $helper->resetMCEcommerceData($scopeId, $scope, true);
-            $success = 1;
-        } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch(Exception $e) {
             $helper->logError($e->getMessage());
+            $success = 0;
         }
 
         $mageApp->getResponse()->setBody($success);
@@ -65,7 +46,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scopeId = $request->getParam('scope_id');
         $success = 0;
         try {
-            $helper->resetMCEcommerceData($scopeId, $scope, false);
+            $helper->resendMCEcommerceData($scopeId, $scope);
             $success = 1;
         } catch(MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
@@ -110,7 +91,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             break;
         }
 
-        return Mage::getSingleton('admin/session')->isAllowed($acl);
+        return $this->getAdminSession()->isAllowed($acl);
     }
 
     /**
@@ -119,5 +100,13 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('admin/session');
     }
 }

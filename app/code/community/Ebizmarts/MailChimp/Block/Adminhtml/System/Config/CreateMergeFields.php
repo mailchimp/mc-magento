@@ -48,6 +48,19 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     }
 
     /**
+     * @return string
+     */
+    public function getMessageForMailchimpErrorLog()
+    {
+        $helper = $this->makeHelper();
+        $message = 'There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information.';
+        if (!$helper->isErrorLogEnabled()) {
+            $message = 'There was an error on the merge fields creation. Please enable the error logs and try again for more information.';
+        }
+        return $helper->__($message);
+    }
+
+    /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function makeHelper()

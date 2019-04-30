@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
 
             $this->getApiSubscriber()->update($subscriber->getSubscriberEmail(), $storeId, '', 1);
 
-            $session->addSuccess($this->__('Thanks for share your interest with us.'));
+            $session->addSuccess($this->__('Thanks for sharing your interest with us.'));
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
             $session->addWarning($this->__('Something went wrong with the interests subscription. Please go to the account subscription menu to subscriber to the interests successfully.'));

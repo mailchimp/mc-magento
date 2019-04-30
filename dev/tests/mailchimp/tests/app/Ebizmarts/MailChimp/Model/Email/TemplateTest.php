@@ -9,11 +9,12 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
 
     public function testSend()
     {
+        $apiKey = 'a1s2d3f4g5';
         $storeId = 1;
         $enabled = true;
         $email = 'email@address.com';
         $name = 'name';
-        $variables = array('email' => $email, 'name' => $name);
+        $variables = array('email' => $email, 'name' => $name, 'tags' => array('tagOne', 'tagTwo'));
         $message = 'message';
         $subject = 'subject';
         $returnPath = 1;
@@ -21,7 +22,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
         $bcc = array('bcc@email.com');
         $userAgent = 'Ebizmarts_Mandrill1.1.12/MageCE1.9.3.7';
         $emailArray = array ('subject' => 'subject', 'to' => array(array('email' => $email, 'name' => $name), array('email' => 'bcc@email.com', 'type' => 'bcc')), 'from_name' => 'name',
-            'from_email' => $senderEmail, 'headers' => array($userAgent), 'tags' => array('default_tag'), 'text' => 'message');
+            'from_email' => $senderEmail, 'headers' => array($userAgent), 'tags' => array('tagOne', 'tagTwo'), 'html' => 'message');
         $mandrillSenders = array(array('domain' => 'email.com'));
 
         /**
@@ -45,8 +46,8 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $mailObjectMock = $this->getMockBuilder(Mandrill_Message::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getBcc', 'getHeaders'))
+            ->setConstructorArgs(array($apiKey))
+            ->setMethods(array('getBcc', 'getHeaders', 'getAttachments'))
             ->getMock();
 
         $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
@@ -74,11 +75,60 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
 
         $mandrillHelperMock->expects($this->once())->method('getUserAgent')->willReturn($userAgent);
 
-        $templateMock->expects($this->once())->method('isPlain')->willReturn(true);
-        $templateMock->expects($this->once())->method('hasQueue')->willReturn(true);
-        $templateMock->expects($this->once())->method('getQueue')->willReturn(true);
+        $mailObjectMock->expects($this->once())->method('getAttachments')->willReturn(null);
+
+        $templateMock->expects($this->once())->method('isPlain')->willReturn(false);
+        $templateMock->expects($this->once())->method('hasQueue')->willReturn(false);
         $templateMock->expects($this->once())->method('sendMail')->with($emailArray, $mailObjectMock);
 
         $templateMock->send($email, $name, $variables);
+    }
+
+    public function testGetMailCreateNewMandrillEmail()
+    {
+        $storeId = 1;
+
+        $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDesignConfig', 'isMandrillEnabled', 'createMandrillMessage'))
+            ->getMock();
+
+        $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
+
+        $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
+        $templateMock->expects($this->once())->method('createMandrillMessage')->with($storeId);
+        $templateMock->expects($this->once())->method('isMandrillEnabled')->with($storeId)->willReturnOnConsecutiveCalls(
+            true,
+            true
+        );
+
+        $varienObjectMock->expects($this->once())->method('getStore')->willReturn($storeId);
+
+        $templateMock->getMail();
+    }
+
+    public function testGetMailMandrillEmailDisabled()
+    {
+        $storeId = 1;
+
+        $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDesignConfig', 'isMandrillEnabled'))
+            ->getMock();
+
+        $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
+
+        $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
+        $templateMock->expects($this->once())->method('isMandrillEnabled')->with($storeId)->willReturn(false);
+
+        $varienObjectMock->expects($this->once())->method('getStore')->willReturn($storeId);
+
+        $templateMock->getMail();
     }
 }

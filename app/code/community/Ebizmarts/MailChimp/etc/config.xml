@@ -3,30 +3,14 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.15</version>
+            <version>1.1.16</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.15</version>
+            <version>1.1.16</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
         <events>
-            <store_group_save>
-                <observers>
-                    <mailchimp_change_store_name>
-                        <class>mailchimp/observer</class>
-                        <method>changeStoreGroupName</method>
-                    </mailchimp_change_store_name>
-                </observers>
-            </store_group_save>
-            <store_edit>
-                <observers>
-                    <mailchimp_change_store_name>
-                        <class>mailchimp/observer</class>
-                        <method>changeStoreName</method>
-                    </mailchimp_change_store_name>
-                </observers>
-            </store_edit>
             <newsletter_subscriber_save_before>
                 <observers>
                     <mailchimp_subscribe_observer>
@@ -141,14 +125,6 @@
                     </mailchimp_clean_catalog_images_cache_after>
                 </observers>
             </clean_catalog_images_cache_after>
-            <controller_front_init_before>
-                <observers>
-                    <mailchimp_controller_front_init_before>
-                        <class>mailchimp/observer</class>
-                        <method>frontInitBefore</method>
-                    </mailchimp_controller_front_init_before>
-                </observers>
-            </controller_front_init_before>
         </events>
         <models>
             <mailchimp>
@@ -173,6 +149,9 @@
                     <interestgroup>
                         <table>mailchimp_interest_group</table>
                     </interestgroup>
+                    <stores>
+                        <table>mailchimp_stores</table>
+                    </stores>
                 </entities>
             </mailchimp_mysql4>
             <newsletter>
@@ -304,14 +283,14 @@
             </updates>
         </layout>
         <translate>
-        <modules>
-            <Ebizmarts_MailChimp>
-                <files>
-                    <default>Ebizmarts_MailChimp.csv</default>
-                </files>
-            </Ebizmarts_MailChimp>
-        </modules>
-    </translate>
+            <modules>
+                <Ebizmarts_MailChimp>
+                    <files>
+                        <default>Ebizmarts_MailChimp.csv</default>
+                    </files>
+                </Ebizmarts_MailChimp>
+            </modules>
+        </translate>
         <events>
             <core_block_abstract_prepare_layout_after>
                 <observers>
@@ -349,14 +328,14 @@
                     </mailchimp_add_synced_to_order_grid_collection>
                 </observers>
             </sales_order_grid_collection_load_before>
-            <admin_system_config_changed_section_mailchimp>
+            <model_config_data_save_before>
                 <observers>
                     <mailchimp_save_config>
                         <class>mailchimp/observer</class>
-                        <method>saveConfig</method>
+                        <method>saveConfigBefore</method>
                     </mailchimp_save_config>
                 </observers>
-            </admin_system_config_changed_section_mailchimp>
+            </model_config_data_save_before>
             <adminhtml_block_html_before>
                 <observers>
                     <mailchimp_alter_newsletter_grid>
@@ -366,15 +345,15 @@
                     </mailchimp_alter_newsletter_grid>
                 </observers>
             </adminhtml_block_html_before>
-            <catalog_product_save_before>
+            <catalog_product_save_after>
                 <observers>
-                    <mailchimp_save_before_product>
+                    <mailchimp_save_after_product>
                         <type>model</type>
                         <class>mailchimp/observer</class>
-                        <method>productSaveBefore</method>
-                    </mailchimp_save_before_product>
+                        <method>productSaveAfter</method>
+                    </mailchimp_save_after_product>
                 </observers>
-            </catalog_product_save_before>
+            </catalog_product_save_after>
             <controller_action_postdispatch_adminhtml_promo_quote_couponsMassDelete>
                 <observers>
                     <mailchimp_controller_couponsMassDelete>

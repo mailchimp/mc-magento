@@ -316,6 +316,14 @@ class Ebizmarts_MailChimp
         return $this->lists;
     }
 
+    /**
+     * @return MailChimp_Campaigns
+     */
+    public function getCampaign()
+    {
+        return $this->campaigns;
+    }
+
     public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
     {
         $paramsOrig = $params;
@@ -342,6 +350,7 @@ class Ebizmarts_MailChimp
         if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         } else {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, null);
             if ($hasParams) {
                 $_params = http_build_query($params);
                 $url .= '?' . $_params;
@@ -352,7 +361,6 @@ class Ebizmarts_MailChimp
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-
 
         $responseBody = curl_exec($ch);
 

@@ -12,9 +12,11 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
 
     public function testHasAttachment()
     {
+        $apiKey = 'a1s2d3f4g5';
+
         /** @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock */
         $messageMock = $this->getMockBuilder('Mandrill_Message')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array($apiKey))
             ->getMock();
 
         $this->assertFalse($messageMock->hasAttachments);
@@ -22,9 +24,11 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
 
     public function testAddGetAttachment()
     {
+        $apiKey = 'a1s2d3f4g5';
+
         /** @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock */
         $messageMock = $this->getMockBuilder('Mandrill_Message')
-            ->disableOriginalConstructor()
+            ->setConstructorArgs(array($apiKey))
             ->setMethods(array('getMail'))
             ->getMock();
 
