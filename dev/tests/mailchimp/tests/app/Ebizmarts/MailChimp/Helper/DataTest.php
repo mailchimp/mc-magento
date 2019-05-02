@@ -131,10 +131,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->handleResendFinish($scopeId, $scope);
     }
 
-    public function testDeleteConfiguredMCStoreLocalData()
+    public function testDeleteAllConfiguredMCStoreLocalData()
     {
-        $scope = 'default';
-        $scopeId = 0;
+        $scope = 'stores';
+        $scopeId = 1;
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $where = "status = 'pending' AND store_id = $mailchimpStoreId";
         $tableName = 'mailchimp_sync_batches';
@@ -163,14 +163,14 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
 
         $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, $scopeId, $scope, false);
-        $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
+        $helperMock->expects($this->exactly(2))->method('getConfig')->willReturn($configMock);
         $helperMock->expects($this->once())->method('getAllStoresForScope')->with($scopeId, $scope)->willReturn($storeIdsArray);
 
-        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdOne);
-        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdTwo);
-        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdThree);
-        $param4 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", $scope, $scopeId);
-        $param5 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdOne);
+        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdTwo);
+        $param4 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", 'stores', $storeIdThree);
+        $param5 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING. "_$mailchimpStoreId", $scope, $scopeId);
+        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
         $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
         $param7 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
         $param8 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
@@ -192,7 +192,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $dbAdapterInterfaceMock->expects($this->once())->method('quoteInto')->with("status = 'pending' AND store_id = ?", $mailchimpStoreId)->willReturn($where);
         $dbAdapterInterfaceMock->expects($this->once())->method('update')->with($tableName, array('status' => 'canceled'), $where);
 
-        $helperMock->deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope);
+        $helperMock->deleteAllConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope);
     }
 
     public function testGetDateSyncFinishByStoreId()
