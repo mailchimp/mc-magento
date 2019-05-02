@@ -82,7 +82,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($subscriber->getMailchimpSyncModified()) {
                     $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
                 } else {
-                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
                 }
 
                 $subscriberArray[$counter]['method'] = "PUT";

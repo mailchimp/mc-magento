@@ -938,7 +938,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         if (!empty($helper->getCountersDataSentToMailchimp()) || $helper->getCountersDataSentToMailchimp() != null) {
             $helper->logBatchStatus("Processed data sent to Mailchimp for store $storeId");
-            $helper->logBatchQuantity($helper->getCountersDataSentToMailchimp());
+            $counter = $helper->getCountersDataSentToMailchimp();
+            $helper->logBatchQuantity($counter);
+            if (isset($counter['SubscriberNotSent'])
+                || isset($counter['ProductNotSent'])
+                || isset($counter['CustomerNotSent'])
+                || isset($counter['OrderNotSent'])
+                || isset($counter['QuoteNotSent'])
+            ) {
+                if ($helper->isErrorLogEnabled()) {
+                    $helper->logBatchStatus('Please check the grid Mailchimp Errors or MailChimp_Errors.log for more details.');
+                } else {
+                    $helper->logBatchStatus('Please check the grid Mailchimp Errors and enable MailChimp_Errors.log for more details.');
+                }
+            }
         } else {
             $helper->logBatchStatus("Nothing was processed for store $storeId");
         }
