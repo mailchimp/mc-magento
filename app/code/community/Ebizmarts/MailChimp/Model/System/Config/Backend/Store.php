@@ -20,18 +20,19 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
         $scope = $this->getScope();
         $groups = $this->getData('groups');
 
-        $mailchimpStoreId = (isset($groups['general']['fields']['storeid']['value'])) ? $groups['general']['fields']['storeid']['value'] : $helper->getMCStoreId($scopeId, $scope);
-        $isSyncing = $helper->getMCIsSyncing($mailchimpStoreId, $scopeId, $scope);
-        $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $scopeId, $scope);
+        $newMailchimpStoreId = (isset($groups['general']['fields']['storeid']['value'])) ? $groups['general']['fields']['storeid']['value'] : null;
+        $oldMailchimpStoreId = $helper->getMCStoreId($scopeId, $scope);
+        $isSyncing = $helper->getMCIsSyncing($newMailchimpStoreId, $scopeId, $scope);
+        $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($newMailchimpStoreId, $scopeId, $scope);
 
         if ($this->isValueChanged() && $this->getValue()) {
-            $helper->deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope);
+                $helper->deletePreviousConfiguredMCStoreLocalData($oldMailchimpStoreId, $scopeId, $scope);
             if ($ecommMinSyncDate === null) {
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$mailchimpStoreId", Varien_Date::now()));
+                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$newMailchimpStoreId", Varien_Date::now()));
                 $helper->saveMailchimpConfig($configValues, 0, 'default');
             }
             if ($isSyncing === null) {
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", true));
+                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$newMailchimpStoreId", true));
                 $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
             }
         }
