@@ -946,9 +946,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 || isset($counter['QuoteNotSent'])
             ) {
                 if ($helper->isErrorLogEnabled()) {
-                    $helper->logBatchStatus('Please check the grid Mailchimp Errors or MailChimp_Errors.log for more details.');
+                    $helper->logBatchStatus('Please check Mailchimp Errors grid or MailChimp_Errors.log for more details.');
                 } else {
-                    $helper->logBatchStatus('Please check the grid Mailchimp Errors and enable MailChimp_Errors.log for more details.');
+                    $helper->logBatchStatus('Please check Mailchimp Errors grid and enable MailChimp_Errors.log for more details.');
                 }
             }
         } else {
