@@ -619,10 +619,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $helper->resetCountersDataSentToMailchimp();
+
         foreach ($files as $file) {
             $items = json_decode(file_get_contents($file));
-
-            $helper->resetCountersDataSentToMailchimp();
 
             if ($items!==false) {
                 foreach ($items as $item) {
@@ -653,7 +653,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                         if (strstr($errorDetails, 'already exists')) {
                             $this->setItemAsModified($helper, $mailchimpStoreId, $id, $type);
-                            $this->processStatusOfEachResponseFile($type, $helper, false);
+                            $this->processStatusOfEachResponseFile($type, $helper);
                             continue;
                         }
                         $error = $response->title . " : " . $response->detail;
@@ -693,8 +693,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
             unlink($file);
-            $this->_showResumeDataSentToMailchimp($magentoStoreId);
         }
+        $this->_showResumeDataSentToMailchimp($magentoStoreId);
     }
 
     /**
@@ -929,7 +929,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $batchId
      * @param $storeId
      * @throws Mage_Core_Exception
      */
