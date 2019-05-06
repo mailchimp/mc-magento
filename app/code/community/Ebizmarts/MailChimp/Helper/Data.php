@@ -12,31 +12,35 @@
  */
 class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const DEFAULT_SIZE   = '0';
-    const SMALL_SIZE     = '1';
-    const THUMBNAIL_SIZE = '2';
-    const ORIGINAL_SIZE  = '3';
+    const DEFAULT_SIZE     = '0';
+    const SMALL_SIZE       = '1';
+    const THUMBNAIL_SIZE   = '2';
+    const ORIGINAL_SIZE    = '3';
 
-    const SUB_MOD        = "SubscriberModified";
-    const SUB_NEW        = "SubscriberNew";
-    const PRO_MOD        = "ProductModified";
-    const PRO_NEW        = "ProductNew";
-    const CUS_MOD        = "CustomerModified";
-    const CUS_NEW        = "CustomerNew";
-    const ORD_MOD        = "OrderModified";
-    const ORD_NEW        = "OrderNew";
-    const QUO_MOD        = "QuoteModified";
-    const QUO_NEW        = "QuoteNew";
-    const SUB_SENT       = "SubscriberProcessed";
-    const SUB_NOT_SENT   = "SubscriberNotSent";
-    const PRO_SENT       = "ProductProcessed";
-    const PRO_NOT_SENT   = "ProductNotSent";
-    const CUS_SENT       = "CustomerProcessed";
-    const CUS_NOT_SENT   = "CustomerNotSent";
-    const ORD_SENT       = "OrderProcessed";
-    const ORD_NOT_SENT   = "OrderNotSent";
-    const QUO_SENT       = "QuoteProcessed";
-    const QUO_NOT_SENT   = "QuoteNotSent";
+    const SUB_MOD          = "SubscriberModified";
+    const SUB_NEW          = "SubscriberNew";
+    const PRO_MOD          = "ProductModified";
+    const PRO_NEW          = "ProductNew";
+    const CUS_MOD          = "CustomerModified";
+    const CUS_NEW          = "CustomerNew";
+    const ORD_MOD          = "OrderModified";
+    const ORD_NEW          = "OrderNew";
+    const QUO_MOD          = "QuoteModified";
+    const QUO_NEW          = "QuoteNew";
+
+    const SUB_SENT         = "SubscriberProcessed";
+    const SUB_NOT_SENT     = "SubscriberNotSent";
+    const PRO_SENT         = "ProductProcessed";
+    const PRO_NOT_SENT     = "ProductNotSent";
+    const CUS_SENT         = "CustomerProcessed";
+    const CUS_NOT_SENT     = "CustomerNotSent";
+    const ORD_SENT         = "OrderProcessed";
+    const ORD_NOT_SENT     = "OrderNotSent";
+    const QUO_SENT         = "QuoteProcessed";
+    const QUO_NOT_SENT     = "QuoteNotSent";
+
+
+    const BATCH_STATUS_LOG = 'Mailchimp_Batch_Status.log';
 
     protected $countersSendBatch        = array();
     protected $countersSubscribers      = array();
@@ -823,7 +827,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function logBatchStatus($message)
     {
         if ($this->isRequestLogEnabled()) {
-            Mage::log($message . "\n", null, 'Mailchimp_Batch_Status.log', true);
+            Mage::log($message . "\n", null, self::BATCH_STATUS_LOG, true);
         }
     }
 
@@ -838,7 +842,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function logBatchQuantity($message)
     {
         if ($this->isRequestLogEnabled()) {
-            Mage::log($message, null, 'Mailchimp_Batch_Status.log', true);
+            Mage::log($message, null, self::BATCH_STATUS_LOG, true);
         }
     }
 
