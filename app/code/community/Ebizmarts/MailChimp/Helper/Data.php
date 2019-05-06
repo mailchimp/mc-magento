@@ -817,7 +817,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Save how many date was sent to Mailchimp,
+     * Save how many data was sent to Mailchimp,
      * how many data was successfully and not sent to Mailchimp
      * in the file "Mailchimp_Batch_Status.log"
      *
@@ -832,7 +832,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Save how many date was sent to Mailchimp,
+     * Save how many data was sent to Mailchimp,
      * how many data was successfully and not sent to Mailchimp
      * in the file "Mailchimp_Batch_Status.log"
      *
