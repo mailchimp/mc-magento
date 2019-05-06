@@ -103,9 +103,9 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $paramFilters = 'filter';
         $scope = 'stores';
         $scopeId = 1;
-        $filter = 1;
+        $filter = 'ORD';
 
-        $result = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+        $result = 'Redirecting... <script type="text/javascript">window.top.location.reload();</script>';
 
         $ecommerceControllerMock = $this->ecommerceController
             ->disableOriginalConstructor()
@@ -114,7 +114,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMageApp', 'resendMCEcommerceData'))
+            ->setMethods(array('getMageApp', 'resendMCEcommerceData', 'getCurrentScope'))
             ->getMock();
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
@@ -135,9 +135,10 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
-        $helperMock->expects($this->once())->method('resendMCEcommerceData')->with($scopeId, $scope);
+        $helperMock->expects($this->once())->method('getCurrentScope')->willReturn(array('scope_id'=>$scopeId, 'scope'=>$scope));
+        $helperMock->expects($this->once())->method('resendMCEcommerceData')->with($scopeId, $scope, $filter)->willReturnSelf();
 
-        $requestMock->expects($this->exactly(2))->method('getParam')->with($paramFilters)->willReturn($filter);
+        $requestMock->expects($this->once())->method('getParam')->with($paramFilters)->willReturn($filter);
         $responseMock->expects($this->once())->method('setBody')->with($result);
 
         $ecommerceControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
