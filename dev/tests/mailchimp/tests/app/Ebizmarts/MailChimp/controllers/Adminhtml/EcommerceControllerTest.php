@@ -100,15 +100,16 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
     public function testResendEcommerceDataAction()
     {
-        $paramScope = 'scope';
-        $paramScopeId = 'scope_id';
+        $paramFilters = 'filter';
         $scope = 'stores';
         $scopeId = 1;
-        $result = 1;
+        $filter = 1;
+
+        $result = 'Redirecting... <script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
 
         $ecommerceControllerMock = $this->ecommerceController
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper'))
+            ->setMethods(array('makeHelper', 'getRequest', 'addSuccess'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -118,7 +119,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getResponse'))
+            ->setMethods(array('getResponse'))
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
@@ -131,26 +132,17 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
             ->setMethods(array('setBody'))
             ->getMock();
 
-        $ecommerceControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
-
-        $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
-
-        $mageAppMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
-
-        $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
-            array($paramScope),
-            array($paramScopeId))
-            ->willReturnOnConsecutiveCalls(
-                $scope,
-                $scopeId
-            );
-
-        $helperMock->expects($this->once())->method('resendMCEcommerceData')->with($scopeId, $scope);
-
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
+        $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
+        $helperMock->expects($this->once())->method('resendMCEcommerceData')->with($scopeId, $scope);
+
+        $requestMock->expects($this->exactly(2))->method('getParam')->with($paramFilters)->willReturn($filter);
         $responseMock->expects($this->once())->method('setBody')->with($result);
 
+        $ecommerceControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $ecommerceControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
+        $ecommerceControllerMock->expects($this->once())->method('addSuccess');
         $ecommerceControllerMock->resendEcommerceDataAction();
     }
 
