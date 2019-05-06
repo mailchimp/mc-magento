@@ -347,16 +347,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $scopeId
      * @param string $scope
      */
-    public function deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope = 'stores')
+    public function deletePreviousConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope = 'stores')
     {
-        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE, 0));
-        $this->saveMailchimpConfig($configValues, $scopeId, $scope, false);
         $config = $this->getConfig();
-        foreach ($this->getAllStoresForScope($scopeId, $scope) as $storeId) {
-            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 'stores', $storeId);
+        if ($mailchimpStoreId !== null && $mailchimpStoreId !== '') {
+            foreach ($this->getAllStoresForScope($scopeId, $scope) as $storeId) {
+                $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 'stores', $storeId);
+            }
+            $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scope, $scopeId);
         }
-        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", $scope, $scopeId);
-        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
         $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
@@ -371,6 +370,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $tableName = $resource->getTableName('mailchimp/synchbatches');
         $where = $connection->quoteInto("status = 'pending' AND store_id = ?", $mailchimpStoreId);
         $connection->update($tableName, array('status' => 'canceled'), $where);
+    }
+
+    /**
+     * Delete all data related to the configured store in a given scope.
+     *
+     * @param $scopeId
+     * @param string $scope
+     */
+    public function deleteAllConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope = 'stores')
+    {
+        $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ACTIVE, 0));
+        $this->saveMailchimpConfig($configValues, $scopeId, $scope, false);
+        $config = $this->getConfig();
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+        $this->deletePreviousConfiguredMCStoreLocalData($mailchimpStoreId, $scopeId, $scope = 'stores');
     }
 
     /**
@@ -394,9 +408,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->clearErrorGridByMCStore($mailchimpStoreId);
 
         //Delete particular scopes configuraion flags for this store
-        $scopeArratIfExist = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
-        if ($scopeArratIfExist !== false) {
-            $this->deleteConfiguredMCStoreLocalData($mailchimpStoreId, $scopeArratIfExist['scope_id'], $scopeArratIfExist['scope']);
+        $scopeArrayIfExist = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
+        if ($scopeArrayIfExist !== false) {
+            $this->deleteAllConfiguredMCStoreLocalData($mailchimpStoreId, $scopeArrayIfExist['scope_id'], $scopeArrayIfExist['scope']);
         }
     }
 
