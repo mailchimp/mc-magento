@@ -41,8 +41,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         //get subscribers
         $collection = Mage::getResourceModel('newsletter/subscriber_collection')
-            ->addFieldToFilter('subscriber_status', array('eq' => 1))
-            ->addFieldToFilter('store_id', array('eq' => $storeId))
+            ->addFieldToFilter(
+                array(
+                    'subscriber_status',
+                    'subscriber_status'
+                ),
+                array(
+                    array('eq' => 1),
+                    array('eq' => 5)
+                )
+            )->addFieldToFilter('store_id', array('eq' => $storeId))
             ->addFieldToFilter(
                 array(
                     'mailchimp_sync_delta',
@@ -59,12 +67,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             );
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
         $collection->getSelect()->limit($limit);
+
         $date = $helper->getDateMicrotime();
         $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
 
         $counter = 0;
         foreach ($collection as $subscriber) {
-            Mage::log($subscriber, null, 'subscriberCustomerNotSubscribed.log', true);
             $data = $this->_buildSubscriberData($subscriber);
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
@@ -79,7 +87,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
-                Mage::log('not empty json', null, 'subscriberCustomerNotSubscribed.log', true);
                 $subscriberArray[$counter]['method'] = "PUT";
                 $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
@@ -521,14 +528,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     public function update($emailAddress, $storeId, $customerId = null)
     {
-        Mage::log(__METHOD__, null, 'subscriberCustomerNotSubscribed.log', true);
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
         if ($subscriber->getId()) {
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         } else {
-            Mage::log('entra al else del update subscriber ', null, 'subscriberCustomerNotSubscribed.log', true);
-            $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($emailAddress);
             $subscriber->setStoreId($storeId);
             $subscriber->setSubscriberStatus(self::TRANSACTIONAL_MEMBERS);
             $subscriber->setEmail($emailAddress);
