@@ -379,7 +379,6 @@ class Ebizmarts_MailChimp
             $title = array_key_exists('title',$result) ? $result['title'] : '';
 
             throw new MailChimp_Error($this->_root . $url, $method, $params, $title, $detail, $errors);
-//            throw new MailChimp_Error($url, $result['title'], $result['detail'], $errors);
         }
 
         return $result;
