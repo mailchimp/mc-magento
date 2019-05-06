@@ -28,17 +28,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     const QUO_MOD          = "QuoteModified";
     const QUO_NEW          = "QuoteNew";
 
-    const SUB_SENT         = "SubscriberProcessed";
-    const SUB_NOT_SENT     = "SubscriberNotSent";
-    const PRO_SENT         = "ProductProcessed";
-    const PRO_NOT_SENT     = "ProductNotSent";
-    const CUS_SENT         = "CustomerProcessed";
-    const CUS_NOT_SENT     = "CustomerNotSent";
-    const ORD_SENT         = "OrderProcessed";
-    const ORD_NOT_SENT     = "OrderNotSent";
-    const QUO_SENT         = "QuoteProcessed";
-    const QUO_NOT_SENT     = "QuoteNotSent";
-
+    const DATA_NOT_SENT_TO_MAILCHIMP = 'NOT SENT';
+    const DATA_SENT_TO_MAILCHIMP     = 'SENT';
 
     const BATCH_STATUS_LOG = 'Mailchimp_Batch_Status.log';
 
@@ -4187,14 +4178,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $index
+     * @param bool $hasError
      * @param int $increment
      */
-    public function modifyCounterDataSentToMailchimp($index, $increment = 1)
+    public function modifyCounterDataSentToMailchimp($index, $hasError = false, $increment = 1)
     {
         if (array_key_exists($index, $this->countersGetResponseBatch)) {
-            $this->countersGetResponseBatch[$index] = $this->countersGetResponseBatch[$index] + $increment;
+            if ($hasError) {
+                $this->countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] = $this->countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] + $increment;
+            } else {
+                $this->countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] = $this->countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] + $increment;
+            }
         } else {
-            $this->countersGetResponseBatch[$index] = 1;
+            if ($hasError) {
+                $this->countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] = 1;
+            } else {
+                $this->countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] = 1;
+            }
         }
     }
 

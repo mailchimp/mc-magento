@@ -653,7 +653,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                         if (strstr($errorDetails, 'already exists')) {
                             $this->setItemAsModified($helper, $mailchimpStoreId, $id, $type);
-                            $this->processStatusOfEachResponseFile($type, $helper);
+                            $helper->modifyCounterDataSentToMailchimp($type);
                             continue;
                         }
                         $error = $response->title . " : " . $response->detail;
@@ -681,13 +681,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         }
 
                         $mailchimpErrors->save();
-                        $this->processStatusOfEachResponseFile($type, $helper, true);
+                        $helper->modifyCounterDataSentToMailchimp($type, true);
                         $helper->logError($error);
                     } else {
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
                         if (!$syncDataItem->getMailchimpSyncModified()) {
                             $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
-                            $this->processStatusOfEachResponseFile($type, $helper);
+                            $helper->modifyCounterDataSentToMailchimp($type);
                         }
                     }
                 }
@@ -952,45 +952,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $type
-     * @param $helper
-     * @param bool $hasError
-     */
-    protected function processStatusOfEachResponseFile($type, $helper, $hasError = false)
-    {
-        if ($hasError) {
-            if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::PRO_NOT_SENT);
-            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::CUS_NOT_SENT);
-            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::ORD_NOT_SENT);
-            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_QUOTE) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::QUO_NOT_SENT);
-            }
-        } else {
-            if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::PRO_SENT);
-            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::CUS_SENT);
-            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_ORDER) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::ORD_SENT);
-            } else if ($type == Ebizmarts_MailChimp_Model_Config::IS_QUOTE) {
-                $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::QUO_SENT);
-            }
-        }
-    }
-
-    /**
      * @param $counter
      * @return bool
      */
     protected function isSetAnyCounterSubscriberOrEcommerceNotSent($counter)
     {
-        return isset($counter['SubscriberNotSent'])
-            || isset($counter['ProductNotSent'])
-            || isset($counter['CustomerNotSent'])
-            || isset($counter['OrderNotSent'])
-            || isset($counter['QuoteNotSent']);
+        return isset($counter['SUB']['NOT SENT'])
+            || isset($counter['CUS']['NOT SENT'])
+            || isset($counter['ORD']['NOT SENT'])
+            || isset($counter['PRO']['NOT SENT'])
+            || isset($counter['QUO']['NOT SENT']);
     }
 }
