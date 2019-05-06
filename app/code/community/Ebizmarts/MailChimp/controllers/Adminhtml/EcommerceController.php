@@ -54,13 +54,13 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
 
         if (is_array($filters) && empty($filters)) {
             $this->addWarning($helper->__('At least one type of eCommerce data should be selected to Resend.'));
-            $success = $helper->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+            $success = $helper->__('Redirecting... ') . '<script type="text/javascript">window.top.location.reload();</script>';
         } else {
             try {
                 $helper->resendMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
 
                 $this->addSuccess($helper->__('Ecommerce data resent succesfully'));
-                $success = $helper->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+                $success = $helper->__('Redirecting... ') . '<script type="text/javascript">window.top.location.reload();</script>';
             } catch (MailChimp_Error $e) {
                 $helper->logError($e->getFriendlyMessage());
                 $this->addError($e->getFriendlyMessage());
