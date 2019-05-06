@@ -726,7 +726,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
         return $addressData;
     }
-     
+
     /**
      * @param $itemId
      * @param $magentoStoreId
