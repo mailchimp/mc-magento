@@ -817,8 +817,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Save how many data was sent to Mailchimp,
-     * how many data was successfully and not sent to Mailchimp
+     * Save the message errors for the data sent
+     * succesfully or not to Mailchimp
      * in the file "Mailchimp_Batch_Status.log"
      *
      * @param $message
