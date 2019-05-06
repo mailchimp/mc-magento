@@ -171,6 +171,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
             if ($cartJson != "") {
+
+                $this->getHelper()->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_MOD);
+
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
                 $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/'.$cartId;
@@ -257,6 +260,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
             if ($cartJson != "") {
+
+                $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_NEW);
+
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'POST';
                 $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
