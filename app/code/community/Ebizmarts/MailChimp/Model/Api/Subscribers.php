@@ -13,6 +13,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
+    /**
+     * Ebizmarts_MailChimp_Helper_Data
+     */
     private $mcHelper;
 
     public function __construct()
@@ -73,6 +76,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
+
+                if ($subscriber->getMailchimpSyncModified()) {
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+                } else {
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
+                }
+
                 $subscriberArray[$counter]['method'] = "PUT";
                 $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
@@ -716,5 +726,25 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
         return $addressData;
     }
+     
+    /**
+     * @param $itemId
+     * @param $magentoStoreId
+     * @return Mage_Newsletter_Model_Subscriber \ subcriberSyncDataItem newsletter/subscriber if exists.
+     */
+    protected function getSubscriberSyncDataItem($itemId, $magentoStoreId)
+    {
+        $subscriberSyndDataItem = null;
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
+            ->addFieldToFilter('subscriber_id', array('eq' => $itemId))
+            ->addFieldToFilter('store_id', array('eq' => $magentoStoreId))
+            ->setCurPage(1)
+            ->setPageSize(1);
 
+        if ($collection->getSize()) {
+            $subscriberSyndDataItem = $collection->getFirstItem();
+        }
+
+        return $subscriberSyndDataItem;
+    }
 }
