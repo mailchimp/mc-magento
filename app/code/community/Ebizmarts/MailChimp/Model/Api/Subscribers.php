@@ -12,6 +12,12 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
+    const STATUS_SUBSCRIBED     = 1;
+    const STATUS_NOT_ACTIVE     = 2;
+    const STATUS_UNSUBSCRIBED   = 3;
+    const STATUS_UNCONFIRMED    = 4;
+    const TRANSACTIONAL_MEMBERS = 5;
+
 
     private $mcHelper;
 
@@ -58,6 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         $counter = 0;
         foreach ($collection as $subscriber) {
+            Mage::log($subscriber, null, 'subscriberCustomerNotSubscribed.log', true);
             $data = $this->_buildSubscriberData($subscriber);
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
@@ -72,6 +79,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
+                Mage::log('not empty json', null, 'subscriberCustomerNotSubscribed.log', true);
                 $subscriberArray[$counter]['method'] = "PUT";
                 $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
@@ -511,12 +519,21 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
     }
 
-    public function update($emailAddress, $storeId)
+    public function update($emailAddress, $storeId, $customerId = null)
     {
+        Mage::log(__METHOD__, null, 'subscriberCustomerNotSubscribed.log', true);
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
         if ($subscriber->getId()) {
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
+        } else {
+            Mage::log('entra al else del update subscriber ', null, 'subscriberCustomerNotSubscribed.log', true);
+            $subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($emailAddress);
+            $subscriber->setStoreId($storeId);
+            $subscriber->setSubscriberStatus(self::TRANSACTIONAL_MEMBERS);
+            $subscriber->setEmail($emailAddress);
+            $subscriber->setCustomerId($customerId);
+            $subscriber->setMailchimpSyncModified(1)->save();
         }
     }
 

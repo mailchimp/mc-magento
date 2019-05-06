@@ -328,7 +328,7 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             //update subscriber data if a subscriber with the same email address exists and was not affected.
             if (!$origEmail || $origEmail == $customerEmail) {
-                $apiSubscriber->update($customerEmail, $storeId);
+                $apiSubscriber->update($customerEmail, $storeId, $customerId);
             }
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
