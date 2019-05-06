@@ -939,12 +939,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $helper->logBatchStatus("Processed data sent to Mailchimp for store $storeId");
             $counter = $helper->getCountersDataSentToMailchimp();
             $helper->logBatchQuantity($counter);
-            if (isset($counter['SubscriberNotSent'])
-                || isset($counter['ProductNotSent'])
-                || isset($counter['CustomerNotSent'])
-                || isset($counter['OrderNotSent'])
-                || isset($counter['QuoteNotSent'])
-            ) {
+            if ($this->isSetAnyCounterSubscriberOrEcommerceNotSent($counter)) {
                 if ($helper->isErrorLogEnabled()) {
                     $helper->logBatchStatus('Please check Mailchimp Errors grid or MailChimp_Errors.log for more details.');
                 } else {
@@ -984,5 +979,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $helper->modifyCounterDataSentToMailchimp(Ebizmarts_MailChimp_Helper_Data::QUO_SENT);
             }
         }
+    }
+
+    /**
+     * @param $counter
+     * @return bool
+     */
+    protected function isSetAnyCounterSubscriberOrEcommerceNotSent($counter)
+    {
+        return isset($counter['SubscriberNotSent'])
+            || isset($counter['ProductNotSent'])
+            || isset($counter['CustomerNotSent'])
+            || isset($counter['OrderNotSent'])
+            || isset($counter['QuoteNotSent']);
     }
 }
