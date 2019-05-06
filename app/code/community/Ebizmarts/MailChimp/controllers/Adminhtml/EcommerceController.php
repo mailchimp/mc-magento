@@ -47,25 +47,26 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
-        $filters = $this->getRequest()->getParam('filter');
+        $request = $this->getRequest();
+        $filters = $request->getParam('filter');
         $scopeArray = $helper->getCurrentScope();
         $success = 0;
 
         if (is_array($filters) && empty($filters)) {
-            Mage::getSingleton('core/session')->addWarning(Mage::helper('mailchimp')->__('At least one type of eCommerce data should be selected to Resend.'));
-            $success = Mage::helper('mailchimp')->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+            $this->addWarning($helper->__('At least one type of eCommerce data should be selected to Resend.'));
+            $success = $helper->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
         } else {
             try {
                 $helper->resendMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
 
-                Mage::getSingleton('core/session')->addSuccess(Mage::helper('mailchimp')->__('Ecommerce data resent succesfully'));
-                $success = Mage::helper('mailchimp')->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
+                $this->addSuccess($helper->__('Ecommerce data resent succesfully'));
+                $success = $helper->__('Redirecting... ') . '<script type="text/javascript">/*window.parent.document.getElementById("loading-mask").display = true;*/window.top.location.reload();</script>';
             } catch (MailChimp_Error $e) {
                 $helper->logError($e->getFriendlyMessage());
-                Mage::getSingleton('core/session')->addError($e->getFriendlyMessage());
+                $this->addError($e->getFriendlyMessage());
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
-                Mage::getSingleton('core/session')->addError($e->getMessage());
+                $this->addError($e->getMessage());
             }
         }
         $mageApp->getResponse()->setBody($success);
@@ -122,5 +123,20 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     protected function getAdminSession()
     {
         return Mage::getSingleton('admin/session');
+    }
+
+    public function addWarning($message)
+    {
+        Mage::getSingleton('core/session')->addWarning($message);
+    }
+
+    public function addSuccess($message)
+    {
+        Mage::getSingleton('core/session')->addSuccess($message);
+    }
+
+    public function addError($message)
+    {
+        Mage::getSingleton('core/session')->addError($message);
     }
 }
