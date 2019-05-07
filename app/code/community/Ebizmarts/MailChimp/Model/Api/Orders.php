@@ -263,7 +263,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer data
-        $data["customer"]["id"] = md5($order->getCustomerEmail());
+        $data["customer"]["id"] = md5(strtolower($order->getCustomerEmail()));
         $data["customer"]["email_address"] = $order->getCustomerEmail();
         $data["customer"]["opt_in_status"] = $this->getCustomerModel()->getOptin($magentoStoreId);
 
