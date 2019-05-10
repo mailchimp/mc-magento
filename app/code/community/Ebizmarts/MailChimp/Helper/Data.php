@@ -1691,7 +1691,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getLastDateOfPurchase($subscriberEmail, $lastOrder = null)
     {
         $lastDateOfPurchase = null;
-        if (!$lastOrder) {
+        if ($lastOrder === null) {
            $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
         }
 
