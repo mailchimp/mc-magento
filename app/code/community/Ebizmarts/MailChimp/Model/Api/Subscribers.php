@@ -381,34 +381,36 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $address
      * @return array
      */
-    protected function getAddressData($address)
+    protected function getAddressData($address, $lastOrder)
     {
-        $addressData = array();
-        if ($address) {
-            $street = $address->getStreet();
-            if (count($street) > 1) {
-                $addressData["addr1"] = $street[0];
-                $addressData["addr2"] = $street[1];
-            } else {
-                if (!empty($street[0])) {
+        $addressData = $this->getAddressFromLastOrder($lastOrder);
+        if (!empty($addressData)) {
+            if ($address) {
+                $street = $address->getStreet();
+                if (count($street) > 1) {
                     $addressData["addr1"] = $street[0];
+                    $addressData["addr2"] = $street[1];
+                } else {
+                    if (!empty($street[0])) {
+                        $addressData["addr1"] = $street[0];
+                    }
                 }
-            }
 
-            if ($address->getCity()) {
-                $addressData["city"] = $address->getCity();
-            }
+                if ($address->getCity()) {
+                    $addressData["city"] = $address->getCity();
+                }
 
-            if ($address->getRegion()) {
-                $addressData["state"] = $address->getRegion();
-            }
+                if ($address->getRegion()) {
+                    $addressData["state"] = $address->getRegion();
+                }
 
-            if ($address->getPostcode()) {
-                $addressData["zip"] = $address->getPostcode();
-            }
+                if ($address->getPostcode()) {
+                    $addressData["zip"] = $address->getPostcode();
+                }
 
-            if ($address->getCountry()) {
-                $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+                if ($address->getCountry()) {
+                    $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
+                }
             }
         }
         return $addressData;
@@ -525,9 +527,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             case 'default_billing':
             case 'default_shipping':
                 $address = $customer->getPrimaryAddress($attributeCode);
-                $addressData = $this->getAddressData($address);
-
-                $addressData = $this->getAddressFromLastOrder($lastOrder, $addressData);
+                $addressData = $this->getAddressData($address, $lastOrder);
 
                 if (count($addressData)) {
                     $mergeVars[$key] = $addressData;
@@ -705,22 +705,23 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder)
     {
-        $addr = explode('_', $customAtt);
-        $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-        $address = $this->getAddressFromLastOrder($lastOrder, $address);
+        $address = $this->getAddressFromLastOrder($lastOrder);
+        if (!empty($address)) {
+            $addr = explode('_', $customAtt);
+            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
+        }
 
         return $address;
     }
 
     /**
      * @param $lastOrder
-     * @param $addressData
      * @return array | return an array with the address from the order if exist and the addressData is empty.
      */
-    protected function getAddressFromLastOrder($lastOrder, $addressData)
+    protected function getAddressFromLastOrder($lastOrder)
     {
-        if (!$addressData && $lastOrder && $lastOrder->getShippingAddress()) {
+        $addressData = array();
+        if ($lastOrder && $lastOrder->getShippingAddress()) {
             $addressData = $lastOrder->getShippingAddress();
         }
         return $addressData;
