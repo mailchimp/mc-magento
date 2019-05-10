@@ -427,14 +427,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * Get Customer data for the cart.
      *
      * @param  $cart
-     * @param  $mailchimpStoreId
      * @param  $magentoStoreId
      * @return array
      */
     public function _getCustomer($cart, $magentoStoreId)
     {
         $customer = array(
-            "id" => md5($cart->getCustomerEmail()),
+            "id" => md5(strtolower($cart->getCustomerEmail())),
             "email_address" => $cart->getCustomerEmail(),
             "opt_in_status" => $this->getApiCustomersOptIn($magentoStoreId)
         );
