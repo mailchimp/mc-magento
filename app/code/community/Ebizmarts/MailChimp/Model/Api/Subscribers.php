@@ -12,6 +12,8 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
+    const GENDER_VALUE_MALE = 1;
+    const GENDER_VALUE_FEMALE = 2;
 
     /**
      * Ebizmarts_MailChimp_Helper_Data
@@ -534,18 +536,18 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             case 'gender':
-                if ($customer->getData($attributeCode)) {
-                    $genderValue = $customer->getData($attributeCode);
-                    if ($genderValue == 1) {
+                if ($this->isCustomerAttributeCodeSet($attributeCode, $customer)) {
+                    $genderValue = $this->isCustomerAttributeCodeSet($attributeCode, $customer);
+                    if ($genderValue == self::GENDER_VALUE_MALE) {
                         $mergeVars[$key] = 'Male';
-                    } elseif ($genderValue == 2) {
+                    } elseif ($genderValue == self::GENDER_VALUE_FEMALE) {
                         $mergeVars[$key] = 'Female';
                     }
                 }
                 break;
             case 'group_id':
-                if ($customer->getData($attributeCode)) {
-                    $group_id = (int)$customer->getData($attributeCode);
+                if ($this->isCustomerAttributeCodeSet($attributeCode, $customer)) {
+                    $group_id = (int)$this->isCustomerAttributeCodeSet($attributeCode, $customer);
                     $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
                     $mergeVars[$key] = $customerGroup[$group_id];
                 } else {
@@ -594,12 +596,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $mergeVars[$key] = $storeName;
                 break;
             case 'dob':
-                if ($customer->getData($attributeCode)) {
-                    $mergeVars[$key] = date("m/d", strtotime($customer->getData($attributeCode)));
+                if ($this->isCustomerAttributeCodeSet($attributeCode, $customer)) {
+                    $mergeVars[$key] = date("m/d", strtotime($this->isCustomerAttributeCodeSet($attributeCode, $customer)));
                 }
                 break;
             default:
-                $attrValue = $customer->getData($attributeCode);
+                $attrValue = $this->isCustomerAttributeCodeSet($attributeCode, $customer);
                 if ($attribute['frontend_input'] == 'select' && $attrValue) {
                     $attr = $customer->getResource()->getAttribute($attributeCode);
                     $optionValue = $attr->getSource()->getOptionText($attrValue);
@@ -746,5 +748,15 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
 
         return $subscriberSyndDataItem;
+    }
+
+    /**
+     * @param $attributeCode
+     * @param $customer
+     * @return mixed
+     */
+    protected function isCustomerAttributeCodeSet($attributeCode, $customer)
+    {
+        return $customer->getData($attributeCode);
     }
 }
