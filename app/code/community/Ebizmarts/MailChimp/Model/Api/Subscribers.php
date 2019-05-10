@@ -381,7 +381,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     /**
      * @param $address
-     * @return array
+     * @param $lastOrder
+     * @return array | returns an array with the address data of the customer.
      */
     protected function getAddressData($address, $lastOrder)
     {
@@ -519,7 +520,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $key
      * @param $storeId
      * @param $attribute
-     * @return array
+     * @return array | returns an array of mergeFields.
      */
     protected function customerAttributes($subscriber, $attributeCode, $customer, $lastOrder, $mergeVars, $key, $storeId, $attribute)
     {
@@ -538,7 +539,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             case 'gender':
                 if ($this->getCustomerGroupLabel($attributeCode, $customer)) {
                     $genderValue = $this->getCustomerGroupLabel($attributeCode, $customer);
-                    $mergeVars = $this->getGenderValue($mergeVars, $key, $genderValue);
+                    $mergeVars[$key] = $this->getGenderValue($mergeVars, $key, $genderValue);
                 }
                 break;
             case 'group_id':
@@ -581,7 +582,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             default:
-                $mergeVars = $this->getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute);
+                $mergeVars[$key] = $this->getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute);
                 break;
         }
 
@@ -726,7 +727,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $attributeCode
      * @param $customer
-     * @return mixed
+     * @return string | returns the data of the attribute code.
      */
     protected function getCustomerGroupLabel($attributeCode, $customer)
     {
@@ -747,14 +748,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $mergeVars[$key] = 'Female';
         }
 
-        return $mergeVars;
+        return $mergeVars[$key];
     }
 
     /**
      * @param $subscriber
      * @param $customer
      * @param $lastOrder
-     * @return mixed
+     * @return string | returns the first name of the customer.
      */
     protected function getFirstName($subscriber, $customer, $lastOrder)
     {
@@ -774,7 +775,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $subscriber
      * @param $customer
      * @param $lastOrder
-     * @return mixed
+     * @return string | return the last name of the customer.
      */
     protected function getLastName($subscriber, $customer, $lastOrder)
     {
@@ -808,13 +809,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         } elseif ($attrValue) {
             $mergeVars[$key] = $attrValue;
         }
-        return $mergeVars;
+        return $mergeVars[$key];
     }
 
     /**
      * @param $attributeCode
      * @param $customer
-     * @return false|string
+     * @return string | returns the date of birth of the customer string format.
      */
     protected function getDateOfBirth($attributeCode, $customer)
     {
