@@ -14,7 +14,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Products",
                 'id'    => 'products',
                 'title' => "Products",
-                'value' => 'PRO',
+                'value' =>  Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 'required' => false,
                 'checked'  => '1',
             )
@@ -25,7 +25,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Customers",
                 'id' => 'customers',
                 'title' => 'Customers',
-                'value' => 'CUS',
+                'value' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                 'required' => false,
                 'checked'  => '1',
             )
@@ -36,7 +36,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Orders",
                 'id' => 'orders',
                 'title' => 'Orders',
-                'value' => 'ORD',
+                'value' => Ebizmarts_MailChimp_Model_Config::IS_ORDER,
                 'required' => false,
                 'checked'  => '1',
             )
@@ -47,7 +47,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Carts",
                 'id' => 'carts',
                 'title' => 'Carts',
-                'value' => 'QUO',
+                'value' => Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                 'required' => false,
                 'checked'  => '1',
             )
@@ -58,7 +58,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Promo Rules",
                 'id' => 'promo',
                 'title' => 'Promo Rules',
-                'value' => 'PCD, PRL',
+                'value' => Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE. ', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                 'required' => false,
                 'checked'  => '1',
             )
