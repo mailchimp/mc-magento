@@ -145,7 +145,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function _buildCustomerData($customer)
     {
         $data = array();
-        $data["id"] = md5($this->getCustomerEmail($customer));
+        $data["id"] = md5(strtolower($this->getCustomerEmail($customer)));
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
