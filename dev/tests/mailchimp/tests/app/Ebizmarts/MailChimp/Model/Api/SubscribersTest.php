@@ -133,7 +133,7 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
             ->setMethods(array(
                     'getWebSiteByStoreId',
                     'getEntityAttributeCollection',
-                    'getCustomerModel',
+                    'getCustomerByWebsiteAndId',
                     'dispatchEventMergeVars',
                     'getMailchimpHelper',
                     'unserilizeMapFields',
@@ -176,7 +176,7 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
             ->method('getEntityAttributeCollection')
             ->willReturn($collectionMock);
         $subscribersApiMock->expects($this->once())
-            ->method('getCustomerModel')
+            ->method('getCustomerByWebsiteAndId')
             ->willReturn($customerMock);
         $newVars = new Varien_Object;
         $subscribersApiMock->expects($this->once())
