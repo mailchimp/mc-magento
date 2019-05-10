@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     public function __construct()
     {
-        $this->mailchimpHelper = Mage::helper('mailchimp');
+        $this->mailchimpHelper = $this->makeHelper();
         $this->optInConfiguration = array();
         $this->locale = Mage::app()->getLocale();
         $this->directoryRegionModel = Mage::getModel('directory/region');
@@ -100,6 +100,15 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
+
+                $helper = $this->getMailChimpHelper();
+                $dataCustomer = $helper->getEcommerceSyncDataItem($customer->getId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId);
+                if ($dataCustomer->getId()) {
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
+                } else {
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
+                }
+
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
                 $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
             } else {
@@ -136,7 +145,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function _buildCustomerData($customer)
     {
         $data = array();
-        $data["id"] = md5($this->getCustomerEmail($customer));
+        $data["id"] = md5(strtolower($this->getCustomerEmail($customer)));
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
@@ -453,4 +462,19 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $subscriber;
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function getMailChimpHelper()
+    {
+        return $this->mailchimpHelper;
+    }
 }

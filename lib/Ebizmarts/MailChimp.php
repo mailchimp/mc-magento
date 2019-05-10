@@ -374,8 +374,11 @@ class Ebizmarts_MailChimp
         }
 
         if (floor($info['http_code'] / 100) >= 4) {
-            $errors = (isset($result['errors'])) ? $result['errors'] : '';
-            throw new MailChimp_Error($url, $result['title'], $result['detail'], $errors);
+            $detail = array_key_exists('detail', $result) ? $result['detail'] : '';
+            $errors = array_key_exists('errors',$result) ? $result['errors'] : null;
+            $title = array_key_exists('title',$result) ? $result['title'] : '';
+
+            throw new MailChimp_Error($this->_root . $url, $method, $params, $title, $detail, $errors);
         }
 
         return $result;
