@@ -4134,7 +4134,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $orderCollection = $this->getOrderCollectionByCustomerEmail($email);
         $lastOrder = array();
-        if ($orderCollection->getSize()) {
+        if ($this->isNotEmptyOrderCollection($orderCollection)) {
             $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
         }
         return $lastOrder;
@@ -4225,5 +4225,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCountersDataSentToMailchimp()
     {
         return $this->countersGetResponseBatch;
+    }
+
+    /**
+     * @param $orderCollection
+     * @return bool
+     */
+    protected function isNotEmptyOrderCollection($orderCollection)
+    {
+        return $orderCollection->getSize() > 0;
     }
 }
