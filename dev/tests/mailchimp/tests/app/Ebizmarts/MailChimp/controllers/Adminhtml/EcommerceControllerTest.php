@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $paramFilters = 'filter';
         $scope = 'stores';
         $scopeId = 1;
-        $filter = 'ORD';
+        $filter = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
 
         $result = 'Redirecting... <script type="text/javascript">window.top.location.reload();</script>';
 

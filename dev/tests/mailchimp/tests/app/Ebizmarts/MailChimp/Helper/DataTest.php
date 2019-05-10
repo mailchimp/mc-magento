@@ -504,7 +504,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $scopeId = 0;
         $scope = 'default';
-        $filters = 'ORD';
+        $filters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $deleteErrorsOnly = false;
 
         $connectionType = 'core_write';
@@ -515,7 +515,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeReturnWhere = "mailchimp_store_id = ".$mailchimpStoreId;
         $storeWhere = "mailchimp_store_id = ?";
 
-        $mailchimpFilters = 'ORD';
+        $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $filterReturnWhere = "type IN (".$mailchimpFilters.')';
         $filterWhere = "type IN (?)";
 
@@ -584,7 +584,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testRemoveAllEcommerceSynddataErrors()
     {
-        $mailchimpFilters = 'ORD';
+        $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $filterReturnWhere = "type IN (".$mailchimpFilters.')';
         $filterWhere = "type IN (?)";
 
@@ -623,7 +623,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $tableAlias = 'mailchimp/ecommercesyncdata';
         $storeReturnWhere = "mailchimp_store_id = $mailchimpStoreId AND mailchimp_sync_error != ''";
 
-        $mailchimpFilters = 'ORD';
+        $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $filterReturnWhere = "type IN (".$mailchimpFilters.')';
         $filterWhere = "type IN (?)";
 
@@ -665,7 +665,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeReturnWhere = "mailchimp_store_id = ".$mailchimpStoreId;
         $storeWhere = "mailchimp_store_id = ?";
 
-        $mailchimpFilters = 'ORD';
+        $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $filterReturnWhere = "type IN (".$mailchimpFilters.')';
         $filterWhere = "type IN (?)";
 
@@ -708,7 +708,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeReturnWhere = "store_id = ".$mailchimpStoreId;
         $storeWhere = "store_id = ?";
 
-        $mailchimpFilters = 'ORD';
+        $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
         $filterReturnWhere = "type IN (".$mailchimpFilters.')';
         $filterWhere = "type IN (?)";
 
@@ -854,7 +854,12 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $scope = 'stores';
         $scopeId = 1;
 
-        $filters = array('PRO', 'ORD', 'CUS', 'QUO', 'PCD, PRL');
+        $filters = array(
+            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+            Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+            Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE. ', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
 
         $resendEnabled = 1;
         $resendTurn = 1;
