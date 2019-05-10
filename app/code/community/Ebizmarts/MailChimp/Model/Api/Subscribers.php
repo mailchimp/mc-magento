@@ -159,7 +159,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->getData();
         $mergeVars = array();
         $subscriberEmail = $subscriber->getSubscriberEmail();
-        $customer = $this->getCustomerModel()->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
+        $customer = $this->getCustomerByWebsiteAndId()->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
 
         $lastOrder = $helper->getLastOrderByEmail($subscriberEmail);
 
@@ -668,7 +668,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @return false|Mage_Customer_Model_Customer
      */
-    protected function getCustomerModel()
+    protected function getCustomerByWebsiteAndId()
     {
         return Mage::getModel('customer/customer');
     }
