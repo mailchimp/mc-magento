@@ -502,7 +502,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
                 $mergeVars[$key] = $storeCode;
         }
-        Mage::log($mergeVars[$key], null, 'testing.log', true);
 
         return $mergeVars;
     }
