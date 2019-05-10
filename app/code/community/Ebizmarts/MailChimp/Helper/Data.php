@@ -4229,7 +4229,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $orderCollection
-     * @return bool
+     * @return bool | returns true if the size of the orderCollection have at least one element.
      */
     protected function isNotEmptyOrderCollection($orderCollection)
     {
