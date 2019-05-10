@@ -536,18 +536,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             case 'gender':
-                if ($this->isCustomerAttributeCodeSet($attributeCode, $customer)) {
-                    $genderValue = $this->isCustomerAttributeCodeSet($attributeCode, $customer);
-                    if ($genderValue == self::GENDER_VALUE_MALE) {
-                        $mergeVars[$key] = 'Male';
-                    } elseif ($genderValue == self::GENDER_VALUE_FEMALE) {
-                        $mergeVars[$key] = 'Female';
-                    }
+                if ($this->getCustomerGroupLabel($attributeCode, $customer)) {
+                    $genderValue = $this->getCustomerGroupLabel($attributeCode, $customer);
+                    $mergeVars = $this->getGenderValue($mergeVars, $key, $genderValue);
                 }
                 break;
             case 'group_id':
-                if ($this->isCustomerAttributeCodeSet($attributeCode, $customer)) {
-                    $group_id = (int)$this->isCustomerAttributeCodeSet($attributeCode, $customer);
+                if ($this->getCustomerGroupLabel($attributeCode, $customer)) {
+                    $group_id = (int)$this->getCustomerGroupLabel($attributeCode, $customer);
                     $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
                     $mergeVars[$key] = $customerGroup[$group_id];
                 } else {
@@ -555,30 +551,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             case 'firstname':
-                $firstName = $customer->getFirstname();
-
-                if (!$firstName) {
-                    if ($subscriber->getSubscriberFirstname()) {
-                        $firstName = $subscriber->getSubscriberFirstname();
-                    } elseif ($lastOrder && $lastOrder->getCustomerFirstname()) {
-                        $firstName = $lastOrder->getCustomerFirstname();
-                    }
-                }
+                $firstName = $this->getFirstName($subscriber, $customer, $lastOrder);
 
                 if ($firstName) {
                     $mergeVars[$key] = $firstName;
                 }
                 break;
             case 'lastname':
-                $lastName = $customer->getLastname();
-
-                if (!$lastName) {
-                    if ($subscriber->getSubscriberLastname()) {
-                        $lastName = $subscriber->getSubscriberLastname();
-                    } elseif ($lastOrder && $lastOrder->getCustomerLastname()) {
-                        $lastName = $lastOrder->getCustomerLastname();
-                    }
-                }
+                $lastName = $this->getLastName($subscriber, $customer, $lastOrder);
 
                 if ($lastName) {
                     $mergeVars[$key] = $lastName;
@@ -596,19 +576,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $mergeVars[$key] = $storeName;
                 break;
             case 'dob':
-                if ($this->isCustomerAttributeCodeSet($attributeCode, $customer)) {
-                    $mergeVars[$key] = date("m/d", strtotime($this->isCustomerAttributeCodeSet($attributeCode, $customer)));
+                if ($this->getCustomerGroupLabel($attributeCode, $customer)) {
+                    $mergeVars[$key] = $this->getDateOfBirth($attributeCode, $customer);
                 }
                 break;
             default:
-                $attrValue = $this->isCustomerAttributeCodeSet($attributeCode, $customer);
-                if ($attribute['frontend_input'] == 'select' && $attrValue) {
-                    $attr = $customer->getResource()->getAttribute($attributeCode);
-                    $optionValue = $attr->getSource()->getOptionText($attrValue);
-                    $mergeVars[$key] = $optionValue;
-                } elseif ($attrValue) {
-                    $mergeVars[$key] = $attrValue;
-                }
+                $mergeVars = $this->getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute);
                 break;
         }
 
@@ -755,8 +728,96 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $customer
      * @return mixed
      */
-    protected function isCustomerAttributeCodeSet($attributeCode, $customer)
+    protected function getCustomerGroupLabel($attributeCode, $customer)
     {
         return $customer->getData($attributeCode);
+    }
+
+    /**
+     * @param $mergeVars
+     * @param $key
+     * @param $genderValue
+     * @return string | return a string with the gender of the customer.
+     */
+    protected function getGenderValue($mergeVars, $key, $genderValue)
+    {
+        if ($genderValue == self::GENDER_VALUE_MALE) {
+            $mergeVars[$key] = 'Male';
+        } elseif ($genderValue == self::GENDER_VALUE_FEMALE) {
+            $mergeVars[$key] = 'Female';
+        }
+
+        return $mergeVars;
+    }
+
+    /**
+     * @param $subscriber
+     * @param $customer
+     * @param $lastOrder
+     * @return mixed
+     */
+    protected function getFirstName($subscriber, $customer, $lastOrder)
+    {
+        $firstName = $customer->getFirstname();
+
+        if (!$firstName) {
+            if ($subscriber->getSubscriberFirstname()) {
+                $firstName = $subscriber->getSubscriberFirstname();
+            } elseif ($lastOrder && $lastOrder->getCustomerFirstname()) {
+                $firstName = $lastOrder->getCustomerFirstname();
+            }
+        }
+        return $firstName;
+    }
+
+    /**
+     * @param $subscriber
+     * @param $customer
+     * @param $lastOrder
+     * @return mixed
+     */
+    protected function getLastName($subscriber, $customer, $lastOrder)
+    {
+        $lastName = $customer->getLastname();
+
+        if (!$lastName) {
+            if ($subscriber->getSubscriberLastname()) {
+                $lastName = $subscriber->getSubscriberLastname();
+            } elseif ($lastOrder && $lastOrder->getCustomerLastname()) {
+                $lastName = $lastOrder->getCustomerLastname();
+            }
+        }
+        return $lastName;
+    }
+
+    /**
+     * @param $attributeCode
+     * @param $customer
+     * @param $mergeVars
+     * @param $key
+     * @param $attribute
+     * @return mixed
+     */
+    protected function getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute)
+    {
+        $attrValue = $this->getCustomerGroupLabel($attributeCode, $customer);
+        if ($attribute['frontend_input'] == 'select' && $attrValue) {
+            $attr = $customer->getResource()->getAttribute($attributeCode);
+            $optionValue = $attr->getSource()->getOptionText($attrValue);
+            $mergeVars[$key] = $optionValue;
+        } elseif ($attrValue) {
+            $mergeVars[$key] = $attrValue;
+        }
+        return $mergeVars;
+    }
+
+    /**
+     * @param $attributeCode
+     * @param $customer
+     * @return false|string
+     */
+    protected function getDateOfBirth($attributeCode, $customer)
+    {
+        return date("m/d", strtotime($this->getCustomerGroupLabel($attributeCode, $customer)));
     }
 }
