@@ -3,26 +3,28 @@
 <?php endif; ?>
 
 <script type="text/javascript">
-    //<![CDATA[
-    function resendecommerce() {
-        if (confirm('<?php echo $this->getMessage() ?>')) {
-            new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
-                method: 'get',
-                onSuccess: function (transport) {
-
-                    if (transport.responseText == 1) {
-                        alert('The sending data process has been reset.')
-                    }
-                    else {
-                        alert('An error happened while removing the local sync data.')
-                    }
-                },
-                onFailure: function () {
-                    alert('Something went wrong.')
+        function openResendEcommerceDialog() {
+            var url = '<?php echo $this->getUrl("adminhtml/ecommerce/renderresendecom") ?>?';
+            var dialogWindow = Dialog.info(null, {
+                draggable:true,
+                resizable:false,
+                closable:true,
+                className:"magento",
+                windowClassName:"resend_window",
+                title:'Resend Ecommerce Data',
+                top:50,
+                width:1000,
+                height:300,
+                zIndex:1000,
+                recenterAuto:false,
+                hideEffect:Element.hide,
+                showEffect:Element.show,
+                id:"resend_window",
+                url: url,
+                onClose:function (param, el) {
+                    location.reload();
                 }
             });
         }
-    }
-    //]]>
 </script>
 
