@@ -1683,26 +1683,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * If orders with the given email exists, returns the date of the last order made.
-     *
-     * @param  $subscriberEmail
-     * @return null
-     */
-    public function getLastDateOfPurchase($subscriberEmail, $lastOrder = null)
-    {
-        $lastDateOfPurchase = null;
-        if ($lastOrder === null) {
-           $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
-        }
-
-        if ($lastOrder !== null) {
-            $lastDateOfPurchase = $lastOrder->getCreatedAt();
-        }
-
-        return $lastDateOfPurchase;
-    }
-
-    /**
      * Return true if there is a custom entry with the value given.
      *
      * @param  $value
@@ -1741,7 +1721,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $subscriberEmail
      * @return mixed
      */
-    protected function getOrderCollectionByCustomerEmail($subscriberEmail)
+    public function getOrderCollectionByCustomerEmail($subscriberEmail)
     {
         return Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('customer_email', array('eq' => $subscriberEmail));
@@ -4125,21 +4105,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 
-     /**
-     * @param $email
-     * @return array | return the latest order made by the email passed by parameter if exists.
-     *
-     */
-    public function getLastOrderByEmail($email)
-    {
-        $orderCollection = $this->getOrderCollectionByCustomerEmail($email);
-        $lastOrder = array();
-        if ($this->isNotEmptyOrderCollection($orderCollection)) {
-            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
-        }
-        return $lastOrder;
-    }
-
     /**
      * @param $index
      * @param int $increment
@@ -4227,12 +4192,4 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->countersGetResponseBatch;
     }
 
-    /**
-     * @param $orderCollection
-     * @return bool | returns true if the size of the orderCollection have at least one element.
-     */
-    protected function isNotEmptyOrderCollection($orderCollection)
-    {
-        return $orderCollection->getSize() > 0;
-    }
 }

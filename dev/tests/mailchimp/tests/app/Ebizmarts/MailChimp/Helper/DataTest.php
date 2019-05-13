@@ -8,33 +8,33 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         Mage::app('default');
     }
 
-    public function testGetLastDateOfPurchase()
-    {
-        $emailAddress = "john@example.com";
-        $lastDateOfPurchase = '2018-02-13 15:14:28';
-
-        /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
-         */
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getLastOrderByEmail'))
-            ->getMock();
-
-        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getCreatedAt'))
-            ->getMock();
-
-        $helperMock->expects($this->once())->method('getLastOrderByEmail')->with($emailAddress)
-            ->willReturn($orderMock);
-
-        $orderMock->expects($this->once())->method('getCreatedAt')->willReturn($lastDateOfPurchase);
-
-        $result = $helperMock->getLastDateOfPurchase($emailAddress);
-
-        $this->assertEquals($result, $lastDateOfPurchase);
-    }
+//    public function testGetLastDateOfPurchase()
+//    {
+//        $emailAddress = "john@example.com";
+//        $lastDateOfPurchase = '2018-02-13 15:14:28';
+//
+//        /**
+//         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+//         */
+//        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getLastOrderByEmail'))
+//            ->getMock();
+//
+//        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+//            ->disableOriginalConstructor()
+//            ->setMethods(array('getCreatedAt'))
+//            ->getMock();
+//
+//        $helperMock->expects($this->once())->method('getLastOrderByEmail')->with($emailAddress)
+//            ->willReturn($orderMock);
+//
+//        $orderMock->expects($this->once())->method('getCreatedAt')->willReturn($lastDateOfPurchase);
+//
+//        $result = $helperMock->getLastDateOfPurchase($emailAddress);
+//
+//        $this->assertEquals($result, $lastDateOfPurchase);
+//    }
 
     public function testCustomMergeFieldAlreadyExists()
     {
@@ -1282,43 +1282,5 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
 
-    }
-
-    public function testGetLastOrderByEmail()
-    {
-        $email = 'test@ebizmarts.com';
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getOrderCollectionByCustomerEmail'))
-            ->getMock();
-
-        $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getSize', 'setOrder', 'getFirstItem'))
-            ->getMock();
-
-        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array())
-            ->getMock();
-
-        $helperMock->expects($this->once())
-            ->method('getOrderCollectionByCustomerEmail')
-            ->with($email)
-            ->willReturn($orderCollectionMock);
-
-        $orderCollectionMock->expects($this->once())
-            ->method('getSize')
-            ->willReturn(1);
-        $orderCollectionMock->expects($this->once())
-            ->method('setOrder')
-            ->with('created_at', 'DESC')
-            ->willReturnSelf();
-        $orderCollectionMock->expects($this->once())
-            ->method('getFirstItem')
-            ->willReturn($orderMock);
-
-        $helperMock->getLastOrderByEmail($email);
     }
 }

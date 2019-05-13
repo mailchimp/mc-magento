@@ -163,7 +163,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $subscriberEmail = $subscriber->getSubscriberEmail();
         $customer = $this->getCustomerByWebsiteAndId()->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
 
-        $lastOrder = $helper->getLastOrderByEmail($subscriberEmail);
+        $this->saveLastOrderInSession($subscriberEmail);
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
@@ -176,13 +176,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         if ($attribute['attribute_id'] == $customAtt) {
                             $attributeCode = $attribute['attribute_code'];
 
-                            $mergeVars = $this->customerAttributes($subscriber, $attributeCode, $customer, $lastOrder, $mergeVars, $key, $storeId, $attribute);
+                            $mergeVars = $this->customerAttributes($subscriber, $attributeCode, $customer, $mergeVars, $key, $storeId, $attribute);
                             $eventValue = $mergeVars[$key];
                             $this->dispatchEventValue($customer, $subscriberEmail, $attributeCode, $eventValue);
                         }
                     }
                 } else {
-                    $mergeVars = $this->customizedAttributes($customAtt, $customer, $lastOrder, $mergeVars, $key, $helper, $subscriberEmail, $storeId);
+                    $mergeVars = $this->customizedAttributes($customAtt, $customer, $mergeVars, $key, $helper, $subscriberEmail, $storeId);
                     if (isset($mergeVars[$key])) {
                         $eventValue = $mergeVars[$key];
                     }
@@ -381,11 +381,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     /**
      * @param $address
-     * @param $lastOrder
      * @return array | returns an array with the address data of the customer.
      */
-    protected function getAddressData($address, $lastOrder)
+    protected function getAddressData($address)
     {
+        $lastOrder = $this->getSubscriberLastOrder();
         $addressData = $this->getAddressFromLastOrder($lastOrder);
         if (!empty($addressData)) {
             if ($address) {
@@ -430,7 +430,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $customAtt
      * @param $customer
-     * @param $lastOrder
      * @param $mergeVars
      * @param $key
      * @param $helper
@@ -438,12 +437,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $storeId
      * @return array
      */
-    protected function customizedAttributes($customAtt, $customer, $lastOrder, $mergeVars, $key, $helper, $subscriberEmail, $storeId)
+    protected function customizedAttributes($customAtt, $customer, $mergeVars, $key, $helper, $subscriberEmail, $storeId)
     {
         switch ($customAtt) {
             case 'billing_company':
             case 'shipping_company':
-                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer);
 
                 if ($address) {
                     $company = $address->getCompany();
@@ -454,7 +453,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_telephone':
             case 'shipping_telephone':
-                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer);
 
                 if ($address) {
                     $telephone = $address->getTelephone();
@@ -465,7 +464,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_country':
             case 'shipping_country':
-                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer);
 
                 if ($address) {
                     $countryCode = $address->getCountry();
@@ -477,7 +476,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_zipcode':
             case 'shipping_zipcode':
-                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer);
 
                 if ($address) {
                     $zipCode = $address->getPostcode();
@@ -488,7 +487,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 break;
             case 'billing_state':
             case 'shipping_state':
-                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder);
+                $address = $this->getAddressForCustomizedAttributes($customAtt, $customer);
 
                 if ($address) {
                     $state = $address->getRegion();
@@ -498,7 +497,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             case 'dop':
-                $dop = $helper->getLastDateOfPurchase($subscriberEmail, $lastOrder);
+                $dop = $this->getLastDateOfPurchase($subscriberEmail);
                 if ($dop) {
                     $mergeVars[$key] = $dop;
                 }
@@ -515,14 +514,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $subscriber
      * @param $attributeCode
      * @param $customer
-     * @param $lastOrder
      * @param $mergeVars
      * @param $key
      * @param $storeId
      * @param $attribute
      * @return array | returns an array of mergeFields.
      */
-    protected function customerAttributes($subscriber, $attributeCode, $customer, $lastOrder, $mergeVars, $key, $storeId, $attribute)
+    protected function customerAttributes($subscriber, $attributeCode, $customer, $mergeVars, $key, $storeId, $attribute)
     {
         switch ($attributeCode) {
             case 'email':
@@ -530,7 +528,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             case 'default_billing':
             case 'default_shipping':
                 $address = $customer->getPrimaryAddress($attributeCode);
-                $addressData = $this->getAddressData($address, $lastOrder);
+                $addressData = $this->getAddressData($address);
 
                 if (count($addressData)) {
                     $mergeVars[$key] = $addressData;
@@ -552,14 +550,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             case 'firstname':
-                $firstName = $this->getFirstName($subscriber, $customer, $lastOrder);
+                $firstName = $this->getFirstName($subscriber, $customer);
 
                 if ($firstName) {
                     $mergeVars[$key] = $firstName;
                 }
                 break;
             case 'lastname':
-                $lastName = $this->getLastName($subscriber, $customer, $lastOrder);
+                $lastName = $this->getLastName($subscriber, $customer);
 
                 if ($lastName) {
                     $mergeVars[$key] = $lastName;
@@ -676,11 +674,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $customAtt
      * @param $customer
-     * @param $lastOrder
      * @return array | returns an array with the address if it exists
      */
-    protected function getAddressForCustomizedAttributes($customAtt, $customer, $lastOrder)
+    protected function getAddressForCustomizedAttributes($customAtt, $customer)
     {
+        $lastOrder = $this->getSubscriberLastOrder();
         $address = $this->getAddressFromLastOrder($lastOrder);
         if (!empty($address)) {
             $addr = explode('_', $customAtt);
@@ -754,11 +752,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $subscriber
      * @param $customer
-     * @param $lastOrder
      * @return string | returns the first name of the customer.
      */
-    protected function getFirstName($subscriber, $customer, $lastOrder)
+    protected function getFirstName($subscriber, $customer)
     {
+        $lastOrder = $this->getSubscriberLastOrder();
         $firstName = $customer->getFirstname();
 
         if (!$firstName) {
@@ -774,11 +772,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $subscriber
      * @param $customer
-     * @param $lastOrder
      * @return string | return the last name of the customer.
      */
-    protected function getLastName($subscriber, $customer, $lastOrder)
+    protected function getLastName($subscriber, $customer)
     {
+        $lastOrder = $this->getSubscriberLastOrder();
         $lastName = $customer->getLastname();
 
         if (!$lastName) {
@@ -820,5 +818,73 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function getDateOfBirth($attributeCode, $customer)
     {
         return date("m/d", strtotime($this->getCustomerGroupLabel($attributeCode, $customer)));
+    }
+
+    /**
+     * @param $helper
+     * @param $subscriberEmail
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
+    protected function saveLastOrderInSession($subscriberEmail)
+    {
+        $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
+        if ($this->getSubscriberLastOrder()) {
+            Mage::unregister('subscriber_last_order');
+        }
+        Mage::register('subscriber_last_order', $lastOrder);
+        return $lastOrder;
+    }
+
+    /**
+     * If orders with the given email exists, returns the date of the last order made.
+     *
+     * @param  $subscriberEmail
+     * @return null
+     */
+    public function getLastDateOfPurchase($subscriberEmail)
+    {
+        $lastOrder = $this->getSubscriberLastOrder();
+        $lastDateOfPurchase = null;
+        if ($lastOrder === null) {
+            $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
+        }
+        if ($lastOrder !== null) {
+            $lastDateOfPurchase = $lastOrder->getCreatedAt();
+        }
+        return $lastDateOfPurchase;
+    }
+
+    /**
+     * @param $email
+     * @return Mage_Sales_Model_Resource_Order_Collection | return the latest order made by the email passed by parameter if exists.
+     *
+     */
+    public function getLastOrderByEmail($email)
+    {
+        $helper = $this->getMailchimpHelper();
+        $orderCollection = $helper->getOrderCollectionByCustomerEmail($email);
+        $lastOrder = null;
+        if ($this->isNotEmptyOrderCollection($orderCollection)) {
+            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+        }
+        return $lastOrder;
+    }
+
+    /**
+     * @param $orderCollection
+     * @return bool | returns true if the size of the orderCollection have at least one element.
+     */
+    protected function isNotEmptyOrderCollection($orderCollection)
+    {
+        return $orderCollection->getSize() > 0;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSubscriberLastOrder()
+    {
+        return Mage::registry('subscriber_last_order');
     }
 }
