@@ -55,8 +55,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules/' . $ruleId;
             $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $ruleId;
             $batchArray[$counter]['body'] = '';
-            $this->deletePromoRuleSyncData($ruleId, $mailchimpStoreId);
             $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
+            $this->deletePromoRuleSyncData($ruleId, $mailchimpStoreId);
             $counter++;
         }
 
