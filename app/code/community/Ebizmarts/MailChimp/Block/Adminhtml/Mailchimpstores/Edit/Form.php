@@ -40,7 +40,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $stores = Mage::app()->getStores();
             $apikeys = array();
             foreach ($stores as $s) {
-                $apikey = Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,$s);
+                $apikey = Mage::helper('mailchimp')->getApiKey($s);
                 if(!array_key_exists($apikey,$apikeys)) {
                     $apikeys[$apikey] = $apikey;
                 }

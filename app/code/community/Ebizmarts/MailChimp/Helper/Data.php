@@ -338,6 +338,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Returns the ApiKey as it is saved in the DB.
+     *
+     * @param $scopeId
+     * @param null $scope
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
+    public function getUnencryptedApiKey($scopeId, $scope = null)
+    {
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY, $scopeId, $scope);
+    }
+
+    /**
      * Return decrypted apiKey.
      *
      * @param $data

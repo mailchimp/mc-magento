@@ -21,7 +21,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $valueChanged = $this->isValueChanged();
 
         $moduleIsActive = (isset($groups['general']['fields']['active']['value'])) ? $groups['general']['fields']['active']['value'] : $helper->isMailChimpEnabled($scopeId, $scope);
-        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
+
+        if (isset($groups['general']['fields']['apikey']['value']) && $groups['general']['fields']['apikey']['value'] !== '******') {
+            $apiKey = $groups['general']['fields']['apikey']['value'];
+        } else {
+            $apiKey = $helper->getApiKey($this->getScopeId(), $this->getScope());
+        }
+
         $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $scopeId, $scope);
 
         if ($valueChanged && !$this->getValue()) {
