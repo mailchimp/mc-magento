@@ -35,6 +35,8 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommerceOrdersLines.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommerceProducts.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommerceProductsVariants.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommercePromoRules.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/EcommercePromoRulesPromoCodes.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/FileManagerFiles.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/FileManagerFolders.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Lists.php';
@@ -91,6 +93,8 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/MailChimp/EcommerceOrdersLines.php';
     include_once dirname(__FILE__) . '/MailChimp/EcommerceProducts.php';
     include_once dirname(__FILE__) . '/MailChimp/EcommerceProductsVariants.php';
+    include_once dirname(__FILE__) . '/MailChimp/EcommercePromoRules.php';
+    include_once dirname(__FILE__) . '/MailChimp/EcommercePromoRulesPromoCodes.php';
     include_once dirname(__FILE__) . '/MailChimp/FileManagerFiles.php';
     include_once dirname(__FILE__) . '/MailChimp/FileManagerFolders.php';
     include_once dirname(__FILE__) . '/MailChimp/Lists.php';
@@ -126,6 +130,48 @@ if (defined("COMPILER_INCLUDE_PATH")) {
 
 class Ebizmarts_MailChimp
 {
+    /** @var MailChimp_BatchOperations */
+    public $batchOperation;
+
+    /** @var MailChimp_Root */
+    public $root;
+
+    /** @var MailChimp_AuthorizedApps */
+    public $authorizedApps;
+
+    /** @var MailChimp_Automation */
+    public $automation;
+
+    /** @var MailChimp_CampaignFolders */
+    public $campaignFolders;
+
+    /** @var MailChimp_Campaigns */
+    public $campaigns;
+
+    /** @var MailChimp_Conversations  */
+    public $conversations;
+
+    /** @var MailChimp_Ecommerce  */
+    public $ecommerce;
+
+    /** @var MailChimp_FileManagerFiles  */
+    public $fileManagerFiles;
+
+    /** @var MailChimp_FileManagerFolders  */
+    public $fileManagerFolders;
+
+    /** @var MailChimp_Lists  */
+    public $lists;
+
+    /** @var MailChimp_Reports  */
+    public $reports;
+
+    /** @var MailChimp_TemplateFolders  */
+    public $templateFolders;
+
+    /** @var MailChimp_Templates  */
+    public $templates;
+
     protected $_apiKey;
     protected $_ch;
     protected $_root    = 'https://api.mailchimp.com/3.0';
@@ -156,7 +202,7 @@ class Ebizmarts_MailChimp
         $this->_root = rtrim($this->_root, '/') . '/';
 
         if (!isset($opts['timeout']) || !is_int($opts['timeout'])) {
-            $opts['timeout'] = 600;
+            $opts['timeout'] = 20;
         }
 
         if (isset($opts['debug'])) {
@@ -178,7 +224,7 @@ class Ebizmarts_MailChimp
 
         curl_setopt($this->_ch, CURLOPT_HEADER, false);
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT,  $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_TIMEOUT, $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_USERPWD, "noname:".$this->_apiKey);
 
@@ -203,6 +249,8 @@ class Ebizmarts_MailChimp
         $this->ecommerce->orders->lines                     = new MailChimp_EcommerceOrdersLines($this);
         $this->ecommerce->products                          = new MailChimp_EcommerceProducts($this);
         $this->ecommerce->products->variants                = new MailChimp_EcommerceProductsVariants($this);
+        $this->ecommerce->promoRules                        = new MailChimp_EcommercePromoRules($this);
+        $this->ecommerce->promoRules->promoCodes            = new MailChimp_EcommercePromoRulesPromoCodes($this);
         $this->fileManagerFiles                             = new MailChimp_FileManagerFiles($this);
         $this->fileManagerFolders                           = new MailChimp_FileManagerFolders($this);
         $this->lists                                        = new MailChimp_Lists($this);
@@ -215,7 +263,7 @@ class Ebizmarts_MailChimp
         $this->lists->members                               = new MailChimp_ListsMembers($this);
         $this->lists->members->memberActivity               = new MailChimp_ListsMembersActivity($this);
         $this->lists->members->memberGoal                   = new MailChimp_ListsMembersGoals($this);
-        $this->lists->members->memberNotes                  = new MailChimp_ListsMembersNotes($this);;
+        $this->lists->members->memberNotes                  = new MailChimp_ListsMembersNotes($this);
         $this->lists->mergeFields                           = new MailChimp_ListsMergeFields($this);
         $this->lists->segments                              = new MailChimp_ListsSegments($this);
         $this->lists->segments->segmentMembers              = new MailChimp_ListsSegmentsMembers($this);
@@ -235,27 +283,84 @@ class Ebizmarts_MailChimp
         $this->templates                                    = new MailChimp_Templates($this);
         $this->templates->defaultContent                    = new MailChimp_TemplatesDefaultContent($this);
     }
+
+    /**
+     * @return MailChimp_Root
+     */
+    public function getRoot()
+    {
+        return $this->root;
+    }
+
+    /**
+     * @return MailChimp_Ecommerce
+     */
+    public function getEcommerce()
+    {
+        return $this->ecommerce;
+    }
+
+    /**
+     * @return MailChimp_BatchOperations
+     */
+    public function getBatchOperation()
+    {
+        return $this->batchOperation;
+    }
+
+    /**
+     * @return MailChimp_Lists
+     */
+    public function getLists()
+    {
+        return $this->lists;
+    }
+
+    /**
+     * @return MailChimp_Campaigns
+     */
+    public function getCampaign()
+    {
+        return $this->campaigns;
+    }
+
     public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
     {
-        if (count($params) && $encodeJson && $method!=Ebizmarts_MailChimp::GET) {
+        $paramsOrig = $params;
+
+        $hasParams = true;
+        if (is_array($params) && count($params) === 0 || $params == null) {
+            $hasParams = false;
+        }
+
+        if ($hasParams && $encodeJson && $method!=Ebizmarts_MailChimp::GET) {
             $params = json_encode($params);
         }
 
+        $headers = array(
+            'Content-Type: application/json',
+        );
+        // check for language param to set as browser language
+        // mailchimp uses header/browser detection for the language rather than any profile setting
+        if (is_array($paramsOrig) && array_key_exists('language', $paramsOrig) && !empty($paramsOrig['language'])) {
+            $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
+        }
+
         $ch = $this->_ch;
-        if (count($params)&&$method!=Ebizmarts_MailChimp::GET) {
+        if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         } else {
-            if (count($params)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, null);
+            if ($hasParams) {
                 $_params = http_build_query($params);
                 $url .= '?' . $_params;
             }
         }
 
         curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-
 
         $responseBody = curl_exec($ch);
 

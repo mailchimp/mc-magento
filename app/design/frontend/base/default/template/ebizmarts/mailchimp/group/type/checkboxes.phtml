@@ -1,0 +1,19 @@
+<?php
+$block = $this;
+$i = $this->getCurrentInterest();
+?>
+<ul class="admin_field_field field" style="list-style: none">
+<?php foreach($i['category'] as $c): ?>
+    <li class="control">
+        <input class="checkbox"
+               name="group[<?php echo $i['interest']['id'] ?>][<?php echo $c['id']?>]"
+               type="checkbox"
+               value="<?php echo $c['id'] ?>"
+               id="<?php echo 'mailchimp_group_'.$c['id'] ?>"
+               title="<?php echo $c['name'] ?>"
+            <?php if($c['checked']) { echo 'checked';} ?>
+        />
+        <label for="<?php echo 'mailchimp_group_'.$c['id'] ?>" class="field label"><?php echo $c['name']?></label>
+    </li>
+<?php endforeach; ?>
+</ul>

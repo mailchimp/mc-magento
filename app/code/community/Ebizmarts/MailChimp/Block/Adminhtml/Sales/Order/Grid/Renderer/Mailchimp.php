@@ -14,11 +14,15 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Mailchimp ex
 {
     public function render(Varien_Object $row)
     {
-        $order = Mage::getModel('sales/order')->load($row->getData('entity_id'));
-        if ($order->getMailchimpAbandonedcartFlag() || $order->getMailchimpCampaignId() || $order->getMailchimpLandingPage()) {
-            $result = '<img src="' . $this->getSkinUrl("ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png") . '" width="40" title="hep hep thanks MailChimp" />';
-        } else {
-            $result = '';
+        $result = '';
+
+        try {
+            $order = Mage::getModel('sales/order')->load($row->getData('entity_id'));
+
+            if ($order->getMailchimpAbandonedcartFlag() || $order->getMailchimpCampaignId()) {
+                $result = '<img src="' . $this->getSkinUrl("ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png") . '" width="40" title="hep hep thanks MailChimp" />';
+            }
+        } catch (Exception $e) {
         }
 
         return $result;

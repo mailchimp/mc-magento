@@ -34,6 +34,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Admi
         case Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER:
             $displayText = $this->__('Subscriber view not available. Id:') . ' ' . $id;
             break;
+        case Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE:
+            $displayText = $this->__('Promo Rule view not available. Id:') . ' ' . $id;
+            break;
+        case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
+            $displayText = $this->__('Promo Code view not available. Id:') . ' ' . $id;
+            break;
         default:
             $displayText = $this->__('Something went wrong when retrieving original item.');
             break;

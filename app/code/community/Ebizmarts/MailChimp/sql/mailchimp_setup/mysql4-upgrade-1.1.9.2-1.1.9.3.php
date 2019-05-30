@@ -5,8 +5,8 @@ $installer = $this;
 try {
     $installer->run(
         "
-ALTER TABLE `{$this->getTable('sales_flat_order')}` 
-ADD INDEX `IDX_M4M_SALES_FLAT_ORDER_CUSTOMER_EMAIL` (`customer_email`);
+ALTER TABLE `{$this->getTable('mailchimp_ecommerce_sync_data')}`
+ADD COLUMN `deleted_related_id` INT(10) DEFAULT NULL;
 "
     );
 } catch (Exception $e) {

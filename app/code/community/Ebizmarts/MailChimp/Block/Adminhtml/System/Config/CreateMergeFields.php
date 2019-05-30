@@ -13,6 +13,9 @@
 class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
+
+    const CREATE_MERGE_PATH = 'adminhtml/ecommerce/createMergeFields';
+
     protected function _construct()
     {
         parent::_construct();
@@ -39,8 +42,31 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     }
     public function getAjaxCheckUrl()
     {
-        $scopeString = Mage::helper('mailchimp')->getScopeString();
-        return Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/createMergeFields', array('scope' => $scopeString));
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        return Mage::helper('adminhtml')->getUrl(self::CREATE_MERGE_PATH, $scopeArray);
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageForMailchimpErrorLog()
+    {
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        $message = 'There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information.';
+        if ($helper->getLogFile($scopeArray['scope_id'], $scopeArray['scope']) === false || !$helper->canLogMessage(Zend_Log::ERR, $scopeArray['scope_id'], $scopeArray['scope'])) {
+            $message = 'There was an error on the merge fields creation. Please enable error logs for the default store and try again for more information.';
+        }
+        return $helper->__($message);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 
 }

@@ -6,11 +6,16 @@
                 <mailchimp translate="title" module="mailchimp">
                     <title>Mailchimp</title>
                     <children>
-                            <mailchimperrors translate="title" module="mailchimp">
-                                <title>Mailchimp Errors</title>
-                                <sort_order>810</sort_order>
-                                <action>adminhtml/mailchimperrors/index</action>
-                        </mailchimperrors>
+                        <mailchimperrors translate="title" module="mailchimp">
+                            <title>Mailchimp Errors</title>
+                            <sort_order>810</sort_order>
+                            <action>adminhtml/mailchimperrors/index</action>
+                         </mailchimperrors>
+                        <mailchimpstores translate="title" module="mailchimp">
+                            <title>Mailchimp Stores</title>
+                            <sort_order>820</sort_order>
+                            <action>adminhtml/mailchimpstores/index</action>
+                        </mailchimpstores>
                     </children>
                 </mailchimp>
             </children>
@@ -28,6 +33,9 @@
                                     <mailchimperrors translate="title" module="mailchimp">
                                         <title>Mailchimp Errors</title>
                                     </mailchimperrors>
+                                    <mailchimpstores translate="title" module="mailchimp">
+                                        <title>Mailchimp Stores</title>
+                                    </mailchimpstores>
                                 </children>
                             </mailchimp>
                         </children>
@@ -37,25 +45,13 @@
                             <config>
                                 <children>
                                     <mailchimp translate="title" module="mailchimp">
-                                        <title>MailChimp Configuration</title>
+                                        <title>Mailchimp Configuration</title>
                                     </mailchimp>
                                     <mandrill transtale="title" module="mailchimp">
                                         <title>Mandrill Configuration</title>
                                     </mandrill>
                                 </children>
                             </config>
-                            <email_template>
-                                <children>
-                                    <mailchimp translate="title" module="mailchimp">
-                                        <title>MailChimp</title>
-                                        <children>
-                                            <mailchimp_syncronization translate="title" module="mailchimp">
-                                                <title>Ecommerce Data Syncronization</title>
-                                            </mailchimp_syncronization>
-                                        </children>
-                                    </mailchimp>
-                                </children>
-                            </email_template>
                         </children>
                     </system>
                 </children>

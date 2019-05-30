@@ -3,13 +3,12 @@
 /**
  * MailChimp For Magento
  *
- * @category  Ebizmarts_MailChimp
- * @author    Troy Patteson <troyp@smartnetworks.com.au>
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date:     4/29/16 3:55 PM
- * @file:     Observer.php
+ * @category   Ebizmarts
+ * @package    Ebizmarts_MailChimp
+ * @author     Ebizmarts Team <info@ebizmarts.com>
+ * @license    http://opensource.org/licenses/osl-3.0.php
  */
-class Ebizmarts_MailChimp_Model_Source_Loglevel
+class Ebizmarts_MailChimp_Model_System_Config_Source_LogLevel
 {
     /**
      * Retrieve option array

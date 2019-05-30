@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
     public function send()
     {
         /**
- * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection 
+ * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection
 */
         $collection = Mage::getResourceModel('core/email_queue_collection')
             ->addOnlyForSendingFilter()
@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
             ->setCurPage(1)
             ->load();
         /**
- * @var $message Mage_Core_Model_Email_Queue 
+ * @var $message Mage_Core_Model_Email_Queue
 */
         foreach ($collection as $message) {
             if ($message->getId()) {

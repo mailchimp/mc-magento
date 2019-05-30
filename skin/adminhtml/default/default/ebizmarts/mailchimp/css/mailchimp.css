@@ -17,11 +17,11 @@ ul.tabs a.mailchimp-section:hover {
 
 ul.tabs a.mailchimp-section span,
 ul.tabs a.mailchimp-section:hover span {
-    background: url(../images/mailchimp-tab.png) no-repeat 18px 3px;
+    background: url(../images/mailchimp-tab.png) no-repeat 18px;
     overflow: hidden;
     padding-left: 20px;
-    width: 120px;
-    height: 18px;
+    background-size: contain;
+
 }
 
 ul.tabs a.mailchimp-section.active, ul.tabs a.mailchimp-section.active:hover {
@@ -36,9 +36,10 @@ h3.mailchimp-header {
     padding-left: 20px;;
     width: 120px;
     text-indent: -9999px;
+    background-size: contain;
 }
 
-fieldset#mailchimp_general p.note a {
+fieldset#mailchimp_general p.note a.mc-link {
     background: url(../images/mailchimp-ico.png) no-repeat left top;
     padding-left: 18px;
     padding-bottom: 4px;
@@ -100,4 +101,8 @@ div.mailchimp-notice {
 
 .mailchimp-image {
     margin: 0 0 4px 10px;
+}
+
+textarea#mailchimp_general_interest_success_before, textarea#mailchimp_general_interest_success_after {
+    height: 5em;
 }

@@ -32,5 +32,56 @@ class MailChimp_Ecommerce extends MailChimp_Abstract
      * @var MailChimp_EcommerceProducts
      */
     public $products;
+    /**
+     * @var MailChimp_EcommercePromoRules
+     */
+    public $promoRules;
 
+    /**
+     * @return MailChimp_EcommerceStore
+     */
+    public function getStores()
+    {
+        return $this->stores;
+    }
+
+    /**
+     * @return MailChimp_EcommerceCarts
+     */
+    public function getCarts()
+    {
+        return $this->carts;
+    }
+
+    /**
+     * @return MailChimp_EcommerceCustomers
+     */
+    public function getCustomers()
+    {
+        return $this->customers;
+    }
+
+    /**
+     * @return MailChimp_EcommerceOrders
+     */
+    public function getOrders()
+    {
+        return $this->orders;
+    }
+
+    /**
+     * @return MailChimp_EcommerceProducts
+     */
+    public function getProducts()
+    {
+        return $this->products;
+    }
+
+    /**
+     * @return MailChimp_EcommercePromoRules
+     */
+    public function getPromoRules()
+    {
+        return $this->promoRules;
+    }
 }

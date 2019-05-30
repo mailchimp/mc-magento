@@ -3,14 +3,22 @@
     <adminhtml_mailchimperrors_grid>
         <update handle="formkey"/>
         <block type="mailchimp/adminhtml_mailchimperrors_grid"
-               name="mailchimp_mailchimperrors.grid" output="toHtml"></block>
+               name="mailchimp_mailchimperrors.grid" output="toHtml"/>
     </adminhtml_mailchimperrors_grid>
     <adminhtml_mailchimperrors_index>
         <reference name="content">
-            <block type="mailchimp/adminhtml_mailchimperrors"
-                   name="mailchimp_mailchimperrors.grid.container"></block>
+            <block type="mailchimp/adminhtml_mailchimperrors" name="mailchimp_mailchimperrors.grid.container"/>
         </reference>
     </adminhtml_mailchimperrors_index>
+    <adminhtml_mailchimpstores_grid>
+        <update handle="formkey"/>
+        <block type="mailchimp/adminhtml_mailchimpstores_grid" name="mailchimp_mailchimpstores.grid" output="toHtml"/>
+    </adminhtml_mailchimpstores_grid>
+    <adminhtml_mailchimpstores_index>
+        <reference name="content">
+            <block type="mailchimp/adminhtml_mailchimpstores" name="mailchimp_mailchimpstores.grid.container"/>
+        </reference>
+    </adminhtml_mailchimpstores_index>
     <adminhtml_mergevars_addmergevar>
         <reference name="content">
             <update handle="default"/>
@@ -19,7 +27,7 @@
             <remove name="footer"/>
             <remove name="notifications"/>
             <remove name="global_notices"/>
-            <block type="mailchimp/adminhtml_mergevars_add" name="adminhtml.mailchimp.add"></block>
+            <block type="mailchimp/adminhtml_mergevars_add" name="adminhtml.mailchimp.add"/>
         </reference>
     </adminhtml_mergevars_addmergevar>
     <adminhtml_system_config_edit>
@@ -48,4 +56,9 @@
             <block type="mailchimp/adminhtml_sales_order_view_info_monkey" name="mailchimp.order.info.monkey.block" template="ebizmarts/mailchimp/sales/order/view/monkey.phtml" before="order_history" />
         </reference>
     </adminhtml_sales_order_view>
+    <default>
+        <reference name="notifications">
+            <block type="mailchimp/adminhtml_notifications" name="mailchimp_notifications" template="ebizmarts/mailchimp/notifications.phtml"/>
+        </reference>
+    </default>
 </layout>

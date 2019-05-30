@@ -11,144 +11,228 @@
  */
 class Ebizmarts_MailChimp_Model_Api_Stores
 {
-    /** @var Ebizmarts_MailChimp_Helper_Data $_helper */
-    private $_helper;
 
-
-    public function __construct()
+    /**
+     * Create Mailchimp store.
+     *
+     * @param $apiKey
+     * @param $listId
+     * @param $storeName
+     * @param $currencyCode
+     * @param $storeDomain
+     * @param $storeEmail
+     * @param $primaryLocale
+     * @param $timeZone
+     * @param $storePhone
+     * @param $address
+     * @return mixed
+     * @throws Exception
+     */
+    public function createMailChimpStore(
+        $apiKey, $listId, $storeName, $currencyCode, $storeDomain, $storeEmail,
+        $primaryLocale, $timeZone, $storePhone, $address
+    )
     {
-        $this->_helper = Mage::helper('mailchimp');
+        $helper = $this->makeHelper();
+        $date = $helper->getDateMicrotime();
+        $mailchimpStoreId = md5($storeName . '_' . $date);
+
+        try {
+            $api = $helper->getApiByKey($apiKey);
+            $isSyncing = true;
+            $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
+            $response = $this->addStore($api, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+            $configValues = array(
+                array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", $response['connected_site']['site_script']['url'])
+            );
+            $helper->saveMailchimpConfig($configValues, 0, 'default');
+            $successMessage = $helper->__("The Mailchimp store was successfully created.");
+            $adminSession = $this->getAdminSession();
+            $adminSession->addSuccess($successMessage);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $response = $errorMessage = $e->getMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
+        } catch (MailChimp_Error $e) {
+            $adminSession = $this->getAdminSession();
+            $response = $errorMessage = $e->getFriendlyMessage();
+            $helper->logError($errorMessage);
+            if (strstr($errorMessage, 'A store with the domain')) {
+                $errorMessage = $helper->__('A Mailchimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
+                $adminSession->addError($errorMessage);
+            } else {
+                $adminSession->addError($errorMessage);
+            }
+        } catch (Exception $e) {
+            $response = $errorMessage = $e->getMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
+        }
+        return $response;
     }
 
     /**
-     * Create MailChimp store.
+     * Edit Mailchimp store.
      *
-     * @param  $mailChimpStoreId
-     * @param  null             $listId
-     * @param  $scope
-     * @param  $scopeId
-     * @throws Exception
+     * @param $mailchimpStoreId
+     * @param $apiKey
+     * @param $storeName
+     * @param $currencyCode
+     * @param $storeDomain
+     * @param $storeEmail
+     * @param $primaryLocale
+     * @param $timeZone
+     * @param $storePhone
+     * @param $address
+     * @return mixed|string
+     * @throws Mage_Core_Exception
      */
-    public function createMailChimpStore($mailChimpStoreId, $listId = null, $scopeId, $scope)
+    public function editMailChimpStore(
+        $mailchimpStoreId, $apiKey, $storeName, $currencyCode, $storeDomain, $storeEmail,
+        $primaryLocale, $timeZone, $storePhone, $address
+    )
     {
-        $api = $this->_helper->getApi($scopeId, $scope);
-        if ($api) {
-            if (!$listId) {
-                $listId = $this->_helper->getGeneralList($scopeId, $scope);
-            }
+        $helper = $this->makeHelper();
 
-            if ($listId != null && $listId != "") {
-                $storeName = $this->_helper->getMCStoreName($scopeId, $scope);
-                $storeEmail = $this->_helper->getConfigValueForScope('trans_email/ident_general/email', $scopeId, $scope);
-                $storeDomain = $this->_helper->getStoreDomain($scopeId, $scope);
-                if (strpos($storeEmail, 'example.com') !== false) {
-                    $storeEmail = null;
-                    throw new Exception('Please, change the general email in Store Email Addresses/General Contact');
-                }
-
-                $currencyCode = $this->_helper->getConfigValueForScope(Mage_Directory_Model_Currency::XML_PATH_CURRENCY_DEFAULT, $scopeId, $scope);
-                $isSyncing = true;
-                $this->_helper->logDebug("MC-API Request: Creating store $mailChimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
-                $response = $api->ecommerce->stores->add($mailChimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail);
-                $this->_helper->logNotice("MC-API Request: Created store $mailChimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
-                return $response;
+        try {
+            $api = $helper->getApiByKey($apiKey);
+            $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
+            $helper->logDebug("MC-API Request: Editing store $mailchimpStoreId name $storeName email $storeEmail domain $storeDomain");
+            $response = $api->getEcommerce()->getStores()->edit($mailchimpStoreId, $storeName, 'Magento', $storeDomain, null, $storeEmail, $currencyCode, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+            $helper->logNotice("MC-API Request: Edited store $mailchimpStoreId name $storeName email $storeEmail domain $storeDomain");
+            $successMessage = $helper->__("The Mailchimp store was successfully edited.");
+            $adminSession = $this->getAdminSession();
+            $adminSession->addSuccess($successMessage);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $response = $errorMessage = $e->getMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
+        } catch (MailChimp_Error $e) {
+            $adminSession = $this->getAdminSession();
+            $response = $errorMessage = $e->getFriendlyMessage();
+            $helper->logError($errorMessage);
+            if (strstr($errorMessage, 'A store with the domain')) {
+                $errorMessage = $helper->__('A Mailchimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
+                $adminSession->addError($errorMessage);
             } else {
-                throw new Exception('You don\'t have any lists configured in MailChimp');
+                $adminSession->addError($errorMessage);
             }
-        } else {
-            throw new Exception('You must provide a MailChimp API key');
+        } catch (Exception $e) {
+            $response = $errorMessage = $e->getMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
         }
+        return $response;
     }
 
     /**
      * Delete MailChimp store.
      *
      * @param $mailchimpStoreId
-     * @param $scopeId
-     * @param $scope
+     * @param $apiKey
+     * @return mixed|string
+     * @throws Mage_Core_Exception
      */
-    public function deleteMailChimpStore($mailchimpStoreId, $scopeId, $scope)
+    public function deleteMailChimpStore($mailchimpStoreId, $apiKey)
     {
+        $helper = $this->makeHelper();
         try {
-            $api = $this->_helper->getApi($scopeId, $scope);
-            $this->_helper->logDebug("MC-API Request: Deleting store $mailchimpStoreId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
-            $api->ecommerce->stores->delete($mailchimpStoreId);
-            $this->_helper->logNotice("MC-API Request: Deleted store $mailchimpStoreId for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
+            $api = $helper->getApiByKey($apiKey);
+            $helper->logDebug("MC-API Request: Deleting store $mailchimpStoreId");
+            $response = $api->getEcommerce()->getStores()->delete($mailchimpStoreId);
+            $helper->logDebug("MC-API Request: Deleted store $mailchimpStoreId");
+            $successMessage = $helper->__("The Mailchimp store was successfully deleted.");
+            $adminSession = $this->getAdminSession();
+            $adminSession->addSuccess($successMessage);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $response = $errorMessage = $e->getMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
         } catch (MailChimp_Error $e) {
-            $this->_helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            $response = $errorMessage = $e->getFriendlyMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
         } catch (Exception $e) {
-            $this->_helper->logError($e->getMessage(), $scopeId, $scope);
+            $response = $errorMessage = $e->getMessage();
+            $helper->logError($errorMessage);
+            $adminSession = $this->getAdminSession();
+            $adminSession->addError($errorMessage);
         }
 
-        $connection = Mage::getSingleton('core/resource')->getConnection('core_write');
-        $resource = Mage::getResourceModel('mailchimp/synchbatches');
-        $connection->update($resource->getMainTable(), array('status' => 'canceled'), "status = 'pending'");
+        return $response;
     }
 
     /**
-     * Edit MailChimp store name for given scope.
+     * Remove all data associated to the given Mailchimp store id.
      *
-     * @param $name
-     * @param $scopeId
-     * @param $scope
+     * @param $mailchimpStoreId
      */
-    public function modifyName($name, $scopeId, $scope)
+    protected function deleteLocalMCStoreData($mailchimpStoreId)
     {
-        try {
-            $api = $this->_helper->getApi($scopeId, $scope);
-            $mailchimpStoreId = $this->_helper->getMCStoreId($scopeId, $scope);
-            $this->_helper->logDebug("MC-API Request: Setting store $mailchimpStoreId name to $name for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
-            $api->ecommerce->stores->edit($mailchimpStoreId, $name);
-            $this->_helper->logNotice("MC-API Request: Set store $mailchimpStoreId name to $name for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
-        } catch (MailChimp_Error $e) {
-            $this->_helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
-        } catch (Exception $e) {
-            $this->_helper->logError($e->getMessage(), $scopeId, $scope);
-        }
-    }
-
-    /**
-     * Returns URL from MailChimp store data
-     *
-     * @param  $scopeId
-     * @param  $scope
-     * @return mixed
-     */
-    public function getMCJsUrl($scopeId, $scope)
-    {
-        try {
-            $api = $this->_helper->getApi($scopeId, $scope);
-            $mailchimpStoreId = $this->_helper->getMCStoreId($scopeId, $scope);
-            $this->_helper->logDebug("MC-API Request: Getting store $mailchimpStoreId connected site URL for " . $this->_helper->getScopeDescription($scopeId, $scope), $scopeId, $scope);
-            $response = $api->ecommerce->stores->get($mailchimpStoreId, 'connected_site');
-            if (isset($response['connected_site']['site_script']['url'])) {
-                $url = $response['connected_site']['site_script']['url'];
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL, $url));
-                $this->_helper->saveMailchimpConfig($configValues, $scopeId, $scope);
-                return $url;
-            }
-        } catch (MailChimp_Error $e) {
-            $this->_helper->logError($e->getFriendlyMessage(), $scopeId, $scope);
-        } catch (Exception $e) {
-            $this->_helper->logError($e->getMessage(), $scopeId, $scope);
-        }
+        $helper = $this->makeHelper();
+        $helper->logDebug("Deleting all local mailchimp store $mailchimpStoreId data");
+        $helper->deleteAllMCStoreData($mailchimpStoreId);
+        $helper->logNotice("Deleted all local mailchimp store $mailchimpStoreId data");
     }
 
     /**
      * Set is_syncing value for the given scope.
      *
-     * @param $mailchimpApi
+     * @param $mailchimpApi Ebizmarts_MailChimp
      * @param $isSincingValue
      * @param $mailchimpStoreId
-     * @param $magentoStoreId
+     * @throws MailChimp_Error
      */
-    public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId, $magentoStoreId)
+    public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId)
     {
-        $this->_helper->logDebug("MC-API Request: Updating store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
-        $mailchimpApi->ecommerce->stores->edit($mailchimpStoreId, null, null, null, $isSincingValue);
-        $this->_helper->logNotice("MC-API Request: Updated store $mailchimpStoreId is_syncing flag to " . ($isSincingValue ? 'YES' : 'NO') . " for " . $this->_helper->getScopeDescription($magentoStoreId, 'stores'), $magentoStoreId, 'stores');
-        $scopeToEdit = $this->_helper->getMailChimpScopeByStoreId($magentoStoreId);
-        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, (int)$isSincingValue));
-        $this->_helper->saveMailchimpConfig($configValue, $scopeToEdit['scope_id'], $scopeToEdit['scope']);
+        $mailchimpApi->getEcommerce()->getStores()->edit($mailchimpStoreId, null, null, null, $isSincingValue);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Mage_Adminhtml_Model_Session
+     */
+    protected function getAdminSession()
+    {
+        return Mage::getSingleton('adminhtml/session');
+    }
+
+    /**
+     * @param $api
+     * @param $mailchimpStoreId
+     * @param $listId
+     * @param $storeName
+     * @param $currencyCode
+     * @param $isSyncing
+     * @param $storeDomain
+     * @param $storeEmail
+     * @param $currencySymbol
+     * @param $primaryLocale
+     * @param $timeZone
+     * @param $storePhone
+     * @param $address
+     * @return mixed
+     */
+    protected function addStore($api, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address)
+    {
+        $helper = $this->makeHelper();
+        $syncingDesc = ($isSyncing ? 'YES' : 'NO');
+        $helper->logDebug("MC-API Request: Adding store $mailchimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId and syncing: $syncingDesc");
+        $response = $api->getEcommerce()->getStores()->add($mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+        $helper->logNotice("MC-API Request: Added store $mailchimpStoreId name $storeName email $storeEmail domain $storeDomain for list ID $listId and syncing: $syncingDesc");
+        return $response;
     }
 }

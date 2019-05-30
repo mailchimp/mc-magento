@@ -182,5 +182,3 @@ class Mandrill_Tags
     }
 
 }
-
-

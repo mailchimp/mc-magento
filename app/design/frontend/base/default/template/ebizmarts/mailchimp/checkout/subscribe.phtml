@@ -1,0 +1,92 @@
+<?php /* @var $this Ebizmarts_MailChimp_Block_Checkout_Subscribe */ ?>
+<?php
+$force = $this->isForceEnabled();
+$check = $this->isChecked();
+$hidden = $this->isForceHidden();
+$addToPostOnLoad = $this->addToPostOnLoad();
+$generalList = $this->getGeneralList();
+?>
+<script type="text/javascript">
+    addSubscribeToPost = function (element) {
+
+        //save old clicked lists and then removes element
+        var subscribeValue = '';
+        var checkedLists = '';
+        <?php if (!$force) : ?>
+        if ($('mailchimp-subscribe')) {
+            checkedLists = $('mailchimp-subscribe').getValue();
+            subscribeValue = checkedLists + ',';
+            $('mailchimp-subscribe').remove();
+        }
+        <?php endif; ?>
+
+        var hidden = false;
+        <?php if ($hidden) : ?>
+        hidden = true;
+        <?php endif; ?>
+        //if checked add this element else remove it
+        if (element.checked || hidden) {
+            var inputer = new Element('input', {
+                name: "mailchimp_subscribe",
+                id: "mailchimp-subscribe",
+                value: subscribeValue + element.readAttribute('value'),
+                type: "hidden"
+            });
+            try {
+                Element.insert(Form.findFirstElement(payment.form), inputer);
+
+            } catch (notelem) {
+                $("co-payment-form").insert(inputer);
+            }
+        } else {
+            var arrCheckedLists = checkedLists.split(',');
+            var pos = arrCheckedLists.indexOf(element.readAttribute('value'));
+            if (pos != -1) {
+                arrCheckedLists.splice(pos, 1);
+                checkedLists = arrCheckedLists.join(',');
+                var inputer = new Element('input', {
+                    name: "mailchimp_subscribe",
+                    id: "mailchimp-subscribe",
+                    value: checkedLists,
+                    type: "hidden"
+                });
+                if (inputer.value) {
+                    try {
+                        Element.insert(Form.findFirstElement(payment.form), inputer);
+                    } catch (notelem) {
+                        $("co-payment-form").insert(inputer);
+                    }
+                }
+            }
+        }
+
+    };
+</script>
+<div class="buttons-set"<?php if ($hidden) : ?> style="display:none;"<?php endif; ?>>
+    <!-- General Subscription -->
+    <div class="page-title">
+        <h1><?php echo $this->__('Newsletter Subscription'); ?></h1>
+    </div>
+    <?php echo $this->getBlockHtml('formkey'); ?>
+    <div class="mailchimp-multisubscribe">
+        <ul class="mailchimp-general-list">
+            <li class="listdata">
+                <input<?php if ($check): ?> checked="checked"<?php endif; ?> type="checkbox"
+                                                                             onchange="addSubscribeToPost(this);"
+                                                                             name="list[<?php echo $generalList; ?>][subscribed]"
+                                                                             id="mailchimp-trigger"
+                                                                             value="<?php echo $generalList; ?>"
+                                                                             title="<?php echo $generalList; ?>"
+                                                                             class="mailchimp-list-subscriber"/>
+                <label for="mailchimp-trigger"><?php echo $this->__('General Subscription'); ?></label>
+            </li>
+        </ul>
+    </div>
+    <!-- General Subscription -->
+</div>
+
+<script type="text/javascript">
+    //If force subscription or checked by default set the elements as clicked
+    <?php if($addToPostOnLoad):?>addSubscribeToPost($('mailchimp-trigger'));
+    <?php endif; ?>
+</script>

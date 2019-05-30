@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         }
         return $this->mailchimpHelper;
     }
+
     /**
      * Entry point for all webhook operations
      */
@@ -34,26 +35,38 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         $moduleName = $request->getModuleName();
         $data = $request->getPost();
         $helper = $this->getHelper();
+        $storeId = 0;
         if ($moduleName == 'monkey') {
-            try {
+
+            if (isset($data['data']['list_id'])) {
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
                 if (count($storeIds)) {
-                    $api = $helper->getApi($storeIds[0]);
-                    $webhooks = $api->lists->webhooks->getAll($listId);
-                    foreach ($webhooks['webhooks'] as $webhook) {
-                        if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                            $helper->logDebug("MC-API Request: Deleting web hook ID {$webhook['id']} url {$webhook['url']} for list ID $listId");
-                            $api->lists->webhooks->delete($listId, $webhook['id']);
-                            $helper->logNotice("MC-API Request: Deleting web hook ID {$webhook['id']} url {$webhook['url']} for list ID $listId");
+                    $storeId = $storeIds[0];
+                    if ($helper->isSubscriptionEnabled($storeId)) {
+                        try {
+                            $api = $helper->getApi($storeId);
+                        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                            $helper->logError($e->getMessage(), $storeId);
+                            $api = null;
+                        }
+                        if (!$api) {
+                            try {
+                                $webhooks = $api->lists->webhooks->getAll($listId);
+                                foreach ($webhooks['webhooks'] as $webhook) {
+                                    if (strpos($webhook['url'], 'monkey/webhook') !== false) {
+                                        $helper->logDebug("MC-API Request: Deleting web hook ID {$webhook['id']} url {$webhook['url']} for list ID $listId", $storeId);
+                                        $api->lists->webhooks->delete($listId, $webhook['id']);
+                                        $helper->logNotice("MC-API Request: Deleting web hook ID {$webhook['id']} url {$webhook['url']} for list ID $listId", $storeId);
+                                    }
+                                }
+                            } catch (MailChimp_Error $e) {
+                                $helper->logError($e->getFriendlyMessage(), $storeId);
+
+                            }
                         }
                     }
                 }
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-
-            } catch (Exception $e) {
-                $helper->logError($e->getMessage());
             }
         } else {
 
@@ -73,12 +86,11 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 if ($request->getPost('type')) {
                     Mage::getModel('mailchimp/processWebhook')->saveWebhookRequest($data);
                 } else {
-                    $helper->logError($this->__('Something went wrong with the Webhook Data'));
-                    $helper->logError($this->__($data));
+                    $helper->logError($this->__('Webhook successfully created.'), $storeId);
                 }
             } else {
-                $helper->logError($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey));
-                $helper->logError($this->__('Webhook call ended'));
+                $helper->logError($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey), $storeId);
+                $helper->logError($this->__('Webhook call ended'), $storeId);
             }
         }
     }

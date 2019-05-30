@@ -19,21 +19,54 @@ class Mandrill_Message extends Mandrill_Mandrill
     protected $_headers = array();
     protected $_fromName;
 
+    /**
+     * Flag: whether or not email has attachments
+     * @var boolean
+     */
+    public $hasAttachments = false;
 
     public function getMail()
     {
         return $this;
     }
 
+    /**
+     * Adds an existing attachment to the mail message
+     *
+     * @param  Zend_Mime_Part $attachment
+     * @return Mandrill_Message Provides fluent interface
+     */
+    public function addAttachment(Zend_Mime_Part $attachment)
+    {
+        $this->_attachments[] = $attachment;
+        $this->hasAttachments = true;
+
+        return $this;
+    }
+
+    /**
+     * @param $body
+     * @param string $mimeType
+     * @param string $disposition
+     * @param string $encoding
+     * @param null $filename
+     * @return Zend_Mime_Part
+     */
     public function createAttachment($body,
         $mimeType = Zend_Mime::TYPE_OCTETSTREAM,
         $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
         $encoding = Zend_Mime::ENCODING_BASE64,
         $filename = null
     ) {
-    
-        $att = array('type' => $mimeType, 'name' => $filename, 'content' => base64_encode($body));
-        array_push($this->_attachments, $att);
+        $mp = new Zend_Mime_Part($body);
+        $mp->encoding = $encoding;
+        $mp->type = $mimeType;
+        $mp->disposition = $disposition;
+        $mp->filename = $filename;
+
+        $this->addAttachment($mp);
+
+        return $mp;
     }
 
     public function log($m)
@@ -46,18 +79,27 @@ class Mandrill_Message extends Mandrill_Mandrill
 
     public function getAttachments()
     {
-        return $this->_attachments;
+        $_attachments = array();
+        foreach($this->_attachments as $attachment) {
+            /** @var Zend_Mime_Part $attachment */
+            $_attachments[] = array(
+                'type' => $attachment->type,
+                'name' => $attachment->filename,
+                'content' => $attachment->getContent()
+            );
+        }
+
+        return $_attachments;
     }
 
     public function addBcc($bcc)
     {
-        $storeId = Mage::app()->getStore()->getId();
         if (is_array($bcc)) {
             foreach ($bcc as $email) {
-                array_push($this->_bcc, $email);
+                $this->_bcc[] = $email;
             }
         } else {
-            array_push($this->_bcc, $bcc);
+            $this->_bcc[] = $bcc;
         }
     }
 
@@ -205,7 +247,7 @@ class Mandrill_Message extends Mandrill_Mandrill
             throw new Zend_Mail_Exception('Cannot set standard header from addHeader()');
         }
 
-        $this->_header[$name] = $value;
+        $this->_headers[$name] = $value;
 
         return $this;
     }
@@ -214,9 +256,9 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
         if (isset($this->_headers[0])) {
             return $this->_headers[0];
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function send()
@@ -252,7 +294,7 @@ class Mandrill_Message extends Mandrill_Mandrill
         }
 
         try {
-            $result = $this->messages->send($email);
+            $this->messages->send($email);
         } catch (Exception $e) {
             Mage::logException($e);
             return false;

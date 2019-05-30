@@ -16,15 +16,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
 
     public function __construct()
     {
+        $helper = $this->makeHelper();
+
         $this->addColumn(
             'mailchimp', array(
-            'label' => Mage::helper('mailchimp')->__('MailChimp'),
+            'label' => $helper->__('Mailchimp'),
             'style' => 'width:120px',
             )
         );
         $this->addColumn(
             'magento', array(
-            'label' => Mage::helper('mailchimp')->__('Customer'),
+            'label' => $helper->__('Customer'),
             'style' => 'width:120px',
             )
         );
@@ -44,8 +46,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
             }
         }
 
-        $scopeArray = explode('-', Mage::helper('mailchimp')->getScopeString());
-        $mapFields = Mage::helper('mailchimp')->getCustomMergeFieldsSerialized($scopeArray[1], $scopeArray[0]);
+        $scopeArray = $helper->getCurrentScope();
+        $mapFields = $helper->getCustomMergeFieldsSerialized($scopeArray['scope_id'], $scopeArray['scope']);
         $customFieldTypes = unserialize($mapFields);
         if(is_array($customFieldTypes)) {
             foreach ($customFieldTypes as $customFieldType) {
@@ -80,7 +82,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
 
         return $rendered;
     }
-    
+
     protected function _getMailChimpValue()
     {
         return Mage::getSingleton('core/session')->getMailchimpValue();
@@ -89,5 +91,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
     protected function _getMailChimpLabel()
     {
         return Mage::getSingleton('core/session')->getMailchimpLabel();
+    }
+
+    /**
+     * @return Mage_Core_Helper_Abstract
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }
