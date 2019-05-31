@@ -20,12 +20,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
         $scope = $this->getScope();
         $groups = $this->getData('groups');
 
-        if (isset($groups['general']['fields']['apikey']['value']) && $groups['general']['fields']['apikey']['value'] !== '******') {
-            $apiKey = $groups['general']['fields']['apikey']['value'];
-        } else {
-            $apiKey = $helper->getApiKey($this->getScopeId(), $this->getScope());
-        }
-
+        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
         //If settings are inherited get from config.
         if (isset($groups['general']['fields']['list']) && isset($groups['general']['fields']['list']['value'])) {
             $listId = $groups['general']['fields']['list']['value'];
