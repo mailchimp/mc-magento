@@ -48,7 +48,7 @@
                             <label>API Key</label>
                             <frontend_type>obscure</frontend_type>
                             <sort_order>20</sort_order>
-                            <backend_model>mailchimp/system_config_backend_apikey</backend_model>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
