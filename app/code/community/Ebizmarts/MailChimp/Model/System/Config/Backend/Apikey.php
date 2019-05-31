@@ -12,20 +12,6 @@
  */
 class Ebizmarts_MailChimp_Model_System_Config_Backend_Apikey extends Mage_Core_Model_Config_Data
 {
-    protected function _beforeSave()
-    {
-        if ($this->getValue() === '******') {
-            $helper = $this->makeHelper();
-            $scopeId = $this->getScopeId();
-            $scope = $this->getScope();
-            $encryptedApiKey = $helper->getUnencryptedApiKey($scopeId, $scope);
-        } else {
-            $encryptedApiKey = Mage::helper('core')->encrypt($this->getValue());
-        }
-
-        $this->setValue($encryptedApiKey);
-    }
-
     protected function _afterSave()
     {
         $helper = $this->makeHelper();
