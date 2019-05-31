@@ -102,13 +102,17 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $name = $formData['name'];
         $domain = $formData['domain'];
         $storeId = isset($formData['storeid']) ? $formData['storeid'] : null;
+        $apiKey = $formData['apikey'];
 
+        if ($apiKey === '******') {
+            $apiKey = $helper->getApiKey($storeId);
+        }
 
         if ($storeId) {
             $apiStore = $helper->getApiStores();
             $apiStore->editMailChimpStore(
                 $storeId,
-                $formData['apikey'],
+                $apiKey,
                 $name,
                 $currencyCode,
                 $domain,
@@ -121,7 +125,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         } else {
             $apiStore = $helper->getApiStores();
             $apiStore->createMailChimpStore(
-                $formData['apikey'],
+                $apiKey,
                 $formData['listid'],
                 $name,
                 $currencyCode,
@@ -243,7 +247,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $mailchimpStoreId = $store->getStoreid();
         $apiKey = $store->getApikey();
         $helper = $this->getMailchimpHelper();
-
 
         if ($store->getId()) {
             try {

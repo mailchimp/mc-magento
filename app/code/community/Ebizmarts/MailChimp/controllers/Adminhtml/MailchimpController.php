@@ -63,6 +63,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     {
         $apiKey = $this->getRequest()->getParam('api_key');
 
+        if ($apiKey === '******') {
+            $helper = $this->makeHelper();
+            $scopeArray = $helper->getConfigScopeId();
+            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        }
+
         $data = $this->getSourceStoreOptions($apiKey);
         $jsonData = json_encode($data);
 
@@ -77,6 +83,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $request = $this->getRequest();
         $mcStoreId = $request->getParam('mailchimp_store_id');
         $apiKey = $request->getParam('api_key');
+
+        if ($apiKey === '******') {
+            $scopeArray = $helper->getConfigScopeId();
+            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        }
 
         $data = $this->getSourceAccountInfoOptions($apiKey, $mcStoreId);
         foreach ($data as $key => $element) {
@@ -100,6 +111,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $apiKey = $request->getParam('api_key');
         $mcStoreId = $request->getParam('mailchimp_store_id');
 
+        if ($apiKey === '******') {
+            $helper = $this->makeHelper();
+            $scopeArray = $helper->getConfigScopeId();
+            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        }
+
         $data = $this->getSourceListOptions($apiKey, $mcStoreId);
         $jsonData = json_encode($data);
 
@@ -110,9 +127,15 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getInterestAction()
     {
+        $helper = $this->makeHelper();
         $request = $this->getRequest();
         $apiKey = $request->getParam('api_key');
         $listId = $request->getParam('list_id');
+
+        if ($apiKey === '******') {
+            $scopeArray = $helper->getConfigScopeId();
+            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        }
 
         $data = $this->getSourceInterestOptions($apiKey, $listId);
         $jsonData = json_encode($data);
