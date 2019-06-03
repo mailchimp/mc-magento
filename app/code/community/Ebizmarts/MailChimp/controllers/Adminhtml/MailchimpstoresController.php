@@ -105,7 +105,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $storeId = isset($formData['storeid']) ? $formData['storeid'] : null;
         $apiKey = $formData['apikey'];
 
-        if ($apiKey === '******') {
+        if ($helper->isApiKeyObscure($apiKey)) {
             $apiKey = $helper->getApiKey($storeId);
         }
 

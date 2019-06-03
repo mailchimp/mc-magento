@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : null;
             $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
 
-            if (isset($configData['groups']['general']['fields']['apikey']['value']) && $configData['groups']['general']['fields']['apikey']['value'] !== '******') {
+            if (isset($configData['groups']['general']['fields']['apikey']['value']) && !$helper->isApiKeyObscure($configData['groups']['general']['fields']['apikey']['value'])) {
                 $apiKey = $configData['groups']['general']['fields']['apikey']['value'];
             } else {
                 $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);

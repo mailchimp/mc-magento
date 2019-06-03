@@ -61,12 +61,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getStoresAction()
     {
+        $helper = $this->makeHelper();
         $apiKey = $this->getRequest()->getParam('api_key');
 
-        if ($apiKey === '******') {
-            $helper = $this->makeHelper();
-            $scopeArray = $helper->getCurrentScope();
-            $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+        if ($helper->isApiKeyObscure($apiKey)) {
+            $apiKey = $helper->getApiKeyValue();
         }
 
         $data = $this->getSourceStoreOptions($apiKey);
@@ -84,9 +83,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $mcStoreId = $request->getParam('mailchimp_store_id');
         $apiKey = $request->getParam('api_key');
 
-        if ($apiKey === '******') {
-            $scopeArray = $helper->getConfigScopeId();
-            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        if ($helper->isApiKeyObscure($apiKey)) {
+            $apiKey = $helper->getApiKeyValue();
         }
 
         $data = $this->getSourceAccountInfoOptions($apiKey, $mcStoreId);
@@ -110,11 +108,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $request = $this->getRequest();
         $apiKey = $request->getParam('api_key');
         $mcStoreId = $request->getParam('mailchimp_store_id');
+        $helper = $this->makeHelper();
 
-        if ($apiKey === '******') {
-            $helper = $this->makeHelper();
-            $scopeArray = $helper->getConfigScopeId();
-            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        if ($helper->isApiKeyObscure($apiKey)) {
+            $apiKey = $helper->getApiKeyValue();
         }
 
         $data = $this->getSourceListOptions($apiKey, $mcStoreId);
@@ -132,9 +129,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $apiKey = $request->getParam('api_key');
         $listId = $request->getParam('list_id');
 
-        if ($apiKey === '******') {
-            $scopeArray = $helper->getConfigScopeId();
-            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+        if ($helper->isApiKeyObscure($apiKey)) {
+            $apiKey = $helper->getApiKeyValue();
         }
 
         $data = $this->getSourceInterestOptions($apiKey, $listId);

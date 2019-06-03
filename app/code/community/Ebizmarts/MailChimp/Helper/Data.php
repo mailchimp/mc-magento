@@ -4276,4 +4276,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return substr($str, 0, 6) . str_repeat('*', strlen($str) - 4) . substr($str, -4);
     }
+
+    public function isApiKeyObscure($apiKey)
+    {
+        return ($apiKey === '******');
+    }
+
+    public function getApiKeyValue()
+    {
+        $scopeArray = $this->getCurrentScope();
+        return $this->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+    }
 }
