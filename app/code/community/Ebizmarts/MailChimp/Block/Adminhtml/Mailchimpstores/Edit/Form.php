@@ -42,10 +42,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             foreach ($stores as $s) {
                 $apikey = Mage::helper('mailchimp')->getApiKey($s);
                 if(!array_key_exists($apikey,$apikeys)) {
-                    $apikeys[$apikey] = $apikey;
+                    $encryptedApiKey = Mage::helper('mailchimp')->encryptData($apikey);
+                    $apikeys[$encryptedApiKey] = Mage::helper('mailchimp')->mask($apikey);
                 }
             }
-            $apikeyField =$fieldset->addField('apikey', 'select', array(
+            $apikeyField = $fieldset->addField('apikey', 'select', array(
                 'label'     => Mage::helper('mailchimp')->__('Api Key'),
                 'title'     => Mage::helper('mailchimp')->__('Api Key'),
                 'name'      => 'apikey',

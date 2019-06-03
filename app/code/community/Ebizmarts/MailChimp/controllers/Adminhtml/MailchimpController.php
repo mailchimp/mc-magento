@@ -65,8 +65,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
         if ($apiKey === '******') {
             $helper = $this->makeHelper();
-            $scopeArray = $helper->getConfigScopeId();
-            $apiKey = $helper->getApiKey($scopeArray['storeId']);
+            $scopeArray = $helper->getCurrentScope();
+            $apiKey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
         }
 
         $data = $this->getSourceStoreOptions($apiKey);
