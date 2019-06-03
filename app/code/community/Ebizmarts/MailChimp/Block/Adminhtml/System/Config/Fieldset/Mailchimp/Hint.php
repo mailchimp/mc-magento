@@ -88,12 +88,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         $apikey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
-        Mage::log('api key '.$apikey, null, 'ebizmarts.log', true);
         if ($apikey !== null && $apikey !== '') {
-            Mage::log('true', null, 'ebizmarts.log', true);
             return true;
         } else {
-            Mage::log('false', null, 'ebizmarts.log', true);
             return false;
         }
     }
