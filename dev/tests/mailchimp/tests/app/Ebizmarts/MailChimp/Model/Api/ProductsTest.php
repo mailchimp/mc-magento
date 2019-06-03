@@ -630,8 +630,19 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $entityId = 145;
         $time = time();
 
+
+        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConnection'))
+            ->getMock();
+
+        $writeAdapterMock = $this->getMockBuilder(Varien_Db_Adapter_Pdo_Mysql::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('quoteInto'))
+            ->getMock();
+
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('getProductResourceCollection', 'getSelect', 'update', 'joinMailchimpSyncDataForSpecialPrices'))
+            ->setMethods(array('getCoreResource', 'getProductResourceCollection', 'getSelect', 'update', 'joinMailchimpSyncDataForSpecialPrices'))
             ->getMock();
 
         $collectiontMock = $this
@@ -645,6 +656,27 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->disableOriginalConstructor()
             ->setMethods(array('getEntityId'))
             ->getMock();
+
+        $productsApiMock
+            ->expects($this->once())
+            ->method('getCoreResource')
+            ->willReturn($coreResourceMock);
+
+        $coreResourceMock
+            ->expects($this->once())
+            ->method('getConnection')
+            ->with('core_write')
+            ->willReturn($writeAdapterMock);
+
+        $writeAdapterMock
+            ->expects($this->once())
+            ->method("quoteInto")
+            ->with(
+                'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
+                date('Y-m-d', $time)." 00:00:00"
+
+            );
+
 
         $productsApiMock->expects($this->exactly(2))
             ->method('getProductResourceCollection')
