@@ -16,6 +16,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     protected $_helper;
 
+    public function preDispatch()
+    {
+        $this->_helper = $this->makeHelper();
+        return parent::preDispatch();
+    }
+
     public function indexAction()
     {
         $customerId = (int)$this->getRequest()->getParam('id');
@@ -31,15 +37,15 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function resendSubscribersAction()
     {
-        $this->_helper = $this->makeHelper();
-        $mageApp = $this->_helper->getMageApp();
+        $helper = $this->getHelper();
+        $mageApp = $helper->getMageApp();
         $request = $mageApp->getRequest();
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
         $success = 1;
 
         try {
-            $this->_helper->resendSubscribers($scopeId, $scope);
+            $helper->resendSubscribers($scopeId, $scope);
         } catch (Exception $e) {
             $success = 0;
         }
@@ -49,24 +55,24 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function createWebhookAction()
     {
-        $this->_helper = $this->makeHelper();
-        $mageApp = $this->_helper->getMageApp();
+        $helper = $this->getHelper();
+        $mageApp = $helper->getMageApp();
         $request = $mageApp->getRequest();
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
-        $listId = $this->_helper->getGeneralList($scopeId);
+        $listId = $helper->getGeneralList($scopeId);
 
-        $message = $this->_helper->createNewWebhook($scopeId, $scope, $listId);
+        $message = $helper->createNewWebhook($scopeId, $scope, $listId);
 
         $mageApp->getResponse()->setBody($message);
     }
 
     public function getStoresAction()
     {
-        $this->_helper = $this->makeHelper();
+        $helper = $this->getHelper();
         $apiKey = $this->getRequest()->getParam('api_key');
 
-        if ($this->_helper->isApiKeyObscure($apiKey)) {
+        if ($helper->isApiKeyObscure($apiKey)) {
             $apiKey = $this->getApiKeyValue();
         }
 
@@ -80,12 +86,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getInfoAction()
     {
-        $this->_helper = $this->makeHelper();
+        $helper = $this->getHelper();
         $request = $this->getRequest();
         $mcStoreId = $request->getParam('mailchimp_store_id');
         $apiKey = $request->getParam('api_key');
 
-        if ($this->_helper->isApiKeyObscure($apiKey)) {
+        if ($helper->isApiKeyObscure($apiKey)) {
             $apiKey = $this->getApiKeyValue();
         }
 
@@ -93,7 +99,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         foreach ($data as $key => $element) {
             $liElement = '';
             if ($element['value'] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY) {
-                $liElement = $this->_helper->getSyncFlagDataHtml($element, $liElement);
+                $liElement = $helper->getSyncFlagDataHtml($element, $liElement);
                 $data[$key]['label'] = $liElement;
             }
         }
@@ -107,12 +113,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getListAction()
     {
+        $helper = $this->getHelper();
         $request = $this->getRequest();
         $apiKey = $request->getParam('api_key');
         $mcStoreId = $request->getParam('mailchimp_store_id');
-        $this->_helper = $this->makeHelper();
 
-        if ($this->_helper->isApiKeyObscure($apiKey)) {
+        if ($helper->isApiKeyObscure($apiKey)) {
             $apiKey = $this->getApiKeyValue();
         }
 
@@ -126,12 +132,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function getInterestAction()
     {
-        $this->_helper = $this->makeHelper();
+        $helper = $this->getHelper();
         $request = $this->getRequest();
         $apiKey = $request->getParam('api_key');
         $listId = $request->getParam('list_id');
 
-        if ($this->_helper->isApiKeyObscure($apiKey)) {
+        if ($helper->isApiKeyObscure($apiKey)) {
             $apiKey = $this->getApiKeyValue();
         }
 
@@ -180,6 +186,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    protected function getHelper()
+    {
+        return $this->_helper;
     }
 
     /**
@@ -232,7 +243,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     protected function getApiKeyValue()
     {
-        $scopeArray = $this->_helper->getCurrentScope();
-        return $this->_helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+        $helper = $this->getHelper();
+        $scopeArray = $helper->getCurrentScope();
+        return $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
     }
 }
