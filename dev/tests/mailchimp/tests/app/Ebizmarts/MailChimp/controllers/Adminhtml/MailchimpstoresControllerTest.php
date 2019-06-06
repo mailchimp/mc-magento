@@ -175,7 +175,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApiByKey'))
+            ->setMethods(array('getApiByKey', 'decryptData'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -199,6 +199,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $mailchimpstoresControllerMock->expects($this->once())->method('getMailchimpHelper')->willReturn($helperMock);
 
+        $helperMock->expects($this->once())->method('decryptData')->with($apiKeyEncrypted)->willReturn($apiKey);
         $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
 
         $apiMock->expects($this->once())->method('getLists')->willReturn($listsMock);
