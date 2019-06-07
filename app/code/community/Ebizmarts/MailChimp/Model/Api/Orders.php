@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, 0, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -148,7 +148,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, 0, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -568,7 +568,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter += 1;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information during migration from 1.1.6.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, 0, 0);
                     continue;
                 }
             } else {
