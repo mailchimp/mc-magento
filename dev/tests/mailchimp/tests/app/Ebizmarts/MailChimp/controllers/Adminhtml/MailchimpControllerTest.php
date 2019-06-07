@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper'))
+            ->setMethods(array('getHelper'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -104,7 +104,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->setMethods(array('setBody'))
             ->getMock();
 
-        $mailchimpControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
 
@@ -137,7 +137,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper'))
+            ->setMethods(array('getHelper'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -160,7 +160,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->setMethods(array('setBody'))
             ->getMock();
 
-        $mailchimpControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId)->willReturn($listId);
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
@@ -193,7 +193,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getResponse', 'getSourceStoreOptions'))
+            ->setMethods(array('getRequest', 'getResponse', 'getSourceStoreOptions', 'getHelper'))
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
@@ -206,9 +206,16 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->setMethods(array('setHeader', 'setBody'))
             ->getMock();
 
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isApiKeyObscure'))
+            ->getMock();
+
+        $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $mailchimpControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
 
         $requestMock->expects($this->once())->method('getParam')->with($apiKeyParam)->willReturn($apiKey);
+        $helperMock->expects($this->once())->method('isApiKeyObscure')->with($apiKey)->willReturn(false);
 
         $mailchimpControllerMock->expects($this->once())->method('getSourceStoreOptions')->with($apiKey)->willReturn($data);
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
@@ -273,7 +280,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getRequest', 'getSourceAccountInfoOptions', 'getResponse'))
+            ->setMethods(array('getHelper', 'getRequest', 'getSourceAccountInfoOptions', 'getResponse'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -291,7 +298,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->setMethods(array('setHeader', 'setBody'))
             ->getMock();
 
-        $mailchimpControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $mailchimpControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
@@ -327,7 +334,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getSourceListOptions', 'getResponse'))
+            ->setMethods(array('getRequest', 'getSourceListOptions', 'getResponse', 'getHelper'))
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
@@ -340,6 +347,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->setMethods(array('setHeader', 'setBody'))
             ->getMock();
 
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isApiKeyObscure'))
+            ->getMock();
+
+        $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $mailchimpControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
@@ -349,6 +362,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             $apiKey,
             $mcStoreId
         );
+
+        $helperMock->expects($this->once())->method('isApiKeyObscure')->with($apiKey)->willReturn(false);
 
         $mailchimpControllerMock->expects($this->once())->method('getSourceListOptions')->with($apiKey, $mcStoreId)->willReturn($data);
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
@@ -374,7 +389,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getSourceInterestOptions', 'getResponse'))
+            ->setMethods(array('getRequest', 'getSourceInterestOptions', 'getResponse', 'getHelper'))
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
@@ -387,6 +402,12 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->setMethods(array('setHeader', 'setBody'))
             ->getMock();
 
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isApiKeyObscure'))
+            ->getMock();
+
+        $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $mailchimpControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
@@ -396,6 +417,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             $apiKey,
             $listId
         );
+
+        $helperMock->expects($this->once())->method('isApiKeyObscure')->with($apiKey)->willReturn(false);
 
         $mailchimpControllerMock->expects($this->once())->method('getSourceInterestOptions')->with($apiKey, $listId)->willReturn($data);
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);

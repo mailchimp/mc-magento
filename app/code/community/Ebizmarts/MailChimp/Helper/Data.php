@@ -334,7 +334,33 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiKey($scopeId, $scope = null)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY, $scopeId, $scope);
+        $apiKey = $this->getConfigValueForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,
+            $scopeId,
+            $scope);
+        return $this->decryptData($apiKey);
+    }
+
+    /**
+     * Return decrypted data.
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function decryptData($data)
+    {
+        return Mage::helper('core')->decrypt($data);
+    }
+
+    /**
+     * Return encrypted data.
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function encryptData($data)
+    {
+        return Mage::helper('core')->encrypt($data);
     }
 
     /**
@@ -4247,5 +4273,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCountersDataSentToMailchimp()
     {
         return $this->countersGetResponseBatch;
+    }
+
+    public function mask($str)
+    {
+        return substr($str, 0, 6) . str_repeat('*', strlen($str) - 4) . substr($str, -4);
+    }
+
+    public function isApiKeyObscure($apiKey)
+    {
+        return ($apiKey === '******');
+    }
+
+    public function getApiKeyValue()
+    {
+        $scopeArray = $this->getCurrentScope();
+        return $this->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
     }
 }

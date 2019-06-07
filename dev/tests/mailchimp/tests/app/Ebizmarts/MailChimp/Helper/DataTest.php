@@ -299,7 +299,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('saveConfig', 'cleanCache'))
             ->getMock();
 
-
         $helperMock->expects($this->exactly(2))->method('getConfig')->willReturn($configMock);
         $configMock->expects($this->once())->method('saveConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116, 1, 'default', 0);
         $configMock->expects($this->once())->method('cleanCache');

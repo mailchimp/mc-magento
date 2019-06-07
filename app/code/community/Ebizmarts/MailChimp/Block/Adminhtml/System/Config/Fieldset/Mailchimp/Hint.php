@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
      */
     public function getMigrationFinishedStatus()
     {
-        return Mage::helper('mailchimp')->migrationFinished();
+        return $this->makeHelper()->migrationFinished();
     }
 
     /**
@@ -81,5 +81,25 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
     public function getInterestUrl()
     {
         return  Mage::helper('adminhtml')->getUrl('adminhtml/mailchimp/getInterest');
+    }
+
+    public function isApiKeySet()
+    {
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        $apikey = $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+        if ($apikey !== null && $apikey !== '') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    private function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }
