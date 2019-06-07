@@ -121,7 +121,12 @@ class Ebizmarts_MailChimp_Model_Observer
             $scopeArray = $helper->getCurrentScope();
             $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : null;
             $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
-            $apiKey = (isset($configData['groups']['general']['fields']['apikey']['value'])) ? $configData['groups']['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+
+            if (isset($configData['groups']['general']['fields']['apikey']['value']) && !$helper->isApiKeyObscure($configData['groups']['general']['fields']['apikey']['value'])) {
+                $apiKey = $configData['groups']['general']['fields']['apikey']['value'];
+            } else {
+                $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+            }
 
             // If ecommerce data section is enabled only allow inheriting both entries (list and MC Store) at the same time.
 

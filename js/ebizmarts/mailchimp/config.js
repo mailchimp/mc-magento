@@ -7,7 +7,7 @@ function loadStores() {
     $("mailchimp_general_storeid").select('option').each(function (i) {
         i.remove();
     });
-    new Ajax.Request(MGETSTORESRUL, {
+    new Ajax.Request(MGETSTORESURL, {
         method: 'get',
         parameters: {api_key: apiKey},
         onComplete: function (transport) {
