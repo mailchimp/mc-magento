@@ -33,13 +33,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Grid extends Mage_Admi
     protected function _prepareColumns()
     {
         $this->addColumn(
-            'title', array(
-                'header' => Mage::helper('mailchimp')->__('API Key'),
-                'index' => 'apikey',
-                'sortable' => true
-            )
-        );
-        $this->addColumn(
             'mc_account_name', array(
                 'header' => Mage::helper('mailchimp')->__('MC Account name'),
                 'index' => 'mc_account_name',

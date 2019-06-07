@@ -125,11 +125,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
         $postData = array('address_address_one' => 'addressOne', 'address_address_two' => 'addressTwo',
             'address_city' => 'city', 'address_postal_code' => 'postCode', 'address_country_code' => 'countryCode',
             'email_address' => 'email@example.com', 'currency_code' => 'USD', 'primary_locale' => 'en_US',
-            'phone' => '123456', 'name' => 'name', 'domain' => 'domain.com', 'storeid' => 1);
+            'phone' => '123456', 'name' => 'name', 'domain' => 'domain.com', 'storeid' => 1, 'apikey' => '');
 
         $mailchimpstoresControllerMock = $this->mailchimpstoresController
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', '_updateMailchimp', '_redirect'))
+            ->setMethods(array('getRequest', '_updateMailchimp', '_redirect', 'getHelper'))
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Response_Http::class)
@@ -151,6 +151,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
     {
         $apiKeyParam = 'api_key';
         $apiKey = 'a1s2d3f4g5h6j7k8l9z1x2c3v4b5-us1';
+        $apiKeyEncrypted = '4rGjyBo/uKChzvu0bF3hjaMwfM503N3/+2fdRjdlAGo=';
         $mcLists = array(
             'lists' => array(array(
                 'id' => 'a1s2d3f4g5',
@@ -174,7 +175,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApiByKey'))
+            ->setMethods(array('getApiByKey', 'decryptData'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -194,10 +195,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $mailchimpstoresControllerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
 
-        $requestMock->expects($this->once())->method('getParam')->with($apiKeyParam)->willReturn($apiKey);
+        $requestMock->expects($this->once())->method('getParam')->with($apiKeyParam)->willReturn($apiKeyEncrypted);
 
         $mailchimpstoresControllerMock->expects($this->once())->method('getMailchimpHelper')->willReturn($helperMock);
 
+        $helperMock->expects($this->once())->method('decryptData')->with($apiKeyEncrypted)->willReturn($apiKey);
         $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
 
         $apiMock->expects($this->once())->method('getLists')->willReturn($listsMock);
@@ -218,6 +220,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
         $tableId = 1;
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
         $apiKey = 'a1s2d3f4g5h6j7k8l9p0z1x2c3v4b5-us1';
+        $apiKeyEncrypted = '4rGjyBo/uKChzvu0bF3hjaMwfM503N3/+2fdRjdlAGo=';
 
         $mailchimpstoresControllerMock = $this->mailchimpstoresController
             ->disableOriginalConstructor()
@@ -236,7 +239,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApiStores', 'deleteAllMCStoreData'))
+            ->setMethods(array('getApiStores', 'deleteAllMCStoreData', 'decryptData'))
             ->getMock();
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
@@ -251,12 +254,13 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
         $mailchimpstoresControllerMock->expects($this->once())->method('loadMailchimpStore')->with($tableId)->willReturn($mailchimpStoreModelMock);
 
         $mailchimpStoreModelMock->expects($this->once())->method('getStoreid')->willReturn($mailchimpStoreId);
-        $mailchimpStoreModelMock->expects($this->once())->method('getApikey')->willReturn($apiKey);
+        $mailchimpStoreModelMock->expects($this->once())->method('getApikey')->willReturn($apiKeyEncrypted);
 
         $mailchimpstoresControllerMock->expects($this->once())->method('getMailchimpHelper')->willReturn($helperMock);
 
         $mailchimpStoreModelMock->expects($this->once())->method('getId')->willReturn($tableId);
 
+        $helperMock->expects($this->once())->method('decryptData')->with($apiKeyEncrypted)->willReturn($apiKey);
         $helperMock->expects($this->once())->method('getApiStores')->willReturn($apiStoresMock);
 
         $apiStoresMock->expects($this->once())->method('deleteMailChimpStore')->with($mailchimpStoreId, $apiKey);

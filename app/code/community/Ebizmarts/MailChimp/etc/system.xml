@@ -46,9 +46,9 @@
                         </active>
                         <apikey translate="label comment">
                             <label>API Key</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
                             <sort_order>20</sort_order>
-                            <backend_model>mailchimp/system_config_backend_apikey</backend_model>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -500,7 +500,8 @@
                         </active>
                         <apikey translate="label comment">
                             <label>API Key</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
