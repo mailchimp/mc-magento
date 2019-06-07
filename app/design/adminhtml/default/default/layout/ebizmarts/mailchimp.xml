@@ -43,15 +43,6 @@
     </adminhtml_ecommerce_renderresendecom>
     <adminhtml_system_config_edit>
         <reference name="head">
-            <action method="addItem">
-                <type>js_css</type>
-                <name>prototype/windows/themes/default.css</name>
-            </action>
-            <action method="addCss">
-                <name>lib/prototype/windows/themes/magento.css</name>
-            </action>
-        </reference>
-        <reference name="head">
             <action method="addCss">
                 <stylesheet>ebizmarts/mailchimp/css/mailchimp.css</stylesheet>
             </action>
@@ -70,6 +61,15 @@
     <default>
         <reference name="notifications">
             <block type="mailchimp/adminhtml_notifications" name="mailchimp_notifications" template="ebizmarts/mailchimp/notifications.phtml"/>
+        </reference>
+        <reference name="head">
+            <action method="addItem">
+                <type>js_css</type>
+                <name>prototype/windows/themes/default.css</name>
+            </action>
+            <action method="addCss">
+                <name>lib/prototype/windows/themes/magento.css</name>
+            </action>
         </reference>
     </default>
 </layout>
