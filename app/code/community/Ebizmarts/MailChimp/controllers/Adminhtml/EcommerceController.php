@@ -99,7 +99,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     {
         switch ($this->getRequest()->getActionName()) {
         case 'resetLocalErrors':
-        case 'resetEcommerceData':
+        case 'renderresendecom':
         case 'resendEcommerceData':
         case 'createMergeFields':
             $acl = 'system/config/mailchimp';
