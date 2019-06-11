@@ -334,7 +334,33 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiKey($scopeId, $scope = null)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY, $scopeId, $scope);
+        $apiKey = $this->getConfigValueForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,
+            $scopeId,
+            $scope);
+        return $this->decryptData($apiKey);
+    }
+
+    /**
+     * Return decrypted data.
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function decryptData($data)
+    {
+        return Mage::helper('core')->decrypt($data);
+    }
+
+    /**
+     * Return encrypted data.
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function encryptData($data)
+    {
+        return Mage::helper('core')->encrypt($data);
     }
 
     /**
@@ -692,6 +718,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
             $this->removeEcommerceSyncData($scopeId, $scope, false, $filters);
             $this->clearErrorGrid($scopeId, $scope, true, $filters);
+
+            if (in_array('PRO', $filters)) {
+                $this->deleteFlushMagentoCacheFlag();
+            }
         }
     }
 
@@ -1035,23 +1065,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($isSyncing != 1) {
             $configValues = array();
 
-            if ($this->getCustomerResendLastId() !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $filters)) {
+            if ($this->getCustomerResendLastId($scopeId, $scope) !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $filters)) {
                 $customerLastId = $this->getLastCustomerSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId);
             }
-            if ($this->getProductResendLastId() !== null && in_array( Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)) {
+            if ($this->getProductResendLastId($scopeId, $scope) !== null && in_array( Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)) {
                 $productLastId = $this->getLastProductSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId);
             }
-            if ($this->getOrderResendLastId() !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_ORDER, $filters)) {
+            if ($this->getOrderResendLastId($scopeId, $scope) !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_ORDER, $filters)) {
                 $orderLastId = $this->getLastOrderSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId);
             }
-            if ($this->getCartResendLastId() !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $filters)) {
+            if ($this->getCartResendLastId($scopeId, $scope) !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $filters)) {
                 $cartLastId = $this->getLastCartSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId);
             }
-            if ($this->getPromoCodeResendLastId() !== null
+            if ($this->getPromoCodeResendLastId($scopeId, $scope) !== null
                 && in_array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE .', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $filters)) {
                 $promoCodeLastId = $this->getLastPromoCodeSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $promoCodeLastId);
@@ -4095,7 +4125,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getUrlForNotification()
     {
-        $this->deleteFlushMagentoCacheFlag();
         $scopeArray = $this->getCurrentScope();
         $url = Mage::helper('adminhtml')->getUrl('adminhtml/ecommerce/resendEcommerceData', array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']));
         return $url;
@@ -4227,4 +4256,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->countersGetResponseBatch;
     }
 
+    public function mask($str)
+    {
+        return substr($str, 0, 6) . str_repeat('*', strlen($str) - 4) . substr($str, -4);
+    }
+
+    public function isApiKeyObscure($apiKey)
+    {
+        return ($apiKey === '******');
+    }
+
+    public function getApiKeyValue()
+    {
+        $scopeArray = $this->getCurrentScope();
+        return $this->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+    }
 }
