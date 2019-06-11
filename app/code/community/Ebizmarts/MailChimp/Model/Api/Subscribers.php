@@ -178,7 +178,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
                             $mergeVars = $this->customerAttributes($subscriber, $attributeCode, $customer, $mergeVars, $key, $storeId, $attribute);
                             $eventValue = $mergeVars[$key];
-                            $this->dispatchEventValue($customer, $subscriberEmail, $attributeCode, $eventValue);
+                            $this->dispatchMergeVarBefore($customer, $subscriberEmail, $attributeCode, $eventValue);
                         }
                     }
                 } else {
@@ -186,7 +186,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     if (isset($mergeVars[$key])) {
                         $eventValue = $mergeVars[$key];
                     }
-                    $this->dispatchEventValue($customer, $subscriberEmail, $customAtt, $eventValue);
+                    $this->dispatchMergeVarBefore($customer, $subscriberEmail, $customAtt, $eventValue);
                 }
 
                 if ($eventValue) {
@@ -196,7 +196,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
 
         $newVars = new Varien_Object;
-        $this->dispatchEventMergeVars($subscriber, $mergeVars, $newVars);
+        $this->dispatchEventMergeVarAfter($subscriber, $mergeVars, $newVars);
+
         if ($newVars->hasData()) {
             $mergeVars = array_merge($mergeVars, $newVars->getData());
         }
@@ -580,7 +581,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
                 break;
             default:
-                $mergeVars[$key] = $this->getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute);
+                $mergeValue = $this->getUnknownMergeField($attributeCode, $customer, $attribute);
+                if ($mergeValue !== null) {
+                    $mergeVars[$key] = $mergeValue;
+                }
+                //$mergeVars[$key] = $this->getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute);
                 break;
         }
 
@@ -588,12 +593,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     }
 
     /**
+     * Add possibility to change value on certain merge tag
+     *
      * @param $customer
      * @param $subscriberEmail
      * @param $attributeCode
      * @param $eventValue
      */
-    protected function dispatchEventValue($customer, $subscriberEmail, $attributeCode, $eventValue)
+    protected function dispatchMergeVarBefore($customer, $subscriberEmail, $attributeCode, &$eventValue)
     {
         Mage::dispatchEvent(
             'mailchimp_merge_field_send_before', array(
@@ -606,17 +613,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     }
 
     /**
+     * Allow possibility to add new vars in 'new_vars' array
+     *
      * @param $subscriber
      * @param $mergeVars
      * @param $newVars
      */
-    protected function dispatchEventMergeVars($subscriber, $mergeVars, $newVars)
+    protected function dispatchEventMergeVarAfter($subscriber, $mergeVars, &$newVars)
     {
         Mage::dispatchEvent(
             'mailchimp_merge_field_send_after', array(
                 'subscriber' => $subscriber,
                 'vars' => $mergeVars,
-                'new_vars' => $newVars
+                'new_vars' => &$newVars
             )
         );
     }
@@ -797,17 +806,21 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $attribute
      * @return mixed
      */
-    protected function getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute)
+    protected function getUnknownMergeField($attributeCode, $customer, $attribute)
     {
+        $optionValue = null;
+
         $attrValue = $this->getCustomerGroupLabel($attributeCode, $customer);
-        if ($attribute['frontend_input'] == 'select' && $attrValue) {
-            $attr = $customer->getResource()->getAttribute($attributeCode);
-            $optionValue = $attr->getSource()->getOptionText($attrValue);
-            $mergeVars[$key] = $optionValue;
-        } elseif ($attrValue) {
-            $mergeVars[$key] = $attrValue;
+        if($attrValue!== null) {
+            if ($attribute['frontend_input'] == 'select' && $attrValue) {
+                $attr = $customer->getResource()->getAttribute($attributeCode);
+                $optionValue = $attr->getSource()->getOptionText($attrValue);
+            } elseif ($attrValue) {
+                $optionValue = $attrValue;
+            }
         }
-        return $mergeVars[$key];
+
+        return $optionValue;
     }
 
     /**
