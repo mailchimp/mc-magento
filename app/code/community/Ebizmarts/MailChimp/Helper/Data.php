@@ -4290,4 +4290,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $scopeArray = $this->getCurrentScope();
         return $this->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
     }
+
+    /**
+     * @return Mage_Sales_Model_Order
+     */
+    public function getSessionLastRealOrder()
+    {
+        $checkoutSession = Mage::getSingleton('checkout/session');
+        $order = $checkoutSession->getLastRealOrder();
+        if(is_null($order)){
+            $orderId = $checkoutSession->getLastOrderId();
+            $order = Mage::getModel('sales/order')->load($orderId);
+        }
+        return $order;
+    }
 }
