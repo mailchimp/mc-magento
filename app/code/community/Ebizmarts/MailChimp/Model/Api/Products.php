@@ -42,9 +42,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $helper = $this->getMailChimpHelper();
-        $oldStore = $helper->getMageApp()->getStore()->getId();
-        $helper->getMageApp()->setCurrentStore($magentoStoreId);
+        $helper     = $this->getMailChimpHelper();
+        $oldStore   = $helper->getCurrentStoreId();
+        $helper->setCurrentStore($magentoStoreId);
 
         if ($this->isProductFlatTableEnabled()) {
             $helper->getMageApp()->getStore($magentoStoreId)
@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($productId, $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", null, null, 0);
             }
         }
-        $helper->getMageApp()->setCurrentStore($oldStore);
+        $helper->setCurrentStore($oldStore);
         return $batchArray;
     }
 
@@ -783,10 +783,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function getProductUrl($product, $magentoStoreId)
     {
-        $oldStoreId = Mage::app()->getStore()->getId();
-        Mage::app()->setCurrentStore($magentoStoreId);
+        $helper = $this->getMailChimpHelper();
+        $oldStoreId = $helper->getCurrentStoreId();
+        $helper->setCurrentStore($magentoStoreId);
         $url = $product->getProductUrl();
-        Mage::app()->setCurrentStore($oldStoreId);
+        $helper->setCurrentStore($oldStoreId);
         return $url;
     }
 
