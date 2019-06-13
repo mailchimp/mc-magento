@@ -68,7 +68,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
      */
     protected function getSessionLastRealOrder()
     {
-        return Mage::getSingleton('checkout/session')->getLastRealOrder();
+        return Mage::getModel('sales/order')->load(Mage::getSingleton('checkout/session')->getLastOrderId());
     }
 
     /**
