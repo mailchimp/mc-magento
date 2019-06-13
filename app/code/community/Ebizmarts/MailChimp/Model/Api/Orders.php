@@ -170,6 +170,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $oldStore = $helper->getCurrentStoreId();
+        $helper->setCurrentStore($magentoStoreId);
+
         $apiProduct = $this->getApiProduct();
         $data = array();
         $data['id'] = $order->getIncrementId();
@@ -259,13 +262,22 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         if (!$itemCount) {
             unset($data['lines']);
+            $helper->setCurrentStore($oldStore);
             return "";
         }
 
         //customer data
         $data["customer"]["id"] = md5(strtolower($order->getCustomerEmail()));
         $data["customer"]["email_address"] = $order->getCustomerEmail();
-        $data["customer"]["opt_in_status"] = $this->getCustomerModel()->getOptin($magentoStoreId);
+        $data["customer"]["opt_in_status"] = false;
+
+        if($this->getCustomerModel()->getOptin($magentoStoreId)) {
+            $subscriber = $this->getSubscriberModel();
+            $isSubscribed = $subscriber->loadByEmail($order->getCustomerEmail())->getSubscriberId();
+            if (!$isSubscribed) {
+                $subscriber->subscribe($order->getCustomerEmail());
+            }
+        }
 
         $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);
         $data['order_url'] = $store->getUrl(
@@ -400,6 +412,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $helper->logError("Order " . $order->getEntityId() . " json encode failed");
         }
 
+        $helper->setCurrentStore($oldStore);
         return $jsonData;
     }
 
@@ -833,4 +846,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return Mage::getModel('mailchimp/api_products');
     }
 
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function getSubscriberModel()
+    {
+        return Mage::getModel('newsletter/subscriber');
+    }
 }
