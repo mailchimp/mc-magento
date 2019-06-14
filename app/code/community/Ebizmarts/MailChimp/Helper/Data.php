@@ -2088,7 +2088,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $orderId = $order->getEntityId();
                     $syncError = null;
                     $syncModified = null;
-                    $orderObject = Mage::getModel('sales/order')->load($orderId);
+                    $orderObject = $this->getSalesOrderModel()->load($orderId);
                     $syncDelta = $orderObject->getMailchimpSyncDelta();
                     if ($order->getMailchimpSyncError()) {
                         $syncError = $order->getMailchimpSyncError();
@@ -2139,7 +2139,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $syncError = null;
                     $syncDeleted = null;
                     $token = null;
-                    $quoteObject = Mage::getModel('sales/order')->load($quoteId);
+                    $quoteObject = $this->getSalesOrderModel()->load($quoteId);
                     $syncDelta = $quoteObject->getMailchimpSyncDelta();
                     if ($quote->getMailchimpSyncError()) {
                         $syncError = $quote->getMailchimpSyncError();
@@ -4296,12 +4296,28 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getSessionLastRealOrder()
     {
-        $checkoutSession = Mage::getSingleton('checkout/session');
+        $checkoutSession = $this->getCheckOutSession();
         $order = $checkoutSession->getLastRealOrder();
         if(is_null($order)){
             $orderId = $checkoutSession->getLastOrderId();
-            $order = Mage::getModel('sales/order')->load($orderId);
+            $order = $this->getSalesOrderModel()->load($orderId);
         }
         return $order;
+    }
+
+    /**
+     * @return Mage_Checkout_Model_Session
+     */
+    protected function getCheckOutSession()
+    {
+        return Mage::getSingleton('checkout/session');
+    }
+
+    /**
+     * @return Mage_Sales_Model_Order
+     */
+    protected function getSalesOrderModel()
+    {
+        return Mage::getModel('sales/order');
     }
 }

@@ -1355,4 +1355,27 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
 
     }
+
+    public function testGetSessionLastRealOrderM19()
+    {
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCheckOutSession'))
+            ->getMock();
+
+        $checkoutSessionMock = $this->getMockBuilder(Mage_Checkout_Model_Session::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLastRealOrder'))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getCheckOutSession')->willReturn($checkoutSessionMock);
+
+        $checkoutSessionMock->expects($this->once())->method('getLastRealOrder')->willReturn($orderMock);
+
+        $helperMock->getSessionLastRealOrder();
+    }
 }
