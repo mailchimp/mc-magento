@@ -686,7 +686,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     } else {
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
                         if (!$syncDataItem->getMailchimpSyncModified()) {
-                            $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                            $this->saveSyncData($id, $type, $mailchimpStoreId, null, '', 0, null, null, 1, true);
                             $helper->modifyCounterDataSentToMailchimp($type);
                         }
                     }
