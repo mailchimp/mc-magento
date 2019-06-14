@@ -1378,4 +1378,32 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->getSessionLastRealOrder();
     }
+
+    public function testGetSessionLastRealOrderM17()
+    {
+        $orderId = 4;
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCheckOutSession', 'getSalesOrderModel'))
+            ->getMock();
+
+        $checkoutSessionMock = $this->getMockBuilder(Mage_Checkout_Model_Session::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLastRealOrder', 'getLastOrderId'))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('load'))
+            ->getMock();
+
+        $helperMock->expects($this->once())->method('getCheckOutSession')->willReturn($checkoutSessionMock);
+
+        $checkoutSessionMock->expects($this->once())->method('getLastRealOrder')->willReturn(null);
+        $checkoutSessionMock->expects($this->once())->method('getLastOrderId')->willReturn($orderId);
+        $helperMock->expects($this->once())->method('getSalesOrderModel')->willReturn($orderMock);
+        $orderMock->expects($this->once())->method('load')->with($orderId)->willReturnSelf();
+
+        $helperMock->getSessionLastRealOrder();
+    }
 }
