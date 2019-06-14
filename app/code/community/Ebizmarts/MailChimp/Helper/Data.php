@@ -4298,7 +4298,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $checkoutSession = $this->getCheckOutSession();
         $order = $checkoutSession->getLastRealOrder();
-        if(is_null($order)){
+        if (is_null($order))
+        {
             $orderId = $checkoutSession->getLastOrderId();
             $order = $this->getSalesOrderModel()->load($orderId);
         }
