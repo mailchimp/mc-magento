@@ -847,7 +847,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return false|Mage_Core_Model_Abstract
+     * @return false|Mage_Newsletter_Model_Subscriber
      */
     protected function getSubscriberModel()
     {

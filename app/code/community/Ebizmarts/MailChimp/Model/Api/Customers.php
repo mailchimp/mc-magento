@@ -115,7 +115,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $this->logCouldNotEncodeCustomerError($customer);
             }
 
-            if($this->optInStatusForStore) {
+            if ($this->optInStatusForStore) {
                 $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();
                 if (!$isSubscribed) {
                     $subscriber->subscribe($customer->getEmail());

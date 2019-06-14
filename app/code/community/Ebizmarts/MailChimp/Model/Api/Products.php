@@ -231,7 +231,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (!$this->currentProductIsVisible()) {
             $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
         } else {
-            $url = $this->getProductUrl($product, $magentoStoreId);
+            $url = $this->getProductUrl($product);
         }
         if (!$url) {
             $url = Mage::app()->getStore($magentoStoreId)->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
@@ -778,17 +778,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * @param $product
-     * @param $magentoStoreId
      * @return mixed
      */
-    protected function getProductUrl($product, $magentoStoreId)
+    protected function getProductUrl($product)
     {
-        $helper = $this->getMailChimpHelper();
-        $oldStoreId = $helper->getCurrentStoreId();
-        $helper->setCurrentStore($magentoStoreId);
-        $url = $product->getProductUrl();
-        $helper->setCurrentStore($oldStoreId);
-        return $url;
+        return $product->getProductUrl();
     }
 
     public function getProductCategories($product, $magentoStoreId)
