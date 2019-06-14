@@ -133,11 +133,11 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
                     'getWebSiteByStoreId',
                     'getEntityAttributeCollection',
                     'getCustomerByWebsiteAndId',
-                    'dispatchEventMergeVars',
+                    'dispatchEventMergeVarAfter',
                     'getMailchimpHelper',
                     'unserilizeMapFields',
                     'customizedAttributes',
-                    'dispatchEventValue',
+                    'dispatchMergeVarBefore',
                     'saveLastOrderInSession')
             )->getMock();
 
@@ -175,7 +175,7 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
             ->willReturn($customerMock);
         $newVars = new Varien_Object;
         $subscribersApiMock->expects($this->once())
-            ->method('dispatchEventMergeVars')
+            ->method('dispatchEventMergeVarAfter')
             ->with($subscriberMock, $mergeVars, $newVars);
         $subscribersApiMock->expects($this->once())
             ->method('unserilizeMapFields')
@@ -211,7 +211,7 @@ class Ebizmarts_MailChimp_Model_Api_SubscribersTest extends PHPUnit_Framework_Te
             );
 
             $subscribersApiMock->expects($this->exactly(9))
-            ->method('dispatchEventValue')
+            ->method('dispatchMergeVarBefore')
             ->withConsecutive(
                 array($customerMock, $email, $maps['_1472845935735_735']['magento'], $eventValue),
                 array($customerMock, $email, $maps['_1472846546252_252']['magento'], $eventValue),
