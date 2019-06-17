@@ -78,7 +78,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
-
                 if ($subscriber->getMailchimpSyncModified()) {
                     $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
                 } else {
@@ -120,9 +119,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($subscriber->getMailchimpSyncModified()) {
             $data["status"] = $status;
         }
+
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
-        if(count($interest)) {
+        if (count($interest)) {
             $data['interests'] = $interest;
         }
 
@@ -140,11 +140,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $interestsAvailable = $helper->getInterest($storeId);
         $interest = $helper->getInterestGroups(null, $subscriber->getSubscriberId(), $storeId, $interestsAvailable);
-        foreach($interest as $i) {
-            foreach($i['category'] as $key=>$value) {
+        foreach ($interest as $i) {
+            foreach ($i['category'] as $key => $value) {
                 $rc[$value['id']] = $value['checked'];
             }
         }
+
         return $rc;
     }
 
@@ -186,6 +187,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     if (isset($mergeVars[$key])) {
                         $eventValue = $mergeVars[$key];
                     }
+
                     $this->dispatchMergeVarBefore($customer, $subscriberEmail, $customAtt, $eventValue);
                 }
 
@@ -226,6 +228,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $helper->logError($e->getMessage());
                 return;
             }
+
             $mergeVars = $this->getMergeVars($subscriber);
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
@@ -233,8 +236,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
-                    $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
-                    $interest, $language, null, null
+                    $listId,
+                    $md5HashEmail,
+                    $subscriber->getSubscriberEmail(),
+                    $newStatus,
+                    null,
+                    $forceStatus,
+                    $mergeVars,
+                    $interest,
+                    $language,
+                    null,
+                    null
                 );
                 $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
                 $subscriber->setData("mailchimp_sync_error", "");
@@ -258,6 +270,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 $errorMessage = $helper->__("The subscription could not be applied.");
                                 $this->addError($errorMessage);
                             }
+
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
                             $saveSubscriber = true;
                         } catch (Exception $e) {
@@ -272,6 +285,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $errorMessage = $helper->__("The subscription could not be applied.");
                             $this->addError($errorMessage);
                         }
+
                         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
                         $saveSubscriber = true;
                     }
@@ -284,11 +298,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         $errorMessage = $helper->__("The subscription could not be applied.");
                         $this->addError($errorMessage);
                     }
+
                     $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
             }
+
             if ($saveSubscriber) {
                 $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
                 $subscriber->save();
@@ -417,6 +433,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
             }
         }
+
         return $addressData;
     }
 
@@ -585,6 +602,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 if ($mergeValue !== null) {
                     $mergeVars[$key] = $mergeValue;
                 }
+
                 //$mergeVars[$key] = $this->getUnknownMergeField($attributeCode, $customer, $mergeVars, $key, $attribute);
                 break;
         }
@@ -603,7 +621,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function dispatchMergeVarBefore($customer, $subscriberEmail, $attributeCode, &$eventValue)
     {
         Mage::dispatchEvent(
-            'mailchimp_merge_field_send_before', array(
+            'mailchimp_merge_field_send_before',
+            array(
                 'customer_id' => $customer->getId(),
                 'subscriber_email' => $subscriberEmail,
                 'merge_field_tag' => $attributeCode,
@@ -622,7 +641,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function dispatchEventMergeVarAfter($subscriber, $mergeVars, &$newVars)
     {
         Mage::dispatchEvent(
-            'mailchimp_merge_field_send_after', array(
+            'mailchimp_merge_field_send_after',
+            array(
                 'subscriber' => $subscriber,
                 'vars' => $mergeVars,
                 'new_vars' => &$newVars
@@ -707,6 +727,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($lastOrder && $lastOrder->getShippingAddress()) {
             $addressData = $lastOrder->getShippingAddress();
         }
+
         return $addressData;
     }
 
@@ -775,6 +796,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $firstName = $lastOrder->getCustomerFirstname();
             }
         }
+
         return $firstName;
     }
 
@@ -795,6 +817,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $lastName = $lastOrder->getCustomerLastname();
             }
         }
+
         return $lastName;
     }
 
@@ -811,7 +834,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $optionValue = null;
 
         $attrValue = $this->getCustomerGroupLabel($attributeCode, $customer);
-        if($attrValue!== null) {
+        if ($attrValue!== null) {
             if ($attribute['frontend_input'] == 'select' && $attrValue) {
                 $attr = $customer->getResource()->getAttribute($attributeCode);
                 $optionValue = $attr->getSource()->getOptionText($attrValue);
@@ -845,6 +868,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($this->getSubscriberLastOrder()) {
             Mage::unregister('subscriber_last_order');
         }
+
         Mage::register('subscriber_last_order', $lastOrder);
         return $lastOrder;
     }
@@ -862,9 +886,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($lastOrder === null) {
             $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
         }
+
         if ($lastOrder !== null) {
             $lastDateOfPurchase = $lastOrder->getCreatedAt();
         }
+
         return $lastDateOfPurchase;
     }
 
@@ -881,6 +907,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($this->isNotEmptyOrderCollection($orderCollection)) {
             $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
         }
+
         return $lastOrder;
     }
 
