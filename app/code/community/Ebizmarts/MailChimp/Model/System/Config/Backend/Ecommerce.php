@@ -14,6 +14,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
 {
     protected function _afterSave()
     {
+        $scopeId = $this->getScopeId();
+        $scope = $this->getScope();
         $helper = $this->makeHelper();
         $groups = $this->getData('groups');
         //If settings are inherited get from config.
@@ -25,10 +27,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Ecommerce extends Mage_Cor
             $listId = $helper->getGeneralList($this->getScopeId(), $this->getScope());
         }
 
-        $thisScopeHasMCStoreId = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $this->getScopeId(), $this->getScope());
-
-        if ($apiKey && $this->isValueChanged() && $moduleIsActive && $listId && $this->getValue() && !$thisScopeHasMCStoreId) {
-            $helper->createStore($listId, $this->getScopeId(), $this->getScope());
+        if ((!$apiKey || !$moduleIsActive || !$listId) && $this->isValueChanged() && $this->getValue()) {
+            $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
+            $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
+            $message = $helper->__('Please add an api key and select a list before enabling the extension.');
+            $helper->getAdminSession()->addError($message);
         }
     }
 

@@ -39,7 +39,7 @@ h3.mailchimp-header {
     background-size: contain;
 }
 
-fieldset#mailchimp_general p.note a {
+fieldset#mailchimp_general p.note a.mc-link {
     background: url(../images/mailchimp-ico.png) no-repeat left top;
     padding-left: 18px;
     padding-bottom: 4px;

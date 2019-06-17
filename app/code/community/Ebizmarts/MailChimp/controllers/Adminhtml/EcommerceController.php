@@ -12,6 +12,12 @@
  */
 class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_Controller_Action
 {
+    public function renderresendecomAction()
+    {
+        $this->loadLayout();
+        $this->renderLayout();
+    }
+
     public function resetLocalErrorsAction()
     {
         $helper = $this->makeHelper();
@@ -30,27 +36,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
             $helper->resetErrors($scopeId, $scope);
         } catch(Exception $e)
         {
-            $success = 0;
-        }
-
-        $mageApp->getResponse()->setBody($success);
-    }
-
-    public function resetEcommerceDataAction()
-    {
-        $helper = $this->makeHelper();
-        $mageApp = $helper->getMageApp();
-        $request = $mageApp->getRequest();
-        $scope = $request->getParam('scope');
-        $scopeId = $request->getParam('scope_id');
-        $success = 0;
-        try {
-            $helper->resetMCEcommerceData($scopeId, $scope, true);
-            $success = 1;
-        } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch(Exception $e) {
             $helper->logError($e->getMessage());
+            $success = 0;
         }
 
         $mageApp->getResponse()->setBody($success);
@@ -60,19 +47,28 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     {
         $helper = $this->makeHelper();
         $mageApp = $helper->getMageApp();
-        $request = $mageApp->getRequest();
-        $scope = $request->getParam('scope');
-        $scopeId = $request->getParam('scope_id');
+        $request = $this->getRequest();
+        $filters = $request->getParam('filter');
+        $scopeArray = $helper->getCurrentScope();
         $success = 0;
-        try {
-            $helper->resetMCEcommerceData($scopeId, $scope, false);
-            $success = 1;
-        } catch(MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch(Exception $e) {
-            $helper->logError($e->getMessage());
-        }
 
+        if (is_array($filters) && empty($filters)) {
+            $this->addWarning($helper->__('At least one type of eCommerce data should be selected to Resend.'));
+            $success = $helper->__('Redirecting... ') . '<script type="text/javascript">window.top.location.reload();</script>';
+        } else {
+            try {
+                $helper->resendMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
+
+                $this->addSuccess($helper->__('Ecommerce data resent succesfully'));
+                $success = $helper->__('Redirecting... ') . '<script type="text/javascript">window.top.location.reload();</script>';
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage());
+                $this->addError($e->getFriendlyMessage());
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage());
+                $this->addError($e->getMessage());
+            }
+        }
         $mageApp->getResponse()->setBody($success);
     }
 
@@ -103,7 +99,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     {
         switch ($this->getRequest()->getActionName()) {
         case 'resetLocalErrors':
-        case 'resetEcommerceData':
+        case 'renderresendecom':
         case 'resendEcommerceData':
         case 'createMergeFields':
             $acl = 'system/config/mailchimp';
@@ -127,5 +123,20 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     protected function getAdminSession()
     {
         return Mage::getSingleton('admin/session');
+    }
+
+    public function addWarning($message)
+    {
+        Mage::getSingleton('core/session')->addWarning($message);
+    }
+
+    public function addSuccess($message)
+    {
+        Mage::getSingleton('core/session')->addSuccess($message);
+    }
+
+    public function addError($message)
+    {
+        Mage::getSingleton('core/session')->addError($message);
     }
 }

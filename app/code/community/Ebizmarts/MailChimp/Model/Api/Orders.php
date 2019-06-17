@@ -27,6 +27,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected $_counter;
     protected $_batchId;
     protected $_api = null;
+    protected $_listsCampaignIds = array();
 
     /**
      * Set the request for orders to be created on MailChimp
@@ -48,6 +49,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
         // get new orders
+
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
 
         return $batchArray;
@@ -83,6 +85,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
+
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
+
                     $batchArray[$this->_counter]['method'] = "PATCH";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $incrementId;
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
@@ -92,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, 0, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -131,6 +136,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
                 if (!empty($orderJson)) {
+
+                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
+
                     $batchArray[$this->_counter]['method'] = "POST";
                     $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
                     $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
@@ -140,7 +148,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, 0, 0);
                     continue;
                 }
             } catch (Exception $e) {
@@ -162,10 +170,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $apiProduct = $this->getApiProduct();
         $data = array();
         $data['id'] = $order->getIncrementId();
-        if ($order->getMailchimpCampaignId()) {
-            $data['campaign_id'] = $order->getMailchimpCampaignId();
+        $mailchimpCampaignId = $order->getMailchimpCampaignId();
+        if ($this->shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId)) {
+            $data['campaign_id'] = $mailchimpCampaignId;
         }
 
         if ($order->getMailchimpLandingPage()) {
@@ -232,7 +242,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $variant = $productId;
             }
 
-            if ($productSyncData->getMailchimpSyncDelta() && $productSyncData->getMailchimpSyncError() == '') {
+            $productSyncError = $productSyncData->getMailchimpSyncError();
+            $isProductEnabled = $apiProduct->isProductEnabled($productId, $magentoStoreId);
+
+            if (!$isProductEnabled || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
                 $data["lines"][] = array(
                     "id" => (string)$itemCount,
@@ -242,6 +255,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "price" => $item->getPrice(),
                     "discount" => abs($item->getDiscountAmount())
                 );
+
+                if (!$isProductEnabled) {
+                    // update disabled products to remove the product from mailchimp after sending the order
+                    $apiProduct->updateDisabledProducts($productId, $mailchimpStoreId);
+                }
             }
         }
 
@@ -251,7 +269,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         //customer data
-        $data["customer"]["id"] = md5($order->getCustomerEmail());
+        $data["customer"]["id"] = md5(strtolower($order->getCustomerEmail()));
         $data["customer"]["email_address"] = $order->getCustomerEmail();
         $data["customer"]["opt_in_status"] = $this->getCustomerModel()->getOptin($magentoStoreId);
 
@@ -556,7 +574,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_counter += 1;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving product information during migration from 1.1.6.');
-                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, null, 0);
+                    $this->_updateSyncData($orderId, $mailchimpStoreId, Varien_Date::now(), $error, 0, 0);
                     continue;
                 }
             } else {
@@ -583,7 +601,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     public function addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray)
     {
         $helper = $this->getHelper();
-        $productData = Mage::getModel('mailchimp/api_products')->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
+        $productData = $this->getApiProduct()->sendModifiedProduct($order, $mailchimpStoreId, $magentoStoreId);
         $productDataArray = $helper->addEntriesToArray($batchArray, $productData, $this->_counter);
         $batchArray = $productDataArray[0];
         $this->_counter = $productDataArray[1];
@@ -770,4 +788,55 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         return Mage::getResourceModel('sales/order_collection');
     }
+
+    /**
+     * @param $mailchimpCampaignId
+     * @return bool \ return true if the campaign is from the current list.
+     * @throws Exception
+     */
+    public function shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId)
+    {
+        $isCampaingFromCurrentList = false;
+        if ($mailchimpCampaignId) {
+            $helper = $this->getHelper();
+            $listId = $helper->getGeneralList($magentoStoreId);
+            try {
+                $apiKey = $helper->getApiKey($magentoStoreId);
+                if ($apiKey) {
+                    if (isset($this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId])) {
+                        $isCampaingFromCurrentList = $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId];
+                    } else {
+                        $api = $helper->getApi($magentoStoreId);
+                        $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
+                        if (isset($campaignData['recipients']['list_id']) && $campaignData['recipients']['list_id'] == $listId) {
+                            $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
+                        } else {
+                            $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
+                        }
+                    }
+
+                }
+            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
+                $helper->logError($e->getMessage());
+            } catch (MailChimp_Error $e) {
+                $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
+                $helper->logError($e->getFriendlyMessage());
+            } catch (Exception $e) {
+                $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
+                $helper->logError($e->getMessage());
+            }
+        }
+
+        return $isCampaingFromCurrentList;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Products
+     */
+    protected function getApiProduct()
+    {
+        return Mage::getModel('mailchimp/api_products');
+    }
+
 }

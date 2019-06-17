@@ -268,7 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $magentoStoreId = 1;
         $syncingFlag = '2018-02-01 00:00:00';
         $ecomSyncDateFlag = '2018-02-02 00:00:00';
-        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, 1));
+        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1));
         $sendPromo = $data['sendPromo'];
         $batchArray = array();
         $batchArray['operations'] = $data['batchArray'];
@@ -298,7 +298,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(
                 array('getHelper', 'getApiCustomers', 'getApiProducts',
                     'getApiCarts', 'getApiOrders', 'deleteUnsentItems', 'markItemsAsSent', 'getApiPromoRules',
-                    'getApiPromoCodes', 'getSyncBatchesModel')
+                    'getApiPromoCodes', 'getSyncBatchesModel', '_showResumeEcommerce')
             )
             ->getMock();
 
@@ -360,6 +360,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchesMock->expects($this->once())->method('deleteUnsentItems');
 
+        $apiBatchesMock->expects($this->once())->method('_showResumeEcommerce')->with($batchResponse['id']);
+
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($magentoStoreId)->willReturn(1);
 
         $apiBatchesMock->expects($this->once())->method('getApiCustomers')->willReturn($apiCustomersMock);
@@ -397,9 +399,9 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchesMock->expects($this->once())->method('markItemsAsSent')->with($batchResponse['id'], $mailchimpStoreId);
 
-        $helperMock->expects($this->once())->method('getMCIsSyncing')->with($magentoStoreId)->willReturn($syncingFlag);
+        $helperMock->expects($this->once())->method('getMCIsSyncing')->with($mailchimpStoreId, $magentoStoreId)->willReturn($syncingFlag);
         $helperMock->expects($this->once())->method('validateDate')->with($syncingFlag)->willReturn(true);
-        $helperMock->expects($this->once())->method('getEcommMinSyncDateFlag')->with($magentoStoreId)->willReturn($ecomSyncDateFlag);
+        $helperMock->expects($this->once())->method('getEcommMinSyncDateFlag')->with($mailchimpStoreId, $magentoStoreId)->willReturn($ecomSyncDateFlag);
         $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValue, $magentoStoreId, 'stores');
 
 
@@ -470,7 +472,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $syncBatches = array();
         $syncBatches[] = $syncBatchesTwoMock;
 
-        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturnOnConsecutiveCalls($helperMock);
         $apiBatchesMock->expects($this->once())->method('getSyncBatchesModel')->willReturn($syncBatchesMock);
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($magentoStoreId)->willReturn($mailchimpStoreId);
@@ -537,7 +539,12 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(array('setStoreId', 'setBatchId', 'setStatus', 'save'))
             ->getMock();
 
-        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $apiBatchesMock->expects($this->exactly(2))
+            ->method('getHelper')
+            ->willReturnOnConsecutiveCalls(
+                $helperMock,
+                $helperMock
+            );
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
         $helperMock->expects($this->once())->method('getGeneralList')->with($storeId)->willReturn($listId);
@@ -569,12 +576,9 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
     public function testHandleSyncingValue()
     {
         $magentoStoreId = 1;
-        $scopeId = 0;
-        $scope = 'default';
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $date = '2018-02-02 00:00:00';
         $syncedDateArray = array($mailchimpStoreId => array($magentoStoreId => $date));
-        $scopeToEdit = array('scope' => $scope, 'scope_id' => $scopeId);
         $config = array(array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", $date));
 
         $apiBatchesMock = $this->apiBatchesMock
@@ -584,8 +588,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isEcomSyncDataEnabled', 'getApi', 'getMailChimpScopeByStoreId', 'getConfig',
-                'saveMailchimpConfig', 'createWebhookIfRequired', 'getDateSyncFinishByMailChimpStoreId'))
+            ->setMethods(array('isEcomSyncDataEnabled', 'getApi',
+                'saveMailchimpConfig', 'getDateSyncFinishByMailChimpStoreId'))
             ->getMock();
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
@@ -595,11 +599,6 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
             ->disableOriginalConstructor()
-            ->getMock();
-
-        $configMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('deleteConfig'))
             ->getMock();
 
         $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
@@ -612,13 +611,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiStoresMock->expects($this->once())->method('editIsSyncing')->with($apiMock, false, $mailchimpStoreId);
 
-        $helperMock->expects($this->once())->method('getMailChimpScopeByStoreId')->with($magentoStoreId)->willReturn($scopeToEdit);
-        $helperMock->expects($this->once())->method('getConfig')->willReturn($configMock);
-
-        $configMock->expects($this->once())->method('deleteConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scopeToEdit['scope'], $scopeToEdit['scope_id']);
-
         $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($config, 0, 'default');
-        $helperMock->expects($this->once())->method('createWebhookIfRequired')->with($magentoStoreId);
 
         $apiBatchesMock->handleSyncingValue($syncedDateArray);
     }
