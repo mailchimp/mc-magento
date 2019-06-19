@@ -79,13 +79,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
      */
     protected function getSessionLastRealOrder()
     {
-        $checkoutSession = Mage::getSingleton('checkout/session');
-        $order = $checkoutSession->getLastRealOrder();
-        if (is_null($order)) {
-            $orderId = $checkoutSession->getLastOrderId();
-            $order = Mage::getModel('sales/order')->load($orderId);
-        }
-        return $order;
+        return $this->getMailChimpHelper()->getSessionLastRealOrder();
     }
 
     /**
