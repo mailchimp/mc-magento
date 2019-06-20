@@ -254,14 +254,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
             if (!$isProductEnabled || ($productSyncData->getMailchimpSyncDelta() && $productSyncError == '')) {
                 $itemCount++;
-                $data["lines"][] = [
+                $data["lines"][] = array(
                     "id" => (string)$itemCount,
                     "product_id" => $productId,
                     "product_variant_id" => $variant,
                     "quantity" => (int)$item->getQtyOrdered(),
                     "price" => $item->getPrice(),
                     "discount" => abs($item->getDiscountAmount())
-                ];
+                );
 
                 if (!$isProductEnabled) {
                     // update disabled products to remove the product from mailchimp after sending the order
