@@ -314,7 +314,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $promoRules = $helper->getAllEcommerceSyncDataItemsPerId($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $this->_updateSyncData($ruleId, $mailchimpStoreId, null, null, null, 1, true, false);
+            $this->_updateSyncData($ruleId, $mailchimpStoreId, null, null, 0, 1, true, false);
         }
     }
 
