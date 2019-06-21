@@ -180,5 +180,4 @@ class Mandrill_Tags
         $_params = array();
         return $this->master->call('tags/all-time-series', $_params);
     }
-
 }

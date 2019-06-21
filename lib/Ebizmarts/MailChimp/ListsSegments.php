@@ -17,7 +17,7 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      */
     public $segmentMembers;
 
-    public function getInformation($listId, $fields=null)
+    public function getInformation($listId, $fields = null)
     {
         $_params = array();
         if ($fields) {
@@ -44,28 +44,46 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($listId, $fields=null, $excludeFields=null, $count=null, $offset=null, $type=null,
-        $sinceCreatedAt=null, $beforeCreatedAt=null, $sinceUpdatedAt=null, $beforeUpdatedAt=null
+    public function getAll(
+        $listId,
+        $fields = null,
+        $excludeFields = null,
+        $count = null,
+        $offset = null,
+        $type = null,
+        $sinceCreatedAt = null,
+        $beforeCreatedAt = null,
+        $sinceUpdatedAt = null,
+        $beforeUpdatedAt = null
     ) {
 
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
-        if($type) { $_params['type'] = $type;
+        if ($type) {
+            $_params['type'] = $type;
         }
-        if($sinceCreatedAt) { $_params['since_created_at'] = $sinceCreatedAt;
+        if ($sinceCreatedAt) {
+            $_params['since_created_at'] = $sinceCreatedAt;
         }
-        if($beforeCreatedAt) { $_params['before_created_at'] = $beforeCreatedAt;
+        if ($beforeCreatedAt) {
+            $_params['before_created_at'] = $beforeCreatedAt;
         }
-        if($sinceUpdatedAt) { $_params['since_updated_at'] = $sinceUpdatedAt;
+        if ($sinceUpdatedAt) {
+            $_params['since_updated_at'] = $sinceUpdatedAt;
         }
-        if($beforeUpdatedAt) { $_params['before_updated_at'] = $beforeUpdatedAt;
+        if ($beforeUpdatedAt) {
+            $_params['before_updated_at'] = $beforeUpdatedAt;
         }
         return $this->_master->call('lists/'.$listId.'/segments', $_params, Ebizmarts_MailChimp::GET);
     }
@@ -94,12 +112,14 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($listId, $name, $staticSegment=null, $options=null)
+    public function add($listId, $name, $staticSegment = null, $options = null)
     {
         $_params = array('name'=>$name);
-        if($staticSegment) { $_params['static_segment'] = $staticSegment;
+        if ($staticSegment) {
+            $_params['static_segment'] = $staticSegment;
         }
-        if($options) { $_params['options'] = $options;
+        if ($options) {
+            $_params['options'] = $options;
         }
         return $this->_master->call('lists/'.$listId.'/segments', $_params, Ebizmarts_MailChimp::POST);
     }
@@ -116,14 +136,17 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($listId, $segmentId, $name, $staticSegment=null, $options=null)
+    public function modify($listId, $segmentId, $name, $staticSegment = null, $options = null)
     {
         $_params = array();
-        if($name) { $_params['name'] =$name;
+        if ($name) {
+            $_params['name'] =$name;
         }
-        if($staticSegment) { $_params['static_segment'] = $staticSegment;
+        if ($staticSegment) {
+            $_params['static_segment'] = $staticSegment;
         }
-        if($options) { $_params['options'] = $options;
+        if ($options) {
+            $_params['options'] = $options;
         }
         return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, $_params, Ebizmarts_MailChimp::PATCH);
     }

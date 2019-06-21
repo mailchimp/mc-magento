@@ -33,14 +33,16 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
     protected function _prepareColumns()
     {
         $this->addColumn(
-            'title', array(
+            'title',
+            array(
             'header' => Mage::helper('mailchimp')->__('Title'),
             'index' => 'title',
             'sortable' => true
             )
         );
         $this->addColumn(
-            'status', array(
+            'status',
+            array(
             'header' => Mage::helper('mailchimp')->__('Status'),
             'index' => 'status',
             'width' => '100px',
@@ -48,7 +50,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
-            'regtype', array(
+            'regtype',
+            array(
             'header' => Mage::helper('mailchimp')->__('Reg Type'),
             'index' => 'regtype',
             'width' => '100px',
@@ -56,28 +59,32 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
-            'store_id', array(
+            'store_id',
+            array(
                 'header' => Mage::helper('mailchimp')->__('Store Id'),
                 'index' => 'store_id',
                 'sortable' => false
             )
         );
         $this->addColumn(
-            'errors', array(
+            'errors',
+            array(
                 'header' => Mage::helper('mailchimp')->__('Error'),
                 'index'  => 'errors',
                 'sortable' => false
             )
         );
         $this->addColumn(
-            'batch_id', array(
+            'batch_id',
+            array(
                 'header' => Mage::helper('mailchimp')->__('Batch ID'),
                 'index'  => 'batch_id',
                 'sortable' => false
             )
         );
         $this->addColumn(
-            'action_donwload', array(
+            'action_donwload',
+            array(
                 'header'   => $this->helper('mailchimp')->__('Download Response'),
                 'width'    => 15,
                 'sortable' => false,
@@ -94,7 +101,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
-            'original_id', array(
+            'original_id',
+            array(
             'header' => Mage::helper('mailchimp')->__('Original'),
             'index' => 'original_id',
             'sortable' => false,
@@ -102,7 +110,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Grid extends Mage_Admi
             )
         );
         $this->addColumn(
-            'created_at', array(
+            'created_at',
+            array(
                 'header' => Mage::helper('mailchimp')->__('Created At'),
                 'index' => 'created_at',
                 'sortable' => true,

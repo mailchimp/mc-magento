@@ -182,7 +182,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             try {
                 $action = isset($data['action']) ? $data['action'] : 'delete';
                 switch ($action) {
-                    case 'delete' :
+                    case 'delete':
                         //if config setting "Webhooks Delete action" is set as "Delete customer account"
                         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $subscriber->getStoreId())) {
                             $subscriber->delete();
@@ -263,7 +263,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     } catch (Exception $e) {
                         $helper->logError($e->getMessage());
                     }
-
                 }
             }
         }
@@ -278,5 +277,4 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $where = array("fired_at < NOW() - INTERVAL 30 DAY AND processed = 1");
         $connection->delete($tableName, $where);
     }
-
 }

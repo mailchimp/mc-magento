@@ -31,14 +31,13 @@ $installer->run(
 "
 );
 
-try{
+try {
     $installer->run(
         "
       ALTER TABLE `{$this->getTable('mailchimp_sync_batches')}` MODIFY `store_id` VARCHAR(50) NOT NULL;
     "
     );
-}
-catch(Exception $e){
+} catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 

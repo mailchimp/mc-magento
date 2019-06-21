@@ -17,9 +17,16 @@ class MailChimp_Automation extends MailChimp_Abstract
      */
     public $emails;
 
-    public function get($id = null, $fields = null, $excludeFields = null, $status = null, $beforeSendTime = null,
-                        $sinceSendTime = null, $beforeCreateTime = null, $sinceCreateTime = null)
-    {
+    public function get(
+        $id = null,
+        $fields = null,
+        $excludeFields = null,
+        $status = null,
+        $beforeSendTime = null,
+        $sinceSendTime = null,
+        $beforeCreateTime = null,
+        $sinceCreateTime = null
+    ) {
         $_params = array();
         if ($fields) {
             $_params['fields'] = $fields;

@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
                     $this->_stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                     $helper->logError($e->getMessage());
-                } catch(MailChimp_Error $e) {
+                } catch (MailChimp_Error $e) {
                     $helper->logError($e->getMessage());
                 }
             }
@@ -55,10 +55,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
             $stores[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp Store ---'));
             foreach ($mcStores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
-                    if($store['list_id']=='') {
+                    if ($store['list_id']=='') {
                         continue;
                     }
-                    if(isset($store['connected_site'])) {
+                    if (isset($store['connected_site'])) {
                         $label = $store['name'];
                     } else {
                         $label = $store['name'] . ' (' . $helper->__("Warning: not connected") . ')';
@@ -96,5 +96,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
     {
         return $this->_stores;
     }
-
 }

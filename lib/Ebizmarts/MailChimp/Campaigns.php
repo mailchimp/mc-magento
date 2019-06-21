@@ -26,10 +26,23 @@ class MailChimp_Campaigns extends MailChimp_Abstract
      */
     public $sendChecklist;
 
-    public function get($id = null, $fields = null, $excludeFields = null, $count = null, $offset = null,
-                        $type = null, $status = null, $beforeSendTime = null, $sinceSendTime = null, $beforeCreateTime = null,
-                        $sinceCreateTime = null, $listId = null, $folderId = null, $sortField = null, $sortDir = null)
-    {
+    public function get(
+        $id = null,
+        $fields = null,
+        $excludeFields = null,
+        $count = null,
+        $offset = null,
+        $type = null,
+        $status = null,
+        $beforeSendTime = null,
+        $sinceSendTime = null,
+        $beforeCreateTime = null,
+        $sinceCreateTime = null,
+        $listId = null,
+        $folderId = null,
+        $sortField = null,
+        $sortDir = null
+    ) {
         $_params = array();
         if ($fields) {
             $_params['fields'] = $fields;

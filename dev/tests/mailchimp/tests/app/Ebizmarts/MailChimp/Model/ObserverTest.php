@@ -775,7 +775,6 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $quoteMock->expects($this->once())->method('setMailchimpLandingPage')->with($landingCookie);
 
         $observerMock->loadCustomerToQuote($eventObserverMock);
-
     }
 
     public function loadCustomerToQuoteDataProvider()
@@ -1288,7 +1287,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->willReturnOnConsecutiveCalls(
                 $productId,
                 $productId,
-                $productId);
+                $productId
+            );
 
         $mailchimpObserverMock->productSaveAfter($observerMock);
     }

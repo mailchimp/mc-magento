@@ -414,7 +414,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         ));
 
         return $allCases;
-
     }
 
     /**

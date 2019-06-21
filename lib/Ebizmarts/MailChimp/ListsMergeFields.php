@@ -27,20 +27,26 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($listId,$fields=null,$excludeFields=null,$count=null,$offset=null,$type=null,$required=null)
+    public function getAll($listId, $fields = null, $excludeFields = null, $count = null, $offset = null, $type = null, $required = null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
-        if($type) { $_params['type'] = $type;
+        if ($type) {
+            $_params['type'] = $type;
         }
-        if($required) { $_params['required'] = $required;
+        if ($required) {
+            $_params['required'] = $required;
         }
         return $this->_master->call('lists/'.$listId.'/merge-fields', $_params, Ebizmarts_MailChimp::GET);
     }
@@ -52,7 +58,7 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function get($listId,$mergeId)
+    public function get($listId, $mergeId)
     {
         return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, null, Ebizmarts_MailChimp::GET);
     }
@@ -72,24 +78,40 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($listId,$name,$type,$displayOrder=null,$tag=null,$required=null,$defaulValue=null,$public=true,
-        $options=null,$helpText=null
+    public function add(
+        $listId,
+        $name,
+        $type,
+        $displayOrder = null,
+        $tag = null,
+        $required = null,
+        $defaulValue = null,
+        $public = true,
+        $options = null,
+        $helpText = null
     ) {
 
         $_params = array('name'=>$name,'type'=>$type);
-        if($tag) { $_params['tag'] = $tag;
+        if ($tag) {
+            $_params['tag'] = $tag;
         }
-        if($required) { $_params['required'] = $required;
+        if ($required) {
+            $_params['required'] = $required;
         }
-        if($defaulValue) { $_params['default_value'] = $defaulValue;
+        if ($defaulValue) {
+            $_params['default_value'] = $defaulValue;
         }
-        if($public) { $_params['public'] = $public;
+        if ($public) {
+            $_params['public'] = $public;
         }
-        if($displayOrder) { $_params['display_order'] = $displayOrder;
+        if ($displayOrder) {
+            $_params['display_order'] = $displayOrder;
         }
-        if($options) { $_params['options'] = $options;
+        if ($options) {
+            $_params['options'] = $options;
         }
-        if($helpText) { $_params['help_text'] = $helpText;
+        if ($helpText) {
+            $_params['help_text'] = $helpText;
         }
         return $this->_master->call('lists/'.$listId.'/merge-fields/', $_params, Ebizmarts_MailChimp::POST);
     }
@@ -110,28 +132,47 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($listId, $mergeId, $displayOrder, $tag=null, $name=null, $type=null, $required=null,
-        $defaulValue=null, $public=null, $options=null, $helpText=null
+    public function modify(
+        $listId,
+        $mergeId,
+        $displayOrder,
+        $tag = null,
+        $name = null,
+        $type = null,
+        $required = null,
+        $defaulValue = null,
+        $public = null,
+        $options = null,
+        $helpText = null
     ) {
 
         $_params = array();
-        if($name) { $_params['name'] = $name;
+        if ($name) {
+            $_params['name'] = $name;
         }
-        if($type) { $_params['type'] = $type;
+        if ($type) {
+            $_params['type'] = $type;
         }
-        if($tag) { $_params['tag'] = $tag;
+        if ($tag) {
+            $_params['tag'] = $tag;
         }
-        if($required) { $_params['required'] = $required;
+        if ($required) {
+            $_params['required'] = $required;
         }
-        if($defaulValue) { $_params['default_value'] = $defaulValue;
+        if ($defaulValue) {
+            $_params['default_value'] = $defaulValue;
         }
-        if($public) { $_params['public'] = $public;
+        if ($public) {
+            $_params['public'] = $public;
         }
-        if($displayOrder) { $_params['display_order'] = $displayOrder;
+        if ($displayOrder) {
+            $_params['display_order'] = $displayOrder;
         }
-        if($options) { $_params['options'] = $options;
+        if ($options) {
+            $_params['options'] = $options;
         }
-        if($helpText) { $_params['help_text'] = $helpText;
+        if ($helpText) {
+            $_params['help_text'] = $helpText;
         }
         return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, $_params, Ebizmarts_MailChimp::PATCH);
     }
@@ -143,7 +184,7 @@ class MailChimp_ListsMergeFields extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function delete($listId,$mergeId)
+    public function delete($listId, $mergeId)
     {
         return $this->_master->call('lists/'.$listId.'/merge-fields/'.$mergeId, null, Ebizmarts_MailChimp::DELETE);
     }

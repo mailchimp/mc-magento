@@ -136,5 +136,4 @@ class Mandrill_Users
         $_params = array();
         return $this->master->call('users/senders', $_params);
     }
-
 }

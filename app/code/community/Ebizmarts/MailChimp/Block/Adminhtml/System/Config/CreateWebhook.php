@@ -6,8 +6,7 @@
  * Time: 4:15 PM
  */
 
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateWebhook
-    extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateWebhook extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected function _construct()
     {

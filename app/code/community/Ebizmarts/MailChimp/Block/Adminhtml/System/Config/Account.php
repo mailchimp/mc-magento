@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Account extends Mage_Adm
                 $html .= "<li style='color:red;font-weight: bold;'>{$dat['label']}</li>";
             } elseif ($dat['value'] == $firstMigrationKey) {
                 $html .= "<li style='color:forestgreen;font-weight: bold;'>{$dat['label']}</li>";
-            } elseif($dat['value'] == $syncLabelKey) {
+            } elseif ($dat['value'] == $syncLabelKey) {
                 $html = $this->getSyncFlagDataHtml($dat, $html);
             } else {
                 $html .= "<li>{$dat['label']}</li>";
