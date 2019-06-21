@@ -142,6 +142,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
     {
         $mailchimpStoreId = '44a100c71040d4ec27fd707d7c667114';
         $magentoStoreId = '1';
+        $oldStore = $magentoStoreId;
         $orderIncrementId = 100;
         $campaignId = 'b6asda8q5';
         $mailchimpLandingPage = 'test';
@@ -197,12 +198,14 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerceSyncDataItem'))
+            ->setMethods(array('getEcommerceSyncDataItem','getCurrentStoreId','setCurrentStore'))
             ->getMock();
 
         $apiProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isProductEnabled'))
+            ->setMethods(array(
+                'isProductEnabled'
+            ))
             ->getMock();
 
         $ordersApiMock = $this->ordersApiMock
@@ -461,6 +464,18 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getIdBySku')
             ->with($sku)
             ->willReturn($variant);
+
+        $helperMock->expects($this->once())
+            ->method('getCurrentStoreId')
+            ->willReturn($magentoStoreId);
+
+        $helperMock->expects($this->exactly(2))
+            ->method('setCurrentStore')
+            ->withConsecutive(
+                $magentoStoreId,
+                $oldStore
+            );
+
 
         $helperMock->expects($this->once())
             ->method('getEcommerceSyncDataItem')

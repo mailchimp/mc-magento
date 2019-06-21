@@ -25,6 +25,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         $magentoStoreId = 0;
         $mailchimpStoreId = 'dasds231231312';
+        $oldStore = $magentoStoreId;
         $products = array();
         $productId = 15;
         $syncDataItemId = 2;
@@ -57,7 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->setMethods(array('getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
+            ->setMethods(array('getCurrentStoreId','setCurrentStore','getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
@@ -83,6 +84,16 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->expects($this->once())->method('_buildNewProductRequest')->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn($productData);
         $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productId, $mailchimpStoreId);
 
+        $helperMock->expects($this->once())
+            ->method('getCurrentStoreId')
+            ->willReturn($magentoStoreId);
+
+        $helperMock->expects($this->exactly(2))
+            ->method('setCurrentStore')
+            ->withConsecutive(
+                $magentoStoreId,
+                $oldStore
+            );
 
         $helperMock->expects($this->once())
             ->method('getEcommerceSyncDataItem')
