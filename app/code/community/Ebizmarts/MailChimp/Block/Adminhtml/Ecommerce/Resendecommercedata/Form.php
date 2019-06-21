@@ -9,7 +9,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
 
 
         $fieldset->addField(
-            'products', 'checkbox', array(
+            'products',
+            'checkbox',
+            array(
                 'name'  => 'filter[]',
                 'label' => "Products",
                 'id'    => 'products',
@@ -20,7 +22,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
             )
         );
         $fieldset->addField(
-            'customers', 'checkbox', array(
+            'customers',
+            'checkbox',
+            array(
                 'name' => 'filter[]',
                 'label' => "Customers",
                 'id' => 'customers',
@@ -31,7 +35,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
             )
         );
         $fieldset->addField(
-            'orders', 'checkbox', array(
+            'orders',
+            'checkbox',
+            array(
                 'name' => 'filter[]',
                 'label' => "Orders",
                 'id' => 'orders',
@@ -42,7 +48,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
             )
         );
         $fieldset->addField(
-            'carts', 'checkbox', array(
+            'carts',
+            'checkbox',
+            array(
                 'name' => 'filter[]',
                 'label' => "Carts",
                 'id' => 'carts',
@@ -53,7 +61,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
             )
         );
         $fieldset->addField(
-            'promo', 'checkbox', array(
+            'promo',
+            'checkbox',
+            array(
                 'name' => 'filter[]',
                 'label' => "Promo Rules",
                 'id' => 'promo',

@@ -37,9 +37,20 @@ class MailChimp_EcommercePromoRules extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId, $promoRuleId, $title = null, $description, $amount, $type, $target, $starts_at = null, $ends_at = null,
-                        $enabled = null, $created_at_foreign = null, $updated_at_foreign = null)
-    {
+    public function add(
+        $storeId,
+        $promoRuleId,
+        $title = null,
+        $description,
+        $amount,
+        $type,
+        $target,
+        $starts_at = null,
+        $ends_at = null,
+        $enabled = null,
+        $created_at_foreign = null,
+        $updated_at_foreign = null
+    ) {
         $_params = array('id' => $promoRuleId, 'description' => $description, 'amount' => $amount, 'type' => $type, 'target' => $target);
 
         if ($title) {
@@ -134,9 +145,20 @@ class MailChimp_EcommercePromoRules extends MailChimp_Abstract
      * @param null      $updated_at_foreign     The date and time the promotion was updated in ISO 8601 format.
      * @return mixed
      */
-    public function modify($storeId, $promoRuleId, $title = null, $description, $amount, $type, $target, $starts_at = null, $ends_at = null,
-                           $enabled = null, $created_at_foreign = null, $updated_at_foreign = null)
-    {
+    public function modify(
+        $storeId,
+        $promoRuleId,
+        $title = null,
+        $description,
+        $amount,
+        $type,
+        $target,
+        $starts_at = null,
+        $ends_at = null,
+        $enabled = null,
+        $created_at_foreign = null,
+        $updated_at_foreign = null
+    ) {
         $_params = array();
         if ($title) {
             $_params['title'] = $title;

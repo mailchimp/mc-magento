@@ -73,5 +73,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
             return array(array('value' => '', 'label' => $helper->__($this->_account_details)));
         }
     }
-
 }

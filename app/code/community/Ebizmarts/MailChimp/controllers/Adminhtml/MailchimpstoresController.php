@@ -150,7 +150,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $connection->delete($tableName);
 
         foreach ($allApiKeys as $apiKey) {
-
             try {
                 $api = $helper->getApiByKey($apiKey);
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
@@ -172,7 +171,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
             foreach ($stores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
-
                     try {
                         $list = $api->getLists()->getLists($store['list_id']);
                     } catch (MailChimp_Error $e) {

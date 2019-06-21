@@ -78,7 +78,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
-
                 if ($subscriber->getMailchimpSyncModified()) {
                     $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
                 } else {
@@ -122,7 +121,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
-        if(count($interest)) {
+        if (count($interest)) {
             $data['interests'] = $interest;
         }
 
@@ -140,8 +139,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->mcHelper;
         $interestsAvailable = $helper->getInterest($storeId);
         $interest = $helper->getInterestGroups(null, $subscriber->getSubscriberId(), $storeId, $interestsAvailable);
-        foreach($interest as $i) {
-            foreach($i['category'] as $key=>$value) {
+        foreach ($interest as $i) {
+            foreach ($i['category'] as $key => $value) {
                 $rc[$value['id']] = $value['checked'];
             }
         }
@@ -254,7 +253,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             }
 
                             Mage::dispatchEvent(
-                                'mailchimp_merge_field_send_before', array(
+                                'mailchimp_merge_field_send_before',
+                                array(
                                     'customer_id' => $customer->getId(),
                                     'subscriber_email' => $subscriberEmail,
                                     'merge_field_tag' => $attributeCode,
@@ -326,7 +326,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     }
 
                     Mage::dispatchEvent(
-                        'mailchimp_merge_field_send_before', array(
+                        'mailchimp_merge_field_send_before',
+                        array(
                             'customer_id' => $customer->getId(),
                             'subscriber_email' => $subscriberEmail,
                             'merge_field_tag' => $customAtt,
@@ -344,7 +345,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $newVars = new Varien_Object;
 
         Mage::dispatchEvent(
-            'mailchimp_merge_field_send_after', array(
+            'mailchimp_merge_field_send_after',
+            array(
                 'subscriber' => $subscriber,
                 'vars' => $mergeVars,
                 'new_vars' => $newVars
@@ -386,8 +388,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
-                    $listId, $md5HashEmail, $subscriber->getSubscriberEmail(), $newStatus, null, $forceStatus, $mergeVars,
-                    $interest, $language, null, null
+                    $listId,
+                    $md5HashEmail,
+                    $subscriber->getSubscriberEmail(),
+                    $newStatus,
+                    null,
+                    $forceStatus,
+                    $mergeVars,
+                    $interest,
+                    $language,
+                    null,
+                    null
                 );
                 $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
                 $subscriber->setData("mailchimp_sync_error", "");

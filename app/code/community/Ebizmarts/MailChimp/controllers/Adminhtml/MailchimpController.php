@@ -108,7 +108,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         $response = $this->getResponse();
         $response->setHeader('Content-type', 'application/json');
         $response->setBody($jsonData);
-
     }
 
     public function getListAction()

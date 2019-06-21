@@ -77,5 +77,4 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_GroupsTest extends PHPUnit_Fram
 
         $groupsMock->getInterest();
     }
-
 }

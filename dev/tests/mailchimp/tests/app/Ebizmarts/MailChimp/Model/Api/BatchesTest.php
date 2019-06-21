@@ -247,7 +247,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiBatchesMock->handleEcommerceBatches();
     }
 
-    public function handleEcommerceBatchesDataProvider(){
+    public function handleEcommerceBatchesDataProvider()
+    {
 
         return array(
             array(array('mailchimp_api_status' => true, 'isEcomSyncDataEnabled' => 1, '_getResults' => 1, '_sendEcommerceBatch' => 1, 'handleResendDataAfter' => 1, 'addSyncValueToArray' => 1,

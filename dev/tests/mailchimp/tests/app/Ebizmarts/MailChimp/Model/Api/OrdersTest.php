@@ -48,7 +48,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
      * @dataProvider getPromoDataProvider
      */
 
-    public function testGetPromoData($type){
+    public function testGetPromoData($type)
+    {
 
         if ($type == 'by_percent') {
             $assertType = 'percentage';
@@ -93,7 +94,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $result = $modelMock->getPromoData($orderMock);
 
         $this->assertEquals($result, array(array('code' => 'aa12', 'amount_discounted' => 10, 'type' => $assertType)));
-
     }
 
     public function getPromoDataProvider()
@@ -106,7 +106,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         );
     }
 
-    public function testGetSyncedOrder(){
+    public function testGetSyncedOrder()
+    {
 
         $orderId = 1;
         $mailchimpStoreId = '5axx998994cxxxx47e6b3b5dxxxx26e2';
@@ -667,5 +668,4 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId);
     }
-
 }
