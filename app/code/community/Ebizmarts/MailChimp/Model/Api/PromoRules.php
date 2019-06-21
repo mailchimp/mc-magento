@@ -161,7 +161,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $mailchimpTableName = $this->getSyncDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId), array(
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId),
+            array(
                 "m4m.related_id",
                 "m4m.type",
                 "m4m.mailchimp_store_id",

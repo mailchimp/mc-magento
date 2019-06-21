@@ -88,5 +88,4 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_IndexTest extends PHPUnit_Fr
 
         $indexMock->getInterest();
     }
-
 }

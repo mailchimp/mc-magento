@@ -1,6 +1,6 @@
 <?php
 
-class MailChimpTest  extends PHPUnit_Framework_TestCase
+class MailChimpTest extends PHPUnit_Framework_TestCase
 {
 
     public function setUp()
@@ -30,5 +30,4 @@ class MailChimpTest  extends PHPUnit_Framework_TestCase
         $this->assertObjectHasAttribute('templateFolders', $apiMock);
         $this->assertObjectHasAttribute('templates', $apiMock);
     }
-
 }

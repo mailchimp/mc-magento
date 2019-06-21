@@ -4,7 +4,7 @@
  * Date: 2/20/19
  * Time: 3:11 PM
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest  extends PHPUnit_Framework_TestCase
+class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var \Ebizmarts_MailChimp_Block_Adminhtml_Notifications $_block

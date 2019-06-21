@@ -353,7 +353,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             $groupedProductId,
             $oldProductId,
             $newProductId
-            );
+        );
 
         $productsApiMock->expects($this->exactly(3))->method('loadProductById')->withConsecutive(
             array($groupedProductId),
@@ -435,7 +435,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         );
 
         $return = $productsApiMock->sendModifiedProduct($orderMock, $mailchimpStoreId, $magentoStoreId);
-
     }
 
     /**
@@ -554,7 +553,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
 
         $productsApiMock->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
-
     }
 
     /**
@@ -674,7 +672,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->with(
                 'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
                 date('Y-m-d', $time)." 00:00:00"
-
             );
 
 
@@ -732,7 +729,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->_markSpecialPrices($mailchimpStoreId, $magentoStoreId);
     }
 
-    public function testJoinMailchimpSyncData(){
+    public function testJoinMailchimpSyncData()
+    {
         $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
         $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
 

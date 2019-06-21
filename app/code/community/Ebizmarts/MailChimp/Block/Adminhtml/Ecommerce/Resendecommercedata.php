@@ -22,5 +22,4 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata extends 
     public function _prepareForm()
     {
     }
-
 }

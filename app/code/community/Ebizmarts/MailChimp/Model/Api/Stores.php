@@ -29,10 +29,17 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @throws Exception
      */
     public function createMailChimpStore(
-        $apiKey, $listId, $storeName, $currencyCode, $storeDomain, $storeEmail,
-        $primaryLocale, $timeZone, $storePhone, $address
-    )
-    {
+        $apiKey,
+        $listId,
+        $storeName,
+        $currencyCode,
+        $storeDomain,
+        $storeEmail,
+        $primaryLocale,
+        $timeZone,
+        $storePhone,
+        $address
+    ) {
         $helper = $this->makeHelper();
         $date = $helper->getDateMicrotime();
         $mailchimpStoreId = md5($storeName . '_' . $date);
@@ -90,10 +97,17 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @throws Mage_Core_Exception
      */
     public function editMailChimpStore(
-        $mailchimpStoreId, $apiKey, $storeName, $currencyCode, $storeDomain, $storeEmail,
-        $primaryLocale, $timeZone, $storePhone, $address
-    )
-    {
+        $mailchimpStoreId,
+        $apiKey,
+        $storeName,
+        $currencyCode,
+        $storeDomain,
+        $storeEmail,
+        $primaryLocale,
+        $timeZone,
+        $storePhone,
+        $address
+    ) {
         $helper = $this->makeHelper();
 
         try {

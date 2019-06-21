@@ -118,5 +118,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     {
         return $this->_lists;
     }
-
 }

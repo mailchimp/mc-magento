@@ -455,7 +455,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $result = $helperMock->getImageFunctionName($imageSize);
 
         $this->assertEquals($result, 'getImageSizeUrl');
-
     }
 
     public function testSetImageSizeVarToArray()
@@ -804,7 +803,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             array($newApiKey)
         )->willReturnOnConsecutiveCalls(
             $apiMock,
-            $apiMock);
+            $apiMock
+        );
 
         $apiMock->expects($this->exactly(2))->method('getRoot')->willReturn($apiRootMock);
 
@@ -1353,7 +1353,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $modelConfigMock->expects($this->once())->method('cleanCache');
 
         $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
-
     }
 
     public function testGetSessionLastRealOrderM19()

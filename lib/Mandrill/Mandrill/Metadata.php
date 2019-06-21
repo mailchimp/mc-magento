@@ -68,5 +68,4 @@ class Mandrill_Metadata
         $_params = array("name" => $name);
         return $this->master->call('metadata/delete', $_params);
     }
-
 }

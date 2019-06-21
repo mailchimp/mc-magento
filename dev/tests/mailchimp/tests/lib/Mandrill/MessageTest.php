@@ -66,5 +66,4 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
 
         return $mp;
     }
-
 }
