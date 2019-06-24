@@ -677,10 +677,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false)
     {
         if ($scopeId == 0 && $deleteErrorsOnly) {
+            $this->logDebug("Removing ecommerce sync data errors for scope ID $scopeId scope $scope", $scopeId, $scope);
             $this->removeAllEcommerceSyncDataErrors();
+            $this->logInfo("Removed ecommerce sync data errors for scope ID $scopeId scope $scope", $scopeId, $scope);
         } else {
             $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
+            $this->logDebug("Removing all ecommerce sync data for scope ID $scopeId scope $scope", $scopeId, $scope);
             $this->removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly);
+            $this->logInfo("Removed all ecommerce sync data for scope ID $scopeId scope $scope", $scopeId, $scope);
         }
     }
 
@@ -696,7 +700,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         try {
             $connection->delete($tableName, $where);
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $this->logError("Failed to remove all ecommerce sync data errors: " . $e->getMessage());
         }
     }
 
@@ -718,7 +722,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         try {
             $connection->delete($tableName, $where);
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $this->logError("Failed to remove ecommerce sync data for mailchimp store $mailchimpStoreId:" . $e->getMessage());
         }
     }
 
@@ -997,10 +1001,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->handleOldErrors();
 
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-        if ($excludeSubscribers) {
-            $this->clearErrorGridByMCStore($mailchimpStoreId);
-        } else {
-            $this->clearErrorGridByStoreId($scopeId);
+        try {
+            $this->logDebug("Clearing error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope", $scopeId, $scope);
+            if ($excludeSubscribers) {
+                $this->clearErrorGridByMCStore($mailchimpStoreId);
+            } else {
+                $this->clearErrorGridByStoreId($scopeId);
+            }
+            $this->logInfo("Cleared error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope", $scopeId, $scope);
+        } catch (Exception $e) {
+            $this->logError("Failed to clear error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope: " . $e->getMessage(), $scopeId, $scope);
         }
     }
 
@@ -2580,7 +2590,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                 }
                 if ($createWebhook) {
+                    $this->logDebug("MC-API Request: Adding web hook url $hookUrl for list ID $listId");
                     $newWebhook = $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                    $this->logNotice("MC-API Request: Added web hook url $hookUrl for list ID $listId");
                     $newWebhookId = $newWebhook['id'];
                     $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
                     $this->saveMailchimpConfig($configValues, $scopeId, $scope);
