@@ -132,7 +132,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
             $totalListSubscribers = null;
             if (isset($this->_accountDetails['list_subscribers'])) {
-                $totalListSubscribersText = $helper->__('Total List Subscribers:');
+                $totalListSubscribersText = $helper->__('Total Audience Subscribers:');
                 $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
             }
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];

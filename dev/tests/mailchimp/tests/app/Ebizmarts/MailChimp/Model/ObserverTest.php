@@ -1063,7 +1063,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $scopeArray = array('scope_id' => '1', 'scope' => 'stores');
         $oldMailchimpStoreId = 'a1s2d3f4g5h6j7k8l9p0';
         $storeListId = 'g5f4d3s2a1';
-        $message = 'The list configuration was automatically modified to show the list associated to the selected Mailchimp store.';
+        $message = 'The audience configuration was automatically modified to show the audience associated to the selected Mailchimp store.';
 
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
@@ -1132,7 +1132,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             'apikey' => array('value' => $apiKey)
         ))));
         $scopeArray = array('scope_id' => '1', 'scope' => 'stores');
-        $message = 'The Mailchimp store configuration was not modified. There is a Mailchimp list configured for this scope. Both must be set to inherit at the same time.';
+        $message = 'The Mailchimp store configuration was not modified. There is a Mailchimp audience configured for this scope. Both must be set to inherit at the same time.';
 
         $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
