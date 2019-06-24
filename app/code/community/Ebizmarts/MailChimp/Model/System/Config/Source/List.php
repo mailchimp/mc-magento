@@ -57,7 +57,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
                         $apiKeyArray = explode('-', $apiKey);
                         $anchorUrl = 'https://' . $apiKeyArray[1] . '.admin.mailchimp.com/lists/new-list/';
                         $htmlAnchor = '<a target="_blank" href="' . $anchorUrl . '">' . $anchorUrl . '</a>';
-                        $message = 'Please create a list at ' . $htmlAnchor;
+                        $message = 'Please create an audience at ' . $htmlAnchor;
                         Mage::getSingleton('adminhtml/session')->addWarning($message);
                     }
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
