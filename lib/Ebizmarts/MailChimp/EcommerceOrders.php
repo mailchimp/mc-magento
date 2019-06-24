@@ -40,30 +40,52 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId, $id, $customer, $currencyCode, $orderTotal, $lines, $campaignId =null,
-        $financialStatus=null, $fullfillmentStatus=null, $taxTotal=null, $processedAtForeign=null,
-        $cancelledAtForeign=null, $updateAtForeign=null, $shippingAddress=null, $billingAddress=null
+    public function add(
+        $storeId,
+        $id,
+        $customer,
+        $currencyCode,
+        $orderTotal,
+        $lines,
+        $campaignId = null,
+        $financialStatus = null,
+        $fullfillmentStatus = null,
+        $taxTotal = null,
+        $processedAtForeign = null,
+        $cancelledAtForeign = null,
+        $updateAtForeign = null,
+        $shippingAddress = null,
+        $billingAddress = null
     ) {
 
         $_params=array('id'=>$id, 'customer'=>$customer, 'currency_code'=>$currencyCode, 'order_total'=>$orderTotal,
             'lines'=>$lines);
-        if($campaignId) { $_params['campaign_id'] = $campaignId;
+        if ($campaignId) {
+            $_params['campaign_id'] = $campaignId;
         }
-        if($financialStatus) { $_params['financial_status'] = $financialStatus;
+        if ($financialStatus) {
+            $_params['financial_status'] = $financialStatus;
         }
-        if($fullfillmentStatus) { $_params['fullfillment_status'] = $fullfillmentStatus;
+        if ($fullfillmentStatus) {
+            $_params['fullfillment_status'] = $fullfillmentStatus;
         }
-        if($taxTotal) { $_params['tax_total'] = $taxTotal;
+        if ($taxTotal) {
+            $_params['tax_total'] = $taxTotal;
         }
-        if($processedAtForeign) { $_params['processed_at_foreign'] = $processedAtForeign;
+        if ($processedAtForeign) {
+            $_params['processed_at_foreign'] = $processedAtForeign;
         }
-        if($cancelledAtForeign) { $_params['cancelled_at_foreign'] = $cancelledAtForeign;
+        if ($cancelledAtForeign) {
+            $_params['cancelled_at_foreign'] = $cancelledAtForeign;
         }
-        if($updateAtForeign) { $_params['update_at_foreign'] = $updateAtForeign;
+        if ($updateAtForeign) {
+            $_params['update_at_foreign'] = $updateAtForeign;
         }
-        if($shippingAddress) { $_params['shipping_address'] = $shippingAddress;
+        if ($shippingAddress) {
+            $_params['shipping_address'] = $shippingAddress;
         }
-        if($billingAddress) { $_params['billing_address'] = $billingAddress;
+        if ($billingAddress) {
+            $_params['billing_address'] = $billingAddress;
         }
         return $this->_master->call('ecommerce/stores/'.$storeId.'/orders', $_params, Ebizmarts_MailChimp::POST);
     }
@@ -82,18 +104,23 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($storeId,$fields=null,$excludeFields=null,$count=null,$offset=null,$customerId=null)
+    public function getAll($storeId, $fields = null, $excludeFields = null, $count = null, $offset = null, $customerId = null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
-        if($customerId) { $_params['customer_id'] = $customerId;
+        if ($customerId) {
+            $_params['customer_id'] = $customerId;
         }
         return $this->_master->call('ecommerce/stores/'.$storeId.'/orders', $_params, Ebizmarts_MailChimp::GET);
     }
@@ -109,12 +136,14 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function get($storeId,$orderId,$fields=null,$excludeFields=null)
+    public function get($storeId, $orderId, $fields = null, $excludeFields = null)
     {
         $_params = array();
-        if($fields) { $_params['fields']= $fields;
+        if ($fields) {
+            $_params['fields']= $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
@@ -141,38 +170,63 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($storeId, $orderId, $customer=null, $campaignId=null, $financialStatus=null,
-        $fullfillmentStatus=null, $currencyCode=null, $orderTotal=null, $taxTotal=null,
-        $processedAtForeign=null,$cancelledAtForeign=null, $updateAtForeign=null,
-        $shippingAddress=null, $billingAddress=null, $lines=null
+    public function modify(
+        $storeId,
+        $orderId,
+        $customer = null,
+        $campaignId = null,
+        $financialStatus = null,
+        $fullfillmentStatus = null,
+        $currencyCode = null,
+        $orderTotal = null,
+        $taxTotal = null,
+        $processedAtForeign = null,
+        $cancelledAtForeign = null,
+        $updateAtForeign = null,
+        $shippingAddress = null,
+        $billingAddress = null,
+        $lines = null
     ) {
 
         $_params = array();
-        if($customer) { $_params['customer'] = $customer;
+        if ($customer) {
+            $_params['customer'] = $customer;
         }
-        if($campaignId) { $_params['campaign_id'] = $campaignId;
+        if ($campaignId) {
+            $_params['campaign_id'] = $campaignId;
         }
-        if($financialStatus) { $_params['financial_status'] = $financialStatus;
+        if ($financialStatus) {
+            $_params['financial_status'] = $financialStatus;
         }
-        if($fullfillmentStatus) { $_params['fullfillment_status'] = $fullfillmentStatus;
+        if ($fullfillmentStatus) {
+            $_params['fullfillment_status'] = $fullfillmentStatus;
         }
-        if($currencyCode) { $_params['currency_code'] = $currencyCode;
+        if ($currencyCode) {
+            $_params['currency_code'] = $currencyCode;
         }
-        if($orderTotal) {  $_params['order_total'] = $orderTotal;
+        if ($orderTotal) {
+            $_params['order_total'] = $orderTotal;
         }
-        if($taxTotal) { $_params['tax_total'] = $taxTotal;
+        if ($taxTotal) {
+            $_params['tax_total'] = $taxTotal;
         }
-        if($processedAtForeign) { $_params['processed_at_foreign'] = $processedAtForeign;
+        if ($processedAtForeign) {
+            $_params['processed_at_foreign'] = $processedAtForeign;
         }
-        if($cancelledAtForeign) { $_params['cancelled_at_foreign'] = $cancelledAtForeign;
+        if ($cancelledAtForeign) {
+            $_params['cancelled_at_foreign'] = $cancelledAtForeign;
         }
-        if($updateAtForeign) { $_params['update_at_foreign'] = $updateAtForeign;
+        if ($updateAtForeign) {
+            $_params['update_at_foreign'] = $updateAtForeign;
         }
-        if($shippingAddress) { $_params['shipping_address'] = $shippingAddress;
+        if ($shippingAddress) {
+            $_params['shipping_address'] = $shippingAddress;
         }
-        if($billingAddress) { $_params['billing_address'] = $billingAddress;
+        if ($billingAddress) {
+            $_params['billing_address'] = $billingAddress;
         }
-        if($lines) { $_params['lines'] = $lines;
+        if ($lines) {
+            $_params['lines'] = $lines;
         }
         $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::PATCH);
@@ -185,7 +239,7 @@ class MailChimp_EcommerceOrders extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function delete($storeId,$orderId)
+    public function delete($storeId, $orderId)
     {
         $url = 'ecommerce/stores/'.$storeId.'/orders/'.$orderId;
         return $this->_master->call($url, null, Ebizmarts_MailChimp::DELETE);

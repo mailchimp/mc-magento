@@ -52,7 +52,8 @@ class Mandrill_Message extends Mandrill_Mandrill
      * @param null $filename
      * @return Zend_Mime_Part
      */
-    public function createAttachment($body,
+    public function createAttachment(
+        $body,
         $mimeType = Zend_Mime::TYPE_OCTETSTREAM,
         $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
         $encoding = Zend_Mime::ENCODING_BASE64,
@@ -80,7 +81,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     public function getAttachments()
     {
         $_attachments = array();
-        foreach($this->_attachments as $attachment) {
+        foreach ($this->_attachments as $attachment) {
             /** @var Zend_Mime_Part $attachment */
             $_attachments[] = array(
                 'type' => $attachment->type,

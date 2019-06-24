@@ -244,5 +244,4 @@ class Mandrill_Templates
         $_params = array("template_name" => $template_name, "template_content" => $template_content, "merge_vars" => $merge_vars);
         return $this->master->call('templates/render', $_params);
     }
-
 }

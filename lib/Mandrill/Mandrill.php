@@ -77,11 +77,14 @@ class Mandrill_Mandrill
 
     public function __construct($apikey = null)
     {
-        if (!$apikey) { $apikey = getenv('MANDRILL_APIKEY');
+        if (!$apikey) {
+            $apikey = getenv('MANDRILL_APIKEY');
         }
-        if (!$apikey) { $apikey = $this->readConfigs();
+        if (!$apikey) {
+            $apikey = $this->readConfigs();
         }
-        if (!$apikey) { throw new Mandrill_Error('You must provide a Mandrill API key');
+        if (!$apikey) {
+            throw new Mandrill_Error('You must provide a Mandrill API key');
         }
         $this->apikey = $apikey;
 
@@ -156,7 +159,8 @@ class Mandrill_Mandrill
         }
 
         $result = json_decode($response_body, true);
-        if ($result === null) { throw new Mandrill_Error('We were unable to decode the JSON response from the Mandrill API: ' . $response_body);
+        if ($result === null) {
+            throw new Mandrill_Error('We were unable to decode the JSON response from the Mandrill API: ' . $response_body);
         }
 
         try {
@@ -176,7 +180,8 @@ class Mandrill_Mandrill
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 $apikey = trim(file_get_contents($path));
-                if ($apikey) { return $apikey;
+                if ($apikey) {
+                    return $apikey;
                 }
             }
         }
@@ -186,7 +191,8 @@ class Mandrill_Mandrill
 
     public function castError($result)
     {
-        if ($result['status'] !== 'error' || !$result['name']) { throw new Mandrill_Error('We received an unexpected error: ' . json_encode($result));
+        if ($result['status'] !== 'error' || !$result['name']) {
+            throw new Mandrill_Error('We received an unexpected error: ' . json_encode($result));
         }
 
         $class = (isset(self::$error_map[$result['name']])) ? self::$error_map[$result['name']] : 'Mandrill_Error';
@@ -195,7 +201,8 @@ class Mandrill_Mandrill
 
     public function log($msg)
     {
-        if ($this->debug) { error_log($msg);
+        if ($this->debug) {
+            error_log($msg);
         }
     }
 }

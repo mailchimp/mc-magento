@@ -1,4 +1,5 @@
-function getCampaign() {
+function getCampaign()
+{
     var urlparams = location.search.substr(1).split('&');
     var params = new Array();
     var mc_cid = null;
@@ -24,8 +25,9 @@ function getCampaign() {
         if (key == 'utm_campaign') {
             var campaignArray = val.split("-");
             var campaignValue = campaignArray[0];
-            if (campaignValue.length == 10)
-            campaign = campaignValue;
+            if (campaignValue.length == 10) {
+                campaign = campaignValue;
+            }
         }
         if (key == 'mc_eid') {
             mc_eid = val;

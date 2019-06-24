@@ -60,8 +60,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
     {
         if (Mage::registry('current_mailchimpstore')->getId()) {
             return $this->escapeHtml(Mage::registry('current_mailchimpstore')->getName());
-        }
-        else {
+        } else {
             return Mage::helper('mailchimp')->__('New Store');
         }
     }
@@ -113,4 +112,3 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         return Mage::helper('mailchimp');
     }
 }
-

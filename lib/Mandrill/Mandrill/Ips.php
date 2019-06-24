@@ -301,5 +301,4 @@ class Mandrill_Ips
         $_params = array("ip" => $ip, "domain" => $domain);
         return $this->master->call('ips/set-custom-dns', $_params);
     }
-
 }

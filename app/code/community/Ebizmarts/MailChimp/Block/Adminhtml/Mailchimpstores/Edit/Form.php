@@ -38,12 +38,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             'legend'    => $helper->__('Store Information'),
             'class'     => 'fieldset',
         ));
-        if(!$store->getId()) {
+        if (!$store->getId()) {
             $stores = Mage::app()->getStores();
             $apikeys = array();
             foreach ($stores as $s) {
                 $apikey = $helper->getApiKey($s);
-                if(!array_key_exists($apikey,$apikeys)) {
+                if (!array_key_exists($apikey, $apikeys)) {
                     $encryptedApiKey = $helper->encryptData($apikey);
                     $apikeys[$encryptedApiKey] = $helper->mask($apikey);
                 }
@@ -72,7 +72,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             'title'     => $helper->__('Store Name'),
             'required'  => true,
         ));
-        $fieldset->addField('domain', 'text',array(
+        $fieldset->addField('domain', 'text', array(
            'name'   => 'domain',
            'label'  => $helper->__('Domain'),
            'title'  => $helper->__('Domain'),

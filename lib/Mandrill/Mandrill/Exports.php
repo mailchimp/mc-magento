@@ -118,5 +118,4 @@ class Mandrill_Exports
         $_params = array("notify_email" => $notify_email, "date_from" => $date_from, "date_to" => $date_to, "tags" => $tags, "senders" => $senders, "states" => $states, "api_keys" => $api_keys);
         return $this->master->call('exports/activity', $_params);
     }
-
 }

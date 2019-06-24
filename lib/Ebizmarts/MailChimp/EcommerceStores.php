@@ -31,11 +31,21 @@ class MailChimp_EcommerceStore extends MailChimp_Abstract
      * @return mixed
      * @throws MailChimp_Error
      */
-    public function add($id, $listId, $name, $currencyCode, $isSyncing, $platform = null, $domain = null,
-                        $emailAddress = null, $moneyFormat = null, $primaryLocale = null, $timezone = null, $phone = null,
-                        $address = null
-    )
-    {
+    public function add(
+        $id,
+        $listId,
+        $name,
+        $currencyCode,
+        $isSyncing,
+        $platform = null,
+        $domain = null,
+        $emailAddress = null,
+        $moneyFormat = null,
+        $primaryLocale = null,
+        $timezone = null,
+        $phone = null,
+        $address = null
+    ) {
         $_params = array('id' => $id, 'list_id' => $listId, 'name' => $name, 'currency_code' => $currencyCode);
         if ($platform) {
             $_params['platform'] = $platform;
@@ -117,10 +127,20 @@ class MailChimp_EcommerceStore extends MailChimp_Abstract
      * @return mixed
      * @throws MailChimp_Error
      */
-    public function edit($storeId, $name = null, $platform = null, $domain = null, $isSyncing = null, $emailAddress = null, $currencyCode = null,
-                         $moneyFormat = null, $primaryLocale = null, $timezone = null, $phone = null, $address = null
-    )
-    {
+    public function edit(
+        $storeId,
+        $name = null,
+        $platform = null,
+        $domain = null,
+        $isSyncing = null,
+        $emailAddress = null,
+        $currencyCode = null,
+        $moneyFormat = null,
+        $primaryLocale = null,
+        $timezone = null,
+        $phone = null,
+        $address = null
+    ) {
 
         $_params = array();
         if ($name) {

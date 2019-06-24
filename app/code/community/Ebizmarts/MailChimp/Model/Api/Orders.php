@@ -86,7 +86,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
 
                 if (!empty($orderJson)) {
-
                     $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
 
                     $batchArray[$this->_counter]['method'] = "PATCH";
@@ -139,7 +138,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
 
                 if (!empty($orderJson)) {
-
                     $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
 
                     $batchArray[$this->_counter]['method'] = "POST";
@@ -282,7 +280,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);
         $data['order_url'] = $store->getUrl(
-            'sales/order/view/', array(
+            'sales/order/view/',
+            array(
                 'order_id' => $order->getId(),
                 '_nosid' => true,
                 '_secure' => true
@@ -660,7 +659,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             if ($code->getCouponId() !== null) {
                 $rule = $this->makeSalesRule()->load($code->getRuleId());
                 if ($rule->getRuleId() !== null) {
-
                     $amountDiscounted = $order->getBaseDiscountAmount();
 
                     $type = $rule->getSimpleAction();
@@ -675,7 +673,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         'amount_discounted' => abs($amountDiscounted),
                         'type' => $type
                     ));
-
                 }
             }
         }
@@ -712,7 +709,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $mailchimpOrderId = $result->getId();
 
         return array('synced_status' => $mailchimpSyncedFlag, 'order_id' => $mailchimpOrderId);
-
     }
 
     /**
@@ -826,7 +822,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                             $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
                         }
                     }
-
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
@@ -850,5 +845,4 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         return Mage::getModel('mailchimp/api_products');
     }
-
 }

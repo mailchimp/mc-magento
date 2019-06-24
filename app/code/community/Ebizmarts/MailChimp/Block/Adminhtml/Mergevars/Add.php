@@ -31,5 +31,4 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add extends Mage_Adminhtml_B
     public function _prepareForm()
     {
     }
-
 }
