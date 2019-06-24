@@ -199,8 +199,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $storeId = $store->getId();
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 if ($this->_ping($storeId)) {
+                    $this->getHelper()->logDebug("Processing store ID $storeId");
                     $this->_getResults($storeId);
                     $this->_sendEcommerceBatch($storeId);
+                    $this->getHelper()->logDebug("Processed store ID $storeId");
                 } else {
                     $helper->logError('Could not connect to MailChimp: Make sure the API Key is correct and there is an internet connection', $storeId);
                     return;
