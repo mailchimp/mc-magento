@@ -138,13 +138,13 @@ class Ebizmarts_MailChimp_Model_Observer
                     $listId = (!empty($previouslyConfiguredListId)) ? $previouslyConfiguredListId : $mcStoreListId;
                     $configData['groups']['general']['fields']['list']['value'] = $listId;
                     $configDataChanged = true;
-                    $message = $helper->__('The list configuration was automatically modified to show the list associated to the selected Mailchimp store.');
+                    $message = $helper->__('The audience configuration was automatically modified to show the audience associated to the selected Mailchimp store.');
                     $this->getAdminSession()->addError($message);
                 } elseif (isset($configData['groups']['general']['fields']['storeid']['inherit'])) {
                     unset($configData['groups']['general']['fields']['storeid']['inherit']);
                     $configData['groups']['general']['fields']['storeid']['value'] = $oldMailchimpStoreId;
                     $configDataChanged = true;
-                    $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp list configured for this scope. Both must be set to inherit at the same time.');
+                    $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp audience configured for this scope. Both must be set to inherit at the same time.');
                     $this->getAdminSession()->addError($message);
                 }
                 if ($configDataChanged) {
