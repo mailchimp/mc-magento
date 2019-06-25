@@ -1,10 +1,10 @@
 <?php if ($message = $this->getMessageNotification()) : ?>
-    <div class="notification-global"><?php echo $message ?></div>
+    <div class="notification-global"><?php echo $this->escapeHtml($message) ?></div>
 <?php endif; ?>
 
 <script type="text/javascript">
         function openResendEcommerceDialog() {
-            var url = '<?php echo $this->getUrl("adminhtml/ecommerce/renderresendecom") ?>?';
+            var url = '<?php echo $this->escapeUrl($this->getUrl("adminhtml/ecommerce/renderresendecom")) ?>?';
             var dialogWindow = Dialog.info(null, {
                 draggable:true,
                 resizable:false,
