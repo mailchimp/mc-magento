@@ -6,7 +6,6 @@
 
 <?php
 $htmlId = $this->getHtmlId() ? $this->getHtmlId() : '_' . uniqid();
-
 $colspan = 2;
 if (!$this->_addAfter) {
     $colspan--;
@@ -15,219 +14,216 @@ if (!$this->_addAfter) {
 $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
 ?>
 
-<div class="grid" id="grid<?php echo $this->escapeHtml($htmlId) ?>">
+<div class="grid" id="grid<?php echo $this->quoteEscape($htmlId) ?>">
     <table cellpadding="0" cellspacing="0" class="border">
         <tbody>
 
-            <tr class="headings" id="headings<?php echo $this->escapeHtml($htmlId) ?>">
-<?php foreach ($this->_columns as $columnName => $column):?>
-                <th><?php echo $this->escapeHtml($column['label']) ?></th>
-<?php endforeach;?>
-                <th <?php echo $this->escapeHtml($colspan)?>></th>
-            </tr>
+        <tr class="headings" id="headings<?php echo $this->quoteEscape($htmlId) ?>">
+            <?php foreach ($this->_columns as $columnName => $column):?>
+                <th><?php echo $this->quoteEscape($column['label']) ?></th>
+            <?php endforeach; ?>
+            <th <?php echo $this->quoteEscape($colspan) ?>></th>
+        </tr>
 
-            <tr id="addRow<?php echo $this->escapeHtml($htmlId) ?>">
-                <td colspan="<?php echo count($this->_columns) ?>">
-                    <button
-                            style=""
-                            onclick=""
-                            class="scalable add"
-                            type="button"
-                            id="addNewType<?php echo $this->escapeHtml($htmlId) ?>">
+        <tr id="addRow<?php echo $this->quoteEscape($htmlId) ?>">
+            <td colspan="<?php echo $this->quoteEscape(count($this->_columns)) ?>">
+                <button style=""
+                        onclick=""
+                        class="scalable add"
+                        type="button"
+                        id="addNewType<?php echo $this->quoteEscape($htmlId) ?>">
+                    <span>
                         <span>
                             <span>
-                                <span>
-                                    <?php
-                                        echo $this->quoteEscape(
-                                            Mage::helper('mailchimp')->__(
-                                                'Add new custom data entry in the column of the right'
-                                            )
-                                        )
-                                    ?>
-                                </span>
+                                <?php echo $this->quoteEscape(
+                                    Mage::helper('mailchimp')->__(
+                                        'Add new custom data entry in the column of the right'
+                                    )
+                                ) ?>
                             </span>
                         </span>
-                    </button>
-                </td>
-                <td <?php echo $this->escapeHtml($colspan) ?>>
-                    <button style=""
-                            onclick=""
-                            class="scalable add"
-                            type="button"
-                            id="addToEndBtn<?php echo $this->escapeHtml($htmlId) ?>">
+                    </span>
+                </button>
+            </td>
+            <td <?php echo $this->quoteEscape($colspan) ?>>
+                <button style=""
+                        onclick=""
+                        class="scalable add"
+                        type="button"
+                        id="addToEndBtn<?php echo $this->quoteEscape($htmlId) ?>">
+                    <span>
                         <span>
                             <span>
-                                <span>
-                                    <?php echo $this->escapeHtml(
-                                        Mage::helper('mailchimp')->__('Add new row')
-                                    ) ?>
-                                </span>
+                                <?php echo $this->quoteEscape(Mage::helper('mailchimp')->__('Add new row')) ?>
                             </span>
                         </span>
-                    </button>
-                </td>
-            </tr>
+                    </span>
+                </button>
+            </td>
+        </tr>
 
         </tbody>
     </table>
-    <input type="hidden" name="<?php echo $this->escapeHtml($this->getElement()->getName()) ?>[__empty]" value="" />
+    <input type="hidden" name="<?php echo $this->quoteEscape($this->getElement()->getName()) ?>[__empty]" value="" />
 </div>
-<div id="empty<?php echo $this->escapeHtml($htmlId) ?>">
+<div id="empty<?php echo $this->quoteEscape($htmlId) ?>">
     <button style=""
             onclick=""
             class="scalable add"
             type="button"
-            id="emptyAddBtn<?php echo $this->escapeHtml($htmlId) ?>">
-        <span><span><span><?php echo $this->escapeHtml($this->_addButtonLabel) ?></span></span></span>
+            id="emptyAddBtn<?php echo $this->quoteEscape($htmlId) ?>">
+        <span>
+            <span>
+                <span>
+                    <?php echo $this->quoteEscape($this->_addButtonLabel) ?>
+                </span>
+            </span>
+        </span>
     </button>
 </div>
 
 <script type="text/javascript">
-//<![CDATA[
-// create row creator
-var arrayRow<?php echo $this->escapeHtml($htmlId) ?> = {
-    // define row prototypeJS template
-    template : new Template(
-        '<tr id="#{_id}">'
-<?php foreach ($this->_columns as $columnName => $column):?>
-            +'<td>'
+    // create row creator
+    var arrayRow<?php echo $this->quoteEscape($htmlId) ?> = {
+        // define row prototypeJS template
+        template : new Template(
+            '<tr id="#{_id}">'
+            <?php foreach ($this->_columns as $columnName => $column):?>
+                +'<td>'
                 +'<?php echo $this->jsQuoteEscape($this->_renderCellTemplate($columnName)) ?>'
-            +'<\/td>'
-<?php endforeach;?>
-<?php if ($this->_addAfter):?>
-            +'<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><span><span>'
-            +'<?php echo $this->jsQuoteEscape(Mage::helper('adminhtml')->__('Add after')) ?>'
+                +'<\/td>'
+            <?php endforeach;?>
+            <?php if ($this->_addAfter):?>
+                +'<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><span><span>'
+                +<?php
+                    echo $this->jsQuoteEscape(
+                        Mage::helper('adminhtml')->__(
+                            'Add after'
+                        )
+                    ) ?>
+                +'<\/span><\/span><\/span><\/button><\/td>'
+            <?php endif;?>
+            +'<td><button onclick="arrayRow<?php echo $this->quoteEscape($htmlId) ?>.del(\'#{_id}\')" '
+            +'class="scalable delete" type="button"><span><span><span>'
+            +'<?php echo $this->jsQuoteEscape(Mage::helper('adminhtml')->__('Delete')) ?>'
             +'<\/span><\/span><\/span><\/button><\/td>'
-<?php endif;?>
-            +'<td><button onclick="arrayRow'
-            +'<?php echo $this->escapeHtml($htmlId) ?>.del(\'#{_id}\')" class="scalable delete" type="button">'
-            +'<span><span><span><?php echo $this->jsQuoteEscape(Mage::helper('adminhtml')->__('Delete')) ?>'
-            +'<\/span><\/span><\/span><\/button><\/td>'
-        +'<\/tr>'
-    ),
-
-    rowsCount : 0,
-
-    add : function(templateData, insertAfterId)
-    {
-        // generate default template data
-        if ('' == templateData) {
-            var d = new Date();
-            templateData = {
-<?php foreach ($this->_columns as $columnName => $column):?>
-                <?php echo $this->escapeHtml($columnName) ?> : '',
-<?php endforeach;?>
-                _id : '_' + d.getTime() + '_' + d.getMilliseconds()
+            +'<\/tr>'
+        ),
+        rowsCount : 0,
+        add : function(templateData, insertAfterId)
+        {
+            // generate default template data
+            if ('' == templateData) {
+                var d = new Date();
+                templateData = {
+                <?php foreach ($this->_columns as $columnName => $column):?>
+                    <?php echo $this->quoteEscape($columnName) ?> : '',
+                <?php endforeach;?>
+                    _id : '_' + d.getTime() + '_' + d.getMilliseconds()
             };
-        }
-
-        // insert before last row
-        if ('' == insertAfterId) {
-            Element.insert(
-                $('addRow<?php echo $this->escapeHtml($htmlId) ?>'),
-                {before: this.template.evaluate(templateData)});
-        }
-        // insert after specified row
-        else {
-            Element.insert($(insertAfterId), {after: this.template.evaluate(templateData)});
-        }
-
-// set the selected drop-down list item
-<?php foreach ($this->_columns as $columnName => $column):?>
-        <?php if ($columnName == 'magento'):?>
-$$('select[name*=' + templateData._id +']').each(function(row){
-    var oldText = 'value="'+templateData.<?php echo $this->escapeHtml($columnName) ?>+'"';
-    var newText = 'selected="selected" value="'+templateData.<?php echo $this->escapeHtml($columnName) ?>+'"';
-    row.innerHTML = row.innerHTML.replace(oldText,newText);
-});
-        <?php endif; ?>
-<?php endforeach;?>
-<?php if ($this->_addAfter):?>
-        Event.observe('addAfterBtn' + templateData._id, 'click', this.add.bind(this, '', templateData._id));
-<?php endif;?>
-
-        this.rowsCount += 1;
-    },
-
-    open: function () {
-        var url = '<?php echo $this->escapeUrl($this->getUrl("adminhtml/mergevars/addmergevar/")) ?>?';
-        var dialogWindow = Dialog.info(null, {
-            draggable:true,
-            resizable:false,
-            closable:true,
-            className:"magento",
-            windowClassName:"popup-window",
-            title:'Add new Merge Var to send to Mailchimp',
-            top:50,
-            width:1000,
-            height:300,
-            zIndex:1000,
-            recenterAuto:false,
-            hideEffect:Element.hide,
-            showEffect:Element.show,
-            id:"browser_window",
-            url: url,
-            onClose:function (param, el) {
-                location.reload();
             }
-        });
-    },
-
-    del : function(rowId)
-    {
-        $(rowId).remove();
-        this.rowsCount -= 1;
-        if (0 == this.rowsCount) {
-            this.showButtonOnly();
+            // insert before last row
+            if ('' == insertAfterId) {
+                Element.insert(
+                    $('addRow<?php echo $this->quoteEscape($htmlId) ?>'),
+                    {before: this.template.evaluate(templateData)});
+            }
+            // insert after specified row
+            else {
+                Element.insert($(insertAfterId), {after: this.template.evaluate(templateData)});
+            }
+            // set the selected drop-down list item
+            <?php foreach ($this->_columns as $columnName => $column):?>
+            <?php if($columnName == 'magento'):?>
+            $$('select[name*=' + templateData._id +']').each(function(row){
+                var oldText = 'value="'+templateData.<?php echo $this->quoteEscape($columnName) ?>+'"';
+                var newText = 'selected="selected" value="'
+                    +templateData.<?php echo $this->quoteEscape($columnName) ?>
+                    +'"';
+                row.innerHTML = row.innerHTML.replace(oldText,newText);
+            });
+            <?php endif; ?>
+            <?php endforeach;?>
+            <?php if ($this->_addAfter):?>
+            Event.observe('addAfterBtn' + templateData._id, 'click', this.add.bind(this, '', templateData._id));
+            <?php endif;?>
+            this.rowsCount += 1;
+        },
+        open: function () {
+            var url = '<?php echo $this->escapeUrl($this->getUrl("adminhtml/mergevars/addmergevar/")) ?>?';
+            var dialogWindow = Dialog.info(null, {
+                draggable:true,
+                resizable:false,
+                closable:true,
+                className:"magento",
+                windowClassName:"popup-window",
+                title:'Add new Merge Var to send to Mailchimp',
+                top:50,
+                width:1000,
+                height:300,
+                zIndex:1000,
+                recenterAuto:false,
+                hideEffect:Element.hide,
+                showEffect:Element.show,
+                id:"browser_window",
+                url: url,
+                onClose:function (param, el) {
+                    location.reload();
+                }
+            });
+        },
+        del : function(rowId)
+        {
+            $(rowId).remove();
+            this.rowsCount -= 1;
+            if (0 == this.rowsCount) {
+                this.showButtonOnly();
+            }
+        },
+        showButtonOnly : function()
+        {
+            $('grid<?php echo $this->quoteEscape($htmlId) ?>').hide();
+            $('empty<?php echo $this->quoteEscape($htmlId) ?>').show();
         }
-    },
-
-    showButtonOnly : function()
-    {
-        $('grid<?php echo $this->escapeHtml($htmlId) ?>').hide();
-        $('empty<?php echo $this->escapeHtml($htmlId) ?>').show();
     }
-}
-
-// bind add action to "Add" button in last row
-Event.observe(
-    'addToEndBtn<?php echo $this->escapeHtml($htmlId) ?>',
-    'click',
-    arrayRow<?php echo $this->escapeHtml($htmlId) ?>.add.bind(arrayRow<?php echo $this->escapeHtml($htmlId) ?>,
-        '',
-        '')
-);
-Event.observe(
-    'addNewType<?php echo $this->escapeHtml($htmlId) ?>',
-    'click',
-    arrayRow<?php echo $this->escapeHtml($htmlId) ?>.open.bind(this)
-);
-
-// add existing rows
-<?php
-$addAfterId = "headings{$htmlId}";
-foreach ($this->getArrayRows() as $rowId => $row) {
-    echo $this->jsQuoteEscape("arrayRow{$htmlId}.add(" . $row->toJson() . ", '{$addAfterId}');\n");
-    $addAfterId = $rowId;
-}
-?>
-
-// initialize standalone button
-$('empty<?php echo $this->escapeHtml($htmlId) ?>').hide();
-Event.observe('emptyAddBtn<?php echo $this->escapeHtml($htmlId) ?>', 'click', function () {
-    $('grid<?php echo $this->escapeHtml($htmlId) ?>').show();
-    $('empty<?php echo $this->escapeHtml($htmlId) ?>').hide();
-    arrayRow<?php echo $this->escapeHtml($htmlId) ?>.add('', '');
-});
-
-// if no rows, hide grid and show button only
-<?php if (!$this->getArrayRows()):?>
-arrayRow<?php echo $this->escapeHtml($htmlId) ?>.showButtonOnly();
-<?php endif;?>
-
-// toggle the grid, if element is disabled (depending on scope)
-<?php if ($this->getElement()->getDisabled()):?>
-toggleValueElements({checked:true}, $('grid<?php echo $this->escapeHtml($htmlId) ?>').parentNode);
-<?php endif;?>
-//]]>
+    // bind add action to "Add" button in last row
+    Event.observe(
+        'addToEndBtn<?php echo $this->quoteEscape($htmlId) ?>',
+        'click',
+        arrayRow<?php echo $this->quoteEscape($htmlId) ?>.add.bind(
+            arrayRow<?php echo $this->quoteEscape($htmlId) ?>,
+            '',
+            ''
+        )
+    );
+    Event.observe(
+        'addNewType<?php echo $this->quoteEscape($htmlId) ?>',
+        'click',
+        arrayRow<?php echo $this->quoteEscape($htmlId) ?>.open.bind(this)
+    );
+    // add existing rows
+    <?php
+    $addAfterId = "headings{$htmlId}";
+    foreach ($this->getArrayRows() as $rowId => $row) {
+        echo $this->quoteEscape("arrayRow{$htmlId}.add(")
+            . $this->jsQuoteEscape($row->toJson())
+            . $this->jsQuoteEscape(", {$addAfterId});\n");
+        $addAfterId = $rowId;
+    }
+    ?>
+    // initialize standalone button
+    $('empty<?php echo $this->quoteEscape($htmlId) ?>').hide();
+    Event.observe('emptyAddBtn<?php echo $this->quoteEscape($htmlId) ?>', 'click', function () {
+        $('grid<?php echo $this->quoteEscape($htmlId) ?>').show();
+        $('empty<?php echo $this->quoteEscape($htmlId) ?>').hide();
+        arrayRow<?php echo $this->quoteEscape($htmlId) ?>.add('', '');
+    });
+    // if no rows, hide grid and show button only
+    <?php if (!$this->getArrayRows()):?>
+    arrayRow<?php echo $this->quoteEscape($htmlId) ?>.showButtonOnly();
+    <?php endif;?>
+    // toggle the grid, if element is disabled (depending on scope)
+    <?php if ($this->getElement()->getDisabled()):?>
+    toggleValueElements({checked:true}, $('grid<?php echo $this->quoteEscape($htmlId) ?>').parentNode);
+    <?php endif;?>
 </script>
