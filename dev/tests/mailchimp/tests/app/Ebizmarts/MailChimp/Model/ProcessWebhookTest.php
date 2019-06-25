@@ -62,9 +62,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getId','getSubscriberFirstname','setSubscriberFirstname',
+            ->setMethods(
+                array('getId','getSubscriberFirstname','setSubscriberFirstname',
                 'getSubscriberLastname','setSubscriberLastname','setSubscriberSource',
-                'save'))
+                'save')
+            )
             ->getMock();
 
         $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
@@ -104,20 +106,24 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getFirstScopeFromConfig'
+            ->setMethods(
+                array('getFirstScopeFromConfig'
                 , 'getApi'
                 , 'loadListCustomer'
                 , 'loadListSubscriber'
                 , 'subscribeMember'
-            ))
+                )
+            )
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('setSubscriberFirstname'
+            ->setMethods(
+                array('setSubscriberFirstname'
                 , 'setSubscriberLastname'
                 , 'getId'
-               ))
+                )
+            )
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -189,21 +195,25 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getFirstScopeFromConfig'
-            , 'getApi'
-            , 'loadListCustomer'
-            , 'loadListSubscriber'
-            , 'unsubscribeMember'
-            , 'getWebhookDeleteAction'
-            ))->getMock();
+            ->setMethods(
+                array('getFirstScopeFromConfig'
+                , 'getApi'
+                , 'loadListCustomer'
+                , 'loadListSubscriber'
+                , 'unsubscribeMember'
+                , 'getWebhookDeleteAction'
+                )
+            )->getMock();
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('setSubscriberFirstname'
-            , 'setSubscriberLastname'
-            , 'getStoreId'
-            , 'getId'
-            ))->getMock();
+            ->setMethods(
+                array('setSubscriberFirstname'
+                , 'setSubscriberLastname'
+                , 'getStoreId'
+                , 'getId'
+                )
+            )->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)->disableOriginalConstructor()
             ->setMethods(array('getLists'))->getMock();

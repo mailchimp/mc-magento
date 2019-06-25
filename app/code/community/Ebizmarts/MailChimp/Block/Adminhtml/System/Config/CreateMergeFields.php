@@ -56,6 +56,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields extend
         if (!$helper->isErrorLogEnabled()) {
             $message = 'There was an error on the merge fields creation. Please enable the error logs and try again for more information.';
         }
+
         return $helper->__($message);
     }
 

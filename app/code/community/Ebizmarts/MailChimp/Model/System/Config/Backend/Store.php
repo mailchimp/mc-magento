@@ -31,6 +31,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$newMailchimpStoreId", Varien_Date::now()));
                 $helper->saveMailchimpConfig($configValues, 0, 'default');
             }
+
             if ($isSyncing === null) {
                 $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$newMailchimpStoreId", true));
                 $helper->saveMailchimpConfig($configValues, $scopeId, $scope);

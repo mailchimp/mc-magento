@@ -22,6 +22,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         if (!$this->mailchimpHelper) {
             $this->mailchimpHelper = Mage::helper('mailchimp');
         }
+
         return $this->mailchimpHelper;
     }
 
@@ -48,6 +49,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                             $helper->logError($e->getMessage());
                             $api = null;
                         }
+
                         if (!$api) {
                             try {
                                 $webhooks = $api->lists->webhooks->getAll($listId);

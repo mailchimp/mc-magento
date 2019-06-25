@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         if (!Mage::registry('current_order')) {
             Mage::register('current_order', $this->_orderMock);
         }
+
         /* We are required to set layouts before we can do anything with blocks */
         $this->_block->setLayout($layout);
     }

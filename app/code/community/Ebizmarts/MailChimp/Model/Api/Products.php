@@ -51,6 +51,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 ->setConfig(Mage_Catalog_Helper_Category_Flat::XML_PATH_IS_ENABLED_FLAT_CATALOG_CATEGORY, 0)
                 ->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 0);
         }
+
         $this->_markSpecialPrices($mailchimpStoreId, $magentoStoreId);
         $collection = $this->makeProductsNotSentCollection($magentoStoreId);
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId);
@@ -87,6 +88,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData($productId, $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", 0, null, 0);
             }
         }
+
         $helper->getMageApp()->setCurrentStore($oldStore);
         return $batchArray;
     }
@@ -107,8 +109,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $batchArray[$counter] = $data;
                 $counter++;
             }
+
             $this->_updateSyncData($product->getId(), $mailchimpStoreId, null, self::PRODUCT_DISABLED_IN_MAGENTO, 0, null, 0);
         }
+
         return $batchArray;
     }
 
@@ -193,6 +197,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             //@TODO bundle
             return array();
         }
+
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
         try {
             $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
@@ -228,9 +233,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else {
             $url = $this->getProductUrl($product, $magentoStoreId);
         }
+
         if (!$url) {
             $url = Mage::app()->getStore($magentoStoreId)->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK);
         }
+
         $data["url"] = $url;
 
         //image
@@ -266,10 +273,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if (isset($data["image_url"])) {
                     $this->_parentImageUrl = $data["image_url"];
                 }
+
                 $this->_parentId = $product->getId();
                 if ($this->currentProductIsVisible()) {
                     $this->_parentUrl = $data['url'];
                 }
+
                 $price = $this->getMailchimpFinalPrice($product);
                 if ($price) {
                     $this->_parentPrice = $price;
@@ -301,6 +310,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($parentIdArray as $parentId) {
             $this->_updateSyncData($parentId, $mailchimpStoreId, null, null, 1, 0, null, true, false);
         }
+
         $this->_updateSyncData($productId, $mailchimpStoreId, null, null, 1, 0, null, true, false);
     }
 
@@ -341,6 +351,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 if ($productId) {
                     $this->_updateSyncData($productId, $mailchimpStoreId, $this->getCurrentDate(), "This product type is not supported on MailChimp.", 0, null, 0);
                 }
+
                 continue;
             }
 
@@ -419,6 +430,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (!$isParentProduct) {
             $collection->addFinalPrice();
         }
+
         $collection->addStoreFilter($magentoStoreId);
         $this->mailchimpHelper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
@@ -730,6 +742,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else {
             $parentId = $this->_parentId;
         }
+
         if ($parentId) {
             $collection = $this->getProductWithAttributesById($magentoStoreId, $parentId);
 
@@ -740,6 +753,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $path = $rc->getAttributeRawValue($parentId, 'url_path', $magentoStoreId);
                 $url = $this->getUrlByPath($path, $magentoStoreId);
             }
+
             $tailUrl = '#';
             $count = 0;
             foreach ($collection as $attribute) {
@@ -749,16 +763,20 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     if ($count > 0) {
                         $tailUrl .= '&';
                     }
+
                     $tailUrl .= $attributeId . '=' . $attributeValue;
                 }
+
                 $count++;
             }
+
             if ($tailUrl != '#') {
                 $url .= $tailUrl;
             }
         } else {
             $url = null;
         }
+
         return $url;
     }
 
@@ -771,10 +789,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
         } else {
             $parentId = $this->_parentId;
         }
+
         if ($parentId) {
             $helper = $this->getMailChimpHelper();
             $imageUrl = $helper->getImageUrlById($parentId, $magentoStoreId);
         }
+
         return $imageUrl;
     }
 
@@ -811,8 +831,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             foreach ($collection as $category) {
                 $categoryNames[] = $category->getName();
             }
+
             $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
         }
+
         return $categoryName;
     }
 
@@ -827,6 +849,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (count($parentIds)) {
             $parentId = $parentIds[0];
         }
+
         return $parentId;
     }
 
@@ -878,6 +901,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         if (!$imageUrl) {
             $imageUrl = $this->getParentImageUrl($product->getId(), $magentoStoreId);
         }
+
         return $imageUrl;
     }
 
@@ -900,6 +924,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $price = $this->_parentPrice;
             }
         }
+
         return $price;
     }
 

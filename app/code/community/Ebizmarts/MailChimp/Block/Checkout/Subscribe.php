@@ -72,6 +72,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         if (!$currentValue) {
             $currentValue = $this->getCurrentCheckoutSubscribeValue();
         }
+
         return ($currentValue == Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::FORCE_HIDDEN);
     }
 
@@ -91,6 +92,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         if ($this->isForceHidden($currentValue) || $this->isForceVisible($currentValue)) {
             return true;
         }
+
         return false;
     }
 
@@ -100,6 +102,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         if ($this->isCheckedByDefault($currentValue) || $this->isForceVisible($currentValue)) {
             return true;
         }
+
         return false;
     }
 

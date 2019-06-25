@@ -20,7 +20,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         parent::__construct();
 
         $this->removeButton('reset');
-        $this->updateButton('delete', null, array(
+        $this->updateButton(
+            'delete', null, array(
             'label'     => Mage::helper('adminhtml')->__('Delete Store'),
             'class'     => 'delete',
             'onclick'   => 'deleteMCStoreConfirm(\''
@@ -31,7 +32,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
                 . $this->getDeleteUrl()
                 . '\')',
             'sort_order' => 0
-        ));
+            )
+        );
 
         $scopeArray = $this->getScopeArrayIfValueExists();
         if ($scopeArray !== false) {
@@ -39,6 +41,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         } else {
             $jsCondition = 'false';
         }
+
         $mcInUseMessage = $this->getMCInUseMessage($scopeArray);
         $this->_formScripts[] = "function deleteMCStoreConfirm(message, url) {
             if ($jsCondition) {
@@ -87,6 +90,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         } else {
             $message = $helper->__("This store is currently in use for this Magento store. Do you want to proceed anyways?");
         }
+
         return $message;
     }
 
@@ -101,6 +105,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         if ($keyIfExist === null) {
             $keyIfExist = 'false';
         }
+
         return $keyIfExist;
     }
 

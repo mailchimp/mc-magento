@@ -293,6 +293,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         if (!$this->apiPromoRules) {
             $this->apiPromoRules = Mage::getModel('mailchimp/api_promoRules');
         }
+
         return $this->apiPromoRules;
     }
 
@@ -352,6 +353,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                 $helper->logError($e->getFriendlyMessage());
             }
         }
+
         return $promoCodes;
     }
 

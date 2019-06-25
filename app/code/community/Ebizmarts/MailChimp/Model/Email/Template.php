@@ -234,6 +234,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         } catch (Exception $e) {
             Mage::log($e->getMessage(), null, 'Mandrill.log', true);
         }
+
         return $mandrillSenders;
     }
 
@@ -250,6 +251,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         } catch (Exception $e) {
             Mage::log($e->getMessage(), null, 'Mandrill.log', true);
         }
+
         return $mailSent;
     }
 

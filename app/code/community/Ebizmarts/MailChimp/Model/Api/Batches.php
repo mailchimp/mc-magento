@@ -207,6 +207,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
         }
+
         $helper->handleResendDataAfter();
 
         $syncedDateArray = array();
@@ -214,6 +215,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $storeId = $store->getId();
             $syncedDateArray = $this->addSyncValueToArray($storeId, $syncedDateArray);
         }
+
         $this->handleSyncingValue($syncedDateArray);
     }
 
@@ -231,6 +233,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         } catch (Exception $e) {
             return false;
         }
+
         return true;
     }
 
@@ -343,6 +346,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
                 }
+
                 //deleted product operations
                 $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
@@ -589,6 +593,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $d;
                             }
                         }
+
                         unlink($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar');
                         unlink($fileName);
                     }
@@ -651,6 +656,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $helper->modifyCounterDataSentToMailchimp($type);
                             continue;
                         }
+
                         $error = $response->title . " : " . $response->detail;
 
                         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
@@ -687,8 +693,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                 }
             }
+
             unlink($file);
         }
+
         $this->_showResumeDataSentToMailchimp($magentoStoreId);
     }
 
@@ -799,6 +807,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
         }
+
         return $syncedDateArray;
     }
 

@@ -34,13 +34,15 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
     {
         $batchArray = array();
 
-        $cartsApiMock = $this->cartsApiMock->setMethods(array(
+        $cartsApiMock = $this->cartsApiMock->setMethods(
+            array(
             'getHelper',
             '_getConvertedQuotes',
             '_getModifiedQuotes',
             '_getNewQuotes',
             'setBatchId'
-        ))
+            )
+        )
             ->getMock();
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -87,7 +89,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $m4m = array('m4m.*');
 
-        $cartsApiMock = $this->cartsApiMock->setMethods(array(
+        $cartsApiMock = $this->cartsApiMock->setMethods(
+            array(
             'getMailchimpEcommerceDataTableName',
             'getQuoteCollection',
             'getBatchLimitFromConfig',
@@ -96,7 +99,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             'getBatchId',
             '_updateSyncData',
             'setCounter'
-        ))
+            )
+        )
             ->getMock();
         $quoteResoureceCollectionMock = $this
             ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -1730,14 +1734,16 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $isProductEnabled = false;
         $mailchimpSyncError = 0;
 
-        $cartsApiMock = $this->cartsApiMock->setMethods(array(
+        $cartsApiMock = $this->cartsApiMock->setMethods(
+            array(
             '_getCheckoutUrl',
             'isProductTypeConfigurable',
             'getApiCustomersOptIn',
             'getCountryModel',
             'getHelper',
             'getApiProducts'
-        ))->getMock();
+            )
+        )->getMock();
 
         $helperMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -1756,7 +1762,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartModelMock = $this
             ->getMockBuilder(Mage_Sales_Model_Quote::class)
             ->disableOriginalConstructor()
-            ->setMethods(array(
+            ->setMethods(
+                array(
                 'getMailchimpCampaignId',
                 'getEntityId',
                 'getQuoteCurrencyCode',
@@ -1765,7 +1772,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getCustomerFirstname',
                 'getCustomerLastname',
                 'getBillingAddress'
-            ))
+                )
+            )
             ->getMock();
 
         $itemsMockCollection = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Item_Collection::class)

@@ -248,6 +248,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     if (!array_key_exists($mcStoreId, $storeRelation)) {
                         $storeRelation[$mcStoreId] = array();
                     }
+
                     $storeRelation[$mcStoreId][] = $storeId;
                 }
             }
@@ -730,6 +731,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if (!$this->getResendEnabled($scopeId, $scope)) {
                 $this->saveLastItemsSent($scopeId, $scope, $filters);
             }
+
             $this->removeEcommerceSyncData($scopeId, $scope, false, $filters);
             $this->clearErrorGrid($scopeId, $scope, true, $filters);
 
@@ -988,6 +990,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $subscriber->setData("mailchimp_sync_error", '');
             $subscriber->save();
         }
+
         // reset ecommerce data with errors
         $this->removeEcommerceSyncData($scopeId, $scope, true);
         $this->clearErrorGrid($scopeId, $scope);
@@ -1205,6 +1208,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $cartSyncData = $syncDataCollection->getFirstItem();
             $lastCartSent = $cartSyncData->getRelatedId();
         }
+
         return $lastCartSent;
     }
 
@@ -1272,6 +1276,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 } catch (MailChimp_Error $e) {
                                     $this->logError($e->getFriendlyMessage());
                                 }
+
                                 $created = true;
                             }
                         }
@@ -1408,9 +1413,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } elseif ($allowBatchRemoval) {
                 $ecommerceSyncDataItem->setData("batch_id", null);
             }
+
             if ($syncError) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
             }
+
             //Always set modified value to 0 when saving sync delta or errors.
             $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
             if ($syncDeleted !== null) {
@@ -1419,15 +1426,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
                 }
             }
+
             if ($token) {
                 $ecommerceSyncDataItem->setData("mailchimp_token", $token);
             }
+
             if ($deletedRelatedId) {
                 $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
             }
+
             if ($syncedFlag !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
             }
+
             $ecommerceSyncDataItem->save();
         }
     }
@@ -1457,6 +1468,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 ->setData("type", $itemType)
                 ->setData("mailchimp_store_id", $mailchimpStoreId);
         }
+
         return $ecommerceSyndDataItem;
     }
 
@@ -1485,13 +1497,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($scopeId === 0) {
                 $filterArray[] = array('eq' => 0);
             }
+
             foreach ($storesForScope as $storeId) {
                 $filterArray[] = array('eq' => $storeId);
             }
         }
+
         if (count($filterArray)) {
             $collection->addFieldToFilter('store_id', $filterArray);
         }
+
         return $collection;
     }
 
@@ -1534,6 +1549,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $magentoStoreId = null;
         }
+
         return $magentoStoreId;
     }
 
@@ -1599,6 +1615,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $imageSize = Ebizmarts_MailChimp_Model_Config::IMAGE_SIZE_DEFAULT;
                 break;
         }
+
         $productImage = $productResourceModel->getAttributeRawValue($productId, $imageSize, $magentoStoreId);
         $productModel->setData($imageSize, $productImage);
 
@@ -1612,6 +1629,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } else {
                 $imageUrl = $this->getImageUrlForSize($imageSize, $productModel);
             }
+
             $this->setCurrentStore($curStore);
         }
 
@@ -1815,6 +1833,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1831,6 +1850,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$customMergeFields) {
             $customMergeFields = array();
         }
+
         return $customMergeFields;
     }
 
@@ -1865,6 +1885,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } else {
                 $url = $this->retrieveAndSaveMCJsUrlInConfig($storeId);
             }
+
             $script = '<script type="text/javascript" src="' . $url . '" defer></script>';
         }
 
@@ -1899,6 +1920,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
+
         return $mcJsUrlSaved;
     }
 
@@ -2235,6 +2257,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$collection->getSize()) {
             $finished = true;
         }
+
         //        $collection->addFieldToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
         $collection->setPageSize(100);
 
@@ -2255,6 +2278,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($this->timePassed($initialTime)) {
                 break;
             }
+
             if ($currentPage == $pages) {
                 $finished = true;
             }
@@ -2281,6 +2305,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($difference > $timeAmount) {
             $timePassed = true;
         }
+
         return $timePassed;
     }
 
@@ -2332,12 +2357,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 if ($this->isEcomSyncDataEnabled($storeId)) {
                     Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
                 }
+
                 if ($this->timePassed($initialTime)) {
                     $finished = false;
                     break;
                 }
             }
         }
+
         return $finished;
     }
 
@@ -2358,6 +2385,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$migrateFrom115 && !$migrateFrom116 && !$migrateFrom1164) {
             $migrationFinished = true;
         }
+
         return $migrationFinished;
     }
 
@@ -2415,6 +2443,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $this->delete1164MigrationConfigData();
             }
         }
+
         $this->getConfig()->cleanCache();
     }
 
@@ -2440,6 +2469,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                 }
             }
+
             Mage::register('mailchimp_store_ids_for_list_' . $listId, $storeIds);
         }
 
@@ -2490,6 +2520,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
         return $subscriber;
     }
 
@@ -2556,6 +2587,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 } catch (Exception $e) {
                     $this->logError($e->getMessage());
                 }
+
                 $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
             } else {
                 $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
@@ -2616,6 +2648,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     'api' => false
                 );
             }
+
             try {
                 $response = $api->lists->webhooks->getAll($listId);
                 $createWebhook = true;
@@ -2626,6 +2659,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         }
                     }
                 }
+
                 if ($createWebhook) {
                     $newWebhook = $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
                     $newWebhookId = $newWebhook['id'];
@@ -2643,6 +2677,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: ' . $hookUrl . ' is accessible externally to allow the webhook creation.';
                     $this->logError($errorMessage);
                 }
+
                 return $this->__($errorMessage);
             } catch (Exception $e) {
                 $this->logError($e->getMessage());
@@ -2673,6 +2708,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (false != strstr($hookUrl, '?', true)) {
             $hookUrl = strstr($hookUrl, '?', true);
         }
+
         return $hookUrl;
     }
 
@@ -2691,6 +2727,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $scopeIdsArray = array($scopeId, 0);
         }
+
         $configCollection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => $path))
             ->addFieldToFilter('scope_id', array('in' => $scopeIdsArray));
@@ -2701,6 +2738,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($this->isExtraEntry($config, $scope, $scopeId, $websiteId)) {
                 continue;
             }
+
             switch ($config->getScope()) {
                 case 'stores':
                     $scopeSoFar = array('scope_id' => $config->getScopeId(), 'scope' => $config->getScope());
@@ -2717,6 +2755,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     break;
             }
         }
+
         return $scopeSoFar;
     }
 
@@ -2747,6 +2786,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                 }
             }
+
             Mage::register('mailchimp_' . $configName . '_exists_for_scope_' . $scope . '_' . $scopeId, $configAssociatedToScope);
         }
 
@@ -2769,6 +2809,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $configEntry = $collection->getFirstItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
+
         return $mailchimpScope;
     }
 
@@ -2789,6 +2830,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $configEntry = $collection->getFirstItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
+
         return $mailchimpScope;
     }
 
@@ -2813,13 +2855,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($syncDelta) {
                 $subscriber->setData("mailchimp_sync_delta", $syncDelta);
             }
+
             if ($syncError) {
                 $subscriber->setData("mailchimp_sync_error", $syncError);
             }
+
             $subscriber->setData("mailchimp_sync_modified", $syncModified);
             if ($syncDeleted) {
                 $subscriber->setData("mailchimp_sync_deleted", $syncDeleted);
             }
+
             $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
             $subscriber->save();
         }
@@ -2854,6 +2899,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
         return array($batchArray, $counter);
     }
 
@@ -3030,6 +3076,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $lastItemSent = 0;
                     $this->logError($this->__('The item type sent in the filter does not match any of the available options.'));
             }
+
             if ($resendTurn) {
                 $collection->addFieldToFilter($keyCol, array('lteq' => $lastItemSent));
             } else {
@@ -3129,6 +3176,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 } else {
                     $this->setResendTurn(1, $scopeId, $scope);
                 }
+
                 $this->handleResendFinish($scopeId, $scope);
             } else {
                 //if ecommerce data sync is disabled delete old config values.
@@ -3150,18 +3198,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $isMissingCustomer = false;
         }
+
         $productId = $this->getProductResendLastId($storeId);
         if ($productId) {
             $isMissingProduct = $this->isMissingItemLowerThanId($productId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $storeId);
         } else {
             $isMissingProduct = false;
         }
+
         $orderId = $this->getOrderResendLastId($storeId);
         if ($orderId) {
             $isMissingOrder = $this->isMissingItemLowerThanId($orderId, Ebizmarts_MailChimp_Model_Config::IS_ORDER, $storeId);
         } else {
             $isMissingOrder = false;
         }
+
         $cartId = $this->getCartResendLastId($storeId);
         if ($cartId) {
             $isMissingCart = $this->isMissingItemLowerThanId($cartId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $storeId);
@@ -3174,6 +3225,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $allItemsSent = false;
         }
+
         return $allItemsSent;
     }
 
@@ -3191,11 +3243,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             } else {
                 $storeId = $store;
             }
+
             $allItemsSentInCurrentStore = $this->allResendItemsSentPerStoreView($storeId);
             if (!$allItemsSentInCurrentStore) {
                 $allItemsSent = false;
             }
         }
+
         return $allItemsSent;
     }
 
@@ -3224,6 +3278,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $isMissing = false;
                 break;
         }
+
         return $isMissing;
     }
 
@@ -3245,6 +3300,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $isMissing = false;
         }
+
         return $isMissing;
     }
 
@@ -3268,6 +3324,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $isMissing = false;
         }
+
         return $isMissing;
     }
 
@@ -3286,6 +3343,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($firstDate) {
             $orderCollection->addFieldToFilter('created_at', array('gt' => $firstDate));
         }
+
         Mage::getModel('mailchimp/api_orders')->joinMailchimpSyncDataWithoutWhere($orderCollection, $mailchimpStoreId);
         $orderCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
         if ($orderCollection->getSize()) {
@@ -3293,6 +3351,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $isMissing = false;
         }
+
         return $isMissing;
     }
 
@@ -3314,6 +3373,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($firstDate) {
             $quoteCollection->addFieldToFilter('updated_at', array('gt' => $firstDate));
         }
+
         Mage::getModel('mailchimp/api_carts')->joinMailchimpSyncDataWithoutWhere($quoteCollection, $mailchimpStoreId);
         $quoteCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
         if ($quoteCollection->getSize()) {
@@ -3321,6 +3381,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $isMissing = false;
         }
+
         return $isMissing;
     }
 
@@ -3340,6 +3401,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 if (isset($campaignData['settings']['title'])) {
                     $campaignName = $campaignData['settings']['title'];
                 }
+
                 if ($campaignName == '' && isset($campaignData['settings']['subject_line'])) {
                     $campaignName = $campaignData['settings']['subject_line'];
                 }
@@ -3351,6 +3413,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
+
         return $campaignName;
     }
 
@@ -3462,6 +3525,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $scopeData = $row->getScope() . '_' . $row->getScopeId();
             $mailchimpStoreIdsArray[$scopeData] = $row->getValue();
         }
+
         return $mailchimpStoreIdsArray;
     }
 
@@ -3476,6 +3540,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($forceUpdateStatus) {
             $subscriber->setMailchimpSyncModified(1);
         }
+
         $this->setMemberGeneralData($subscriber);
     }
 
@@ -3552,6 +3617,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $d = null;
         }
+
         return $d && $d->format($format) == $date;
     }
 
@@ -3630,6 +3696,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
         return $isNewApiKeyForSameAccount;
     }
 
@@ -3692,17 +3759,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (count($storesForScope)) {
             $whereString .= " AND (";
         }
+
         $counter = 0;
         foreach ($storesForScope as $storeId) {
             if ($counter) {
                 $whereString .= " OR ";
             }
+
             $whereString .= $connection->quoteInto("store_id = ?", $storeId);
             $counter++;
         }
+
         if (count($storesForScope)) {
             $whereString .= ")";
         }
+
         return $whereString;
     }
 
@@ -3766,6 +3837,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $string .= "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} : <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
         }
+
         return $string;
     }
 
@@ -3790,6 +3862,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->isDate($textArray)) {
             $textArray[1] = "$textArray[1]:$textArray[2]:$textArray[3]";
         }
+
         return $textArray;
     }
 
@@ -3823,6 +3896,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
+
         return $listId;
     }
 
@@ -3851,6 +3925,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
+
         return $interestGroupsArray;
     }
 
@@ -3874,6 +3949,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 foreach ($interestGroups['interests'] as $interestGroup) {
                     $groups[$interestGroup['id']] = $interestGroup['name'];
                 }
+
                 $interestGroupsArray[] = array(
                     'id' => $interestCategory['id'],
                     'title' => $interestCategory['title'],
@@ -3884,6 +3960,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
+
         return $interestGroupsArray;
     }
 
@@ -3934,6 +4011,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
             $interest = array();
         }
+
         $api = $this->getApi($storeId);
         $listId = $this->getGeneralList($storeId);
         try {
@@ -3944,6 +4022,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $rc[$item['id']]['interest'] = array('id' => $item['id'], 'title' => $item['title'], 'type' => $item['type']);
                 }
             }
+
             $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
             foreach ($interest as $interestId) {
                 $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
@@ -3954,6 +4033,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (MailChimp_Error $e) {
             $this->logError($e->getFriendlyMessage());
         }
+
         return $rc;
     }
 
@@ -3972,6 +4052,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if (!$interest) {
                 $interest = $this->getInterest($storeId);
             }
+
             $interestGroup = $this->getInterestGroupModel();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             if ($interestGroup->getId()) {
@@ -4000,6 +4081,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                 }
             }
+
             return $interest;
         } else {
             return array();
@@ -4049,10 +4131,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $customerId = $customerData->getId();
                 }
             }
+
             $subscriberId = null;
             if ($subscriber) {
                 $subscriberId = $subscriber->getSubscriberId();
             }
+
             $interestGroup = $this->getInterestGroupModel();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             $origSubscriberId = $interestGroup->getSubscriberId();
@@ -4060,9 +4144,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
                 $interestGroup->setSubscriberId($subscriberId);
             }
+
             if (!$origCustomerId || $customerId && $origCustomerId != $customerId) {
                 $interestGroup->setCustomerId($customerId);
             }
+
             $encodedGroups = $this->arrayEncode($groups);
             $interestGroup->setGroupdata($encodedGroups);
             //Avoid creating a new entry if no groupData available. (Customer creation)
@@ -4070,6 +4156,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 if ($storeId) {
                     $interestGroup->setStoreId($storeId);
                 }
+
                 $interestGroup->setUpdatedAt($this->getCurrentDateTime());
                 $interestGroup->save();
             }
@@ -4088,6 +4175,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } elseif (isset($params['group'])) {
             $groups = $params['group'];
         }
+
         return $groups;
     }
 
@@ -4152,6 +4240,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 continue;
             }
         }
+
         return $ret;
     }
 

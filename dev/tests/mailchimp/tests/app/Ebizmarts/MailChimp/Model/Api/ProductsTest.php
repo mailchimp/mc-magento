@@ -50,10 +50,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
+            ->setMethods(
+                array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
                 'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
                 'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
-                '_updateSyncData', '_markSpecialPrices'))
+                '_updateSyncData', '_markSpecialPrices')
+            )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -304,8 +306,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $isProductEnabled = false;
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('makeBatchId', '_updateSyncData', 'loadProductById', 'getMailChimpHelper',
-                'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest', 'isProductEnabled'))
+            ->setMethods(
+                array('makeBatchId', '_updateSyncData', 'loadProductById', 'getMailChimpHelper',
+                'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest', 'isProductEnabled')
+            )
             ->getMock();
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
@@ -525,8 +529,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $data = array(456, 789, 123);
 
         $productsApiMock = $this->productsApiMock
-            ->setMethods(array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
-                'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest'))
+            ->setMethods(
+                array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
+                'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
+            )
             ->getMock();
 
         $productMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)

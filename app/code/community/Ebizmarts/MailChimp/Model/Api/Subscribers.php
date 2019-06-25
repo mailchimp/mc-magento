@@ -119,6 +119,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         if ($subscriber->getMailchimpSyncModified()) {
             $data["status"] = $status;
         }
+
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
         if (count($interest)) {
@@ -144,6 +145,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $rc[$value['id']] = $value['checked'];
             }
         }
+
         return $rc;
     }
 
@@ -381,6 +383,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $helper->logError($e->getMessage());
                 return;
             }
+
             $mergeVars = $this->getMergeVars($subscriber);
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
@@ -422,6 +425,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                                 $errorMessage = $helper->__("The subscription could not be applied.");
                                 $this->addError($errorMessage);
                             }
+
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
                             $saveSubscriber = true;
                         } catch (Exception $e) {
@@ -436,6 +440,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             $errorMessage = $helper->__("The subscription could not be applied.");
                             $this->addError($errorMessage);
                         }
+
                         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
                         $saveSubscriber = true;
                     }
@@ -448,11 +453,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                         $errorMessage = $helper->__("The subscription could not be applied.");
                         $this->addError($errorMessage);
                     }
+
                     $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
             }
+
             if ($saveSubscriber) {
                 $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
                 $subscriber->save();
@@ -578,6 +585,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
             }
         }
+
         return $addressData;
     }
 

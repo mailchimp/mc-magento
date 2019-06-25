@@ -124,6 +124,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             $counter++;
         }
+
         return $customerArray;
     }
 
@@ -423,6 +424,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         if (!$mailchimpStoreId) {
             $mailchimpStoreId = $this->mailchimpStoreId;
         }
+
         $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getSyncDataTableName();
 

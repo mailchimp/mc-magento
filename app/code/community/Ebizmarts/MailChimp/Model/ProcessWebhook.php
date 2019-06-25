@@ -77,6 +77,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         $this->_profile($data);
                 }
             }
+
             $webhookRequest->setProcessed(1)
                 ->save();
         }
@@ -160,6 +161,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
                         $subscriber->setSubscriberLastname($subscriberLname);
                     }
+
                     $helper->subscribeMember($subscriber);
                 }
             }
@@ -216,10 +218,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 $customer->setFirstname($fname);
                 $saveRequired = true;
             }
+
             if ($lname && $lname !== $customer->getLastname()) {
                 $customer->setLastname($lname);
                 $saveRequired = true;
             }
+
             if ($saveRequired) {
                 $customer->save();
             }
@@ -231,10 +235,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         $subscriber->setSubscriberFirstname($fname);
                         $saveRequired = true;
                     }
+
                     if ($lname && $lname !== $subscriber->getSubscriberLastname()) {
                         $subscriber->setSubscriberLastname($lname);
                         $saveRequired = true;
                     }
+
                     if ($saveRequired) {
                         $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
                         $subscriber->save();

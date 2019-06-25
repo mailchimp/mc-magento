@@ -83,6 +83,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 if (!$error) {
                     $error = $helper->__('Something went wrong when retrieving the information.');
                 }
+
                 $this->_updateSyncData($ruleId, $mailchimpStoreId, Varien_Date::now(), $error);
             }
         } catch (Exception $e) {
@@ -271,6 +272,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 $mailChimpType = self::TYPE_FIXED;
                 break;
         }
+
         return $mailChimpType;
     }
 
@@ -286,6 +288,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 $mailChimpTarget = self::TARGET_PER_ITEM;
                 break;
         }
+
         return $mailChimpTarget;
     }
 
@@ -327,6 +330,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         } else {
             $mailChimpDiscount = $promoRule->getDiscountAmount();
         }
+
         return $mailChimpDiscount;
     }
 

@@ -38,8 +38,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
 
         $mailchimperrorsControllerMock = $this->mailchimperrorsController
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getRequest', 'getResponse', 'getMailchimperrorsModel', 'getApiBatches',
-                'getFileContent', 'unlink'))
+            ->setMethods(
+                array('makeHelper', 'getRequest', 'getResponse', 'getMailchimperrorsModel', 'getApiBatches',
+                'getFileContent', 'unlink')
+            )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)

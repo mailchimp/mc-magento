@@ -48,6 +48,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             // get all the orders modified
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
+
         // get new orders
 
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
@@ -189,6 +190,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if ($dataPromo !== null) {
             $data['promos'] = $dataPromo;
         }
+
         $statusArray = $this->_getMailChimpStatus($order);
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
@@ -197,6 +199,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (isset($statusArray['fulfillment_status'])) {
             $data['fulfillment_status'] = $statusArray['fulfillment_status'];
         }
+
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['updated_at_foreign'] = $order->getUpdatedAt();
         if ($this->isOrderCanceled($order)) {
@@ -658,6 +661,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
         }
+
         return $promo;
     }
 

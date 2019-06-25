@@ -46,6 +46,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
         } else {
             $groups[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
+
         return $groups;
     }
 

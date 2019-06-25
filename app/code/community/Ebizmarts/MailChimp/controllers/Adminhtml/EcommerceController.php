@@ -33,6 +33,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
                     $helper->resetErrors($store->getId());
                 }
             }
+
             $helper->resetErrors($scopeId, $scope);
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
@@ -68,6 +69,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
                 $this->addError($e->getMessage());
             }
         }
+
         $mageApp->getResponse()->setBody($success);
     }
 

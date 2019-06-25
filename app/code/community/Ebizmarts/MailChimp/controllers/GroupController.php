@@ -33,6 +33,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
                 $subscriber->setSubscriberLastname($order->getCustomerLastname());
                 $subscriber->subscribe($customerEmail);
             }
+
             $subscriberId = $subscriber->getSubscriberId();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             $encodedGroups = $helper->arrayEncode($params);
@@ -50,6 +51,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
             $helper->logError($e->getMessage());
             $session->addWarning($this->__('Something went wrong with the interests subscription. Please go to the account subscription menu to subscriber to the interests successfully.'));
         }
+
         $this->_redirect('/');
     }
 

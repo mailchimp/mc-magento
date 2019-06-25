@@ -45,6 +45,7 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
             $customerId = null;
             $storeId = $subscriber->getStoreId();
         }
+
         $interest = $helper->getInterestGroups($customerId, $subscriber->getSubscriberId(), $storeId);
         return $interest;
     }

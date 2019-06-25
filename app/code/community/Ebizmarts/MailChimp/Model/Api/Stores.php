@@ -77,6 +77,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         }
+
         return $response;
     }
 
@@ -138,6 +139,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $adminSession = $this->getAdminSession();
             $adminSession->addError($errorMessage);
         }
+
         return $response;
     }
 

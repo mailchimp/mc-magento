@@ -156,6 +156,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
                 $helper->logError($e->getMessage());
                 continue;
             }
+
             try {
                 $root = $api->getRoot()->info();
                 $stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);

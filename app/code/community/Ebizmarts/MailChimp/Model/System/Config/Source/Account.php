@@ -75,8 +75,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                             $message = $helper->__('Looks like your Mailchimp store was deleted. Please create a new one and associate it in order to get your Ecommerce data synced.');
                             Mage::getSingleton('adminhtml/session')->addWarning($message);
                         }
+
                         $this->_accountDetails['store_exists'] = false;
                     }
+
                     try {
                         $listId = (isset($mcStore['list_id']) && $mcStore['list_id']) ? $mcStore['list_id'] : null;
 
@@ -135,6 +137,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $totalListSubscribersText = $helper->__('Total Audience Subscribers:');
                 $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
             }
+
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
             $returnArray = array(
                 array('value' => self::USERNAME_KEY, 'label' => $username),
@@ -143,6 +146,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             if ($totalListSubscribers) {
                 $returnArray[] = array('value' => self::TOTAL_LIST_SUB_KEY, 'label' => $totalListSubscribers);
             }
+
             if ($this->_accountDetails['store_exists']) {
                 $totalCustomersText = $helper->__('  Total Customers:');
                 $totalCustomers = $totalCustomersText . ' ' . $this->_accountDetails['total_customers'];
@@ -163,6 +167,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $syncValue = self::FINISHED;
                     }
                 }
+
                 $syncLabel = $helper->__('Initial sync') . ': ' . $syncValue;
                 $returnArray = array_merge(
                     $returnArray,

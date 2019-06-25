@@ -38,9 +38,11 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
 
         $groupControllerMock = $this->groupController
             ->disableOriginalConstructor()
-            ->setMethods(array('getSessionLastRealOrder', 'getCoreSession', 'getHelper', 'getRequest',
+            ->setMethods(
+                array('getSessionLastRealOrder', 'getCoreSession', 'getHelper', 'getRequest',
                 'getInterestGroupModel', 'getSubscriberModel', 'getApiSubscriber', '_redirect',
-                'getCurrentDateTime','__'))
+                'getCurrentDateTime','__')
+            )
             ->getMock();
 
         $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
@@ -55,8 +57,10 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getSubscriberId', 'setSubscriberEmail', 'setSubscriberFirstname',
-                'setSubscriberLastname', 'subscribe', 'getSubscriberEmail', 'loadByEmail'))
+            ->setMethods(
+                array('getSubscriberId', 'setSubscriberEmail', 'setSubscriberFirstname',
+                'setSubscriberLastname', 'subscribe', 'getSubscriberEmail', 'loadByEmail')
+            )
             ->getMock();
 
         $coreSessionMock = $this->getMockBuilder(Mage_Core_Model_Session::class)
@@ -66,8 +70,10 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
 
         $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getByRelatedIdStoreId', 'setGroupdata', 'setSubscriberId', 'setCustomerId',
-                'setStoreId', 'setUpdatedAt', 'save'))
+            ->setMethods(
+                array('getByRelatedIdStoreId', 'setGroupdata', 'setSubscriberId', 'setCustomerId',
+                'setStoreId', 'setUpdatedAt', 'save')
+            )
             ->getMock();
 
         $apiSubscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)

@@ -58,6 +58,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
                     if ($store['list_id']=='') {
                         continue;
                     }
+
                     if (isset($store['connected_site'])) {
                         $label = $store['name'];
                     } else {
@@ -70,6 +71,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
         } else {
             $stores[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
+
         return $stores;
     }
 

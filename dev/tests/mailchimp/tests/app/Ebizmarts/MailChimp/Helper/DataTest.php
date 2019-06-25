@@ -227,8 +227,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'getResendEnabled',
-                'setIsSyncingIfFinishedPerScope', 'isEcomSyncDataEnabled'))
+            ->setMethods(
+                array('getResendTurnConfigCollection', 'getResendTurn', 'getResendEnabled',
+                'setIsSyncingIfFinishedPerScope', 'isEcomSyncDataEnabled')
+            )
             ->getMock();
 
         $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
@@ -264,8 +266,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope',
-                'setResendTurn', 'handleResendFinish', 'isEcomSyncDataEnabled'))
+            ->setMethods(
+                array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope',
+                'setResendTurn', 'handleResendFinish', 'isEcomSyncDataEnabled')
+            )
             ->getMock();
 
         $collectionMock = $this->getMockBuilder(Mage_Core_Model_Resource_Config_Data_Collection::class)
@@ -315,8 +319,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRealScopeForConfig', 'getGeneralList', 'deleteCurrentWebhook',
-                'isSubscriptionEnabled', 'createNewWebhook'))
+            ->setMethods(
+                array('getRealScopeForConfig', 'getGeneralList', 'deleteCurrentWebhook',
+                'isSubscriptionEnabled', 'createNewWebhook')
+            )
             ->getMock();
 
         $helperMock->expects($this->once())->method('getRealScopeForConfig')->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)->willReturn($realScopeArray);
@@ -344,8 +350,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
-                'setCurrentStore', 'getImageUrl', 'getImageUrlForSize'))
+            ->setMethods(
+                array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
+                'setCurrentStore', 'getImageUrl', 'getImageUrlForSize')
+            )
             ->getMock();
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
@@ -400,8 +408,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
-                'setCurrentStore', 'getImageUrl', 'getOriginalPath'))
+            ->setMethods(
+                array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
+                'setCurrentStore', 'getImageUrl', 'getOriginalPath')
+            )
             ->getMock();
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
@@ -879,9 +889,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getMCIsSyncing', 'getLastCustomerSent', 'getLastProductSent',
+            ->setMethods(
+                array('getMCStoreId', 'getMCIsSyncing', 'getLastCustomerSent', 'getLastProductSent',
                 'getLastOrderSent', 'getLastCartSent', 'getLastPromoCodeSent', 'saveMailchimpConfig',
-                'getCustomerResendLastId', 'getProductResendLastId', 'getOrderResendLastId', 'getCartResendLastId', 'getPromoCodeResendLastId'))
+                'getCustomerResendLastId', 'getProductResendLastId', 'getOrderResendLastId', 'getCartResendLastId', 'getPromoCodeResendLastId')
+            )
             ->getMock();
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($scopeId, $scope)->willReturn($mailchimpStoreId);
@@ -1193,14 +1205,18 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getInterestGroupsIfAvailable', 'isAdmin', 'getCustomerSession', 'getInterestGroupModel',
-                'getCurrentDateTime', 'arrayEncode'))
+            ->setMethods(
+                array('getInterestGroupsIfAvailable', 'isAdmin', 'getCustomerSession', 'getInterestGroupModel',
+                'getCurrentDateTime', 'arrayEncode')
+            )
             ->getMock();
 
         $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getByRelatedIdStoreId', 'getSubscriberId', 'getCustomerId', 'setSubscriberId',
-                'setCustomerId', 'setGroupdata', 'getGroupdata', 'setStoreId', 'setUpdatedAt', 'save'))
+            ->setMethods(
+                array('getByRelatedIdStoreId', 'getSubscriberId', 'getCustomerId', 'setSubscriberId',
+                'setCustomerId', 'setGroupdata', 'getGroupdata', 'setStoreId', 'setUpdatedAt', 'save')
+            )
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
@@ -1261,8 +1277,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMageApp', 'isEcomSyncDataEnabled', 'getConfigValueForScope',
-                'retrieveAndSaveMCJsUrlInConfig', 'getMCStoreId'))
+            ->setMethods(
+                array('getMageApp', 'isEcomSyncDataEnabled', 'getConfigValueForScope',
+                'retrieveAndSaveMCJsUrlInConfig', 'getMCStoreId')
+            )
             ->getMock();
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)

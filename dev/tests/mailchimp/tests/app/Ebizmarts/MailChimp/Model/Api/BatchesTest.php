@@ -305,8 +305,10 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMCStoreId', 'getEcommMinSyncDateFlag', 'isEcomSyncDataEnabled', 'getApi',
-                'getMCIsSyncing', 'logRequest', 'validateDate', 'saveMailchimpConfig', 'getPromoConfig'))
+            ->setMethods(
+                array('getMCStoreId', 'getEcommMinSyncDateFlag', 'isEcomSyncDataEnabled', 'getApi',
+                'getMCIsSyncing', 'logRequest', 'validateDate', 'saveMailchimpConfig', 'getPromoConfig')
+            )
             ->getMock();
 
         $apiCustomersMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Customers::class)
@@ -446,8 +448,10 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchesMock = $this->apiBatchesMock
             ->disableOriginalConstructor()
-            ->setMethods(array('getHelper', 'getSyncBatchesModel', 'getMagentoBaseDir', 'getBatchResponse',
-                'processEachResponseFile', 'batchDirExists', 'removeBatchDir'))
+            ->setMethods(
+                array('getHelper', 'getSyncBatchesModel', 'getMagentoBaseDir', 'getBatchResponse',
+                'processEachResponseFile', 'batchDirExists', 'removeBatchDir')
+            )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -589,8 +593,10 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isEcomSyncDataEnabled', 'getApi',
-                'saveMailchimpConfig', 'getDateSyncFinishByMailChimpStoreId'))
+            ->setMethods(
+                array('isEcomSyncDataEnabled', 'getApi',
+                'saveMailchimpConfig', 'getDateSyncFinishByMailChimpStoreId')
+            )
             ->getMock();
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)

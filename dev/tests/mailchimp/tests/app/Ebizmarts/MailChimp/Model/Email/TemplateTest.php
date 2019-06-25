@@ -30,9 +30,11 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
          */
         $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getDesignConfig', 'isValidForSend', 'setUseAbsoluteLinks', 'getProcessedTemplate',
+            ->setMethods(
+                array('getDesignConfig', 'isValidForSend', 'setUseAbsoluteLinks', 'getProcessedTemplate',
                 'getProcessedTemplateSubject', 'getSenderEmail', 'getMail', 'getSenderName', 'isPlain', 'makeMandrillHelper',
-                'hasQueue', 'getQueue', 'makeHelper', 'getSendingSetReturnPath', 'getSendersDomains', 'sendMail'))
+                'hasQueue', 'getQueue', 'makeHelper', 'getSendingSetReturnPath', 'getSendersDomains', 'sendMail')
+            )
             ->getMock();
 
         $varienObjectMock = $this->getMockBuilder(Varien_Object::class)

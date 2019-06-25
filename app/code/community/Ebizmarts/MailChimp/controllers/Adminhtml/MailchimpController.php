@@ -103,6 +103,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
                 $data[$key]['label'] = $liElement;
             }
         }
+
         $jsonData = json_encode($data);
 
         $response = $this->getResponse();

@@ -94,6 +94,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
         if (!$storeId) {
             $storeId = $this->_customer->getMailchimpStoreView();
         }
+
         return $storeId;
     }
 }

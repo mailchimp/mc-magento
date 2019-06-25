@@ -79,6 +79,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
         if (!$this->order) {
             $this->order = Mage::registry('current_order');
         }
+
         return $this->order;
     }
 

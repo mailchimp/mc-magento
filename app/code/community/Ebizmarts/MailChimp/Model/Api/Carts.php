@@ -46,6 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             // get all the carts modified but not converted in orders
             $allCarts = array_merge($allCarts, $this->_getModifiedQuotes($mailchimpStoreId, $magentoStoreId));
         }
+
         // get new carts
         $allCarts = array_merge($allCarts, $this->_getNewQuotes($mailchimpStoreId, $magentoStoreId));
         return $allCarts;
@@ -166,6 +167,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $this->_updateSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
+
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
 
@@ -321,6 +323,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if (empty($customer)) {
             return "";
         }
+
         $oneCart['customer'] = $customer;
         if ($campaignId) {
             $oneCart['campaign_id'] = $campaignId;
@@ -407,6 +410,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         } else {
             $token = $cart->getMailchimpToken();
         }
+
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl('', array('_nosid' => true, '_secure' => true)) . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->setToken($token);
         return $url;
@@ -488,6 +492,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if ($billingAddress->getCompany()) {
             $customer["company"] = $billingAddress->getCompany();
         }
+
         return $customer;
     }
 
