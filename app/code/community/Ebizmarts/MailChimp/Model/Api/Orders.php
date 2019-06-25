@@ -84,6 +84,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
+
                 if (!empty($orderJson)) {
                     $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
 
@@ -110,6 +111,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function _getNewOrders($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+
         $batchArray = array();
         $newOrders = $this->getResourceModelOrderCollection();
         // select carts for the current Magento store id
@@ -134,6 +136,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
+
                 if (!empty($orderJson)) {
                     $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
 
@@ -175,6 +178,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data = array();
         $data['id'] = $order->getIncrementId();
         $mailchimpCampaignId = $order->getMailchimpCampaignId();
+
         if ($this->shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId)) {
             $data['campaign_id'] = $mailchimpCampaignId;
         }
@@ -183,16 +187,19 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data['landing_site'] = $order->getMailchimpLandingPage();
         }
 
-        $data['currency_code'] = $order->getStoreCurrencyCode();
-        $data['order_total'] = $order->getBaseGrandTotal();
-        $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
-        $data['discount_total'] = abs($order->getBaseDiscountAmount());
-        $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
+        $data['currency_code'] = $order->getOrderCurrencyCode();
+        $data['order_total'] = $order->getGrandTotal();
+        $data['tax_total'] = $this->returnZeroIfNull($order->getTaxAmount());
+        $data['discount_total'] = abs($order->getDiscountAmount());
+        $data['shipping_total'] = $this->returnZeroIfNull($order->getShippingAmount());
         $dataPromo = $this->getPromoData($order);
+
         if ($dataPromo !== null) {
             $data['promos'] = $dataPromo;
         }
+
         $statusArray = $this->_getMailChimpStatus($order);
+
         if (isset($statusArray['financial_status'])) {
             $data['financial_status'] = $statusArray['financial_status'];
         }
@@ -200,11 +207,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         if (isset($statusArray['fulfillment_status'])) {
             $data['fulfillment_status'] = $statusArray['fulfillment_status'];
         }
+
         $data['processed_at_foreign'] = $order->getCreatedAt();
         $data['updated_at_foreign'] = $order->getUpdatedAt();
+
         if ($this->isOrderCanceled($order)) {
             $orderCancelDate = null;
             $commentCollection = $order->getStatusHistoryCollection();
+
             foreach ($commentCollection as $comment) {
                 if ($this->isTheOrderCommentCanceled($comment)) {
                     $orderCancelDate = $comment->getCreatedAt();
@@ -220,14 +230,17 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         //order lines
         $items = $order->getAllVisibleItems();
         $itemCount = 0;
+
         foreach ($items as $item) {
             $productId = $item->getProductId();
             $isTypeProduct = $this->isTypeProduct();
             $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
+
             if ($this->isItemConfigurable($item)) {
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
                 $variant = $this->getModelProduct()->getIdBySku($sku);
+
                 if (!$variant) {
                     continue;
                 }
@@ -286,6 +299,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 '_secure' => true
             )
         );
+
         if ($order->getCustomerFirstname()) {
             $data["customer"]["first_name"] = $order->getCustomerFirstname();
         }
@@ -295,9 +309,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
 
         $billingAddress = $order->getBillingAddress();
+
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
             $address = array();
+
             if ($street[0]) {
                 $address["address1"] = $data['billing_address']["address1"] = $street[0];
             }
@@ -345,6 +361,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $shippingAddress = $order->getShippingAddress();
         if ($shippingAddress) {
             $street = $shippingAddress->getStreet();
+
             if ($shippingAddress->getName()) {
                 $data['shipping_address']['name'] = $shippingAddress->getName();
             }
@@ -395,6 +412,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()));
         $totalOrders = 0;
         $totalAmountSpent = 0;
+
         foreach ($orderCollection as $customerOrder) {
             $totalOrders++;
             $totalAmountSpent += ($customerOrder->getGrandTotal() - $customerOrder->getTotalRefunded() - $customerOrder->getTotalCanceled());

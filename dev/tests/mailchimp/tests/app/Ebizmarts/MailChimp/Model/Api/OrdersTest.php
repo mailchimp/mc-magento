@@ -147,7 +147,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $orderIncrementId = 100;
         $campaignId = 'b6asda8q5';
         $mailchimpLandingPage = 'test';
-        $currencyCode = 'test';
+        $currencyCode = 'USD';
         $baseGrandTotal = 200;
         $baseTaxAmount = 0;
         $taxTotal = 0;
@@ -235,11 +235,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getIncrementId',
                 'getMailchimpCampaignId',
                 'getMailchimpLandingPage',
-                'getStoreCurrencyCode',
-                'getBaseGrandTotal',
-                'getBaseTaxAmount',
-                'getBaseDiscountAmount',
-                'getBaseShippingAmount',
+                'getOrderCurrencyCode',
+                'getGrandTotal',
+                'getTaxAmount',
+                'getDiscountAmount',
+                'getShippingAmount',
                 'getCreatedAt',
                 'getUpdatedAt',
                 'getAllVisibleItems',
@@ -326,19 +326,19 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $mailchimpLandingPage
             );
         $orderMock->expects($this->once())
-            ->method('getStoreCurrencyCode')
+            ->method('getOrderCurrencyCode')
             ->willReturn($currencyCode);
         $orderMock->expects($this->once())
-            ->method('getBaseGrandTotal')
+            ->method('getGrandTotal')
             ->willReturn($baseGrandTotal);
         $orderMock->expects($this->once())
-            ->method('getBaseTaxAmount')
+            ->method('getTaxAmount')
             ->willReturn($baseTaxAmount);
         $orderMock->expects($this->once())
-            ->method('getBaseDiscountAmount')
+            ->method('getDiscountAmount')
             ->willReturn($baseDiscountAmount);
         $orderMock->expects($this->once())
-            ->method('getBaseShippingAmount')
+            ->method('getShippingAmount')
             ->willReturn($baseShippingAmount);
         $orderMock->expects($this->once())
             ->method('getCreatedAt')
