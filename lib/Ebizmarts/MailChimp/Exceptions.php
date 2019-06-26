@@ -73,7 +73,6 @@ class MailChimp_Error extends Exception
                 $message = array_key_exists('message', $error) ? $error['message'] : '';
                 $line = "\t\t field [$field] : $message\n";
                 $errorDetails .= $line;
-
             }
             $friendlyMessage .= "\tErrors:\n".$errorDetails;
         }
@@ -137,5 +136,4 @@ class MailChimp_Error extends Exception
     {
         return $this->_mailchimpParams;
     }
-
 }

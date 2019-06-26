@@ -236,7 +236,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 '_makeCart',
                 'getAllCartsByEmail',
                 'addProductNotSentData'
-            ))
+            )
+        )
             ->getMock();
         $cartModelMock = $this
             ->getMockBuilder(Mage_Sales_Model_Quote::class)
@@ -410,7 +411,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getOrderCollection',
                 'getMailchimpEcommerceDataTableName'
-            ))
+            )
+        )
             ->getMock();
         $newCartsCollectionMock = $this
             ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -540,7 +542,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 '_makeCart',
                 'getAllCartsByEmail',
                 'addProductNotSentData'
-            ))
+            )
+        )
             ->getMock();
         $cartModelMock = $this
             ->getMockBuilder(Mage_Sales_Model_Quote::class)
@@ -724,7 +727,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'setToken',
                 'getToken',
                 'getOrderCollection'
-            ))
+            )
+        )
             ->getMock();
         $helperMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -937,7 +941,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchLimitFromConfig',
                 '_updateSyncData',
                 'getOrderCollection'
-            ))
+            )
+        )
             ->getMock();
         $helperMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -1061,7 +1066,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchLimitFromConfig',
                 '_updateSyncData',
                 'getOrderCollection'
-            ))
+            )
+        )
             ->getMock();
         $helperMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -1188,7 +1194,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getWebSiteIdFromMagentoStoreId',
                 'getBatchId',
                 'getOrderCollection'
-            ))
+            )
+        )
             ->getMock();
         $helperMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -1364,7 +1371,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 '_makeCart',
                 'setToken',
                 'getOrderCollection'
-            ))
+            )
+        )
             ->getMock();
         $helperMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)

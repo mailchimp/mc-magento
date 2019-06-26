@@ -10,10 +10,9 @@
 class Ebizmarts_MailChimp_Model_System_Config_Source_MailchimpStoreView extends Mage_Eav_Model_Entity_Attribute_Source_Abstract
 {
 
-    public function getAllOptions(){
+    public function getAllOptions()
+    {
 
         return Mage::getSingleton('adminhtml/system_store')->getStoreValuesForForm(false, true);
-
     }
-
 }

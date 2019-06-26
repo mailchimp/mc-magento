@@ -45,12 +45,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $orderDate = $syncedData['order_date'];
         $firstDate = '2018-09-26 00:00:00';
 
-        if ($status === 1){
+        if ($status === 1) {
             $assertStatus = '<div style ="color:green">Yes</div>';
-        } elseif ($orderId && $status === null){
+        } elseif ($orderId && $status === null) {
             $assertStatus = '<div style ="color:#ed6502">Processing</div>';
-        } elseif ($status === null && $orderDate > $firstDate){
-           $assertStatus = '<div style ="color:mediumblue">In queue</div>';
+        } elseif ($status === null && $orderDate > $firstDate) {
+            $assertStatus = '<div style ="color:mediumblue">In queue</div>';
         } else {
             $assertStatus = '<div style ="color:red">No</div>';
         }
@@ -90,7 +90,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $this->assertEquals($assertStatus, $result);
     }
 
-    public function renderDataProvider(){
+    public function renderDataProvider()
+    {
 
         return array(
             array(array('synced_status' => 1, 'order_id' => 1, 'order_date' => '2018-09-28 18:52:38')),
@@ -100,5 +101,4 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
             array(array('synced_status' => 0, 'order_id' => 1, 'order_date' => '2018-09-28 18:52:38'))
         );
     }
-
 }

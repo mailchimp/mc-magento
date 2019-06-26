@@ -23,9 +23,7 @@ try {
   ALTER TABLE `{$this->getTable('newsletter_subscriber')}` ADD column `mailchimp_sync_error` VARCHAR(255) NOT NULL;
 "
     );
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 

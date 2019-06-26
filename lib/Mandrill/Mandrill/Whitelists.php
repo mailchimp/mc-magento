@@ -54,5 +54,4 @@ class Mandrill_Whitelists
         $_params = array("email" => $email);
         return $this->master->call('whitelists/delete', $_params);
     }
-
 }

@@ -112,7 +112,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <can_be_empty>1</can_be_empty>
-                            <comment><![CDATA[Synchronize Magento's General Subscription List with this Mailchimp list.]]></comment>
+                            <comment><![CDATA[Synchronize Magento's General Subscription Audience with this Mailchimp audience.]]></comment>
                         </list>
                         <interest_categories translate="label comment">
                             <label>Interest Categories</label>
@@ -133,7 +133,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[In case no Interest groups are selected it will work as a normal subscription to the configured list]]></comment>
+                            <comment><![CDATA[In case no Interest groups are selected it will work as a normal subscription to the configured audience]]></comment>
                         </interest_in_success>
                         <interest_success_before translate="label">
                             <label>Add html code before the interest groups are displayed</label>
@@ -207,7 +207,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Click this button to create the above fields on the selected Mailchimp list.]]></comment>
+                            <comment><![CDATA[Click this button to create the above fields on the selected Mailchimp audience.]]></comment>
                         </create_fields>
                         <create_webhook>
                             <label translate="comment">Create Webhook</label>

@@ -55,13 +55,13 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                         foreach ($message->getRecipients() as $recipient) {
                             list($email, $name, $type) = $recipient;
                             switch ($type) {
-                            case self::EMAIL_TYPE_TO:
-                            case self::EMAIL_TYPE_CC:
-                                $mailer->addTo($email, $name);
-                                break;
-                            case self::EMAIL_TYPE_BCC:
-                                $mailer->addBcc($email);
-                                break;
+                                case self::EMAIL_TYPE_TO:
+                                case self::EMAIL_TYPE_CC:
+                                    $mailer->addTo($email, $name);
+                                    break;
+                                case self::EMAIL_TYPE_BCC:
+                                    $mailer->addBcc($email);
+                                    break;
                             }
                         }
 
@@ -105,14 +105,14 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     foreach ($message->getRecipients() as $recipient) {
                         list($email, $name, $type) = $recipient;
                         switch ($type) {
-                        case self::EMAIL_TYPE_BCC:
-                            $mailer->addBcc($email, '=?utf-8?B?' . base64_encode($name) . '?=');
-                            break;
-                        case self::EMAIL_TYPE_TO:
-                        case self::EMAIL_TYPE_CC:
-                        default:
-                            $mailer->addTo($email, '=?utf-8?B?' . base64_encode($name) . '?=');
-                            break;
+                            case self::EMAIL_TYPE_BCC:
+                                $mailer->addBcc($email, '=?utf-8?B?' . base64_encode($name) . '?=');
+                                break;
+                            case self::EMAIL_TYPE_TO:
+                            case self::EMAIL_TYPE_CC:
+                            default:
+                                $mailer->addTo($email, '=?utf-8?B?' . base64_encode($name) . '?=');
+                                break;
                         }
                     }
 

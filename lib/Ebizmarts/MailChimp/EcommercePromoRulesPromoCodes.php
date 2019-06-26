@@ -120,9 +120,17 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($storeId, $promoRuleId, $promoCodeId, $code = null, $redemption_url = null, $usage_count = null,
-                           $enabled = null, $created_at_foreign = null, $updated_at_foreign = null)
-    {
+    public function modify(
+        $storeId,
+        $promoRuleId,
+        $promoCodeId,
+        $code = null,
+        $redemption_url = null,
+        $usage_count = null,
+        $enabled = null,
+        $created_at_foreign = null,
+        $updated_at_foreign = null
+    ) {
         $_params = array();
         if ($code) {
             $_params['code'] = $code;

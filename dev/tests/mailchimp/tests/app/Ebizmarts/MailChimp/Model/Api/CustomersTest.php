@@ -140,7 +140,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->method('getId')
             ->willReturnOnConsecutiveCalls(
                 $customerId,
-                $customerId);
+                $customerId
+            );
         $customerMock->expects($this->any())->method('getEmail')->willReturn($customerEmail);
         $this->customersApiMock->expects($this->once())->method('_updateSyncData')->with($customerId, $mailchimpStoreId);
 
