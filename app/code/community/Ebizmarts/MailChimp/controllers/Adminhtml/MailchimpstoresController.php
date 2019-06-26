@@ -67,7 +67,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $title = $id ? $this->__('Edit Store') : $this->__('New Store');
 
         $this->_initAction();
-        $block = $this->getLayout()->createBlock('mailchimp/adminhtml_mailchimpstores_edit')->setData('action', $this->getUrl('*/*/save'));
+        $block = $this->getLayout()
+            ->createBlock('mailchimp/adminhtml_mailchimpstores_edit')
+            ->setData('action', $this->getUrl('*/*/save'));
 
         $this->_addBreadcrumb($title, $title)
             ->_addContent($block)

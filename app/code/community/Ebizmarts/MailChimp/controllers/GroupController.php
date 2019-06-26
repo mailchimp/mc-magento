@@ -49,7 +49,12 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
             $session->addSuccess($this->__('Thanks for sharing your interest with us.'));
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
-            $session->addWarning($this->__('Something went wrong with the interests subscription. Please go to the account subscription menu to subscriber to the interests successfully.'));
+            $session->addWarning(
+                $this->__(
+                    'Something went wrong with the interests subscription. '
+                    . 'Please go to the account subscription menu to subscriber to the interests successfully.'
+                )
+            );
         }
 
         $this->_redirect('/');
@@ -108,6 +113,6 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
      */
     protected function getCurrentDateTime()
     {
-        return Mage::getModel('core/date')->gmtDate('d-m-Y H:i:s');
+        return Mage::getSingleton('core/date')->gmtDate('d-m-Y H:i:s');
     }
 }

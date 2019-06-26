@@ -12,18 +12,18 @@
  */
 class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_Action
 {
-    private $mailchimpHelper = null;
+    protected $_>_mailchimpHelper = null;
 
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
      */
     protected function getHelper()
     {
-        if (!$this->mailchimpHelper) {
-            $this->mailchimpHelper = Mage::helper('mailchimp');
+        if (!$this->>_mailchimpHelper) {
+            $this->>_mailchimpHelper = Mage::helper('mailchimp');
         }
 
-        return $this->mailchimpHelper;
+        return $this->>_mailchimpHelper;
     }
 
     /**
@@ -40,7 +40,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
             if (isset($data['data']['list_id'])) {
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
-                if (count($storeIds)) {
+                if (!empty($storeIds)) {
                     $storeId = $storeIds[0];
                     if ($helper->isSubscriptionEnabled($storeId)) {
                         try {
