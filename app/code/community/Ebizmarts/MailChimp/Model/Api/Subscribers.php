@@ -186,7 +186,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
-        Mage::log(__METHOD__, null, 'events.log', true);
         $saveSubscriber = false;
         $isAdmin = Mage::app()->getStore()->isAdmin();
         $helper = $this->getMailchimpHelper();
