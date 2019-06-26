@@ -7,9 +7,11 @@
     <img width="244px" height="60px" src="https://ebizmarts-website.s3.amazonaws.com/Logo_Ebizmarts.png"/>
     <h4>
         <strong style="color:#EA7601;">
-        <?php echo $this->escapeHtml(Mage::helper('mailchimp')->__(
+        <?php echo $this->escapeHtml(
+            Mage::helper('mailchimp')->__(
                 'Mandrill For Magento v%s by',
-                $this->getMandrillVersion())
+                $this->getMandrillVersion()
+            )
         ); ?>
         </strong>
         <a target="_blank" href="http://ebizmarts.com">

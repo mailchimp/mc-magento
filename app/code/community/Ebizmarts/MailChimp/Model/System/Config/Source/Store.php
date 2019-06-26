@@ -31,7 +31,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         if (empty($this->_stores)) {
-            $apiKey = (empty($params)) ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']) : $params['api_key'];
+            $apiKey = (empty($params))
+                ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope'])
+                : $params['api_key'];
 
             if ($apiKey) {
                 try {

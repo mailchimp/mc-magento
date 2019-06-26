@@ -23,8 +23,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function send($email, $name = null, array $variables = array())
     {
-        $email_config = $this->getDesignConfig();
-        $storeId = (integer) $email_config->getStore();
+        $emailConfig = $this->getDesignConfig();
+        $storeId = (integer) $emailConfig->getStore();
         $mandrillHelper = $this->makeMandrillHelper();
         if (!$mandrillHelper->isMandrillEnabled($storeId)) {
             return $this->parentSend($email, $name, $variables);
@@ -108,11 +108,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $headers = $mail->getHeaders();
         $headers[] = $mandrillHelper->getUserAgent();
         $email['headers'] = $headers;
-        if (isset($variables['tags']) && count($variables['tags'])) {
+        if (isset($variables['tags']) && !empty($variables['tags'])) {
             $email ['tags'] = $variables['tags'];
         }
 
-        if (isset($variables['tags']) && count($variables['tags'])) {
+        if (isset($variables['tags']) && !empty($variables['tags'])) {
             $email ['tags'] = $variables['tags'];
         } else {
             $templateId = (string)$this->getId();
@@ -181,8 +181,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
     public function getMail()
     {
         $helper = $this->makeMandrillHelper();
-        $email_config = $this->getDesignConfig();
-        $storeId = (integer) $email_config->getStore();
+        $emailConfig = $this->getDesignConfig();
+        $storeId = (integer) $emailConfig->getStore();
         if (!$this->isMandrillEnabled($storeId)) {
             return parent::getMail();
         }

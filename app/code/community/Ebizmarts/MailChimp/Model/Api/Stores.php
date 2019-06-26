@@ -48,9 +48,26 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $api = $helper->getApiByKey($apiKey);
             $isSyncing = true;
             $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
-            $response = $this->addStore($api, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+            $response = $this->addStore(
+                $api,
+                $mailchimpStoreId,
+                $listId,
+                $storeName,
+                $currencyCode,
+                $isSyncing,
+                $storeDomain,
+                $storeEmail,
+                $currencySymbol,
+                $primaryLocale,
+                $timeZone,
+                $storePhone,
+                $address
+            );
             $configValues = array(
-                array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", $response['connected_site']['site_script']['url'])
+                array(
+                    Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId",
+                    $response['connected_site']['site_script']['url']
+                )
             );
             $helper->saveMailchimpConfig($configValues, 0, 'default');
             $successMessage = $helper->__("The Mailchimp store was successfully created.");
@@ -66,7 +83,15 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
             if (strstr($errorMessage, 'A store with the domain')) {
-                $errorMessage = $helper->__('A Mailchimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
+                $errorMessage = $helper->__(
+                    'A Mailchimp store with the same domain already exists in this account. '
+                    . 'You need to have a different URLs for each scope you set up the ecommerce data. '
+                    . 'Possible solutions '
+                )
+                . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>"
+                . "HERE</a> and "
+                . "<a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>"
+                . "HERE</a>";
                 $adminSession->addError($errorMessage);
             } else {
                 $adminSession->addError($errorMessage);
@@ -114,7 +139,20 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = $helper->getApiByKey($apiKey);
             $currencySymbol = $helper->getMageApp()->getLocale()->currency($currencyCode)->getSymbol();
-            $response = $api->getEcommerce()->getStores()->edit($mailchimpStoreId, $storeName, 'Magento', $storeDomain, null, $storeEmail, $currencyCode, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+            $response = $api->getEcommerce()->getStores()->edit(
+                $mailchimpStoreId,
+                $storeName,
+                'Magento',
+                $storeDomain,
+                null,
+                $storeEmail,
+                $currencyCode,
+                $currencySymbol,
+                $primaryLocale,
+                $timeZone,
+                $storePhone,
+                $address
+            );
             $successMessage = $helper->__("The Mailchimp store was successfully edited.");
             $adminSession = $this->getAdminSession();
             $adminSession->addSuccess($successMessage);
@@ -128,7 +166,15 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
             if (strstr($errorMessage, 'A store with the domain')) {
-                $errorMessage = $helper->__('A Mailchimp store with the same domain already exists in this account. You need to have a different URLs for each scope you set up the ecommerce data. Possible solutions ') . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>HERE</a> and <a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>HERE</a>";
+                $errorMessage = $helper->__(
+                    'A Mailchimp store with the same domain already exists in this account. '
+                    . 'You need to have a different URLs for each scope you set up the ecommerce data. '
+                    . 'Possible solutions '
+                )
+                . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>"
+                . "HERE</a> and "
+                . "<a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>"
+                . "HERE</a>";
                 $adminSession->addError($errorMessage);
             } else {
                 $adminSession->addError($errorMessage);
@@ -201,7 +247,13 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      */
     public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId)
     {
-        $mailchimpApi->getEcommerce()->getStores()->edit($mailchimpStoreId, null, null, null, $isSincingValue);
+        $mailchimpApi->getEcommerce()->getStores()->edit(
+            $mailchimpStoreId,
+            null,
+            null,
+            null,
+            $isSincingValue
+        );
     }
 
     /**
@@ -236,8 +288,35 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @param $address
      * @return mixed
      */
-    protected function addStore($api, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address)
-    {
-        return $api->getEcommerce()->getStores()->add($mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, 'Magento', $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address);
+    protected function addStore(
+        $api,
+        $mailchimpStoreId,
+        $listId,
+        $storeName,
+        $currencyCode,
+        $isSyncing,
+        $storeDomain,
+        $storeEmail,
+        $currencySymbol,
+        $primaryLocale,
+        $timeZone,
+        $storePhone,
+        $address
+) {
+        return $api->getEcommerce()->getStores()->add(
+            $mailchimpStoreId,
+            $listId,
+            $storeName,
+            $currencyCode,
+            $isSyncing,
+            'Magento',
+            $storeDomain,
+            $storeEmail,
+            $currencySymbol,
+            $primaryLocale,
+            $timeZone,
+            $storePhone,
+            $address
+        );
     }
 }

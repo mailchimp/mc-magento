@@ -4209,7 +4209,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getCurrentDateTime()
     {
-        return Mage::getModel('core/date')->date('d-m-Y H:i:s');
+        return Mage::getModel('core/date')->gmtDate('d-m-Y H:i:s');
     }
 
     /**

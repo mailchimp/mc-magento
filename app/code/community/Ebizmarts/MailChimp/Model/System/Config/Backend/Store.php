@@ -20,7 +20,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
         $scope = $this->getScope();
         $groups = $this->getData('groups');
 
-        $newMailchimpStoreId = (isset($groups['general']['fields']['storeid']['value'])) ? $groups['general']['fields']['storeid']['value'] : null;
+        $newMailchimpStoreId = (isset($groups['general']['fields']['storeid']['value']))
+            ? $groups['general']['fields']['storeid']['value']
+            : null;
         $oldMailchimpStoreId = $helper->getMCStoreId($scopeId, $scope);
         $isSyncing = $helper->getMCIsSyncing($newMailchimpStoreId, $scopeId, $scope);
         $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($newMailchimpStoreId, $scopeId, $scope);
@@ -28,12 +30,22 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
         if ($this->isValueChanged() && $this->getValue()) {
                 $helper->deletePreviousConfiguredMCStoreLocalData($oldMailchimpStoreId, $scopeId, $scope);
             if ($ecommMinSyncDate === null) {
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$newMailchimpStoreId", Varien_Date::now()));
+                $configValues = array(
+                    array(
+                        Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$newMailchimpStoreId",
+                        Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s")
+                    )
+                );
                 $helper->saveMailchimpConfig($configValues, 0, 'default');
             }
 
             if ($isSyncing === null) {
-                $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$newMailchimpStoreId", true));
+                $configValues = array(
+                    array(
+                        Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$newMailchimpStoreId",
+                        true
+                    )
+                );
                 $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
             }
         }

@@ -23,13 +23,18 @@ class Ebizmarts_MailChimp_Model_Mysql4_Interestgroup extends Mage_Core_Model_Mys
         $this->_init('mailchimp/interestgroup', 'id');
     }
 
-    public function getByRelatedIdStoreId($customerId = 0, $subscriberId = 0, $storeId)
+    public function getByRelatedIdStoreId($customerId = 0, $subscriberId = 0, $storeId = 0)
     {
         $read = $this->_getReadAdapter();
         $select = $read->select()
             ->from($this->getMainTable())
             ->where('store_id = ?', $storeId)
-            ->where('(' . $read->quoteInto('customer_id = ?', $customerId) . ' OR ' . $read->quoteInto('subscriber_id = ?', $subscriberId) . ')');
+            ->where(
+                '('
+                . $read->quoteInto('customer_id = ?', $customerId)
+                . ' OR ' . $read->quoteInto('subscriber_id = ?', $subscriberId)
+                . ')'
+            );
 
         $result = $read->fetchRow($select);
 

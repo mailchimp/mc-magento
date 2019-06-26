@@ -16,7 +16,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    private $helper;
+    protected $_helper;
     /**
      * Webhooks request url path
      *
@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
     public function __construct()
     {
-        $this->helper = Mage::helper('mailchimp');
+        $this->_helper = Mage::helper('mailchimp');
     }
 
     /**
@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected function getHelper()
     {
-        return $this->helper;
+        return $this->_helper;
     }
 
     public function saveWebhookRequest(array $data)
@@ -186,14 +186,20 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 switch ($action) {
                     case 'delete':
                         //if config setting "Webhooks Delete action" is set as "Delete customer account"
-                        if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $subscriber->getStoreId())) {
+                        if (Mage::getStoreConfig(
+                            Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE,
+                            $subscriber->getStoreId()
+                        )
+                        ) {
                             $subscriber->delete();
-                        } elseif ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                        } elseif ($subscriber->getSubscriberStatus() !=
+                            Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
                             $helper->unsubscribeMember($subscriber);
                         }
                         break;
                     case 'unsub':
-                        if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
+                        if ($subscriber->getSubscriberStatus() !=
+                            Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED) {
                             $helper->unsubscribeMember($subscriber);
                         }
                         break;
@@ -250,13 +256,21 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                      * Mailchimp subscriber not currently in magento newsletter subscribers.
                      * Get mailchimp subscriber status and add missing newsletter subscriber.
                      */
-                    $scopeArray = $helper->getFirstScopeFromConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $listId);
+                    $scopeArray = $helper->getFirstScopeFromConfig(
+                        Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+                        $listId
+                    );
                     $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
                     try {
                         $subscriber->setSubscriberFirstname($fname);
                         $subscriber->setSubscriberLastname($lname);
                         $md5HashEmail = md5(strtolower($email));
-                        $member = $api->getLists()->getMembers()->get($listId, $md5HashEmail, null, null);
+                        $member = $api->getLists()->getMembers()->get(
+                            $listId,
+                            $md5HashEmail,
+                            null,
+                            null
+                        );
                         if ($member['status'] == 'subscribed') {
                             $helper->subscribeMember($subscriber);
                         } elseif ($member['status'] == 'unsubscribed') {

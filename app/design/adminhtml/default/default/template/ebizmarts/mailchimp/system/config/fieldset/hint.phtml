@@ -13,17 +13,19 @@
     <img width="244px" height="60px" src="https://ebizmarts-website.s3.amazonaws.com/Logo_Ebizmarts.png"/>
     <h4>
         <strong style="color:#EA7601;">
-        <?php echo $this->escapeHtml(Mage::helper('mailchimp')->__(
+        <?php echo $this->escapeHtml(
+            Mage::helper('mailchimp')->__(
                 'Mailchimp For Magento v%s by',
                 $this->getMailChimpVersion()
-            )) ?>
+            )
+        ) ?>
         </strong>
         <a target="_blank" href="http://ebizmarts.com">
             <strong>ebizmarts</strong>
         </a>
         <br>
         <?php echo $this->escapeHtml(
-                Mage::helper('mailchimp')->__('Need help? Read how to')
+            Mage::helper('mailchimp')->__('Need help? Read how to')
         ); ?>
         <a href="http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-'
                         . 'magento#Configure-and-Connect"
