@@ -51,11 +51,11 @@ try {
         '999'  //sort_order
     );
 
-    $used_in_forms = array();
+    $usedInForms = array();
 
-    $used_in_forms[] = "adminhtml_customer";
+    $usedInForms[] = "adminhtml_customer";
 
-    $attribute->setData("used_in_forms", $used_in_forms)
+    $attribute->setData("used_in_forms", $usedInForms)
         ->setData("is_used_for_customer_segment", true)
         ->setData("is_system", 0)
         ->setData("is_user_defined", 1)
