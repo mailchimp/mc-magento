@@ -37,8 +37,12 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
             'connected_site' => array(
                 'site_foreign_id'  => 'a1s2d3f4g5h6j7k8l9p0',
                 'site_script' => array(
-                    'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js',
-                    'fragment' => '<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js");</script>'
+                    'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9'
+                        . '/a946187aed2d57d15cdac9987.js',
+                    'fragment' => '<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),'
+                        . 'p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}'
+                        . '(document,"script","https://chimpstatic.com/mcjs-connected/js/users/'
+                        . '1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js");</script>'
                 ),
             ),
             'automations' => array(
@@ -54,7 +58,10 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
             'updated_at' => '2019-03-04T19:53:57+00:00'
         );
         $configValues = array(
-            array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", $response['connected_site']['site_script']['url'])
+            array(
+                Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId",
+                $response['connected_site']['site_script']['url']
+            )
         );
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
@@ -95,9 +102,20 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $mageAppMock->expects($this->once())->method('getLocale')->willReturn($localeMock);
 
         $localeMock->expects($this->once())->method('currency')->with($currencyCode)->willReturnSelf();
-        $localeMock->expects($this->once())->method('getSymbol')->willReturn($currencySymbol)->willReturn($currencySymbol);
+        $localeMock
+            ->expects($this->once())
+            ->method('getSymbol')
+            ->willReturn($currencySymbol)
+            ->willReturn($currencySymbol);
 
-        $apiStoresMock->expects($this->once())->method('addStore')->with($apiMock, $mailchimpStoreId, $listId, $storeName, $currencyCode, $isSyncing, $storeDomain, $storeEmail, $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address)->willReturn($response);
+        $apiStoresMock
+            ->expects($this->once())
+            ->method('addStore')
+            ->with(
+                $apiMock, $mailchimpStoreId, $listId, $storeName,
+                $currencyCode, $isSyncing, $storeDomain, $storeEmail,
+                $currencySymbol, $primaryLocale, $timeZone, $storePhone, $address
+            )->willReturn($response);
 
         $helperMock->expects($this->once())->method('saveMailchimpConfig')->with($configValues, 0, 'default');
 
@@ -105,7 +123,11 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $adminSessionMock->expects($this->once())->method('addSuccess')->with($successMessage);
 
-        $apiStoresMock->createMailChimpStore($apiKey, $listId, $storeName, $currencyCode, $storeDomain, $storeEmail, $primaryLocale, $timeZone, $storePhone, $address);
+        $apiStoresMock
+            ->createMailChimpStore(
+                $apiKey, $listId, $storeName, $currencyCode,
+                $storeDomain, $storeEmail, $primaryLocale, $timeZone, $storePhone, $address
+            );
     }
 
     public function testDeleteMailChimpStore()

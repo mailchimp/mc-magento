@@ -7,17 +7,19 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
     /**
      * @var Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController $mailchimperrorsController
      */
-    private $mailchimperrorsController;
+    protected $_mailchimperrorsController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->mailchimperrorsController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController::class);
+        $this->_mailchimperrorsController = $this->getMockBuilder(
+            Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController::class
+        );
     }
 
     public function tearDown()
     {
-        $this->mailchimperrorsController = null;
+        $this->_mailchimperrorsController = null;
     }
 
     public function testDownloadresponseAction()
@@ -36,7 +38,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
         $items = array($item);
         $magentoBaseDir = '/magento/';
 
-        $mailchimperrorsControllerMock = $this->mailchimperrorsController
+        $mailchimperrorsControllerMock = $this->_mailchimperrorsController
             ->disableOriginalConstructor()
             ->setMethods(
                 array('makeHelper', 'getRequest', 'getResponse', 'getMailchimperrorsModel', 'getApiBatches',
@@ -75,7 +77,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
 
         $requestMock->expects($this->once())->method('getParam')->with($paramId)->willReturn($errorId);
 
-        $mailchimperrorsControllerMock->expects($this->once())->method('getMailchimperrorsModel')->willReturn($mailchimperrorsMock);
+        $mailchimperrorsControllerMock
+            ->expects($this->once())
+            ->method('getMailchimperrorsModel')
+            ->willReturn($mailchimperrorsMock);
 
         $mailchimperrorsControllerMock->expects($this->once())->method('getApiBatches')->willReturn($apiBatchesMock);
 
@@ -93,13 +98,25 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
             array('Content-type', 'application/json')
         );
 
-        $apiBatchesMock->expects($this->once())->method('getBatchResponse')->with($batchId, $storeId)->willReturn($files);
+        $apiBatchesMock
+            ->expects($this->once())
+            ->method('getBatchResponse')
+            ->with($batchId, $storeId)
+            ->willReturn($files);
 
-        $mailchimperrorsControllerMock->expects($this->once())->method('getFileContent')->with($file)->willReturn($items);
+        $mailchimperrorsControllerMock
+            ->expects($this->once())
+            ->method('getFileContent')
+            ->with($file)
+            ->willReturn($items);
         $mailchimperrorsControllerMock->expects($this->once())->method('unlink')->with($file);
 
         $apiBatchesMock->expects($this->once())->method('getMagentoBaseDir')->willReturn($magentoBaseDir);
-        $apiBatchesMock->expects($this->once())->method('batchDirExists')->with($magentoBaseDir, $batchId)->willReturn(true);
+        $apiBatchesMock
+            ->expects($this->once())
+            ->method('batchDirExists')
+            ->with($magentoBaseDir, $batchId)
+            ->willReturn(true);
         $apiBatchesMock->expects($this->once())->method('removeBatchDir')->with($magentoBaseDir, $batchId);
 
         $responseMock->expects($this->once())->method('setBody');

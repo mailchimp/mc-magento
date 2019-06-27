@@ -7,22 +7,24 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
     /**
      * @var Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController $mailchimpstoresController
      */
-    private $mailchimpstoresController;
+    protected $_mailchimpstoresController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->mailchimpstoresController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController::class);
+        $this->_mailchimpstoresController = $this->getMockBuilder(
+            Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController::class
+        );
     }
 
     public function tearDown()
     {
-        $this->mailchimpstoresController = null;
+        $this->_mailchimpstoresController = null;
     }
 
     public function testIndexAction()
     {
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(array('_loadStores', 'loadLayout', '_setActiveMenu', 'renderLayout'))
             ->getMock();
@@ -37,7 +39,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
     public function testGridAction()
     {
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(array('loadLayout', 'renderLayout'))
             ->getMock();
@@ -55,7 +57,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
         $urlPath = '*/*/save';
         $url = 'domain.com/mailchimp/mailchimpstores/save';
 
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(
                 array('_title', 'getRequest', 'loadMailchimpStore', 'sessionregisterStore', '_initAction',
@@ -93,18 +95,37 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $requestMock->expects($this->once())->method('getParam')->with($idParam)->willReturn($id);
 
-        $mailchimpstoresControllerMock->expects($this->once())->method('loadMailchimpStore')->with($id)->willReturn($mailchimpStoreModelMock);
-        $mailchimpstoresControllerMock->expects($this->once())->method('sessionregisterStore')->with($mailchimpStoreModelMock);
+        $mailchimpstoresControllerMock
+            ->expects($this->once())
+            ->method('loadMailchimpStore')
+            ->with($id)
+            ->willReturn($mailchimpStoreModelMock);
+        $mailchimpstoresControllerMock
+            ->expects($this->once())
+            ->method('sessionregisterStore')
+            ->with($mailchimpStoreModelMock);
         $mailchimpstoresControllerMock->expects($this->once())->method('_initAction')->willReturnSelf();
-        $mailchimpstoresControllerMock->expects($this->once())->method('_addBreadcrumb')->with('Edit Store', 'Edit Store')->willReturnSelf();
+        $mailchimpstoresControllerMock
+            ->expects($this->once())
+            ->method('_addBreadcrumb')
+            ->with('Edit Store', 'Edit Store')
+            ->willReturnSelf();
         $mailchimpstoresControllerMock->expects($this->once())->method('getLayout')->willReturn($layoutMock);
         $mailchimpstoresControllerMock->expects($this->once())->method('getUrl')->with($urlPath)->willReturn($url);
 
-        $layoutMock->expects($this->once())->method('createBlock')->with('mailchimp/adminhtml_mailchimpstores_edit')->willReturn($blockMock);
+        $layoutMock
+            ->expects($this->once())
+            ->method('createBlock')
+            ->with('mailchimp/adminhtml_mailchimpstores_edit')
+            ->willReturn($blockMock);
 
         $blockMock->expects($this->once())->method('setData')->with('action', $url)->willReturnSelf();
 
-        $mailchimpstoresControllerMock->expects($this->once())->method('_addContent')->with($blockMock)->willReturnSelf();
+        $mailchimpstoresControllerMock
+            ->expects($this->once())
+            ->method('_addContent')
+            ->with($blockMock)
+            ->willReturnSelf();
         $mailchimpstoresControllerMock->expects($this->once())->method('renderLayout')->willReturnSelf();
 
         $mailchimpstoresControllerMock->editAction();
@@ -112,7 +133,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
     public function testNewAction()
     {
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(array('_forward'))
             ->getMock();
@@ -129,7 +150,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
             'email_address' => 'email@example.com', 'currency_code' => 'USD', 'primary_locale' => 'en_US',
             'phone' => '123456', 'name' => 'name', 'domain' => 'domain.com', 'storeid' => 1, 'apikey' => '');
 
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', '_updateMailchimp', '_redirect', 'getHelper'))
             ->getMock();
@@ -165,7 +186,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
         );
         $jsonData = '{"a1s2d3f4g5":{"id":"a1s2d3f4g5","name":"Newsletter"}}';
 
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'getMailchimpHelper', 'getResponse'))
             ->getMock();
@@ -224,7 +245,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
         $apiKey = 'a1s2d3f4g5h6j7k8l9p0z1x2c3v4b5-us1';
         $apiKeyEncrypted = '4rGjyBo/uKChzvu0bF3hjaMwfM503N3/+2fdRjdlAGo=';
 
-        $mailchimpstoresControllerMock = $this->mailchimpstoresController
+        $mailchimpstoresControllerMock = $this->_mailchimpstoresController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'loadMailchimpStore', 'getMailchimpHelper', '_redirect'))
             ->getMock();
@@ -253,7 +274,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
 
         $requestMock->expects($this->once())->method('getParam')->with($idParam)->willReturn($tableId);
 
-        $mailchimpstoresControllerMock->expects($this->once())->method('loadMailchimpStore')->with($tableId)->willReturn($mailchimpStoreModelMock);
+        $mailchimpstoresControllerMock
+            ->expects($this->once())
+            ->method('loadMailchimpStore')
+            ->with($tableId)
+            ->willReturn($mailchimpStoreModelMock);
 
         $mailchimpStoreModelMock->expects($this->once())->method('getStoreid')->willReturn($mailchimpStoreId);
         $mailchimpStoreModelMock->expects($this->once())->method('getApikey')->willReturn($apiKeyEncrypted);

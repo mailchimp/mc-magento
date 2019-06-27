@@ -7,17 +7,17 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
     /**
      * @var Ebizmarts_MailChimp_GroupController $groupController
      */
-    private $groupController;
+    protected $_groupController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->groupController = $this->getMockBuilder(Ebizmarts_MailChimp_GroupController::class);
+        $this->_groupController = $this->getMockBuilder(Ebizmarts_MailChimp_GroupController::class);
     }
 
     public function tearDown()
     {
-        $this->groupController = null;
+        $this->_groupController = null;
     }
 
     public function testIndexAction()
@@ -36,7 +36,7 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
         $currentDateTime = '2018-07-26 12:43:40';
         $successMessage = 'Thanks for sharing your interest with us.';
 
-        $groupControllerMock = $this->groupController
+        $groupControllerMock = $this->_groupController
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getSessionLastRealOrder', 'getCoreSession', 'getHelper', 'getRequest',
@@ -52,7 +52,12 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getStoreId', 'getCustomerEmail', 'getCustomerId', 'getCustomerFirstname', 'getCustomerLastname'))
+            ->setMethods(
+                array(
+                    'getStoreId', 'getCustomerEmail', 'getCustomerId',
+                    'getCustomerFirstname', 'getCustomerLastname'
+                )
+            )
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
@@ -96,7 +101,10 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
 
         $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
         $orderMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
-        $orderMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
+        $orderMock
+            ->expects($this->once())
+            ->method('getCustomerId')
+            ->willReturn($customerId);
         $orderMock->expects($this->once())->method('getCustomerFirstname')->willReturn($customerFirstName);
         $orderMock->expects($this->once())->method('getCustomerLastname')->willReturn($customerLastName);
 
@@ -106,12 +114,28 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
         $subscriberMock->expects($this->once())->method('loadByEmail')->with($customerEmail)->willReturnSelf();
         $subscriberMock->expects($this->exactly(2))->method('getSubscriberId')
             ->willReturnOnConsecutiveCalls(null, $subscriberId);
-        $subscriberMock->expects($this->once())->method('setSubscriberEmail')->with($customerEmail)->willReturnSelf();
-        $subscriberMock->expects($this->once())->method('setSubscriberFirstname')->with($customerFirstName)->willReturnSelf();
-        $subscriberMock->expects($this->once())->method('setSubscriberLastname')->with($customerLastName)->willReturnSelf();
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberEmail')
+            ->with($customerEmail)
+            ->willReturnSelf();
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberFirstname')
+            ->with($customerFirstName)
+            ->willReturnSelf();
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberLastname')
+            ->with($customerLastName)
+            ->willReturnSelf();
         $subscriberMock->expects($this->once())->method('subscribe')->willReturnSelf();
 
-        $interestGroupMock->expects($this->once())->method('getByRelatedIdStoreId')->with($customerId, $subscriberId, $storeId)->willReturnSelf();
+        $interestGroupMock
+            ->expects($this->once())
+            ->method('getByRelatedIdStoreId')
+            ->with($customerId, $subscriberId, $storeId)
+            ->willReturnSelf();
 
         $helperMock->expects($this->once())->method('arrayEncode')->with($params)->willReturn($encodedGroupData);
 

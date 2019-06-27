@@ -26,8 +26,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_StoreTest extends PHPUnit_F
                     'connected_site' => array(
                         'site_foreign_id'  => 'a1s2d3f4g5h6j7k8l9p0',
                         'site_script' => array(
-                            'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js',
-                            'fragment' => '<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js");</script>'
+                            'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9'
+                                . '/a946187aed2d57d15cdac9987.js',
+                            'fragment' => '<script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),'
+                                . 'p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}'
+                                . '(document,"script","https://chimpstatic.com/mcjs-connected/js/users/'
+                                . '1647ea7abc3f2f3259e2613f9/a946187aed2d57d15cdac9987.js");</script>'
                         ),
                     ),
                     'automations' => array(

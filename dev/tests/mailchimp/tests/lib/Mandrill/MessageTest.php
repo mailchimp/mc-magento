@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
     /**
      * @return Zend_Mime_Part
      */
-    private function createAttachment()
+    public function createAttachment()
     {
         $mp              = new Zend_Mime_Part(self::ATTACHMENT_TEST_CONTENT);
         $mp->encoding    = Zend_Mime::ENCODING_BASE64;

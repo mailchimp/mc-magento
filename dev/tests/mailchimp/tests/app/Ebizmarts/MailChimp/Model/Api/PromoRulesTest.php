@@ -2,7 +2,7 @@
 
 class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_TestCase
 {
-    private $promoRulesApiMock;
+    protected $_promoRulesApiMock;
 
     const BATCH_ID = 'storeid-1_PRL_2017-05-18-14-45-54-38849500';
 
@@ -13,12 +13,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         Mage::app('default');
 
         /** @var Ebizmarts_MailChimp_Model_Api_PromoRules $apiPromoRulesMock promoRulesApiMock */
-        $this->promoRulesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoRules::class);
+        $this->_promoRulesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoRules::class);
     }
 
     public function tearDown()
     {
-        $this->promoRulesApiMock = null;
+        $this->_promoRulesApiMock = null;
     }
 
     public function testCreateBatchJson()
@@ -34,7 +34,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             )
         );
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('getMailChimpHelper', '_getModifiedAndDeletedPromoRules'))
             ->getMock();
 
@@ -44,8 +44,15 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->getMock();
 
         $promoRulesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
-        $mailChimpHelperMock->expects($this->once())->method('getDateMicrotime')->willReturn('2017-10-23-19-34-31-92333600');
-        $promoRulesApiMock->expects($this->once())->method('_getModifiedAndDeletedPromoRules')->with($mailchimpStoreId)->willReturn($promoRulesArray);
+        $mailChimpHelperMock
+            ->expects($this->once())
+            ->method('getDateMicrotime')
+            ->willReturn('2017-10-23-19-34-31-92333600');
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('_getModifiedAndDeletedPromoRules')
+            ->with($mailchimpStoreId)
+            ->willReturn($promoRulesArray);
 
         $promoRulesApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
     }
@@ -64,7 +71,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $ruleSimpleAction = 'by_percent';
         $ruleIsActive = true;
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getPromoRule', 'getMailChimpHelper', '_updateSyncData', 'getMailChimpDiscountAmount',
@@ -176,7 +183,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $ruleIsActive = true;
         $error = $promoRuleData['error'];
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->disableOriginalConstructor()
             ->setMethods(array('getPromoRule', '_updateSyncData', 'getMailChimpHelper', 'getMailChimpDiscountAmount', 'getMailChimpType', 'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation'))
             ->getMock();
@@ -258,7 +265,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $magentoStoreId = 1;
         $websiteId = 1;
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('getPromoRuleResourceCollection', 'getWebsiteIdByStoreId'))
             ->getMock();
 
@@ -279,7 +286,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
     public function testGetSyncDataTableName()
     {
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('getCoreResource'))
             ->getMock();
 
@@ -296,7 +303,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
     public function testUpdate()
     {
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('_setModified'))
             ->getMock();
 
@@ -307,7 +314,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
     public function testMarkAsDeleted()
     {
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('_setDeleted'))
             ->getMock();
 
