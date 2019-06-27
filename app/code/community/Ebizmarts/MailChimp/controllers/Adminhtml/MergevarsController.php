@@ -31,22 +31,28 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
 
         if (is_numeric($value)) {
             Mage::getSingleton('adminhtml/session')
-                ->addError($this->__(
-                    'There was an error processing the new field. '
-                    . 'MailChimp tag value can not be numeric.'
-                ));
+                ->addError(
+                    $this->__(
+                        'There was an error processing the new field. '
+                        . 'MailChimp tag value can not be numeric.'
+                    )
+                );
         } elseif ($helper->customMergeFieldAlreadyExists($value, $scopeArray['scope_id'], $scopeArray['scope'])) {
             Mage::getSingleton('adminhtml/session')
-                ->addError($this->__(
-                    'There was an error processing the new field. '
-            . 'MailChimp tag value already exists.'
-                ));
+                ->addError(
+                    $this->__(
+                        'There was an error processing the new field. '
+                        . 'MailChimp tag value already exists.'
+                    )
+                );
         } elseif ($blankSpacesAmount > 0) {
             Mage::getSingleton('adminhtml/session')
-                ->addError($this->__(
-                    'There was an error processing the new field. '
-            . 'MailChimp tag value can not contain blank spaces.'
-                ));
+                ->addError(
+                    $this->__(
+                        'There was an error processing the new field. '
+                        . 'MailChimp tag value can not contain blank spaces.'
+                    )
+                );
         } else {
             $customMergeFields = $helper->getCustomMergeFields($scopeArray['scope_id'], $scopeArray['scope']);
             $customMergeFields[] = array('label' => $label, 'value' => $value, 'field_type' => $fieldType);

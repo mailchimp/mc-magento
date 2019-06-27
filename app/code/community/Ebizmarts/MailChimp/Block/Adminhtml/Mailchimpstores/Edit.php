@@ -86,9 +86,14 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         $helper = $this->makeHelper();
         if ($scope !== false) {
             $scopeName = $helper->getScopeName($scope);
-            $message = $helper->__("This store is currently in use for this Magento store at %s scope. Do you want to proceed anyways?", $scopeName);
+            $message = $helper->__(
+                "This store is currently in use for this Magento store at %s scope. Do you want to proceed anyways?",
+                $scopeName
+            );
         } else {
-            $message = $helper->__("This store is currently in use for this Magento store. Do you want to proceed anyways?");
+            $message = $helper->__(
+                "This store is currently in use for this Magento store. Do you want to proceed anyways?"
+            );
         }
 
         return $message;

@@ -10,8 +10,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminh
 {
     protected function _prepareForm()
     {
-        $form = new Varien_Data_Form(array('id' => 'edit_form', 'action' => $this->getUrl('*/*/saveadd'), 'method' => 'post'));
-        $fieldset = $form->addFieldset('base_fieldset', array('legend' => Mage::helper('mailchimp')->__('Mergevars Data')));
+        $form = new Varien_Data_Form(
+            array(
+                'id' => 'edit_form',
+                'action' => $this->getUrl('*/*/saveadd'),
+                'method' => 'post'
+            )
+        );
+        $fieldset = $form->addFieldset(
+            'base_fieldset',
+            array('legend' => Mage::helper('mailchimp')->__('Mergevars Data'))
+        );
 
 
         $fieldset->addField(
@@ -45,7 +54,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminh
             'label' => Mage::helper('mailchimp')->__('Merge Field Tag'),
             'id'    => 'mergevar_value',
             'title' => Mage::helper('mailchimp')->__('Merge Field Tag'),
-            'note'     => 'This value will be used when adding the logic in the Observer. Blank spaces are not allowed.',
+            'note'     => 'This value will be used when adding the logic in the Observer. '
+                . 'Blank spaces are not allowed.',
             'required' => true
             )
         );

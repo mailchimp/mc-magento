@@ -99,24 +99,30 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                     Mage::getSingleton('core/session')->addSuccess($this->__('Coupon was automatically applied.'));
                     if (!$quote->getItemsCount()) {
                         Mage::getSingleton('core/session')
-                            ->addWarning($this->__(
-                                'If you log in without adding any item to the cart, '
-                                . 'you will need to re-apply the coupon code manually.'
-                            ));
+                            ->addWarning(
+                                $this->__(
+                                    'If you log in without adding any item to the cart, '
+                                    . 'you will need to re-apply the coupon code manually.'
+                                )
+                            );
                     }
                 } else {
                     Mage::getSingleton('core/session')
-                        ->addError($this->__(
-                            'Something went wrong when trying to apply the coupon code.'
-                        ));
+                        ->addError(
+                            $this->__(
+                                'Something went wrong when trying to apply the coupon code.'
+                            )
+                        );
                 }
 
                 $this->getResponse()->setRedirect($url, 301);
             } else {
                 Mage::getSingleton('customer/session')
-                    ->addNotice($this->__(
-                        "The coupon code could not be applied for the current store. Please try to apply it manually."
-                    ));
+                    ->addNotice(
+                        $this->__(
+                            "The coupon code could not be applied for the current store. Please try to apply it manually."
+                        )
+                    );
                 $this->getResponse()
                     ->setRedirect($url);
             }

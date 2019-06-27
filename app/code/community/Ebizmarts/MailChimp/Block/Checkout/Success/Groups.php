@@ -14,14 +14,14 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected $helper;
-    protected $storeId;
+    protected $_helper;
+    protected $_toreId;
 
     public function __construct()
     {
         parent::__construct();
-        $this->helper = Mage::helper('mailchimp');
-        $this->storeId = Mage::app()->getStore()->getId();
+        $this->_helper = Mage::helper('mailchimp');
+        $this->_storeId = Mage::app()->getStore()->getId();
     }
 
     public function getFormUrl()
@@ -49,14 +49,14 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
 
     public function getMessageBefore()
     {
-        $storeId = $this->storeId;
+        $storeId = $this->_storeId;
         $message = $this->getMailChimpHelper()->getCheckoutSuccessHtmlBefore($storeId);
         return $message;
     }
 
     public function getMessageAfter()
     {
-        $storeId = $this->storeId;
+        $storeId = $this->_storeId;
         $message = $this->getMailChimpHelper()->getCheckoutSuccessHtmlAfter($storeId);
         return $message;
     }
@@ -87,6 +87,6 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
      */
     protected function getMailChimpHelper()
     {
-        return $this->helper;
+        return $this->_helper;
     }
 }

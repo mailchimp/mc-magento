@@ -10,7 +10,8 @@
  * @date:     6/28/16 3:55 PM
  * @file:     Mapfields.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
+    extends Mage_Adminhtml_Block_System_Config_Form_Field_Array_Abstract
 {
     protected $_customerAttributes;
 
@@ -65,7 +66,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
     protected function _renderCellTemplate($columnName)
     {
         if (empty($this->_columns[$columnName])) {
-            throw new Exception('Wrong column name specified.');
+            Mage:throwException('Wrong column name specified.');
         }
 
         $column = $this->_columns[$columnName];
@@ -79,7 +80,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields ext
 
             $rendered .= '</select>';
         } else {
-            return '<input type="text" name="' . $inputName . '" value="#{' . $columnName . '}" ' . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';
+            return
+                '<input type="text" name="'
+                . $inputName . '" value="#{' . $columnName . '}" '
+                . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';
         }
 
         return $rendered;

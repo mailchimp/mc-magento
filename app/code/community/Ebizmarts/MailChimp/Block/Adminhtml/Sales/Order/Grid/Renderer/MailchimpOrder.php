@@ -11,7 +11,8 @@
  * @date:     12/12/17 3:28 PM
  * @file:     Abandoned.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder
+    extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
     const SYNCED = 1;
 

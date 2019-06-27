@@ -1,11 +1,23 @@
 <?php
 
-class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form extends Mage_Adminhtml_Block_Widget_Form
+class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form
+    extends Mage_Adminhtml_Block_Widget_Form
 {
     protected function _prepareForm()
     {
-        $form = new Varien_Data_Form(array('id' => 'edit_form', 'action' => $this->getUrl('*/*/resendEcommerceData'), 'method' => 'post'));
-        $fieldset = $form->addFieldset('base_fieldset', array('legend' => Mage::helper('mailchimp')->__('Resend Data')));
+        $form = new Varien_Data_Form(
+            array(
+                'id' => 'edit_form',
+                'action' => $this->getUrl('*/*/resendEcommerceData'),
+                'method' => 'post'
+            )
+        );
+        $fieldset = $form->addFieldset(
+            'base_fieldset',
+            array(
+                'legend' => Mage::helper('mailchimp')->__('Resend Data')
+            )
+        );
 
 
         $fieldset->addField(
@@ -68,7 +80,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form ext
                 'label' => "Promo Rules",
                 'id' => 'promo',
                 'title' => 'Promo Rules',
-                'value' => Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE. ', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
+                'value' => Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE. ', '
+                    . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                 'required' => false,
                 'checked'  => '1',
             )
