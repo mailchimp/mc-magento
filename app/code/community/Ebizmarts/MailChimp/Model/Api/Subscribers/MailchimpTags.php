@@ -19,6 +19,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     private $_customer;
     private $_mcHelper;
 
+    public function __construct()
+    {
+        $this->setMailChimpHelper();
+    }
+
     public function setStoreId($storeId)
     {
         $this->_storeId = $storeId;
@@ -62,11 +67,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     public function getMailChimpTagValue($key)
     {
         return $this->_mailChimpTags[$key];
-    }
-
-    public function __construct()
-    {
-        $this->setMailChimpHelper();
     }
 
     /**
@@ -130,6 +130,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param $attributeCode
      * @param $key
      * @param $attribute
+     * @return |null
      */
     protected function customerAttributes($attributeCode, $key, $attribute)
     {
@@ -171,7 +172,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
     /**
      * @param $mapFields
-     * @return array | returns an array of mapFields
+     * @return mixed
      */
     protected function unserializeMapFields($mapFields)
     {
@@ -191,7 +192,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function dispatchMergeVarBefore($attributeCode, &$eventValue)
     {
-
         Mage::dispatchEvent(
             'mailchimp_merge_field_send_before',
             array(
@@ -444,7 +444,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         $optionValue = null;
 
         $attrValue = $this->getCustomerGroupLabel($attributeCode, $customer);
-        if ($attrValue!== null) {
+        if ($attrValue !== null) {
             if ($attribute['frontend_input'] == 'select' && $attrValue) {
                 $attr = $customer->getResource()->getAttribute($attributeCode);
                 $optionValue = $attr->getSource()->getOptionText($attrValue);
@@ -460,11 +460,15 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     /**
      * @param $attributeCode
      * @param $customer
-     * @return string | returns the date of birth of the customer string format.
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
      */
     protected function getDateOfBirth($attributeCode, $customer)
     {
-        return date("m/d", strtotime($this->getCustomerGroupLabel($attributeCode, $customer)));
+        return $this->getMailchimpHelper()->formatDate(
+            $this->getCustomerGroupLabel($attributeCode, $customer),
+            'm/d', 1
+        );
     }
 
     /**

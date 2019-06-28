@@ -44,6 +44,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $this->_storeId;
     }
 
+    /**
+     * @param $listId
+     * @param $storeId
+     * @param $limit
+     * @return array
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function createBatchJson($listId, $storeId, $limit)
     {
         $this->setStoreId($storeId);
@@ -122,6 +130,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $subscriberArray;
     }
 
+    /**
+     * @param $subscriber
+     * @return array
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
     protected function _buildSubscriberData($subscriber)
     {
         $helper = $this->getMailchimpHelper();
@@ -129,15 +143,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
 
-        $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_mailchimpTags');
-        $mailChimpTags->setMailChimpHelper($helper);
-        $mailChimpTags->setStoreId($storeId);
-        $mailChimpTags->setSubscriber($subscriber);
-        $mailChimpTags->setCustomer(
-            $this->getCustomerByWebsiteAndId()
-            ->setWebsiteId($this->getWebSiteByStoreId($storeId))->load($subscriber->getCustomerId())
-        );
-        $mailChimpTags->buildMailChimpTags();
+        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $storeId);
 
         if ($mailChimpTags->getMailchimpTags()) {
             $data["merge_fields"] = $mailChimpTags->getMailchimpTags();
@@ -161,6 +167,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $subscriber
      * @return array
+     * @throws Mage_Core_Exception
+     * @throws MailChimp_Error
      */
     protected function _getInterest($subscriber)
     {
@@ -178,12 +186,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $rc;
     }
 
-
-
     /**
-     * @param $subscriber
-     * @param bool $updateStatus If set to true, it will force the status update even for those already subscribed.
-     */
+    * @param $subscriber
+    * @param bool $updateStatus If set to true, it will force the status update even for those already subscribed.
+    */
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
         $saveSubscriber = false;
@@ -202,16 +208,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 return;
             }
 
-            $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
-            $mailChimpTags->setMailChimpHelper($helper);
-            $mailChimpTags->setStoreId($storeId);
-            $mailChimpTags->setSubscriber($subscriber);
-            $mailChimpTags->setCustomer(
-                $this->getCustomerByWebsiteAndId()->
-                setWebsiteId($this->getWebSiteByStoreId($storeId))->load($subscriber->getCustomerId())
-            );
-
-            $mailChimpTags->buildMailChimpTags();
+            $mailChimpTags = $this->_buildMailchimpTags($subscriber, $storeId);
 
 
             $language = $helper->getStoreLanguageCode($storeId);
@@ -237,11 +234,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $saveSubscriber = true;
             } catch (MailChimp_Error $e) {
-                if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged()
+                if ($this->isSubscribed($newStatus) && $subscriber->getIsStatusChanged()
                     && !$helper->isSubscriptionConfirmationEnabled($storeId)) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
-                            $api->lists->members->update(
+                            $api->getLists()->getMembers()->update(
                                 $listId, $md5HashEmail, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
                             );
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
@@ -355,6 +352,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     /**
      * @param $subscriber
+     * @throws Mage_Core_Exception
      */
     public function deleteSubscriber($subscriber)
     {
@@ -364,7 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         try {
             $api = $helper->getApi($storeId);
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
+            $api->getLists()->getMembers()->update($listId, $md5HashEmail, null, 'unsubscribed');
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
@@ -375,6 +373,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
     }
 
+    /**
+     * @param $emailAddress
+     */
     public function update($emailAddress)
     {
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
@@ -384,7 +385,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
     }
 
-
     /**
      * @param $errorMessage
      */
@@ -393,19 +393,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         Mage::getSingleton('core/session')->addError($errorMessage);
     }
 
-
-
-
     /**
      * @param $storeId
      * @return Mage_Core_Model_Abstract
      */
-    protected function getWebSiteByStoreId($storeId)
+    protected function getWebsiteByStoreId($storeId)
     {
         return Mage::getModel('core/store')->load($storeId)->getWebsiteId();
     }
-
-
 
     /**
      * @return false|Mage_Customer_Model_Customer
@@ -431,7 +426,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $this->mcHelper;
     }
 
-
     /**
      * @param $lastOrder
      * @return array | return an array with the address from the order if exist and the addressData is empty.
@@ -453,7 +447,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function getSubscriberSyncDataItem($itemId, $magentoStoreId)
     {
-        $subscriberSyndDataItem = null;
+        $subscriberSyncDataItem = null;
         $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_id', array('eq' => $itemId))
             ->addFieldToFilter('store_id', array('eq' => $magentoStoreId))
@@ -461,14 +455,40 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->setPageSize(1);
 
         if ($collection->getSize()) {
-            $subscriberSyndDataItem = $collection->getFirstItem();
+            $subscriberSyncDataItem = $collection->getFirstItem();
         }
 
-        return $subscriberSyndDataItem;
+        return $subscriberSyncDataItem;
     }
 
+    /**
+     * @param $status
+     * @return bool
+     */
+    protected function isSubscribed($status)
+    {
+        if ($status === Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+            return true;
+        }
+    }
 
-
-
+    /**
+     * @param $subscriber
+     * @param $storeId
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function _buildMailchimpTags($subscriber, $storeId)
+    {
+        $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
+        $mailChimpTags->setMailChimpHelper($this->getMailchimpHelper());
+        $mailChimpTags->setStoreId($storeId);
+        $mailChimpTags->setSubscriber($subscriber);
+        $mailChimpTags->setCustomer(
+            $this->getCustomerByWebsiteAndId()->
+            setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
+        );
+        $mailChimpTags->buildMailChimpTags();
+        return $mailChimpTags;
+    }
 
 }
