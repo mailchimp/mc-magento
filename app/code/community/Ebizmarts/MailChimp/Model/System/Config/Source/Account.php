@@ -70,7 +70,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         if (empty($mcStore)) {
                             $this->_accountDetails['store_exists'] = false;
                         }
-
                     } catch (MailChimp_Error $e) {
                         if ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
                             $message = $helper->__('Looks like your Mailchimp store was deleted. Please create a new one and associate it in order to get your Ecommerce data synced.');
@@ -79,7 +78,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $this->_accountDetails['store_exists'] = false;
                     }
                     try {
-
                         $listId = (isset($mcStore['list_id']) && $mcStore['list_id']) ? $mcStore['list_id'] : null;
 
 
@@ -104,7 +102,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                             $totalCarts = $ecommerceApi->getCarts()->getAll($mcStoreId, 'total_items');
                             $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
                         }
-
                     } catch (MailChimp_Error $e) {
                         $helper->logError($e->getMessage());
                     }
@@ -135,7 +132,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
             $totalListSubscribers = null;
             if (isset($this->_accountDetails['list_subscribers'])) {
-                $totalListSubscribersText = $helper->__('Total List Subscribers:');
+                $totalListSubscribersText = $helper->__('Total Audience Subscribers:');
                 $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
             }
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
@@ -219,5 +216,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         $date = $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
         return $date;
     }
-
 }

@@ -27,9 +27,7 @@ try {
  ADD column `mailchimp_landing_page` VARCHAR (512) NOT NULL DEFAULT '';
 "
     );
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 

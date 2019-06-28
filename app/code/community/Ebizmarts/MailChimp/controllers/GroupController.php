@@ -53,22 +53,28 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
         $this->_redirect('/');
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
+     */
     protected function getHelper()
     {
         return Mage::helper('mailchimp');
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Subscribers
+     */
     protected function getApiSubscriber()
     {
         return Mage::getModel('mailchimp/api_subscribers');
     }
 
     /**
-     * @return mixed
+     * @return Mage_Sales_Model_Order
      */
     protected function getSessionLastRealOrder()
     {
-        return Mage::getSingleton('checkout/session')->getLastRealOrder();
+        return $this->getHelper()->getSessionLastRealOrder();
     }
 
     /**

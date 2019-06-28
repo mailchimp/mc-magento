@@ -56,5 +56,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     {
         return Mage::helper('mailchimp');
     }
-
 }

@@ -90,10 +90,17 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($name, $contact, $permissionRemanider, $campaingDefaults, $notifyOnUnsubscribe,
-                        $emailTypeOption, $useArchiveBar = false, $notifyOnSubscribe = false, $visibility = 'pub'
-    )
-    {
+    public function add(
+        $name,
+        $contact,
+        $permissionRemanider,
+        $campaingDefaults,
+        $notifyOnUnsubscribe,
+        $emailTypeOption,
+        $useArchiveBar = false,
+        $notifyOnSubscribe = false,
+        $visibility = 'pub'
+    ) {
 
         $_params = array('name' => $name, 'contact' => $contact, 'permission_reminder' => $permissionRemanider,
             'use_archive_bar' => $useArchiveBar, 'campaign_defaults' => $campaingDefaults,
@@ -102,11 +109,18 @@ class MailChimp_Lists extends MailChimp_Abstract
         return $this->_master->call('lists', $_params, Ebizmarts_MailChimp::POST);
     }
 
-    public function getLists($id = null, $fields = null, $excludeFields = null, $count = null, $offset = null,
-                             $beforeDateCreated = null, $sinceDateCreated = null, $beforeCampaignLastSent = null,
-                             $sinceCampaignLastSent = null, $email = null
-    )
-    {
+    public function getLists(
+        $id = null,
+        $fields = null,
+        $excludeFields = null,
+        $count = null,
+        $offset = null,
+        $beforeDateCreated = null,
+        $sinceDateCreated = null,
+        $beforeCampaignLastSent = null,
+        $sinceCampaignLastSent = null,
+        $email = null
+    ) {
 
         $_params = array();
         if ($fields) {
@@ -163,10 +177,18 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function edit($listId, $name, $contact, $permissionReminder, $emailTypeOption, $useArchiveBar = null,
-                         $campaignDefaults = null, $notifyOnSubscribe = null, $notifyOnUnsubscribe = null, $visibility = null
-    )
-    {
+    public function edit(
+        $listId,
+        $name,
+        $contact,
+        $permissionReminder,
+        $emailTypeOption,
+        $useArchiveBar = null,
+        $campaignDefaults = null,
+        $notifyOnSubscribe = null,
+        $notifyOnUnsubscribe = null,
+        $visibility = null
+    ) {
 
         $_params = array('name' => $name, 'contact' => $contact, 'permission_reminder' => $permissionReminder,
             'email_type_option' => $emailTypeOption);

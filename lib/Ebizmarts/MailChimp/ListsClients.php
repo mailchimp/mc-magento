@@ -22,12 +22,14 @@ class MailChimp_ListsClients extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getTop($listId,$fields=null,$excludeFields=null)
+    public function getTop($listId, $fields = null, $excludeFields = null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         return $this->_master->call('lists/'.$listId.'/clients', $_params, Ebizmarts_MailChimp::GET);
     }

@@ -25,6 +25,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         $magentoStoreId = 0;
         $mailchimpStoreId = 'dasds231231312';
+        $oldStore = $magentoStoreId;
         $products = array();
         $productId = 15;
         $syncDataItemId = 2;
@@ -57,7 +58,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->setMethods(array('getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
+            ->setMethods(array('getCurrentStoreId','setCurrentStore','getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
@@ -83,6 +84,16 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->expects($this->once())->method('_buildNewProductRequest')->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)->willReturn($productData);
         $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productId, $mailchimpStoreId);
 
+        $helperMock->expects($this->once())
+            ->method('getCurrentStoreId')
+            ->willReturn($magentoStoreId);
+
+        $helperMock->expects($this->exactly(2))
+            ->method('setCurrentStore')
+            ->withConsecutive(
+                $magentoStoreId,
+                $oldStore
+            );
 
         $helperMock->expects($this->once())
             ->method('getEcommerceSyncDataItem')
@@ -353,7 +364,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             $groupedProductId,
             $oldProductId,
             $newProductId
-            );
+        );
 
         $productsApiMock->expects($this->exactly(3))->method('loadProductById')->withConsecutive(
             array($groupedProductId),
@@ -435,7 +446,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         );
 
         $return = $productsApiMock->sendModifiedProduct($orderMock, $mailchimpStoreId, $magentoStoreId);
-
     }
 
     /**
@@ -554,7 +564,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->expects($this->once())->method('_updateSyncData')->with($productMock->getId(), $mailchimpStoreId, null, 'This product was deleted because it is disabled in Magento.', null, null, 0);
 
         $productsApiMock->createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId);
-
     }
 
     /**
@@ -674,7 +683,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->with(
                 'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
                 date('Y-m-d', $time)." 00:00:00"
-
             );
 
 
@@ -732,7 +740,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock->_markSpecialPrices($mailchimpStoreId, $magentoStoreId);
     }
 
-    public function testJoinMailchimpSyncData(){
+    public function testJoinMailchimpSyncData()
+    {
         $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
         $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
 

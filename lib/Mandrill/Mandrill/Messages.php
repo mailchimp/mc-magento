@@ -514,5 +514,4 @@ class Mandrill_Messages
         $_params = array("id" => $id, "send_at" => $send_at);
         return $this->master->call('messages/reschedule', $_params);
     }
-
 }

@@ -5,11 +5,15 @@ $installer = $this;
 $installer->startSetup();
 
 $installer->getConnection()->addColumn(
-    $installer->getTable('newsletter_subscriber'), 'subscriber_firstname', 'varchar(50)'
+    $installer->getTable('newsletter_subscriber'),
+    'subscriber_firstname',
+    'varchar(50)'
 );
 
 $installer->getConnection()->addColumn(
-    $installer->getTable('newsletter_subscriber'), 'subscriber_lastname', 'varchar(50)'
+    $installer->getTable('newsletter_subscriber'),
+    'subscriber_lastname',
+    'varchar(50)'
 );
 
 $installer->run(
@@ -28,10 +32,8 @@ $baseDir = Mage::getBaseDir();
 
 try {
     mkdir($baseDir . DS . 'var' . DS . 'mailchimp');
-}
-catch (Exception $e){
+} catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
 $installer->endSetup();
-
