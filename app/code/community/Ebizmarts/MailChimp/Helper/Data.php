@@ -4369,4 +4369,69 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $scopeArray = $this->getCurrentScope();
         return $this->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
     }
+
+    /**
+     * Return date in given format and avoid timezone offset when avoidOffset(true)
+     *
+     * @param string $format
+     * @param $date
+     * @param bool $avoidOffset
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function formatDate($date, $format='Y-m-d', $avoidOffset = 1)
+    {
+        $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp($date);
+        $currentTimestamp = Mage::getModel('core/date')->timestamp($gmtTimestamp);
+        if ($avoidOffset) {
+            $currentTimestamp = $this->avoidTimeZoneOffset($currentTimestamp);
+        }
+
+        $newDate = Mage::getModel('core/date')->gmtDate($format, $currentTimestamp);
+        return $newDate;
+    }
+
+    /**
+     * @param $timestamp
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function avoidTimeZoneOffset($timestamp)
+    {
+        $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
+        $offSet   = Mage::getModel('core/date')->calculateOffset($timeZone);
+        return ($timestamp + $offSet);
+    }
+
+    /**
+     * @return Mage_Sales_Model_Order
+     */
+    public function getSessionLastRealOrder()
+    {
+        $checkoutSession = $this->getCheckOutSession();
+        $order = $checkoutSession->getLastRealOrder();
+
+        if ($order === null) {
+            $orderId = $checkoutSession->getLastOrderId();
+            $order = $this->getSalesOrderModel()->load($orderId);
+        }
+
+        return $order;
+    }
+
+    /**
+     * @return Mage_Checkout_Model_Session
+     */
+    protected function getCheckOutSession()
+    {
+        return Mage::getSingleton('checkout/session');
+    }
+
+    /**
+     * @return Mage_Sales_Model_Order
+     */
+    protected function getSalesOrderModel()
+    {
+        return Mage::getModel('sales/order');
+    }
 }
