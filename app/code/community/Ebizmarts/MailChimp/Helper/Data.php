@@ -1006,7 +1006,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isRequestLogEnabled()
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_REQUESTS) ? true : false;
+        return Mage::getStoreConfigFlag(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_REQUESTS);
     }
 
     /**
