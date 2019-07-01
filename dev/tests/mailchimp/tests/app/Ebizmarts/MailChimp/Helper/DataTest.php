@@ -1382,8 +1382,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                 'category' => array(
                     $displayOrderOne => array(
                         'id' => $interestIdOne,
-                        'name' => $interestNameOne, '
-                        checked' => false
+                        'name' => $interestNameOne,
+                        'checked' => false
                     ),
                     $displayOrderTwo => array(
                         'id' => $interestIdTwo,

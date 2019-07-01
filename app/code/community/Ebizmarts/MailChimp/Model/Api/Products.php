@@ -1128,8 +1128,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $mailchimpTableName = $this->getSyncDataTableName();
         $deletedProducts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
         $deletedProducts->getSelect()->where("m4m.mailchimp_sync_deleted = 1");

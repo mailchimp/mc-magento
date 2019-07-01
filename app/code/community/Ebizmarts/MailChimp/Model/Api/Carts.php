@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$counter]['body'] = '';
             $this->_updateSyncData(
                 $cartId,
-                mailchimpStoreId,
+                $mailchimpStoreId,
                 null,
                 null,
                 0,
@@ -153,9 +153,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
         $modifiedCarts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+            "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
@@ -377,9 +377,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $allCartsForEmail->addFieldToFilter('customer_email', array('eq' => $email));
         $allCartsForEmail->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+            "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
         // be sure that the quotes are already in mailchimp and not deleted
@@ -654,8 +654,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $newCarts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+            "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
             array('m4m.*')
         );
     }

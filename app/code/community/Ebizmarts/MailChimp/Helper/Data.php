@@ -2226,8 +2226,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $customerCollection->addAttributeToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
                 $customerCollection->getSelect()->joinLeft(
                     array('m4m' => $mailchimpTableName),
-                    "m4m.related_id = e.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+                    "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+                    . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
                     array('m4m.*')
                 );
                 $customerCollection->getSelect()->where(
@@ -2287,8 +2287,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $productCollection->addAttributeToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
                 $productCollection->getSelect()->joinLeft(
                     array('m4m' => $mailchimpTableName),
-                    "m4m.related_id = e.entity_id and m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+                    "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+                    . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
                     array('m4m.*')
                 );
                 $productCollection->getSelect()->where(
@@ -2415,9 +2415,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $quoteCollection = Mage::getResourceModel('sales/quote_collection');
                 $quoteCollection->getSelect()->joinLeft(
                     array('m4m' => $mailchimpTableName),
-                    "m4m.related_id = main_table.entity_id and m4m.type = '"
-                    . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
+                    "m4m.related_id = main_table.entity_id AND m4m.type = '"
+                    . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+                    . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
                     array('m4m.*')
                 );
                 // be sure that the quotes are already in mailchimp and not deleted

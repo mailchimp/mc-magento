@@ -611,11 +611,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $fileUrl = urldecode($response['response_body_url']);
                     $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
                     $fd = fopen($fileName, 'w');
+
                     $ch = curl_init();
                     curl_setopt($ch, CURLOPT_URL, $fileUrl);
                     curl_setopt($ch, CURLOPT_FILE, $fd);
                     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
                     $r = curl_exec($ch);
+
                     curl_close($ch);
                     fclose($fd);
                     mkdir(

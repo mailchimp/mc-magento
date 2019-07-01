@@ -116,9 +116,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_deleted = 0";
         $arrayTableName = array('m4m' => $mailchimpTableName);
-        $conditionSelect = "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $m4m = array('m4m.*');
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
@@ -187,8 +187,16 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->exactly(2))
             ->method('_updateSyncData')
             ->withConsecutive(
-                array(self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, 1),
-                array(self::CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, 1)
+                array(
+                    self::ALREADY_SENT_CART_ID,
+                    self::MAILCHIMP_STORE_ID,
+                    null, null, null, null, 1
+                ),
+                array(
+                    self::CART_ID,
+                    self::MAILCHIMP_STORE_ID,
+                    null, null, null, null, 1
+                )
             );
         $cartsApiMock->expects($this->exactly(2))
             ->method('setCounter')
@@ -257,9 +265,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $where = "m4m.mailchimp_sync_deleted = 0
         AND m4m.mailchimp_sync_delta < updated_at";
         $arrayTableName = array('m4m' => $mcTableName);
-        $conditionSelect = "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $m4m = array('m4m.*');
         $allCarts = array(
             array(
@@ -448,9 +456,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $where = "m4m.mailchimp_sync_deleted = 0
         AND m4m.mailchimp_sync_delta < updated_at";
         $arrayTableName = array('m4m' => $mcTableName);
-        $conditionSelect = "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $m4m = array('m4m.*');
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
@@ -574,9 +582,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $where = "m4m.mailchimp_sync_deleted = 0
         AND m4m.mailchimp_sync_delta < updated_at";
         $arrayTableName = array('m4m' => $mcTableName);
-        $conditionSelect = "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $m4m = array('m4m.*');
         $allCarts = array(
             array(
@@ -1639,9 +1647,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $stringCustomerId = 'customer_email';
         $arrayAddToFilterCustomerId = array('eq' => self::CUSTOMER_EMAIL_BY_CART);
         $arrayMailchimpTableName = array('m4m' => $mailchimpTableName);
-        $condition = "m4m.related_id = main_table.entity_id and m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE . "'
-            AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $condition = "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $m4m = array('m4m.*');
         $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
 
