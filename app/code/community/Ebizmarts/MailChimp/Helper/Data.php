@@ -1942,7 +1942,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @return int
      * @throws Mage_Core_Model_Store_Exception
      */
-    protected function getCurrentStoreId()
+    public function getCurrentStoreId()
     {
         $curStore = $this->getMageApp()->getStore()->getId();
         return $curStore;
@@ -1951,7 +1951,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param $magentoStoreId
      */
-    protected function setCurrentStore($magentoStoreId)
+    public function setCurrentStore($magentoStoreId)
     {
         $this->getMageApp()->setCurrentStore($magentoStoreId);
     }
