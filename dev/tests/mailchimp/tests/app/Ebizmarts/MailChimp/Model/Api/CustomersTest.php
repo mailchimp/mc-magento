@@ -163,12 +163,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->with($customerJson)
             ->willReturn($operationData);
         $this->_customersApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
-        $subscriberMock
-            ->expects($this->once())
-            ->method('loadByEmail')
-            ->with($customerEmail)
-            ->willReturn($subscribersMailchimpMock);
-        $subscribersMailchimpMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
         $customerMock->expects($this->exactly(2))
             ->method('getId')
             ->willReturnOnConsecutiveCalls(
