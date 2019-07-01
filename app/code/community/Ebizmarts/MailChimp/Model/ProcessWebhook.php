@@ -144,7 +144,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $listId = $data['list_id'];
         $email = $data['email'];
         try {
-            $s = $helper->loadListSubscriber($data['list_id'], $data['email']);
+            $s = $helper->loadListSubscriber($listId, $email);
 
             if ($s) {
                 if ($s->getId()) {

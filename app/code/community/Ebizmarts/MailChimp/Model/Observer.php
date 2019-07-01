@@ -210,7 +210,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
         $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
-        $helper->logDebug("Handle subscriber event for $subscriberDescription email {$subscriber->getSubscriberEmail()} status {$subscriber->getSubscriberStatus()}", $storeId);
+        $helper->logDebug("Handle subscriber event for $subscriberDescription email {$subscriber->getSubscriberEmail()} status {$subscriber->getSubscriberStatus()}");
 
         if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $params = $this->getRequest()->getParams();
@@ -251,7 +251,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $subscriber = $observer->getEvent()->getSubscriber();
         $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
         $helper = $this->makeHelper();
-        $helper->logDebug("Handle subscriber deletion event for $subscriberDescription email {$subscriber->getSubscriberEmail()} status {$subscriber->getSubscriberStatus()}", $subscriber->getStoreId());
+        $helper->logDebug("Handle subscriber deletion event for $subscriberDescription email {$subscriber->getSubscriberEmail()} status {$subscriber->getSubscriberStatus()}");
         $isEnabled = $helper->isSubscriptionEnabled($subscriber->getStoreId());
 
         if ($isEnabled) {
@@ -319,7 +319,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $storeId = $customer->getMailchimpStoreView();
         }
         $helper = $this->makeHelper();
-        $helper->logDebug("Handle customer save event for $customerDescription email {$customerEmail}" . ($origEmail ? " orig $origEmail" : ''), $storeId);
+        $helper->logDebug("Handle customer save event for $customerDescription email {$customerEmail}" . ($origEmail ? " orig $origEmail" : ''));
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
         $params = $this->getRequest()->getParams();
 
@@ -364,7 +364,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $customerDescription = ($customer->getId() ? 'customer ID ' . $customer->getId() : 'guest customer');
         $storeId = $customer->getStoreId();
         $helper = $this->makeHelper();
-        $helper->logDebug("Handle customer address save event for $customerDescription email {$customer->getEmail()}", $storeId);
+        $helper->logDebug("Handle customer address save event for $customerDescription email {$customer->getEmail()}");
 
         if ($helper->isSubscriptionEnabled($storeId)) {
             //update subscriber data if a subscriber with the same email address exists

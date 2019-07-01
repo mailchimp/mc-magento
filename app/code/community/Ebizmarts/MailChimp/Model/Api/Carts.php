@@ -94,8 +94,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $this->setCounter($this->getCounter()+1);
                     $helper->logDebug(
                         "Creating e-commerce batch for store $magentoStoreId: " .
-                        "Removing old cart ID $cartId for customer email " . $cart->getCustomerEmail(),
-                        $magentoStoreId
+                        "Removing old cart ID $cartId for customer email " . $cart->getCustomerEmail()
                     );
                 }
             }
@@ -110,8 +109,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $this->setCounter($this->getCounter()+1);
             $helper->logDebug(
                 "Creating e-commerce batch for store $magentoStoreId: " .
-                "Removing old cart ID $cartId for customer email " . $cart->getCustomerEmail(),
-                $magentoStoreId
+                "Removing old cart ID $cartId for customer email " . $cart->getCustomerEmail()
             );
         }
 
@@ -170,8 +168,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $this->setCounter($this->getCounter() + 1);
                         $helper->logDebug(
                             "Creating e-commerce batch for store $magentoStoreId: " .
-                            "Removing old cart ID $alreadySentCartId for customer email " . $cart->getCustomerEmail(),
-                            $magentoStoreId
+                            "Removing old cart ID $alreadySentCartId for customer email " . $cart->getCustomerEmail()
                         );
                     }
                 }
@@ -202,8 +199,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     "Creating e-commerce batch for store $magentoStoreId: " .
                     "Adding updated cart ID $cartId for customer email " . $cart->getCustomerEmail() .
                     " currency " . $cart->getQuoteCurrencyCode() . " order_total " .
-                    sprintf("%.4f", $cart->getGrandTotal()),
-                    $magentoStoreId
+                    sprintf("%.4f", $cart->getGrandTotal())
                 );
             } else {
                 $this->_updateSyncData($cartId, $mailchimpStoreId);
@@ -270,8 +266,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $this->setCounter($this->getCounter()+1);
                     $helper->logDebug(
                         "Creating e-commerce batch for store $magentoStoreId: " .
-                        "Removing old cart ID $alreadySentCartId for customer email " . $cart->getCustomerEmail(),
-                        $magentoStoreId
+                        "Removing old cart ID $alreadySentCartId for customer email " . $cart->getCustomerEmail()
                     );
                 }
 
@@ -302,8 +297,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     "Creating e-commerce batch for store $magentoStoreId: " .
                     "Adding new cart ID $cartId for customer email " . $cart->getCustomerEmail() .
                     " currency " . $cart->getQuoteCurrencyCode() . " order_total " .
-                    $cart->getGrandTotal(),
-                    $magentoStoreId
+                    $cart->getGrandTotal()
                 );
             } else {
                 $this->_updateSyncData($cartId, $mailchimpStoreId);
@@ -423,7 +417,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $jsonData = json_encode($oneCart);
             } catch (Exception $e) {
                 //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed", $magentoStoreId);
+                $helper->logError("Carts " . $cart->getId() . " json encode failed: " . print_r($jsonData, true));
             }
         }
 

@@ -738,14 +738,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false, $filters = null)
     {
         if ($scopeId == 0 && $deleteErrorsOnly) {
-            $this->logDebug("Removing ecommerce sync data errors for scope ID $scopeId scope $scope", $scopeId, $scope);
+            $this->logDebug("Removing ecommerce sync data errors for scope ID $scopeId scope $scope");
             $this->removeAllEcommerceSyncDataErrors($filters);
-            $this->logInfo("Removed ecommerce sync data errors for scope ID $scopeId scope $scope", $scopeId, $scope);
+            $this->logInfo("Removed ecommerce sync data errors for scope ID $scopeId scope $scope");
         } else {
             $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
-            $this->logDebug("Removing all ecommerce sync data for scope ID $scopeId scope $scope", $scopeId, $scope);
+            $this->logDebug("Removing all ecommerce sync data for scope ID $scopeId scope $scope");
             $this->removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly, $filters);
-            $this->logInfo("Removed all ecommerce sync data for scope ID $scopeId scope $scope", $scopeId, $scope);
+            $this->logInfo("Removed all ecommerce sync data for scope ID $scopeId scope $scope");
         }
     }
 
@@ -845,29 +845,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get log level for given given scope.
+     * Get maximum log level to log.
      *
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
-     * @return int|null    Maximum log level for the given scope.
+     * @return int|null    Maximum log level.
      */
-    public function getLogLevel($scopeId = null, $scope = null)
+    public function getLogLevel()
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_LEVEL, $scopeId, $scope);
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_LEVEL);
     }
 
     /**
-     * Get log file for given given scope.
+     * Get log file if any.
      *
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
      * @return string|false The log file for the given scope or false.
      */
-    public function getLogFile($scopeId = null, $scope = null)
+    public function getLogFile()
     {
-        $file = $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_FILE, $scopeId, $scope);
+        $file = Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_FILE);
         if (!empty($file)) {
             if (!preg_match('/\.log$/i', $file)) {
                 $file .= '.log';
@@ -879,19 +873,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Determine if a message can be logged at the given level for the given
-     * scope.
+     * Determine if a message can be logged at the given level.
      *
      * @param  int         $level   Level of message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
      * @return bool        Returns true if can log at the given level,
      *                     false otherwise.
      */
-    public function canLogMessage($level, $scopeId = null, $scope = null)
+    public function canLogMessage($level)
     {
-        $logLevel = $this->getLogLevel($scopeId, $scope);
+        $logLevel = $this->getLogLevel();
         return ($level <= $logLevel);
     }
 
@@ -900,98 +890,85 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param  int|false   $level   Logging level to log message at.
      * @param  string      $message Message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
+     * @return boolean     Return true if message logged, false othwrise.
      */
-    public function logMessage($level, $message, $scopeId = null, $scope = null)
+    public function logMessage($level, $message)
     {
-        if ($scope === null) {
-
-        }
-        $logFile = $this->getLogFile($scopeId, $scope);
-        if ($logFile !== false && $this->canLogMessage($level, $scopeId, $scope)) {
+        $logged = false;
+        $logFile = $this->getLogFile();
+        if ($logFile !== false && $this->canLogMessage($level)) {
             Mage::log($message, $level, $logFile, true);
+            $logged = true;
         }
-        return false;
+        return $logged;
     }
 
     /**
      * Log error message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
+     * @return boolean     Return true if message logged, false othwrise.
      */
-    public function logError($message, $scopeId = 0, $scope = 'default')
+    public function logError($message)
     {
-        $this->logMessage(Zend_Log::ERR, $message, $scopeId, $scope);
+        return $this->logMessage(Zend_Log::ERR, $message);
     }
 
     /**
      * Log warning message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
+     * @return boolean     Return true if message logged, false othwrise.
      */
-    public function logWarning($message, $scopeId = 0, $scope = 'default')
+    public function logWarning($message)
     {
-        $this->logMessage(Zend_Log::WARN, $message, $scopeId, $scope);
+        return $this->logMessage(Zend_Log::WARN, $message);
     }
 
     /**
      * Log notice to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
+     * @return boolean     Return true if message logged, false othwrise.
      */
-    public function logNotice($message, $scopeId = 0, $scope = 'default')
+    public function logNotice($message)
     {
-        $this->logMessage(Zend_Log::NOTICE, $message, $scopeId, $scope);
+        return $this->logMessage(Zend_Log::NOTICE, $message);
     }
  
     /**
      * Log informational message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
+     * @return boolean     Return true if message logged, false othwrise.
      */
-    public function logInfo($message, $scopeId = 0, $scope = 'default')
+    public function logInfo($message)
     {
-        $this->logMessage(Zend_Log::INFO, $message, $scopeId, $scope);
+        return $this->logMessage(Zend_Log::INFO, $message);
     }
 
     /**
      * Log debug message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @param  int|null    $scopeId Website ID for websites scope, store ID
-     *                              for stores scope. Use current store if null.
-     * @param  string|null $scope   Use websites, stores, default.
+     * @return boolean     Return true if message logged, false othwrise.
      */
-    public function logDebug($message, $scopeId = 0, $scope = 'default')
+    public function logDebug($message)
     {
-        $this->logMessage(Zend_Log::DEBUG, $message, $scopeId, $scope);
+        return $this->logMessage(Zend_Log::DEBUG, $message);
     }
 
     /**
-     * Save how many data was sent to Mailchimp,
-     * how many data was successfully and not sent to Mailchimp
-     * in the file "Mailchimp_Batch_Status.log"
+     * Log how many batch item quantities were successfully sent to Mailchimp,
+     * and how many failed to send if logging enabled
      *
      * @param $message
+     * @return boolean     Return true if message logged, false othwrise.
      * @throws Mage_Core_Exception
      */
-    public function logBatchQuantity($message, $scopeId = 0, $scope = 'default')
+    public function logBatchQuantity($message)
     {
-        $this->logDebug("Batch quantities sent: ". print_r($message, true), $scopeId, $scope);
+        return$this->logDebug("Batch quantities sent: ". print_r($message, true));
     }
 
     /**
@@ -999,43 +976,37 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * directory. If batch request couldn't be JSON encoded it is
      * logged to"MailChimp_Requests.log" file.
      *
-     * @param string       $message Batch data or message to log.
-     * @param int $scopeId Magento store ID.
-     * @param string|null  $batchId Batch ID if logging batch request
-     *                              or NULL to log batch data/message
-     *                              to MailChimp_Requests.log file.
+     * @param string $message Batch data or message to log.
+     * @param string $batchId Batch ID of request to log.
+     * @throws Mage_Core_Exception
      */
-    public function logRequest($message, $scopeId, $batchId = null)
+    public function logRequest($message, $batchId)
     {
-        if ($this->isRequestLogEnabled($scopeId)) {
-            if (!$batchId) {
-                Mage::log($message, null, static::REQUESTS_LOG_DIR . '.log', true);
-            } else {
-                $logDir = Mage::getBaseDir('var') . DS . 'log';
-                if (!file_exists($logDir)) {
-                    mkdir($logDir, 0750);
-                }
-                $logDir .= DS . static::REQUESTS_LOG_DIR;
-                if (!file_exists($logDir)) {
-                    mkdir($logDir, 0750);
-                }
-                $fileName = $logDir . DS . $batchId . '.Request.log';
-                $oldPermission = umask(0046);
-                file_put_contents($fileName, $message);
-                umask($oldPermission);
+        if ($this->isRequestLogEnabled() && !empty($batchId)) {
+            $logDir = Mage::getBaseDir('var') . DS . 'log';
+            if (!file_exists($logDir)) {
+                mkdir($logDir, 0750);
             }
+            $logDir .= DS . static::REQUESTS_LOG_DIR;
+            if (!file_exists($logDir)) {
+                mkdir($logDir, 0750);
+            }
+            $fileName = $logDir . DS . $batchId . '.Request.log';
+            $oldPermission = umask(0046);
+            file_put_contents($fileName, $message);
+            umask($oldPermission);
          }
      }
 
     /**
      * Check whether logging batch requests is enabled.
      *
-     * @return mixed
+     * @return boolean
      * @throws Mage_Core_Exception
      */
-    public function isRequestLogEnabled($scopeId = 0, $scope = null)
+    public function isRequestLogEnabled()
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_REQUESTS, $scopeId, $scope);
+        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LOG_REQUESTS) ? true : false;
     }
 
     /**
@@ -1090,17 +1061,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         //Make sure there are no errors without no MailChimp store id due to older versions.
         $this->handleOldErrors();
 
+        $typesDesc = (!empty($filters) && count($filters) > 0) ? "types: " . implode(',', $filters) : "all types";
+
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         try {
-            $this->logDebug("Clearing error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope", $scopeId, $scope);
+            $this->logDebug("Clearing error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope for $typesDesc");
             if ($excludeSubscribers) {
                 $this->clearErrorGridByMCStore($mailchimpStoreId, $filters);
             } else {
                 $this->clearErrorGridByStoreId($scopeId, $filters);
             }
-            $this->logInfo("Cleared error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope", $scopeId, $scope);
+            $this->logInfo("Cleared error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope for $typesDesc");
         } catch (Exception $e) {
-            $this->logError("Failed to clear error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope: " . $e->getMessage(), $scopeId, $scope);
+            $this->logError("Failed to clear error grid for mailchimp store $mailchimpStoreId for scope ID $scopeId scope $scope for $typesDesc: " . $e->getMessage());
         }
     }
 
@@ -1336,11 +1309,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $api = $this->getApi($scopeId, $scope);
             $mailchimpFields = array();
             try {
-                $this->logDebug("MC-API Request: Getting current merge fields for list $listId: " . json_encode($mailchimpFields), $scopeId, $scope);
+                $this->logDebug("MC-API Request: Getting current merge fields for list $listId: " . json_encode($mailchimpFields));
                 $mailchimpFields = $api->lists->mergeFields->getAll($listId, null, null, 50);
-                $this->logDebug("MC-API Request: Current merge fields for list $listId: " . json_encode($mailchimpFields), $scopeId, $scope);
+                $this->logDebug("MC-API Request: Current merge fields for list $listId: " . json_encode($mailchimpFields));
             } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                $this->logError($e->getFriendlyMessage());
             }
 
             if (count($mailchimpFields) > 0) {
@@ -1359,11 +1332,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         foreach ($customFieldTypes as $customFieldType) {
                             if ($customFieldType['value'] == $customAtt) {
                                 try {
-                                    $this->logDebug("MC-API Request: Adding merge field {$customFieldType['label']} type {$customFieldType['field_type']} as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                    $this->logDebug("MC-API Request: Adding merge field {$customFieldType['label']} type {$customFieldType['field_type']} as tag $chimpTag to list $listId");
                                     $api->lists->mergeFields->add($listId, $customFieldType['label'], $customFieldType['field_type'], null, $chimpTag);
-                                    $this->logNotice("MC-API Request: Adding merge field {$customFieldType['label']} type {$customFieldType['field_type']} as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                    $this->logNotice("MC-API Request: Adding merge field {$customFieldType['label']} type {$customFieldType['field_type']} as tag $chimpTag to list $listId");
                                 } catch (MailChimp_Error $e) {
-                                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                                    $this->logError($e->getFriendlyMessage());
                                 }
                                 $created = true;
                             }
@@ -1385,29 +1358,29 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                                 if ($label) {
                                     //Shipping and Billing Address
                                     if ($customAtt == 13 || $customAtt == 14) {
-                                        $this->logDebug("MC-API Request: Adding merge field $label type address as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                        $this->logDebug("MC-API Request: Adding merge field $label type address as tag $chimpTag to list $listId");
                                         $api->lists->mergeFields->add($listId, $label, 'address', null, $chimpTag);
-                                        $this->logNotice("MC-API Request: Added merge field $label type address as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                        $this->logNotice("MC-API Request: Added merge field $label type address as tag $chimpTag to list $listId");
                                         //Birthday
                                     } elseif ($customAtt == 11) {
-                                        $this->logDebug("MC-API Request: Adding merge field $label type birthday as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                        $this->logDebug("MC-API Request: Adding merge field $label type birthday as tag $chimpTag to list $listId");
                                         $api->lists->mergeFields->add($listId, $label, 'birthday', null, $chimpTag);
-                                        $this->logNotice("MC-API Request: Adding merge field $label type birthday as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                        $this->logNotice("MC-API Request: Adding merge field $label type birthday as tag $chimpTag to list $listId");
                                     } else {
-                                        $this->logDebug("MC-API Request: Adding merge field $label type text as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                        $this->logDebug("MC-API Request: Adding merge field $label type text as tag $chimpTag to list $listId");
                                         $api->lists->mergeFields->add($listId, $label, 'text', null, $chimpTag);
-                                        $this->logNotice("MC-API Request: Added merge field $label type text as tag $chimpTag to list $listId: ", $scopeId, $scope);
+                                        $this->logNotice("MC-API Request: Added merge field $label type text as tag $chimpTag to list $listId");
                                     }
                                 }
                             } catch (MailChimp_Error $e) {
-                                $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                                $this->logError($e->getFriendlyMessage());
                             }
                         }
                     }
                 }
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         }
     }
 
@@ -1442,7 +1415,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $api = new Ebizmarts_MailChimp($apiKey, array('timeout' => $timeOut), 'Mailchimp4Magento' . (string)$this->getConfig()->getNode('modules/Ebizmarts_MailChimp/version'));
         } else {
             $e = new Ebizmarts_MailChimp_Helper_Data_ApiKeyException('You must provide a MailChimp API key');
-            $this->logError($e->getTraceAsString(), $scopeId, $scope);
+            $this->logError($e->getTraceAsString());
             throw $e;
         }
 
@@ -1887,7 +1860,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getLastDateOfPurchase($subscriberEmail)
     {
-        $orderCollection = $this->getOrderCollectionByCustomerEmail($subscriberEmail);
         $lastDateOfPurchase = null;
 
         $orderCollection = $this->getOrderCollectionByCustomerEmail($subscriberEmail);
@@ -1993,11 +1965,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $mcJsUrlSaved = true;
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
-            $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            $this->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         }
         return $mcJsUrlSaved;
     }
@@ -2652,9 +2624,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 try {
                     $api->lists->webhooks->delete($listId, $webhookId);
                 } catch (MailChimp_Error $e) {
-                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                    $this->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
-                    $this->logError($e->getMessage(), $scopeId, $scope);
+                    $this->logError($e->getMessage());
                 }
                 $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
             } else {
@@ -2669,13 +2641,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         }
                     }
                 } catch (MailChimp_Error $e) {
-                    $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+                    $this->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
-                    $this->logError($e->getMessage(), $scopeId, $scope);
+                    $this->logError($e->getMessage());
                 }
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         }
     }
 
@@ -2739,18 +2711,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             } catch (MailChimp_Error $e) {
                 $errorMessage = $e->getFriendlyMessage();
-                $this->logError($errorMessage, $scopeId, $scope);
+                $this->logError($errorMessage);
                 $textToCompare = 'The resource submitted could not be validated. For field-specific details, see the \'errors\' array.';
                 if ($e->getMailchimpDetails() == $textToCompare) {
                     $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. Please confirm the URL: ' . $hookUrl . ' is accessible externally to allow the webhook creation.';
-                    $this->logError($errorMessage, $scopeId, $scope);
+                    $this->logError($errorMessage);
                 }
                 return $this->__($errorMessage);
             } catch (Exception $e) {
-                $this->logError($e->getMessage(), $scopeId, $scope);
+                $this->logError($e->getMessage());
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         }
     }
 
@@ -3007,7 +2979,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $this->getApiStores()->editIsSyncing($mailchimpApi, $syncValue, $mailchimpStoreId);
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         }
     }
 
@@ -3447,11 +3419,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
-            $this->logError($e->getFriendlyMessage(), $scopeId, $scope);
+            $this->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $this->logError($e->getMessage(), $scopeId, $scope);
+            $this->logError($e->getMessage());
         }
         return $campaignName;
     }
@@ -3696,7 +3668,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $api = $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
             return $api;
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage(), $scopeArray['scope_id'], $scopeArray['scope']);
+            $this->logError($e->getMessage());
         }
     }
 

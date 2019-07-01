@@ -101,7 +101,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -153,7 +153,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     continue;
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -267,8 +267,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $helper->logDebug(
                     " => Store $magentoStoreId batch for order ID {$data['id']} " .
                     "item $itemCount product ID $productId variant $variant quantity ".(int)$item->getQtyOrdered() . ' ' .
-                    "price " . $item->getPrice() . " discount " . abs($item->getDiscountAmount()),
-                    $magentoStoreId
+                    "price " . $item->getPrice() . " discount " . abs($item->getDiscountAmount())
                 );
 
                 if (!$isProductEnabled) {
@@ -284,8 +283,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 "Ignoring e-commerce batch for store $magentoStoreId: " .
                 "order ID {$data['id']} " . (isset($data['campaign_id']) ? "campaign ID " . $data['campaign_id'].' ' : '') .
                 "currency {$data['currency_code']} total {$data['order_total']} tax {$data['tax_total']} " .
-                "discount {$data['discount_total']} shipping {$data['shipping_total']}: no supported products",
-                $magentoStoreId
+                "discount {$data['discount_total']} shipping {$data['shipping_total']}: no supported products"
             );
             $helper->setCurrentStore($oldStore);
             return "";
@@ -295,8 +293,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             "Creating e-commerce batch for store $magentoStoreId: " .
             "Adding order ID {$data['id']} " . (isset($data['campaign_id']) ? "campaign ID " . $data['campaign_id'].' ' : '') .
             "currency {$data['currency_code']} total {$data['order_total']} tax {$data['tax_total']} " .
-            "discount {$data['discount_total']} shipping {$data['shipping_total']}",
-            $magentoStoreId
+            "discount {$data['discount_total']} shipping {$data['shipping_total']}"
         );
 
         //customer data
@@ -448,8 +445,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $jsonData = json_encode($data);
         } catch (Exception $e) {
             //json encode failed
-            $helper->logError("Order " . $order->getEntityId() . " json encode failed:", $magentoStoreId);
-            $helper->logError(print_r($data, true), $magentoStoreId);
+            $helper->logError("Order " . $order->getEntityId() . " json encode failed");
+            $helper->logError(print_r($data, true));
         }
 
         $helper->setCurrentStore($oldStore);
@@ -861,13 +858,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
-                $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+                $helper->logError($e->getFriendlyMessage());
             } catch (Exception $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             }
         }
 

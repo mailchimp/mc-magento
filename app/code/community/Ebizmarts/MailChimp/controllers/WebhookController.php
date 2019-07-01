@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                         try {
                             $api = $helper->getApi($storeId);
                         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                            $helper->logError($e->getMessage(), $storeId);
+                            $helper->logError($e->getMessage());
                             $api = null;
                         }
                         if (!$api) {
@@ -60,7 +60,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                                     }
                                 }
                             } catch (MailChimp_Error $e) {
-                                $helper->logError($e->getFriendlyMessage(), $storeId);
+                                $helper->logError($e->getFriendlyMessage());
                             }
                         }
                     }
@@ -83,11 +83,11 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 if ($request->getPost('type')) {
                     Mage::getModel('mailchimp/processWebhook')->saveWebhookRequest($data);
                 } else {
-                    $helper->logError($this->__('Webhook successfully created.'), $storeId);
+                    $helper->logError($this->__('Webhook successfully created.'));
                 }
             } else {
-                $helper->logError($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey), $storeId);
-                $helper->logError($this->__('Webhook call ended'), $storeId);
+                $helper->logError($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey));
+                $helper->logError($this->__('Webhook call ended'));
             }
         }
     }

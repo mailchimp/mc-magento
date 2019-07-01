@@ -376,7 +376,7 @@
                 <connection_timeout>20</connection_timeout>
                 <log_level>3</log_level>
                 <log_file>MailChimp.log</log_file>
-                <log_requests>no</log_requests>
+                <log_requests>0</log_requests>
             </general>
             <ecommerce>
                 <customer_batch_amount>100</customer_batch_amount>

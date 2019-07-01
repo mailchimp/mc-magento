@@ -204,7 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $this->_sendEcommerceBatch($storeId);
                     $this->getHelper()->logDebug("Processed store ID $storeId");
                 } else {
-                    $helper->logError('Could not connect to MailChimp: Make sure the API Key is correct and there is an internet connection', $storeId);
+                    $helper->logError('Could not connect to MailChimp: Make sure the API Key is correct and there is an internet connection');
                     return;
                 }
             }
@@ -266,7 +266,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         if ($enabled) {
-            $helper->logDebug('Get results from Mailchimp', $magentoStoreId);
+            $helper->logDebug('Get results from Mailchimp');
             foreach ($collection as $item) {
                 try {
                     $batchId = $item->getBatchId();
@@ -287,7 +287,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $this->removeBatchDir($baseDir, $batchId);
                     }
                 } catch (Exception $e) {
-                    $helper->logError("Error processing response for batch ID " . $item->getBatchId() . ": " . $e->getMessage(), $magentoStoreId);
+                    $helper->logError("Error processing response for batch ID " . $item->getBatchId() . ": " . $e->getMessage());
                 }
             }
         }
@@ -310,36 +310,36 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $helper->resetCountersSentPerBatch();
                 $batchArray = array();
                 //customer operations
-                $helper->logDebug('Generate Customers Payload', $magentoStoreId);
+                $helper->logDebug('Generate Customers Payload');
                 $apiCustomers = $this->getApiCustomers();
                 $customersArray = $apiCustomers->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $customerAmount = count($customersArray);
                 $batchArray['operations'] = $customersArray;
                 //product operations
-                $helper->logDebug('Generate Products Payload', $magentoStoreId);
+                $helper->logDebug('Generate Products Payload');
                 $apiProducts = $this->getApiProducts();
                 $productsArray = $apiProducts->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
                 //cart operations
-                $helper->logDebug('Generate Carts Payload', $magentoStoreId);
+                $helper->logDebug('Generate Carts Payload');
                 $apiCarts = $this->getApiCarts();
                 $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
                 //order operations
-                $helper->logDebug('Generate Orders Payload', $magentoStoreId);
+                $helper->logDebug('Generate Orders Payload');
                 $apiOrders = $this->getApiOrders();
                 $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
-                    $helper->logDebug('Generate Promo Rules Payload', $magentoStoreId);
+                    $helper->logDebug('Generate Promo Rules Payload');
                     $apiPromoRules = $this->getApiPromoRules();
                     $promoRulesArray = $apiPromoRules->createBatchJson($mailchimpStoreId, $magentoStoreId);
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
                     //promo code operations
-                    $helper->logDebug('Generate Promo Codes Payload', $magentoStoreId);
+                    $helper->logDebug('Generate Promo Codes Payload');
                     $apiPromoCodes = $this->getApiPromoCodes();
                     $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
@@ -355,12 +355,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     if (!empty($batchArray['operations'])) {
                         $batchJson = json_encode($batchArray);
                         if (!$batchJson || $batchJson == '') {
-                            $helper->logRequest('An empty operation was detected', $magentoStoreId);
+                            $helper->logError('Empty batch operations detected or failed to JSON encode the following batch operations: ' . print_r($batchArray, true));
                         } else {
-                            $helper->logDebug("MC-API Request: Sending e-commerce batch", $magentoStoreId);
+                            $helper->logDebug("MC-API Request: Sending e-commerce batch");
                             $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
-                            $helper->logInfo("MC-API Request: Sent e-commerce batch as ID {$batchResponse['id']}", $magentoStoreId);
-                            $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
+                            $helper->logInfo("MC-API Request: Sent e-commerce batch as ID {$batchResponse['id']}");
+                            $helper->logRequest($batchJson, $batchResponse['id']);
                             //save batch id to db
                             $batch = $this->getSyncBatchesModel();
                             $batch->setStoreId($mailchimpStoreId)
@@ -386,22 +386,19 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         }
                     }
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                    $helper->logError($e->getMessage(), $magentoStoreId);
+                    $helper->logError($e->getMessage());
                 } catch (MailChimp_Error $e) {
-                    $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
-                    if ($batchJson && !isset($batchResponse['id'])) {
-                        $helper->logRequest($batchJson, $magentoStoreId);
-                    }
+                    $helper->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
-                    $helper->logError($e->getMessage(), $magentoStoreId);
-                    $helper->logError("Json encode fails for the following batch data:", $magentoStoreId);
-                    $helper->logError(print_r($batchArray, true), $magentoStoreId);
+                    $helper->logError($e->getMessage());
+                    $helper->logError("Json encode fails for the following batch data:");
+                    $helper->logError(print_r($batchArray, true));
                 }
             }
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $magentoStoreId);
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -520,14 +517,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
                     if (!$batchJson || $batchJson == '') {
-                        $helper->logRequest('An empty operation was detected', $storeId);
+                        $helper->logError('Empty batch operations detected or failed to JSON encode the following batch operations: ' . print_r($batchArray, true));
                     } else {
                         try {
                             $mailchimpApi = $helper->getApi($storeId);
-                            $helper->logDebug("MC-API Request: Sending subscriber batch", $storeId);
+                            $helper->logDebug("MC-API Request: Sending subscriber batch");
                             $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
-                            $helper->logInfo("MC-API Request: Sent subscriber batch as ID {$batchResponse['id']}", $storeId);
-                            $helper->logRequest($batchJson, $storeId, $batchResponse['id']);
+                            $helper->logInfo("MC-API Request: Sent subscriber batch as ID {$batchResponse['id']}");
+                            $helper->logRequest($batchJson, $batchResponse['id']);
 
                             //save batch id to db
                             $batch = $this->getSyncBatchesModel();
@@ -538,18 +535,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $this->_showResumeSubscriber($batchResponse['id'], $storeId);
                             return array($batchResponse, $limit);
                         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                            $helper->logError($e->getMessage(), $storeId);
+                            $helper->logError($e->getMessage());
                         } catch (MailChimp_Error $e) {
-                            $helper->logRequest($batchJson, $storeId);
-                            $helper->logError($e->getFriendlyMessage(), $storeId);
+                            $helper->logError($e->getFriendlyMessage());
                         }
                     }
                 }
             }
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $storeId);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $storeId);
+            $helper->logError($e->getMessage());
         }
 
         return array(null, $limit);
@@ -600,14 +596,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $helper->logError($e->getMessage(), $magentoStoreId);
+            $helper->logError($e->getMessage());
             $files['error'] = $e->getMessage();
         } catch (MailChimp_Error $e) {
             $files['error'] = $e->getFriendlyMessage();
-            $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
             $files['error'] = $e->getMessage();
-            $helper->logError($e->getMessage(), $magentoStoreId);
+            $helper->logError($e->getMessage());
         }
 
         return $files;
@@ -721,10 +717,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
                     if (!$batchJson || $batchJson == '') {
-                        $helper->logRequest('An empty operation was detected', $magentoStoreId);
+                        $helper->logError('Empty batch operations detected or failed to JSON encode the following batch operations: ' . print_r($batchArray, true));
                     } else {
                         $batchResponse = $mailchimpApi->batchOperation->add($batchJson);
-                        $helper->logRequest($batchJson, $magentoStoreId, $batchResponse['id']);
+                        $helper->logRequest($batchJson, $batchResponse['id']);
                         //save batch id to db
                         $batch = $this->getSyncBatchesModel();
                         $batch->setStoreId($mailchimpStoreId)
@@ -734,18 +730,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
+                $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+                $helper->logError($e->getFriendlyMessage());
             } catch (Exception $e) {
-                $helper->logError($e->getMessage(), $magentoStoreId);
-                $helper->logError("Json encode fails for the following batch data:", $magentoStoreId);
-                $helper->logError(print_r($batchArray, true), $magentoStoreId);
+                $helper->logError($e->getMessage());
+                $helper->logError("Json encode fails for the following batch data:");
+                $helper->logError(print_r($batchArray, true));
             }
         } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+            $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError($e->getMessage(), $magentoStoreId);
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -828,11 +824,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $helper->saveMailchimpConfig($config, 0, 'default');
                     }
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                    $helper->logError($e->getMessage(), $magentoStoreId);
+                    $helper->logError($e->getMessage());
                 } catch (MailChimp_Error $e) {
-                    $helper->logError($e->getFriendlyMessage(), $magentoStoreId);
+                    $helper->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
-                    $helper->logError($e->getMessage(), $magentoStoreId);
+                    $helper->logError($e->getMessage());
                 }
             }
         }
@@ -913,10 +909,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         if (!empty($helper->getCountersSentPerBatch()) || $helper->getCountersSentPerBatch() != null) {
-            $helper->logInfo("Sent batch $batchId for store $storeId", $storeId);
-            $helper->logBatchQuantity($helper->getCountersSentPerBatch(), $storeId);
+            $helper->logInfo("Sent batch $batchId for store $storeId");
+            $helper->logBatchQuantity($helper->getCountersSentPerBatch());
         } else {
-            $helper->logInfo("Nothing to sync for store $storeId", $storeId);
+            $helper->logInfo("Nothing to sync for store $storeId");
         }
     }
 
@@ -929,10 +925,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         if (!empty($helper->getCountersSubscribers()) || $helper->getCountersSubscribers() != null) {
-            $helper->logInfo("Sent batch $batchId for store $storeId", $storeId);
-            $helper->logBatchQuantity($helper->getCountersSubscribers(), $storeId);
+            $helper->logInfo("Sent batch $batchId for store $storeId");
+            $helper->logBatchQuantity($helper->getCountersSubscribers());
         } else {
-            $helper->logInfo("Nothing to sync for store $storeId", $storeId);
+            $helper->logInfo("Nothing to sync for store $storeId");
         }
     }
 
@@ -944,11 +940,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         if (!empty($helper->getCountersDataSentToMailchimp()) || $helper->getCountersDataSentToMailchimp() != null) {
-            $helper->logInfo("Processed data sent to Mailchimp for store $storeId", $storeId);
+            $helper->logInfo("Processed data sent to Mailchimp for store $storeId");
             $counter = $helper->getCountersDataSentToMailchimp();
-            $helper->logBatchQuantity($counter, $storeId);
+            $helper->logBatchQuantity($counter);
         } else {
-            $helper->logInfo("Nothing was processed for store $storeId", $storeId);
+            $helper->logInfo("Nothing was processed for store $storeId");
         }
     }
 

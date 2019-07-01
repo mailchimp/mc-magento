@@ -105,8 +105,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 ": Adding customer {$data['id']} email {$data['email_address']} " .
                 "fname {$data['first_name']} lname {$data['last_name']} " .
                 "opt-in " . ($data['opt_in_status'] ? 'YES' : 'NO') . " num_orders {$data['orders_count']} " .
-                "total_spent {$data['total_spent']}",
-                $magentoStoreId
+                "total_spent {$data['total_spent']}"
             );
 
             $customerJson = json_encode($data);
@@ -403,9 +402,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function logCouldNotEncodeCustomerError($customer)
     {
-        $storeId = $this->getBatchMagentoStoreId();
-        $this->mailchimpHelper->logError("Customer " . $customer->getId() . " json encode failed on store $storeId: ", $storeId);
-        $this->mailchimpHelper->logError(print_r($customer, true), $storeId);
+        $this->mailchimpHelper->logError(
+            "Customer " . $customer->getId() . " json encode failed on store " . $this->getBatchMagentoStoreId()
+        );
+        $this->mailchimpHelper->logError(print_r($customer, true));
     }
 
     /**

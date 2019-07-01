@@ -148,8 +148,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->getMailchimpHelper()->logDebug(
                     "Creating e-commerce batch for store $magentoStoreId: " .
                     "Adding updated product ID {$data['id']} title {$data['title']} " .
-                    "sku {$data['sku']} price {$price}",
-                    $magentoStoreId
+                    "sku {$data['sku']} price {$price}"
                 );
             }
         }
@@ -158,8 +157,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
         } catch (Exception $e) {
             //json encode failed
-            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed", $magentoStoreId);
-            $this->getMailChimpHelper()->logError(print_r($bodyData, true), $magentoStoreId);
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
+            $this->getMailChimpHelper()->logError(print_r($bodyData, true));
             return array();
         }
 
@@ -188,8 +187,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
                     } catch (Exception $e) {
                         //json encode failed
-                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed:", $magentoStoreId);
-                        $this->getMailChimpHelper()->logError(print_r($bodyData, true), $magentoStoreId);
+                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
+                        $this->getMailChimpHelper()->logError(print_r($bodyData, true));
                         return array();
                     }
 
@@ -212,8 +211,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $body = json_encode($bodyData, JSON_HEX_APOS|JSON_HEX_QUOT);
         } catch (Exception $e) {
             //json encode failed
-            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed:", $magentoStoreId);
-            $this->getMailChimpHelper()->logError(print_r($bodyData, true), $magentoStoreId);
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
+            $this->getMailChimpHelper()->logError(print_r($bodyData, true));
             return array();
         }
 
@@ -263,8 +262,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $helper->logDebug(
                 "Creating e-commerce batch for store $magentoStoreId: " .
                 "Adding updated product ID {$data['id']} title {$data['title']} " .
-                "sku {$data['sku']} price {$price} url {$data['url']}",
-                $magentoStoreId
+                "sku {$data['sku']} price {$price} url {$data['url']}"
             );
         } else {
             $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
