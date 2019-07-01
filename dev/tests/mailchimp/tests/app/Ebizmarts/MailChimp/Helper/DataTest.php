@@ -1838,7 +1838,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     }
 
     public function testGetCurrentStoreId()
-     {
+    {
          $storeId = 1;
          $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
              ->disableOriginalConstructor()
@@ -1872,7 +1872,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
          $return  = $helperMock->getCurrentStoreId();
 
          $this->assertInternalType('int', $return);
-     }
+    }
 
 
 

@@ -216,9 +216,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $apiProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
-            ->setMethods(array(
+            ->setMethods(
+                array(
                 'isProductEnabled'
-            ))
+                )
+            )
             ->getMock();
 
         $ordersApiMock = $this->_ordersApiMock

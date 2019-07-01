@@ -65,7 +65,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->setMethods(array('getCurrentStoreId','setCurrentStore','getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
+            ->setMethods(
+                array(
+                    'getCurrentStoreId','setCurrentStore',
+                    'getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'
+                )
+            )
             ->getMock();
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
@@ -747,7 +752,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
         $magentoStoreId = 1;
         $entityId = 145;
-        $time = Mage::getSingleton('core/date')->gmtTimestamp();
+
+        $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
+        $offSet   = Mage::getSingleton('core/date')->calculateOffset($timeZone);
+        $time = Mage::getSingleton('core/date')->gmtTimestamp() + $offSet;
 
 
         $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
