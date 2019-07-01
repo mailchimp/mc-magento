@@ -890,7 +890,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param  int|false   $level   Logging level to log message at.
      * @param  string      $message Message to log.
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      */
     public function logMessage($level, $message)
     {
@@ -907,7 +907,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Log error message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      */
     public function logError($message)
     {
@@ -918,7 +918,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Log warning message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      */
     public function logWarning($message)
     {
@@ -929,7 +929,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Log notice to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      */
     public function logNotice($message)
     {
@@ -940,7 +940,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Log informational message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      */
     public function logInfo($message)
     {
@@ -951,7 +951,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Log debug message to the log file if enabled.
      *
      * @param  string      $message Message to log.
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      */
     public function logDebug($message)
     {
@@ -959,16 +959,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Log how many batch item quantities were successfully sent to Mailchimp,
-     * and how many failed to send if logging enabled
+     * Log how many batch item quantities were successfully and
+     * unsuccessfully sent to Mailchimp if logging is enabled.
      *
      * @param $message
-     * @return boolean     Return true if message logged, false othwrise.
+     * @return boolean     Return true if message logged, false otherwise.
      * @throws Mage_Core_Exception
      */
     public function logBatchQuantity($message)
     {
-        return$this->logDebug("Batch quantities sent: ". print_r($message, true));
+        return $this->logDebug("Batch quantities sent: ". print_r($message, true));
     }
 
     /**
