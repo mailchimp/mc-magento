@@ -361,7 +361,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             //update subscriber data if a subscriber with the same email address exists and was not affected.
             if (!$origEmail || $origEmail == $customerEmail) {
-                $apiSubscriber->update($customerEmail, $storeId);
+                $apiSubscriber->update($customerEmail);
             }
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
@@ -382,7 +382,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
         if ($helper->isSubscriptionEnabled($storeId)) {
             //update subscriber data if a subscriber with the same email address exists
-            $this->makeApiSubscriber()->update($customer->getEmail(), $storeId);
+            $this->makeApiSubscriber()->update($customer->getEmail());
         }
 
         if ($helper->isEcomSyncDataEnabled($storeId)) {
@@ -1194,4 +1194,20 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         return Mage::getModel('catalog/product_status');
     }
+
+    public function mergeFieldSendBefore(Varien_Event_Observer $observer)
+    {
+        if ($observer->getEvent()->getData()['merge_field_tag'] == 'lastname')
+        {
+          //  $observer->getEvent()->setMergeFieldValue('customValue');
+        }
+    }
+
+    public function mergeFieldSendAfter(Varien_Event_Observer $observer)
+    {
+        $newVars = array("NEWVAR" => "newValue");
+        //$observer->getEvent()->getNewVars()->addData($newVars);
+    }
+
+
 }

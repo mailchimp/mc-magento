@@ -1218,29 +1218,20 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId);
             }
 
-            if ($this->getProductResendLastId($scopeId, $scope) !== null
-                && in_array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)) {
+            if ($this->getProductResendLastId($scopeId, $scope) !== null && in_array( Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)) {
                 $productLastId = $this->getLastProductSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId);
             }
-
-            if ($this->getOrderResendLastId($scopeId, $scope) !== null
-                && in_array(Ebizmarts_MailChimp_Model_Config::IS_ORDER, $filters)) {
+            if ($this->getOrderResendLastId($scopeId, $scope) !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_ORDER, $filters)) {
                 $orderLastId = $this->getLastOrderSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId);
             }
-
-            if ($this->getCartResendLastId($scopeId, $scope) !== null
-                && in_array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $filters)) {
+            if ($this->getCartResendLastId($scopeId, $scope) !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $filters)) {
                 $cartLastId = $this->getLastCartSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId);
             }
-
             if ($this->getPromoCodeResendLastId($scopeId, $scope) !== null
-                && in_array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
-                    . ', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $filters
-                )) {
+                && in_array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE .', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $filters)) {
                 $promoCodeLastId = $this->getLastPromoCodeSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $promoCodeLastId);
             }
@@ -1670,7 +1661,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        if (!empty($filterArray)) {
+        if (count($filterArray)) {
             $collection->addFieldToFilter('store_id', $filterArray);
         }
 
@@ -1973,25 +1964,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * If orders with the given email exists, returns the date of the last order made.
-     *
-     * @param  $subscriberEmail
-     * @return null
-     */
-    public function getLastDateOfPurchase($subscriberEmail)
-    {
-        $lastDateOfPurchase = null;
-
-        $orderCollection = $this->getOrderCollectionByCustomerEmail($subscriberEmail);
-        if ($orderCollection->getSize()) {
-            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
-            $lastDateOfPurchase = $lastOrder->getCreatedAt();
-        }
-
-        return $lastDateOfPurchase;
-    }
-
-    /**
      * Return true if there is a custom entry with the value given.
      *
      * @param  $value
@@ -2032,7 +2004,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $subscriberEmail
      * @return mixed
      */
-    protected function getOrderCollectionByCustomerEmail($subscriberEmail)
+    public function getOrderCollectionByCustomerEmail($subscriberEmail)
     {
         return Mage::getResourceModel('sales/order_collection')
             ->addFieldToFilter('customer_email', array('eq' => $subscriberEmail));
@@ -2868,11 +2840,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $this->logError($e->getMessage());
                 }
 
-                $this->getConfig()->deleteConfig(
-                    Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID,
-                    $scope,
-                    $scopeId
-                );
+                $this->getConfig()->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
             } else {
                 $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
                 try {
@@ -3041,6 +3009,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
                     break;
             }
+
         }
 
         return $scopeSoFar;
@@ -4445,6 +4414,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $interest = $this->getLocalInterestCategories($storeId);
         if ($interest != '') {
             $interest = explode(",", $interest);
+
         } else {
             $interest = array();
         }
@@ -4894,6 +4864,39 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $scopeArray = $this->getCurrentScope();
         return $this->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+    }
+
+    /**
+     * Return date in given format and avoid timezone offset when avoidOffset(true)
+     *
+     * @param string $format
+     * @param $date
+     * @param bool $avoidOffset
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function formatDate($date, $format='Y-m-d', $avoidOffset = 1)
+    {
+        $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp($date);
+        $currentTimestamp = Mage::getModel('core/date')->timestamp($gmtTimestamp);
+        if ($avoidOffset) {
+            $currentTimestamp = $this->avoidTimeZoneOffset($currentTimestamp);
+        }
+
+        $newDate = Mage::getModel('core/date')->gmtDate($format, $currentTimestamp);
+        return $newDate;
+    }
+
+    /**
+     * @param $timestamp
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function avoidTimeZoneOffset($timestamp)
+    {
+        $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
+        $offSet   = Mage::getModel('core/date')->calculateOffset($timeZone);
+        return ($timestamp + $offSet);
     }
 
     /**

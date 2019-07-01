@@ -12,29 +12,56 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
+    const GENDER_VALUE_MALE = 1;
+    const GENDER_VALUE_FEMALE = 2;
+
 
     /**
      * Ebizmarts_MailChimp_Helper_Data
      */
     private $mcHelper;
+    private $_storeId;
 
     public function __construct()
     {
-        $this->mcHelper = Mage::helper('mailchimp');
+        $mageMCHelper = Mage::helper('mailchimp');
+        $this->setMailchimpHelper($mageMCHelper);
     }
 
+    /**
+     * @param $storeId
+     */
+    protected function setStoreId($storeId)
+    {
+        $this->_storeId = $storeId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStoreId()
+    {
+        return $this->_storeId;
+    }
+
+    /**
+     * @param $listId
+     * @param $storeId
+     * @param $limit
+     * @return array
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function createBatchJson($listId, $storeId, $limit)
     {
-        /**
-         * Ebizmarts_MailChimp_Helper_Data
-         */
-        $helper = $this->mcHelper;
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
-        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+        $this->setStoreId($storeId);
+        $helper = $this->getMailchimpHelper();
+        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $this->getStoreId());
+        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $this->getStoreId());
 
         $subscriberArray = array();
-        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($storeId)) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
+        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($this->getStoreId())) {
+            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $this->getStoreId());
             $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
             $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
         }
@@ -42,7 +69,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         //get subscribers
         $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_status', array('eq' => 1))
-            ->addFieldToFilter('store_id', array('eq' => $storeId))
+            ->addFieldToFilter('store_id', array('eq' => $this->getStoreId()))
             ->addFieldToFilter(
                 array(
                     'mailchimp_sync_delta',
@@ -53,14 +80,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 array(
                     array('null' => true),
                     array('eq' => ''),
-                    array('lt' => $helper->getSubMinSyncDateFlag($storeId)),
+                    array('lt' => $helper->getSubMinSyncDateFlag($this->getStoreId())),
                     array('eq' => 1)
                 )
             );
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
         $collection->getSelect()->limit($limit);
         $date = $helper->getDateMicrotime();
-        $batchId = 'storeid-' . $storeId . '_' . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
+        $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
 
         $counter = 0;
         foreach ($collection as $subscriber) {
@@ -103,15 +130,23 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $subscriberArray;
     }
 
+    /**
+     * @param $subscriber
+     * @return array
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
     protected function _buildSubscriberData($subscriber)
     {
-        $helper = $this->mcHelper;
+        $helper = $this->getMailchimpHelper();
         $storeId = $subscriber->getStoreId();
         $data = array();
         $data["email_address"] = $subscriber->getSubscriberEmail();
-        $mergeVars = $this->getMergeVars($subscriber);
-        if ($mergeVars) {
-            $data["merge_fields"] = $mergeVars;
+
+        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $storeId);
+
+        if ($mailChimpTags->getMailchimpTags()) {
+            $data["merge_fields"] = $mailChimpTags->getMailchimpTags();
         }
 
         $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus());
@@ -132,12 +167,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $subscriber
      * @return array
+     * @throws Mage_Core_Exception
+     * @throws MailChimp_Error
      */
     protected function _getInterest($subscriber)
     {
         $storeId = $subscriber->getStoreId();
         $rc = array();
-        $helper = $this->mcHelper;
+        $helper = $this->getMailchimpHelper();
         $interestsAvailable = $helper->getInterest($storeId);
         $interest = $helper->getInterestGroups(null, $subscriber->getSubscriberId(), $storeId, $interestsAvailable);
         foreach ($interest as $i) {
@@ -149,228 +186,15 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $rc;
     }
 
-    public function getMergeVars($subscriber)
-    {
-        $helper = $this->mcHelper;
-        $storeId = $subscriber->getStoreId();
-        $mapFields = $helper->getMapFields($storeId);
-        $maps = unserialize($mapFields);
-        $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
-        $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
-            ->setEntityTypeFilter(1)
-            ->addSetInfo()
-            ->getData();
-        $mergeVars = array();
-        $subscriberEmail = $subscriber->getSubscriberEmail();
-        $customer = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->load($subscriber->getCustomerId());
-
-        foreach ($maps as $map) {
-            $customAtt = $map['magento'];
-            $chimpTag = $map['mailchimp'];
-            if ($chimpTag && $customAtt) {
-                $eventValue = null;
-                $key = strtoupper($chimpTag);
-                if (is_numeric($customAtt)) {
-                    foreach ($attrSetId as $attribute) {
-                        if ($attribute['attribute_id'] == $customAtt) {
-                            $attributeCode = $attribute['attribute_code'];
-                            switch ($attributeCode) {
-                                case 'email':
-                                    break;
-                                case 'default_billing':
-                                case 'default_shipping':
-                                    $address = $customer->getPrimaryAddress($attributeCode);
-                                    $addressData = $this->getAddressData($address);
-                                    if (count($addressData)) {
-                                        $eventValue = $mergeVars[$key] = $addressData;
-                                    }
-                                    break;
-                                case 'gender':
-                                    if ($customer->getData($attributeCode)) {
-                                        $genderValue = $customer->getData($attributeCode);
-                                        if ($genderValue == 1) {
-                                            $eventValue = $mergeVars[$key] = 'Male';
-                                        } elseif ($genderValue == 2) {
-                                            $eventValue = $mergeVars[$key] = 'Female';
-                                        }
-                                    }
-                                    break;
-                                case 'group_id':
-                                    if ($customer->getData($attributeCode)) {
-                                        $group_id = (int)$customer->getData($attributeCode);
-                                        $customerGroup = Mage::helper('customer')->getGroups()->toOptionHash();
-                                        $eventValue = $mergeVars[$key] = $customerGroup[$group_id];
-                                    } else {
-                                        $eventValue = $mergeVars[$key] = 'NOT LOGGED IN';
-                                    }
-                                    break;
-                                case 'firstname':
-                                    $firstName = $customer->getFirstname();
-
-                                    if (!$firstName) {
-                                        $firstName = $subscriber->getSubscriberFirstname();
-                                    }
-
-                                    if ($firstName) {
-                                        $eventValue = $mergeVars[$key] = $firstName;
-                                    }
-                                    break;
-                                case 'lastname':
-                                    $lastName = $customer->getLastname();
-
-                                    if (!$lastName) {
-                                        $lastName = $subscriber->getSubscriberLastname();
-                                    }
-
-                                    if ($lastName) {
-                                        $eventValue = $mergeVars[$key] = $lastName;
-                                    }
-                                    break;
-                                case 'store_id':
-                                    $eventValue = $mergeVars[$key] = $storeId;
-                                    break;
-                                case 'website_id':
-                                    $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
-                                    $eventValue = $mergeVars[$key] = $websiteId;
-                                    break;
-                                case 'created_in':
-                                        $storeName = Mage::getModel('core/store')->load($storeId)->getName();
-                                        $eventValue = $mergeVars[$key] = $storeName;
-                                    break;
-                                case 'dob':
-                                    if ($customer->getData($attributeCode)) {
-                                        $eventValue = $mergeVars[$key] = date("m/d", strtotime($customer->getData($attributeCode)));
-                                    }
-                                    break;
-                                default:
-                                    $attrValue = $customer->getData($attributeCode);
-                                    if ($attribute['frontend_input']=='select' && $attrValue) {
-                                        $attr = $customer->getResource()->getAttribute($attributeCode);
-                                        $optionValue =  $attr->getSource()->getOptionText($attrValue);
-                                        $eventValue = $mergeVars[$key] = $optionValue;
-                                    } elseif ($attrValue) {
-                                        $eventValue = $mergeVars[$key] = $attrValue;
-                                    }
-                                    break;
-                            }
-
-                            Mage::dispatchEvent(
-                                'mailchimp_merge_field_send_before',
-                                array(
-                                    'customer_id' => $customer->getId(),
-                                    'subscriber_email' => $subscriberEmail,
-                                    'merge_field_tag' => $attributeCode,
-                                    'merge_field_value' => &$eventValue
-                                )
-                            );
-                        }
-                    }
-                } else {
-                    switch ($customAtt) {
-                        case 'billing_company':
-                        case 'shipping_company':
-                            $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                            if ($address) {
-                                $company = $address->getCompany();
-                                if ($company) {
-                                    $eventValue = $mergeVars[$key] = $company;
-                                }
-                            }
-                            break;
-                        case 'billing_telephone':
-                        case 'shipping_telephone':
-                            $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                            if ($address) {
-                                $telephone = $address->getTelephone();
-                                if ($telephone) {
-                                    $eventValue = $mergeVars[$key] = $telephone;
-                                }
-                            }
-                            break;
-                        case 'billing_country':
-                        case 'shipping_country':
-                            $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                            if ($address) {
-                                $countryCode = $address->getCountry();
-                                if ($countryCode) {
-                                    $countryName = Mage::getModel('directory/country')->loadByCode($countryCode)->getName();
-                                    $eventValue = $mergeVars[$key] = $countryName;
-                                }
-                            }
-                            break;
-                        case 'billing_zipcode':
-                        case 'shipping_zipcode':
-                            $addr = explode('_', $customAtt);
-                            $address = $customer->getPrimaryAddress('default_' . $addr[0]);
-
-                            if ($address) {
-                                $zipCode = $address->getPostcode();
-                                if ($zipCode) {
-                                    $eventValue = $mergeVars[$key] = $zipCode;
-                                }
-                            }
-                            break;
-                        case 'dop':
-                            $dop = $helper->getLastDateOfPurchase($subscriberEmail);
-                            if ($dop) {
-                                $eventValue = $mergeVars[$key] = $dop;
-                            }
-                            break;
-                        case 'store_code':
-                            $storeCode = Mage::getModel('core/store')->load($storeId)->getCode();
-                            $eventValue = $mergeVars[$key] = $storeCode;
-                    }
-
-                    Mage::dispatchEvent(
-                        'mailchimp_merge_field_send_before',
-                        array(
-                            'customer_id' => $customer->getId(),
-                            'subscriber_email' => $subscriberEmail,
-                            'merge_field_tag' => $customAtt,
-                            'merge_field_value' => &$eventValue
-                        )
-                    );
-                }
-
-                if ($eventValue) {
-                    $mergeVars[$key] = $eventValue;
-                }
-            }
-        }
-
-        $newVars = new Varien_Object;
-
-        Mage::dispatchEvent(
-            'mailchimp_merge_field_send_after',
-            array(
-                'subscriber' => $subscriber,
-                'vars' => $mergeVars,
-                'new_vars' => $newVars
-            )
-        );
-
-        if ($newVars->hasData()) {
-            $mergeVars = array_merge($mergeVars, $newVars->getData());
-        }
-
-        return (!empty($mergeVars)) ? $mergeVars : null;
-    }
-
     /**
-     * @param $subscriber
-     * @param bool $updateStatus If set to true, it will force the status update even for those already subscribed.
-     */
+    * @param $subscriber
+    * @param bool $updateStatus If set to true, it will force the status update even for those already subscribed.
+    */
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
         $saveSubscriber = false;
         $isAdmin = Mage::app()->getStore()->isAdmin();
-        $helper = $this->mcHelper;
+        $helper = $this->getMailchimpHelper();
         $storeId = $subscriber->getStoreId();
         $subscriptionEnabled = $helper->isSubscriptionEnabled($storeId);
         if ($subscriptionEnabled) {
@@ -384,7 +208,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 return;
             }
 
-            $mergeVars = $this->getMergeVars($subscriber);
+            $mailChimpTags = $this->_buildMailchimpTags($subscriber, $storeId);
+
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
 
@@ -397,7 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $newStatus,
                     null,
                     $forceStatus,
-                    $mergeVars,
+                    $mailChimpTags->getMailchimpTags(),
                     $interest,
                     $language,
                     null,
@@ -408,13 +233,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $saveSubscriber = true;
             } catch (MailChimp_Error $e) {
-                if ($newStatus === 'subscribed' && $subscriber->getIsStatusChanged() && !$helper->isSubscriptionConfirmationEnabled($storeId)) {
+                if ($this->isSubscribed($newStatus) && $subscriber->getIsStatusChanged()
+                    && !$helper->isSubscriptionConfirmationEnabled($storeId)) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
-                            $api->lists->members->update($listId, $md5HashEmail, null, 'pending', $mergeVars, $interest);
+                            $api->getLists()->getMembers()->update(
+                                $listId, $md5HashEmail, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+                            );
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                             $saveSubscriber = true;
-                            $message = $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
+                            $message =
+                            $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
                             Mage::getSingleton('core/session')->addWarning($message);
                         } catch (MailChimp_Error $e) {
                             $errorMessage = $e->getFriendlyMessage();
@@ -522,16 +351,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     /**
      * @param $subscriber
+     * @throws Mage_Core_Exception
      */
     public function deleteSubscriber($subscriber)
     {
-        $helper = $this->mcHelper;
+        $helper = $this->getMailchimpHelper();
         $storeId = $subscriber->getStoreId();
         $listId = $helper->getGeneralList($storeId);
         try {
             $api = $helper->getApi($storeId);
             $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->lists->members->update($listId, $md5HashEmail, null, 'unsubscribed');
+            $api->getLists()->getMembers()->update($listId, $md5HashEmail, null, 'unsubscribed');
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
@@ -542,51 +372,16 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
     }
 
-    public function update($emailAddress, $storeId)
+    /**
+     * @param $emailAddress
+     */
+    public function update($emailAddress)
     {
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
         if ($subscriber->getId()) {
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
         }
-    }
-
-    /**
-     * @param $address
-     * @return array
-     */
-    protected function getAddressData($address)
-    {
-        $addressData = array();
-        if ($address) {
-            $street = $address->getStreet();
-            if (count($street) > 1) {
-                $addressData["addr1"] = $street[0];
-                $addressData["addr2"] = $street[1];
-            } else {
-                if (!empty($street[0])) {
-                    $addressData["addr1"] = $street[0];
-                }
-            }
-
-            if ($address->getCity()) {
-                $addressData["city"] = $address->getCity();
-            }
-
-            if ($address->getRegion()) {
-                $addressData["state"] = $address->getRegion();
-            }
-
-            if ($address->getPostcode()) {
-                $addressData["zip"] = $address->getPostcode();
-            }
-
-            if ($address->getCountry()) {
-                $addressData["country"] = Mage::getModel('directory/country')->loadByCode($address->getCountry())->getName();
-            }
-        }
-
-        return $addressData;
     }
 
     /**
@@ -598,13 +393,60 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     }
 
     /**
+     * @param $storeId
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getWebsiteByStoreId($storeId)
+    {
+        return Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+    }
+
+    /**
+     * @return false|Mage_Customer_Model_Customer
+     */
+    protected function getCustomerByWebsiteAndId()
+    {
+        return Mage::getModel('customer/customer');
+    }
+
+    /**
+     * @param $mageMCHelper
+     */
+    protected function setMailchimpHelper($mageMCHelper)
+    {
+        $this->mcHelper = $mageMCHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function getMailchimpHelper()
+    {
+        return $this->mcHelper;
+    }
+
+    /**
+     * @param $lastOrder
+     * @return array | return an array with the address from the order if exist and the addressData is empty.
+     */
+    protected function getAddressFromLastOrder($lastOrder)
+    {
+        $addressData = array();
+        if ($lastOrder && $lastOrder->getShippingAddress()) {
+            $addressData = $lastOrder->getShippingAddress();
+        }
+
+        return $addressData;
+    }
+
+    /**
      * @param $itemId
      * @param $magentoStoreId
      * @return Mage_Newsletter_Model_Subscriber \ subcriberSyncDataItem newsletter/subscriber if exists.
      */
     protected function getSubscriberSyncDataItem($itemId, $magentoStoreId)
     {
-        $subscriberSyndDataItem = null;
+        $subscriberSyncDataItem = null;
         $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_id', array('eq' => $itemId))
             ->addFieldToFilter('store_id', array('eq' => $magentoStoreId))
@@ -612,9 +454,40 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             ->setPageSize(1);
 
         if ($collection->getSize()) {
-            $subscriberSyndDataItem = $collection->getFirstItem();
+            $subscriberSyncDataItem = $collection->getFirstItem();
         }
 
-        return $subscriberSyndDataItem;
+        return $subscriberSyncDataItem;
     }
+
+    /**
+     * @param $status
+     * @return bool
+     */
+    protected function isSubscribed($status)
+    {
+        if ($status === Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
+            return true;
+        }
+    }
+
+    /**
+     * @param $subscriber
+     * @param $storeId
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function _buildMailchimpTags($subscriber, $storeId)
+    {
+        $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
+        $mailChimpTags->setMailChimpHelper($this->getMailchimpHelper());
+        $mailChimpTags->setStoreId($storeId);
+        $mailChimpTags->setSubscriber($subscriber);
+        $mailChimpTags->setCustomer(
+            $this->getCustomerByWebsiteAndId()->
+            setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
+        );
+        $mailChimpTags->buildMailChimpTags();
+        return $mailChimpTags;
+    }
+
 }
