@@ -15,8 +15,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpStoreIdsArray = array('stores_1' => $mailchimpStoreId);
         $isMarkedAsDeleted = 0;
         $type = Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
-        $productId1 = 12;
-        $productId2 = 34;
+        $productIds [1]= 12;
+        $productIds [2]= 34;
 
         /**
          * @var \Ebizmarts_MailChimp_Model_Observer $modelMock
@@ -54,16 +54,16 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('isEcommerceEnabled')->with($scopeId, $scope)->willReturn(true);
         $helperMock->expects($this->exactly(2))->method('getEcommerceSyncDataItem')
             ->withConsecutive(
-                array($productId1, $type, $mailchimpStoreId),
-                array($productId2, $type, $mailchimpStoreId)
+                array($productIds[1], $type, $mailchimpStoreId),
+                array($productIds[2], $type, $mailchimpStoreId)
             )->willReturnOnConsecutiveCalls(
                 $dataProductMock,
                 $dataProductMock
             );
 
         $apiProductsMock->expects($this->exactly(2))->method('update')->withConsecutive(
-            array($productId1, $mailchimpStoreId),
-            array($productId2, $mailchimpStoreId)
+            array($productIds[1], $mailchimpStoreId),
+            array($productIds[2], $mailchimpStoreId)
         );
 
         $dataProductMock->expects($this->exactly(2))->method('getMailchimpSyncDeleted')->willReturnOnConsecutiveCalls(

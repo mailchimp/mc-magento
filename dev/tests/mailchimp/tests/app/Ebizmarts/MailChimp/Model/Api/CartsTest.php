@@ -119,7 +119,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
             . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $m4m = array('m4m.*');
+        $mailchimpSelect = array('m4m.*');
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
@@ -222,7 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(new ArrayIterator(array($cartModelMock)));
         $varienSelectMock->expects($this->once())
             ->method('joinLeft')
-            ->with($arrayTableName, $conditionSelect, $m4m);
+            ->with($arrayTableName, $conditionSelect, $mailchimpSelect);
         $varienSelectMock->expects($this->once())
             ->method('where')
             ->with($where);
@@ -268,7 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
             . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $m4m = array('m4m.*');
+        $mailchimpSelect = array('m4m.*');
         $allCarts = array(
             array(
                 'method' => 'DELETE',
@@ -417,7 +417,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(new ArrayIterator(array($cartModelMock)));
         $varienSelectMock->expects($this->once())
             ->method('joinLeft')
-            ->with($arrayTableName, $conditionSelect, $m4m);
+            ->with($arrayTableName, $conditionSelect, $mailchimpSelect);
         $varienSelectMock->expects($this->once())
             ->method('where')
             ->with($where);
@@ -459,7 +459,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
             . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $m4m = array('m4m.*');
+        $mailchimpSelect = array('m4m.*');
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
@@ -541,7 +541,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->with(self::BATCH_LIMIT_FROM_CONFIG);
         $varienSelectMock->expects($this->once())
             ->method('joinLeft')
-            ->with($arrayTableName, $conditionSelect, $m4m);
+            ->with($arrayTableName, $conditionSelect, $mailchimpSelect);
         $customerModelMock->expects($this->once())
             ->method('setWebsiteId')
             ->with(self::WEB_SITE_ID_FROM_MAGENTO_STORE_ID);
@@ -585,7 +585,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
             . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $m4m = array('m4m.*');
+        $mailchimpSelect = array('m4m.*');
         $allCarts = array(
             array(
                 'method' => 'DELETE',
@@ -724,7 +724,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(new ArrayIterator(array($cartModelMock)));
         $varienSelectMock->expects($this->once())
             ->method('joinLeft')
-            ->with($arrayTableName, $conditionSelect, $m4m);
+            ->with($arrayTableName, $conditionSelect, $mailchimpSelect);
         $varienSelectMock->expects($this->once())
             ->method('where')
             ->with($where);
@@ -1650,7 +1650,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $condition = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
             . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $m4m = array('m4m.*');
+        $mailchimpSelect = array('m4m.*');
         $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
 
         $cartsApiMock = $this->_cartsApiMock
@@ -1690,7 +1690,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $varienSelectMock->expects($this->once())
             ->method('joinLeft')
-            ->with($arrayMailchimpTableName, $condition, $m4m);
+            ->with($arrayMailchimpTableName, $condition, $mailchimpSelect);
         $varienSelectMock->expects($this->once())
             ->method('where')
             ->with($where);

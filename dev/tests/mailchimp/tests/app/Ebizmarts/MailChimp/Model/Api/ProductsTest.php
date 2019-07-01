@@ -736,7 +736,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
         $magentoStoreId = 1;
         $entityId = 145;
-        $time = time();
+        $time = Mage::getSingleton('core/date')->gmtTimestamp();
 
 
         $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
@@ -786,7 +786,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method("quoteInto")
             ->with(
                 'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
-                date('Y-m-d', $time)." 00:00:00"
+                Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time) ." 00:00:00"
             );
 
 
@@ -819,10 +819,14 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method('addAttributeToFilter')
             ->withConsecutive(
                 array('special_price',  array('gt' => 0) , 'left'),
-                array('special_from_date', array('lteq' => date('Y-m-d', $time)." 23:59:59"),'left'),
+                array('special_from_date',
+                    array('lteq' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time)." 23:59:59"),
+                    'left'),
                 array('special_from_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')) , 'left'),
                 array('special_price', array('gt' => 0), 'left'),
-                array('special_to_date',  array('lt' => date('Y-m-d', $time)." 00:00:00"), 'left'),
+                array('special_to_date',
+                    array('lt' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time)." 00:00:00"),
+                    'left'),
                 array('special_to_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')), 'left')
             )->willReturnOnConsecutiveCalls(
                 $collectiontMock,

@@ -176,30 +176,31 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->with($scopeId, $scope)
             ->willReturn($storeIdsArray);
 
-        $param2 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
+        $params = array();
+        $params ['param2'] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
             . "_$mailchimpStoreId", 'stores', $storeIdOne);
-        $param3 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
+        $params ['param3'] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
             . "_$mailchimpStoreId", 'stores', $storeIdTwo);
-        $param4 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
+        $params ['param4'] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
             . "_$mailchimpStoreId", 'stores', $storeIdThree);
-        $param5 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
+        $params ['param5'] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING
             . "_$mailchimpStoreId", $scope, $scopeId);
-        $param1 = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
-        $param6 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
-        $param7 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
-        $param8 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
-        $param9 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
-        $param10 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
-        $param11 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
-        $param12 = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
+        $params ['param1'] = array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $scope, $scopeId);
+        $params ['param6'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
+        $params ['param7'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
+        $params ['param8'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
+        $params ['param9'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
+        $params ['param10'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
+        $params ['param11'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
+        $params ['param12'] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
 
         $configMock
             ->expects($this->exactly(12))
             ->method('deleteConfig')
             ->withConsecutive(
-                $param1, $param2, $param3, $param4, $param5,
-                $param6, $param7, $param8, $param9, $param10,
-                $param11, $param12
+                $params ['param1'], $params ['param2'], $params ['param3'], $params ['param4'], $params ['param5'],
+                $params ['param6'], $params ['param7'], $params ['param8'], $params ['param9'], $params ['param10'],
+                $params ['param11'], $params ['param12']
             );
 
         $configMock->expects($this->once())->method('cleanCache');

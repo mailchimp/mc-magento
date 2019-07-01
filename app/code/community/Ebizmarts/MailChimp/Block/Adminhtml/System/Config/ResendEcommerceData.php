@@ -31,7 +31,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
         if ($helper->getIfConfigExistsForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID,
             $scopeArray['scope_id'],
-            $scopeArray['scope'])
+            $scopeArray['scope']
+        )
         ) {
             $label = $helper->__('Resend Ecommerce Data');
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')

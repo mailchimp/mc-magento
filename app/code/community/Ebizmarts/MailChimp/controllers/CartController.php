@@ -120,7 +120,8 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                 Mage::getSingleton('customer/session')
                     ->addNotice(
                         $this->__(
-                            "The coupon code could not be applied for the current store. Please try to apply it manually."
+                            "The coupon code could not be applied for the current store. "
+                            . "Please try to apply it manually."
                         )
                     );
                 $this->getResponse()

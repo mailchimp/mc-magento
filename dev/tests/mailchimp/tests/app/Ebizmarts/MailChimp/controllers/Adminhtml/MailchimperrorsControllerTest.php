@@ -34,7 +34,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
         $item = new stdClass();
         $item->status_code = 400;
         $item->operation_id = 'storeid-1_CUS_2018-02-06-18-46-06-86970300_64';
-        $item->response = '{"type":"http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/","title":"Invalid Resource","status":400,"detail":"The resource submitted could not be validated. For field-specific details, see the \'errors\' array.","instance":"","errors":[{"field":"email_address","message":"This email address looks fake or invalid. Please enter a real email address."}]}';
+        $item->response = '{"type":"http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/",'
+            . '"title":"Invalid Resource","status":400,"detail":"The resource submitted could not be validated. '
+            . 'For field-specific details, see the \'errors\' array.","instance":"","errors":'
+            . '[{"field":"email_address","message":"This email address looks fake or invalid. '
+            . 'Please enter a real email address."}]}';
         $items = array($item);
         $magentoBaseDir = '/magento/';
 

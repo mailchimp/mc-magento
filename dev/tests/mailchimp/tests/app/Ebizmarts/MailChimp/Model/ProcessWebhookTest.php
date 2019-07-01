@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $scope = 'stores';
         $scopeId = 1;
         $member['status'] = 'subscribed';
-        $md5HashEmail = md5(strtolower($email));
+        $cryptHashEmail = md5(strtolower($email));
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
@@ -203,7 +203,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $memberMock->expects($this->once())
             ->method('get')
-            ->with($listId, $md5HashEmail, null, null)
+            ->with($listId, $cryptHashEmail, null, null)
             ->willReturn($member);
 
         $helperMock->expects($this->once())->method('subscribeMember')
@@ -224,7 +224,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $scope = 'stores';
         $scopeId = 1;
         $member['status'] = 'unsubscribed';
-        $md5HashEmail = md5(strtolower($email));
+        $cryptHashEmail = md5(strtolower($email));
         $webhookDeleteActionReturn = 0;
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
@@ -285,7 +285,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $memberMock
             ->expects($this->once())
             ->method('get')
-            ->with($listId, $md5HashEmail, null, null)
+            ->with($listId, $cryptHashEmail, null, null)
             ->willReturn($member);
 
         $helperMock->expects($this->once())->method('unsubscribeMember')->with($subscriberMock)->willReturn(null);

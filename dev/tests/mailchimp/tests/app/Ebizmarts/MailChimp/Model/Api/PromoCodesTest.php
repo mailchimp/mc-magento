@@ -2,7 +2,7 @@
 
 class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_TestCase
 {
-    private $promoCodesApiMock;
+    protected $_promoCodesApiMock;
 
     const BATCH_ID = 'storeid-1_PCD_2017-05-18-14-45-54-38849500';
 
@@ -15,19 +15,19 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         Mage::app('default');
 
         /** @var Ebizmarts_MailChimp_Model_Api_PromoCodes $apiPromoCodesMock promoCodesApiMock */
-        $this->promoCodesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoCodes::class);
+        $this->_promoCodesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoCodes::class);
     }
 
     public function tearDown()
     {
-        $this->promoCodesApiMock = null;
+        $this->_promoCodesApiMock = null;
     }
 
     public function testCreateBatchJson()
     {
         $magentoStoreId = 1;
         $batchArray = array();
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('_getDeletedPromoCodes', '_getNewPromoCodes'))
             ->getMock();
 
@@ -50,7 +50,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
     {
         $magentoStoreId = 0;
 
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(
                 array(
                     'getPromoCodeResourceCollection', 'addWebsiteColumn',
@@ -90,7 +90,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
     public function testGetSyncDataTableName()
     {
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('getCoreResource'))
             ->getMock();
 
@@ -112,7 +112,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
     public function testMarkAsDeleted()
     {
         $promoRuleId = 1;
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('_setDeleted'))
             ->getMock();
 
@@ -127,7 +127,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $promoCodesIds = array();
         $syncDataItems = array();
 
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('getPromoCodesForRule', 'getMailChimpHelper'))
             ->getMock();
 
@@ -179,7 +179,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
     public function testDeletePromoCodeSyncData()
     {
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('getMailChimpHelper'))
             ->getMock();
 
