@@ -30,16 +30,18 @@
             <block type="mailchimp/adminhtml_mergevars_add" name="adminhtml.mailchimp.add"/>
         </reference>
     </adminhtml_mergevars_addmergevar>
-    <adminhtml_system_config_edit>
-        <reference name="head">
-            <action method="addItem">
-                <type>js_css</type>
-                <name>prototype/windows/themes/default.css</name>
-            </action>
-            <action method="addCss">
-                <name>lib/prototype/windows/themes/magento.css</name>
-            </action>
+    <adminhtml_ecommerce_renderresendecom>
+        <reference name="content">
+            <update handle="default"/>
+            <remove name="header"/>
+            <remove name="menu"/>
+            <remove name="footer"/>
+            <remove name="notifications"/>
+            <remove name="global_notices"/>
+            <block type="mailchimp/adminhtml_ecommerce_resendecommercedata" name="adminhtml.mailchimp.resend"></block>
         </reference>
+    </adminhtml_ecommerce_renderresendecom>
+    <adminhtml_system_config_edit>
         <reference name="head">
             <action method="addCss">
                 <stylesheet>ebizmarts/mailchimp/css/mailchimp.css</stylesheet>
@@ -59,6 +61,15 @@
     <default>
         <reference name="notifications">
             <block type="mailchimp/adminhtml_notifications" name="mailchimp_notifications" template="ebizmarts/mailchimp/notifications.phtml"/>
+        </reference>
+        <reference name="head">
+            <action method="addItem">
+                <type>js_css</type>
+                <name>prototype/windows/themes/default.css</name>
+            </action>
+            <action method="addCss">
+                <name>lib/prototype/windows/themes/magento.css</name>
+            </action>
         </reference>
     </default>
 </layout>

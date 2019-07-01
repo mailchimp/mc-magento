@@ -20,7 +20,8 @@ if (strstr($apiKey, "-")) {
 $curl = curl_init();
 
 curl_setopt_array(
-    $curl, array(
+    $curl,
+    array(
     CURLOPT_URL => "https://$dc.api.mailchimp.com/3.0/batches/$batchId",
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => "",
@@ -61,7 +62,7 @@ if ($err) {
             curl_close($ch);
             fclose($fd);
             printf("$batchId.response.tar.gz\n");
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             printf($e->getMessage());
         }
     }

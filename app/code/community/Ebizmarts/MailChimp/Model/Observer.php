@@ -121,7 +121,12 @@ class Ebizmarts_MailChimp_Model_Observer
             $scopeArray = $helper->getCurrentScope();
             $mailchimpStoreId = (isset($configData['groups']['general']['fields']['storeid']['value'])) ? $configData['groups']['general']['fields']['storeid']['value'] : null;
             $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
-            $apiKey = (isset($configData['groups']['general']['fields']['apikey']['value'])) ? $configData['groups']['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+
+            if (isset($configData['groups']['general']['fields']['apikey']['value']) && !$helper->isApiKeyObscure($configData['groups']['general']['fields']['apikey']['value'])) {
+                $apiKey = $configData['groups']['general']['fields']['apikey']['value'];
+            } else {
+                $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+            }
 
             // If ecommerce data section is enabled only allow inheriting both entries (list and MC Store) at the same time.
 
@@ -133,13 +138,13 @@ class Ebizmarts_MailChimp_Model_Observer
                     $listId = (!empty($previouslyConfiguredListId)) ? $previouslyConfiguredListId : $mcStoreListId;
                     $configData['groups']['general']['fields']['list']['value'] = $listId;
                     $configDataChanged = true;
-                    $message = $helper->__('The list configuration was automatically modified to show the list associated to the selected Mailchimp store.');
+                    $message = $helper->__('The audience configuration was automatically modified to show the audience associated to the selected Mailchimp store.');
                     $this->getAdminSession()->addError($message);
                 } elseif (isset($configData['groups']['general']['fields']['storeid']['inherit'])) {
                     unset($configData['groups']['general']['fields']['storeid']['inherit']);
                     $configData['groups']['general']['fields']['storeid']['value'] = $oldMailchimpStoreId;
                     $configDataChanged = true;
-                    $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp list configured for this scope. Both must be set to inherit at the same time.');
+                    $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp audience configured for this scope. Both must be set to inherit at the same time.');
                     $this->getAdminSession()->addError($message);
                 }
                 if ($configDataChanged) {
@@ -272,19 +277,23 @@ class Ebizmarts_MailChimp_Model_Observer
 
         if ($block instanceof Mage_Adminhtml_Block_Newsletter_Subscriber_Grid) {
             $block->addColumnAfter(
-                'firstname', array(
+                'firstname',
+                array(
                 'header' => Mage::helper('newsletter')->__('Customer First Name'),
                 'index' => 'customer_firstname',
                 'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_firstname',
-            ), 'type'
+                ),
+                'type'
             );
 
             $block->addColumnAfter(
-                'lastname', array(
+                'lastname',
+                array(
                 'header' => Mage::helper('newsletter')->__('Customer Last Name'),
                 'index' => 'customer_lastname',
                 'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_lastname'
-            ), 'firstname'
+                ),
+                'firstname'
             );
         }
 
@@ -331,7 +340,6 @@ class Ebizmarts_MailChimp_Model_Observer
                         $subscriber = $subscriberModel->loadByCustomer($customer);
                         $subscriber->setSubscriberEmail($customerEmail); // make sure we set the new email address
                         $subscriber->save();
-
                     }
                 }
             }
@@ -549,7 +557,8 @@ class Ebizmarts_MailChimp_Model_Observer
         ) {
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_MAILCHIMP_LOGO_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
-                    'mailchimp_campaign_id', array(
+                    'mailchimp_campaign_id',
+                    array(
                     'header' => $helper->__('MailChimp'),
                     'index' => 'mailchimp_campaign_id',
                     'align' => 'center',
@@ -557,12 +566,14 @@ class Ebizmarts_MailChimp_Model_Observer
                     'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
                     'sortable' => false,
                     'width' => 70
-                ), 'created_at'
+                    ),
+                    'created_at'
                 );
             }
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
-                    'mailchimp_synced_flag', array(
+                    'mailchimp_synced_flag',
+                    array(
                     'header' => $helper->__('Synced to MailChimp'),
                     'index' => 'mailchimp_synced_flag',
                     'align' => 'center',
@@ -570,7 +581,8 @@ class Ebizmarts_MailChimp_Model_Observer
                     'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
                     'sortable' => true,
                     'width' => 70
-                ), 'created_at'
+                    ),
+                    'created_at'
                 );
 
                 $columnId = $block->getParam($block->getVarNameSort());
@@ -676,7 +688,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiOrder = $this->makeApiOrder();
 
         if ($ecomEnabled) {
-
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
             $items = $creditMemo->getAllItems();
@@ -716,7 +727,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiOrder = $this->makeApiOrder();
 
         if ($ecomEnabled) {
-
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
             $items = $creditMemo->getAllItems();
@@ -754,7 +764,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $apiProduct = $this->makeApiProduct();
 
         if ($ecomEnabled) {
-
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
             $productId = $item->getProductId();
@@ -782,11 +791,9 @@ class Ebizmarts_MailChimp_Model_Observer
 
         $stores = $helper->getMageApp()->getStores();
         foreach ($stores as $storeId => $store) {
-
             $ecommEnabled = $helper->isEcommerceEnabled($storeId);
 
             if ($ecommEnabled) {
-
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
                 $status = $this->getCatalogProductStatusModel()->getProductStatus($product->getId(), $storeId);
@@ -820,7 +827,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $mailchimpStoreIdsArray = $helper->getAllMailChimpStoreIds();
 
         foreach ($mailchimpStoreIdsArray as $scopeData => $mailchimpStoreId) {
-
             $scopeArray = $this->getScopeArrayFromString($scopeData);
             $ecommEnabled = $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope']);
 
@@ -913,7 +919,6 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
-
     }
 
     public function cleanProductImagesCacheAfter(Varien_Event_Observer $observer)
@@ -1003,7 +1008,13 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         if (!$this->isCustomerLoggedIn() && !Mage::app()->getStore()->isAdmin()) {
             Mage::getModel('core/cookie')->set(
-                'email', $subscriber->getSubscriberEmail(), null, null, null, null, false
+                'email',
+                $subscriber->getSubscriberEmail(),
+                null,
+                null,
+                null,
+                null,
+                false
             );
         }
     }
@@ -1027,7 +1038,6 @@ class Ebizmarts_MailChimp_Model_Observer
                     'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
                     'class' => 'ajax'
                 ));
-
             }
         }
         return $observer;

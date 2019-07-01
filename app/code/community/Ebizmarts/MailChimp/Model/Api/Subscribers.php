@@ -13,6 +13,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
 
+    /**
+     * Ebizmarts_MailChimp_Helper_Data
+     */
     private $mcHelper;
 
     public function __construct()
@@ -22,6 +25,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
     public function createBatchJson($listId, $storeId, $limit)
     {
+        /**
+         * Ebizmarts_MailChimp_Helper_Data
+         */
         $helper = $this->mcHelper;
         $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $storeId);
         $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $storeId);
@@ -84,6 +90,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if (!empty($subscriberJson)) {
+                if ($subscriber->getMailchimpSyncModified()) {
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+                } else {
+                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
+                }
+
                 $subscriberArray[$counter]['method'] = "PUT";
                 $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
@@ -121,7 +133,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
-        if(count($interest)) {
+        if (count($interest)) {
             $data['interests'] = $interest;
         }
 
@@ -139,8 +151,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->mcHelper;
         $interestsAvailable = $helper->getInterest($storeId);
         $interest = $helper->getInterestGroups(null, $subscriber->getSubscriberId(), $storeId, $interestsAvailable);
-        foreach($interest as $i) {
-            foreach($i['category'] as $key=>$value) {
+        foreach ($interest as $i) {
+            foreach ($i['category'] as $key => $value) {
                 $rc[$value['id']] = $value['checked'];
             }
         }
@@ -253,7 +265,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             }
 
                             Mage::dispatchEvent(
-                                'mailchimp_merge_field_send_before', array(
+                                'mailchimp_merge_field_send_before',
+                                array(
                                     'customer_id' => $customer->getId(),
                                     'subscriber_email' => $subscriberEmail,
                                     'merge_field_tag' => $attributeCode,
@@ -325,7 +338,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     }
 
                     Mage::dispatchEvent(
-                        'mailchimp_merge_field_send_before', array(
+                        'mailchimp_merge_field_send_before',
+                        array(
                             'customer_id' => $customer->getId(),
                             'subscriber_email' => $subscriberEmail,
                             'merge_field_tag' => $customAtt,
@@ -343,7 +357,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $newVars = new Varien_Object;
 
         Mage::dispatchEvent(
-            'mailchimp_merge_field_send_after', array(
+            'mailchimp_merge_field_send_after',
+            array(
                 'subscriber' => $subscriber,
                 'vars' => $mergeVars,
                 'new_vars' => $newVars
@@ -388,8 +403,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             try {
                 $helper->logDebug("MC-API request: Adding/updating member for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                 $api->lists->members->addOrUpdate(
-                    $listId, $md5HashEmail, $email, $newStatus, null, $forceStatus, $mergeVars,
-                    $interest, $language, null, null
+                    $listId,
+                    $md5HashEmail,
+                    $email,
+                    $newStatus,
+                    null,
+                    $forceStatus,
+                    $mergeVars,
+                    $interest,
+                    $language,
+                    null,
+                    null
                 );
                 $helper->logInfo("MC-API request: Updated member status to pending for $subscriberDescription email $email store ID $storeId list ID $listId", $storeId);
                 $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
@@ -593,5 +617,26 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function addError($errorMessage)
     {
         Mage::getSingleton('core/session')->addError($errorMessage);
+    }
+
+    /**
+     * @param $itemId
+     * @param $magentoStoreId
+     * @return Mage_Newsletter_Model_Subscriber \ subcriberSyncDataItem newsletter/subscriber if exists.
+     */
+    protected function getSubscriberSyncDataItem($itemId, $magentoStoreId)
+    {
+        $subscriberSyndDataItem = null;
+        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
+            ->addFieldToFilter('subscriber_id', array('eq' => $itemId))
+            ->addFieldToFilter('store_id', array('eq' => $magentoStoreId))
+            ->setCurPage(1)
+            ->setPageSize(1);
+
+        if ($collection->getSize()) {
+            $subscriberSyndDataItem = $collection->getFirstItem();
+        }
+
+        return $subscriberSyndDataItem;
     }
 }

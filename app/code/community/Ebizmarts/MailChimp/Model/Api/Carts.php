@@ -90,7 +90,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                     $allCarts[$counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, 0, null, 1);
                     $this->setCounter($this->getCounter()+1);
                     $helper->logDebug(
                         "Creating e-commerce batch for store $magentoStoreId: " .
@@ -106,7 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
             $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
             $allCarts[$counter]['body'] = '';
-            $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, null, null, 1);
+            $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, 0, null, 1);
             $this->setCounter($this->getCounter()+1);
             $helper->logDebug(
                 "Creating e-commerce batch for store $magentoStoreId: " .
@@ -166,7 +166,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                         $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                         $allCarts[$counter]['body'] = '';
-                        $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
+                        $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, 0, null, 1);
                         $this->setCounter($this->getCounter() + 1);
                         $helper->logDebug(
                             "Creating e-commerce batch for store $magentoStoreId: " .
@@ -189,13 +189,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
             if ($cartJson != "") {
+                $this->getHelper()->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_MOD);
+
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
                 $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/'.$cartId;
                 $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                 $allCarts[$counter]['body'] = $cartJson;
                 $this->setCounter($this->getCounter()+1);
-                $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, null, null, null, $this->getToken());
+                $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, 0, null, null, $this->getToken());
                 $helper->logDebug(
                     "Creating e-commerce batch for store $magentoStoreId: " .
                     "Adding updated cart ID $cartId for customer email " . $cart->getCustomerEmail() .
@@ -264,7 +266,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $alreadySentCartId;
                     $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                     $allCarts[$counter]['body'] = '';
-                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, null, null, 1);
+                    $this->_updateSyncData($alreadySentCartId, $mailchimpStoreId, null, null, 0, null, 1);
                     $this->setCounter($this->getCounter()+1);
                     $helper->logDebug(
                         "Creating e-commerce batch for store $magentoStoreId: " .
@@ -287,13 +289,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
             if ($cartJson != "") {
+                $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_NEW);
+
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'POST';
                 $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
                 $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                 $allCarts[$counter]['body'] = $cartJson;
                 $this->setCounter($this->getCounter()+1);
-                $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, null, null, null, $this->getToken());
+                $this->_updateSyncData($cartId, $mailchimpStoreId, null, null, 0, null, null, $this->getToken());
                 $helper->logDebug(
                     "Creating e-commerce batch for store $magentoStoreId: " .
                     "Adding new cart ID $cartId for customer email " . $cart->getCustomerEmail() .
@@ -458,14 +462,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * Get Customer data for the cart.
      *
      * @param  $cart
-     * @param  $mailchimpStoreId
      * @param  $magentoStoreId
      * @return array
      */
     public function _getCustomer($cart, $magentoStoreId)
     {
         $customer = array(
-            "id" => md5($cart->getCustomerEmail()),
+            "id" => md5(strtolower($cart->getCustomerEmail())),
             "email_address" => $cart->getCustomerEmail(),
             "opt_in_status" => $this->getApiCustomersOptIn($magentoStoreId)
         );
@@ -729,4 +732,3 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         return Mage::getModel('mailchimp/api_products');
     }
 }
-

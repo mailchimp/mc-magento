@@ -29,22 +29,37 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId, $id, $emailAddress, $optInStatus, $company=null, $firstName=null, $lastName=null,
-        $ordersCount=null, $totalSpent=null, $address=null
+    public function add(
+        $storeId,
+        $id,
+        $emailAddress,
+        $optInStatus,
+        $company = null,
+        $firstName = null,
+        $lastName = null,
+        $ordersCount = null,
+        $totalSpent = null,
+        $address = null
     ) {
 
         $_params = array('id'=>$id,'email_address'=>$emailAddress,'opt_in_status'=>$optInStatus);
-        if($company) { $_params['company'] = $company;
+        if ($company) {
+            $_params['company'] = $company;
         }
-        if($firstName) { $_params['first_name'] = $firstName;
+        if ($firstName) {
+            $_params['first_name'] = $firstName;
         }
-        if($lastName) { $_params['last_name'] = $lastName;
+        if ($lastName) {
+            $_params['last_name'] = $lastName;
         }
-        if($ordersCount) { $_params['orders_count'] = $ordersCount;
+        if ($ordersCount) {
+            $_params['orders_count'] = $ordersCount;
         }
-        if($totalSpent) { $_params['total_spent'] = $totalSpent;
+        if ($totalSpent) {
+            $_params['total_spent'] = $totalSpent;
         }
-        if($address) { $_params['address'] = $address;
+        if ($address) {
+            $_params['address'] = $address;
         }
         return $this->_master->call('ecommerce/stores/'.$storeId.'/customers', $_params, Ebizmarts_MailChimp::POST);
     }
@@ -62,16 +77,20 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($storeId,$fields=null,$excludeFields=null,$count=null,$offset=null)
+    public function getAll($storeId, $fields = null, $excludeFields = null, $count = null, $offset = null)
     {
         $_params = array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
         return $this->_master->call('ecommerce/stores/'.$storeId.'/customers', $_params, Ebizmarts_MailChimp::GET);
     }
@@ -87,12 +106,14 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function get($storeId,$customerId,$fields=null,$excludeFields=null)
+    public function get($storeId, $customerId, $fields = null, $excludeFields = null)
     {
         $_params = array();
-        if($fields) { $_params['fields']= $fields;
+        if ($fields) {
+            $_params['fields']= $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         $url = 'ecommerce/stores/'.$storeId.'/customers/'.$customerId;
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
@@ -109,12 +130,14 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getByEmail($storeId,$customerEmail,$fields=null,$excludeFields=null)
+    public function getByEmail($storeId, $customerEmail, $fields = null, $excludeFields = null)
     {
         $_params = array('email_address'=>$customerEmail);
-        if($fields) { $_params['fields']= $fields;
+        if ($fields) {
+            $_params['fields']= $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         return $this->_master->call('ecommerce/stores/'.$storeId.'/customers', $_params, Ebizmarts_MailChimp::GET);
     }
@@ -134,24 +157,39 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($storeId, $customerId, $optInStatus=null, $company=null, $firstName=null, $lastName=null,
-        $ordersCount=null, $totalSpent=null, $address=null
+    public function modify(
+        $storeId,
+        $customerId,
+        $optInStatus = null,
+        $company = null,
+        $firstName = null,
+        $lastName = null,
+        $ordersCount = null,
+        $totalSpent = null,
+        $address = null
     ) {
 
         $_params = array();
-        if($optInStatus) { $_params['opt_in_status'] = $optInStatus;
+        if ($optInStatus) {
+            $_params['opt_in_status'] = $optInStatus;
         }
-        if($company) { $_params['company'] = $company;
+        if ($company) {
+            $_params['company'] = $company;
         }
-        if($firstName) { $_params['first_name'] = $firstName;
+        if ($firstName) {
+            $_params['first_name'] = $firstName;
         }
-        if($lastName) { $_params['last_name'] = $lastName;
+        if ($lastName) {
+            $_params['last_name'] = $lastName;
         }
-        if($ordersCount) { $_params['orders_count'] = $ordersCount;
+        if ($ordersCount) {
+            $_params['orders_count'] = $ordersCount;
         }
-        if($totalSpent) { $_params['total_spent'] = $totalSpent;
+        if ($totalSpent) {
+            $_params['total_spent'] = $totalSpent;
         }
-        if($address) { $_params['address'] = $address;
+        if ($address) {
+            $_params['address'] = $address;
         }
         $url = 'ecommerce/stores/'.$storeId.'/customers/'.$customerId;
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::PATCH);
@@ -174,22 +212,37 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function addOrModify($storeId, $customerId, $emailAddress, $optInStatus, $company=null, $firstName=null,
-        $lastName=null, $ordersCount=null, $totalSpent=null, $address=null
+    public function addOrModify(
+        $storeId,
+        $customerId,
+        $emailAddress,
+        $optInStatus,
+        $company = null,
+        $firstName = null,
+        $lastName = null,
+        $ordersCount = null,
+        $totalSpent = null,
+        $address = null
     ) {
 
         $_params = array('id'=>$customerId,'email_address'=>$emailAddress,'opt_in_status'=>$optInStatus);
-        if($company) { $_params['company'] = $company;
+        if ($company) {
+            $_params['company'] = $company;
         }
-        if($firstName) { $_params['first_name'] = $firstName;
+        if ($firstName) {
+            $_params['first_name'] = $firstName;
         }
-        if($lastName) { $_params['last_name'] = $lastName;
+        if ($lastName) {
+            $_params['last_name'] = $lastName;
         }
-        if($ordersCount) { $_params['orders_count'] = $ordersCount;
+        if ($ordersCount) {
+            $_params['orders_count'] = $ordersCount;
         }
-        if($totalSpent) { $_params['total_spent'] = $totalSpent;
+        if ($totalSpent) {
+            $_params['total_spent'] = $totalSpent;
         }
-        if($address) { $_params['address'] = $address;
+        if ($address) {
+            $_params['address'] = $address;
         }
         $url = 'ecommerce/stores/'.$storeId.'/customers/'.$customerId;
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::PUT);
@@ -202,7 +255,7 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function delete($storeId,$customerId)
+    public function delete($storeId, $customerId)
     {
         $url = 'ecommerce/stores/'.$storeId.'/customers/'.$customerId;
         return $this->_master->call($url, null, Ebizmarts_MailChimp::DELETE);

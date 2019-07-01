@@ -152,5 +152,4 @@ class Mandrill_Inbound
         $_params = array("raw_message" => $raw_message, "to" => $to, "mail_from" => $mail_from, "helo" => $helo, "client_address" => $client_address);
         return $this->master->call('inbound/send-raw', $_params);
     }
-
 }

@@ -27,24 +27,41 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function add($storeId,$productId,$id,$title,$url=null,$sku=null,$price=null,$inventoryQuantity=null,
-        $imageUrl=null,$backorders=null,$visibility=null
+    public function add(
+        $storeId,
+        $productId,
+        $id,
+        $title,
+        $url = null,
+        $sku = null,
+        $price = null,
+        $inventoryQuantity = null,
+        $imageUrl = null,
+        $backorders = null,
+        $visibility = null
     ) {
 
         $_params=array('id'=>$id,'title'=>$title);
-        if($url) { $_params['url'] = $url;
+        if ($url) {
+            $_params['url'] = $url;
         }
-        if($sku) { $_params['sku'] = $sku;
+        if ($sku) {
+            $_params['sku'] = $sku;
         }
-        if($price) { $_params['price'] = $price;
+        if ($price) {
+            $_params['price'] = $price;
         }
-        if($inventoryQuantity) { $_params['inventory_quantity'] = $inventoryQuantity;
+        if ($inventoryQuantity) {
+            $_params['inventory_quantity'] = $inventoryQuantity;
         }
-        if($imageUrl) { $_params['image_url'] = $imageUrl;
+        if ($imageUrl) {
+            $_params['image_url'] = $imageUrl;
         }
-        if($backorders) { $_params['backorders'] = $backorders;
+        if ($backorders) {
+            $_params['backorders'] = $backorders;
         }
-        if($visibility) { $_params['visibility'] = $visibility;
+        if ($visibility) {
+            $_params['visibility'] = $visibility;
         }
         $url = '/ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::POST);
@@ -63,16 +80,20 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function getAll($storeId,$productId,$fields=null,$excludeFields=null,$count=null,$offset=null)
+    public function getAll($storeId, $productId, $fields = null, $excludeFields = null, $count = null, $offset = null)
     {
         $_params=array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
-        if($count) { $_params['count'] = $count;
+        if ($count) {
+            $_params['count'] = $count;
         }
-        if($offset) { $_params['offset'] = $offset;
+        if ($offset) {
+            $_params['offset'] = $offset;
         }
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants';
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
@@ -89,12 +110,14 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function get($storeId,$productId,$variantId,$fields=null,$excludeFields=null)
+    public function get($storeId, $productId, $variantId, $fields = null, $excludeFields = null)
     {
         $_params=array();
-        if($fields) { $_params['fields'] = $fields;
+        if ($fields) {
+            $_params['fields'] = $fields;
         }
-        if($excludeFields) { $_params['exclude_fields'] = $excludeFields;
+        if ($excludeFields) {
+            $_params['exclude_fields'] = $excludeFields;
         }
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
@@ -115,26 +138,44 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function modify($storeId,$productId,$variantId,$title=null,$url=null,$sku=null,$price=null,
-        $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
+    public function modify(
+        $storeId,
+        $productId,
+        $variantId,
+        $title = null,
+        $url = null,
+        $sku = null,
+        $price = null,
+        $inventoryQuantity = null,
+        $imageUrl = null,
+        $backorders = null,
+        $visibility = null
     ) {
 
         $_params=array();
-        if($title) { $_params['title'] = $title;
+        if ($title) {
+            $_params['title'] = $title;
         }
-        if($url) { $_params['url'] = $url;
+        if ($url) {
+            $_params['url'] = $url;
         }
-        if($sku) { $_params['sku'] = $sku;
+        if ($sku) {
+            $_params['sku'] = $sku;
         }
-        if($price) { $_params['price'] = $price;
+        if ($price) {
+            $_params['price'] = $price;
         }
-        if($inventoryQuantity) { $_params['inventory_quantity'] = $inventoryQuantity;
+        if ($inventoryQuantity) {
+            $_params['inventory_quantity'] = $inventoryQuantity;
         }
-        if($imageUrl) { $_params['image_url'] = $imageUrl;
+        if ($imageUrl) {
+            $_params['image_url'] = $imageUrl;
         }
-        if($backorders) { $_params['backorders'] = $backorders;
+        if ($backorders) {
+            $_params['backorders'] = $backorders;
         }
-        if($visibility) { $_params['visibility'] = $visibility;
+        if ($visibility) {
+            $_params['visibility'] = $visibility;
         }
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::PATCH);
@@ -155,24 +196,41 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function addOrModify($storeId,$productId,$variantId,$title,$url=null,$sku=null,$price=null,
-        $inventoryQuantity=null,$imageUrl=null,$backorders=null,$visibility=null
+    public function addOrModify(
+        $storeId,
+        $productId,
+        $variantId,
+        $title,
+        $url = null,
+        $sku = null,
+        $price = null,
+        $inventoryQuantity = null,
+        $imageUrl = null,
+        $backorders = null,
+        $visibility = null
     ) {
 
         $_params=array('id'=>$variantId,'title'=>$title);
-        if($url) { $_params['url'] = $url;
+        if ($url) {
+            $_params['url'] = $url;
         }
-        if($sku) { $_params['sku'] = $sku;
+        if ($sku) {
+            $_params['sku'] = $sku;
         }
-        if($price) { $_params['price'] = $price;
+        if ($price) {
+            $_params['price'] = $price;
         }
-        if($inventoryQuantity) { $_params['inventory_quantity'] = $inventoryQuantity;
+        if ($inventoryQuantity) {
+            $_params['inventory_quantity'] = $inventoryQuantity;
         }
-        if($imageUrl) { $_params['image_url'] = $imageUrl;
+        if ($imageUrl) {
+            $_params['image_url'] = $imageUrl;
         }
-        if($backorders) { $_params['backorders'] = $backorders;
+        if ($backorders) {
+            $_params['backorders'] = $backorders;
         }
-        if($visibility) { $_params['visibility'] = $visibility;
+        if ($visibility) {
+            $_params['visibility'] = $visibility;
         }
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
         $this->_master->call($url, $_params, Ebizmarts_MailChimp::PUT);
@@ -184,7 +242,7 @@ class MailChimp_EcommerceProductsVariants extends MailChimp_Abstract
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function delete($storeId,$productId,$variantId)
+    public function delete($storeId, $productId, $variantId)
     {
         $url = 'ecommerce/stores/'.$storeId.'/products/'.$productId.'/variants/'.$variantId;
         $this->_master->call($url, null, Ebizmarts_MailChimp::DELETE);

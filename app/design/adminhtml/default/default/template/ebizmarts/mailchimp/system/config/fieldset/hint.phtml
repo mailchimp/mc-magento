@@ -4,7 +4,7 @@
  */
 ?>
 <script>
-    var MGETSTORESRUL = '<?php echo $this->getStoresUrl();?>';
+    var MGETSTORESURL = '<?php echo $this->getStoresUrl();?>';
     var MGETLISTURL = '<?php echo $this->getListUrl();?>';
     var MGETINFOURL = '<?php echo $this->getInfoUrl();?>';
     var MGETINTERESTURL = '<?php echo $this->getInterestUrl();?>';
@@ -16,4 +16,7 @@
         <br>
         <?php echo Mage::helper('mailchimp')->__('Need help? Read how to <a href="http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-magento#Configure-and-Connect" target="_blank">Configure and Connect</a> or browse our <a href="http://ebizmarts.com/mailchimp-for-magento-support" target="_blank">support forums</a>'); ?>
     </h4>
+    <?php if (!$this->isApiKeySet() ) : ?>
+        <p><a style="padding: 5px 23px; background-color:#D75F07 ;color:white;font-weight: bold" href="https://bit.ly/2KpDH5C" target="_blank">Support Mailchimp4Magento, Subscribe for a free Mailchimp Account!</a> </p>
+    <?php endif; ?>
 </div>

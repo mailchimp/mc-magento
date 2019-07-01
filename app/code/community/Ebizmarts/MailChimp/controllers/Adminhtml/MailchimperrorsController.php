@@ -82,11 +82,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
-        case 'index':
-        case 'grid':
-        case 'downloadresponse':
-            $acl = 'newsletter/mailchimp/mailchimperrors';
-            break;
+            case 'index':
+            case 'grid':
+            case 'downloadresponse':
+                $acl = 'newsletter/mailchimp/mailchimperrors';
+                break;
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);

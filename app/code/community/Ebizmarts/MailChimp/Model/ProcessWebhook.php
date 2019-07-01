@@ -364,5 +364,4 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $where = array("fired_at < NOW() - INTERVAL 30 DAY AND processed = 1");
         $connection->delete($tableName, $where);
     }
-
 }

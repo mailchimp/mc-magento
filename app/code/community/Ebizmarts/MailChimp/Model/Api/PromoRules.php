@@ -55,8 +55,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
             $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules/' . $ruleId;
             $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $ruleId;
             $batchArray[$counter]['body'] = '';
-            $this->deletePromoRuleSyncData($ruleId, $mailchimpStoreId);
             $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
+            $this->deletePromoRuleSyncData($ruleId, $mailchimpStoreId);
             $counter++;
         }
 
@@ -161,7 +161,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $mailchimpTableName = $this->getSyncDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId), array(
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId),
+            array(
                 "m4m.related_id",
                 "m4m.type",
                 "m4m.mailchimp_store_id",
@@ -314,7 +315,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $promoRules = $helper->getAllEcommerceSyncDataItemsPerId($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $this->_updateSyncData($ruleId, $mailchimpStoreId, null, null, null, 1, true, false);
+            $this->_updateSyncData($ruleId, $mailchimpStoreId, null, null, 0, 1, true, false);
         }
     }
 

@@ -37,7 +37,6 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         $helper = $this->getHelper();
         $storeId = 0;
         if ($moduleName == 'monkey') {
-
             if (isset($data['data']['list_id'])) {
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
@@ -62,14 +61,12 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                                 }
                             } catch (MailChimp_Error $e) {
                                 $helper->logError($e->getFriendlyMessage(), $storeId);
-
                             }
                         }
                     }
                 }
             }
         } else {
-
             //Checking if "wkey" para is present on request, we cannot check for !isPost()
             //because Mailchimp pings the URL (GET request) to validate webhook
             if (!$requestKey) {
@@ -94,5 +91,4 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
             }
         }
     }
-
 }

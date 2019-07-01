@@ -22,58 +22,118 @@ class MailChimp_Error extends Exception
     /**
      * @var string
      */
-    protected $_mailchimpTitle;
+    protected $_mailchimpTitleComplete;
 
     /**
      * @var string
      */
     protected $_mailchimpDetails;
 
-    public function __construct($url = "", $title = "", $details = "", $errors = null)
+    /**
+     * @var string
+     */
+    protected $_mailchimpTitle;
+
+    /**
+     * @var string
+     */
+    protected $_mailchimpUrl;
+
+    /**
+     * @var string
+     */
+    protected $_mailchimpMethod;
+
+    /**
+     * @var string
+     */
+    protected $_mailchimpParams;
+
+    public function __construct($method = "", $params = "", $url = "", $title = "", $details = "", $errors = null)
     {
         $titleComplete = $title . " for Api Call: " . $url;
         parent::__construct($titleComplete . " - " . $details);
-        $this->_mailchimpTitle = $titleComplete;
+        $this->_mailchimpTitleComplete = $titleComplete;
         $this->_mailchimpDetails = $details;
         $this->_mailchimpErrors = $errors;
+        $this->_mailchimpUrl = $url;
+        $this->_mailchimpTitle = $title;
+        $this->_mailchimpMethod = $method;
+        $this->_mailchimpParams = $params;
     }
 
     public function getFriendlyMessage()
     {
-        $errorDetails = "";
+        $friendlyMessage = $this->_mailchimpTitle . " for Api Call: [" . $this->_mailchimpUrl. "] using method [".$this->_mailchimpMethod."]\n";
+        $friendlyMessage .= "\tDetail: [".$this->_mailchimpDetails."]\n";
         if (!empty($this->_mailchimpErrors)) {
+            $errorDetails = "";
             foreach ($this->_mailchimpErrors as $error) {
-                if (array_key_exists("message", $error)) {
-                    $errorDetails .= $errorDetails != "" ? " / " : "";
-                    if (array_key_exists("field", $error) && $error['field']) {
-                        $errorDetails .= $error["field"] . " : ";
-                    }
-
-                    $errorDetails .= $error["message"];
-                }
+                $field = array_key_exists('field', $error) ? $error['field'] : '';
+                $message = array_key_exists('message', $error) ? $error['message'] : '';
+                $line = "\t\t field [$field] : $message\n";
+                $errorDetails .= $line;
             }
+            $friendlyMessage .= "\tErrors:\n".$errorDetails;
         }
 
-        if ($errorDetails != "") {
-            return $this->_mailchimpTitle . " : " . $errorDetails;
-        } else {
-            return $this->getMessage();
-        }
+        $friendlyMessage .= "\tParams:\n\t\t".$this->_mailchimpParams;
+        return $friendlyMessage;
     }
 
-    public function getMailchimpTitle()
+    /**
+     * @return string
+     */
+    public function getMailchimpTitleComplete()
     {
-        return $this->_mailchimpTitle;
+        return $this->_mailchimpTitleComplete;
     }
 
+    /**
+     * @return string
+     */
     public function getMailchimpDetails()
     {
         return $this->_mailchimpDetails;
     }
 
+    /**
+     * @return array|null
+     */
     public function getMailchimpErrors()
     {
         return $this->_mailchimpErrors;
     }
 
+    /**
+     * @return string
+     */
+    public function getMailchimpTitle()
+    {
+        return $this->_mailchimpTitle;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailchimpUrl()
+    {
+        return $this->_mailchimpUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailchimpMethod()
+    {
+        return $this->_mailchimpMethod;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMailchimpParams()
+    {
+        return $this->_mailchimpParams;
+    }
 }

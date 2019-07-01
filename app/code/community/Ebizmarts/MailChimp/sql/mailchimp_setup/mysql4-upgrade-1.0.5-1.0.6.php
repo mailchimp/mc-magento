@@ -25,9 +25,7 @@ try {
  ADD column `mailchimp_abandonedcart_flag` INT(1) NOT NULL DEFAULT 0;
 "
     );
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 

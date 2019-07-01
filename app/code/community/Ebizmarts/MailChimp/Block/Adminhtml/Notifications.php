@@ -18,7 +18,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
         $helper = $this->makeHelper();
         if ($helper->isImageCacheFlushed() && $helper->isEcomSyncDataEnabledInAnyScope()) {
             $message = '<strong style=color:red>Important: </strong>'.
-                '<span>Image cache has been flushed please <a href="#" onclick="resendecommerce(); location.reload()">resend the products</a> in order to update image URL</span>';
+                '<span>Image cache has been flushed please <a href="#" onclick="openResendEcommerceDialog();">resend the products</a> in order to update image URL</span>';
             return $message;
         }
     }

@@ -24,7 +24,7 @@ $entityTypeId     = $setup->getEntityTypeId('customer');
 $attributeSetId   = $setup->getDefaultAttributeSetId($entityTypeId);
 $attributeGroupId = $setup->getDefaultAttributeGroupId($entityTypeId, $attributeSetId);
 
-$setup->addAttribute("customer", "mailchimp_store_view",  array(
+$setup->addAttribute("customer", "mailchimp_store_view", array(
     "type"     => "int",
     "label"    => "Store View (For MailChimp)",
     "input"    => "select",

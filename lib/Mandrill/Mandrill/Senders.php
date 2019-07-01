@@ -228,5 +228,4 @@ class Mandrill_Senders
         $_params = array("address" => $address);
         return $this->master->call('senders/time-series', $_params);
     }
-
 }

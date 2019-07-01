@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
         $responseMock->expects($this->exactly(2))->method('setHeader')->withConsecutive(
             array('Content-disposition', 'attachment; filename=' . $batchId . '.json'),
             array('Content-type', 'application/json')
-            );
+        );
 
         $apiBatchesMock->expects($this->once())->method('getBatchResponse')->with($batchId, $storeId)->willReturn($files);
 

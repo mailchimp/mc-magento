@@ -2,12 +2,13 @@ var listSelected = null;
 var interestSelected = [];
 var firstTime = true;
 
-function loadStores() {
+function loadStores()
+{
     var apiKey = $('mailchimp_general_apikey').value;
     $("mailchimp_general_storeid").select('option').each(function (i) {
         i.remove();
     });
-    new Ajax.Request(MGETSTORESRUL, {
+    new Ajax.Request(MGETSTORESURL, {
         method: 'get',
         parameters: {api_key: apiKey},
         onComplete: function (transport) {
@@ -23,7 +24,8 @@ function loadStores() {
     });
 }
 
-function loadInfo() {
+function loadInfo()
+{
     const syncLabelKey = 11;
     var storeId = $('mailchimp_general_storeid').value;
     var apiKey = $('mailchimp_general_apikey').value;
@@ -48,7 +50,8 @@ function loadInfo() {
     });
 }
 
-function loadList() {
+function loadList()
+{
     var storeId = $('mailchimp_general_storeid').value;
     var apiKey = $('mailchimp_general_apikey').value;
     var listId = $("mailchimp_general_list");
@@ -87,7 +90,8 @@ function loadList() {
     });
 }
 
-function loadInterest() {
+function loadInterest()
+{
     var listOptions = $('mailchimp_general_list');
     var index = listOptions.selectedIndex;
     var listId = listOptions.options[index].value;
@@ -118,11 +122,13 @@ function loadInterest() {
     });
 }
 
-function changeApikey() {
+function changeApikey()
+{
     loadStores();
 }
 
-function initAdmin() {
+function initAdmin()
+{
     $('mailchimp_general_apikey').onchange = changeApikey;
     $('mailchimp_general_storeid').onchange = loadList;
     $('mailchimp_general_list').onchange = loadInterest;

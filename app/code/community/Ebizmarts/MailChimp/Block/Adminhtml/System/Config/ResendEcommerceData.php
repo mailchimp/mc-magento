@@ -10,8 +10,7 @@
  * @date:     5/27/16 1:16 PM
  * @file:     ResendEcommerceData.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
-    extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected function _construct()
     {
@@ -35,7 +34,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
                     array(
                         'id' => 'resendecommercedata_button',
                         'label' => $label,
-                        'onclick' => 'javascript:resendecommerce(); return false;',
+                        'onclick' => 'javascript:openResendEcommerceDialog(); return false;',
                         'title' => $helper->__('Resend Ecommerce Data current scope')
                     )
                 );
@@ -51,5 +50,4 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResendEcommerceData
     {
         return $this->helper('mailchimp');
     }
-
 }

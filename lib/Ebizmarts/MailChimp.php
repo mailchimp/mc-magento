@@ -183,7 +183,7 @@ class Ebizmarts_MailChimp
     const DELETE    = 'DELETE';
     const PUT       = 'PUT';
 
-    public function __construct($apiKey=null,$opts=array(),$userAgent=null)
+    public function __construct($apiKey = null, $opts = array(), $userAgent = null)
     {
         if (!$apiKey) {
             throw new MailChimp_Error('You must provide a MailChimp API key');
@@ -224,7 +224,7 @@ class Ebizmarts_MailChimp
 
         curl_setopt($this->_ch, CURLOPT_HEADER, false);
         curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT,  $opts['timeout']);
+        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT, $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_TIMEOUT, $opts['timeout']);
         curl_setopt($this->_ch, CURLOPT_USERPWD, "noname:".$this->_apiKey);
 
@@ -324,7 +324,7 @@ class Ebizmarts_MailChimp
         return $this->campaigns;
     }
 
-    public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
+    public function call($url, $params, $method = Ebizmarts_MailChimp::GET, $encodeJson = true)
     {
         $paramsOrig = $params;
 
@@ -374,8 +374,11 @@ class Ebizmarts_MailChimp
         }
 
         if (floor($info['http_code'] / 100) >= 4) {
-            $errors = (isset($result['errors'])) ? $result['errors'] : '';
-            throw new MailChimp_Error($url, $result['title'], $result['detail'], $errors);
+            $detail = array_key_exists('detail', $result) ? $result['detail'] : '';
+            $errors = array_key_exists('errors', $result) ? $result['errors'] : null;
+            $title = array_key_exists('title', $result) ? $result['title'] : '';
+
+            throw new MailChimp_Error($this->_root . $url, $method, $params, $title, $detail, $errors);
         }
 
         return $result;
