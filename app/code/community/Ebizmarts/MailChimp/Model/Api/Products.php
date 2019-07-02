@@ -64,6 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             if ($this->shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)) {
                 $batchArray = array_merge($this->_buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId), $batchArray);
                 $counter = count($batchArray);
+                $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::PRO_MOD);
                 $this->_updateSyncData($productId, $mailchimpStoreId);
                 continue;
             } else {
