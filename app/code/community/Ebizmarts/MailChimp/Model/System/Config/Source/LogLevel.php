@@ -32,6 +32,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_LogLevel
             ),
             array(
                 'value' => Zend_Log::NOTICE,
+                'label' => 'Log signifcant events, warnings and errors'
+            ),
+            array(
+                'value' => Zend_Log::INFO,
                 'label' => 'Log all except debug'
             ),
             array(
