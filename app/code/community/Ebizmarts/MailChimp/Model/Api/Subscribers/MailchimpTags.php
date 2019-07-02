@@ -572,7 +572,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param $customAtt
      * @param $key
      */
-    public function buildCustomerAttributes($attrSetId, $customAtt, $key)
+    protected function buildCustomerAttributes($attrSetId, $customAtt, $key)
     {
         $eventValue = null;
         foreach ($attrSetId as $attribute) {
@@ -594,7 +594,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param $customAtt
      * @param $key
      */
-    public function buildCustomizedAttributes($customAtt, $key)
+    protected function buildCustomizedAttributes($customAtt, $key)
     {
         $eventValue = null;
         $eventValue = $this->customizedAttributes(
