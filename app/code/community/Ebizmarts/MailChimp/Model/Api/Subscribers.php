@@ -19,8 +19,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * Ebizmarts_MailChimp_Helper_Data
      */
-    private $mcHelper;
-    private $_storeId;
+    protected $_mcHelper;
+    protected $_storeId;
 
     public function __construct()
     {
@@ -56,13 +56,28 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         $this->setStoreId($storeId);
         $helper = $this->getMailchimpHelper();
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $this->getStoreId());
-        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $this->getStoreId());
+        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
+            $this->getStoreId()
+        );
+        $thisScopeHasList = $helper->getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+            $this->getStoreId()
+        );
 
         $subscriberArray = array();
-        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($this->getStoreId())) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $this->getStoreId());
-            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
+        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag
+            || !$helper->getSubMinSyncDateFlag($this->getStoreId())) {
+            $realScope = $helper->getRealScopeForConfig(
+                Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+                $this->getStoreId()
+            );
+            $configValues = array(
+                array(
+                    Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
+                    $this->_mcHelper->formatDate(null, 'Y-m-d H:i:s')
+                )
+            );
             $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
         }
 
@@ -92,7 +107,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $counter = 0;
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            $cryptmcHelper = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
             //enconde to JSON
@@ -112,12 +127,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
 
                 $subscriberArray[$counter]['method'] = "PUT";
-                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $cryptmcHelper;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
                 $subscriberArray[$counter]['body'] = $subscriberJson;
 
                 //update subscribers delta
-                $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
+                $subscriber->setData("mailchimp_sync_delta", $this->_mcHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
@@ -157,7 +172,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
-        if (count($interest)) {
+        if (!empty($interest)) {
             $data['interests'] = $interest;
         }
 
@@ -213,11 +228,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
 
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            $cryptmcHelper = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
                     $listId,
-                    $md5HashEmail,
+                    $cryptmcHelper,
                     $subscriber->getSubscriberEmail(),
                     $newStatus,
                     null,
@@ -228,7 +243,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     null,
                     null
                 );
-                $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
+                $subscriber->setData("mailchimp_sync_delta", $this->_mcHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $saveSubscriber = true;
@@ -238,7 +253,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
                             $api->getLists()->getMembers()->update(
-                                $listId, $md5HashEmail, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+                                $listId, $cryptmcHelper, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
                             );
                             $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                             $saveSubscriber = true;
@@ -360,8 +375,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $listId = $helper->getGeneralList($storeId);
         try {
             $api = $helper->getApi($storeId);
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->getLists()->getMembers()->update($listId, $md5HashEmail, null, 'unsubscribed');
+            $cryptmcHelper = md5(strtolower($subscriber->getSubscriberEmail()));
+            $api->getLists()->getMembers()->update($listId, $cryptmcHelper, null, 'unsubscribed');
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
@@ -414,7 +429,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function setMailchimpHelper($mageMCHelper)
     {
-        $this->mcHelper = $mageMCHelper;
+        $this->_mcHelper = $mageMCHelper;
     }
 
     /**
@@ -422,7 +437,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function getMailchimpHelper()
     {
-        return $this->mcHelper;
+        return $this->_mcHelper;
     }
 
     /**

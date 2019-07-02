@@ -936,7 +936,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $categoryNames = array();
         $categoryName = null;
         if (is_array($categoryIds) && !empty($categoryIds)) {
-            /* @var $collection Mage_Catalog_Model_Resource_Category_Collection */
             $collection = $this->makeCatalogCategory()->getCollection();
             $collection->addAttributeToSelect(array('name'))
                 ->setStoreId($magentoStoreId)
@@ -945,7 +944,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 ->addAttributeToSort('level', 'asc')
                 ->addAttributeToSort('name', 'asc');
 
-            /* @var $category Mage_Catalog_Model_Category */
             foreach ($collection as $category) {
                 $categoryNames[] = $category->getName();
             }
@@ -1200,7 +1198,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_from_date',
-            array('lteq' => date('Y-m-d', time())." 23:59:59"),
+            array('lteq' => $this->_mailchimpHelper->formatDate() . " 23:59:59"),
             'left'
         )->addAttributeToFilter(
             'special_from_date',
@@ -1211,7 +1209,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $whereCondition = $connection->quoteInto(
             'm4m.mailchimp_sync_delta IS NOT NULL '
                 . 'AND m4m.mailchimp_sync_delta < ?',
-            date('Y-m-d', time())." 00:00:00"
+            $this->_mailchimpHelper->formatDate() . " 00:00:00"
         );
         $collection->getSelect()->where($whereCondition);
 
@@ -1232,7 +1230,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_to_date',
-            array('lt' => date('Y-m-d', time())." 00:00:00"),
+            array('lt' => $this->_mailchimpHelper->formatDate() . " 00:00:00"),
             'left'
         )->addAttributeToFilter(
             'special_to_date',

@@ -399,7 +399,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             $configValue = array(
                                 array(
                                     Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId",
-                                    date('Y-m-d H:i:s')
+                                    $helper->formatDate(null, 'Y-m-d H:i:s')
                                 )
                             );
                             $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
