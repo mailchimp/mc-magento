@@ -959,16 +959,54 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Flatten an associative array into a single array with keys made up
+     * of the nested keys to reach each value.
+     *
+     * @param array $array      Associative array to flatten.
+     * @param string $separator Separator used to join newsted keys.
+     * @param array $keys       Current set of nested keys.
+     * @return array Flattened array
+     */
+    public function flattenArray($array, $separator = '/', $keys = array())
+    {
+        $output = array();
+        foreach ($array as $key => $value) {
+            $currentKeys = array();
+            foreach ($keys as $k) {
+                array_push($currentKeys, $k);
+            }
+
+            array_push($currentKeys, $key);
+            if (is_array($value)) {
+                $output = array_merge($output, $this->flattenArray($value, $separator, $currentKeys));
+            } else {
+                $path = implode($separator, $currentKeys);
+                $output[$path] = $value;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
      * Log how many batch item quantities were successfully and
      * unsuccessfully sent to Mailchimp if logging is enabled.
      *
-     * @param $message
-     * @return boolean     Return true if message logged, false otherwise.
-     * @throws Mage_Core_Exception
+     * @param array $batchQuantites An array of batch item quantities by type.
+     * @param int $level Debug level (A Zend_Log::* value)
      */
-    public function logBatchQuantity($message)
+    public function logBatchQuantity($batchQuantites, $level = Zend_Log::INFO)
     {
-        return $this->logDebug("Batch quantities sent: ". print_r($message, true));
+        if ($this->canLogMessage($level)) {
+            $quantities = $this->flattenArray($batchQuantites);
+            if (count($quantities) > 0) {
+                ksort($quantities);
+                $this->logMessage($level, "Batch item quantities sent:");
+                foreach ($quantities as $type => $value) {
+                    $this->logMessage($level, " => $type : $value");
+                }
+            }
+        }
     }
 
     /**

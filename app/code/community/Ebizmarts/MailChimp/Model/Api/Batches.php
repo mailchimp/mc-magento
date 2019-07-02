@@ -265,7 +265,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $enabled = $helper->isSubscriptionEnabled($magentoStoreId);
         }
 
-        if ($enabled) {
+        if ($enabled && count($collection) > 0) {
             $helper->logDebug('Get results from Mailchimp');
             foreach ($collection as $item) {
                 try {
