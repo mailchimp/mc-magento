@@ -189,7 +189,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             return parent::getMail();
         }
 
-        if ($this->_mail && (!$this->isMandrillEnabled($storeId))) {
+        if ($this->_mail) {
             return $this->_mail;
         } else {
             $helper->log("store: $storeId API: " . $helper->getMandrillApiKey($storeId), $storeId);
