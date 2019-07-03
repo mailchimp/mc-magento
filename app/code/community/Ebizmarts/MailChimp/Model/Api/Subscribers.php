@@ -427,7 +427,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $mageMCHelper
      */
-    protected function setMailchimpHelper($mageMCHelper)
+    public function setMailchimpHelper($mageMCHelper)
     {
         $this->_mcHelper = $mageMCHelper;
     }
@@ -494,7 +494,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function _buildMailchimpTags($subscriber, $storeId)
     {
         $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
-        $mailChimpTags->setMailChimpHelper($this->getMailchimpHelper());
         $mailChimpTags->setStoreId($storeId);
         $mailChimpTags->setSubscriber($subscriber);
         $mailChimpTags->setCustomer(

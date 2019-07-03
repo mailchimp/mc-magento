@@ -351,7 +351,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
 
-        $apiSubscriberMock->expects($this->once())->method('update')->with($customerEmail, $storeId);
+        $apiSubscriberMock->expects($this->once())->method('update')->with($customerEmail);
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
 

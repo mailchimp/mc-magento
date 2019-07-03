@@ -101,7 +101,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
             }
         }
 
-        $newVars = new Varien_Object;
+        $newVars = $this->getNewVarienObject();
         $this->dispatchEventMergeVarAfter($newVars);
 
         if ($newVars->hasData()) {
@@ -109,6 +109,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         }
     }
 
+    protected function getNewVarienObject()
+    {
+        return new Varien_Object;
+    }
     /**
      * @param $subscriberEmail
      * @return mixed
@@ -477,7 +481,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param  $subscriberEmail
      * @return null
      */
-    public function getLastDateOfPurchase($subscriberEmail)
+    protected function getLastDateOfPurchase($subscriberEmail)
     {
         $lastOrder = $this->getSubscriberLastOrder();
         $lastDateOfPurchase = null;
@@ -517,7 +521,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * parameter if exists.
      *
      */
-    public function getLastOrderByEmail()
+    protected function getLastOrderByEmail()
     {
         $helper = $this->getMailchimpHelper();
         $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
@@ -541,7 +545,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getMailchimpHelper()
+    public function getMailchimpHelper()
     {
         return $this->_mcHelper;
     }
@@ -549,7 +553,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     /**
      * @param $mageMCHelper
      */
-    public function setMailChimpHelper()
+    protected function setMailChimpHelper()
     {
         $this->_mcHelper = Mage::helper('mailchimp');
     }
