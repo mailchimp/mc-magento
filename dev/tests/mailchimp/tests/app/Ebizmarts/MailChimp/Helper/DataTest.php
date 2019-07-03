@@ -455,7 +455,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $result = $helperMock->getImageFunctionName($imageSize);
 
         $this->assertEquals($result, 'getImageSizeUrl');
-
     }
 
     public function testSetImageSizeVarToArray()
@@ -804,7 +803,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             array($newApiKey)
         )->willReturnOnConsecutiveCalls(
             $apiMock,
-            $apiMock);
+            $apiMock
+        );
 
         $apiMock->expects($this->exactly(2))->method('getRoot')->willReturn($apiRootMock);
 
@@ -1353,7 +1353,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $modelConfigMock->expects($this->once())->method('cleanCache');
 
         $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
-
     }
 
     public function testGetSessionLastRealOrderM19()
@@ -1406,4 +1405,72 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperMock->getSessionLastRealOrder();
     }
+
+    public function testSetCurrentStore()
+    {
+        $storeId = 1;
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMageApp'))
+            ->getMock();
+
+        $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setCurrentStore'))
+            ->getMock();
+
+        $helperMock
+            ->expects($this->once())
+            ->method('getMageApp')
+            ->willReturn($mageAppMock);
+
+        $mageAppMock
+            ->expects($this->once())
+            ->method('setCurrentStore')
+            ->with($storeId)
+            ->willReturnSelf();
+
+        $helperMock->setCurrentStore($storeId);
+    }
+
+    public function testGetCurrentStoreId()
+     {
+         $storeId = 1;
+         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+             ->disableOriginalConstructor()
+             ->setMethods(array('getMageApp'))
+             ->getMock();
+
+         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+             ->disableOriginalConstructor()
+             ->setMethods(array('getStore'))
+             ->getMock();
+
+         $mageAppMockStore = $this->getMockBuilder(Mage_Core_Model_Store::class)
+             ->disableOriginalConstructor()
+             ->setMethods(array('getId'))
+             ->getMock();
+
+         $helperMock
+             ->expects($this->once())
+             ->method('getMageApp')
+             ->willReturn($mageAppMock);
+
+         $mageAppMock
+             ->expects($this->once())
+             ->method('getStore')
+             ->willReturn($mageAppMockStore);
+
+         $mageAppMockStore
+             ->expects($this->once())
+             ->method('getId')->willReturn($storeId);
+
+         $return  = $helperMock->getCurrentStoreId();
+
+         $this->assertInternalType('int', $return);
+     }
+
+
+
+
 }

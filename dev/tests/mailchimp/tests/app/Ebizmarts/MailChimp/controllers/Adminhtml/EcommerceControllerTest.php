@@ -74,7 +74,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
@@ -188,11 +189,12 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
-            $scope,
-            $scopeId
-        );
+                $scope,
+                $scopeId
+            );
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(true);
         $helperMock->expects($this->once())->method('createMergeFields')->with($scopeId, $scope);

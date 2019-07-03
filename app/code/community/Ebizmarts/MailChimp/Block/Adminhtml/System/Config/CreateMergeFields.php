@@ -10,8 +10,7 @@
  * @date:     30/8/16 1:02 PM
  * @file:     CreateMergeFields.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
-    extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
 
     const CREATE_MERGE_PATH = 'adminhtml/ecommerce/createMergeFields';
@@ -67,5 +66,4 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
     {
         return Mage::helper('mailchimp');
     }
-
 }

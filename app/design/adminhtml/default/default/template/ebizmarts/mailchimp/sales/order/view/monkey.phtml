@@ -14,7 +14,7 @@
                         <?php if ($this->isDataAvailable()): ?>
                             <strong><?php echo $this->__("Yaay! Recovered by Mailchimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->getCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId(); ?></strong>
                         <?php else: ?>
-                            <strong><?php echo $this->__("The campaign does not belong to the list configured for ").$this->getStoreCodeFromOrder().$this->__(" view."); ?></strong>
+                            <strong><?php echo $this->__("The campaign does not belong to the audience configured for ").$this->getStoreCodeFromOrder().$this->__(" view."); ?></strong>
                         <?php endif; ?>
                     </td>
                 </tr>

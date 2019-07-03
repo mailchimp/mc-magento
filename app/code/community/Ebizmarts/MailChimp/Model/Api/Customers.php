@@ -47,7 +47,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             array(
                 array('attribute' => 'store_id', 'eq' => $this->getBatchMagentoStoreId()),
                 array('attribute' => 'mailchimp_store_view', 'eq' => $this->getBatchMagentoStoreId()),
-            ), null, 'left'
+            ),
+            null,
+            'left'
         );
         $this->joinMailchimpSyncData($collection);
 
@@ -100,7 +102,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
-
                 $helper = $this->getMailChimpHelper();
                 $dataCustomer = $helper->getEcommerceSyncDataItem($customer->getId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId);
                 if ($dataCustomer->getId()) {
@@ -115,10 +116,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $this->logCouldNotEncodeCustomerError($customer);
             }
 
-            $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();
-
-            if ($this->optInStatusForStore && !$isSubscribed){
-                $subscriber->subscribe($customer->getEmail());
+            if ($this->optInStatusForStore) {
+                $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();
+                if (!$isSubscribed) {
+                    $subscriber->subscribe($customer->getEmail());
+                }
             }
 
             $counter++;
@@ -427,7 +429,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId), array(
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId),
+            array(
                 "m4m.related_id",
                 "m4m.type",
                 "m4m.mailchimp_store_id",

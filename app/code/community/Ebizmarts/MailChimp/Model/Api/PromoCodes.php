@@ -106,7 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $codeId;
                     $batchArray[$counter]['body'] = $promoCodeJson;
 
-                    $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, null, null, $promoCode->getToken());
+                    $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, 0, null, $promoCode->getToken());
                     $counter++;
                 } else {
                     $error = $helper->__('Something went wrong when retrieving the information.');
@@ -183,7 +183,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $mailchimpTableName = $this->getSyncDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, $mailchimpStoreId), array(
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, $mailchimpStoreId),
+            array(
                 "m4m.related_id",
                 "m4m.type",
                 "m4m.mailchimp_store_id",
@@ -306,7 +307,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $promoCodes = $helper->getAllEcommerceSyncDataItemsPerId($codeId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
         foreach ($promoCodes as $promoCode) {
             $mailchimpStoreId = $promoCode->getMailchimpStoreId();
-            $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, null, 1, null, true, $promoRuleId, false);
+            $this->_updateSyncData($codeId, $mailchimpStoreId, null, null, 0, 1, null, true, $promoRuleId, false);
         }
     }
 

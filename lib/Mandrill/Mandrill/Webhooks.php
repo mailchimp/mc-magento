@@ -128,5 +128,4 @@ class Mandrill_Webhooks
         $_params = array("id" => $id);
         return $this->master->call('webhooks/delete', $_params);
     }
-
 }

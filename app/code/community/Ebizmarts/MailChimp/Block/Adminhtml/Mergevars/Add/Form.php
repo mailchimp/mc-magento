@@ -15,7 +15,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminh
 
 
         $fieldset->addField(
-            'mergevar_label', 'text', array(
+            'mergevar_label',
+            'text',
+            array(
             'name'  => 'mergevar[label]',
             'label' => Mage::helper('mailchimp')->__('Merge Field Name'),
             'id'    => 'mergevar_label',
@@ -24,7 +26,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminh
             )
         );
         $fieldset->addField(
-            'mergevar_fieldtype', 'select', array(
+            'mergevar_fieldtype',
+            'select',
+            array(
             'name' => 'mergevar[fieldtype]',
             'label' => Mage::helper('mailchimp')->__('Merge Field Type'),
             'id' => 'mergevar_fieldtype',
@@ -34,7 +38,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add_Form extends Mage_Adminh
         );
 
         $fieldset->addField(
-            'mergevar_value', 'text', array(
+            'mergevar_value',
+            'text',
+            array(
             'name'  => 'mergevar[value]',
             'label' => Mage::helper('mailchimp')->__('Merge Field Tag'),
             'id'    => 'mergevar_value',

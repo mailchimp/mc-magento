@@ -37,8 +37,8 @@ To enable MailChimp For Magento:
 1. Go to System -> Configuration -> MAILCHIMP -> MailChimp Configuration -> Select scope on your Magento’s back end.<br />
 2. Click the <b>Get API credentials</b> and place your MailChimp credentials, then an API Key will be shown.<br />
 3. Paste the API Key on MailChimp For Magento’s configuration and click <b>Save Config</b><br />
-4. When the page is loaded again select the desired list to sync with the Magento’s newsletter list. At this point your Magento subscribers will start being sent to the configured MailChimp list.<br />
-5. If you have a paid MailChimp account and want to use MailChimp Automations go to "<b>Default Config</b>" scope and to the Ecommerce section and set it to Enabled. Now all your store information (Products, orders, customers and carts) will start being sent to MailChimp's associated list at your "<b>Default Config</b>" scope.
+4. When the page is loaded again select the desired audience to sync with the Magento’s newsletter audience. At this point your Magento subscribers will start being sent to the configured MailChimp audience.<br />
+5. If you have a paid MailChimp account and want to use MailChimp Automations go to "<b>Default Config</b>" scope and to the Ecommerce section and set it to Enabled. Now all your store information (Products, orders, customers and carts) will start being sent to MailChimp's associated audience at your "<b>Default Config</b>" scope.
 
 More guides and tutorials about the Mailchimp integration with Magento can be found on the [tutorial page of Mailchimp](https://mailchimp.com/help/connect-or-disconnect-mailchimp-for-magento/).
 

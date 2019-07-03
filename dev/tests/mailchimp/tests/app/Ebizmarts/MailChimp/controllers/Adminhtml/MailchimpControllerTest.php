@@ -112,7 +112,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
@@ -169,7 +170,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId

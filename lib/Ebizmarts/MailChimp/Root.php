@@ -12,7 +12,7 @@
  */
 class MailChimp_Root extends MailChimp_Abstract
 {
-    public function info($fields=null, $excludeFields=null)
+    public function info($fields = null, $excludeFields = null)
     {
         $_params = array();
         if ($fields) {

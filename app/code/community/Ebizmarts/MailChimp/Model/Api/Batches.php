@@ -206,7 +206,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     return;
                 }
             }
-
         }
         $helper->handleResendDataAfter();
 
@@ -428,7 +427,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
         $where = array("batch_id IS NULL AND mailchimp_store_id = ?" => $mailchimpStoreId);
         $connection->update($tableName, array('batch_id' => $batchResponseId, 'mailchimp_sync_delta' => $this->getCurrentDate()), $where);
-
     }
 
     public function ecommerceSentCallback($args)
@@ -504,7 +502,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         try {
             if ($helper->isSubscriptionEnabled($storeId)) {
-
                 $helper->resetCountersSubscribers();
 
                 $listId = $helper->getGeneralList($storeId);
@@ -626,13 +623,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             if ($items !== false) {
                 foreach ($items as $item) {
-
                     $line = explode('_', $item->operation_id);
                     $store = explode('-', $line[0]);
                     $type = $line[1];
                     $id = $line[3];
                     if ($item->status_code != 200) {
-
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
                         //parse error
@@ -686,7 +681,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     } else {
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
                         if (!$syncDataItem->getMailchimpSyncModified()) {
-                            $this->saveSyncData($id, $type, $mailchimpStoreId, null, null, 0, null, null, 1, true);
+                            $this->saveSyncData($id, $type, $mailchimpStoreId, null, '', 0, null, null, 1, true);
                             $helper->modifyCounterDataSentToMailchimp($type);
                         }
                     }
@@ -733,7 +728,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $batch->save();
                     }
                 }
-
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $helper->logError($e->getMessage());
             } catch (MailChimp_Error $e) {
@@ -750,9 +744,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
     }
 
-    protected function saveSyncData($itemId, $itemType, $mailchimpStoreId, $syncDelta = null, $syncError = null,
-                                    $syncModified = 0, $syncDeleted = null, $token = null, $syncedFlag = null, $saveOnlyIfexists = false)
-    {
+    protected function saveSyncData(
+        $itemId,
+        $itemType,
+        $mailchimpStoreId,
+        $syncDelta = null,
+        $syncError = null,
+        $syncModified = 0,
+        $syncDeleted = null,
+        $token = null,
+        $syncedFlag = null,
+        $saveOnlyIfexists = false
+    ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
