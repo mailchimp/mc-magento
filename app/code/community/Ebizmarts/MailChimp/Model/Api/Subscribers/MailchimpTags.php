@@ -13,64 +13,127 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 {
 
+    /**
+     * @var int
+     */
     private $_storeId;
+    /**
+     * @var array
+     */
     private $_mailChimpTags;
+    /**
+     * @var Mage_Newsletter_Model_Subscriber
+     */
     private $_subscriber;
+    /**
+     * @var Mage_Customer_Model_Customer
+     */
     private $_customer;
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     private $_mcHelper;
+    /**
+     * @var Mage_Sales_Model_Order
+     */
+    private $_lastOrder;
 
     public function __construct()
     {
         $this->setMailChimpHelper();
     }
 
+    /**
+     * @param $storeId
+     */
     public function setStoreId($storeId)
     {
         $this->_storeId = $storeId;
     }
 
+    /**
+     * @return int
+     */
     public function getStoreId()
     {
         return $this->_storeId;
     }
 
+    /**
+     * @param Mage_Newsletter_Model_Subscriber $subscriber
+     */
     public function setSubscriber($subscriber)
     {
         $this->_subscriber = $subscriber;
     }
 
+    /**
+     * @return Mage_Newsletter_Model_Subscriber
+     */
     public function getSubscriber()
     {
         return $this->_subscriber;
     }
 
+    /**
+     * @param Mage_Customer_Model_Customer $customer
+     */
     public function setCustomer($customer)
     {
         $this->_customer = $customer;
     }
 
+    /**
+     * @return Mage_Customer_Model_Customer
+     */
     public function getCustomer()
     {
         return $this->_customer;
     }
 
+    /**
+     * @return array
+     */
     public function getMailChimpTags()
     {
         return $this->_mailChimpTags;
     }
 
+    /**
+     * @param $key
+     * @param $value
+     */
     public function addMailChimpTag($key, $value)
     {
         $this->_mailChimpTags[$key] = $value;
     }
 
+    /**
+     * @param $key
+     * @return mixed
+     */
     public function getMailChimpTagValue($key)
     {
         return $this->_mailChimpTags[$key];
     }
 
     /**
-     * @return array|null
+     * @return Mage_Sales_Model_Order
+     */
+    public function getLastOrder()
+    {
+        return $this->_lastOrder;
+    }
+
+    /**
+     * @param Mage_Sales_Model_Order $lastOrder
+     */
+    public function setLastOrder($lastOrder)
+    {
+        $this->_lastOrder = $lastOrder;
+    }
+
+    /**
      * @throws Mage_Core_Exception
      */
     public function buildMailChimpTags()
@@ -107,6 +170,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         }
     }
 
+    /**
+     * @return Varien_Object
+     */
     protected function getNewVarienObject()
     {
         return new Varien_Object;
@@ -349,6 +415,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         return $lastName;
     }
 
+    /**
+     * @param $lastOrder
+     * @return array
+     */
     protected function getAddressFromLastOrder($lastOrder)
     {
         $addressData = array();
@@ -379,6 +449,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     /**
      * @param $customAtt
      * @param $key
+     * @return mixed | null
      */
     protected function customizedAttributes($customAtt, $key)
     {
@@ -483,18 +554,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     }
 
     /**
-     * @param $email
-     * @return Mage_Sales_Model_Resource_Order_Collection | return the latest order made by the email passed by
-     * parameter if exists.
-     *
+     * return the latest order for this subscriber
+     * @return Mage_Sales_Model_Order
      */
     protected function getLastOrderByEmail()
     {
-        $helper = $this->getMailchimpHelper();
-        $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
-        $lastOrder = null;
-        if ($this->isNotEmptyOrderCollection($orderCollection)) {
-            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+        $lastOrder = $this->getLastOrder();
+        if ($lastOrder === null) {
+            $helper = $this->getMailchimpHelper();
+            $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
+            if ($this->isNotEmptyOrderCollection($orderCollection)) {
+                $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+                $this->setLastOrder($lastOrder);
+            }
         }
 
         return $lastOrder;
