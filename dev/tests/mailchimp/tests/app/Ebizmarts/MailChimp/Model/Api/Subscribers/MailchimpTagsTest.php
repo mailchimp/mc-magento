@@ -188,7 +188,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
                 array($collectionMock,$maps[14]['magento'], strtoupper($maps[14]['mailchimp'])),
                 array($collectionMock,$maps[15]['magento'], strtoupper($maps[15]['mailchimp'])),
                 array($collectionMock,$maps[16]['magento'], strtoupper($maps[16]['mailchimp']))
-                )
+            )
             ->willReturnSelf();
 
         $mailchimpTagsApiMock->expects($this->exactly(9))
@@ -227,4 +227,3 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
 }
 
 
-?>
