@@ -98,7 +98,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
                     'getStoreId',
                     'unserializeMapFields',
                     'getEntityAttributeCollection',
-                    'saveLastOrderInSession',
                     'buildCustomerAttributes',
                     'buildCustomizedAttributes',
                     'dispatchEventMergeVarAfter',
@@ -164,10 +163,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
         $mailchimpTagsApiMock->expects($this->once())
             ->method('getEntityAttributeCollection')
             ->willReturn($collectionMock);
-
-        $mailchimpTagsApiMock->expects($this->once())
-            ->method('saveLastOrderInSession')
-            ->willReturnSelf();
 
         $mailchimpTagsApiMock->expects($this->exactly(16))
             ->method('buildCustomerAttributes')
