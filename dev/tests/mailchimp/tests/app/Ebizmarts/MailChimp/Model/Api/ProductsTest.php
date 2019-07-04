@@ -563,7 +563,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock
             ->expects($this->once())
             ->method('getMailChimpProductPrice')
-            ->with($productMock, $magentoStoreId)
+            ->with($productMock)
             ->willReturn($price);
 
         $productMock->expects($this->once())->method('getSku')->willReturn($sku);
@@ -659,7 +659,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock
             ->expects($this->once())
             ->method('_buildDeleteProductRequest')
-            ->with($productMock, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId)
+            ->with($productMock, self::BATCH_ID, $mailchimpStoreId)
             ->willReturn($data);
 
         $products [] = $productMock;

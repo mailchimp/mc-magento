@@ -428,7 +428,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())
             ->method('isTypeProduct')
             ->willReturn($isTypeProduct);
-        $ordersApiMock->expects($this->once())
+        $ordersApiMock->expects($this->exactly(2))
             ->method('getHelper')
             ->willReturn($helperMock);
         $ordersApiMock->expects($this->once())

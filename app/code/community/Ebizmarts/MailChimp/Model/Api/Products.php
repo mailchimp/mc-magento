@@ -132,7 +132,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
         foreach ($deletedProducts as $product) {
-            $data = $this->_buildDeleteProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
+            $data = $this->_buildDeleteProductRequest($product, $batchId, $mailchimpStoreId);
 
             if (!empty($data)) {
                 $batchArray[$counter] = $data;
@@ -153,7 +153,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $batchArray;
     }
 
-    protected function _buildDeleteProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
+    protected function _buildDeleteProductRequest($product, $batchId, $mailchimpStoreId)
     {
         if ($this->isBundleProduct($product)) {
             return array();
@@ -298,7 +298,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["published_at_foreign"] = "";
 
         if ($isVariant) {
-            $data += $this->getProductVariantData($product, $magentoStoreId);
+            $data += $this->getProductVariantData($product);
         } else {
             $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
             if (is_string($description)) {
@@ -317,33 +317,38 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //variants
             if (!empty($variants)) {
-                $data["variants"] = array();
-                if (isset($data["image_url"])) {
-                    $this->_parentImageUrl = $data["image_url"];
-                }
-
-                $this->_parentId = $product->getId();
-                if ($this->currentProductIsVisible()) {
-                    $this->_parentUrl = $data['url'];
-                }
-
-                $price = $this->getMailchimpFinalPrice($product);
-                if ($price) {
-                    $this->_parentPrice = $price;
-                }
-
-                foreach ($variants as $variant) {
-                    $data["variants"][] = $this->_buildProductData($variant, $magentoStoreId);
-                }
-
-                $this->_parentImageUrl = null;
-                $this->_parentPrice = null;
-                $this->_parentId = null;
-                $this->_parentUrl = null;
+                $this->_processVariants($variants);
             }
         }
 
         return $data;
+    }
+
+    protected function _processVariants($variants)
+    {
+        $data["variants"] = array();
+        if (isset($data["image_url"])) {
+            $this->_parentImageUrl = $data["image_url"];
+        }
+
+        $this->_parentId = $product->getId();
+        if ($this->currentProductIsVisible()) {
+            $this->_parentUrl = $data['url'];
+        }
+
+        $price = $this->getMailchimpFinalPrice($product);
+        if ($price) {
+            $this->_parentPrice = $price;
+        }
+
+        foreach ($variants as $variant) {
+            $data["variants"][] = $this->_buildProductData($variant, $magentoStoreId);
+        }
+
+        $this->_parentImageUrl = null;
+        $this->_parentPrice = null;
+        $this->_parentId = null;
+        $this->_parentUrl = null;
     }
 
     /**
@@ -680,13 +685,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return mixed
      */
-    protected function getProductVariantData($product, $magentoStoreId)
+    protected function getProductVariantData($product)
     {
         $data = array();
         $sku = $product->getSku();
         $data["sku"] = $sku ? $sku : '';
 
-        $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
+        $price = $this->getMailChimpProductPrice($product);
         if ($price) {
             $data["price"] = $price;
         }
@@ -1034,7 +1039,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return float
      */
-    protected function getMailChimpProductPrice($product, $magentoStoreId)
+    protected function getMailChimpProductPrice($product)
     {
         $price = null;
         $parentId = null;
