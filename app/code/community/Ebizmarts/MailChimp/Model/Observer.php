@@ -336,7 +336,7 @@ class Ebizmarts_MailChimp_Model_Observer
             }
             //update subscriber data if a subscriber with the same email address exists and was not affected.
             if (!$origEmail || $origEmail == $customerEmail) {
-                $apiSubscriber->update($customerEmail, $storeId);
+                $apiSubscriber->update($customerEmail);
             }
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
@@ -357,7 +357,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
         if ($helper->isSubscriptionEnabled($storeId)) {
             //update subscriber data if a subscriber with the same email address exists
-            $this->makeApiSubscriber()->update($customer->getEmail(), $storeId);
+            $this->makeApiSubscriber()->update($customer->getEmail());
         }
 
         if ($helper->isEcomSyncDataEnabled($storeId)) {
@@ -734,6 +734,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $apiOrder->update($order->getEntityId(), $storeId);
         }
+
         return $observer;
     }
 
@@ -1029,6 +1030,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 ));
             }
         }
+
         return $observer;
     }
 
@@ -1064,6 +1066,7 @@ class Ebizmarts_MailChimp_Model_Observer
             //save frontend groupdata when customer is not subscribed.
             $helper->saveInterestGroupData($params, $storeId, $customerId);
         }
+
         return $subscriber;
     }
 
@@ -1117,4 +1120,5 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         return Mage::getModel('catalog/product_status');
     }
+
 }
