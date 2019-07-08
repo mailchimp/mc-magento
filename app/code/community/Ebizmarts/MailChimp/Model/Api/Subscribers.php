@@ -252,53 +252,22 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     && !$helper->isSubscriptionConfirmationEnabled($storeId)) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
-                            $api->getLists()->getMembers()->update(
-                                $listId, $cryptmcHelper, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+                            $this->_catchMailchompNewstellerConfirm(
+                                $api, $listId, $cryptmcHelper, $mailChimpTags, $subscriber, $interest
                             );
-                            $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                             $saveSubscriber = true;
-                            $message =
-                            $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
-                            Mage::getSingleton('core/session')->addWarning($message);
                         } catch (MailChimp_Error $e) {
-                            $errorMessage = $e->getFriendlyMessage();
-                            $helper->logError($errorMessage);
-                            if ($isAdmin) {
-                                $this->addError($errorMessage);
-                            } else {
-                                $errorMessage = $helper->__("The subscription could not be applied.");
-                                $this->addError($errorMessage);
-                            }
-
-                            $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+                            $this->_catchMailchimpEx($e, $subscriber, $isAdmin);
                             $saveSubscriber = true;
                         } catch (Exception $e) {
                             $helper->logError($e->getMessage());
                         }
                     } else {
-                        $errorMessage = $e->getFriendlyMessage();
-                        $helper->logError($errorMessage);
-                        if ($isAdmin) {
-                            $this->addError($errorMessage);
-                        } else {
-                            $errorMessage = $helper->__("The subscription could not be applied.");
-                            $this->addError($errorMessage);
-                        }
-
-                        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+                        $this->_catchMailchimpSubsNotAppliedIf($e, $isAdmin, $subscriber);
                         $saveSubscriber = true;
                     }
                 } else {
-                    $errorMessage = $e->getFriendlyMessage();
-                    $helper->logError($errorMessage);
-                    if ($isAdmin) {
-                        $this->addError($errorMessage);
-                    } else {
-                        $errorMessage = $helper->__("The subscription could not be applied.");
-                        $this->addError($errorMessage);
-                    }
-
-                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+                    $this->_catchMailchimpSubsNotAppliedElse($e, $isAdmin, $subscriber);
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
@@ -309,6 +278,71 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $subscriber->save();
             }
         }
+    }
+
+    protected function _catchMailchimpSubsNotAppliedIf($e, $isAdmin, $subscriber)
+    {
+        $helper = $this->getMailchimpHelper();
+        $errorMessage = $e->getFriendlyMessage();
+        $helper->logError($errorMessage);
+        if ($isAdmin) {
+            $this->addError($errorMessage);
+        } else {
+            $errorMessage = $helper->__("The subscription could not be applied.");
+            $this->addError($errorMessage);
+        }
+
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+    }
+
+    protected function _catchMailchimpSubsNotAppliedElse($e, $isAdmin, $subscriber)
+    {
+        $helper = $this->getMailchimpHelper();
+        $errorMessage = $e->getFriendlyMessage();
+        $helper->logError($errorMessage);
+        if ($isAdmin) {
+            $this->addError($errorMessage);
+        } else {
+            $errorMessage = $helper->__("The subscription could not be applied.");
+            $this->addError($errorMessage);
+        }
+
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+    }
+
+    protected function _catchMailchompNewstellerConfirm(
+        $api,
+        $listId,
+        $cryptmcHelper,
+        $mailChimpTags,
+        $subscriber,
+        $interest
+) {
+        $helper = $this->getMailchimpHelper();
+        $api->getLists()->getMembers()->update(
+            $listId, $cryptmcHelper, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+        );
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+        $message = $helper->__(
+            'To begin receiving the newsletter, you must first confirm your subscription'
+        );
+        Mage::getSingleton('core/session')->addWarning($message);
+    }
+
+    protected function _catchMailchimpEx($e, $subscriber, $isAdmin)
+    {
+        $helper = $this->getMailchimpHelper();
+        $errorMessage = $e->getFriendlyMessage();
+        $helper->logError($errorMessage);
+
+        if ($isAdmin) {
+            $this->addError($errorMessage);
+        } else {
+            $errorMessage = $helper->__("The subscription could not be applied.");
+            $this->addError($errorMessage);
+        }
+
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
     }
 
     /**

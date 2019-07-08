@@ -12,7 +12,7 @@
  */
 class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_Action
 {
-    protected $_>_mailchimpHelper = null;
+    protected $this->_mailchimpHelper = null;
 
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract

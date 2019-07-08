@@ -417,10 +417,32 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $oneCart['currency_code'] = $cart->getQuoteCurrencyCode();
         $oneCart['order_total'] = $cart->getGrandTotal();
         $oneCart['tax_total'] = 0;
-        $lines = array();
         // get all items on the cart
-        $items = $cart->getAllVisibleItems();
+        $lines = $this->_processCartLines(
+            $cart->getAllVisibleItems(), $mailchimpStoreId, $magentoStoreId, $apiProduct
+        );
+
+        $jsonData = "";
+        if ($lines['count']) {
+            $oneCart['lines'] = $lines['lines'];
+            //enconde to JSON
+            try {
+                $jsonData = json_encode($oneCart);
+            } catch (Exception $e) {
+                //json encode failed
+                $helper->logError("Carts " . $cart->getId() . " json encode failed");
+            }
+        }
+
+        return $jsonData;
+    }
+
+    protected function _processCartLines($items, $mailchimpStoreId, $magentoStoreId, $apiProduct)
+    {
+        $helper = $this->getHelper();
+        $lines = array();
         $itemCount = 0;
+
         foreach ($items as $item) {
             $productId = $item->getProductId();
             $isTypeProduct = $this->isTypeProduct();
@@ -465,19 +487,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
         }
 
-        $jsonData = "";
-        if ($itemCount) {
-            $oneCart['lines'] = $lines;
-            //enconde to JSON
-            try {
-                $jsonData = json_encode($oneCart);
-            } catch (Exception $e) {
-                //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed");
-            }
-        }
-
-        return $jsonData;
+        return array('lines' => $lines, $count = $itemCount);
     }
 
     /**

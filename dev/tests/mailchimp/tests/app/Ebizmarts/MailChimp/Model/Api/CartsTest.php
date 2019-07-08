@@ -1916,7 +1916,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('isProductTypeConfigurable')
             ->with($itemMock)
             ->willReturn(true);
-        $cartsApiMock->expects($this->once())
+        $cartsApiMock->expects($this->exactly(2))
             ->method('getHelper')
             ->willReturn($helperMock);
         $cartsApiMock->expects($this->once())
