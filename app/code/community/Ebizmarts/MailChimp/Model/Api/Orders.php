@@ -483,7 +483,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
     }
 
-    protected function _processCanceledOrder($order) 
+    /**
+     * @return mixed
+     */
+    protected function _processCanceledOrder($order)
     {
         $orderCancelDate = null;
         $commentCollection = $order->getStatusHistoryCollection();
