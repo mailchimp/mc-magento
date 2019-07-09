@@ -1,5 +1,4 @@
 <?php
-
 /**
  * mailchimp-lib Magento Component
  *
