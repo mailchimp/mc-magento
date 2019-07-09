@@ -111,7 +111,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
     /**
      * @param $key
-     * @return mixed
+     * @return mixed|null
      */
     public function getMailChimpTagValue($key)
     {
