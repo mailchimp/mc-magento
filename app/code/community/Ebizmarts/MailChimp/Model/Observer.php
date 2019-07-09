@@ -1194,4 +1194,5 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         return Mage::getModel('catalog/product_status');
     }
+
 }

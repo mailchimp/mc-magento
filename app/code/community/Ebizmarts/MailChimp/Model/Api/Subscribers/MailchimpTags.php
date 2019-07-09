@@ -13,64 +13,127 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 {
 
+    /**
+     * @var int
+     */
     protected $_storeId;
+    /**
+     * @var array
+     */
     protected $_mailChimpTags;
+    /**
+     * @var Mage_Newsletter_Model_Subscriber
+     */
     protected $_subscriber;
+    /**
+     * @var Mage_Customer_Model_Customer
+     */
     protected $_customer;
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
     protected $_mcHelper;
+    /**
+     * @var Mage_Sales_Model_Order
+     */
+    protected $_lastOrder;
 
     public function __construct()
     {
         $this->setMailChimpHelper();
     }
 
+    /**
+     * @param $storeId
+     */
     public function setStoreId($storeId)
     {
         $this->_storeId = $storeId;
     }
 
+    /**
+     * @return int
+     */
     public function getStoreId()
     {
         return $this->_storeId;
     }
 
+    /**
+     * @param Mage_Newsletter_Model_Subscriber $subscriber
+     */
     public function setSubscriber($subscriber)
     {
         $this->_subscriber = $subscriber;
     }
 
+    /**
+     * @return Mage_Newsletter_Model_Subscriber
+     */
     public function getSubscriber()
     {
         return $this->_subscriber;
     }
 
+    /**
+     * @param Mage_Customer_Model_Customer $customer
+     */
     public function setCustomer($customer)
     {
         $this->_customer = $customer;
     }
 
+    /**
+     * @return Mage_Customer_Model_Customer
+     */
     public function getCustomer()
     {
         return $this->_customer;
     }
 
+    /**
+     * @return array
+     */
     public function getMailChimpTags()
     {
         return $this->_mailChimpTags;
     }
 
+    /**
+     * @param $key
+     * @param $value
+     */
     public function addMailChimpTag($key, $value)
     {
         $this->_mailChimpTags[$key] = $value;
     }
 
+    /**
+     * @param $key
+     * @return mixed
+     */
     public function getMailChimpTagValue($key)
     {
         return $this->_mailChimpTags[$key];
     }
 
     /**
-     * @return array|null
+     * @return Mage_Sales_Model_Order
+     */
+    public function getLastOrder()
+    {
+        return $this->_lastOrder;
+    }
+
+    /**
+     * @param Mage_Sales_Model_Order $lastOrder
+     */
+    public function setLastOrder($lastOrder)
+    {
+        $this->_lastOrder = $lastOrder;
+    }
+
+    /**
      * @throws Mage_Core_Exception
      */
     public function buildMailChimpTags()
@@ -84,8 +147,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
             ->setEntityTypeFilter(1)
             ->addSetInfo()
             ->getData();
-
-        $this->saveLastOrderInSession();
 
         foreach ($maps as $map) {
             $customAtt = $map['magento'];
@@ -109,26 +170,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         }
     }
 
+    /**
+     * @return Varien_Object
+     */
     protected function getNewVarienObject()
     {
         return new Varien_Object;
     }
-    /**
-     * @param $subscriberEmail
-     * @return mixed
-     * @throws Mage_Core_Exception
-     */
-    protected function saveLastOrderInSession()
-    {
-        $lastOrder = $this->getLastOrderByEmail();
-        if ($this->getSubscriberLastOrder()) {
-            Mage::unregister('subscriber_last_order');
-        }
-
-        Mage::register('subscriber_last_order', $lastOrder);
-        return $lastOrder;
-    }
-
 
     /**
      * @param $attributeCode
@@ -268,7 +316,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function getAddressData($address)
     {
-        $lastOrder = $this->getSubscriberLastOrder();
+        $lastOrder = $this->getLastOrderByEmail();
         $addressData = $this->getAddressFromLastOrder($lastOrder);
         if (!empty($addressData)) {
             if ($address) {
@@ -339,7 +387,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function getFirstName($subscriber, $customer)
     {
-        $lastOrder = $this->getSubscriberLastOrder();
+        $lastOrder = $this->getLastOrderByEmail();
         $firstName = $customer->getFirstname();
 
         if (!$firstName) {
@@ -360,7 +408,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function getLastName($subscriber, $customer)
     {
-        $lastOrder = $this->getSubscriberLastOrder();
+        $lastOrder = $this->getLastOrderByEmail();
         $lastName = $customer->getLastname();
 
         if (!$lastName) {
@@ -374,16 +422,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         return $lastName;
     }
 
-
     /**
-     * @return mixed
+     * @param $lastOrder
+     * @return array
      */
-    protected function getSubscriberLastOrder()
-    {
-        return Mage::registry('subscriber_last_order');
-    }
-
-
     protected function getAddressFromLastOrder($lastOrder)
     {
         $addressData = array();
@@ -401,7 +443,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function getAddressForCustomizedAttributes($customAtt, $customer)
     {
-        $lastOrder = $this->getSubscriberLastOrder();
+        $lastOrder = $this->getLastOrderByEmail();
         $address = $this->getAddressFromLastOrder($lastOrder);
         if (!empty($address)) {
             $addr = explode('_', $customAtt);
@@ -414,12 +456,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     /**
      * @param $customAtt
      * @param $key
+     * @return mixed | null
      */
     protected function customizedAttributes($customAtt, $key)
     {
         $eventValue = null;
         $customer = $this->getCustomer();
-        $subscriberEmail = $this->getSubscriber()->getSubscriberEmail();
 
         if ($customAtt == 'billing_company' || $customAtt == 'shipping_company') {
             $this->addCompany($customAtt, $customer, $key);
@@ -432,7 +474,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         } elseif ($customAtt == 'billing_state' || $customAtt == 'shipping_state') {
             $this->addStateFromCustomizedAttribute($customAtt, $key, $customer);
         } elseif ($customAtt == 'dop') {
-            $this->addDopFromCustomizedAttribute($key, $subscriberEmail);
+            $this->addDopFromCustomizedAttribute($key);
         } elseif ($customAtt == 'store_code') {
             $this->addStoreCodeFromCustomizedAttribute($key);
         }
@@ -488,14 +530,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param  $subscriberEmail
      * @return null
      */
-    protected function getLastDateOfPurchase($subscriberEmail)
+    protected function getLastDateOfPurchase()
     {
-        $lastOrder = $this->getSubscriberLastOrder();
         $lastDateOfPurchase = null;
-        if ($lastOrder === null) {
-            $lastOrder = $this->getLastOrderByEmail($subscriberEmail);
-        }
-
+        $lastOrder = $this->getLastOrderByEmail();
         if ($lastOrder !== null) {
             $lastDateOfPurchase = $lastOrder->getCreatedAt();
         }
@@ -523,18 +561,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     }
 
     /**
-     * @param $email
-     * @return Mage_Sales_Model_Resource_Order_Collection | return the latest order made by the email passed by
-     * parameter if exists.
-     *
+     * return the latest order for this subscriber
+     * @return Mage_Sales_Model_Order
      */
     protected function getLastOrderByEmail()
     {
-        $helper = $this->getMailchimpHelper();
-        $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
-        $lastOrder = null;
-        if ($this->isNotEmptyOrderCollection($orderCollection)) {
-            $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+        $lastOrder = $this->getLastOrder();
+        if ($lastOrder === null) {
+            $helper = $this->getMailchimpHelper();
+            $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
+            if ($this->isNotEmptyOrderCollection($orderCollection)) {
+                $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+                $this->setLastOrder($lastOrder);
+            }
         }
 
         return $lastOrder;
@@ -799,9 +838,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param $key
      * @param $subscriberEmail
      */
-    protected function addDopFromCustomizedAttribute($key, $subscriberEmail)
+    protected function addDopFromCustomizedAttribute($key)
     {
-        $dop = $this->getLastDateOfPurchase($subscriberEmail);
+        $dop = $this->getLastDateOfPurchase();
         if ($dop) {
             $this->addMailChimpTag($key, $dop);
         }
