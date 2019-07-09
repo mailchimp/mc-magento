@@ -4247,12 +4247,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]
                 == Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED) {
                 $string .=
-                    "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} 
-                    : <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
+                    "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]}"
+                    . ": <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
             } else {
                 $string .=
-                    "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} 
-                    : <span style='color:forestgreen;font-weight: bold;'>"
+                    "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]}"
+                    . ": <span style='color:forestgreen;font-weight: bold;'>"
                     . $this->__(
                         'Finished at %s',
                         $syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]
@@ -4260,8 +4260,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } else {
             $string .=
-                "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]} 
-                : <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
+                "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]}"
+                . ": <span style='color:#ed6502;font-weight: bold;'>{$this->__('In Progress')}</span></li>";
         }
 
         return $string;
