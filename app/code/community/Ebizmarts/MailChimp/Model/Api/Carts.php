@@ -560,26 +560,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 }
             }
 
-            if ($billingAddress->getCity()) {
-                $address['city'] = $billingAddress->getCity();
-            }
-
-            if ($billingAddress->getRegion()) {
-                $address['province'] = $billingAddress->getRegion();
-            }
-
-            if ($billingAddress->getRegionCode()) {
-                $address['province_code'] = $billingAddress->getRegionCode();
-            }
-
-            if ($billingAddress->getPostcode()) {
-                $address['postal_code'] = $billingAddress->getPostcode();
-            }
-
-            if ($billingAddress->getCountry()) {
-                $address['country'] = $this->getCountryModel($billingAddress);
-                $address['country_code'] = $billingAddress->getCountry();
-            }
+            $address = $this->_addBillingAddress($address, $billingAddress);
 
             if (!empty($address)) {
                 $customer['address'] = $address;
@@ -592,6 +573,32 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
 
         return $customer;
+    }
+
+    protected function _addBillingAddress($address, $billingAddress)
+    {
+        if ($billingAddress->getCity()) {
+            $address['city'] = $billingAddress->getCity();
+        }
+
+        if ($billingAddress->getRegion()) {
+            $address['province'] = $billingAddress->getRegion();
+        }
+
+        if ($billingAddress->getRegionCode()) {
+            $address['province_code'] = $billingAddress->getRegionCode();
+        }
+
+        if ($billingAddress->getPostcode()) {
+            $address['postal_code'] = $billingAddress->getPostcode();
+        }
+
+        if ($billingAddress->getCountry()) {
+            $address['country'] = $this->getCountryModel($billingAddress);
+            $address['country_code'] = $billingAddress->getCountry();
+        }
+
+        return $address;
     }
 
     /**

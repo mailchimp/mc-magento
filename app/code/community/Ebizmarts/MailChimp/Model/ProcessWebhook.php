@@ -256,35 +256,41 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                      * Mailchimp subscriber not currently in magento newsletter subscribers.
                      * Get mailchimp subscriber status and add missing newsletter subscriber.
                      */
-                    $scopeArray = $helper->getFirstScopeFromConfig(
-                        Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
-                        $listId
-                    );
-                    $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
-                    try {
-                        $subscriber->setSubscriberFirstname($fname);
-                        $subscriber->setSubscriberLastname($lname);
-                        $md5HashEmail = md5(strtolower($email));
-                        $member = $api->getLists()->getMembers()->get(
-                            $listId,
-                            $md5HashEmail,
-                            null,
-                            null
-                        );
-                        if ($member['status'] == 'subscribed') {
-                            $helper->subscribeMember($subscriber);
-                        } elseif ($member['status'] == 'unsubscribed') {
-                            if (!$helper->getWebhookDeleteAction($subscriber->getStoreId())) {
-                                $helper->unsubscribeMember($subscriber);
-                            }
-                        }
-                    } catch (MailChimp_Error $e) {
-                        $helper->logError($e->getFriendlyMessage());
-                    } catch (Exception $e) {
-                        $helper->logError($e->getMessage());
-                    }
+                    $this->_addSubscriberData($subscriber, $fname, $lname, $email, $listId);
                 }
             }
+        }
+    }
+
+    protected function _addSubscriberData($subscriber, $fname, $lname, $email, $listId)
+    {
+        $helper = $this->getHelper();
+        $scopeArray = $helper->getFirstScopeFromConfig(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+            $listId
+        );
+        $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+        try {
+            $subscriber->setSubscriberFirstname($fname);
+            $subscriber->setSubscriberLastname($lname);
+            $md5HashEmail = md5(strtolower($email));
+            $member = $api->getLists()->getMembers()->get(
+                $listId,
+                $md5HashEmail,
+                null,
+                null
+            );
+            if ($member['status'] == 'subscribed') {
+                $helper->subscribeMember($subscriber);
+            } elseif ($member['status'] == 'unsubscribed') {
+                if (!$helper->getWebhookDeleteAction($subscriber->getStoreId())) {
+                    $helper->unsubscribeMember($subscriber);
+                }
+            }
+        } catch (MailChimp_Error $e) {
+            $helper->logError($e->getFriendlyMessage());
+        } catch (Exception $e) {
+            $helper->logError($e->getMessage());
         }
     }
 

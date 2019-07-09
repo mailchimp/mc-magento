@@ -13,11 +13,11 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 {
 
-    private $_storeId;
-    private $_mailChimpTags;
-    private $_subscriber;
-    private $_customer;
-    private $_mcHelper;
+    protected $_storeId;
+    protected $_mailChimpTags;
+    protected $_subscriber;
+    protected $_customer;
+    protected $_mcHelper;
 
     public function __construct()
     {
@@ -145,7 +145,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
         if ($attributeCode == 'email') {
             return $eventValue;
-        } elseif ($attributeCode == 'default_billing' || $attributeCode == 'default_shipping') {
+        } else {
+            $this->_addTags($attributeCode, $subscriber, $customer, $key, $attribute);
+        }
+
+        if ($this->getMailChimpTagValue($key) !== null) {
+            $eventValue = $this->getMailChimpTagValue($key);
+        }
+
+        return $eventValue;
+    }
+
+    protected function _addTags($attributeCode, $subscriber, $customer, $key, $attribute)
+    {
+        if ($attributeCode == 'default_billing' || $attributeCode == 'default_shipping') {
             $this->addDefaultShipping($attributeCode, $key, $customer);
         } elseif ($attributeCode == 'gender') {
             $this->addGender($attributeCode, $key, $customer);
@@ -166,12 +179,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         } else {
             $this->addUnknownMergeField($attributeCode, $key, $attribute, $customer);
         }
-
-        if ($this->getMailChimpTagValue($key) !== null) {
-            $eventValue = $this->getMailChimpTagValue($key);
-        }
-
-        return $eventValue;
     }
 
     /**
@@ -617,7 +624,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         $address = $customer->getPrimaryAddress($attributeCode);
         $addressData = $this->getAddressData($address);
 
-        if (count($addressData)) {
+        if (!empty($addressData)) {
             $this->addMailChimpTag($key, $addressData);
         }
     }

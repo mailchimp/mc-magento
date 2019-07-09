@@ -1392,7 +1392,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $customAtt = $map['magento'];
                     $chimpTag = $map['mailchimp'];
                     $alreadyExists = false;
-                    $created = false;
                     foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
                         if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
                             $alreadyExists = true;
@@ -1400,73 +1399,86 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     }
 
                     if (!$alreadyExists) {
-                        foreach ($customFieldTypes as $customFieldType) {
-                            if ($customFieldType['value'] == $customAtt) {
-                                try {
-                                    $api->lists->mergeFields->add(
-                                        $listId,
-                                        $customFieldType['label'],
-                                        $customFieldType['field_type'],
-                                        null,
-                                        $chimpTag
-                                    );
-                                } catch (MailChimp_Error $e) {
-                                    $this->logError($e->getFriendlyMessage());
-                                }
-
-                                $created = true;
-                            }
-                        }
-
-                        if (!$created) {
-                            $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
-                                ->setEntityTypeFilter(1)
-                                ->addSetInfo()
-                                ->getData();
-                            $label = null;
-                            foreach ($attrSetId as $option) {
-                                if ($option['attribute_id'] == $customAtt && $option['frontend_label']) {
-                                    $label = $option['frontend_label'];
-                                }
-                            }
-
-                            try {
-                                if ($label) {
-                                    //Shipping and Billing Address
-                                    if ($customAtt == 13 || $customAtt == 14) {
-                                        $api->lists->mergeFields->add(
-                                            $listId,
-                                            $label,
-                                            'address',
-                                            null,
-                                            $chimpTag
-                                        );
-                                        //Birthday
-                                    } elseif ($customAtt == 11) {
-                                        $api->lists->mergeFields->add(
-                                            $listId, $label,
-                                            'birthday',
-                                            null,
-                                            $chimpTag
-                                        );
-                                    } else {
-                                        $api->lists->mergeFields->add(
-                                            $listId, $label,
-                                            'text',
-                                            null,
-                                            $chimpTag
-                                        );
-                                    }
-                                }
-                            } catch (MailChimp_Error $e) {
-                                $this->logError($e->getFriendlyMessage());
-                            }
-                        }
+                        $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
                     }
                 }
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $this->logError($e->getMessage());
+        }
+    }
+
+    protected function _createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag)
+    {
+        $created = false;
+        foreach ($customFieldTypes as $customFieldType) {
+            if ($customFieldType['value'] == $customAtt) {
+                try {
+                    $api->lists->mergeFields->add(
+                        $listId,
+                        $customFieldType['label'],
+                        $customFieldType['field_type'],
+                        null,
+                        $chimpTag
+                    );
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage());
+                }
+
+                $created = true;
+            }
+        }
+
+        if (!$created) {
+            $attrSetId = Mage::getResourceModel('eav/entity_attribute_collection')
+                ->setEntityTypeFilter(1)
+                ->addSetInfo()
+                ->getData();
+            $label = null;
+            foreach ($attrSetId as $option) {
+                if ($option['attribute_id'] == $customAtt && $option['frontend_label']) {
+                    $label = $option['frontend_label'];
+                }
+            }
+
+            $this->_addMergeFieldByLabel($api, $label, $customAtt, $listId, $chimpTag);
+        }
+    }
+
+    protected function _addMergeFieldByLabel($api, $label, $customAtt, $listId, $chimpTag)
+    {
+        try {
+            if ($label) {
+                //Shipping and Billing Address
+                if ($customAtt == 13 || $customAtt == 14) {
+                    $api->lists->mergeFields->add(
+                        $listId,
+                        $label,
+                        'address',
+                        null,
+                        $chimpTag
+                    );
+                    //Birthday
+                } elseif ($customAtt == 11) {
+                    $api->lists->mergeFields->add(
+                        $listId,
+                        $label,
+                        'birthday',
+                        null,
+                        $chimpTag
+                    );
+                } else {
+                    $api->lists->mergeFields->add(
+                        $listId,
+                        $label,
+                        'text',
+                        null,
+                        $chimpTag
+                    );
+                }
+            }
+        } catch (MailChimp_Error $e) {
+            $this->logError($e->getFriendlyMessage());
         }
     }
 
@@ -1480,7 +1492,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $microtime = explode(' ', microtime());
         $msec = $microtime[0];
         $msecArray = explode('.', $msec);
-        $date = date('Y-m-d-H-i-s') . '-' . $msecArray[1];
+        $time = $this->formatDate(null, 'Y-m-d-H-i-s');
+        $date = $time . '-' . $msecArray[1];
         return $date;
     }
 
@@ -2093,7 +2106,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function handleMigrationUpdates()
     {
-        $initialTime = time();
+        $initialTime = Mage::getSingleton('core/date')->timestamp();
         $migrateFrom115 = $this->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
             0,
@@ -2145,46 +2158,51 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                         //migrate carts
                         $finished = $this->_migrateCartsFrom115($mailchimpStoreId, $initialTime);
                         if ($finished) {
-                            $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
-
-                            //Remove attributes no longer used
-                            $setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
-                            try {
-                                $setup->removeAttribute('catalog_product', 'mailchimp_sync_delta');
-                                $setup->removeAttribute('catalog_product', 'mailchimp_sync_error');
-                                $setup->removeAttribute('catalog_product', 'mailchimp_sync_modified');
-                                $setup->removeAttribute('customer', 'mailchimp_sync_delta');
-                                $setup->removeAttribute('customer', 'mailchimp_sync_error');
-                                $setup->removeAttribute('customer', 'mailchimp_sync_modified');
-                            } catch (Exception $e) {
-                                $this->logError($e->getMessage());
-                            }
-
-                            $coreResource = $this->getCoreResource();
-                            try {
-                                $quoteTable = $coreResource->getTableName('sales/quote');
-                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_delta');
-                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_error');
-                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_deleted');
-                                $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_token');
-                            } catch (Exception $e) {
-                                $this->logError($e->getMessage());
-                            }
-
-                            try {
-                                $orderTable = $coreResource->getTableName('sales/order');
-                                $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_delta');
-                                $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_error');
-                                $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_modified');
-                            } catch (Exception $e) {
-                                $this->logError($e->getMessage());
-                            }
+                            $this->_migrateFrom115dropColumn($arrayMigrationConfigData);
                         }
                     }
                 }
             }
         } else {
             $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
+        }
+    }
+
+    protected function _migrateFrom115dropColumn($arrayMigrationConfigData)
+    {
+        $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
+
+        //Remove attributes no longer used
+        $setup = Mage::getResourceModel('catalog/setup', 'catalog_setup');
+        try {
+            $setup->removeAttribute('catalog_product', 'mailchimp_sync_delta');
+            $setup->removeAttribute('catalog_product', 'mailchimp_sync_error');
+            $setup->removeAttribute('catalog_product', 'mailchimp_sync_modified');
+            $setup->removeAttribute('customer', 'mailchimp_sync_delta');
+            $setup->removeAttribute('customer', 'mailchimp_sync_error');
+            $setup->removeAttribute('customer', 'mailchimp_sync_modified');
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
+
+        $coreResource = $this->getCoreResource();
+        try {
+            $quoteTable = $coreResource->getTableName('sales/quote');
+            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_delta');
+            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_error');
+            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_deleted');
+            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_token');
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
+        }
+
+        try {
+            $orderTable = $coreResource->getTableName('sales/order');
+            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_delta');
+            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_error');
+            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_modified');
+        } catch (Exception $e) {
+            $this->logError($e->getMessage());
         }
     }
 
@@ -2855,12 +2873,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
                 try {
                     if ($listId) {
-                        $webhooks = $api->lists->webhooks->getAll($listId);
-                        foreach ($webhooks['webhooks'] as $webhook) {
-                            if (strpos($webhook['url'], $webhookUrl) !== false) {
-                                $api->lists->webhooks->delete($listId, $webhook['id']);
-                            }
-                        }
+                        $this->_deletedWebhooksByListId($api, $listId, $webhookUrl);
                     }
                 } catch (MailChimp_Error $e) {
                     $this->logError($e->getFriendlyMessage());
@@ -2870,6 +2883,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $this->logError($e->getMessage());
+        }
+    }
+
+    protected function _deletedWebhooksByListId($api, $listId, $webhookUrl)
+    {
+        $webhooks = $api->lists->webhooks->getAll($listId);
+        foreach ($webhooks['webhooks'] as $webhook) {
+            if (strpos($webhook['url'], $webhookUrl) !== false) {
+                $api->lists->webhooks->delete($listId, $webhook['id']);
+            }
         }
     }
 
@@ -4165,7 +4188,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param string $languageCode
      * @return string   Returns empty string if not MC Language match found
      */
-    private function _lang2MCLanguage($languageCode = '')
+    protected function _lang2MCLanguage($languageCode = '')
     {
         $mailchimpLanguage = '';
 
@@ -4481,30 +4504,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $interestGroup = $this->getInterestGroupModel();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             if ($interestGroup->getId()) {
-                $groups = $this->arrayDecode($interestGroup->getGroupdata());
-                foreach ($groups as $key => $value) {
-                    if (isset($interest[$key])) {
-                        if (is_array($value)) {
-                            foreach ($value as $groupId) {
-                                foreach ($interest[$key]['category'] as $gkey => $gvalue) {
-                                    if ($gvalue['id'] == $groupId) {
-                                        $interest[$key]['category'][$gkey]['checked'] = true;
-                                    } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
-                                        $interest[$key]['category'][$gkey]['checked'] = false;
-                                    }
-                                }
-                            }
-                        } else {
-                            foreach ($interest[$key]['category'] as $gkey => $gvalue) {
-                                if ($gvalue['id'] == $value) {
-                                    $interest[$key]['category'][$gkey]['checked'] = true;
-                                } else {
-                                    $interest[$key]['category'][$gkey]['checked'] = false;
-                                }
-                            }
-                        }
-                    }
-                }
+                $this->_getInsterestChecked($interestGroup, $interest);
             }
 
             return $interest;
@@ -4513,6 +4513,42 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
+    protected function _getInsterestChecked($interestGroup, $interest)
+    {
+        $groups = $this->arrayDecode($interestGroup->getGroupdata());
+        foreach ($groups as $key => $value) {
+            if (isset($interest[$key])) {
+                if (is_array($value)) {
+                    foreach ($value as $groupId) {
+                        $this->_getInterestCheckedByGroupId($interest, $key, $groupId);
+                    }
+                } else {
+                    foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+                        if ($gvalue['id'] == $value) {
+                            $interest[$key]['category'][$gkey]['checked'] = true;
+                        } else {
+                            $interest[$key]['category'][$gkey]['checked'] = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $interest;
+    }
+
+    protected function _getInterestCheckedByGroupId($interest, $key, $groupId)
+    {
+        foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+            if ($gvalue['id'] == $groupId) {
+                $interest[$key]['category'][$gkey]['checked'] = true;
+            } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
+                $interest[$key]['category'][$gkey]['checked'] = false;
+            }
+        }
+
+        return $interest;
+    }
 
     /**
      * Format array to save in database.

@@ -36,13 +36,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         }
 
         $emails = array_values((array)$email);
-        $names = is_array($name) ? $name : (array)$name;
-        $names = array_values($names);
-        foreach ($emails as $key => $email) {
-            if (!isset($names[$key])) {
-                $names[$key] = substr($email, 0, strpos($email, '@'));
-            }
-        }
+        $names = $this->_getEmailsNames($emails, $name);
 
         // Get message
         $this->setUseAbsoluteLinks(true);
@@ -66,71 +60,14 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         }
 
         $mail = $this->getMail();
-        $max = count($emails);
-        for ($i = 0; $i < $max; $i++) {
-            if (isset($names[$i])) {
-                $email['to'][] = array(
-                    'email' => $emails[$i],
-                    'name' => $names[$i]
-                );
-            } else {
-                $email['to'][] = array(
-                    'email' => $emails[$i],
-                    'name' => ''
-                );
-            }
-        }
-
-        foreach ($mail->getBcc() as $bcc) {
-            $email['to'][] = array(
-                'email' => $bcc,
-                'type' => 'bcc'
-            );
-        }
-
+        $email['to'] = $this->_getEmailsTo($emails, $names, $mail);
+        $email['from_email'] = $this->_getEmailFrom($mail);
         $email['from_name'] = $this->getSenderName();
-        $email['from_email'] = $this->getSenderEmail();
-        $mandrillSenders = $this->getSendersDomains($mail);
-        $senderExists = false;
-        foreach ($mandrillSenders as $sender) {
-            if (isset($sender['domain'])) {
-                $emailArray = explode('@', $email['from_email']);
-                if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
-                    $senderExists = true;
-                }
-            }
-        }
-
-        if (!$senderExists) {
-            $email['from_email'] = $this->getGeneralEmail();
-        }
+        $email['tags'] = $this->_getEmailsTags($variables);
 
         $headers = $mail->getHeaders();
         $headers[] = $mandrillHelper->getUserAgent();
         $email['headers'] = $headers;
-        if (isset($variables['tags']) && !empty($variables['tags'])) {
-            $email ['tags'] = $variables['tags'];
-        }
-
-        if (isset($variables['tags']) && !empty($variables['tags'])) {
-            $email ['tags'] = $variables['tags'];
-        } else {
-            $templateId = (string)$this->getId();
-            $templates = parent::getDefaultTemplates();
-            if (isset($templates[$templateId]) && isset($templates[$templateId]['label'])) {
-                $email ['tags'] = array(substr($templates[$templateId]['label'], 0, 50));
-            } else {
-                if ($this->getTemplateCode()) {
-                    $email ['tags'] = array(substr($this->getTemplateCode(), 0, 50));
-                } else {
-                    if ($templateId) {
-                        $email ['tags'] = array(substr($templateId, 0, 50));
-                    } else {
-                        $email['tags'] = array('default_tag');
-                    }
-                }
-            }
-        }
 
         if ($att = $mail->getAttachments()) {
             $email['attachments'] = $att;
@@ -171,6 +108,95 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         }
 
         return true;
+    }
+
+    protected function _getEmailsNames($emails, $name)
+    {
+        $names = is_array($name) ? $name : (array)$name;
+        $names = array_values($names);
+        foreach ($emails as $key => $email) {
+            if (!isset($names[$key])) {
+                $names[$key] = substr($email, 0, strpos($email, '@'));
+            }
+        }
+
+        return $names;
+    }
+
+    protected function _getEmailsTo($emails, $names, $mail)
+    {
+        $to = array();
+        $max = count($emails);
+        for ($i = 0; $i < $max; $i++) {
+            if (isset($names[$i])) {
+                $to[] = array(
+                    'email' => $emails[$i],
+                    'name' => $names[$i]
+                );
+            } else {
+                $to[] = array(
+                    'email' => $emails[$i],
+                    'name' => ''
+                );
+            }
+        }
+
+        foreach ($mail->getBcc() as $bcc) {
+            $to[] = array(
+                'email' => $bcc,
+                'type' => 'bcc'
+            );
+        }
+
+        return $to;
+    }
+
+    protected function _getEmailFrom($mail)
+    {
+        $fromEmail = $this->getSenderEmail();
+        $mandrillSenders = $this->getSendersDomains($mail);
+        $senderExists = false;
+        foreach ($mandrillSenders as $sender) {
+            if (isset($sender['domain'])) {
+                $emailArray = explode('@', $fromEmail);
+                if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
+                    $senderExists = true;
+                }
+            }
+        }
+
+        if (!$senderExists) {
+            $fromEmail = $this->getGeneralEmail();
+        }
+
+        return $fromEmail;
+    }
+
+    protected function _getEmailsTags($variables)
+    {
+        $tags = null;
+
+        if (isset($variables['tags']) && !empty($variables['tags'])) {
+            $tags = $variables['tags'];
+        } else {
+            $templateId = (string)$this->getId();
+            $templates = parent::getDefaultTemplates();
+            if (isset($templates[$templateId]) && isset($templates[$templateId]['label'])) {
+                $tags = array(substr($templates[$templateId]['label'], 0, 50));
+            } else {
+                if ($this->getTemplateCode()) {
+                    $tags = array(substr($this->getTemplateCode(), 0, 50));
+                } else {
+                    if ($templateId) {
+                        $tags = array(substr($templateId, 0, 50));
+                    } else {
+                        $tags = array('default_tag');
+                    }
+                }
+            }
+        }
+
+        return $tags;
     }
 
     /**

@@ -167,7 +167,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
             ->setMethods(array('get'))
             ->getMock();
 
-        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $processWebhookMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
         $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
         $helperMock
             ->expects($this->once())
@@ -263,7 +263,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
             ->setMethods(array('get'))
             ->getMock();
 
-        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $processWebhookMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
         $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
         $helperMock->expects($this->once())->method('loadListSubscriber')->with($listId, $email)
             ->willReturn($subscriberMock);
