@@ -123,6 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
         return $mailchimpTagValue;
     }
+
     /**
      * @return Mage_Sales_Model_Order
      */
