@@ -12,6 +12,8 @@
 
 class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 {
+    const GENDER_VALUE_MALE = 1;
+    const GENDER_VALUE_FEMALE = 2;
 
     /**
      * @var int
@@ -114,9 +116,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     public function getMailChimpTagValue($key)
     {
-        return $this->_mailChimpTags[$key];
-    }
+        $mailchimpTagValue = null;
 
+        if (isset($this->_mailChimpTags[$key])) {
+            $mailchimpTagValue = $this->_mailChimpTags[$key];
+        }
+
+        return $mailchimpTagValue;
+    }
     /**
      * @return Mage_Sales_Model_Order
      */
