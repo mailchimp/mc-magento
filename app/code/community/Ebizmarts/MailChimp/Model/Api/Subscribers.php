@@ -12,9 +12,6 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
-    const GENDER_VALUE_MALE = 1;
-    const GENDER_VALUE_FEMALE = 2;
-
 
     /**
      * Ebizmarts_MailChimp_Helper_Data
