@@ -59,6 +59,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $batchArray;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     protected function _getModifiedOrders($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
@@ -121,6 +126,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $batchArray;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     * @throws Mage_Core_Exception
+     */
     protected function _getNewOrders($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
@@ -284,6 +295,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $jsonData;
     }
 
+    /**
+     * @param $order
+     * @param $magentoStoreId
+     * @return array
+     * @throws Exception
+     */
     protected function _getPayloadData($order, $magentoStoreId)
     {
         $data = array();
@@ -333,6 +350,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $data;
     }
 
+    /**
+     * @param $order
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     protected function _getPayloadDataLines($order, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
@@ -386,6 +409,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return array('lines' => $lines, 'itemsCount' => $itemCount);
     }
 
+    /**
+     * @param $data
+     * @param $billingAddress
+     * @param $street
+     */
     protected function _getPayloadBilling($data, $billingAddress, $street)
     {
         $address = array();
@@ -430,6 +458,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
     }
 
+    /**
+     * @param $data
+     * @param $address
+     * @param $street
+     */
     protected function _getPayloadBillingStreet($data, $address, $street)
     {
         if ($street[0]) {
@@ -441,6 +474,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         }
     }
 
+    /**
+     * @param $data
+     * @param $shippingAddress
+     */
     protected function _getPayloadShipping($data, $shippingAddress)
     {
         $street = $shippingAddress->getStreet();
@@ -509,6 +546,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $helper->getOrderAmountLimit();
     }
 
+    /**
+     * @param $value
+     * @return int
+     */
     protected function returnZeroIfNull($value)
     {
         $returnValue = $value;
@@ -519,6 +560,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $returnValue;
     }
 
+    /**
+     * @param $order
+     * @return array
+     */
     protected function _getMailChimpStatus($order)
     {
         $totalItemsOrdered = $order->getData('total_qty_ordered');
@@ -547,6 +592,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         return $mailChimpStatus;
     }
 
+    /**
+     * @param $orderItems
+     * @param $totalItemsOrdered
+     * @return array
+     */
     protected function _getFinancialFulfillmentStatus($orderItems, $totalItemsOrdered)
     {
         $items = array(

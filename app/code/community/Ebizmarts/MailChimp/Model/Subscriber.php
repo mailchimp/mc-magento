@@ -10,6 +10,9 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
 {
     const SUBSCRIBE_SOURCE = 'MailChimp';
 
+    /**
+     * @return $this|Mage_Newsletter_Model_Subscriber
+     */
     public function sendUnsubscriptionEmail()
     {
         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)
@@ -20,6 +23,9 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
         }
     }
 
+    /**
+     * @return $this|Mage_Newsletter_Model_Subscriber
+     */
     public function sendConfirmationRequestEmail()
     {
         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)
@@ -30,6 +36,9 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
         }
     }
 
+    /**
+     * @return $this|Mage_Newsletter_Model_Subscriber
+     */
     public function sendConfirmationSuccessEmail()
     {
         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)
@@ -40,6 +49,10 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
         }
     }
 
+    /**
+     * @param string $code
+     * @return bool
+     */
     public function confirm($code)
     {
         if ($this->getCode()==$code) {

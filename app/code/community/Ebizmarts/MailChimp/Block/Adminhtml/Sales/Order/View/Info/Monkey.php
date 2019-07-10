@@ -24,6 +24,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
      */
     protected $_order = null;
 
+    /**
+     * @return bool
+     */
     public function isReferred()
     {
         $order = $this->getCurrentOrder();

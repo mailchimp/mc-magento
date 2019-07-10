@@ -204,6 +204,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         return $eventValue;
     }
 
+    /**
+     * @param $attributeCode
+     * @param $subscriber
+     * @param $customer
+     * @param $key
+     * @param $attribute
+     */
     protected function _addTags($attributeCode, $subscriber, $customer, $key, $attribute)
     {
         if ($attributeCode == 'default_billing' || $attributeCode == 'default_shipping') {
@@ -238,6 +245,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         return unserialize($mapFields);
     }
 
+    /**
+     * @return Object
+     */
     protected function getEntityAttributeCollection()
     {
         return Mage::getResourceModel('eav/entity_attribute_collection');

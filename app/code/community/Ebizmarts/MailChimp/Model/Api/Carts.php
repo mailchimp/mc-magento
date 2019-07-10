@@ -437,6 +437,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         return $jsonData;
     }
 
+    /**
+     * @param $items
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @param $apiProduct
+     * @return array
+     */
     protected function _processCartLines($items, $mailchimpStoreId, $magentoStoreId, $apiProduct)
     {
         $helper = $this->getHelper();
@@ -575,6 +582,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         return $customer;
     }
 
+    /**
+     * @param $address
+     * @param $billingAddress
+     * @return array
+     */
     protected function _addBillingAddress($address, $billingAddress)
     {
         if ($billingAddress->getCity()) {

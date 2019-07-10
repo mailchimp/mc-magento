@@ -257,7 +257,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                             );
                             $saveSubscriber = true;
                         } catch (MailChimp_Error $e) {
-                            $this->_catchMailchimpEx($e, $subscriber, $isAdmin);
+                            $this->_catchMailchimpException($e, $subscriber, $isAdmin);
                             $saveSubscriber = true;
                         } catch (Exception $e) {
                             $helper->logError($e->getMessage());
@@ -280,6 +280,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         }
     }
 
+    /**
+     * @param $e
+     * @param $isAdmin
+     * @param $subscriber
+     */
     protected function _catchMailchimpSubsNotAppliedIf($e, $isAdmin, $subscriber)
     {
         $helper = $this->getMailchimpHelper();
@@ -295,6 +300,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
     }
 
+    /**
+     * @param $e
+     * @param $isAdmin
+     * @param $subscriber
+     */
     protected function _catchMailchimpSubsNotAppliedElse($e, $isAdmin, $subscriber)
     {
         $helper = $this->getMailchimpHelper();
@@ -310,6 +320,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
     }
 
+    /**
+     * @param $api
+     * @param $listId
+     * @param $cryptmcHelper
+     * @param $mailChimpTags
+     * @param $subscriber
+     * @param $interest
+     */
     protected function _catchMailchompNewstellerConfirm(
         $api,
         $listId,
@@ -329,7 +347,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         Mage::getSingleton('core/session')->addWarning($message);
     }
 
-    protected function _catchMailchimpEx($e, $subscriber, $isAdmin)
+    /**
+     * @param $e
+     * @param $subscriber
+     * @param $isAdmin
+     */
+    protected function _catchMailchimpException($e, $subscriber, $isAdmin)
     {
         $helper = $this->getMailchimpHelper();
         $errorMessage = $e->getFriendlyMessage();

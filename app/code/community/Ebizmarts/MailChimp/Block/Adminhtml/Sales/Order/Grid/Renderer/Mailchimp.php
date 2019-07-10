@@ -13,6 +13,10 @@
 class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Mailchimp
     extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
+    /**
+     * @param Varien_Object $row
+     * @return string
+     */
     public function render(Varien_Object $row)
     {
         $result = '';

@@ -361,7 +361,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                 try {
                     $this->_processBatchOperations($batchArray, $mailchimpStoreId, $magentoStoreId);
-                    $this->_saveFlagSynced(
+                    $this->_updateSyncingFlag(
                         $customerAmount, $productAmount, $orderAmount,
                         $mailchimpStoreId, $magentoStoreId
                     );
@@ -385,6 +385,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
     }
 
+    /**
+     * @param $batchArray
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @throws Mage_Core_Exception
+     * @throws MailChimp_Error
+     */
     protected function _processBatchOperations($batchArray, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
@@ -409,7 +416,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
     }
 
-    protected function _saveFlagSynced($customerAmount, $productAmount, $orderAmount,$mailchimpStoreId, $magentoStoreId)
+    /**
+     * @param $customerAmount
+     * @param $productAmount
+     * @param $orderAmount
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @throws Mage_Core_Exception
+     */
+    protected function _updateSyncingFlag($customerAmount, $productAmount, $orderAmount,$mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
@@ -771,6 +786,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $this->_showResumeDataSentToMailchimp($magentoStoreId);
     }
 
+    /**
+     * @param $type
+     * @param $mailchimpStoreId
+     * @param $id
+     * @param $response
+     * @return string
+     */
     protected function _getError($type, $mailchimpStoreId, $id, $response)
     {
         $error = $response->title . " : " . $response->detail;
@@ -788,6 +810,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         return $error;
     }
 
+    /**
+     * @param $response
+     * @return string
+     */
     protected function _processFileErrors($response)
     {
         $errorDetails = "";
@@ -864,6 +890,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
     }
 
+    /**
+     * @param $itemId
+     * @param $itemType
+     * @param $mailchimpStoreId
+     * @param null $syncDelta
+     * @param null $syncError
+     * @param int $syncModified
+     * @param null $syncDeleted
+     * @param null $token
+     * @param null $syncedFlag
+     * @param bool $saveOnlyIfexists
+     */
     protected function saveSyncData(
         $itemId,
         $itemType,

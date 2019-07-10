@@ -24,17 +24,29 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         $this->_storeId = Mage::app()->getStore()->getId();
     }
 
+    /**
+     * @return string
+     */
     public function getFormUrl()
     {
         return $this->getSuccessInterestUrl();
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function getSuccessInterestUrl()
     {
         $url = 'mailchimp/group/index';
         return Mage::app()->getStore()->getUrl($url);
     }
 
+    /**
+     * @return array|null
+     * @throws Mage_Core_Exception
+     * @throws MailChimp_Error
+     */
     public function getInterest()
     {
         $subscriber = $this->getSubscriberModel();
@@ -47,6 +59,10 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         return $interest;
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     public function getMessageBefore()
     {
         $storeId = $this->_storeId;
@@ -54,6 +70,10 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         return $message;
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     public function getMessageAfter()
     {
         $storeId = $this->_storeId;

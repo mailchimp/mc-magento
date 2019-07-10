@@ -30,6 +30,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $this->_mailchimpHelper = Mage::helper('mailchimp');
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $batchArray = array();
@@ -43,6 +48,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         return $batchArray;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @return array
+     */
     protected function _getDeletedPromoCodes($mailchimpStoreId)
     {
         $batchArray = array();
@@ -65,6 +74,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         return $batchArray;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     protected function _getNewPromoCodes($mailchimpStoreId, $magentoStoreId)
     {
         $batchArray = array();
@@ -192,6 +206,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         return $collection;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @return object
+     */
     protected function makeDeletedPromoCodesCollection($mailchimpStoreId)
     {
         $deletedPromoCodes = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
@@ -342,6 +360,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         return $url;
     }
 
+    /**
+     * @return string
+     */
     protected function getToken()
     {
         $token = md5(rand(0, 9999999));
@@ -360,11 +381,19 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         return $this->_apiPromoRules;
     }
 
+    /**
+     * @param $codeId
+     * @param $promoRuleId
+     */
     public function markAsDeleted($codeId, $promoRuleId)
     {
         $this->_setDeleted($codeId, $promoRuleId);
     }
 
+    /**
+     * @param $codeId
+     * @param $promoRuleId
+     */
     protected function _setDeleted($codeId, $promoRuleId)
     {
         $helper = $this->getMailChimpHelper();
@@ -406,6 +435,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         }
     }
 
+    /**
+     * @param $promoCodeId
+     * @param $mailchimpStoreId
+     */
     public function deletePromoCodeSyncData($promoCodeId, $mailchimpStoreId)
     {
         $promoCodeSyncDataItem = $this->getMailChimpHelper()->getEcommerceSyncDataItem(
@@ -444,6 +477,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         return $promoCodes;
     }
 
+    /**
+     * @param $promoCodeId
+     * @return string
+     */
     protected function getPromoRuleIdByCouponId($promoCodeId)
     {
         $coupon = Mage::getModel('salesrule/coupon')->load($promoCodeId);

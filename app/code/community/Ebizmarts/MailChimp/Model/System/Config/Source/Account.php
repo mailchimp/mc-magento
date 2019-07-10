@@ -236,6 +236,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         return Mage::helper('mailchimp');
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     protected function getDateSync($mailchimpStoreId)
     {
         $date = $this->makeHelper()->getConfigValueForScope(

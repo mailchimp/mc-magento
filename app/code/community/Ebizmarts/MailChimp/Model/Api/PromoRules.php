@@ -34,6 +34,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $this->_promoCodes = Mage::getModel('mailchimp/api_promoCodes');
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $batchArray = array();
@@ -46,6 +51,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         return $batchArray;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @return array
+     */
     protected function _getModifiedAndDeletedPromoRules($mailchimpStoreId)
     {
         $batchArray = array();
@@ -66,6 +75,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         return $batchArray;
     }
 
+    /**
+     * @param $ruleId
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     public function getNewPromoRule($ruleId, $mailchimpStoreId, $magentoStoreId)
     {
         $promoData = array();
@@ -113,6 +128,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         return $batchLimit;
     }
 
+    /**
+     * @param $ruleId
+     * @return Mage_Core_Model_Abstract
+     */
     protected function getPromoRule($ruleId)
     {
         return Mage::getModel('salesrule/rule')->load($ruleId);
@@ -226,6 +245,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         );
     }
 
+    /**
+     * @param $ruleId
+     * @param $mailchimpStoreId
+     */
     protected function deletePromoRuleSyncData($ruleId, $mailchimpStoreId)
     {
         $ruleSyncDataItem = $this->getMailChimpHelper()->getEcommerceSyncDataItem(
@@ -236,6 +259,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $ruleSyncDataItem->delete();
     }
 
+    /**
+     * @param $promoRule
+     * @return array
+     */
     protected function generateRuleData($promoRule)
     {
         $error = null;
@@ -287,6 +314,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         return $this->_mailchimpHelper;
     }
 
+    /**
+     * @param $promoAction
+     * @return string|null
+     */
     protected function getMailChimpType($promoAction)
     {
         $mailChimpType = null;
@@ -303,6 +334,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         return $mailChimpType;
     }
 
+    /**
+     * @param $promoAction
+     * @return string|null
+     */
     protected function getMailChimpTarget($promoAction)
     {
         $mailChimpTarget = null;
@@ -319,11 +354,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         return $mailChimpTarget;
     }
 
+    /**
+     * @param $ruleId
+     */
     public function update($ruleId)
     {
         $this->_setModified($ruleId);
     }
 
+    /**
+     * @param $ruleId
+     */
     protected function _setModified($ruleId)
     {
         $helper = $this->getMailChimpHelper();
@@ -346,11 +387,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         }
     }
 
+    /**
+     * @param $ruleId
+     */
     public function markAsDeleted($ruleId)
     {
         $this->_setDeleted($ruleId);
     }
 
+    /**
+     * @param $ruleId
+     */
     protected function _setDeleted($ruleId)
     {
         $helper = $this->getMailChimpHelper();
@@ -373,6 +420,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         }
     }
 
+    /**
+     * @param $promoRule
+     * @return float|int
+     */
     protected function getMailChimpDiscountAmount($promoRule)
     {
         $action = $promoRule->getSimpleAction();

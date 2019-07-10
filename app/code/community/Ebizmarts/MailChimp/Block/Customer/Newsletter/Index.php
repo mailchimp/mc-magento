@@ -31,6 +31,12 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
         $this->_storeId = Mage::app()->getStore()->getId();
     }
 
+    /**
+     * @return array|null
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     * @throws MailChimp_Error
+     */
     public function getInterest()
     {
         $subscriber = $this->getSubscriberModel();

@@ -20,6 +20,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add extends Mage_Adminhtml_B
         $this->_removeButton("reset");
     }
 
+    /**
+     * @return string
+     */
     public function getHeaderText()
     {
         return Mage::helper('mailchimp')->__('New Field Type');

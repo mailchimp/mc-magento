@@ -2188,19 +2188,21 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $coreResource = $this->getCoreResource();
         try {
             $quoteTable = $coreResource->getTableName('sales/quote');
-            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_delta');
-            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_sync_error');
-            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_deleted');
-            $setup->getConnection()->dropColumn($quoteTable, 'mailchimp_token');
+            $connectionQuote = $setup->getConnection();
+            $connectionQuote->dropColumn($quoteTable, 'mailchimp_sync_delta');
+            $connectionQuote->dropColumn($quoteTable, 'mailchimp_sync_error');
+            $connectionQuote->dropColumn($quoteTable, 'mailchimp_deleted');
+            $connectionQuote->dropColumn($quoteTable, 'mailchimp_token');
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
 
         try {
             $orderTable = $coreResource->getTableName('sales/order');
-            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_delta');
-            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_error');
-            $setup->getConnection()->dropColumn($orderTable, 'mailchimp_sync_modified');
+            $connectionOrder = $setup->getConnection();
+            $connectionOrder->dropColumn($orderTable, 'mailchimp_sync_delta');
+            $connectionOrder->dropColumn($orderTable, 'mailchimp_sync_error');
+            $connectionOrder->dropColumn($orderTable, 'mailchimp_sync_modified');
         } catch (Exception $e) {
             $this->logError($e->getMessage());
         }
@@ -2542,7 +2544,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function timePassed($initialTime)
     {
-        $storeCount = !empty($this->getMageApp()->getStores());
+        $storeCount = count($this->getMageApp()->getStores());
         $timePassed = false;
         $finalTime = time();
         $difference = $finalTime - $initialTime;
@@ -3450,22 +3452,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function deleteResendConfigValues($scopeId, $scope = 'stores')
     {
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
-        $this->getConfig()
-            ->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
-        $this->getConfig()
-            ->cleanCache();
+        $config = $this->getConfig();
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PCD_LAST_ID, $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_ENABLED, $scope, $scopeId);
+        $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_RESEND_TURN, $scope, $scopeId);
+        $config->cleanCache();
     }
 
     /**
@@ -3877,14 +3872,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $isAdmin = $this->isAdmin();
         $userLangCode = Mage::app()->getLocale()->getLocaleCode();
-        if ($isAdmin || '' == $lang = $this->_lang2MCLanguage($userLangCode)) {
+        if ($isAdmin || '' == $lang = $this->_langToMCLanguage($userLangCode)) {
             // IS Admin OR if users lang is not supported, try store views default locale
             $userLangCode = $this->getConfigValueForScope(
                 Mage_Core_Model_Locale::XML_PATH_DEFAULT_LOCALE,
                 $scopeId,
                 $scope
             );
-            $lang = $this->_lang2MCLanguage($userLangCode);
+            $lang = $this->_langToMCLanguage($userLangCode);
         }
 
         return $lang;
@@ -4188,7 +4183,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param string $languageCode
      * @return string   Returns empty string if not MC Language match found
      */
-    protected function _lang2MCLanguage($languageCode = '')
+    protected function _langToMCLanguage($languageCode = '')
     {
         $mailchimpLanguage = '';
 
@@ -4892,6 +4887,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->_countersGetResponseBatch;
     }
 
+    /**
+     * @param $str
+     * @return string
+     */
     public function mask($str)
     {
         return substr($str, 0, 6)
@@ -4899,11 +4898,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             . substr($str, -4);
     }
 
+    /**
+     * @param $apiKey
+     * @return bool
+     */
     public function isApiKeyObscure($apiKey)
     {
         return ($apiKey === '******');
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     public function getApiKeyValue()
     {
         $scopeArray = $this->getCurrentScope();

@@ -42,6 +42,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $this->_visibilityOptions = Mage::getModel('catalog/product_visibility')->getOptionArray();
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $helper     = $this->getMailChimpHelper();
@@ -122,6 +129,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $batchArray;
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     public function createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $deletedProducts = $this->getProductResourceCollection();
@@ -153,6 +165,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $batchArray;
     }
 
+    /**
+     * @param $product
+     * @param $batchId
+     * @param $mailchimpStoreId
+     * @return array
+     */
     protected function _buildDeleteProductRequest($product, $batchId, $mailchimpStoreId)
     {
         if ($this->isBundleProduct($product)) {
@@ -167,6 +185,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $data;
     }
 
+    /**
+     * @param $product
+     * @param $batchId
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     protected function _buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $variantProducts = array();
@@ -197,6 +222,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $data;
     }
 
+    /**
+     * @param $product
+     * @param $batchId
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return array
+     */
     protected function _buildUpdateProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $variantProducts = array();
@@ -264,6 +296,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $operations;
     }
 
+    /**
+     * @param $product
+     * @param $magentoStoreId
+     * @param bool $isVariant
+     * @param array $variants
+     * @return array
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
+     */
     protected function _buildProductData($product, $magentoStoreId, $isVariant = true, $variants = array())
     {
         $data = array();
@@ -324,6 +365,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $data;
     }
 
+    /**
+     * @param $variants
+     * @throws Mage_Core_Exception
+     */
     protected function _processVariants($variants)
     {
         $data["variants"] = array();
@@ -908,6 +953,12 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $url;
     }
 
+    /**
+     * @param $childId
+     * @param $magentoStoreId
+     * @return string|null
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function getParentImageUrl($childId, $magentoStoreId)
     {
         $imageUrl = null;
@@ -935,6 +986,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $product->getProductUrl();
     }
 
+    /**
+     * @param $product
+     * @param $magentoStoreId
+     * @return string|null
+     */
     public function getProductCategories($product, $magentoStoreId)
     {
         $categoryIds = $product->getResource()->getCategoryIds($product);
@@ -1065,6 +1121,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         return $this->_visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
     }
 
+    /**
+     * @param $product
+     * @return float
+     * @throws Mage_Core_Exception
+     */
     protected function getProductPrice($product)
     {
         $helper = $this->getMailChimpHelper();

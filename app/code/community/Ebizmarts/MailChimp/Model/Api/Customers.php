@@ -149,6 +149,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $batchData;
     }
 
+    /**
+     * @param $customer
+     * @return array
+     */
     protected function _buildCustomerData($customer)
     {
         $data = array();
@@ -220,6 +224,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $data;
     }
 
+    /**
+     * @param $countryCode
+     * @return array
+     */
     protected function getCountryNameByCode($countryCode)
     {
         return $this->_locale->getCountryTranslation($countryCode);
@@ -237,12 +245,20 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true, false);
     }
 
+    /**
+     * @param $magentoStoreId
+     * @return array
+     */
     public function getOptin($magentoStoreId)
     {
-        return $this->getOptinConfiguration($magentoStoreId);
+        return $this->getOptionConfiguration($magentoStoreId);
     }
 
-    protected function getOptinConfiguration($magentoStoreId)
+    /**
+     * @param $magentoStoreId
+     * @return array
+     */
+    protected function getOptionConfiguration($magentoStoreId)
     {
         if (array_key_exists($magentoStoreId, $this->_optInConfiguration)) {
             return $this->_optInConfiguration[$magentoStoreId];
@@ -315,6 +331,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection->joinAttribute('company', 'customer_address/company', 'default_billing', null, 'left');
     }
 
+    /**
+     * @param $collection
+     */
     protected function joinSalesData($collection)
     {
         $collection->getSelect()->joinLeft(

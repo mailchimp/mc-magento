@@ -261,6 +261,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         )->toOptionArray();
     }
 
+    /**
+     * @return string
+     */
     protected function getApiKeyValue()
     {
         $helper = $this->getHelper();

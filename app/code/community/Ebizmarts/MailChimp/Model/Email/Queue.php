@@ -70,6 +70,12 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
         return $this;
     }
 
+    /**
+     * @param $message
+     * @param $parameters
+     * @param $storeId
+     * @throws Zend_Mail_Exception
+     */
     protected function _sendMandrillEnabled($message, $parameters, $storeId)
     {
         $mailer = $this->getMail($storeId);
@@ -120,6 +126,11 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
         unset($mailer);
     }
 
+    /**
+     * @param $message
+     * @param $parameters
+     * @throws Zend_Mail_Exception
+     */
     protected function _sendMandrillNotEnabled($message, $parameters)
     {
         $mailer = new Zend_Mail('utf-8');

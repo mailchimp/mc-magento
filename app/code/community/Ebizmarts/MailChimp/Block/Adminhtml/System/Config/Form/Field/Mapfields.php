@@ -63,6 +63,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
         ksort($this->_customerAttributes);
     }
 
+    /**
+     * @param string $columnName
+     * @return string
+     */
     protected function _renderCellTemplate($columnName)
     {
         if (empty($this->_columns[$columnName])) {
@@ -89,11 +93,17 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
         return $rendered;
     }
 
+    /**
+     * @return string
+     */
     protected function _getMailChimpValue()
     {
         return Mage::getSingleton('core/session')->getMailchimpValue();
     }
 
+    /**
+     * @return string
+     */
     protected function _getMailChimpLabel()
     {
         return Mage::getSingleton('core/session')->getMailchimpLabel();
