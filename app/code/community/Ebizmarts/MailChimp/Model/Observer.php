@@ -147,11 +147,13 @@ class Ebizmarts_MailChimp_Model_Observer
                     $message = $helper->__('The Mailchimp store configuration was not modified. There is a Mailchimp audience configured for this scope. Both must be set to inherit at the same time.');
                     $this->getAdminSession()->addError($message);
                 }
+
                 if ($configDataChanged) {
                     $config->setData($configData);
                 }
             }
         }
+
         return $observer;
     }
 
@@ -205,18 +207,19 @@ class Ebizmarts_MailChimp_Model_Observer
     public function subscriberSaveAfter(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
-        $storeId = $subscriber->getStoreId();
+        $storeViewId = $this->getStoreViewIdBySubscriber($subscriber);
         $helper = $this->makeHelper();
-        $isEnabled = $helper->isSubscriptionEnabled($storeId);
+        $isEnabled = $helper->isSubscriptionEnabled($storeViewId);
 
         if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $params = $this->getRequest()->getParams();
-            $helper->saveInterestGroupData($params, $storeId, null, $subscriber);
+            $helper->saveInterestGroupData($params, $storeViewId, null, $subscriber);
 
             $this->createEmailCookie($subscriber);
 
-            if ($helper->isUseMagentoEmailsEnabled($storeId) != 1) {
+            if ($helper->isUseMagentoEmailsEnabled($storeViewId) != 1) {
                 $apiSubscriber = $this->makeApiSubscriber();
+
                 if ($subscriber->getIsStatusChanged()) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
@@ -310,6 +313,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if (!$storeId) {
             $storeId = $customer->getMailchimpStoreView();
         }
+
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
         $params = $this->getRequest()->getParams();
@@ -334,6 +338,7 @@ class Ebizmarts_MailChimp_Model_Observer
                     }
                 }
             }
+
             //update subscriber data if a subscriber with the same email address exists and was not affected.
             if (!$origEmail || $origEmail == $customerEmail) {
                 $apiSubscriber->update($customerEmail);
@@ -393,6 +398,7 @@ class Ebizmarts_MailChimp_Model_Observer
                         $subscriber->setSubscriberFirstname($order->getCustomerFirstname());
                         $subscriber->setSubscriberLastname($order->getCustomerLastname());
                     }
+
                     $subscriber->subscribe($email);
                 }
             }
@@ -559,6 +565,7 @@ class Ebizmarts_MailChimp_Model_Observer
                     'created_at'
                 );
             }
+
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
                 $block->addColumnAfter(
                     'mailchimp_synced_flag',
@@ -696,6 +703,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             $apiOrder->update($order->getEntityId(), $storeId);
         }
+
         return $observer;
     }
 
@@ -1022,12 +1030,15 @@ class Ebizmarts_MailChimp_Model_Observer
             if (!$storeId) {
                 $storeId = $customer->getMailchimpStoreView();
             }
+
             if ($helper->getLocalInterestCategories($storeId) && ($this->getRequest()->getActionName() == 'edit' || $this->getRequest()->getParam('type'))) {
-                $block->addTab('mailchimp', array(
+                $block->addTab(
+                    'mailchimp', array(
                     'label' => $helper->__('MailChimp'),
                     'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
                     'class' => 'ajax'
-                ));
+                    )
+                );
             }
         }
 
@@ -1119,6 +1130,41 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getCatalogProductStatusModel()
     {
         return Mage::getModel('catalog/product_status');
+    }
+
+    /**
+     * @param int $customerId
+     * @return int|null
+     */
+    protected function getStoreViewIdByCustomerId($customerId)
+    {
+        $storeViewId = null;
+        $customer = Mage::getModel("customer/customer")->load($customerId);
+
+        if ($customer->getId() !== null) {
+            $storeViewId = $customer->getMailchimpStoreView();
+        }
+
+        return $storeViewId;
+    }
+
+    /**
+     * @param Mage_Newsletter_Model_Subscriber $subscriber
+     * @return int|null
+     */
+    protected function getStoreViewIdBySubscriber($subscriber)
+    {
+        $storeViewId = $subscriber->getStoreId();
+
+        if ($storeViewId == 0) {
+            $storeViewIdByCustomerId = $this->getStoreViewIdByCustomerId($subscriber->getCustomerId());
+
+            if ($storeViewIdByCustomerId !== null) {
+                $storeViewId = $storeViewIdByCustomerId;
+            }
+        }
+
+        return $storeViewId;
     }
 
 }
