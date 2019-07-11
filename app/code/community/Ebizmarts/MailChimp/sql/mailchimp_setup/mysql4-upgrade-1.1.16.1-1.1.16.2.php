@@ -17,9 +17,10 @@ try {
         ->getCollection()
         ->addFieldToFilter('path', 'mailchimp/general/apikey');
 
+    $mailchimpShards = array('us');
     foreach ($configDataCollection as $data) {
         $dbApiKey = $data->getValue();
-        foreach (Ebizmarts_MailChimp_Model_Config::MAILCHIMP_SHARDS as $shard) {
+        foreach ($mailchimpShards as $shard) {
             if (strpos($dbApiKey, "-$shard") !== false) {
                 list($hash, $server) = explode("-$shard", $dbApiKey);
                 if (is_numeric($server) && strlen($hash) === 32) {
