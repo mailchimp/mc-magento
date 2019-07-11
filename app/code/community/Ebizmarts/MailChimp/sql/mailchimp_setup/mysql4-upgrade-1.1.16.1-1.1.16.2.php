@@ -18,13 +18,16 @@ try {
         ->addFieldToFilter('path', 'mailchimp/general/apikey');
 
     foreach ($configDataCollection as $data) {
-        $encryptedApiKey = Mage::helper('core')->encrypt($data->getValue());
-        $installer->setConfigData(
-            'mailchimp/general/apikey',
-            $encryptedApiKey,
-            $data->getScope(),
-            $data->getScopeId()
-        );
+        $dbApiKey = $data->getValue();
+        if (strpos($dbApiKey, '-us') !== false && strlen($dbApiKey) === 37) {
+            $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
+            $installer->setConfigData(
+                'mailchimp/general/apikey',
+                $encryptedApiKey,
+                $data->getScope(),
+                $data->getScopeId()
+            );
+        }
     }
 
     /* Mandrill migration */
@@ -33,13 +36,16 @@ try {
         ->addFieldToFilter('path', 'mandrill/general/apikey');
 
     foreach ($configDataCollection as $data) {
-        $encryptedApiKey = Mage::helper('core')->encrypt($data->getValue());
-        $installer->setConfigData(
-            'mandrill/general/apikey',
-            $encryptedApiKey,
-            $data->getScope(),
-            $data->getScopeId()
-        );
+        $dbApiKey = $data->getValue();
+        if (strlen($dbApiKey) == 22) {
+            $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
+            $installer->setConfigData(
+                'mandrill/general/apikey',
+                $encryptedApiKey,
+                $data->getScope(),
+                $data->getScopeId()
+            );
+        }
     }
 } catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
