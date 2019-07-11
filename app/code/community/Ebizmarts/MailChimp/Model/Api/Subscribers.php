@@ -107,7 +107,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $counter = 0;
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
-            $cryptmcHelper = md5(strtolower($subscriber->getSubscriberEmail()));
+            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
             //enconde to JSON
@@ -127,7 +127,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
 
                 $subscriberArray[$counter]['method'] = "PUT";
-                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $cryptmcHelper;
+                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $emailHash;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
                 $subscriberArray[$counter]['body'] = $subscriberJson;
 
@@ -228,11 +228,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
 
-            $cryptmcHelper = md5(strtolower($subscriber->getSubscriberEmail()));
+            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
                     $listId,
-                    $cryptmcHelper,
+                    $emailHash,
                     $subscriber->getSubscriberEmail(),
                     $newStatus,
                     null,
@@ -253,7 +253,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
                             $this->_catchMailchompNewstellerConfirm(
-                                $api, $listId, $cryptmcHelper, $mailChimpTags, $subscriber, $interest
+                                $api, $listId, $emailHash, $mailChimpTags, $subscriber, $interest
                             );
                             $saveSubscriber = true;
                         } catch (MailChimp_Error $e) {
@@ -323,7 +323,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @param $api
      * @param $listId
-     * @param $cryptmcHelper
+     * @param $emailHash
      * @param $mailChimpTags
      * @param $subscriber
      * @param $interest
@@ -331,14 +331,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function _catchMailchompNewstellerConfirm(
         $api,
         $listId,
-        $cryptmcHelper,
+        $emailHash,
         $mailChimpTags,
         $subscriber,
         $interest
 ) {
         $helper = $this->getMailchimpHelper();
         $api->getLists()->getMembers()->update(
-            $listId, $cryptmcHelper, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+            $listId, $emailHash, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
         );
         $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
         $message = $helper->__(
@@ -432,8 +432,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $listId = $helper->getGeneralList($storeId);
         try {
             $api = $helper->getApi($storeId);
-            $cryptmcHelper = md5(strtolower($subscriber->getSubscriberEmail()));
-            $api->getLists()->getMembers()->update($listId, $cryptmcHelper, null, 'unsubscribed');
+            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
+            $api->getLists()->getMembers()->update($listId, $emailHash, null, 'unsubscribed');
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {

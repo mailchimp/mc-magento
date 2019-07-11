@@ -1015,7 +1015,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function getCurrentDate()
     {
-        return Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s");
+        return $this->getHelper()->formatDate(null, "Y-m-d H:i:s");
 
     }
 

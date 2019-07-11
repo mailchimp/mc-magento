@@ -358,7 +358,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //variants
             if (!empty($variants)) {
-                $this->_processVariants($variants);
+                $this->_processVariants($variants, $product, $magentoStoreId);
             }
         }
 
@@ -367,9 +367,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * @param $variants
+     * @param $product
+     * @param $magentoStoreId
      * @throws Mage_Core_Exception
      */
-    protected function _processVariants($variants)
+    protected function _processVariants($variants, $product, $magentoStoreId)
     {
         $data["variants"] = array();
         if (isset($data["image_url"])) {
@@ -381,7 +383,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $this->_parentUrl = $data['url'];
         }
 
-        $price = $this->getMailchimpFinalPrice($product);
+        $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
         if ($price) {
             $this->_parentPrice = $price;
         }
@@ -1158,7 +1160,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function getCurrentDate()
     {
-        return Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s");
+        return $this->getMailChimpHelper()->formatDate(null, "Y-m-d H:i:s");
     }
 
     /**
@@ -1215,17 +1217,18 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * Return price with tax if setting enabled.
      *
      * @param $product
+     * @param $magentoStoreId
      * @return float \ return the price of the product
      * @throws Mage_Core_Exception
      */
-    protected function getMailchimpFinalPrice($product)
+    protected function getMailchimpFinalPrice($product, $magentoStoreId)
     {
         $helper = $this->getMailChimpHelper();
         $price = Mage::helper('tax')
             ->getPrice(
                 $product,
                 $product->getFinalPrice(),
-                $helper->isIncludeTaxesEnabled()
+                $helper->isIncludeTaxesEnabled($magentoStoreId)
             );
 
         return $price;

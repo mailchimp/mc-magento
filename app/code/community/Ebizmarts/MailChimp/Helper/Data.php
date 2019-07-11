@@ -4665,7 +4665,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getCurrentDateTime()
     {
-        return Mage::getModel('core/date')->gmtDate('d-m-Y H:i:s');
+        return $this->formatDate(null, 'd-m-Y H:i:s');
     }
 
     /**
@@ -4765,12 +4765,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @return bool \ return true if is enabled include the taxes in the price of the products.
      * @throws Mage_Core_Exception
      */
-    public function isIncludeTaxesEnabled()
+    public function isIncludeTaxesEnabled($scopeId = 0, $scope = 'default')
     {
         return $this->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::ECOMMERCE_XML_INCLUDE_TAXES,
-            0,
-            'default'
+            $scopeId,
+            $scope
         );
     }
 
@@ -4928,12 +4928,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function formatDate($date = null, $format = 'Y-m-d', $avoidOffset = 1)
     {
-        if ($date !== null) {
-            $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp($date);
-        } else {
-            $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp();
-        }
-
+        $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp($date);
         $currentTimestamp = Mage::getModel('core/date')->timestamp($gmtTimestamp);
         if ($avoidOffset) {
             $currentTimestamp = $this->avoidTimeZoneOffset($currentTimestamp);

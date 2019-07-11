@@ -23,6 +23,12 @@ class Ebizmarts_MailChimp_Model_Mysql4_Interestgroup extends Mage_Core_Model_Mys
         $this->_init('mailchimp/interestgroup', 'id');
     }
 
+    /**
+     * @param int $customerId
+     * @param int $subscriberId
+     * @param int $storeId
+     * @return array
+     */
     public function getByRelatedIdStoreId($customerId = 0, $subscriberId = 0, $storeId = 0)
     {
         $read = $this->_getReadAdapter();

@@ -191,9 +191,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
         $eventValue = null;
 
-        if ($attributeCode == 'email') {
-            return $eventValue;
-        } else {
+        if ($attributeCode != 'email') {
             $this->_addTags($attributeCode, $subscriber, $customer, $key, $attribute);
         }
 

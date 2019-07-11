@@ -210,6 +210,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
+    /**
+     * @param array $data
+     * @throws Mage_Core_Exception
+     */
     public function _profile(array $data)
     {
         $helper = $this->getHelper();
@@ -262,6 +266,14 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
+    /**
+     * @param $subscriber
+     * @param $fname
+     * @param $lname
+     * @param $email
+     * @param $listId
+     * @throws Exception
+     */
     protected function _addSubscriberData($subscriber, $fname, $lname, $email, $listId)
     {
         $helper = $this->getHelper();

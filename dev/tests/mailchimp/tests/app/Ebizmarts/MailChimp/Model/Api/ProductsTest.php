@@ -455,7 +455,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             $newProductId
         );
 
-        $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
+        $productsApiMock->expects($this->exactly(2))->method('getMailChimpHelper')->willReturn($helperMock);
 
         $productsApiMock->expects($this->exactly(2))
             ->method('isProductEnabled')

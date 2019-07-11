@@ -155,7 +155,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     $this->_updateSyncData(
                         $codeId,
                         $mailchimpStoreId,
-                        Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s"),
+                        $helper->formatDate(null, "Y-m-d H:i:s"),
                         $error
                     );
                     continue;

@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
             $configValues = array(
                 array(
                     Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
-                    Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s")
+                    $helper->formatDate(null, "Y-m-d H:i:s")
                 )
             );
             $helper->saveMailchimpConfig($configValues, $scopeId, $scope);

@@ -110,6 +110,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         return true;
     }
 
+    /**
+     * @param $emails
+     * @param $name
+     * @return array
+     */
     protected function _getEmailsNames($emails, $name)
     {
         $names = is_array($name) ? $name : (array)$name;
@@ -123,6 +128,12 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         return $names;
     }
 
+    /**
+     * @param $emails
+     * @param $names
+     * @param $mail
+     * @return array
+     */
     protected function _getEmailsTo($emails, $names, $mail)
     {
         $to = array();
@@ -151,6 +162,10 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         return $to;
     }
 
+    /**
+     * @param $mail
+     * @return mixed
+     */
     protected function _getEmailFrom($mail)
     {
         $fromEmail = $this->getSenderEmail();
@@ -172,6 +187,10 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         return $fromEmail;
     }
 
+    /**
+     * @param $variables
+     * @return array|null
+     */
     protected function _getEmailsTags($variables)
     {
         $tags = null;
