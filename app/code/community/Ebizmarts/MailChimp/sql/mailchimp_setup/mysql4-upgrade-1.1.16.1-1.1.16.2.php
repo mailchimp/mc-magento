@@ -19,14 +19,19 @@ try {
 
     foreach ($configDataCollection as $data) {
         $dbApiKey = $data->getValue();
-        if (strpos($dbApiKey, '-us') !== false && strlen($dbApiKey) === 37) {
-            $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
-            $installer->setConfigData(
-                'mailchimp/general/apikey',
-                $encryptedApiKey,
-                $data->getScope(),
-                $data->getScopeId()
-            );
+        foreach (Ebizmarts_MailChimp_Model_Config::MAILCHIMP_SHARDS as $shard) {
+            if (strpos($dbApiKey, "-$shard") !== false) {
+                list($hash, $server) = explode("-$shard", $dbApiKey);
+                if (is_numeric($server) && strlen($hash) === 32) {
+                    $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
+                    $installer->setConfigData(
+                        'mailchimp/general/apikey',
+                        $encryptedApiKey,
+                        $data->getScope(),
+                        $data->getScopeId()
+                    );
+                }
+            }
         }
     }
 
