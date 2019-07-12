@@ -98,50 +98,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $promoCodesApiMock->markAsDeleted(self::PROMOCODE_ID, $promoRuleId);
     }
 
-    public function testDeletePromoCodesSyncDataByRule()
-    {
-        $promoRuleId = 1;
-        $promoCodesIds = array();
-        $syncDataItems = array();
-
-        $promoCodesApiMock = $this->promoCodesApiMock
-            ->setMethods(array('getPromoCodesForRule', 'getMailChimpHelper'))
-            ->getMock();
-
-        $promoRuleMock = $this->getMockBuilder(Mage_SalesRule_Model_Rule::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getRelatedId'))
-            ->getMock();
-
-        $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getAllEcommerceSyncDataItemsPerId'))
-            ->getMock();
-
-        $syncDataItemCollectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('delete'))
-            ->getMock();
-
-        $promoRuleMock->expects($this->once())->method('getRelatedId')->willReturn($promoRuleId);
-
-        $promoCodesIds[] = self::PROMOCODE_ID;
-        $promoCodesApiMock->expects($this->once())->method('getPromoCodesForRule')->with($promoRuleId)->willReturn($promoCodesIds);
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
-
-        $mailChimpHelperMock->expects($this->once())->method('getAllEcommerceSyncDataItemsPerId')->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)->willReturn($syncDataItemCollectionMock);
-        $syncDataItems[] = $syncDataItemMock;
-        $syncDataItemCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($syncDataItems));
-
-        $syncDataItemMock->expects($this->once())->method('delete');
-
-        $promoCodesApiMock->deletePromoCodesSyncDataByRule($promoRuleMock);
-    }
-
     public function testDeletePromoCodeSyncData()
     {
         $promoCodesApiMock = $this->promoCodesApiMock
