@@ -778,7 +778,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
-                        Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s"),
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $error,
                         0,
                         0

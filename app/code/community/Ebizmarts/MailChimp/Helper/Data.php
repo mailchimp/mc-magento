@@ -2093,7 +2093,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $dateHelper = $this->getDateHelper();
 
-        $initialTime = Mage::getSingleton('core/date')->timestamp();
+        $initialTime = $dateHelper->getTimestamp();
         $migrateFrom115 = $this->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
             0,

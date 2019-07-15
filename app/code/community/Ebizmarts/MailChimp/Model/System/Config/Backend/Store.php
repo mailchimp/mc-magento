@@ -16,6 +16,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
     protected function _afterSave()
     {
         $helper = $this->makeHelper();
+        $dateHelper = $this->makeDateHelper();
+        
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
         $groups = $this->getData('groups');
@@ -33,7 +35,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
                 $configValues = array(
                     array(
                         Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$newMailchimpStoreId",
-                        Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s")
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     )
                 );
                 $helper->saveMailchimpConfig($configValues, 0, 'default');
@@ -57,6 +59,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function makeDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
     }
 
     /**

@@ -69,6 +69,14 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
+    }
+
+    /**
      * @return Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function getApiSubscriber()
@@ -109,10 +117,10 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     protected function getCurrentDateTime()
     {
-        return Mage::getSingleton('core/date')->gmtDate('d-m-Y H:i:s');
+        return $this->getDateHelper()->formatDate(null, 'd-m-Y H:i:s');
     }
 }

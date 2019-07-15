@@ -72,7 +72,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     public function formatDate($date = null, $format = 'Y-m-d', $avoidOffset = 1)
     {
         $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp($date);
-        $currentTimestamp = Mage::getModel('core/date')->timestamp($gmtTimestamp);
+        $currentTimestamp = $this->getTimestamp($gmtTimestamp);
         if ($avoidOffset) {
             $currentTimestamp = $this->avoidTimeZoneOffset($currentTimestamp);
         }
@@ -91,5 +91,14 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
         $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
         $offSet   = Mage::getModel('core/date')->calculateOffset($timeZone);
         return ($timestamp + $offSet);
+    }
+
+    /**
+     * @param null $time
+     * @return string
+     */
+    protected function getTimestamp($time = null)
+    {
+        return Mage::getModel('core/date')->timestamp($time);
     }
 }

@@ -505,13 +505,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      */
     protected function setCodeWithParentError($mailchimpStoreId, $ruleId, $codeId)
     {
+        $dateHelper = $this->getMailChimpDateHelper();
         $error = Mage::helper('mailchimp')->__(
             'Parent rule with id ' . $ruleId . ' has not been correctly sent.'
         );
         $this->_updateSyncData(
             $codeId,
             $mailchimpStoreId,
-            Mage::getSingleton('core/date')->gmtDate("Y-m-d H:i:s"),
+            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
             $error
         );
     }
