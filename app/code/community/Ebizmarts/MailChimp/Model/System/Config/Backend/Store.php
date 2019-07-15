@@ -17,7 +17,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
     {
         $helper = $this->makeHelper();
         $dateHelper = $this->makeDateHelper();
-        
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
         $groups = $this->getData('groups');
