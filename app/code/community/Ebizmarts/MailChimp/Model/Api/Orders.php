@@ -68,6 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function _getModifiedOrders($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
         $batchArray = array();
         $modifiedOrders = $this->getResourceModelOrderCollection();
@@ -112,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
-                        $helper->formatDate(null, "Y-m-d H:i:s"),
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $error,
                         0,
                         0
@@ -136,6 +137,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function _getNewOrders($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getHelper();
 
         $batchArray = array();
         $newOrders = $this->getResourceModelOrderCollection();
@@ -177,7 +179,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
-                        $helper->formatDate(null, "Y-m-d H:i:s"),
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $error,
                         0,
                         0

@@ -21,6 +21,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
     public function send()
     {
         $mageMCHelper = Mage::helper('mailchimp');
+        $mageMCDateHelper = Mage::helper('mailchimp/date');
 
         /**
  * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection
@@ -48,7 +49,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
 
                     try {
                         $this->_sendMandrillEnabled($message, $parameters, $storeId);
-                        $message->setProcessedAt($mageMCHelper->formatDate(null, 'Y-m-d H:i:s'));
+                        $message->setProcessedAt($mageMCDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                         $message->save();
                     } catch (Exception $e) {
                         Mage::logException($e);
@@ -61,7 +62,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     }
 
                     $this->_sendMandrillNotEnabled($message, $parameters);
-                    $message->setProcessedAt($mageMCHelper->formatDate(null, 'Y-m-d H:i:s'));
+                    $message->setProcessedAt($mageMCDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                     $message->save();
                 }
             }

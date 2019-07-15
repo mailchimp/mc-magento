@@ -825,6 +825,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailChimpDateHelper()
+    {
+        return $this->_mailchimpDateHelper;
+    }
+
+    /**
      * This function will perform the join of the collection with the table
      * mailchimp_ecommerce_sync_data when the programcreates the batch json
      * to send the product data to mailchimp
@@ -1162,7 +1170,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function getCurrentDate()
     {
-        return $this->getMailChimpHelper()->formatDate(null, "Y-m-d H:i:s");
+        return $this->getMailChimpDateHelper()->formatDate(null, "Y-m-d H:i:s");
     }
 
     /**
@@ -1269,7 +1277,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_from_date',
-            array('lteq' => $this->_mailchimpHelper->formatDate() . " 23:59:59"),
+            array('lteq' => $this->_mailchimpDateHelper->formatDate() . " 23:59:59"),
             'left'
         )->addAttributeToFilter(
             'special_from_date',
@@ -1280,7 +1288,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $whereCondition = $connection->quoteInto(
             'm4m.mailchimp_sync_delta IS NOT NULL '
                 . 'AND m4m.mailchimp_sync_delta < ?',
-            $this->_mailchimpHelper->formatDate() . " 00:00:00"
+            $this->_mailchimpDateHelper->formatDate() . " 00:00:00"
         );
         $collection->getSelect()->where($whereCondition);
 
@@ -1301,7 +1309,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_to_date',
-            array('lt' => $this->_mailchimpHelper->formatDate() . " 00:00:00"),
+            array('lt' => $this->_mailchimpDateHelper->formatDate() . " 00:00:00"),
             'left'
         )->addAttributeToFilter(
             'special_to_date',

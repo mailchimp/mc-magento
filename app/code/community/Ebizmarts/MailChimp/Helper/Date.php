@@ -54,7 +54,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     /**
      * @return string
      */
-    protected function getCurrentDateTime()
+    protected function getCurrentaDateTime()
     {
 
         return $this->formatDate(null, 'd-m-Y H:i:s');

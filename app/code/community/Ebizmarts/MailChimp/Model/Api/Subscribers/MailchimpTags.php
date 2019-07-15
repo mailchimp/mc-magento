@@ -34,6 +34,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected $_mcHelper;
     /**
+     * @var Ebizmarts_MailChimp_Helper_Date
+     */
+    protected $_mcDateHelper;
+    /**
      * @var Mage_Sales_Model_Order
      */
     protected $_lastOrder;
@@ -41,6 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     public function __construct()
     {
         $this->setMailChimpHelper();
+        $this->setMailChimpDateHelper();
     }
 
     /**
@@ -526,7 +531,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function getDateOfBirth($attributeCode, $customer)
     {
-        return $this->getMailchimpHelper()->formatDate(
+        return $this->getMailchimpDateHelper()->formatDate(
             $this->getCustomerGroupLabel($attributeCode, $customer),
             'm/d', 1
         );
@@ -610,6 +615,22 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     protected function setMailChimpHelper()
     {
         $this->_mcHelper = Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    public function getMailchimpDateHelper()
+    {
+        return $this->_mcDateHelper;
+    }
+
+    /**
+     * @param $mageMCDateHelper
+     */
+    protected function setMailChimpDateHelper()
+    {
+        $this->_mcDateHelper = Mage::helper('mailchimp/date');
     }
 
     /**

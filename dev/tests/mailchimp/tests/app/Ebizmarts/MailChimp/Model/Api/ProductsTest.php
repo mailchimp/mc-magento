@@ -387,7 +387,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->setMethods(
                 array('makeBatchId', '_updateSyncData', 'loadProductById', 'getMailChimpHelper',
                     'isGroupedProduct', 'isBundleProduct', '_buildUpdateProductRequest',
-                    '_buildNewProductRequest', 'isProductEnabled'
+                    '_buildNewProductRequest', 'isProductEnabled', 'getMailChimpDateHelper'
                 )
             )
             ->getMock();
@@ -420,6 +420,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getEcommerceSyncDataItem', 'getEcommMinSyncDateFlag'))
+            ->getMock();
+
+        $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
@@ -455,7 +459,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             $newProductId
         );
 
-        $productsApiMock->expects($this->exactly(2))->method('getMailChimpHelper')->willReturn($helperMock);
+        $productsApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
+        $productsApiMock->expects($this->once())->method('getMailChimpDateHelper')->willReturn($dateHelperMock);
 
         $productsApiMock->expects($this->exactly(2))
             ->method('isProductEnabled')

@@ -20,6 +20,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
 
     protected $_batchId;
     protected $_mailchimpHelper;
+    protected $_mailchimpDateHelper;
     /**
      * @var Ebizmarts_MailChimp_Model_Api_PromoRules
      */
@@ -28,6 +29,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     public function __construct()
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
+        $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
     }
 
     /**
@@ -83,6 +85,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     {
         $batchArray = array();
         $helper = $this->getMailChimpHelper();
+        $dateHelper = $this->getMailChimpDateHelper();
         $newPromoCodes = $this->makePromoCodesCollection($magentoStoreId);
 
         $this->joinMailchimpSyncDataWithoutWhere($newPromoCodes, $mailchimpStoreId);
@@ -155,7 +158,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     $this->_updateSyncData(
                         $codeId,
                         $mailchimpStoreId,
-                        $helper->formatDate(null, "Y-m-d H:i:s"),
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $error
                     );
                     continue;
@@ -314,6 +317,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     protected function getMailChimpHelper()
     {
         return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailChimpDateHelper()
+    {
+        return $this->_mailchimpDateHelper;
     }
 
     protected function addWebsiteColumn($collection)

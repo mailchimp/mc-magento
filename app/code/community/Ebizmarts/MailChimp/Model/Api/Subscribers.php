@@ -79,7 +79,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $configValues = array(
                 array(
                     Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
-                    $this->_mcHelper->formatDate(null, 'Y-m-d H:i:s')
+                    $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s')
                 )
             );
             $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
@@ -136,7 +136,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $subscriberArray[$counter]['body'] = $subscriberJson;
 
                 //update subscribers delta
-                $subscriber->setData("mailchimp_sync_delta", $this->_mcHelper->formatDate(null, 'Y-m-d H:i:s'));
+                $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
@@ -247,7 +247,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     null,
                     null
                 );
-                $subscriber->setData("mailchimp_sync_delta", $this->_mcHelper->formatDate(null, 'Y-m-d H:i:s'));
+                $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $saveSubscriber = true;

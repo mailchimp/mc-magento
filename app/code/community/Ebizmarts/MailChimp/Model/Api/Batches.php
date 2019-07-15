@@ -19,6 +19,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected $_mailchimpHelper;
 
     /**
+     * @var Ebizmarts_MailChimp_Helper_Date
+     */
+    protected $_mailchimpDateHelper;
+
+    /**
      * @var Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected $_apiCustomers;
@@ -61,6 +66,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function __construct()
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
+        $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
         $this->_apiCustomers = Mage::getModel('mailchimp/api_customers');
         $this->_apiProducts = Mage::getModel('mailchimp/api_products');
         $this->_apiCarts = Mage::getModel('mailchimp/api_carts');
@@ -77,6 +83,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function getHelper()
     {
         return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getDateHelper()
+    {
+        return $this->_mailchimpDateHelper;
     }
 
     /**
@@ -427,6 +441,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _updateSyncingFlag($customerAmount, $productAmount, $orderAmount,$mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
         $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
         if ($this->shouldFlagAsSyncing(
@@ -447,7 +462,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $configValue = array(
                     array(
                         Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId",
-                        $helper->formatDate(null, 'Y-m-d H:i:s')
+                        $dateHelper->formatDate(null, 'Y-m-d H:i:s')
                     )
                 );
                 $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
@@ -475,6 +490,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function markItemsAsSent($batchResponseId, $mailchimpStoreId)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $resource = $helper->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
@@ -483,7 +499,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $tableName,
             array(
                 'batch_id' => $batchResponseId,
-                'mailchimp_sync_delta' => $this->getCurrentDate()
+                'mailchimp_sync_delta' => $dateHelper->getCurrentDate()
             ),
             $where
         );
@@ -1008,15 +1024,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
         }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getCurrentDate()
-    {
-        return $this->getHelper()->formatDate(null, "Y-m-d H:i:s");
-
     }
 
     /**
