@@ -1,5 +1,4 @@
 <?php
-
 /**
  * mailchimp-lib Magento Component
  *
@@ -12,6 +11,8 @@
 
 class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 {
+    const GENDER_VALUE_MALE = 1;
+    const GENDER_VALUE_FEMALE = 2;
 
     /**
      * @var int
@@ -115,11 +116,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
     /**
      * @param $key
-     * @return mixed
+     * @return mixed|null
      */
     public function getMailChimpTagValue($key)
     {
-        return $this->_mailChimpTags[$key];
+        $mailchimpTagValue = null;
+
+        if (isset($this->_mailChimpTags[$key])) {
+            $mailchimpTagValue = $this->_mailChimpTags[$key];
+        }
+
+        return $mailchimpTagValue;
     }
 
     /**

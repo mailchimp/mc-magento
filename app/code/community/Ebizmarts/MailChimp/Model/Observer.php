@@ -227,19 +227,20 @@ class Ebizmarts_MailChimp_Model_Observer
     public function subscriberSaveAfter(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getEvent()->getSubscriber();
-        $storeId = $subscriber->getStoreId();
+        $storeViewId = $this->getStoreViewIdBySubscriber($subscriber);
         $helper = $this->makeHelper();
-        $isEnabled = $helper->isSubscriptionEnabled($storeId);
+        $isEnabled = $helper->isSubscriptionEnabled($storeViewId);
 
         if ($isEnabled
             && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $params = $this->getRequest()->getParams();
-            $helper->saveInterestGroupData($params, $storeId, null, $subscriber);
+            $helper->saveInterestGroupData($params, $storeViewId, null, $subscriber);
 
             $this->createEmailCookie($subscriber);
 
-            if ($helper->isUseMagentoEmailsEnabled($storeId) != 1) {
+            if ($helper->isUseMagentoEmailsEnabled($storeViewId) != 1) {
                 $apiSubscriber = $this->makeApiSubscriber();
+
                 if ($subscriber->getIsStatusChanged()) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
@@ -1193,6 +1194,41 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getCatalogProductStatusModel()
     {
         return Mage::getModel('catalog/product_status');
+    }
+
+    /**
+     * @param int $customerId
+     * @return int|null
+     */
+    protected function getStoreViewIdByCustomerId($customerId)
+    {
+        $storeViewId = null;
+        $customer = Mage::getModel("customer/customer")->load($customerId);
+
+        if ($customer->getId() !== null) {
+            $storeViewId = $customer->getMailchimpStoreView();
+        }
+
+        return $storeViewId;
+    }
+
+    /**
+     * @param Mage_Newsletter_Model_Subscriber $subscriber
+     * @return int|null
+     */
+    protected function getStoreViewIdBySubscriber($subscriber)
+    {
+        $storeViewId = $subscriber->getStoreId();
+
+        if ($storeViewId == 0) {
+            $storeViewIdByCustomerId = $this->getStoreViewIdByCustomerId($subscriber->getCustomerId());
+
+            if ($storeViewIdByCustomerId !== null) {
+                $storeViewId = $storeViewIdByCustomerId;
+            }
+        }
+
+        return $storeViewId;
     }
 
 }
