@@ -66,12 +66,17 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
                 ->disableOriginalConstructor()
-                ->setMethods(array('makeHelper', 'getAdminSession', 'addStore'))
+                ->setMethods(array('makeHelper', 'getAdminSession', 'addStore', 'makeDateHelper'))
                 ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getDateMicrotime', 'getApiByKey', 'getMageApp', 'saveMailchimpConfig'))
+            ->setMethods(array('getApiByKey', 'getMageApp', 'saveMailchimpConfig'))
+            ->getMock();
+
+        $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDateMicrotime'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -94,8 +99,9 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $apiStoresMock->expects($this->once())->method('makeDateHelper')->willReturn($helperDateMock);
 
-        $helperMock->expects($this->once())->method('getDateMicrotime')->willReturn($date);
+        $helperDateMock->expects($this->once())->method('getDateMicrotime')->willReturn($date);
         $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
 

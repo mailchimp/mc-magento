@@ -24,6 +24,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
      */
     protected $_mailchimpHelper;
     /**
+     * @var Ebizmarts_MailChimp_Helper_Date
+     */
+    protected $_mailchimpDateHelper;
+    /**
      * @var Ebizmarts_MailChimp_Model_Api_PromoCodes
      */
     protected $_promoCodes;
@@ -31,6 +35,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     public function __construct()
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
+        $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
         $this->_promoCodes = Mage::getModel('mailchimp/api_promoCodes');
     }
 
@@ -45,7 +50,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $this->_batchId = 'storeid-'
             . $magentoStoreId . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_'
-            . $this->getMailChimpHelper()->getDateMicrotime();
+            . $this->getMailChimpDateHelper()->getDateMicrotime();
         $batchArray = array_merge($batchArray, $this->_getModifiedAndDeletedPromoRules($mailchimpStoreId));
 
         return $batchArray;
@@ -86,6 +91,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         $promoData = array();
         $promoRule = $this->getPromoRule($ruleId);
         $helper = $this->getMailChimpHelper();
+        $dateHelper = $this->getMailChimpDateHelper();
         try {
             $ruleData = $this->generateRuleData($promoRule);
             $promoRuleJson = json_encode($ruleData);
@@ -95,7 +101,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 $promoData['operation_id'] = 'storeid-'
                     . $magentoStoreId . '_'
                     . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_'
-                    . $helper->getDateMicrotime() . '_' . $ruleId;
+                    . $dateHelper->getDateMicrotime() . '_' . $ruleId;
                 $promoData['body'] = $promoRuleJson;
                 //update promo rule delta
                 $this->_updateSyncData($ruleId, $mailchimpStoreId);
@@ -312,6 +318,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     protected function getMailChimpHelper()
     {
         return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailChimpDateHelper()
+    {
+        return $this->_mailchimpDateHelper;
     }
 
     /**

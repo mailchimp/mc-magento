@@ -29,6 +29,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     {
         /** @var Ebizmarts_MailChimp_Helper_Data $helper */
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $allCarts = array();
         if (!$helper->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
@@ -37,7 +38,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $this->_firstDate = $helper->getAbandonedCartFirstDate($magentoStoreId);
         $this->setCounter(0);
 
-        $date = $helper->getDateMicrotime();
+        $date = $dateHelper->getDateMicrotime();
         $this->setBatchId(
             'storeid-'
             . $magentoStoreId . '_'
@@ -672,6 +673,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function getHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
     }
 
     /**

@@ -36,11 +36,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
-            'getHelper',
-            '_getConvertedQuotes',
-            '_getModifiedQuotes',
-            '_getNewQuotes',
-            'setBatchId'
+                'getHelper',
+                '_getConvertedQuotes',
+                '_getModifiedQuotes',
+                '_getNewQuotes',
+                'setBatchId',
+                'getDateHelper'
             )
         )
             ->getMock();
@@ -50,14 +51,19 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 array(
                     'isAbandonedCartEnabled',
                     'getAbandonedCartFirstDate',
-                    'getDateMicrotime',
                     'getResendTurn'
                 )
             )
             ->getMock();
 
+        $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDateMicrotime'))
+            ->getMock();
+
         $cartsApiMock->expects($this->once())->method('setBatchId')->with(self::BATCH_ID);
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($helperDateMock);
         $cartsApiMock
             ->expects($this->once())
             ->method('_getConvertedQuotes')
@@ -83,7 +89,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('getAbandonedCartFirstDate')
             ->with(self::MAGENTO_STORE_ID)
             ->willReturn('00-00-00 00:00:00');
-        $helperMock->expects($this->once())->method('getDateMicrotime')->willReturn(self::DATE);
+        $helperDateMock->expects($this->once())->method('getDateMicrotime')->willReturn(self::DATE);
         $helperMock->expects($this->once())->method('getResendTurn')->with(self::MAGENTO_STORE_ID)->willReturn(null);
 
         $cartsApiMock->createBatchJson(self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID);

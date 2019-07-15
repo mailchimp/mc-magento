@@ -26,6 +26,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @var Ebizmarts_MailChimp_Helper_Data
      */
     protected $_mailchimpHelper;
+    protected $_mailchimpDateHelper;
     protected $_visibilityOptions;
     protected $_productTypeConfigurableResource;
     public static $noChildrenIds = array(0 => array());
@@ -39,6 +40,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'catalog/product_type_configurable'
         );
         $this->_mailchimpHelper = Mage::helper('mailchimp');
+        $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
         $this->_visibilityOptions = Mage::getModel('catalog/product_visibility')->getOptionArray();
     }
 
@@ -573,7 +575,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function makeBatchId($magentoStoreId)
     {
         $batchId = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
-        $batchId .= '_' . Mage::helper('mailchimp')->getDateMicrotime();
+        $batchId .= '_' . $this->_mailchimpDateHelper->getDateMicrotime();
 
         return $batchId;
     }

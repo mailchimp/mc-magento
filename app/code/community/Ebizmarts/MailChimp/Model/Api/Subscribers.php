@@ -20,12 +20,15 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * Ebizmarts_MailChimp_Helper_Data
      */
     protected $_mcHelper;
+    protected $_mcDateHelper;
     protected $_storeId;
 
     public function __construct()
     {
         $mageMCHelper = Mage::helper('mailchimp');
         $this->setMailchimpHelper($mageMCHelper);
+        $mageMCDateHelper = Mage::helper('mailchimp/date');
+        $this->setMailchimpDateHelper($mageMCDateHelper);
     }
 
     /**
@@ -56,6 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         $this->setStoreId($storeId);
         $helper = $this->getMailchimpHelper();
+        $dateHelper = $this->getMailchimpDateHelper();
         $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
             $this->getStoreId()
@@ -101,7 +105,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             );
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
         $collection->getSelect()->limit($limit);
-        $date = $helper->getDateMicrotime();
+        $date = $dateHelper->getDateMicrotime();
         $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
 
         $counter = 0;
@@ -495,6 +499,22 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function getMailchimpHelper()
     {
         return $this->_mcHelper;
+    }
+
+    /**
+     * @param $mageMCDateHelper
+     */
+    public function setMailchimpDateHelper($mageMCDateHelper)
+    {
+        $this->_mcDateHelper = $mageMCDateHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailchimpDateHelper()
+    {
+        return $this->_mcDateHelper;
     }
 
     /**

@@ -39,13 +39,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $batchArray = array();
         $this->_firstDate = $helper->getEcommerceFirstDate($magentoStoreId);
         $this->_counter = 0;
         $this->_batchId = 'storeid-'
             . $magentoStoreId . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_ORDER
-            . '_' . $helper->getDateMicrotime();
+            . '_' . $dateHelper->getDateMicrotime();
         $resendTurn = $helper->getResendTurn($magentoStoreId);
         if (!$resendTurn) {
             // get all the orders modified
@@ -819,6 +820,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function getHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
     }
 
     /**

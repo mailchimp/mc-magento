@@ -41,7 +41,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         $address
     ) {
         $helper = $this->makeHelper();
-        $date = $helper->getDateMicrotime();
+        $dateHelper = $this->makeDateHelper();
+        $date = $dateHelper->getDateMicrotime();
         $mailchimpStoreId = md5($storeName . '_' . $date);
 
         try {
@@ -262,6 +263,14 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Dat3
+     */
+    protected function makeDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
     }
 
     /**

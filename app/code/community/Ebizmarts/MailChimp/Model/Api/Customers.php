@@ -18,6 +18,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @var Ebizmarts_MailChimp_Helper_Data
      */
     protected $_mailchimpHelper;
+    protected $_mailchimpDateHelper;
     protected $_optInConfiguration;
     protected $_optInStatusForStore;
     protected $_locale;
@@ -29,6 +30,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function __construct()
     {
         $this->_mailchimpHelper = $this->makeHelper();
+        $this->_mailchimpDateHelper = $this->makeDateHelper();
         $this->_optInConfiguration = array();
         $this->_locale = Mage::app()->getLocale();
         $this->_directoryRegionModel = Mage::getModel('directory/region');
@@ -314,7 +316,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $this->_batchId = "storeid-{$this->getBatchMagentoStoreId()}_";
         $this->_batchId .= Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_';
-        $this->_batchId .= $this->_mailchimpHelper->getDateMicrotime();
+        $this->_batchId .= $this->_mailchimpDateHelper->getDateMicrotime();
     }
 
     /**
@@ -526,5 +528,21 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function getMailChimpHelper()
     {
         return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function makeDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailChimpDateHelper()
+    {
+        return $this->_mailchimpDateHelper;
     }
 }

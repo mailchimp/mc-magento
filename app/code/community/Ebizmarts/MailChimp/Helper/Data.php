@@ -1483,21 +1483,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * get Date with Microtime.
-     *
-     * @return string
-     */
-    public function getDateMicrotime()
-    {
-        $microtime = explode(' ', microtime());
-        $msec = $microtime[0];
-        $msecArray = explode('.', $msec);
-        $time = $this->formatDate(null, 'Y-m-d-H-i-s');
-        $date = $time . '-' . $msecArray[1];
-        return $date;
-    }
-
-    /**
      * Get Api object for given scope.
      *
      * @param $scopeId
@@ -4661,7 +4646,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     protected function getCurrentDateTime()
     {

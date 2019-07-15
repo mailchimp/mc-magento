@@ -41,7 +41,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $this->_batchId = 'storeid-'
             . $magentoStoreId . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE . '_'
-            . Mage::helper('mailchimp')->getDateMicrotime();
+            . Mage::helper('mailchimp/date')->getDateMicrotime();
         $batchArray = array_merge($batchArray, $this->_getDeletedPromoCodes($mailchimpStoreId));
         $batchArray = array_merge($batchArray, $this->_getNewPromoCodes($mailchimpStoreId, $magentoStoreId));
 
