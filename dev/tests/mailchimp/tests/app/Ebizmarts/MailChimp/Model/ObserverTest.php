@@ -756,7 +756,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $helperMock
             ->expects($this->once())
             ->method('saveInterestGroupData')
-            ->with($params, $storeId, null, $subscriberMock);
+            ->with($params, $storeViewId, null, $subscriberMock);
 
         $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
 
