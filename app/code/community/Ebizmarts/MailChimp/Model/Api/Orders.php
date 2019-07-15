@@ -717,6 +717,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     public function replaceAllOrdersBatch($initialTime, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $this->_counter = 0;
         $this->_batchId = 'storeid-'
             . $magentoStoreId . '_'
@@ -753,7 +754,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             //Delete order
             $orderId = $order->getEntityId();
             $config = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID, $orderId));
-            if (!$helper->timePassed($initialTime)) {
+            if (!$dateHelper->timePassed($initialTime)) {
                 $batchArray[$this->_counter]['method'] = "DELETE";
                 $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $orderId;
                 $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;

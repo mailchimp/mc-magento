@@ -2091,6 +2091,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function handleMigrationUpdates()
     {
+        $dateHelper = $this->getDateHelper();
+
         $initialTime = Mage::getSingleton('core/date')->timestamp();
         $migrateFrom115 = $this->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
@@ -2110,9 +2112,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($migrateFrom115) {
             $this->_migrateFrom115($initialTime);
-        } elseif ($migrateFrom116 && !$this->timePassed($initialTime)) {
+        } elseif ($migrateFrom116 && !$dateHelper->timePassed($initialTime)) {
             $this->_migrateFrom116($initialTime);
-        } elseif ($migrateFrom1164 && !$this->timePassed($initialTime)) {
+        } elseif ($migrateFrom1164 && !$dateHelper->timePassed($initialTime)) {
             $this->_migrateFrom1164($initialTime);
         }
     }
@@ -2125,6 +2127,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom115($initialTime)
     {
+        $dateHelper = $this->getDateHelper();
         $arrayMigrationConfigData = array('115' => true, '116' => false, '1164' => false);
         //migrate data from older version to the new schemma
         if ($this->isEcommerceEnabled(0)) {
@@ -2133,13 +2136,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             //migrate customers
             $this->_migrateCustomersFrom115($mailchimpStoreId, $initialTime);
 
-            if (!$this->timePassed($initialTime)) {
+            if (!$dateHelper->timePassed($initialTime)) {
                 //migrate products
                 $this->_migrateProductsFrom115($mailchimpStoreId, $initialTime);
-                if (!$this->timePassed($initialTime)) {
+                if (!$dateHelper->timePassed($initialTime)) {
                     //migrate orders
                     $this->_migrateOrdersFrom115($mailchimpStoreId, $initialTime);
-                    if (!$this->timePassed($initialTime)) {
+                    if (!$dateHelper->timePassed($initialTime)) {
                         //migrate carts
                         $finished = $this->_migrateCartsFrom115($mailchimpStoreId, $initialTime);
                         if ($finished) {
@@ -2487,6 +2490,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _makeForCollectionItem($collection, $mailchimpStoreId, $initialTime, Closure $callback)
     {
+        $dateHelper = $this->getDateHelper();
+
         $finished = false;
         if (!$collection->getSize()) {
             $finished = true;
@@ -2510,7 +2515,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             // if not done, the same page will be loaded each loop
             // - will also free memory
             $collection->clear();
-            if ($this->timePassed($initialTime)) {
+            if ($dateHelper->timePassed($initialTime)) {
                 break;
             }
 
@@ -2519,29 +2524,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } while ($currentPage <= $pages);
         return $finished;
-    }
-
-    /**
-     * Check if more than 270 seconds passed since the migration started to prevent the job to take too long.
-     *
-     * @param  $initialTime
-     * @return bool
-     */
-    public function timePassed($initialTime)
-    {
-        $storeCount = count($this->getMageApp()->getStores());
-        $timePassed = false;
-        $finalTime = time();
-        $difference = $finalTime - $initialTime;
-        //Set minimum of 30 seconds per store view.
-        $timeForAllStores = (30 * $storeCount);
-        //Set total time in 4:30 minutes if it is lower.
-        $timeAmount = ($timeForAllStores < 270) ? 270 : $timeForAllStores;
-        if ($difference > $timeAmount) {
-            $timePassed = true;
-        }
-
-        return $timePassed;
     }
 
     /**
@@ -2584,8 +2566,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _migrateOrdersFrom116($initialTime)
     {
+        $dateHelper = $this->getDateHelper();
         $finished = false;
-        if (!$this->timePassed($initialTime)) {
+        if (!$dateHelper->timePassed($initialTime)) {
             $finished = true;
             $stores = $this->getMageApp()->getStores();
             foreach ($stores as $storeId => $store) {
@@ -2593,7 +2576,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
                 }
 
-                if ($this->timePassed($initialTime)) {
+                if ($dateHelper->timePassed($initialTime)) {
                     $finished = false;
                     break;
                 }
@@ -2663,7 +2646,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom1164($initialTime)
     {
-        if (!$this->timePassed($initialTime)) {
+        $dateHelper = $this->getDateHelper();
+        if (!$dateHelper->timePassed($initialTime)) {
             $write_connection = $this->getCoreResource()->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
             $write_connection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
@@ -4965,5 +4949,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getSalesOrderModel()
     {
         return Mage::getModel('sales/order');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
     }
 }
