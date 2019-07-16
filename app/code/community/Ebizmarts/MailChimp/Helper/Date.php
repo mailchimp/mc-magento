@@ -36,7 +36,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
      */
     public function timePassed($initialTime)
     {
-        $storeCount = count($this->getMageApp()->getStores());
+        $storeCount = count(Mage::app()->getStores());
         $timePassed = false;
         $finalTime = time();
         $difference = $finalTime - $initialTime;
@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
      * @param null $time
      * @return string
      */
-    protected function getTimestamp($time = null)
+    public function getTimestamp($time = null)
     {
         return Mage::getModel('core/date')->timestamp($time);
     }
