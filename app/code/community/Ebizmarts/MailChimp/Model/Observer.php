@@ -183,7 +183,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeId);
 
-        if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+        if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE) {
             $statusChanged = $subscriber->getIsStatusChanged();
 
             //Override Magento status to always send double opt-in confirmation.
@@ -1186,7 +1186,7 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     protected function isMailchimpSave($subscriberSource)
     {
-        return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE;
+        return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE;
     }
 
 }

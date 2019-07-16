@@ -8,7 +8,7 @@
  */
 class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscriber
 {
-    const SUBSCRIBE_SOURCE = 'MailChimp';
+    const MAILCHIMP_SUBSCRIBE = 'MailChimp';
     const SUBSCRIBE_CONFIRMATION = 'MailChimp_Confirmation';
 
     public function sendUnsubscriptionEmail()

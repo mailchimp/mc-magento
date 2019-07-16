@@ -2825,7 +2825,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if ($syncDeleted) {
                 $subscriber->setData("mailchimp_sync_deleted", $syncDeleted);
             }
-            $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+            $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
             $subscriber->save();
         }
     }
@@ -3510,7 +3510,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function setMemberGeneralData($subscriber)
     {
         $subscriber->setImportMode(true);
-        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
         $subscriber->setIsStatusChanged(true);
         $subscriber->save();
     }

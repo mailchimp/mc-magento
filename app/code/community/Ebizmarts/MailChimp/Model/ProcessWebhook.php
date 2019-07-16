@@ -102,7 +102,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             if (!$newSubscriber->getId()) {
                 if ($oldSubscriber->getId()) {
                     $oldSubscriber->setSubscriberEmail($new);
-                    $oldSubscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                    $oldSubscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                     $oldSubscriber->save();
                 } else {
                     $helper->subscribeMember($newSubscriber);
@@ -236,7 +236,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                         $saveRequired = true;
                     }
                     if ($saveRequired) {
-                        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                         $subscriber->save();
                     }
                 } else {
