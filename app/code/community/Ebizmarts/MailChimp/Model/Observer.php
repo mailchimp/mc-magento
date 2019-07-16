@@ -210,16 +210,19 @@ class Ebizmarts_MailChimp_Model_Observer
         $storeViewId = $this->getStoreViewIdBySubscriber($subscriber);
         $helper = $this->makeHelper();
         $isEnabled = $helper->isSubscriptionEnabled($storeViewId);
+        $subscriberSource = $subscriber->getSubscriberSource();
 
-        if ($isEnabled && $subscriber->getSubscriberSource() != Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+        if ($isEnabled && $subscriberSource !== Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
             $params = $this->getRequest()->getParams();
             $helper->saveInterestGroupData($params, $storeViewId, null, $subscriber);
 
             $this->createEmailCookie($subscriber);
 
-            if ($helper->isUseMagentoEmailsEnabled($storeViewId) != 1) {
-                $apiSubscriber = $this->makeApiSubscriber();
+            $apiSubscriber = $this->makeApiSubscriber();
 
+            if ($helper->isUseMagentoEmailsEnabled($storeViewId) !== 1
+                && $this->isMagentoSubscription($subscriberSource)
+                || $this->isEmailConfirmationRequired($subscriberSource)) {
                 if ($subscriber->getIsStatusChanged()) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
@@ -1165,6 +1168,16 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $storeViewId;
+    }
+
+    protected function isEmailConfirmationRequired($subscriberSource)
+    {
+        return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_CONFIRMATION;
+    }
+
+    protected function isMagentoSubscription($subscriberSource)
+    {
+        return empty($subscriberSource);
     }
 
 }
