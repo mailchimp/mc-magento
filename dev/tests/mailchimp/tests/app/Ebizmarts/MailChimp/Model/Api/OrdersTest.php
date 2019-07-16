@@ -204,16 +204,13 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $apiProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
-            ->setMethods(
-                array(
+            ->setMethods(array(
                 'isProductEnabled'
-                )
-            )
+            ))
             ->getMock();
 
         $ordersApiMock = $this->ordersApiMock
-            ->setMethods(
-                array(
+            ->setMethods(array(
                 'returnZeroIfNull',
                 'getPromoData',
                 '_getMailChimpStatus',
@@ -228,16 +225,13 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getCountryModelNameFromShippingAddress',
                 'getResourceModelOrderCollection',
                 'shouldSendCampaignId',
-                'getApiProduct',
-                'calculateRowTotal'
-                )
-            )
+                'getApiProduct'
+            ))
             ->getMock();
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
             ->disableOriginalConstructor()
-            ->setMethods(
-                array(
+            ->setMethods(array(
                 'getIncrementId',
                 'getMailchimpCampaignId',
                 'getMailchimpLandingPage',
@@ -255,8 +249,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getCustomerLastname',
                 'getBillingAddress',
                 'getShippingAddress'
-                )
-            )
+            ))
             ->getMock();
 
         $itemsOrderCollection = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Item_Collection::class)
@@ -266,7 +259,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $itemOrderMock = $this->getMockBuilder(Mage_Sales_Model_Order_Item::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getProductId', 'getProductOptions', 'getQtyOrdered', 'getDiscountAmount'))
+            ->setMethods(array('getProductId', 'getProductOptions', 'getQtyOrdered', 'getPrice', 'getDiscountAmount'))
             ->getMock();
 
         $productModelMock = $this->getMockBuilder(Mage_Catalog_Model_Product::class)
@@ -286,8 +279,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $billingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
-            ->setMethods(
-                array(
+            ->setMethods(array(
                 'getStreet',
                 'getCity',
                 'getRegion',
@@ -296,13 +288,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getCountry',
                 'getName',
                 'getCompany'
-                )
-            )
+            ))
             ->getMock();
 
         $shippingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
-            ->setMethods(
-                array(
+            ->setMethods(array(
                 'getStreet',
                 'getCity',
                 'getRegion',
@@ -311,8 +301,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getCountry',
                 'getName',
                 'getCompany'
-                )
-            )
+            ))
             ->getMock();
 
         $orderCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
@@ -447,9 +436,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())
             ->method('getApiProduct')
             ->willReturn($apiProductMock);
-        $ordersApiMock->expects($this->once())
-            ->method('calculateRowTotal')
-            ->with($itemOrderMock);
 
         $apiProductMock->expects($this->once())
             ->method('isProductEnabled')
@@ -468,7 +454,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $itemOrderMock->expects($this->once())
             ->method('getQtyOrdered')
             ->willReturn($qtyOrdered);
-
+        $itemOrderMock->expects($this->once())
+            ->method('getPrice')
+            ->willReturn($price);
         $itemOrderMock->expects($this->once())
             ->method('getDiscountAmount')
             ->willReturn($discountAmount);
@@ -636,12 +624,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(
-                array(
+            ->setMethods(array(
                 'getGeneralList',
                 'getApiKey',
-                'getApi')
-            )
+                'getApi'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
