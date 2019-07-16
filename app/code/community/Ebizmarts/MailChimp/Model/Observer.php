@@ -212,7 +212,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $isEnabled = $helper->isSubscriptionEnabled($storeViewId);
         $subscriberSource = $subscriber->getSubscriberSource();
 
-        if ($isEnabled && $subscriberSource !== Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE) {
+        if ($isEnabled && !$this->isMailchimpSave($subscriberSource)) {
             $params = $this->getRequest()->getParams();
             $helper->saveInterestGroupData($params, $storeViewId, null, $subscriber);
 
@@ -1178,6 +1178,15 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function isMagentoSubscription($subscriberSource)
     {
         return empty($subscriberSource);
+    }
+
+    /**
+     * @param $subscriberSource
+     * @return bool
+     */
+    protected function isMailchimpSave($subscriberSource)
+    {
+        return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE;
     }
 
 }

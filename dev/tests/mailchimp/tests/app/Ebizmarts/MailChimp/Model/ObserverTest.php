@@ -655,7 +655,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('makeHelper', 'getRequest', 'createEmailCookie', 'makeApiSubscriber',
-                    'getStoreViewIdBySubscriber', 'isEmailConfirmationRequired')
+                    'getStoreViewIdBySubscriber', 'isEmailConfirmationRequired', 'isMailchimpSave')
             )
             ->getMock();
 
@@ -694,6 +694,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn($subscriberSource);
 
+        $observerMock->expects($this->once())->method('isMailchimpSave')->with($subscriberSource)->willReturn(false);
+
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeViewId)->willReturn(true);
 
         $observerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
@@ -730,7 +732,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('makeHelper', 'getRequest', 'createEmailCookie', 'makeApiSubscriber',
-                    'getStoreViewIdBySubscriber', 'isMagentoSubscription', 'isEmailConfirmationRequired')
+                    'getStoreViewIdBySubscriber', 'isMagentoSubscription', 'isEmailConfirmationRequired',
+                    'isMailchimpSave')
             )
             ->getMock();
 
@@ -769,6 +772,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn($subscriberSource);
+
+        $observerMock->expects($this->once())->method('isMailchimpSave')->with($subscriberSource)->willReturn(false);
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeViewId)->willReturn(true);
 
