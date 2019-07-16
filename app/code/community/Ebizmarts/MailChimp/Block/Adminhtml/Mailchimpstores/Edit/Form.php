@@ -51,7 +51,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $stores = Mage::app()->getStores();
             $apikeys = array();
             foreach ($stores as $s) {
-                $apikey = $helper->getApiKey($s);
+                $apikey = $helper->getApiKey($s->getStoreId());
                 if (!array_key_exists($apikey, $apikeys)) {
                     $encryptedApiKey = $helper->encryptData($apikey);
                     $apikeys[$encryptedApiKey] = $helper->mask($apikey);
