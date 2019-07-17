@@ -54,6 +54,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $helper     = $this->getMailChimpHelper();
+        $dateHelper     = $this->getMailChimpDateHelper();
         $oldStore   = $helper->getCurrentStoreId();
         $helper->setCurrentStore($magentoStoreId);
 
@@ -117,7 +118,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData(
                     $productId,
                     $mailchimpStoreId,
-                    $this->getCurrentDate(),
+                    $dateHelper->getCurrentDateTime(),
                     "This product type is not supported on MailChimp.",
                     0,
                     null,
@@ -341,7 +342,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["published_at_foreign"] = "";
 
         if ($isVariant) {
-            $data += $this->getProductVariantData($product);
+            $data += $this->getProductVariantData($product, $magentoStoreId);
         } else {
             $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
             if (is_string($description)) {
@@ -360,7 +361,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //variants
             if (!empty($variants)) {
-                $this->_processVariants($variants, $product, $magentoStoreId);
+                $data = $this->_processVariants($data, $variants, $product, $magentoStoreId);
             }
         }
 
@@ -368,12 +369,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
+     * @param $data
      * @param $variants
      * @param $product
      * @param $magentoStoreId
+     * @return array
      * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
-    protected function _processVariants($variants, $product, $magentoStoreId)
+    protected function _processVariants($data, $variants, $product, $magentoStoreId)
     {
         $data["variants"] = array();
         if (isset($data["image_url"])) {
@@ -398,6 +402,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $this->_parentPrice = null;
         $this->_parentId = null;
         $this->_parentUrl = null;
+
+        return $data;
     }
 
     /**
@@ -473,6 +479,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchId = $this->makeBatchId($magentoStoreId);
         $items = $order->getAllVisibleItems();
         $helper = $this->getMailChimpHelper();
+        $dateHelper = $this->getMailChimpDateHelper();
         $syncDateFlag = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
@@ -490,7 +497,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     $this->_updateSyncData(
                         $productId,
                         $mailchimpStoreId,
-                        $this->getCurrentDate(),
+                        $dateHelper->getCurrentDateTime(),
                         "This product type is not supported on MailChimp.",
                         0,
                         null,
@@ -734,13 +741,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return mixed
      */
-    protected function getProductVariantData($product)
+    protected function getProductVariantData($product, $magentoStoreId)
     {
         $data = array();
         $sku = $product->getSku();
         $data["sku"] = $sku ? $sku : '';
 
-        $price = $this->getMailChimpProductPrice($product);
+        $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
         if ($price) {
             $data["price"] = $price;
         }
@@ -1107,14 +1114,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @param $magentoStoreId
      * @return float
      */
-    protected function getMailChimpProductPrice($product)
+    protected function getMailChimpProductPrice($product, $magentoStoreId)
     {
         $price = null;
         $parentId = null;
         if (!$this->currentProductIsVisible()) {
             $parentId = $this->getParentId($product->getId());
             if ($parentId) {
-                $price = $this->getProductPrice($product);
+                $price = $this->getProductPrice($product, $magentoStoreId);
             }
         } else {
             if ($this->_parentPrice) {
@@ -1138,11 +1145,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @return float
      * @throws Mage_Core_Exception
      */
-    protected function getProductPrice($product)
+    protected function getProductPrice($product, $magentoStoreId)
     {
         $helper = $this->getMailChimpHelper();
         $rc = $helper->getProductResourceModel();
-        $price = $this->getMailchimpFinalPrice($product);
+        $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
         return $price;
     }
 
@@ -1163,14 +1170,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function isProductFlatTableEnabled()
     {
         return Mage::helper('catalog/category_flat')->isEnabled();
-    }
-
-    /**
-     * @return string
-     */
-    protected function getCurrentDate()
-    {
-        return $this->getMailChimpDateHelper()->formatDate(null, "Y-m-d H:i:s");
     }
 
     /**

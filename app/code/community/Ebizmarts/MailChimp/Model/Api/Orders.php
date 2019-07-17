@@ -137,7 +137,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function _getNewOrders($mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
-        $dateHelper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
 
         $batchArray = array();
         $newOrders = $this->getResourceModelOrderCollection();

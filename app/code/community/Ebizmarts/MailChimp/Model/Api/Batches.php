@@ -499,7 +499,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $tableName,
             array(
                 'batch_id' => $batchResponseId,
-                'mailchimp_sync_delta' => $dateHelper->getCurrentDate()
+                'mailchimp_sync_delta' => $dateHelper->getCurrentDateTime()
             ),
             $where
         );
@@ -673,7 +673,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     );
                     $archive = new Mage_Archive();
                     if (file_exists($fileName)) {
-                        $this->_unpackBatchFile($batchId, $archive, $fileName, $baseDir);
+                        $files = $this->_unpackBatchFile($files, $batchId, $archive, $fileName, $baseDir);
                     }
                 }
             }
@@ -691,7 +691,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         return $files;
     }
 
-    protected function _unpackBatchFile($batchId, $archive, $fileName, $baseDir)
+    /**
+     * @param $files
+     * @param $batchId
+     * @param $archive
+     * @param $fileName
+     * @param $baseDir
+     * @return array
+     */
+    protected function _unpackBatchFile($files, $batchId, $archive, $fileName, $baseDir)
     {
         $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
         $archive->unpack(
@@ -710,6 +718,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar'
         );
         unlink($fileName);
+
+        return $files;
     }
 
     /**
