@@ -1172,18 +1172,26 @@ class Ebizmarts_MailChimp_Model_Observer
         return $storeViewId;
     }
 
+    /**
+     * @param string $subscriberSource
+     * @return bool
+     */
     protected function isEmailConfirmationRequired($subscriberSource)
     {
         return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_CONFIRMATION;
     }
 
+    /**
+     * @param string $subscriberSource
+     * @return bool
+     */
     protected function isMagentoSubscription($subscriberSource)
     {
         return empty($subscriberSource);
     }
 
     /**
-     * @param $subscriberSource
+     * @param string $subscriberSource
      * @return bool
      */
     protected function isMailchimpSave($subscriberSource)
