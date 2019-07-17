@@ -491,6 +491,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
+
         $resource = $helper->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
@@ -499,7 +500,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $tableName,
             array(
                 'batch_id' => $batchResponseId,
-                'mailchimp_sync_delta' => $dateHelper->getCurrentDateTime()
+                'mailchimp_sync_delta' => $dateHelper->formatDate(null, 'Y-m-d H:i:s')
             ),
             $where
         );

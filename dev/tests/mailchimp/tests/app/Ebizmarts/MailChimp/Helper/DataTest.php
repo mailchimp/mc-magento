@@ -1525,8 +1525,15 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(
-                array('getInterestGroupsIfAvailable', 'isAdmin', 'getCustomerSession', 'getInterestGroupModel',
-                'getCurrentDateTime', 'arrayEncode')
+                array('getInterestGroupsIfAvailable', 'isAdmin', 'getCustomerSession',
+                    'getInterestGroupModel', 'arrayEncode', 'getDateHelper')
+            )
+            ->getMock();
+
+        $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
+            ->setMethods(
+                array('formatDate')
             )
             ->getMock();
 
@@ -1561,6 +1568,13 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('getCustomerSession')->willReturn($customerSessionMock);
         $helperMock->expects($this->once())->method('isAdmin')->willReturn(false);
 
+        $helperMock->expects($this->once())->method('getDateHelper')->willReturn($helperDateMock);
+        $helperDateMock
+            ->expects($this->once())
+            ->method('formatDate')
+            ->with(null, 'Y-m-d H:i:s')
+            ->willReturn($currentDateTime);
+
         $customerSessionMock->expects($this->once())->method('isLoggedIn')->willReturn(true);
         $customerSessionMock->expects($this->once())->method('getCustomer')->willReturn($customerMock);
 
@@ -1585,8 +1599,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $interestGroupMock->expects($this->once())->method('setGroupdata')->with($encodedGroupData)->willReturnSelf();
         $interestGroupMock->expects($this->once())->method('getGroupdata')->willReturn($encodedGroupData);
         $interestGroupMock->expects($this->once())->method('setStoreId')->with($storeId)->willReturnSelf();
-
-        $helperMock->expects($this->once())->method('getCurrentDateTime')->willReturn($currentDateTime);
 
         $interestGroupMock->expects($this->once())->method('setUpdatedAt')->with($currentDateTime)->willReturnSelf();
         $interestGroupMock->expects($this->once())->method('save')->willReturnSelf();

@@ -118,7 +118,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 $this->_updateSyncData(
                     $productId,
                     $mailchimpStoreId,
-                    $dateHelper->getCurrentDateTime(),
+                    $dateHelper->formatDate(null, 'Y-m-d H:i:s'),
                     "This product type is not supported on MailChimp.",
                     0,
                     null,
@@ -497,7 +497,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     $this->_updateSyncData(
                         $productId,
                         $mailchimpStoreId,
-                        $dateHelper->getCurrentDateTime(),
+                        $dateHelper->formatDate(null, 'Y-m-d H:i:s'),
                         "This product type is not supported on MailChimp.",
                         0,
                         null,

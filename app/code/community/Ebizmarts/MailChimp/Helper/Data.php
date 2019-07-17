@@ -4545,6 +4545,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function saveInterestGroupData($params, $storeId, $customerId = null, $subscriber = null)
     {
+        $dateHelper = $this->getDateHelper();
         $groups = $this->getInterestGroupsIfAvailable($params);
         if ($groups) {
             if (!$customerId) {
@@ -4582,7 +4583,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     $interestGroup->setStoreId($storeId);
                 }
 
-                $interestGroup->setUpdatedAt($this->getCurrentDateTime());
+                $interestGroup->setUpdatedAt($dateHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $interestGroup->save();
             }
         }
