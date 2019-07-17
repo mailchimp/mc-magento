@@ -573,6 +573,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     {
         $getStoreId = $data['getStoreId'];
         $storeId = 1;
+        $subscriberSource = null;
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->disableOriginalConstructor()
@@ -581,7 +582,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'addSuccessIfRequired'))
+            ->setMethods(array('makeHelper', 'addSuccessIfRequired', 'isMailchimpSave'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -606,28 +607,32 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $eventMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
 
+        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn($subscriberSource);
+
         $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
 
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
 
-        $subscriberMock->expects($this->once())->method('getStatus')->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+        $subscriberMock->expects($this->once())->method('getStatus')
+            ->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+
+        $observerMock->expects($this->once())->method('isMailchimpSave')->with($subscriberSource)->willReturn(false);
 
         $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
 
-        $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)->willReturn(true);
+        $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)
+            ->willReturn(true);
 
         $helperMock->expects($this->once())->method('isUseMagentoEmailsEnabled')->with($storeId)->willReturn(false);
 
-        $subscriberMock->expects($this->once())->method('setStatus')->with(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+        $subscriberMock->expects($this->once())->method('setStatus')
+            ->with(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
 
         $observerMock->expects($this->once())->method('addSuccessIfRequired')->with($helperMock);
 
-        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn(null);
-
         $subscriberMock->expects($this->exactly($getStoreId))->method('getStoreId')->willReturn($storeId);
-
 
         $observerMock->subscriberSaveBefore($eventObserverMock);
     }
