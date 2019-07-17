@@ -607,7 +607,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             'refundedItemAmount' => 0
         );
         $mailchimpStatus = array(
-            'financialStatus', 'fulfillmentStatus'
+            'financialStatus' => null,
+            'fulfillmentStatus' => null
         );
 
         foreach ($orderItems as $item) {
