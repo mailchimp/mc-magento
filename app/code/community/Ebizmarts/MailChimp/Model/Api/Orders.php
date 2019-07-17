@@ -52,7 +52,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             // get all the orders modified
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
-
         // get new orders
 
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
@@ -195,26 +194,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * get order item total price
-     * @param $item
-     * @return mixed
-     */
-    protected function calculateRowTotal($item)
-    {
-        $rowTotal = $item->getRowTotal() + $item->getTaxAmount()
-            + $item->getHiddenTaxAmount() + Mage::helper('weee')->getRowWeeeAmountAfterDiscount($item)
-            - $item->getDiscountAmount();
-
-        return $rowTotal;
-    }
-
-    /**
-     *  Set all the data for each order to be sent
-     * @param $order
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
-     * @return false|string
-     * @throws Mage_Core_Model_Store_Exception
+     * Set all the data for each order to be sent
+     *
+     * @param  $order
+     * @param  $mailchimpStoreId
+     * @param  $magentoStoreId
+     * @return string
      */
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
@@ -412,7 +397,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     "product_id" => $productId,
                     "product_variant_id" => $variant,
                     "quantity" => (int)$item->getQtyOrdered(),
-                    "price" => $this->calculateRowTotal($item),
+                    "price" => $item->getPrice(),
                     "discount" => abs($item->getDiscountAmount())
                 );
 
@@ -896,7 +881,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
         }
-
         return $promo;
     }
 
