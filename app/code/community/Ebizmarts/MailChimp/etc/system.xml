@@ -219,7 +219,6 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Click this button to create the webhook manually, it will only work if the webhook doesn't already exist.]]></comment>
                         </create_webhook>
-
                         <webhook_delete translate="label">
                             <label>Webhook Delete Subscriber Action</label>
                             <frontend_type>select</frontend_type>
@@ -229,7 +228,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </webhook_delete>
-
                         <webhook_active translate="label comment">
                             <label>Enable Two Way Sync</label>
                             <frontend_type>select</frontend_type>
