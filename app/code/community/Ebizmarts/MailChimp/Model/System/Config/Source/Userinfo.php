@@ -25,6 +25,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
      */
     public function __construct()
     {
+        $mandillHelper = Mage::helper('mailchimp/mandrill');
         $storeId = Mage::app()->getStore()->getId();
         if (Mage::app()->getRequest()->getParam('store')) {
             $stores = Mage::app()->getStores();
@@ -36,8 +37,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
             }
         }
 
-        if ((!is_array($this->_account_details) || isset($this->_account_details['status'])) && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId)) {
-            $api = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
+        if ((!is_array($this->_account_details) || isset($this->_account_details['status'])) && $mandillHelper->getMandrillApiKey($storeId)) {
+            $api = new Mandrill_Message($mandillHelper->getMandrillApiKey($storeId));
             try {
                 $this->_account_details = $api->users->info();
             } catch (Exception $e) {
@@ -72,5 +73,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
             return array(array('value' => '', 'label' => $helper->__($this->_account_details)));
         }
     }
-
 }

@@ -27,12 +27,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         if ($valueChanged && !$this->getValue()) {
             $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
             $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
-            $message = $helper->__('Please note the extension has been disabled due to the lack of an api key or list configured.');
+            $message = $helper->__('Please note the extension has been disabled due to the lack of an api key or audience configured.');
             $this->getAdminSession()->addWarning($message);
         }
 
-        if ($valueChanged && ($moduleIsActive || $thisScopeHasSubMinSyncDateFlag) && $this->getValue())
-        {
+        if ($valueChanged && ($moduleIsActive || $thisScopeHasSubMinSyncDateFlag) && $this->getValue()) {
             $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
             $helper->saveMailchimpConfig($configValues, $scopeId, $scope);
         }

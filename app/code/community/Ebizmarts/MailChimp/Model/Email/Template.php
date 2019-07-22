@@ -54,15 +54,15 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $email = array('subject' => $subject, 'to' => array());
         $setReturnPath = $this->getSendingSetReturnPath();
         switch ($setReturnPath) {
-        case 1:
-            $returnPathEmail = $this->getSenderEmail();
-            break;
-        case 2:
-            $returnPathEmail = $this->getSendingReturnPathEmail();
-            break;
-        default:
-            $returnPathEmail = null;
-            break;
+            case 1:
+                $returnPathEmail = $this->getSenderEmail();
+                break;
+            case 2:
+                $returnPathEmail = $this->getSendingReturnPathEmail();
+                break;
+            default:
+                $returnPathEmail = null;
+                break;
         }
 
         $mail = $this->getMail();
@@ -92,8 +92,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $email['from_email'] = $this->getSenderEmail();
         $mandrillSenders = $this->getSendersDomains($mail);
         $senderExists = false;
-        foreach ($mandrillSenders as $sender)
-        {
+        foreach ($mandrillSenders as $sender) {
             if (isset($sender['domain'])) {
                 $emailArray = explode('@', $email['from_email']);
                 if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
@@ -102,7 +101,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             }
         }
 
-        if(!$senderExists) {
+        if (!$senderExists) {
             $email['from_email'] = $this->getGeneralEmail();
         }
 
@@ -172,7 +171,6 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         }
 
         return true;
-
     }
 
     /**
@@ -182,16 +180,17 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function getMail()
     {
+        $helper = $this->makeMandrillHelper();
         $email_config = $this->getDesignConfig();
         $storeId = (integer) $email_config->getStore();
         if (!$this->isMandrillEnabled($storeId)) {
             return parent::getMail();
         }
 
-        if ($this->_mail && (!$this->isMandrillEnabled($storeId))) {
+        if ($this->_mail) {
             return $this->_mail;
         } else {
-            Mage::helper('mailchimp/mandrill')->log("store: $storeId API: " . Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId), $storeId);
+            $helper->log("store: $storeId API: " . $helper->getMandrillApiKey($storeId), $storeId);
             return $this->createMandrillMessage($storeId);
         }
     }
@@ -286,6 +285,6 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     protected function createMandrillMessage($storeId)
     {
-        return $this->_mail = new Mandrill_Message(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $storeId));
+        return $this->_mail = new Mandrill_Message($this->makeMandrillHelper()->getMandrillApiKey($storeId));
     }
 }

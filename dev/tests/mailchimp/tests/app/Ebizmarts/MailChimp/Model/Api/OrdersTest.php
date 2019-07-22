@@ -48,7 +48,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
      * @dataProvider getPromoDataProvider
      */
 
-    public function testGetPromoData($type){
+    public function testGetPromoData($type)
+    {
 
         if ($type == 'by_percent') {
             $assertType = 'percentage';
@@ -93,7 +94,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $result = $modelMock->getPromoData($orderMock);
 
         $this->assertEquals($result, array(array('code' => 'aa12', 'amount_discounted' => 10, 'type' => $assertType)));
-
     }
 
     public function getPromoDataProvider()
@@ -106,7 +106,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         );
     }
 
-    public function testGetSyncedOrder(){
+    public function testGetSyncedOrder()
+    {
 
         $orderId = 1;
         $mailchimpStoreId = '5axx998994cxxxx47e6b3b5dxxxx26e2';
@@ -142,10 +143,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
     {
         $mailchimpStoreId = '44a100c71040d4ec27fd707d7c667114';
         $magentoStoreId = '1';
+        $oldStore = $magentoStoreId;
         $orderIncrementId = 100;
         $campaignId = 'b6asda8q5';
         $mailchimpLandingPage = 'test';
-        $currencyCode = 'test';
+        $currencyCode = 'USD';
         $baseGrandTotal = 200;
         $baseTaxAmount = 0;
         $taxTotal = 0;
@@ -197,12 +199,14 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerceSyncDataItem'))
+            ->setMethods(array('getEcommerceSyncDataItem','getCurrentStoreId','setCurrentStore'))
             ->getMock();
 
         $apiProductMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('isProductEnabled'))
+            ->setMethods(array(
+                'isProductEnabled'
+            ))
             ->getMock();
 
         $ordersApiMock = $this->ordersApiMock
@@ -231,11 +235,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 'getIncrementId',
                 'getMailchimpCampaignId',
                 'getMailchimpLandingPage',
-                'getStoreCurrencyCode',
-                'getBaseGrandTotal',
-                'getBaseTaxAmount',
-                'getBaseDiscountAmount',
-                'getBaseShippingAmount',
+                'getOrderCurrencyCode',
+                'getGrandTotal',
+                'getTaxAmount',
+                'getDiscountAmount',
+                'getShippingAmount',
                 'getCreatedAt',
                 'getUpdatedAt',
                 'getAllVisibleItems',
@@ -322,19 +326,19 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $mailchimpLandingPage
             );
         $orderMock->expects($this->once())
-            ->method('getStoreCurrencyCode')
+            ->method('getOrderCurrencyCode')
             ->willReturn($currencyCode);
         $orderMock->expects($this->once())
-            ->method('getBaseGrandTotal')
+            ->method('getGrandTotal')
             ->willReturn($baseGrandTotal);
         $orderMock->expects($this->once())
-            ->method('getBaseTaxAmount')
+            ->method('getTaxAmount')
             ->willReturn($baseTaxAmount);
         $orderMock->expects($this->once())
-            ->method('getBaseDiscountAmount')
+            ->method('getDiscountAmount')
             ->willReturn($baseDiscountAmount);
         $orderMock->expects($this->once())
-            ->method('getBaseShippingAmount')
+            ->method('getShippingAmount')
             ->willReturn($baseShippingAmount);
         $orderMock->expects($this->once())
             ->method('getCreatedAt')
@@ -461,6 +465,18 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getIdBySku')
             ->with($sku)
             ->willReturn($variant);
+
+        $helperMock->expects($this->once())
+            ->method('getCurrentStoreId')
+            ->willReturn($magentoStoreId);
+
+        $helperMock->expects($this->exactly(2))
+            ->method('setCurrentStore')
+            ->withConsecutive(
+                $magentoStoreId,
+                $oldStore
+            );
+
 
         $helperMock->expects($this->once())
             ->method('getEcommerceSyncDataItem')
@@ -652,5 +668,4 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId);
     }
-
 }

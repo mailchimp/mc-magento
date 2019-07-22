@@ -57,7 +57,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
                         $apiKeyArray = explode('-', $apiKey);
                         $anchorUrl = 'https://' . $apiKeyArray[1] . '.admin.mailchimp.com/lists/new-list/';
                         $htmlAnchor = '<a target="_blank" href="' . $anchorUrl . '">' . $anchorUrl . '</a>';
-                        $message = 'Please create a list at ' . $htmlAnchor;
+                        $message = 'Please create an audience at ' . $htmlAnchor;
                         Mage::getSingleton('adminhtml/session')->addWarning($message);
                     }
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
         $mcLists = $this->getMCLists();
         if (isset($mcLists['lists'])) {
             if (count($mcLists['lists']) > 1) {
-                $lists[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp List ---'));
+                $lists[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp Audience ---'));
             }
             foreach ($mcLists['lists'] as $list) {
                 $memberCount = $list['stats']['member_count'];
@@ -118,5 +118,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
     {
         return $this->_lists;
     }
-
 }

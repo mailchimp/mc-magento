@@ -3,8 +3,8 @@
 class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_TestCase
 {
     /**
- * @var Ebizmarts_MailChimp_Model_Api_Customers
-*/
+     * @var Ebizmarts_MailChimp_Model_Api_Customers
+     */
     private $customersApiMock;
 
     public function setUp()
@@ -81,7 +81,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->customersApiMock = $this->customersApiMock->setMethods(
             array('getCustomersToSync', 'makeBatchId', 'makeCustomersNotSentCollection', 'getOptin',
                 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
-                '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId', 'getCustomerResourceCollection', 'getSubscriberModel'
+                '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
+                'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper'
             )
         )
             ->getMock();
@@ -97,14 +98,24 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
-                ->disableOriginalConstructor()
-                ->setMethods(array('loadByEmail'))
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(array('loadByEmail'))
+            ->getMock();
 
         $subscribersMailchimpMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Subscriber::class)
-                ->disableOriginalConstructor()
-                ->setMethods(array('getSubscriberId'))
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriberId'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'))
+            ->getMock();
+
+        $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getId'))
+            ->getMock();
 
         $customerArray = array($customerMock);
 
@@ -122,11 +133,29 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $customerCollectionMock->expects($this->once())->method('getIterator')->willReturn(new ArrayIterator($customerArray));
         $this->customersApiMock->expects($this->once())->method('_buildCustomerData')->with($customerMock)->willReturn($customerData);
         $this->customersApiMock->expects($this->once())->method('makePutBatchStructure')->with($customerJson)->willReturn($operationData);
+        $this->customersApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
         $subscriberMock->expects($this->once())->method('loadByEmail')->with($customerEmail)->willReturn($subscribersMailchimpMock);
         $subscribersMailchimpMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
-        $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
+        $customerMock->expects($this->exactly(2))
+            ->method('getId')
+            ->willReturnOnConsecutiveCalls(
+                $customerId,
+                $customerId
+            );
         $customerMock->expects($this->any())->method('getEmail')->willReturn($customerEmail);
         $this->customersApiMock->expects($this->once())->method('_updateSyncData')->with($customerId, $mailchimpStoreId);
+
+        $helperMock->expects($this->once())
+            ->method('getEcommerceSyncDataItem')
+            ->with($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId)
+            ->willReturn($syncDataItemMock);
+        $helperMock->expects($this->once())
+            ->method('modifyCounterSentPerBatch')
+            ->with(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
+
+        $syncDataItemMock->expects($this->once())
+            ->method('getId')
+            ->willReturn($customerId);
 
         $return = $this->customersApiMock->createBatchJson($mailchimpStoreId, $storeId);
         $this->assertEquals($operationData['method'], $return[0]['method']);

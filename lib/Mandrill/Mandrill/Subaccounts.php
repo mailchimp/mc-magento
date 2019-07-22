@@ -181,5 +181,4 @@ class Mandrill_Subaccounts
         $_params = array("id" => $id);
         return $this->master->call('subaccounts/resume', $_params);
     }
-
 }

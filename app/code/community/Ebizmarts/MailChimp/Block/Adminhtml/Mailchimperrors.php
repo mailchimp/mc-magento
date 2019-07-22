@@ -22,7 +22,5 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors extends Mage_Adminhtml
 
         parent::__construct();
         $this->removeButton('add');
-
     }
-
 }

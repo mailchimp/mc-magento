@@ -84,6 +84,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $isPost = $this->getRequest()->getPost();
 
         if ($isPost) {
+            $isPost['apikey'] = $this->getMailchimpHelper()->decryptData($isPost['apikey']);
             $this->_updateMailchimp($isPost);
         }
 
@@ -102,13 +103,17 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $name = $formData['name'];
         $domain = $formData['domain'];
         $storeId = isset($formData['storeid']) ? $formData['storeid'] : null;
+        $apiKey = $formData['apikey'];
 
+        if ($helper->isApiKeyObscure($apiKey)) {
+            $apiKey = $helper->getApiKey($storeId);
+        }
 
         if ($storeId) {
             $apiStore = $helper->getApiStores();
             $apiStore->editMailChimpStore(
                 $storeId,
-                $formData['apikey'],
+                $apiKey,
                 $name,
                 $currencyCode,
                 $domain,
@@ -121,7 +126,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         } else {
             $apiStore = $helper->getApiStores();
             $apiStore->createMailChimpStore(
-                $formData['apikey'],
+                $apiKey,
                 $formData['listid'],
                 $name,
                 $currencyCode,
@@ -145,7 +150,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $connection->delete($tableName);
 
         foreach ($allApiKeys as $apiKey) {
-
             try {
                 $api = $helper->getApiByKey($apiKey);
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
@@ -163,9 +167,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
                 continue;
             }
 
+            $apiKey = $helper->encryptData($apiKey);
+
             foreach ($stores['stores'] as $store) {
                 if ($store['platform'] == 'Magento') {
-
                     try {
                         $list = $api->getLists()->getLists($store['list_id']);
                     } catch (MailChimp_Error $e) {
@@ -208,8 +213,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
     public function getstoresAction()
     {
-        $apiKey = $this->getRequest()->getParam('api_key');
         $helper = $this->getMailchimpHelper();
+        $apiKey = $helper->decryptData($this->getRequest()->getParam('api_key'));
 
         try {
             $api = $helper->getApiByKey($apiKey);
@@ -238,12 +243,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
 
     public function deleteAction()
     {
+        $helper = $this->getMailchimpHelper();
         $id = $this->getRequest()->getParam('id');
         $store = $this->loadMailchimpStore($id);
         $mailchimpStoreId = $store->getStoreid();
-        $apiKey = $store->getApikey();
-        $helper = $this->getMailchimpHelper();
-
+        $apiKey = $helper->decryptData($store->getApikey());
 
         if ($store->getId()) {
             try {

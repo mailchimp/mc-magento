@@ -82,5 +82,4 @@ class Mandrill_Rejects
         $_params = array("email" => $email, "subaccount" => $subaccount);
         return $this->master->call('rejects/delete', $_params);
     }
-
 }

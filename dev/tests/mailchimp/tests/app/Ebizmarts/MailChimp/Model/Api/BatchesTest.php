@@ -247,7 +247,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiBatchesMock->handleEcommerceBatches();
     }
 
-    public function handleEcommerceBatchesDataProvider(){
+    public function handleEcommerceBatchesDataProvider()
+    {
 
         return array(
             array(array('mailchimp_api_status' => true, 'isEcomSyncDataEnabled' => 1, '_getResults' => 1, '_sendEcommerceBatch' => 1, 'handleResendDataAfter' => 1, 'addSyncValueToArray' => 1,
@@ -298,7 +299,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(
                 array('getHelper', 'getApiCustomers', 'getApiProducts',
                     'getApiCarts', 'getApiOrders', 'deleteUnsentItems', 'markItemsAsSent', 'getApiPromoRules',
-                    'getApiPromoCodes', 'getSyncBatchesModel')
+                    'getApiPromoCodes', 'getSyncBatchesModel', '_showResumeEcommerce')
             )
             ->getMock();
 
@@ -359,6 +360,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $helperMock->expects($this->once())->method('getMCStoreId')->with($magentoStoreId)->willReturn($mailchimpStoreId);
 
         $apiBatchesMock->expects($this->once())->method('deleteUnsentItems');
+
+        $apiBatchesMock->expects($this->once())->method('_showResumeEcommerce')->with($batchResponse['id']);
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($magentoStoreId)->willReturn(1);
 
@@ -470,7 +473,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $syncBatches = array();
         $syncBatches[] = $syncBatchesTwoMock;
 
-        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturnOnConsecutiveCalls($helperMock);
         $apiBatchesMock->expects($this->once())->method('getSyncBatchesModel')->willReturn($syncBatchesMock);
 
         $helperMock->expects($this->once())->method('getMCStoreId')->with($magentoStoreId)->willReturn($mailchimpStoreId);
@@ -537,7 +540,12 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(array('setStoreId', 'setBatchId', 'setStatus', 'save'))
             ->getMock();
 
-        $apiBatchesMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $apiBatchesMock->expects($this->exactly(2))
+            ->method('getHelper')
+            ->willReturnOnConsecutiveCalls(
+                $helperMock,
+                $helperMock
+            );
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
         $helperMock->expects($this->once())->method('getGeneralList')->with($storeId)->willReturn($listId);

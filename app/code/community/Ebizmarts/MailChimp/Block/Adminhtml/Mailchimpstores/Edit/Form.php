@@ -15,6 +15,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
 
     protected function _prepareForm()
     {
+        $helper = $this->makeHelper();
+
         $form = new Varien_Data_Form(array(
             'id'        => 'edit_form',
             'action'    => $this->getUrl('*/*/save'),
@@ -33,21 +35,22 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $form->setValues($store->getData());
         }
         $fieldset   = $form->addFieldset('base_fieldset', array(
-            'legend'    => Mage::helper('mailchimp')->__('Store Information'),
+            'legend'    => $helper->__('Store Information'),
             'class'     => 'fieldset',
         ));
-        if(!$store->getId()) {
+        if (!$store->getId()) {
             $stores = Mage::app()->getStores();
             $apikeys = array();
             foreach ($stores as $s) {
-                $apikey = Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_APIKEY,$s);
-                if(!array_key_exists($apikey,$apikeys)) {
-                    $apikeys[$apikey] = $apikey;
+                $apikey = $helper->getApiKey($s);
+                if (!array_key_exists($apikey, $apikeys)) {
+                    $encryptedApiKey = $helper->encryptData($apikey);
+                    $apikeys[$encryptedApiKey] = $helper->mask($apikey);
                 }
             }
-            $apikeyField =$fieldset->addField('apikey', 'select', array(
-                'label'     => Mage::helper('mailchimp')->__('Api Key'),
-                'title'     => Mage::helper('mailchimp')->__('Api Key'),
+            $apikeyField = $fieldset->addField('apikey', 'select', array(
+                'label'     => $helper->__('Api Key'),
+                'title'     => $helper->__('Api Key'),
                 'name'      => 'apikey',
                 'required'  => true,
                 'options'   => $apikeys,
@@ -57,28 +60,28 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
 
             $fieldset->addField('listid', 'select', array(
                 'name'      => 'listid',
-                'label'     => Mage::helper('mailchimp')->__('List'),
-                'title'     => Mage::helper('mailchimp')->__('List'),
+                'label'     => $helper->__('List'),
+                'title'     => $helper->__('List'),
                 'required'  => true,
                 'options'   => array()
             ));
         }
         $fieldset->addField('name', 'text', array(
             'name'      => 'name',
-            'label'     => Mage::helper('mailchimp')->__('Store Name'),
-            'title'     => Mage::helper('mailchimp')->__('Store Name'),
+            'label'     => $helper->__('Store Name'),
+            'title'     => $helper->__('Store Name'),
             'required'  => true,
         ));
-        $fieldset->addField('domain', 'text',array(
+        $fieldset->addField('domain', 'text', array(
            'name'   => 'domain',
-           'label'  => Mage::helper('mailchimp')->__('Domain'),
-           'title'  => Mage::helper('mailchimp')->__('Domain'),
+           'label'  => $helper->__('Domain'),
+           'title'  => $helper->__('Domain'),
             'required' => true
         ));
         $fieldset->addField('email_address', 'text', array(
            'name'   => 'email_address',
-           'label'  => Mage::helper('mailchimp')->__('Email'),
-           'title'  => Mage::helper('mailchimp')->__('Email'),
+           'label'  => $helper->__('Email'),
+           'title'  => $helper->__('Email'),
            'required' => true
         ));
         $currencies = Mage::getModel('adminhtml/system_config_source_currency')->toOptionArray(false);
@@ -87,8 +90,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $currencyArray[$c['value']] = $c['label'];
         }
         $fieldset->addField('currency_code', 'select', array(
-            'label'     => Mage::helper('mailchimp')->__('Currency'),
-            'title'     => Mage::helper('mailchimp')->__('Currency'),
+            'label'     => $helper->__('Currency'),
+            'title'     => $helper->__('Currency'),
             'name'      => 'currency_code',
             'required'  => true,
             'options'   => $currencyArray,
@@ -99,8 +102,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $localeArray[$c['value']] = $c['label'];
         }
         $fieldset->addField('primary_locale', 'select', array(
-            'label'     => Mage::helper('mailchimp')->__('Locale'),
-            'title'     => Mage::helper('mailchimp')->__('Locale'),
+            'label'     => $helper->__('Locale'),
+            'title'     => $helper->__('Locale'),
             'name'      => 'primary_locale',
             'required'  => true,
             'options'   => $localeArray,
@@ -111,8 +114,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $timezoneArray[$c['value']] = $c['label'];
         }
         $fieldset->addField('timezone', 'select', array(
-            'label'     => Mage::helper('mailchimp')->__('Time Zone'),
-            'title'     => Mage::helper('mailchimp')->__('Time Zone'),
+            'label'     => $helper->__('Time Zone'),
+            'title'     => $helper->__('Time Zone'),
             'name'      => 'timezone',
             'required'  => true,
             'options'   => $timezoneArray,
@@ -120,33 +123,33 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
 
         $fieldset->addField('phone', 'text', array(
             'name'   => 'phone',
-            'label'  => Mage::helper('mailchimp')->__('Phone'),
-            'title'  => Mage::helper('mailchimp')->__('Phone'),
+            'label'  => $helper->__('Phone'),
+            'title'  => $helper->__('Phone'),
             'required' => true
         ));
         $fieldset->addField('address_address_one', 'text', array(
             'name'   => 'address_address_one',
-            'label'  => Mage::helper('mailchimp')->__('Street'),
-            'title'  => Mage::helper('mailchimp')->__('Street'),
+            'label'  => $helper->__('Street'),
+            'title'  => $helper->__('Street'),
             'required' => true
         ));
 
         $fieldset->addField('address_address_two', 'text', array(
             'name'   => 'address_address_two',
-            'label'  => Mage::helper('mailchimp')->__('Street'),
-            'title'  => Mage::helper('mailchimp')->__('Street'),
+            'label'  => $helper->__('Street'),
+            'title'  => $helper->__('Street'),
             'required' => false
         ));
         $fieldset->addField('address_city', 'text', array(
             'name'   => 'address_city',
-            'label'  => Mage::helper('mailchimp')->__('City'),
-            'title'  => Mage::helper('mailchimp')->__('City'),
+            'label'  => $helper->__('City'),
+            'title'  => $helper->__('City'),
             'required' => true
         ));
         $fieldset->addField('address_postal_code', 'text', array(
             'name'   => 'address_postal_code',
-            'label'  => Mage::helper('mailchimp')->__('Postal Code'),
-            'title'  => Mage::helper('mailchimp')->__('Postal Code'),
+            'label'  => $helper->__('Postal Code'),
+            'title'  => $helper->__('Postal Code'),
             'required' => true
         ));
         $countries = Mage::getModel('adminhtml/system_config_source_country')->toOptionArray();
@@ -155,8 +158,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             $countryArray[$c['value']] = $c['label'];
         }
         $fieldset->addField('address_country_code', 'select', array(
-            'label'     => Mage::helper('mailchimp')->__('Country'),
-            'title'     => Mage::helper('mailchimp')->__('Country'),
+            'label'     => $helper->__('Country'),
+            'title'     => $helper->__('Country'),
             'name'      => 'address_country_code',
             'required'  => true,
             'options'   => $countryArray,
@@ -167,5 +170,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
         $form->setUseContainer(true);
         $this->setForm($form);
         return parent::_prepareForm();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    protected function makeHelper()
+    {
+        return Mage::helper('mailchimp');
     }
 }
