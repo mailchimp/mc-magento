@@ -48,7 +48,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
         $fname  = $data['merges']['FNAME'] = 'Enterprise1';
         $lname  = $data['merges']['LNAME'] = 'enterprise11';
-        $subscribeSource = Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE;
+        $subscribeSource = Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE;
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
