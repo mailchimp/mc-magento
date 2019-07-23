@@ -620,6 +620,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
     {
         $getStoreId = $data['getStoreId'];
         $storeId = 1;
+        $subscriberSource = null;
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->disableOriginalConstructor()
@@ -628,7 +629,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'addSuccessIfRequired'))
+            ->setMethods(array('makeHelper', 'addSuccessIfRequired', 'isMailchimpSave'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -653,38 +654,32 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $eventMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
 
+        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn($subscriberSource);
+
         $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
 
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeId)->willReturn(true);
 
-        $subscriberMock
-            ->expects($this->once())
-            ->method('getStatus')
+        $subscriberMock->expects($this->once())->method('getStatus')
             ->willReturn(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+
+        $observerMock->expects($this->once())->method('isMailchimpSave')->with($subscriberSource)->willReturn(false);
 
         $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
 
-        $helperMock
-            ->expects($this->once())
-            ->method('isSubscriptionConfirmationEnabled')
-            ->with($storeId)
+        $helperMock->expects($this->once())->method('isSubscriptionConfirmationEnabled')->with($storeId)
             ->willReturn(true);
 
         $helperMock->expects($this->once())->method('isUseMagentoEmailsEnabled')->with($storeId)->willReturn(false);
 
-        $subscriberMock
-            ->expects($this->once())
-            ->method('setStatus')
+        $subscriberMock->expects($this->once())->method('setStatus')
             ->with(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
 
         $observerMock->expects($this->once())->method('addSuccessIfRequired')->with($helperMock);
 
-        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn(null);
-
         $subscriberMock->expects($this->exactly($getStoreId))->method('getStoreId')->willReturn($storeId);
-
 
         $observerMock->subscriberSaveBefore($eventObserverMock);
     }
@@ -697,10 +692,11 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSubscriberSaveAfter()
+    public function testSubscriberSaveAfterUseMagentoEmail()
     {
         $storeViewId = 1;
         $params = array();
+        $subscriberSource = null;
 
         $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
             ->disableOriginalConstructor()
@@ -709,7 +705,88 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeHelper', 'getRequest', 'createEmailCookie', 'makeApiSubscriber', 'getStoreViewIdBySubscriber'))
+            ->setMethods(
+                array('makeHelper', 'getRequest', 'createEmailCookie', 'makeApiSubscriber',
+                    'getStoreViewIdBySubscriber', 'isEmailConfirmationRequired', 'isMailchimpSave')
+            )
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('isSubscriptionEnabled', 'saveInterestGroupData', 'isUseMagentoEmailsEnabled'))
+            ->getMock();
+
+        $eventMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriber'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriberSource'))
+            ->getMock();
+
+        $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getParams'))
+            ->getMock();
+
+        $apiSubscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $eventObserverMock->expects($this->once())->method('getEvent')->willReturn($eventMock);
+
+        $eventMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
+
+        $observerMock->expects($this->once())->method('getStoreViewIdBySubscriber')
+            ->with($subscriberMock)->willReturn($storeViewId);
+
+        $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+
+        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn($subscriberSource);
+
+        $observerMock->expects($this->once())->method('isMailchimpSave')->with($subscriberSource)->willReturn(false);
+
+        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeViewId)->willReturn(true);
+
+        $observerMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
+
+        $requestMock->expects($this->once())->method('getParams')->willReturn($params);
+
+        $helperMock->expects($this->once())->method('saveInterestGroupData')
+            ->with($params, $storeViewId, null, $subscriberMock);
+
+        $observerMock->expects($this->once())->method('isEmailConfirmationRequired')
+            ->with($subscriberSource)->willReturn(false);
+
+        $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
+
+        $helperMock->expects($this->once())->method('isUseMagentoEmailsEnabled')->with($storeViewId)->willReturn(1);
+
+        $observerMock->expects($this->once())->method('makeApiSubscriber')->willReturn($apiSubscriberMock);
+
+        $observerMock->subscriberSaveAfter($eventObserverMock);
+    }
+
+    public function testSubscriberSaveAfterEmailConfirmation()
+    {
+        $storeViewId = 1;
+        $params = array();
+        $subscriberSource = Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_CONFIRMATION;
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(
+                array('makeHelper', 'getRequest', 'createEmailCookie', 'makeApiSubscriber',
+                    'getStoreViewIdBySubscriber', 'isMagentoSubscription', 'isEmailConfirmationRequired',
+                    'isMailchimpSave')
+            )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -741,11 +818,14 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $eventMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
 
-        $observerMock->expects($this->once())->method('getStoreViewIdBySubscriber')->with($subscriberMock)->willReturn($storeViewId);
+        $observerMock->expects($this->once())->method('getStoreViewIdBySubscriber')
+            ->with($subscriberMock)->willReturn($storeViewId);
 
         $observerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
-        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn(null);
+        $subscriberMock->expects($this->once())->method('getSubscriberSource')->willReturn($subscriberSource);
+
+        $observerMock->expects($this->once())->method('isMailchimpSave')->with($subscriberSource)->willReturn(false);
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($storeViewId)->willReturn(true);
 
@@ -753,14 +833,18 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
 
         $requestMock->expects($this->once())->method('getParams')->willReturn($params);
 
-        $helperMock
-            ->expects($this->once())
-            ->method('saveInterestGroupData')
+        $helperMock->expects($this->once())->method('saveInterestGroupData')
             ->with($params, $storeViewId, null, $subscriberMock);
+
+        $observerMock->expects($this->once())->method('isMagentoSubscription')
+            ->with($subscriberSource)->willReturn(false);
+
+        $observerMock->expects($this->once())->method('isEmailConfirmationRequired')
+            ->with($subscriberSource)->willReturn(true);
 
         $observerMock->expects($this->once())->method('createEmailCookie')->with($subscriberMock);
 
-        $helperMock->expects($this->once())->method('isUseMagentoEmailsEnabled')->with($storeViewId)->willReturn(false);
+        $helperMock->expects($this->once())->method('isUseMagentoEmailsEnabled')->with($storeViewId)->willReturn(0);
 
         $subscriberMock->expects($this->once())->method('getIsStatusChanged')->willReturn(true);
 

@@ -324,7 +324,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isUseMagentoEmailsEnabled($scopeId)
     {
-        return $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $scopeId);
+        return (int) $this->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL, $scopeId);
     }
 
     /**
@@ -3139,7 +3139,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 $subscriber->setData("mailchimp_sync_deleted", $syncDeleted);
             }
 
-            $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+            $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
             $subscriber->save();
         }
     }
@@ -3922,7 +3922,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function setMemberGeneralData($subscriber)
     {
         $subscriber->setImportMode(true);
-        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
         $subscriber->setIsStatusChanged(true);
         $subscriber->save();
     }

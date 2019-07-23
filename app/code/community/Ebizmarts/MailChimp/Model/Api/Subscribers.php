@@ -136,7 +136,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
-                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                 $subscriber->save();
             }
 
@@ -275,7 +275,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             if ($saveSubscriber) {
-                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                 $subscriber->save();
             }
         }
