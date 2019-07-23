@@ -313,46 +313,34 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
 
     /**
      * @param $promoRule
+     * @throws Exception
      */
     public function deletePromoCodesSyncDataByRule($promoRule)
     {
-        $promoCodeIds = $this->getPromoCodesForRule($promoRule->getRelatedId());
-        foreach ($promoCodeIds as $promoCodeId) {
-            $promoCodeSyncDataItems = $this->getMailChimpHelper()->getAllEcommerceSyncDataItemsPerId($promoCodeId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
-            foreach ($promoCodeSyncDataItems as $promoCodeSyncDataItem) {
-                $promoCodeSyncDataItem->delete();
+        $promoRuleId = $promoRule->getRelatedId();
+        $helper = $this->getMailChimpHelper();
+        $promoRules = $helper->getAllEcommerceSyncDataItemsPerId($promoRuleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
+        foreach ($promoRules as $promoRule) {
+            $mailchimpStoreId = $promoRule->getMailchimpStoreId();
+            $api = $helper->getApiByMailChimpStoreId($mailchimpStoreId);
+            if ($api !== null) {
+                try {
+                    $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes->getAll($mailchimpStoreId, $promoRuleId);
+                    foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
+                        $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
+                    }
+                } catch (MailChimp_Error $e) {
+                    $helper->logError($e->getFriendlyMessage());
+                }
             }
         }
+
     }
 
     public function deletePromoCodeSyncData($promoCodeId, $mailchimpStoreId)
     {
         $promoCodeSyncDataItem = $this->getMailChimpHelper()->getEcommerceSyncDataItem($promoCodeId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, $mailchimpStoreId);
         $promoCodeSyncDataItem->delete();
-    }
-
-    /**
-     * @param $promoRuleId
-     * @return array
-     */
-    protected function getPromoCodesForRule($promoRuleId)
-    {
-        $promoCodes = array();
-        $helper = $this->getMailChimpHelper();
-        $promoRules = $helper->getAllEcommerceSyncDataItemsPerId($promoRuleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
-        foreach ($promoRules as $promoRule) {
-            $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $api = $helper->getApiByMailChimpStoreId($mailchimpStoreId);
-            try {
-                $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes->getAll($mailchimpStoreId, $promoRuleId);
-                foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
-                    $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
-                }
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-            }
-        }
-        return $promoCodes;
     }
 
     protected function getPromoRuleIdByCouponId($promoCodeId)

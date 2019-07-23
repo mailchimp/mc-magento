@@ -3606,13 +3606,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getApiByMailChimpStoreId($mailchimpStoreId)
     {
+        $api = null;
         $scopeArray = $this->getFirstScopeFromConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID, $mailchimpStoreId);
         try {
             $api = $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
-            return $api;
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $this->logError($e->getMessage());
         }
+        return $api;
     }
 
     /**
