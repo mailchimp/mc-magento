@@ -1,7 +1,6 @@
 <script type="text/javascript">
-    //<![CDATA[
     function createMergeFields() {
-        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+        new Ajax.Request('<?php echo $this->escapeUrl($this->getAjaxCheckUrl()) ?>', {
             method: 'get',
             onSuccess: function (transport) {
 
@@ -9,7 +8,7 @@
                     alert('The merge fields were successfully created.')
                 }
                 else {
-                    alert('<?php echo $this->getMessageForMailchimpErrorLog() ?>')
+                    alert('<?php echo $this->escapeHtml($this->getMessageForMailchimpErrorLog()) ?>')
                 }
             },
             onFailure: function () {
@@ -17,7 +16,6 @@
             }
         });
     }
-    //]]>
 </script>
 
 

@@ -5,17 +5,18 @@
  * Time: 3:49 PM
  */
 
-class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrderTest extends PHPUnit_Framework_TestCase
+class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrderTest
+    extends PHPUnit_Framework_TestCase
 {
 
     /**
      * @var \Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder $_block
      */
-    private $_block;
+    protected $_block;
     /**
      * @var \Mage_Sales_Model_Order $_orderMock
      */
-    private $_orderMock;
+    protected $_orderMock;
 
     public function setUp()
     {
@@ -57,7 +58,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
 
         $orderMock = $this->_orderMock;
 
-        $blockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder::class)
+        $blockMock = $this->getMockBuilder(
+            Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrder::class
+        )
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper', 'makeApiOrders'))
             ->getMock();
@@ -83,7 +86,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_MailchimpOrd
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
         $helperMock->expects($this->any())->method('getEcommerceFirstDate')->with($storeId)->willReturn($firstDate);
 
-        $modelMock->expects($this->once())->method('getSyncedOrder')->with($orderId, $mailchimpStoreId)->willReturn($syncedData);
+        $modelMock
+            ->expects($this->once())
+            ->method('getSyncedOrder')
+            ->with($orderId, $mailchimpStoreId)
+            ->willReturn($syncedData);
 
         $result = $blockMock->render($orderMock);
 

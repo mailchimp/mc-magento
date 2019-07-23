@@ -17,21 +17,23 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    private $mailchimpHelper;
-    private $optInConfiguration;
-    private $optInStatusForStore;
-    private $locale;
-    private $directoryRegionModel;
-    private $magentoStoreId;
-    private $mailchimpStoreId;
-    private $batchId;
+    protected $_mailchimpHelper;
+    protected $_mailchimpDateHelper;
+    protected $_optInConfiguration;
+    protected $_optInStatusForStore;
+    protected $_locale;
+    protected $_directoryRegionModel;
+    protected $_magentoStoreId;
+    protected $_mailchimpStoreId;
+    protected $_batchId;
 
     public function __construct()
     {
-        $this->mailchimpHelper = $this->makeHelper();
-        $this->optInConfiguration = array();
-        $this->locale = Mage::app()->getLocale();
-        $this->directoryRegionModel = Mage::getModel('directory/region');
+        $this->_mailchimpHelper = $this->makeHelper();
+        $this->_mailchimpDateHelper = $this->makeDateHelper();
+        $this->_optInConfiguration = array();
+        $this->_locale = Mage::app()->getLocale();
+        $this->_directoryRegionModel = Mage::getModel('directory/region');
     }
 
     /**
@@ -88,13 +90,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $customersCollection = array();
         $customerIds = $this->getCustomersToSync();
-        if (count($customerIds) > 0) {
+        if (!empty($customerIds)) {
             $customersCollection = $this->makeCustomersNotSentCollection($customerIds);
         }
 
         $customerArray = array();
         $this->makeBatchId();
-        $this->optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
+        $this->_optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
         $subscriber = $this->getSubscriberModel();
 
         $counter = 0;
@@ -103,7 +105,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerJson = json_encode($data);
             if (false !== $customerJson) {
                 $helper = $this->getMailChimpHelper();
-                $dataCustomer = $helper->getEcommerceSyncDataItem($customer->getId(), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId);
+                $dataCustomer = $helper->getEcommerceSyncDataItem(
+                    $customer->getId(),
+                    Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+                    $mailchimpStoreId
+                );
                 if ($dataCustomer->getId()) {
                     $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
                 } else {
@@ -125,6 +131,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             $counter++;
         }
+
         return $customerArray;
     }
 
@@ -138,12 +145,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $batchData = array();
         $batchData['method'] = "PUT";
-        $batchData['path'] = "/ecommerce/stores/{$this->mailchimpStoreId}/customers/{$customerId}";
-        $batchData['operation_id'] = "{$this->batchId}_{$customerId}";
+        $batchData['path'] = "/ecommerce/stores/{$this->_mailchimpStoreId}/customers/{$customerId}";
+        $batchData['operation_id'] = "{$this->_batchId}_{$customerId}";
         $batchData['body'] = $customerJson;
         return $batchData;
     }
 
+    /**
+     * @param $customer
+     * @return array
+     */
     protected function _buildCustomerData($customer)
     {
         $data = array();
@@ -193,7 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
 
         if ($customer->getRegionId()) {
-            $customerAddress["province_code"] = $this->directoryRegionModel->load($customer->getRegionId())->getCode();
+            $customerAddress["province_code"] = $this->_directoryRegionModel->load($customer->getRegionId())->getCode();
             if (!$customerAddress["province_code"]) {
                 unset($customerAddress["province_code"]);
             }
@@ -215,9 +226,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $data;
     }
 
+    /**
+     * @param $countryCode
+     * @return array
+     */
     protected function getCountryNameByCode($countryCode)
     {
-        return $this->locale->getCountryTranslation($countryCode);
+        return $this->_locale->getCountryTranslation($countryCode);
     }
 
     /**
@@ -228,24 +243,32 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     public function update($customerId, $storeId)
     {
-        $mailchimpStoreId = $this->mailchimpHelper->getMCStoreId($storeId);
+        $mailchimpStoreId = $this->_mailchimpHelper->getMCStoreId($storeId);
         $this->_updateSyncData($customerId, $mailchimpStoreId, null, null, 1, null, true, false);
     }
 
+    /**
+     * @param $magentoStoreId
+     * @return array
+     */
     public function getOptin($magentoStoreId)
     {
-        return $this->getOptinConfiguration($magentoStoreId);
+        return $this->getOptionConfiguration($magentoStoreId);
     }
 
-    protected function getOptinConfiguration($magentoStoreId)
+    /**
+     * @param $magentoStoreId
+     * @return array
+     */
+    protected function getOptionConfiguration($magentoStoreId)
     {
-        if (array_key_exists($magentoStoreId, $this->optInConfiguration)) {
-            return $this->optInConfiguration[$magentoStoreId];
+        if (array_key_exists($magentoStoreId, $this->_optInConfiguration)) {
+            return $this->_optInConfiguration[$magentoStoreId];
         }
 
         $this->checkEcommerceOptInConfigAndUpdateStorage($magentoStoreId);
 
-        return $this->optInConfiguration[$magentoStoreId];
+        return $this->_optInConfiguration[$magentoStoreId];
     }
 
     /**
@@ -260,9 +283,30 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param bool $saveOnlyIfexists
      * @param bool $allowBatchRemoval
      */
-    protected function _updateSyncData($customerId, $mailchimpStoreId, $syncDelta = null, $syncError = null, $syncModified = 0, $syncedFlag = null, $saveOnlyIfexists = false, $allowBatchRemoval = true)
-    {
-        $this->mailchimpHelper->saveEcommerceSyncData($customerId, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId, $syncDelta, $syncError, $syncModified, null, null, $syncedFlag, $saveOnlyIfexists, null, $allowBatchRemoval);
+    protected function _updateSyncData(
+        $customerId,
+        $mailchimpStoreId,
+        $syncDelta = null,
+        $syncError = null,
+        $syncModified = 0,
+        $syncedFlag = null,
+        $saveOnlyIfexists = false,
+        $allowBatchRemoval = true
+) {
+        $this->_mailchimpHelper->saveEcommerceSyncData(
+            $customerId,
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+            $mailchimpStoreId,
+            $syncDelta,
+            $syncError,
+            $syncModified,
+            null,
+            null,
+            $syncedFlag,
+            $saveOnlyIfexists,
+            null,
+            $allowBatchRemoval
+        );
     }
 
     /**
@@ -270,9 +314,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function makeBatchId()
     {
-        $this->batchId = "storeid-{$this->getBatchMagentoStoreId()}_";
-        $this->batchId .= Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_';
-        $this->batchId .= $this->mailchimpHelper->getDateMicrotime();
+        $this->_batchId = "storeid-{$this->getBatchMagentoStoreId()}_";
+        $this->_batchId .= Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_';
+        $this->_batchId .= $this->_mailchimpDateHelper->getDateMicrotime();
     }
 
     /**
@@ -289,6 +333,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection->joinAttribute('company', 'customer_address/company', 'default_billing', null, 'left');
     }
 
+    /**
+     * @param $collection
+     */
     protected function joinSalesData($collection)
     {
         $collection->getSelect()->joinLeft(
@@ -306,12 +353,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function joinMailchimpSyncData($collection)
     {
-        $joinCondition      = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
+        $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getSyncdataTableName();
 
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->mailchimpStoreId),
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->_mailchimpStoreId),
             array()
         );
 
@@ -323,7 +370,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     public function getSyncDataTableName()
     {
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = Mage::getSingleton('core/resource')
+            ->getTableName('mailchimp/ecommercesyncdata');
 
         return $mailchimpTableName;
     }
@@ -334,7 +382,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function isEcommerceCustomerOptInConfigEnabled($magentoStoreId)
     {
-        $configValue = $this->mailchimpHelper->getConfigValueForScope(
+        $configValue = $this->_mailchimpHelper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMERS_OPTIN,
             $magentoStoreId
         );
@@ -347,9 +395,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function checkEcommerceOptInConfigAndUpdateStorage($magentoStoreId)
     {
         if ($this->isEcommerceCustomerOptInConfigEnabled($magentoStoreId)) {
-            $this->optInConfiguration[$magentoStoreId] = true;
+            $this->_optInConfiguration[$magentoStoreId] = true;
         } else {
-            $this->optInConfiguration[$magentoStoreId] = false;
+            $this->_optInConfiguration[$magentoStoreId] = false;
         }
     }
 
@@ -358,7 +406,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function getBatchLimitFromConfig()
     {
-        $helper = $this->mailchimpHelper;
+        $helper = $this->_mailchimpHelper;
         return $helper->getCustomerAmountLimit();
     }
 
@@ -394,7 +442,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function logCouldNotEncodeCustomerError($customer)
     {
-        $this->mailchimpHelper->logError(
+        $this->_mailchimpHelper->logError(
             "Customer " . $customer->getId() . " json encode failed on store " . $this->getBatchMagentoStoreId()
         );
     }
@@ -412,7 +460,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function getBatchMagentoStoreId()
     {
-        return $this->magentoStoreId;
+        return $this->_magentoStoreId;
     }
 
     /**
@@ -422,9 +470,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId = null)
     {
         if (!$mailchimpStoreId) {
-            $mailchimpStoreId = $this->mailchimpStoreId;
+            $mailchimpStoreId = $this->_mailchimpStoreId;
         }
-        $joinCondition = "m4m.related_id = e.entity_id and m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
+
+        $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getSyncDataTableName();
 
         $collection->getSelect()->joinLeft(
@@ -445,7 +494,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function setMailchimpStoreId($mailchimpStoreId)
     {
-        $this->mailchimpStoreId = $mailchimpStoreId;
+        $this->_mailchimpStoreId = $mailchimpStoreId;
     }
 
     /**
@@ -453,7 +502,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function setMagentoStoreId($magentoStoreId)
     {
-        $this->magentoStoreId = $magentoStoreId;
+        $this->_magentoStoreId = $magentoStoreId;
     }
 
     /**
@@ -478,6 +527,22 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function getMailChimpHelper()
     {
-        return $this->mailchimpHelper;
+        return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function makeDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailChimpDateHelper()
+    {
+        return $this->_mailchimpDateHelper;
     }
 }

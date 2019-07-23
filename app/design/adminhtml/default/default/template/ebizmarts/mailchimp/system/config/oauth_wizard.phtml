@@ -7,7 +7,21 @@
     <tr>
         <td>
             <button style=""
-                    onclick="javascript:window.open('<?php echo $this->getButtonUrl() ?>', 'apiwizard','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=100, top=100, width=500, height=700'); return false;"
+                    onclick="javascript:window.open(
+                        '<?php echo $this->escapeUrl($this->getButtonUrl()) ?>',
+                            'apiwizard',
+                            'toolbar=no, ' +
+                            'location=no, ' +
+                            'directories=no, ' +
+                            'status=no, ' +
+                            'menubar=no, ' +
+                            'scrollbars=yes, ' +
+                            'resizable=yes, ,' +
+                            'left=100, ' +
+                            'top=100, ' +
+                            'width=500, ' +
+                            'height=700'
+                            ); return false;"
                     class="scalable" type="button" id="<?php echo $this->getHtmlId() ?>">
                 <span><?php echo $this->escapeHtml($this->getButtonLabel()); ?></span>
             </button>

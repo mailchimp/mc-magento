@@ -34,7 +34,9 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
 
         $aux = (array_key_exists('Enterprise_Enterprise', $modulesArray)) ? 'EE' : 'CE';
         $v = (string)Mage::getConfig()->getNode('modules/Ebizmarts_Mandrill/version');
-        $version = strpos(Mage::getVersion(), '-') ? substr(Mage::getVersion(), 0, strpos(Mage::getVersion(), '-')) : Mage::getVersion();
+        $version = strpos(Mage::getVersion(), '-')
+            ? substr(Mage::getVersion(), 0, strpos(Mage::getVersion(), '-'))
+            : Mage::getVersion();
         return (string)'Ebizmarts_Mandrill' . $v . '/Mage' . $aux . $version;
     }
 
@@ -47,7 +49,12 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
      */
     public function isMandrillLogEnabled($scopeId = 0, $scope = null)
     {
-        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG, $scopeId, $scope);
+        return Mage::helper('mailchimp')
+            ->getConfigValueForScope(
+                Ebizmarts_MailChimp_Model_Config::MANDRILL_LOG,
+                $scopeId,
+                $scope
+            );
     }
 
     /**
@@ -59,7 +66,12 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
      */
     public function isMandrillEnabled($scopeId = 0, $scope = null)
     {
-        return Mage::helper('mailchimp')->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE, $scopeId, $scope);
+        return Mage::helper('mailchimp')
+            ->getConfigValueForScope(
+                Ebizmarts_MailChimp_Model_Config::MANDRILL_ACTIVE,
+                $scopeId,
+                $scope
+            );
     }
 
     /**
@@ -72,6 +84,13 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
     public function getMandrillApiKey($scopeId = 0, $scope = null)
     {
         $mailchimpHelper = Mage::helper('mailchimp');
-        return $mailchimpHelper->decryptData($mailchimpHelper->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY, $scopeId, $scope));
+        return $mailchimpHelper->decryptData(
+            $mailchimpHelper
+                ->getConfigValueForScope(
+                    Ebizmarts_MailChimp_Model_Config::MANDRILL_APIKEY,
+                    $scopeId,
+                    $scope
+                )
+        );
     }
 }

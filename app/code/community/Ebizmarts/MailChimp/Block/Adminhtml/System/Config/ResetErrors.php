@@ -10,7 +10,8 @@
  * @date:     5/27/16 1:02 PM
  * @file:     ResetErrors.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
+    extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected function _construct()
     {
@@ -27,7 +28,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors extends Mage
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        if ($helper->isSubscriptionEnabled($scopeArray['scope_id'], $scopeArray['scope']) || $scopeArray['scope_id'] == 0) {
+        if ($helper->isSubscriptionEnabled($scopeArray['scope_id'], $scopeArray['scope'])
+            || $scopeArray['scope_id'] == 0) {
             $button = $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(
                     array(

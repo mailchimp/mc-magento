@@ -10,7 +10,8 @@
  * @date:     6/10/16 2:23 PM
  * @file:     Link.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Link
+    extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
 {
     public function render(Varien_Object $row)
     {
@@ -18,15 +19,24 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimperrors_Link extends Mage_Admi
         switch ($row->getData('regtype')) {
             case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
                 $url = Mage::helper("adminhtml")->getUrl("adminhtml/customer/edit", array('id'=>$id));
-                $displayText = '<a href="' . $url . '" target="_blank">' . $this->__('Go to Customer view. Id:') . ' ' . $id . '</a>';
+                $displayText =
+                    '<a href="' . $url . '" target="_blank">'
+                    . $this->__('Go to Customer view. Id:') . ' ' . $id
+                    . '</a>';
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_ORDER:
                 $url = Mage::helper("adminhtml")->getUrl("adminhtml/sales_order/view", array('order_id'=>$id));
-                $displayText = '<a href="' . $url . '" target="_blank">' . $this->__('Go to Order view. Id:') . ' ' . $id . '</a>';
+                $displayText =
+                    '<a href="' . $url . '" target="_blank">'
+                    . $this->__('Go to Order view. Id:') . ' ' . $id
+                    . '</a>';
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
                 $url = Mage::helper("adminhtml")->getUrl("adminhtml/catalog_product/edit", array('id'=>$id));
-                $displayText = '<a href="' . $url . '" target="_blank">' . $this->__('Go to Product view. Id:') . ' ' . $id . '</a>';
+                $displayText =
+                    '<a href="' . $url . '" target="_blank">'
+                    . $this->__('Go to Product view. Id:') . ' ' . $id
+                    . '</a>';
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
                 $displayText = $this->__('Quote view not available. Id:') . ' ' . $id;

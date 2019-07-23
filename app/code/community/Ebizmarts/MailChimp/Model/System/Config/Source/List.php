@@ -37,13 +37,17 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         if (empty($this->_lists)) {
-            $apiKey = (empty($params)) ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']) : $params['api_key'];
+            $apiKey = (empty($params))
+                ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope'])
+                : $params['api_key'];
             if ($apiKey) {
                 try {
                     $api = $helper->getApiByKey($apiKey);
 
                     //Add filter to only show the lists for the selected store when MC store selected.
-                    $mcStoreId = (!empty($params)) ? $params['mailchimp_store_id'] : $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
+                    $mcStoreId = (!empty($params))
+                        ? $params['mailchimp_store_id']
+                        : $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
                     if ($mcStoreId !== '' && $mcStoreId !== null) {
                         $listId = $helper->getListIdByApiKeyAndMCStoreId($apiKey, $mcStoreId);
                         if ($listId !== false) {
@@ -83,6 +87,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
             if (count($mcLists['lists']) > 1) {
                 $lists[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp Audience ---'));
             }
+
             foreach ($mcLists['lists'] as $list) {
                 $memberCount = $list['stats']['member_count'];
                 $memberText = $helper->__('members');
@@ -92,6 +97,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
         } else {
             $lists[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
+
         return $lists;
     }
 
