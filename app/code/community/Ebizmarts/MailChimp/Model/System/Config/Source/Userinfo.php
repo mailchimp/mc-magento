@@ -61,8 +61,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
             if (!isset($this->_accountDetails['status'])) {
                 return array(
                     array(
-                        'value' => 0, '
-                        label' => $helper->__(
+                        'value' => 0,
+                        'label' => $helper->__(
     "<strong>Username</strong>: %s %s",
     $this->_accountDetails["username"],
     "<small>used for SMTP authentication</small>"
@@ -77,8 +77,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
                         )
                     ),
                     array(
-                        'value' => 2, '
-                        label' => $helper->__(
+                        'value' => 2,
+                        'label' => $helper->__(
     '<strong>Hourly Quota</strong>: %s %s',
     $this->_accountDetails['hourly_quota'],
     "<small>the maximum number of emails Mandrill will deliver for this user each hour. "
