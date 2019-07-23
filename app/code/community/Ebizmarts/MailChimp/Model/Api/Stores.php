@@ -83,20 +83,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $adminSession = $this->getAdminSession();
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
-            if (strstr($errorMessage, 'A store with the domain')) {
-                $errorMessage = $helper->__(
-                    'A Mailchimp store with the same domain already exists in this account. '
-                    . 'You need to have a different URLs for each scope you set up the ecommerce data. '
-                    . 'Possible solutions '
-                )
-                . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>"
-                . "HERE</a> and "
-                . "<a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>"
-                . "HERE</a>";
-                $adminSession->addError($errorMessage);
-            } else {
-                $adminSession->addError($errorMessage);
-            }
+            $errorMessage = $this->getUserFriendlyMessage($e);
+            $adminSession->addError($errorMessage);
         } catch (Exception $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
@@ -166,20 +154,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
             $adminSession = $this->getAdminSession();
             $response = $errorMessage = $e->getFriendlyMessage();
             $helper->logError($errorMessage);
-            if (strstr($errorMessage, 'A store with the domain')) {
-                $errorMessage = $helper->__(
-                    'A Mailchimp store with the same domain already exists in this account. '
-                    . 'You need to have a different URLs for each scope you set up the ecommerce data. '
-                    . 'Possible solutions '
-                )
-                . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>"
-                . "HERE</a> and "
-                . "<a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>"
-                . "HERE</a>";
-                $adminSession->addError($errorMessage);
-            } else {
-                $adminSession->addError($errorMessage);
-            }
+            $errorMessage = $this->getUserFriendlyMessage($e);
+            $adminSession->addError($errorMessage);
         } catch (Exception $e) {
             $response = $errorMessage = $e->getMessage();
             $helper->logError($errorMessage);
@@ -188,6 +164,46 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         }
 
         return $response;
+    }
+
+    /**
+     * @param $e MailChimp_Error
+     * @return string
+     */
+    private function getUserFriendlyMessage($e)
+    {
+        $helper = $this->makeHelper();
+        $errorMessage = $e->getFriendlyMessage();
+
+        if (strstr($errorMessage, 'A store with the domain')) {
+            $errorMessage = $helper->__(
+                'A Mailchimp store with the same domain already exists in this account. '
+                . 'You need to have a different URLs for each scope you set up the ecommerce data. '
+                . 'Possible solutions '
+            )
+            . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>"
+            . "HERE</a> and "
+            . "<a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>"
+            . "HERE</a>";
+        } else {
+            if (is_array($e->getMailchimpErrors())) {
+                $errorDetail = "";
+
+                foreach ($e->getMailchimpErrors() as $error) {
+                    if (isset($error['field'])) {
+                        $errorDetail .= "<br />    Field: " . $error['field'];
+                    }
+                    if (isset($error['message'])) {
+                        $errorDetail .= " Message: " . $error['message'];
+                    }
+                }
+
+                if (!empty($errorDetail)) {
+                    $errorMessage = "Error: $errorDetail";
+                }
+            }
+        }
+        return $errorMessage;
     }
 
     /**

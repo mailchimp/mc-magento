@@ -85,7 +85,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
         $mcLists = $this->getMCLists();
         if (isset($mcLists['lists'])) {
             if (count($mcLists['lists']) > 1) {
-                $lists[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp List ---'));
+                $lists[] = array('value' => '', 'label' => $helper->__('--- Select a Mailchimp Audience ---'));
             }
 
             foreach ($mcLists['lists'] as $list) {

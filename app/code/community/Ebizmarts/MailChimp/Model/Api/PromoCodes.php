@@ -431,6 +431,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
 
     /**
      * @param $promoRule
+     * @throws Exception
      */
     public function deletePromoCodesSyncDataByRule($promoRule)
     {
@@ -475,13 +476,15 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
             $api = $helper->getApiByMailChimpStoreId($mailchimpStoreId);
-            try {
-                $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes->getAll($mailchimpStoreId, $promoRuleId);
-                foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
-                    $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
+            if ($api !== null) {
+                try {
+                    $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes->getAll($mailchimpStoreId, $promoRuleId);
+                    foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
+                        $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
+                    }
+                } catch (MailChimp_Error $e) {
+                    $helper->logError($e->getFriendlyMessage());
                 }
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
             }
         }
 

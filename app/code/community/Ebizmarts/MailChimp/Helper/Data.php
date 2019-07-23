@@ -4028,10 +4028,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         );
         try {
             $api = $this->getApi($scopeArray['scope_id'], $scopeArray['scope']);
-            return $api;
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $this->logError($e->getMessage());
         }
+        return $api;
     }
 
     /**

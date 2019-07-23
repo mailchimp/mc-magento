@@ -1,6 +1,29 @@
 # Changelog
-## [1.1.16](https://github.com/mailchimp/mc-magento/releases/tag/1.1.16) - 2019-04-10
+## [1.1.17](https://github.com/mailchimp/mc-magento/releases/tag/1.1.17) - 2019-07-04
 **Fixed**
+- Currency discrepancy in order confirmation email  [\#982](https://github.com/mailchimp/mc-magento/issues/982)
+- Fix subscription confirmation email when "Subscribe all customers to the newsletter" is enabled [\#978](https://github.com/mailchimp/mc-magento/issues/978)
+- Errors saved in mailchimp_sync_ecommerce_data table may not set the sync_modified value to 0 [\#976](https://github.com/mailchimp/mc-magento/issues/976)
+- Fix for infinite sync of modified orders containing only unsupported products [\#970](https://github.com/mailchimp/mc-magento/issues/970)
+- Promo codes unexpectedly deleted from Mailchimp [\#967](https://github.com/mailchimp/mc-magento/issues/967)
+- Unknown column 'at_special_from_date_default.value' in 'on clause' [\#964](https://github.com/mailchimp/mc-magento/issues/964)
+- Remove error message when resend an item with error [\#963](https://github.com/mailchimp/mc-magento/issues/963)
+- Customer and subscriber with same email sent to mailchimp with different id [\#952](https://github.com/mailchimp/mc-magento/issues/952)
+- getLastRealOrder() doesn't exist [\#946](https://github.com/mailchimp/mc-magento/issues/946)
+
+**Changed**
+- Change "List" appearances to "Audience" [\#977](https://github.com/mailchimp/mc-magento/issues/977)
+- Encrypt sensitive data [\#955](https://github.com/mailchimp/mc-magento/issues/955)
+- Improve logging [\#947](https://github.com/mailchimp/mc-magento/pull/947)
+- Add default merge var for province/state [\#937](https://github.com/mailchimp/mc-magento/issues/937)
+- Add the options to resend all the ecommerce data or resend only the products, customers, orders or quotes [\#891](https://github.com/mailchimp/mc-magento/issues/891)
+- Improve logging [\#886](https://github.com/mailchimp/mc-magento/issues/886)
+- Add some js in the admin to avoid save before continue [\#649](https://github.com/mailchimp/mc-magento/issues/649)
+- Get guest information from orders made with the same email address [\#545](https://github.com/mailchimp/mc-magento/issues/545)
+
+## [1.1.16](https://github.com/mailchimp/mc-magento/releases/tag/1.1.16) - 2019-04-30
+**Fixed**
+- Error syncing order with disabled product [\#943](https://github.com/mailchimp/mc-magento/issues/943)
 - Orders don't sync with Mailchimp when the order have a child disabled product [\#930](https://github.com/mailchimp/mc-magento/issues/930)
 - Interest groups in checkout success with the option disabled [\#927](https://github.com/mailchimp/mc-magento/issues/927)
 - Fixed grammar in success message after group subscription in order success page. [\#925](https://github.com/mailchimp/mc-magento/pull/925)
@@ -417,3 +440,4 @@
 ## [1.0.2](https://github.com/mailchimp/mc-magento/releases/tag/1.0.2) - 2016-06-14
 **Changed**
 - Change array declaration to pre php 5.4. [\#3](https://github.com/mailchimp/mc-magento/issues/3)
+
