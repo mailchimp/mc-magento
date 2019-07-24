@@ -173,17 +173,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $storeName = false;
         if (isset($scopeArray['scope'])) {
             switch ($scopeArray['scope']) {
-                case 'stores':
-                    $store = $this->getMageApp()->getStore($scopeArray[1]);
-                    $storeName = $store->getName();
-                    break;
-                case 'websites':
-                    $website = $this->getMageApp()->getWebsite($scopeArray[1]);
-                    $storeName = $website->getName();
-                    break;
-                case 'default':
-                    $storeName = 'Default Config';
-                    break;
+            case 'stores':
+                $store = $this->getMageApp()->getStore($scopeArray[1]);
+                $storeName = $store->getName();
+                break;
+            case 'websites':
+                $website = $this->getMageApp()->getWebsite($scopeArray[1]);
+                $storeName = $website->getName();
+                break;
+            case 'default':
+                $storeName = 'Default Config';
+                break;
             }
         }
 
@@ -279,13 +279,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $ret = array();
         $storeRelation = $this->getStoreRelation();
         $mailchimpStoreIdForScope = $this->getMCStoreId($scopeId, $scope);
+        $isThereAnyStore = array_key_exists($mailchimpStoreIdForScope, $storeRelation);
 
-        if ($mailchimpStoreIdForScope) {
-            foreach ($storeRelation as $mailchimpStoreId => $magentoStoreIds) {
-                if ($mailchimpStoreIdForScope == $mailchimpStoreId) {
-                    $ret = $magentoStoreIds;
-                }
-            }
+        if ($mailchimpStoreIdForScope && $isThereAnyStore) {
+            $ret = $storeRelation[$mailchimpStoreIdForScope];
         }
 
         return $ret;
@@ -1057,7 +1054,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $logEnabled = false;
         $logConfig = $this->getLogsEnabled();
         if ($logConfig == Ebizmarts_MailChimp_Model_System_Config_Source_Log::REQUEST_LOG
-            || $logConfig == Ebizmarts_MailChimp_Model_System_Config_Source_Log::BOTH) {
+            || $logConfig == Ebizmarts_MailChimp_Model_System_Config_Source_Log::BOTH
+        ) {
             $logEnabled = true;
         }
 
@@ -1073,7 +1071,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $logEnabled = false;
         $logConfig = $this->getLogsEnabled();
         if ($logConfig == Ebizmarts_MailChimp_Model_System_Config_Source_Log::ERROR_LOG
-            || $logConfig == Ebizmarts_MailChimp_Model_System_Config_Source_Log::BOTH) {
+            || $logConfig == Ebizmarts_MailChimp_Model_System_Config_Source_Log::BOTH
+        ) {
             $logEnabled = true;
         }
 
@@ -1101,19 +1100,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function resetErrors($scopeId, $scope = 'stores')
     {
-        // reset subscribers with errors
-        $collection = Mage::getResourceModel('newsletter/subscriber_collection')
-            ->addFieldToFilter('mailchimp_sync_error', array('neq' => ''));
+        $where = "mailchimp_sync_error <> ''";
+        $idsString = null;
 
-        if ($scopeId != 0) {
-            $collection = $this->addStoresToFilter($collection, $scopeId, $scope);
-        }
-
-        foreach ($collection as $subscriber) {
-            $subscriber->setData("mailchimp_sync_delta", '0000-00-00 00:00:00');
-            $subscriber->setData("mailchimp_sync_error", '');
-            $subscriber->save();
-        }
+        $this->removeMessageErrorsFromNewsletterSubscriber($scopeId, $scope, $where);
 
         // reset ecommerce data with errors
         $this->removeEcommerceSyncData($scopeId, $scope, true);
@@ -4917,5 +4907,34 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function getDateHelper()
     {
         return Mage::helper('mailchimp/date');
+    }
+
+    /**
+     * @param $scopeId
+     * @param $scope
+     * @param $where
+     * @throws Mage_Core_Exception
+     */
+    protected function removeMessageErrorsFromNewsletterSubscriber($scopeId, $scope, $where)
+    {
+        if ($scopeId != 0) {
+            $storeIds = $this->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
+
+            if (!empty($storeIds)) {
+                $idsString = implode(',', $storeIds);
+            }
+        }
+
+        $resource = $this->getCoreResource();
+        $conn = $resource->getConnection('core_write');
+        $where = empty($idsString) ? $where : $conn->quoteInto($where . " AND store_id IN (?)", $idsString);
+        $conn->update(
+            $resource->getTableName('newsletter/subscriber'),
+            array(
+                'mailchimp_sync_delta' => '0000-00-00 00:00:00',
+                'mailchimp_sync_error' => ''
+            ),
+            $where
+        );
     }
 }
