@@ -238,7 +238,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
     /**
      * Check if Mailchimp API is available
-     * @param $storeId
+     *
+     * @param  $storeId
      * @return boolean
      */
     protected function _ping($storeId)
@@ -265,8 +266,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     /**
      * Get results of batch operations sent to MailChimp.
      *
-     * @param $magentoStoreId
-     * @param bool $isEcommerceData
+     * @param  $magentoStoreId
+     * @param  bool           $isEcommerceData
      * @throws Mage_Core_Exception
      */
     public function _getResults($magentoStoreId, $isEcommerceData = true)
@@ -316,7 +317,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * Send Customers, Products, Orders, Carts to MailChimp store for given scope.
      * Return true if MailChimp store is reset in the process.
      *
-     * @param $magentoStoreId
+     * @param  $magentoStoreId
      * @throws Mage_Core_Exception
      */
     public function _sendEcommerceBatch($magentoStoreId)
@@ -450,7 +451,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $itemAmount,
             $helper,
             $mailchimpStoreId
-        )) {
+        )
+        ) {
             //Set is syncing per scope in 1 until sync finishes.
             $configValue = array(
                 array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1)
@@ -828,8 +830,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
             $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
             if ($dataProduct->getMailchimpSyncDeleted()
-                || $dataProduct->getMailchimpSyncError() ==
-                Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+                || $dataProduct->getMailchimpSyncError() ==Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+            ) {
                 $error = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
             }
         }
@@ -921,13 +923,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $itemId
      * @param $itemType
      * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncDeleted
-     * @param null $token
-     * @param null $syncedFlag
-     * @param bool $saveOnlyIfexists
+     * @param null             $syncDelta
+     * @param null             $syncError
+     * @param int              $syncModified
+     * @param null             $syncDeleted
+     * @param null             $token
+     * @param null             $syncedFlag
+     * @param bool             $saveOnlyIfexists
      */
     protected function saveSyncData(
         $itemId,
@@ -1051,8 +1053,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
 
             if (!$isMarkedAsDeleted
-                || $dataProduct->getMailchimpSyncError() !=
-                    Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+                || $dataProduct->getMailchimpSyncError() !=                Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+            ) {
                 $this->saveSyncData(
                     $id,
                     $type,

@@ -27,7 +27,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        /** @var Ebizmarts_MailChimp_Helper_Data $helper */
+        /**
+ * @var Ebizmarts_MailChimp_Helper_Data $helper 
+*/
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $allCarts = array();
@@ -502,7 +504,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * Get URL for the cart.
      *
      * @param  $cart
-     * @param $isModified
+     * @param  $isModified
      * @return string
      */
     protected function _getCheckoutUrl($cart, $isModified)
@@ -619,12 +621,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      *
      * @param $cartId
      * @param $mailchimpStoreId
-     * @param int|null $syncDelta
-     * @param int|null $syncError
-     * @param int|null $syncModified
-     * @param int|null $syncedFlag
-     * @param int|null $syncDeleted
-     * @param string|null $token
+     * @param int|null         $syncDelta
+     * @param int|null         $syncError
+     * @param int|null         $syncModified
+     * @param int|null         $syncedFlag
+     * @param int|null         $syncDeleted
+     * @param string|null      $token
      */
     protected function _updateSyncData(
         $cartId,

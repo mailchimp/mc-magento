@@ -12,7 +12,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         Mage::app('default');
 
-        /** @var Ebizmarts_MailChimp_Model_Api_Products $apiProductsMock productsApiMock */
+        /**
+ * @var Ebizmarts_MailChimp_Model_Api_Products $apiProductsMock productsApiMock 
+*/
         $this->_productsApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class);
     }
 
@@ -299,7 +301,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $categoryMockGeneric = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
-          ->disableOriginalConstructor()
+            ->disableOriginalConstructor()
             ->setMethods(array('getCollection'))
             ->getMock();
 

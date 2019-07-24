@@ -48,7 +48,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
 
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_Account constructor.
-     * @param $params
+     *
+     * @param  $params
      * @throws Exception
      */
     public function __construct($params)
@@ -170,7 +171,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     . ':';
                 if ($this->_accountDetails['store_sync_flag']
                     && !$this->_accountDetails['store_sync_date']
-                    && !$helper->getResendEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+                    && !$helper->getResendEnabled($scopeArray['scope_id'], $scopeArray['scope'])
+                ) {
                     $syncValue = self::IN_PROGRESS;
                 } else {
                     $syncData = $this->_accountDetails['store_sync_date'];
@@ -207,7 +209,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             }
 
             if (!$helper->migrationFinished()
-                && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+                && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])
+            ) {
                 $storeMigrationText = $helper->__(
                     'The store data is currently being migrated to the new version. This process '
                     . 'might take a while depending on the amount of data in Magento.'

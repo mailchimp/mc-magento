@@ -14,7 +14,9 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
     {
         $apiKey = 'a1s2d3f4g5';
 
-        /** @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock */
+        /**
+ * @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock 
+*/
         $messageMock = $this->getMockBuilder('Mandrill_Message')
             ->setConstructorArgs(array($apiKey))
             ->getMock();
@@ -26,7 +28,9 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
     {
         $apiKey = 'a1s2d3f4g5';
 
-        /** @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock */
+        /**
+ * @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock 
+*/
         $messageMock = $this->getMockBuilder('Mandrill_Message')
             ->setConstructorArgs(array($apiKey))
             ->setMethods(array('getMail'))

@@ -130,46 +130,74 @@ if (defined("COMPILER_INCLUDE_PATH")) {
 
 class Ebizmarts_MailChimp
 {
-    /** @var MailChimp_BatchOperations */
+    /**
+     * @var MailChimp_BatchOperations 
+     */
     public $batchOperation;
 
-    /** @var MailChimp_Root */
+    /**
+     * @var MailChimp_Root 
+     */
     public $root;
 
-    /** @var MailChimp_AuthorizedApps */
+    /**
+     * @var MailChimp_AuthorizedApps 
+     */
     public $authorizedApps;
 
-    /** @var MailChimp_Automation */
+    /**
+     * @var MailChimp_Automation 
+     */
     public $automation;
 
-    /** @var MailChimp_CampaignFolders */
+    /**
+     * @var MailChimp_CampaignFolders 
+     */
     public $campaignFolders;
 
-    /** @var MailChimp_Campaigns */
+    /**
+     * @var MailChimp_Campaigns 
+     */
     public $campaigns;
 
-    /** @var MailChimp_Conversations  */
+    /**
+     * @var MailChimp_Conversations  
+     */
     public $conversations;
 
-    /** @var MailChimp_Ecommerce  */
+    /**
+     * @var MailChimp_Ecommerce  
+     */
     public $ecommerce;
 
-    /** @var MailChimp_FileManagerFiles  */
+    /**
+     * @var MailChimp_FileManagerFiles  
+     */
     public $fileManagerFiles;
 
-    /** @var MailChimp_FileManagerFolders  */
+    /**
+     * @var MailChimp_FileManagerFolders  
+     */
     public $fileManagerFolders;
 
-    /** @var MailChimp_Lists  */
+    /**
+     * @var MailChimp_Lists  
+     */
     public $lists;
 
-    /** @var MailChimp_Reports  */
+    /**
+     * @var MailChimp_Reports  
+     */
     public $reports;
 
-    /** @var MailChimp_TemplateFolders  */
+    /**
+     * @var MailChimp_TemplateFolders  
+     */
     public $templateFolders;
 
-    /** @var MailChimp_Templates  */
+    /**
+     * @var MailChimp_Templates  
+     */
     public $templates;
 
     protected $_apiKey;

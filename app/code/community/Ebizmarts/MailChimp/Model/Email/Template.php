@@ -16,8 +16,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
 
     /**
      * @param array|string $email
-     * @param null $name
-     * @param array $variables
+     * @param null         $name
+     * @param array        $variables
      * @return bool
      * @throws Exception
      */
@@ -48,15 +48,15 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $email = array('subject' => $subject, 'to' => array());
         $setReturnPath = $this->getSendingSetReturnPath();
         switch ($setReturnPath) {
-            case 1:
-                $returnPathEmail = $this->getSenderEmail();
-                break;
-            case 2:
-                $returnPathEmail = $this->getSendingReturnPathEmail();
-                break;
-            default:
-                $returnPathEmail = null;
-                break;
+        case 1:
+            $returnPathEmail = $this->getSenderEmail();
+            break;
+        case 2:
+            $returnPathEmail = $this->getSendingReturnPathEmail();
+            break;
+        default:
+            $returnPathEmail = null;
+            break;
         }
 
         $mail = $this->getMail();
