@@ -87,6 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $this->setMailchimpStoreId($mailchimpStoreId);
         $this->setMagentoStoreId($magentoStoreId);
+        $helper = $this->getMailChimpHelper();
 
         $customersCollection = array();
         $customerIds = $this->getCustomersToSync();
@@ -98,12 +99,15 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $this->makeBatchId();
         $this->_optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
         $subscriber = $this->getSubscriberModel();
+        $listId = $helper->getGeneralList($magentoStoreId);
 
         $counter = 0;
         foreach ($customersCollection as $customer) {
             $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
+
             if (false !== $customerJson) {
+                $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();/* method: && status != subscribed(const)*/
                 $helper = $this->getMailChimpHelper();
                 $dataCustomer = $helper->getEcommerceSyncDataItem(
                     $customer->getId(),
@@ -118,21 +122,70 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
                 $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
+                $counter++;
+                /**
+                 *subscribe all customers to the newsletter
+                 */
+                if ($this->_optInStatusForStore) {
+                    if (!$isSubscribed) {
+                        $subscriber->subscribe($customer->getEmail());
+                    }
+                }
+                else {
+                    /**
+                     * send merge fields for customers currently not subscribed (transactional)
+                     */
+                    if (!$isSubscribed) {
+                        $subscriber->setSubscriberEmail($customer->getEmail());
+                        $subscriber->setCustomerId($customer->getId());
+                        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
+                        $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
+                        if (!empty($mergeFields["merge_fields"])) {
+                            $batchData = $this->makePatchBatchStructure($customer, $listId, $mergeFields);
+                            if ($batchData !== null) {
+                                $customerArray[$counter] = $batchData;
+                                $counter++;
+                            }
+                        }
+                    }
+                }
             } else {
                 $this->logCouldNotEncodeCustomerError($customer);
             }
-
-            if ($this->optInStatusForStore) {
-                $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();
-                if (!$isSubscribed) {
-                    $subscriber->subscribe($customer->getEmail());
-                }
-            }
-
-            $counter++;
         }
 
         return $customerArray;
+    }
+
+    protected function _buildMailchimpTags($subscriber, $storeId)
+    {
+        $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
+        $mailChimpTags->setStoreId($storeId);
+        $mailChimpTags->setSubscriber($subscriber);
+        $mailChimpTags->setCustomer(
+            $this->getCustomerByWebsiteAndId()->
+            setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
+        );
+        $mailChimpTags->buildMailChimpTags();
+
+        return $mailChimpTags;
+    }
+
+    /**
+     * @param $storeId
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function getWebsiteByStoreId($storeId)
+    {
+        return Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+    }
+
+    /**
+     * @return false|Mage_Customer_Model_Customer
+     */
+    protected function getCustomerByWebsiteAndId()
+    {
+        return Mage::getModel('customer/customer');
     }
 
     /**
@@ -292,7 +345,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $allowBatchRemoval = true
-) {
+    ) {
         $this->_mailchimpHelper->saveEcommerceSyncData(
             $customerId,
             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
@@ -545,4 +598,31 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         return $this->_mailchimpDateHelper;
     }
+
+    /**
+     * @param $customer
+     * @param $listId
+     * @param $mergeFields
+     * @return array|null
+     */
+    protected function makePatchBatchStructure($customer, $listId, $mergeFields)
+    {
+        $batchData = null;
+        $mergeFieldJSON = json_encode($mergeFields);
+
+        if($mergeFieldJSON === false) {
+            //loguear error
+        }
+        else {
+            $md5HashEmail = md5(strtolower($customer->getEmail()));
+            $batchData = array();
+            $batchData['method'] = "PATCH";
+            $batchData['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+            $batchData['operation_id'] = "{$this->batchId}_SUB_" . $md5HashEmail;
+            $batchData['body'] = $mergeFieldJSON;
+        }
+
+        return $batchData;
+    }
+
 }
