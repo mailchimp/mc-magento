@@ -12,20 +12,20 @@
 class Ebizmarts_MailChimp_Model_Api_Subscribers
 {
     const BATCH_LIMIT = 100;
-    const GENDER_VALUE_MALE = 1;
-    const GENDER_VALUE_FEMALE = 2;
-
 
     /**
      * Ebizmarts_MailChimp_Helper_Data
      */
-    private $mcHelper;
-    private $_storeId;
+    protected $_mcHelper;
+    protected $_mcDateHelper;
+    protected $_storeId;
 
     public function __construct()
     {
         $mageMCHelper = Mage::helper('mailchimp');
         $this->setMailchimpHelper($mageMCHelper);
+        $mageMCDateHelper = Mage::helper('mailchimp/date');
+        $this->setMailchimpDateHelper($mageMCDateHelper);
     }
 
     /**
@@ -56,13 +56,29 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     {
         $this->setStoreId($storeId);
         $helper = $this->getMailchimpHelper();
-        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, $this->getStoreId());
-        $thisScopeHasList = $helper->getIfConfigExistsForScope(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $this->getStoreId());
+        $dateHelper = $this->getMailchimpDateHelper();
+        $thisScopeHasSubMinSyncDateFlag = $helper->getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
+            $this->getStoreId()
+        );
+        $thisScopeHasList = $helper->getIfConfigExistsForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+            $this->getStoreId()
+        );
 
         $subscriberArray = array();
-        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag || !$helper->getSubMinSyncDateFlag($this->getStoreId())) {
-            $realScope = $helper->getRealScopeForConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $this->getStoreId());
-            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG, Varien_Date::now()));
+        if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag
+            || !$helper->getSubMinSyncDateFlag($this->getStoreId())) {
+            $realScope = $helper->getRealScopeForConfig(
+                Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+                $this->getStoreId()
+            );
+            $configValues = array(
+                array(
+                    Ebizmarts_MailChimp_Model_Config::GENERAL_SUBMINSYNCDATEFLAG,
+                    $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s')
+                )
+            );
             $helper->saveMailchimpConfig($configValues, $realScope['scope_id'], $realScope['scope']);
         }
 
@@ -86,13 +102,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             );
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
         $collection->getSelect()->limit($limit);
-        $date = $helper->getDateMicrotime();
+        $date = $dateHelper->getDateMicrotime();
         $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
 
         $counter = 0;
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
-            $md5HashEmail = md5(strtolower($subscriber->getSubscriberEmail()));
+            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
             $subscriberDescription = "subscriber " . $subscriber->getId() . " email " . $data['email_address'];
@@ -105,9 +121,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
             }
             $subscriberDescription .= ' status ' . $data['status_if_new'];
-            $helper->logDebug("Creating subscriber batch for store ID $storeId: Adding $subscriberDescription");
+            $helper->logDebug(
+                "Creating subscriber batch for store ID $storeId: "
+                . "Adding $subscriberDescription"
+            );
 
-            //encode to JSON
+            //enconde to JSON
             try {
                 $subscriberJson = json_encode($data);
             } catch (Exception $e) {
@@ -124,15 +143,15 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
 
                 $subscriberArray[$counter]['method'] = "PUT";
-                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $emailHash;
                 $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
                 $subscriberArray[$counter]['body'] = $subscriberJson;
 
                 //update subscribers delta
-                $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
+                $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
-                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                 $subscriber->save();
             }
 
@@ -169,7 +188,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
-        if (count($interest)) {
+        if (!empty($interest)) {
             $data['interests'] = $interest;
         }
 
@@ -222,18 +241,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
             $mailChimpTags = $this->_buildMailchimpTags($subscriber, $storeId);
 
-
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
 
             $email = $subscriber->getSubscriberEmail();
-            $md5HashEmail = md5(strtolower($email));
+            $emailHash = md5(strtolower($email));
             $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
             try {
-                $helper->logDebug("MC-API request: Adding/updating member for $subscriberDescription email $email store ID $storeId list ID $listId");
+                $helper->logDebug(
+                    "MC-API request: Adding/updating member for $subscriberDescription "
+                    . "email $email store ID $storeId list ID $listId"
+                );
                 $api->lists->members->addOrUpdate(
                     $listId,
-                    $md5HashEmail,
+                    $emailHash,
                     $email,
                     $newStatus,
                     null,
@@ -244,81 +265,168 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     null,
                     null
                 );
-                $helper->logInfo("MC-API request: Updated member status to pending for $subscriberDescription email $email store ID $storeId list ID $listId");
-                $subscriber->setData("mailchimp_sync_delta", Varien_Date::now());
+                $helper->logInfo(
+                    "MC-API request: Updated member status to pending for "
+                    . "$subscriberDescription email $email store ID $storeId "
+                    . "list ID $listId"
+                );
+                $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
                 $subscriber->setData("mailchimp_sync_error", "");
                 $subscriber->setData("mailchimp_sync_modified", 0);
                 $saveSubscriber = true;
             } catch (MailChimp_Error $e) {
-                $helper->logWarning("MC-API Request:  Error updating $subscriberDescription email $email store ID $storeId list ID $listId status $newStatus: " . $e->getMessage());
+                $helper->logWarning(
+                    "MC-API Request:  Error updating " . "$subscriberDescription "
+                    . "email $email store ID $storeId list ID $listId status "
+                    . "$newStatus: " . $e->getMessage()
+                );
                 if ($this->isSubscribed($newStatus) && $subscriber->getIsStatusChanged()
                     && !$helper->isSubscriptionConfirmationEnabled($storeId)) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
-                            $helper->logDebug("MC-API request: Updating member status to pending for $subscriberDescription email $email store ID $storeId list ID $listId");
-                            $api->getLists()->getMembers()->update(
-                                $listId, $md5HashEmail, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+                            $this->_catchMailchompNewstellerConfirm(
+                                $api, $listId, $emailHash, $mailChimpTags, $subscriber, $interest
                             );
-
-                            $helper->logInfo("MC-API request: Updated member status to pending for $subscriberDescription email $email store ID $storeId list ID $listId");
-                            $helper->logDebug("Setting $subscriberDescription email $email store ID $storeId list ID $listId to NOT ACTIVE");
-                            $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+                            $helper->logDebug(
+                                "Setting $subscriberDescription email $email store "
+                                . "ID $storeId list ID $listId to NOT ACTIVE"
+                            );
                             $saveSubscriber = true;
-                            $message =
-                            $helper->__('To begin receiving the newsletter, you must first confirm your subscription');
-                            Mage::getSingleton('core/session')->addWarning($message);
                         } catch (MailChimp_Error $e) {
-                            $errorMessage = $e->getFriendlyMessage();
-                            $helper->logError($errorMessage);
-                            if ($isAdmin) {
-                                $this->addError($errorMessage);
-                            } else {
-                                $errorMessage = $helper->__("The subscription could not be applied.");
-                                $this->addError($errorMessage);
-                            }
-
-                            $helper->logDebug("Setting $subscriberDescription email $email store ID $storeId list ID $listId to UNSUBSCRIBED");
-                            $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+                            $this->_catchMailchimpException($e, $subscriber, $isAdmin);
+                            $helper->logDebug(
+                                "Setting $subscriberDescription email $email store "
+                                . "ID $storeId list ID $listId to UNSUBSCRIBED"
+                            );
                             $saveSubscriber = true;
                         } catch (Exception $e) {
                             $helper->logError($e->getMessage());
                         }
                     } else {
-                        $errorMessage = $e->getFriendlyMessage();
-                        $helper->logError($errorMessage);
-                        if ($isAdmin) {
-                            $this->addError($errorMessage);
-                        } else {
-                            $errorMessage = $helper->__("The subscription could not be applied.");
-                            $this->addError($errorMessage);
-                        }
-
-                        $helper->logDebug("Setting $subscriberDescription email $email store ID $storeId list ID $listId to UNSUBSCRIBED");
-                        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+                        $this->_catchMailchimpSubsNotAppliedIf($e, $isAdmin, $subscriber);
+                        $helper->logDebug(
+                            "Setting $subscriberDescription email $email store ID "
+                            . "$storeId list ID $listId to UNSUBSCRIBED"
+                        );
                         $saveSubscriber = true;
                     }
                 } else {
-                    $errorMessage = $e->getFriendlyMessage();
-                    $helper->logError($errorMessage);
-                    if ($isAdmin) {
-                        $this->addError($errorMessage);
-                    } else {
-                        $errorMessage = $helper->__("The subscription could not be applied.");
-                        $this->addError($errorMessage);
-                    }
-
-                    $helper->logDebug("Setting $subscriberDescription email $email store ID $storeId list ID $listId to UNSUBSCRIBED");
-                    $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+                    $this->_catchMailchimpSubsNotAppliedElse($e, $isAdmin, $subscriber);
+                    $helper->logDebug(
+                        "Setting $subscriberDescription email $email store ID "
+                        . "$storeId list ID $listId to UNSUBSCRIBED"
+                    );
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
             }
 
             if ($saveSubscriber) {
-                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE);
+                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                 $subscriber->save();
             }
         }
+    }
+
+    /**
+     * @param $e
+     * @param $isAdmin
+     * @param $subscriber
+     */
+    protected function _catchMailchimpSubsNotAppliedIf($e, $isAdmin, $subscriber)
+    {
+        $helper = $this->getMailchimpHelper();
+        $errorMessage = $e->getFriendlyMessage();
+        $helper->logError($errorMessage);
+        if ($isAdmin) {
+            $this->addError($errorMessage);
+        } else {
+            $errorMessage = $helper->__("The subscription could not be applied.");
+            $this->addError($errorMessage);
+        }
+
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+    }
+
+    /**
+     * @param $e
+     * @param $isAdmin
+     * @param $subscriber
+     */
+    protected function _catchMailchimpSubsNotAppliedElse($e, $isAdmin, $subscriber)
+    {
+        $helper = $this->getMailchimpHelper();
+        $errorMessage = $e->getFriendlyMessage();
+        $helper->logError($errorMessage);
+        if ($isAdmin) {
+            $this->addError($errorMessage);
+        } else {
+            $errorMessage = $helper->__("The subscription could not be applied.");
+            $this->addError($errorMessage);
+        }
+
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
+    }
+
+    /**
+     * @param $api
+     * @param $listId
+     * @param $emailHash
+     * @param $mailChimpTags
+     * @param $subscriber
+     * @param $interest
+     */
+    protected function _catchMailchompNewstellerConfirm(
+        $api,
+        $listId,
+        $emailHash,
+        $mailChimpTags,
+        $subscriber,
+        $interest
+    ) {
+        $helper = $this->getMailchimpHelper();
+        $storeId = $subscriber->getStoreId();
+        $email = $subscriber->getSubscriberEmail();
+        $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
+        $helper->logDebug(
+            "MC-API request: Updating member status to pending for "
+            . "$subscriberDescription email $email store ID $storeId list "
+            . "ID $listId"
+        );
+        $api->getLists()->getMembers()->update(
+            $listId, $emailHash, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
+        );
+        $helper->logInfo(
+            "MC-API request: Updated member status to pending for "
+            . "$subscriberDescription email $email store ID $storeId list ID "
+            . "$listId"
+        );
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
+        $message = $helper->__(
+            'To begin receiving the newsletter, you must first confirm your subscription'
+        );
+        Mage::getSingleton('core/session')->addWarning($message);
+    }
+
+    /**
+     * @param $e
+     * @param $subscriber
+     * @param $isAdmin
+     */
+    protected function _catchMailchimpException($e, $subscriber, $isAdmin)
+    {
+        $helper = $this->getMailchimpHelper();
+        $errorMessage = $e->getFriendlyMessage();
+        $helper->logError($errorMessage);
+
+        if ($isAdmin) {
+            $this->addError($errorMessage);
+        } else {
+            $errorMessage = $helper->__("The subscription could not be applied.");
+            $this->addError($errorMessage);
+        }
+
+        $subscriber->setSubscriberStatus(Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED);
     }
 
     /**
@@ -386,17 +494,27 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $email = $subscriber->getSubscriberEmail();
         try {
             $api = $helper->getApi($storeId);
-            $md5HashEmail = md5(strtolower($email));
-            $helper->logDebug("MC-API Request: Un-subscribing member $md5HashEmail ($email) from list ID $listId for store ID $storeId");
-            $api->getLists()->getMembers()->update($listId, $md5HashEmail, null, 'unsubscribed');
-            $helper->logNotice("MC-API Request: Un-subscribed member $md5HashEmail ($email) from list ID $listId for store ID $storeId");
+            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
+            $helper->logDebug(
+                "MC-API Request: Un-subscribing member $emailHash ($email) from "
+                . "list ID $listId for store ID $storeId"
+            );
+            $api->getLists()->getMembers()->update($listId, $emailHash, null, 'unsubscribed');
+            $helper->logNotice(
+                "MC-API Request: Un-subscribed member $emailHash ($email) from "
+                . "list ID $listId for store ID $storeId"
+            );
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());
         } catch (MailChimp_Error $e) {
             $helper->logError($e->getFriendlyMessage());
             Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
         } catch (Exception $e) {
-            $helper->logError("MC-API Request: Failed to un-subscribe member $md5HashEmail ($email) from list ID $listId for store ID $storeId: " . $e->getMessage());
+            $helper->logError(
+                "MC-API Request: Failed to un-subscribe member $emailHash ($email) "
+                . "from list ID $listId for store ID $storeId: "
+                . $e->getMessage()
+            );
         }
     }
 
@@ -408,11 +526,19 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
         if ($subscriber->getId()) {
             $subscriberDescription = ($subscriber->getId() ? 'subscriber ID ' . $subscriber->getId() : 'new subscriber');
-            $helper = $this->mcHelper;
-            $helper->logDebug("Marking $subscriberDescription email " . $subscriber->getSubscriberEmail() . " for store " . $subscriber->getStoreId() . " as modified for syncing");
+            $helper = $this->getMailchimpHelper();
+            $helper->logDebug(
+                "Marking $subscriberDescription email "
+                . $subscriber->getSubscriberEmail() . " for store "
+                . $subscriber->getStoreId() . " as modified for syncing"
+            );
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
-            $helper->logInfo("Marked subscriber ID " . $subscriber->getId() . " email " . $subscriber->getSubscriberEmail() . " for store " . $subscriber->getStoreId() . " as modified for syncing");
+            $helper->logInfo(
+                "Marked subscriber ID " . $subscriber->getId() . " email "
+                . $subscriber->getSubscriberEmail() . " for store "
+                . $subscriber->getStoreId() . " as modified for syncing"
+            );
         }
     }
 
@@ -446,7 +572,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     public function setMailchimpHelper($mageMCHelper)
     {
-        $this->mcHelper = $mageMCHelper;
+        $this->_mcHelper = $mageMCHelper;
     }
 
     /**
@@ -454,7 +580,23 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      */
     protected function getMailchimpHelper()
     {
-        return $this->mcHelper;
+        return $this->_mcHelper;
+    }
+
+    /**
+     * @param $mageMCDateHelper
+     */
+    public function setMailchimpDateHelper($mageMCDateHelper)
+    {
+        $this->_mcDateHelper = $mageMCDateHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getMailchimpDateHelper()
+    {
+        return $this->_mcDateHelper;
     }
 
     /**

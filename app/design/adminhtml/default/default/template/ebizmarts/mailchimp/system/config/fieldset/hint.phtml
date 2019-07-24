@@ -4,19 +4,47 @@
  */
 ?>
 <script>
-    var MGETSTORESURL = '<?php echo $this->getStoresUrl();?>';
-    var MGETLISTURL = '<?php echo $this->getListUrl();?>';
-    var MGETINFOURL = '<?php echo $this->getInfoUrl();?>';
-    var MGETINTERESTURL = '<?php echo $this->getInterestUrl();?>';
+    var MGETSTORESURL = '<?php echo $this->escapeUrl($this->getStoresUrl());?>';
+    var MGETLISTURL = '<?php echo $this->escapeUrl($this->getListUrl());?>';
+    var MGETINFOURL = '<?php echo $this->escapeUrl($this->getInfoUrl());?>';
+    var MGETINTERESTURL = '<?php echo $this->escapeUrl($this->getInterestUrl());?>';
 </script>
 <div class="mailchimp-notice">
     <img width="244px" height="60px" src="https://ebizmarts-website.s3.amazonaws.com/Logo_Ebizmarts.png"/>
     <h4>
-        <?php echo Mage::helper('mailchimp')->__('<strong style="color:#EA7601;">Mailchimp For Magento v%s by</strong> <a target="_blank" href="http://ebizmarts.com"><strong>ebizmarts</strong></a>', $this->getMailChimpVersion()) ?>
+        <strong style="color:#EA7601;">
+        <?php echo $this->escapeHtml(
+            Mage::helper('mailchimp')->__(
+                'Mailchimp For Magento v%s by',
+                $this->getMailChimpVersion()
+            )
+        ) ?>
+        </strong>
+        <a target="_blank" href="http://ebizmarts.com">
+            <strong>ebizmarts</strong>
+        </a>
         <br>
-        <?php echo Mage::helper('mailchimp')->__('Need help? Read how to <a href="http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-magento#Configure-and-Connect" target="_blank">Configure and Connect</a> or browse our <a href="http://ebizmarts.com/mailchimp-for-magento-support" target="_blank">support forums</a>'); ?>
+        <?php echo $this->escapeHtml(
+            Mage::helper('mailchimp')->__('Need help? Read how to')
+        ); ?>
+        <a href="http://kb.mailchimp.com/integrations/e-commerce/connect-or-disconnect-mailchimp-for-'
+                        . 'magento#Configure-and-Connect"
+           target="_blank">
+            <?php echo $this->escapeHtml(Mage::helper('mailchimp')->__('Configure and Connect')); ?>
+        </a> <?php echo $this->escapeHtml(Mage::helper('mailchimp')->__('or browse our ')); ?>
+        <a href="http://ebizmarts.com/mailchimp-for-magento-support" target="_blank">
+            <?php echo $this->escapeHtml(Mage::helper('mailchimp')->__('support forums')); ?>
+        </a>
     </h4>
     <?php if (!$this->isApiKeySet() ) : ?>
-        <p><a style="padding: 5px 23px; background-color:#D75F07 ;color:white;font-weight: bold" href="https://bit.ly/2KpDH5C" target="_blank">Support Mailchimp4Magento, Subscribe for a free Mailchimp Account!</a> </p>
+        <p><a style="
+                padding: 5px 23px;
+                background-color:#D75F07;
+                color:white;
+            font-weight: bold"
+              href="https://bit.ly/2KpDH5C"
+              target="_blank">
+                Support Mailchimp4Magento, Subscribe for a free Mailchimp Account!
+            </a> </p>
     <?php endif; ?>
 </div>

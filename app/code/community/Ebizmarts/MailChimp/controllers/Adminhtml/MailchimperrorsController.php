@@ -59,10 +59,15 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
                     $fileContent = $this->__("Response was deleted from MailChimp server.");
                     break;
                 }
+
                 foreach ($files as $file) {
                     $items = $this->getFileContent($file);
                     foreach ($items as $item) {
-                        $fileContent[] = array('status_code' => $item->status_code, 'operation_id' => $item->operation_id, 'response' => json_decode($item->response));
+                        $fileContent[] = array(
+                            'status_code' => $item->status_code,
+                            'operation_id' => $item->operation_id,
+                            'response' => json_decode($item->response)
+                        );
                     }
 
                     $this->unlink($file);
@@ -76,6 +81,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
 
             $response->setBody(json_encode($fileContent, JSON_PRETTY_PRINT));
         }
+
         return;
     }
 

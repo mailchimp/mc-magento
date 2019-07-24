@@ -12,17 +12,18 @@
  */
 class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_Action
 {
-    private $mailchimpHelper = null;
+    protected $_mailchimpHelper = null;
 
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
      */
     protected function getHelper()
     {
-        if (!$this->mailchimpHelper) {
-            $this->mailchimpHelper = Mage::helper('mailchimp');
+        if (!$this->_mailchimpHelper) {
+            $this->_mailchimpHelper = Mage::helper('mailchimp');
         }
-        return $this->mailchimpHelper;
+
+        return $this->_mailchimpHelper;
     }
 
     /**
@@ -35,34 +36,14 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         $moduleName = $request->getModuleName();
         $data = $request->getPost();
         $helper = $this->getHelper();
-        $storeId = 0;
         if ($moduleName == 'monkey') {
             if (isset($data['data']['list_id'])) {
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
-                if (count($storeIds)) {
+                if (!empty($storeIds)) {
                     $storeId = $storeIds[0];
                     if ($helper->isSubscriptionEnabled($storeId)) {
-                        try {
-                            $api = $helper->getApi($storeId);
-                        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                            $helper->logError($e->getMessage());
-                            $api = null;
-                        }
-                        if (!$api) {
-                            try {
-                                $webhooks = $api->lists->webhooks->getAll($listId);
-                                foreach ($webhooks['webhooks'] as $webhook) {
-                                    if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                                        $helper->logDebug("MC-API Request: Deleting web hook ID {$webhook['id']} url {$webhook['url']} for list ID $listId", $storeId);
-                                        $api->lists->webhooks->delete($listId, $webhook['id']);
-                                        $helper->logNotice("MC-API Request: Deleting web hook ID {$webhook['id']} url {$webhook['url']} for list ID $listId", $storeId);
-                                    }
-                                }
-                            } catch (MailChimp_Error $e) {
-                                $helper->logError($e->getFriendlyMessage());
-                            }
-                        }
+                        $this->_deleteWebhook($storeId, $listId);
                     }
                 }
             }
@@ -88,6 +69,44 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
             } else {
                 $helper->logError($this->__('Webhook Key invalid! Key Request: %s - My Key: %s', $requestKey, $myKey));
                 $helper->logError($this->__('Webhook call ended'));
+            }
+        }
+    }
+
+    /**
+     * @param $storeId
+     * @param $listId
+     * @throws Exception
+     */
+    protected function _deleteWebhook($storeId, $listId)
+    {
+        $helper = $this->getHelper();
+
+        try {
+            $api = $helper->getApi($storeId);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $helper->logError($e->getMessage());
+            $api = null;
+        }
+
+        if (!$api) {
+            try {
+                $webhooks = $api->lists->webhooks->getAll($listId);
+                foreach ($webhooks['webhooks'] as $webhook) {
+                    if (strpos($webhook['url'], 'monkey/webhook') !== false) {
+                        $helper->logDebug(
+                            "MC-API Request: Deleting web hook ID {$webhook['id']} "
+                            . "url {$webhook['url']} for list ID $listId", $storeId
+                        );
+                        $api->lists->webhooks->delete($listId, $webhook['id']);
+                        $helper->logNotice(
+                            "MC-API Request: Deleting web hook ID {$webhook['id']} "
+                            . "url {$webhook['url']} for list ID $listId", $storeId
+                        );
+                    }
+                }
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage());
             }
         }
     }

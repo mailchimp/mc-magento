@@ -9,11 +9,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest extends PHPUnit_Fram
     /**
      * @var \Ebizmarts_MailChimp_Block_Adminhtml_Notifications $_block
      */
-    private $_block;
+    protected $_block;
     /**
      * @var \Ebizmarts_MailChimp_Helper_Data $_helperMock
      */
-    private $_helperMock;
+    protected $_helperMock;
 
     public function setUp()
     {

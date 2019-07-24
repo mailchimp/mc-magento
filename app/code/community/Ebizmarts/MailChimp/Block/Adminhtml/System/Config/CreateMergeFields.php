@@ -10,7 +10,8 @@
  * @date:     30/8/16 1:02 PM
  * @file:     CreateMergeFields.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields
+    extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
 
     const CREATE_MERGE_PATH = 'adminhtml/ecommerce/createMergeFields';
@@ -53,10 +54,16 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateMergeFields extend
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        $message = 'There was an error on the merge fields creation. Please check the MailChimp_Errors.log file for more information.';
-        if ($helper->getLogFile($scopeArray['scope_id'], $scopeArray['scope']) === false || !$helper->canLogMessage(Zend_Log::ERR, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            $message = 'There was an error on the merge fields creation. Please enable error logs for the default store and try again for more information.';
+        $message =
+            'There was an error on the merge fields creation. '
+            . 'Please check the MailChimp_Errors.log file for more information.';
+        if ($helper->getLogFile($scopeArray['scope_id'], $scopeArray['scope']) === false
+            || !$helper->canLogMessage(Zend_Log::ERR, $scopeArray['scope_id'], $scopeArray['scope'])) {
+            $message =
+                'There was an error on the merge fields creation. '
+                . 'Please enable the error logs and try again for more information.';
         }
+
         return $helper->__($message);
     }
 

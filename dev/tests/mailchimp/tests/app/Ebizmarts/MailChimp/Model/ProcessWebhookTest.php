@@ -30,7 +30,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
             ->getMock();
 
         $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-        $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn($customerMock);
+        $helperMock
+            ->expects($this->once())
+            ->method('loadListCustomer')
+            ->with($listId, $email)
+            ->willReturn($customerMock);
 
         $customerMock->expects($this->once())->method('setFirstName')->with($fname)->willReturn($customerMock);
         $customerMock->expects($this->once())->method('setLastName')->with($lname)->willReturn($customerMock);
@@ -48,7 +52,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
         $fname  = $data['merges']['FNAME'] = 'Enterprise1';
         $lname  = $data['merges']['LNAME'] = 'enterprise11';
-        $subscribeSource = Ebizmarts_MailChimp_Model_Subscriber::SUBSCRIBE_SOURCE;
+        $subscribeSource = Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE;
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
@@ -62,21 +66,45 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getId','getSubscriberFirstname','setSubscriberFirstname',
+            ->setMethods(
+                array('getId','getSubscriberFirstname','setSubscriberFirstname',
                 'getSubscriberLastname','setSubscriberLastname','setSubscriberSource',
-                'save'))
+                'save')
+            )
             ->getMock();
 
         $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
-        $helperMock->expects($this->once())->method('loadListSubscriber')->with($listId, $email)->willReturn($subscriberMock);
+        $helperMock
+            ->expects($this->once())
+            ->method('loadListSubscriber')
+            ->with($listId, $email)
+            ->willReturn($subscriberMock);
 
-        $subscriberMock->expects($this->once())->method('getId')->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('getSubscriberLastname')->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('setSubscriberFirstname')->with($fname)->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('setSubscriberLastname')->with($lname)->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('setSubscriberSource')->with($subscribeSource)->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('getId')
+            ->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('getSubscriberLastname')
+            ->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberFirstname')
+            ->with($fname)
+            ->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberLastname')
+            ->with($lname)
+            ->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberSource')
+            ->with($subscribeSource)
+            ->willReturn($subscriberMock);
         $subscriberMock->expects($this->once())->method('save')->willReturn($subscriberMock);
 
         $processWebhookMock->_profile($data);
@@ -93,9 +121,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $generalList = Ebizmarts_MailChimp_Model_Config::GENERAL_LIST;
         $scope = 'stores';
-        $scope_id = 1;
+        $scopeId = 1;
         $member['status'] = 'subscribed';
-        $md5HashEmail = md5(strtolower($email));
+        $cryptHashEmail = md5(strtolower($email));
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
@@ -104,20 +132,24 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getFirstScopeFromConfig'
+            ->setMethods(
+                array('getFirstScopeFromConfig'
                 , 'getApi'
                 , 'loadListCustomer'
                 , 'loadListSubscriber'
                 , 'subscribeMember'
-            ))
+                )
+            )
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('setSubscriberFirstname'
+            ->setMethods(
+                array('setSubscriberFirstname'
                 , 'setSubscriberLastname'
                 , 'getId'
-               ))
+                )
+            )
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -135,19 +167,31 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
             ->setMethods(array('get'))
             ->getMock();
 
-        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $processWebhookMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
         $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
-        $helperMock->expects($this->once())->method('loadListSubscriber')->with($listId, $email)->willReturn($subscriberMock);
+        $helperMock
+            ->expects($this->once())
+            ->method('loadListSubscriber')
+            ->with($listId, $email)
+            ->willReturn($subscriberMock);
         $helperMock->expects($this->once())->method('getFirstScopeFromConfig')
             ->with($generalList, $listId)
-            ->willReturn(array('scope'=>$scope,'scope_id'=>$scope_id));
+            ->willReturn(array('scope'=>$scope,'scope_id'=>$scopeId));
 
         $helperMock->expects($this->once())->method('getApi')
-            ->with($scope_id, $scope)
+            ->with($scopeId, $scope)
             ->willReturn($apiMock);
 
-        $subscriberMock->expects($this->once())->method('setSubscriberFirstname')->with($fname)->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('setSubscriberLastname')->with($lname)->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberFirstname')
+            ->with($fname)
+            ->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('setSubscriberLastname')
+            ->with($lname)
+            ->willReturn($subscriberMock);
 
         $apiMock->expects($this->once())
             ->method('getLists')
@@ -159,14 +203,13 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $memberMock->expects($this->once())
             ->method('get')
-            ->with($listId, $md5HashEmail, null, null)
+            ->with($listId, $cryptHashEmail, null, null)
             ->willReturn($member);
 
         $helperMock->expects($this->once())->method('subscribeMember')
             ->with($subscriberMock)
             ->willReturn(null);
 
-        //$subscriberMock->expects($this->once())->method('getStoreId')->willReturn($subscriberMock);
         $processWebhookMock->_profile($data);
     }
 
@@ -179,9 +222,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $lname  = $data['merges']['LNAME'] = 'enterprise11';
         $generalList = Ebizmarts_MailChimp_Model_Config::GENERAL_LIST;
         $scope = 'stores';
-        $scope_id = 1;
+        $scopeId = 1;
         $member['status'] = 'unsubscribed';
-        $md5HashEmail = md5(strtolower($email));
+        $cryptHashEmail = md5(strtolower($email));
         $webhookDeleteActionReturn = 0;
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
@@ -189,21 +232,25 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getFirstScopeFromConfig'
-            , 'getApi'
-            , 'loadListCustomer'
-            , 'loadListSubscriber'
-            , 'unsubscribeMember'
-            , 'getWebhookDeleteAction'
-            ))->getMock();
+            ->setMethods(
+                array('getFirstScopeFromConfig'
+                , 'getApi'
+                , 'loadListCustomer'
+                , 'loadListSubscriber'
+                , 'unsubscribeMember'
+                , 'getWebhookDeleteAction'
+                )
+            )->getMock();
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('setSubscriberFirstname'
-            , 'setSubscriberLastname'
-            , 'getStoreId'
-            , 'getId'
-            ))->getMock();
+            ->setMethods(
+                array('setSubscriberFirstname'
+                , 'setSubscriberLastname'
+                , 'getStoreId'
+                , 'getId'
+                )
+            )->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)->disableOriginalConstructor()
             ->setMethods(array('getLists'))->getMock();
@@ -216,16 +263,16 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
             ->setMethods(array('get'))
             ->getMock();
 
-        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $processWebhookMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
         $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
         $helperMock->expects($this->once())->method('loadListSubscriber')->with($listId, $email)
             ->willReturn($subscriberMock);
         $helperMock->expects($this->once())->method('getFirstScopeFromConfig')
             ->with($generalList, $listId)
-            ->willReturn(array('scope'=>$scope,'scope_id'=>$scope_id));
+            ->willReturn(array('scope'=>$scope,'scope_id'=>$scopeId));
 
         $helperMock->expects($this->once())->method('getApi')
-            ->with($scope_id, $scope)
+            ->with($scopeId, $scope)
             ->willReturn($apiMock);
 
         $subscriberMock->expects($this->once())->method('setSubscriberFirstname')->with($fname)
@@ -235,12 +282,16 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
 
         $apiMock->expects($this->once())->method('getLists')->willReturn($listsMock);
         $listsMock->expects($this->once())->method('getMembers')->willReturn($memberMock);
-        $memberMock->expects($this->once())->method('get')->with($listId, $md5HashEmail, null, null)->willReturn($member);
+        $memberMock
+            ->expects($this->once())
+            ->method('get')
+            ->with($listId, $cryptHashEmail, null, null)
+            ->willReturn($member);
 
         $helperMock->expects($this->once())->method('unsubscribeMember')->with($subscriberMock)->willReturn(null);
-        $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($scope_id);
+        $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($scopeId);
 
-        $helperMock->expects($this->once())->method('getWebhookDeleteAction')->with($scope_id)
+        $helperMock->expects($this->once())->method('getWebhookDeleteAction')->with($scopeId)
             ->willReturn($webhookDeleteActionReturn);
 
         $processWebhookMock->_profile($data);

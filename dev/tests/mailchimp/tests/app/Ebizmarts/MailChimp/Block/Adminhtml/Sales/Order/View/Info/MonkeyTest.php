@@ -5,11 +5,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
     /**
      * @var \Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey $_block
      */
-    private $_block;
+    protected $_block;
     /**
      * @var \Mage_Sales_Model_Order $_orderMock
      */
-    private $_orderMock;
+    protected $_orderMock;
 
 
     public function setUp()
@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         if (!Mage::registry('current_order')) {
             Mage::register('current_order', $this->_orderMock);
         }
+
         /* We are required to set layouts before we can do anything with blocks */
         $this->_block->setLayout($layout);
     }
@@ -33,7 +34,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         /**
          * @var \Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey $monkeyBlock
          */
-        $monkeyBlockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey::class)
+        $monkeyBlockMock = $this->getMockBuilder(
+            Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey::class
+        )
             ->disableOriginalConstructor()
             ->setMethods(array('getMailChimpHelper', 'getCampaignId', 'getCurrentOrder'))
             ->getMock();
@@ -54,7 +57,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         /**
          * @var \Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey $monkeyBlock
          */
-        $monkeyBlockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey::class)
+        $monkeyBlockMock = $this->getMockBuilder(
+            Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey::class
+        )
             ->disableOriginalConstructor()
             ->setMethods(array('getCampaignName'))
             ->getMock();
@@ -72,7 +77,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $campaignName = 'campaignName';
         $storeId = 1;
 
-        $monkeyBlockMock = $this->getMockBuilder(Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey::class)
+        $monkeyBlockMock = $this->getMockBuilder(
+            Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey::class
+        )
             ->disableOriginalConstructor()
             ->setMethods(array('getCampaignId', 'getCurrentOrder', 'getMailChimpHelper'))
             ->getMock();
@@ -94,7 +101,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_MonkeyTest exten
         $monkeyBlockMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('isEcomSyncDataEnabled')->with($storeId)->willReturn(true);
-        $helperMock->expects($this->once())->method('getMailChimpCampaignNameById')->with($campaignId, $storeId)->willReturn($campaignName);
+        $helperMock
+            ->expects($this->once())
+            ->method('getMailChimpCampaignNameById')
+            ->with($campaignId, $storeId)
+            ->willReturn($campaignName);
 
         $result = $monkeyBlockMock->getCampaignName();
 

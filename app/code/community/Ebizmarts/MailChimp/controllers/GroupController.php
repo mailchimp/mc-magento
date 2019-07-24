@@ -33,6 +33,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
                 $subscriber->setSubscriberLastname($order->getCustomerLastname());
                 $subscriber->subscribe($customerEmail);
             }
+
             $subscriberId = $subscriber->getSubscriberId();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             $encodedGroups = $helper->arrayEncode($params);
@@ -48,8 +49,14 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
             $session->addSuccess($this->__('Thanks for sharing your interest with us.'));
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
-            $session->addWarning($this->__('Something went wrong with the interests subscription. Please go to the account subscription menu to subscriber to the interests successfully.'));
+            $session->addWarning(
+                $this->__(
+                    'Something went wrong with the interests subscription. '
+                    . 'Please go to the account subscription menu to subscriber to the interests successfully.'
+                )
+            );
         }
+
         $this->_redirect('/');
     }
 
@@ -59,6 +66,14 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
     protected function getHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    protected function getDateHelper()
+    {
+        return Mage::helper('mailchimp/date');
     }
 
     /**
@@ -102,10 +117,10 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     protected function getCurrentDateTime()
     {
-        return Mage::getModel('core/date')->date('d-m-Y H:i:s');
+        return $this->getDateHelper()->formatDate(null, 'd-m-Y H:i:s');
     }
 }
