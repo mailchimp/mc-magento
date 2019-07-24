@@ -107,7 +107,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerJson = json_encode($data);
 
             if (false !== $customerJson) {
-                $isSubscribed = $subscriber->loadByEmail($customer->getEmail())->getSubscriberId();/* method: && status != subscribed(const)*/
+                $isSubscribed = $this->isSubscribed($subscriber, $customer);
                 $helper = $this->getMailChimpHelper();
                 $dataCustomer = $helper->getEcommerceSyncDataItem(
                     $customer->getId(),
@@ -623,6 +623,21 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         }
 
         return $batchData;
+    }
+
+    /**
+     * @param $subscriber
+     * @param $customer
+     * @return mixed
+     */
+    protected function isSubscribed($subscriber, $customer)
+    {
+        if($subscriber->loadByEmail($customer->getEmail())->getSubscriberId() && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED ) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 }
