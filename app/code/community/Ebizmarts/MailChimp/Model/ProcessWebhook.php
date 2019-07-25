@@ -186,19 +186,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 switch ($action) {
                 case 'delete':
                     //if config setting "Webhooks Delete action" is set as "Delete customer account"
+                    $statusUnsubscribed = Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED;
                     if (Mage::getStoreConfig(
-                        Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE,
-                        $subscriber->getStoreId()
+                        Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $subscriber->getStoreId()
                     )
                     ) {
                         $subscriber->delete();
-                    } elseif ($subscriber->getSubscriberStatus() !=                        Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED
-                    ) {
+                    }
+                    elseif ($subscriber->getSubscriberStatus() != $statusUnsubscribed) {
                         $helper->unsubscribeMember($subscriber);
                     }
                     break;
                 case 'unsub':
-                    if ($subscriber->getSubscriberStatus() !=                        Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED
+                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED
                     ) {
                         $helper->unsubscribeMember($subscriber);
                     }

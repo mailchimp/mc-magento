@@ -829,10 +829,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
             $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
+            $isProductDisabledInMagento = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
+
             if ($dataProduct->getMailchimpSyncDeleted()
-                || $dataProduct->getMailchimpSyncError() == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+                || $dataProduct->getMailchimpSyncError() == $isProductDisabledInMagento
             ) {
-                $error = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
+                $error = $isProductDisabledInMagento;
             }
         }
 

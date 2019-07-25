@@ -4217,9 +4217,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getSyncFlagDataHtml($dat, $string)
     {
         $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
-        if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]!= Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS
+        $syncFlagStatus = Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS;
+        $inProgress = Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS;
+
+        if ($syncFlagDataArray[$syncFlagStatus] != $inProgress
         ) {
-            if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]== Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED
+            if ($syncFlagDataArray[$syncFlagStatus]== Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED
             ) {
                 $string .=
                     "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]}"
@@ -4230,7 +4233,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     . ": <span style='color:forestgreen;font-weight: bold;'>"
                     . $this->__(
                         'Finished at %s',
-                        $syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]
+                        $syncFlagDataArray[$syncFlagStatus]
                     ) . "</span></li>";
             }
         } else {
@@ -4344,9 +4347,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         try {
             $apiInterestCategory = $api->getLists()->getInterestCategory();
             $interestCategories = $apiInterestCategory->getAll($listId, 'categories');
+
             foreach ($interestCategories['categories'] as $interestCategory) {
                 $interestGroups = $apiInterestCategory->getInterests()->getAll($listId, $interestCategory['id']);
                 $groups = array();
+
                 foreach ($interestGroups['interests'] as $interestGroup) {
                     $groups[$interestGroup['id']] = $interestGroup['name'];
                 }
@@ -4419,6 +4424,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $rc = array();
         $interest = $this->getLocalInterestCategories($storeId);
+        
         if ($interest != '') {
             $interest = explode(",", $interest);
         } else {
@@ -4442,6 +4448,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
+            
             foreach ($interest as $interestId) {
                 $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
                 foreach ($mailchimpInterest['interests'] as $mi) {
@@ -4478,6 +4485,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             $interestGroup = $this->getInterestGroupModel();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+            
             if ($interestGroup->getId()) {
                 $this->_getInsterestChecked($interestGroup, $interest);
             }
@@ -4578,6 +4586,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             $origSubscriberId = $interestGroup->getSubscriberId();
             $origCustomerId = $interestGroup->getCustomerId();
+            
             if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
                 $interestGroup->setSubscriberId($subscriberId);
             }
@@ -4607,6 +4616,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getInterestGroupsIfAvailable($params)
     {
         $groups = null;
+        
         if (isset($params['customer']) && isset($params['customer']['interestgroup'])) {
             $groups = $params['customer']['interestgroup'];
         } elseif (isset($params['group'])) {
@@ -4659,6 +4669,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $ret = array();
         $stores = $this->getMageApp()->getStores();
+        
         foreach ($stores as $storeId => $store) {
             try {
                 $apiKey = $this->getApiKey($storeId);
@@ -4690,7 +4701,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param $message \ add a warning with the message that receive as param
+     * @param $message add a warning with the message that receive as param
      */
     public function addAdminWarning($message)
     {
@@ -4717,6 +4728,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']
                 )
             );
+        
         return $url;
     }
 

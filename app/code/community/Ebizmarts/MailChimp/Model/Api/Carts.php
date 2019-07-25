@@ -33,6 +33,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $allCarts = array();
+        
         if (!$helper->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
         }
@@ -48,6 +49,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             . $date
         );
         $resendTurn = $helper->getResendTurn($magentoStoreId);
+        
         if (!$resendTurn) {
             // get all the carts converted in orders (must be deleted on mailchimp)
             $allCarts = array_merge($allCarts, $this->_getConvertedQuotes($mailchimpStoreId, $magentoStoreId));
@@ -57,6 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         // get new carts
         $allCarts = array_merge($allCarts, $this->_getNewQuotes($mailchimpStoreId, $magentoStoreId));
+        
         return $allCarts;
     }
 
@@ -86,6 +89,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $convertedCarts->getSelect()->where("m4m.mailchimp_sync_deleted = 0");
         // limit the collection
         $convertedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
+        
         foreach ($convertedCarts as $cart) {
             $cartId = $cart->getEntityId();
             // we need to delete all the carts associated with this email
@@ -94,9 +98,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $mailchimpStoreId,
                 $magentoStoreId
             );
+            
             foreach ($allCartsForEmail as $cartForEmail) {
                 $alreadySentCartId = $cartForEmail->getEntityId();
                 $counter = $this->getCounter();
+                
                 if ($alreadySentCartId != $cartId) {
                     $allCarts[$counter]['method'] = 'DELETE';
                     $allCarts[$counter]['path'] = '/ecommerce/stores/'
@@ -168,6 +174,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // limit the collection
         $modifiedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
+        
         foreach ($modifiedCarts as $cart) {
             $cartId = $cart->getEntityId();
             /**
@@ -176,15 +183,18 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer = $this->getCustomerModel();
             $customer->setWebsiteId($this->getWebSiteIdFromMagentoStoreId($magentoStoreId));
             $customer->loadByEmail($cart->getCustomerEmail());
+            
             if ($customer->getEmail() != $cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->getAllCartsByEmail(
                     $cart->getCustomerEmail(),
                     $mailchimpStoreId,
                     $magentoStoreId
                 );
+                
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $alreadySentCartId = $cartForEmail->getEntityId();
                     $counter = $this->getCounter();
+                    
                     if ($alreadySentCartId != $cartId) {
                         $allCarts[$counter]['method'] = 'DELETE';
                         $allCarts[$counter]['path'] = '/ecommerce/stores/'
@@ -217,8 +227,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
-
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
+            
             if ($cartJson != "") {
                 $this->getHelper()->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_MOD);
 
@@ -293,12 +303,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer = $this->getCustomerModel();
             $customer->setWebsiteId($this->getWebSiteIdFromMagentoStoreId($magentoStoreId));
             $customer->loadByEmail($cart->getCustomerEmail());
+            
             if ($customer->getEmail() != $cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->getAllCartsByEmail(
                     $cart->getCustomerEmail(),
                     $mailchimpStoreId,
                     $magentoStoreId
                 );
+                
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $counter = $this->getCounter();
                     $alreadySentCartId = $cartForEmail->getEntityId();
@@ -332,8 +344,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
-
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
+
             if ($cartJson != "") {
                 $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_NEW);
 
@@ -407,11 +419,13 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $oneCart = array();
         $oneCart['id'] = $cart->getEntityId();
         $customer = $this->_getCustomer($cart, $magentoStoreId);
+        
         if (empty($customer)) {
             return "";
         }
 
         $oneCart['customer'] = $customer;
+        
         if ($campaignId) {
             $oneCart['campaign_id'] = $campaignId;
         }
@@ -426,6 +440,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
 
         $jsonData = "";
+        
         if ($lines['count']) {
             $oneCart['lines'] = $lines['lines'];
             //enconde to JSON
@@ -458,12 +473,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $isTypeProduct = $this->isTypeProduct();
             $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
             $line = array();
+            
             if ($item->getProductType() == 'bundle' || $item->getProductType() == 'grouped') {
                 continue;
             }
 
             if ($this->isProductTypeConfigurable($item)) {
                 $variant = null;
+                
                 if ($item->getOptionByCode('simple_product')) {
                     $variant = $item->getOptionByCode('simple_product')->getProduct();
                 }
@@ -549,19 +566,23 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
 
         $firstName = $cart->getCustomerFirstname();
+        
         if ($firstName) {
             $customer["first_name"] = $firstName;
         }
 
         $lastName = $cart->getCustomerLastname();
+        
         if ($lastName) {
             $customer["last_name"] = $lastName;
         }
 
         $billingAddress = $cart->getBillingAddress();
+        
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
             $address = array();
+            
             if (isset($street[0])) {
                 $address['address1'] = $street[0];
 
