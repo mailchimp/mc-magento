@@ -183,7 +183,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $customer = $this->getCustomerModel();
             $customer->setWebsiteId($this->getWebSiteIdFromMagentoStoreId($magentoStoreId));
             $customer->loadByEmail($cart->getCustomerEmail());
-    
+
             if ($customer->getEmail() != $cart->getCustomerEmail()) {
                 $allCartsForEmail = $this->getAllCartsByEmail(
                     $cart->getCustomerEmail(),
@@ -194,7 +194,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $alreadySentCartId = $cartForEmail->getEntityId();
                     $counter = $this->getCounter();
-    
+
                     if ($alreadySentCartId != $cartId) {
                         $allCarts[$counter]['method'] = 'DELETE';
                         $allCarts[$counter]['path'] = '/ecommerce/stores/'
