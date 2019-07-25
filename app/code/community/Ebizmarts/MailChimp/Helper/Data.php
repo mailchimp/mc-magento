@@ -4424,7 +4424,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $rc = array();
         $interest = $this->getLocalInterestCategories($storeId);
-        
+
         if ($interest != '') {
             $interest = explode(",", $interest);
         } else {
@@ -4448,7 +4448,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
-            
+
             foreach ($interest as $interestId) {
                 $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
                 foreach ($mailchimpInterest['interests'] as $mi) {

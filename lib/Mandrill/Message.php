@@ -82,7 +82,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     public function getAttachments()
     {
         $_attachments = array();
-        
+
         foreach ($this->_attachments as $attachment) {
             /**
              * @var Zend_Mime_Part $attachment

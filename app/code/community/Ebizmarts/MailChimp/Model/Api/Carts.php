@@ -33,7 +33,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $allCarts = array();
-        
+
         if (!$helper->isAbandonedCartEnabled($magentoStoreId)) {
             return $allCarts;
         }
