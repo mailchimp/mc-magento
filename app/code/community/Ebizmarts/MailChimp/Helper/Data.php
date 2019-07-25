@@ -4485,7 +4485,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             $interestGroup = $this->getInterestGroupModel();
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-            
+
             if ($interestGroup->getId()) {
                 $this->_getInsterestChecked($interestGroup, $interest);
             }
@@ -4499,6 +4499,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _getInsterestChecked($interestGroup, $interest)
     {
         $groups = $this->arrayDecode($interestGroup->getGroupdata());
+
         foreach ($groups as $key => $value) {
             if (isset($interest[$key])) {
                 if (is_array($value)) {
@@ -4566,6 +4567,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $dateHelper = $this->getDateHelper();
         $groups = $this->getInterestGroupsIfAvailable($params);
+
         if ($groups) {
             if (!$customerId) {
                 $customerSession = $this->getCustomerSession();
@@ -4578,6 +4580,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             $subscriberId = null;
+
             if ($subscriber) {
                 $subscriberId = $subscriber->getSubscriberId();
             }
@@ -4586,7 +4589,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
             $origSubscriberId = $interestGroup->getSubscriberId();
             $origCustomerId = $interestGroup->getCustomerId();
-            
+
             if (!$origSubscriberId || $subscriberId && $origSubscriberId != $subscriberId) {
                 $interestGroup->setSubscriberId($subscriberId);
             }
@@ -4616,7 +4619,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getInterestGroupsIfAvailable($params)
     {
         $groups = null;
-        
+
         if (isset($params['customer']) && isset($params['customer']['interestgroup'])) {
             $groups = $params['customer']['interestgroup'];
         } elseif (isset($params['group'])) {
