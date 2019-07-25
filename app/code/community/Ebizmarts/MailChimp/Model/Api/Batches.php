@@ -1052,8 +1052,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
 
+            $isProductDisabledInMagento = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
             if (!$isMarkedAsDeleted  
-                || $dataProduct->getMailchimpSyncError() != Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+                || $dataProduct->getMailchimpSyncError() != $isProductDisabledInMagento
             ) {
                 $this->saveSyncData(
                     $id,
@@ -1073,7 +1074,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $type,
                     $mailchimpStoreId,
                     null,
-                    Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO,
+                    $isProductDisabledInMagento,
                     0,
                     1,
                     null,
