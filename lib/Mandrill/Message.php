@@ -34,7 +34,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     /**
      * Adds an existing attachment to the mail message
      *
-     * @param  Zend_Mime_Part $attachment
+     * @param Zend_Mime_Part $attachment
      * @return Mandrill_Message Provides fluent interface
      */
     public function addAttachment(Zend_Mime_Part $attachment)
@@ -50,7 +50,7 @@ class Mandrill_Message extends Mandrill_Mandrill
      * @param string $mimeType
      * @param string $disposition
      * @param string $encoding
-     * @param null   $filename
+     * @param null $filename
      * @return Zend_Mime_Part
      */
     public function createAttachment(
@@ -59,7 +59,8 @@ class Mandrill_Message extends Mandrill_Mandrill
         $disposition = Zend_Mime::DISPOSITION_ATTACHMENT,
         $encoding = Zend_Mime::ENCODING_BASE64,
         $filename = null
-    ) {
+    )
+    {
         $mp = new Zend_Mime_Part($body);
         $mp->encoding = $encoding;
         $mp->type = $mimeType;
@@ -84,8 +85,8 @@ class Mandrill_Message extends Mandrill_Mandrill
         $_attachments = array();
         foreach ($this->_attachments as $attachment) {
             /**
- * @var Zend_Mime_Part $attachment 
-*/
+             * @var Zend_Mime_Part $attachment
+             */
             $_attachments[] = array(
                 'type' => $attachment->type,
                 'name' => $attachment->filename,
@@ -203,7 +204,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     /**
      * Filter of name data
      *
-     * @param  string $name
+     * @param string $name
      * @return string
      */
     protected function _filterName($name)
