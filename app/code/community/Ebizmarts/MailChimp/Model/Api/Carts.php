@@ -516,9 +516,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
 
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl(
-                '',
-                array('_nosid' => true, '_secure' => true)
-            )
+            '',
+            array('_nosid' => true, '_secure' => true)
+        )
             . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->setToken($token);
         return $url;
@@ -621,12 +621,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      *
      * @param $cartId
      * @param $mailchimpStoreId
-     * @param int|null $syncDelta
-     * @param int|null $syncError
-     * @param int|null $syncModified
-     * @param int|null $syncedFlag
-     * @param int|null $syncDeleted
-     * @param string|null $token
+     * @param int|null         $syncDelta
+     * @param int|null         $syncError
+     * @param int|null         $syncModified
+     * @param int|null         $syncedFlag
+     * @param int|null         $syncDeleted
+     * @param string|null      $token
      */
     protected function _updateSyncData(
         $cartId,
@@ -637,8 +637,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $syncedFlag = null,
         $syncDeleted = null,
         $token = null
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
             $cartId,

@@ -439,7 +439,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $magentoStoreId
      * @throws Mage_Core_Exception
      */
-    protected function _updateSyncingFlag($customerAmount, $productAmount, $orderAmount,$mailchimpStoreId, $magentoStoreId)
+    protected function _updateSyncingFlag($customerAmount, $productAmount, $orderAmount, $mailchimpStoreId, $magentoStoreId)
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
@@ -830,7 +830,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
             $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
             if ($dataProduct->getMailchimpSyncDeleted()
-                || $dataProduct->getMailchimpSyncError() ==Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+                || $dataProduct->getMailchimpSyncError() == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
             ) {
                 $error = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
             }
@@ -885,7 +885,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             );
             try {
                 /**
-                 * @var $mailchimpApi \Ebizmarts_MailChimp
+                 * @var $mailchimpApi Ebizmarts_MailChimp
                  */
                 $mailchimpApi = $helper->getApi($magentoStoreId);
                 if (!empty($batchArray['operations'])) {
@@ -1052,8 +1052,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
 
-            if (!$isMarkedAsDeleted
-                || $dataProduct->getMailchimpSyncError() !=                Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+            if (!$isMarkedAsDeleted  
+                || $dataProduct->getMailchimpSyncError() != Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
             ) {
                 $this->saveSyncData(
                     $id,

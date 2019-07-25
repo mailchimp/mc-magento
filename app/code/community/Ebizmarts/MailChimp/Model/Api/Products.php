@@ -306,8 +306,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * @param $product
      * @param $magentoStoreId
-     * @param bool $isVariant
-     * @param array $variants
+     * @param bool           $isVariant
+     * @param array          $variants
      * @return array
      * @throws Mage_Core_Exception
      * @throws Mage_Core_Model_Store_Exception
@@ -545,13 +545,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
      *
      * @param $productId
      * @param $mailchimpStoreId
-     * @param int|null $syncDelta
-     * @param int|null $syncError
-     * @param int|null $syncModified
-     * @param int|null $syncDeleted
-     * @param int|null $syncedFlag
-     * @param bool $saveOnlyIfexists
-     * @param bool $allowBatchRemoval
+     * @param int|null         $syncDelta
+     * @param int|null         $syncError
+     * @param int|null         $syncModified
+     * @param int|null         $syncDeleted
+     * @param int|null         $syncedFlag
+     * @param bool             $saveOnlyIfexists
+     * @param bool             $allowBatchRemoval
      */
     protected function _updateSyncData(
         $productId,
@@ -563,8 +563,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $allowBatchRemoval = true
-    )
-    {
+    ) {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $productId,
             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
@@ -791,7 +790,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * @param $product
      * @param $magentoStoreId
-     * @param bool $isBuildUpdateProductRequest
+     * @param bool           $isBuildUpdateProductRequest
      * @return array | return an array with the childs of the product passed by parameter
      */
     public function makeProductChildrenArray($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
