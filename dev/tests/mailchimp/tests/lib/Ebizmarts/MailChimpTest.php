@@ -11,8 +11,8 @@ class MailChimpTest extends PHPUnit_Framework_TestCase
     public function testPublicPropertiesExist()
     {
         /**
- * @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock 
-*/
+        * @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock
+        */
         $apiMock = $this->getMockBuilder('Ebizmarts_MailChimp')
             ->disableOriginalConstructor()
             ->getMock();
