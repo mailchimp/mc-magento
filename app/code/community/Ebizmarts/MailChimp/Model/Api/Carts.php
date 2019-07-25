@@ -28,8 +28,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         /**
- * @var Ebizmarts_MailChimp_Helper_Data $helper 
-*/
+         * @var Ebizmarts_MailChimp_Helper_Data $helper
+         */
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $allCarts = array();
@@ -113,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         null,
                         1
                     );
-                    $this->setCounter($this->getCounter()+1);
+                    $this->setCounter($this->getCounter() + 1);
                 }
             }
 
@@ -132,7 +132,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 null,
                 1
             );
-            $this->setCounter($this->getCounter()+1);
+            $this->setCounter($this->getCounter() + 1);
         }
 
         return $allCarts;
@@ -224,10 +224,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
                 $counter = $this->getCounter();
                 $allCarts[$counter]['method'] = 'PATCH';
-                $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/'.$cartId;
+                $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
                 $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                 $allCarts[$counter]['body'] = $cartJson;
-                $this->setCounter($this->getCounter()+1);
+                $this->setCounter($this->getCounter() + 1);
                 $this->_updateSyncData(
                     $cartId,
                     $mailchimpStoreId,
@@ -318,7 +318,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         null,
                         1
                     );
-                    $this->setCounter($this->getCounter()+1);
+                    $this->setCounter($this->getCounter() + 1);
                 }
 
                 $allCartsForEmail->clear();
@@ -342,7 +342,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
                 $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                 $allCarts[$counter]['body'] = $cartJson;
-                $this->setCounter($this->getCounter()+1);
+                $this->setCounter($this->getCounter() + 1);
                 $this->_updateSyncData(
                     $cartId,
                     $mailchimpStoreId,
@@ -516,9 +516,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         }
 
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl(
-            '',
-            array('_nosid' => true, '_secure' => true)
-        )
+                '',
+                array('_nosid' => true, '_secure' => true)
+            )
             . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->setToken($token);
         return $url;
@@ -621,12 +621,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      *
      * @param $cartId
      * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncedFlag
-     * @param int|null         $syncDeleted
-     * @param string|null      $token
+     * @param int|null $syncDelta
+     * @param int|null $syncError
+     * @param int|null $syncModified
+     * @param int|null $syncedFlag
+     * @param int|null $syncDeleted
+     * @param string|null $token
      */
     protected function _updateSyncData(
         $cartId,
@@ -637,7 +637,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $syncedFlag = null,
         $syncDeleted = null,
         $token = null
-    ) {
+    )
+    {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
             $cartId,
@@ -776,6 +777,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     {
         return $this->_token;
     }
+
     /**
      * @param string $token
      */

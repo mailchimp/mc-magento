@@ -4,7 +4,7 @@ $installer = $this;
 
 /**
  * @var Mage_Eav_Model_Entity_Setup $installer
-*/
+ */
 $installer->startSetup();
 
 try {
@@ -23,20 +23,20 @@ try {
 
 $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
 
-$entityTypeId     = $setup->getEntityTypeId('customer');
-$attributeSetId   = $setup->getDefaultAttributeSetId($entityTypeId);
+$entityTypeId = $setup->getEntityTypeId('customer');
+$attributeSetId = $setup->getDefaultAttributeSetId($entityTypeId);
 $attributeGroupId = $setup->getDefaultAttributeGroupId($entityTypeId, $attributeSetId);
 
 $setup->addAttribute(
     "customer", "mailchimp_store_view", array(
-    "type"     => "int",
-    "label"    => "Store View (For MailChimp)",
-    "input"    => "select",
-    "source"   => "mailchimp/system_config_source_mailchimpStoreView",
-    "visible"  => true,
-    "required" => false,
-    "unique"     => false,
-    "note"       => "A store view must be specified to sync this customer to MailChimp"
+        "type" => "int",
+        "label" => "Store View (For MailChimp)",
+        "input" => "select",
+        "source" => "mailchimp/system_config_source_mailchimpStoreView",
+        "visible" => true,
+        "required" => false,
+        "unique" => false,
+        "note" => "A store view must be specified to sync this customer to MailChimp"
 
     )
 );
