@@ -474,7 +474,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $isTypeProduct = $this->isTypeProduct();
             $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
             $line = array();
-    
+
             if ($item->getProductType() == 'bundle' || $item->getProductType() == 'grouped') {
                 continue;
             }
@@ -583,7 +583,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
             $address = array();
-    
+
             if (isset($street[0])) {
                 $address['address1'] = $street[0];
 
