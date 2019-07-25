@@ -4672,7 +4672,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $ret = array();
         $stores = $this->getMageApp()->getStores();
-        
+
         foreach ($stores as $storeId => $store) {
             try {
                 $apiKey = $this->getApiKey($storeId);
@@ -4731,7 +4731,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']
                 )
             );
-        
+
         return $url;
     }
 
