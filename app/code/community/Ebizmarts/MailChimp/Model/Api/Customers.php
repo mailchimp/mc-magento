@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $customerArray = array();
         $this->makeBatchId();
-        $this->_optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
+        $this->setOptInStatusForStore($this->getOptin($this->getBatchMagentoStoreId()));
         $subscriber = $this->getSubscriberModel();
         $listId = $helper->getGeneralList($magentoStoreId);
 
@@ -108,7 +108,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
             if (false !== $customerJson) {
                 $isSubscribed = $this->isSubscribed($subscriber, $customer);
-                $helper = $this->getMailChimpHelper();
                 $dataCustomer = $helper->getEcommerceSyncDataItem(
                     $customer->getId(),
                     Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
@@ -126,16 +125,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 /**
                  *subscribe all customers to the newsletter
                  */
-                if ($this->_optInStatusForStore) {
-                    if (!$isSubscribed) {
-                        $subscriber->subscribe($customer->getEmail());
+                if (!$isSubscribed) {
+                    if ($this->getOptInStatusForStore()) {
+                            $subscriber->subscribe($customer->getEmail());
                     }
-                }
-                else {
-                    /**
-                     * send merge fields for customers currently not subscribed (transactional)
-                     */
-                    if (!$isSubscribed) {
+                    else {
+                        /**
+                         * send merge fields for customers currently not subscribed (transactional)
+                         */
                         $subscriber->setSubscriberEmail($customer->getEmail());
                         $subscriber->setCustomerId($customer->getId());
                         $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
@@ -157,6 +154,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         return $customerArray;
     }
 
+    /**
+     * @param $subscriber
+     * @param $storeId
+     * @return false|Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
+     */
     protected function _buildMailchimpTags($subscriber, $storeId)
     {
         $mailChimpTags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
@@ -638,6 +640,22 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         else {
             return false;
         }
+    }
+
+    /**
+     * @param $optInStatus
+     */
+    protected function setOptInStatusForStore($optInStatus)
+    {
+        $this->_optInStatusForStore = $optInStatus;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getOptInStatusForStore()
+    {
+        return $this->_optInStatusForStore;
     }
 
 }

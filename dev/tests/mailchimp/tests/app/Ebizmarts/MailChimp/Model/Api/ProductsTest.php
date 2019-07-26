@@ -758,6 +758,15 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $magentoStoreId = 1;
         $entityId = 145;
 
+        $dateToday = '2019-07-25';
+        $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->setMethods(
+                array(
+                    'formatDate'
+                )
+            )
+            ->getMock();
+
         $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
         $offSet   = Mage::getSingleton('core/date')->calculateOffset($timeZone);
         $time = Mage::getSingleton('core/date')->gmtTimestamp() + $offSet;
@@ -777,7 +786,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->setMethods(
                 array(
                     'getCoreResource', 'getProductResourceCollection',
-                    'getSelect', 'update', 'joinMailchimpSyncDataForSpecialPrices'
+                    'getSelect', 'update', 'joinMailchimpSyncDataForSpecialPrices',
+                    'getMailChimpDateHelper'
                 )
             )
             ->getMock();
@@ -799,6 +809,16 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method('getCoreResource')
             ->willReturn($coreResourceMock);
 
+        $productsApiMock
+            ->expects($this->exactly(3))
+            ->method('getMailChimpDateHelper')
+            ->willReturn($helperDateMock);
+
+        $helperDateMock
+            ->expects($this->exactly(3))
+            ->method('formatDate')
+            ->willReturn($dateToday);
+
         $coreResourceMock
             ->expects($this->once())
             ->method('getConnection')
@@ -810,7 +830,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method("quoteInto")
             ->with(
                 'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
-                Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time) ." 00:00:00"
+                $dateToday ." 00:00:00"
             );
 
 
@@ -844,12 +864,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->withConsecutive(
                 array('special_price',  array('gt' => 0) , 'left'),
                 array('special_from_date',
-                    array('lteq' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time)." 23:59:59"),
+                    array('lteq' => $dateToday." 23:59:59"),
                     'left'),
                 array('special_from_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')) , 'left'),
                 array('special_price', array('gt' => 0), 'left'),
                 array('special_to_date',
-                    array('lt' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time)." 00:00:00"),
+                    array('lt' => $dateToday." 00:00:00"),
                     'left'),
                 array('special_to_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')), 'left')
             )->willReturnOnConsecutiveCalls(
