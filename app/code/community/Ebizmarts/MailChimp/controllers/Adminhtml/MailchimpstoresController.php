@@ -273,15 +273,15 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     {
         $acl = '';
         switch ($this->getRequest()->getActionName()) {
-            case 'index':
-            case 'grid':
-            case 'edit':
-            case 'new':
-            case 'save':
-            case 'getstores':
-            case 'delete':
-                $acl = 'newsletter/mailchimp/mailchimpstores';
-                break;
+        case 'index':
+        case 'grid':
+        case 'edit':
+        case 'new':
+        case 'save':
+        case 'getstores':
+        case 'delete':
+            $acl = 'newsletter/mailchimp/mailchimpstores';
+            break;
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);

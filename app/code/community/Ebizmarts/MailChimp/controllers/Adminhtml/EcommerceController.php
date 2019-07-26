@@ -101,12 +101,12 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
-            case 'resetLocalErrors':
-            case 'renderresendecom':
-            case 'resendEcommerceData':
-            case 'createMergeFields':
-                $acl = 'system/config/mailchimp';
-                break;
+        case 'resetLocalErrors':
+        case 'renderresendecom':
+        case 'resendEcommerceData':
+        case 'createMergeFields':
+            $acl = 'system/config/mailchimp';
+            break;
         }
 
         return $this->getAdminSession()->isAllowed($acl);
