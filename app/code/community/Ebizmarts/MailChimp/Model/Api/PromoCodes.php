@@ -114,7 +114,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                 if (!$promoRuleSyncData->getId()
                     || $promoRuleSyncData->getMailchimpSyncDelta() < $helper->getEcommMinSyncDateFlag(
                         $mailchimpStoreId, $magentoStoreId
-                    )) {
+                    )
+                ) {
                     $promoRuleMailchimpData = $this->getApiPromoRules()->getNewPromoRule(
                         $ruleId,
                         $mailchimpStoreId,
@@ -261,14 +262,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      *
      * @param $codeId
      * @param $mailchimpStoreId
-     * @param int|null $syncDelta
-     * @param int|null $syncError
-     * @param int|null $syncModified
-     * @param int|null $syncDeleted
-     * @param int|null $token
-     * @param bool $saveOnlyIfexists
-     * @param null $deletedRelatedId
-     * @param bool $allowBatchRemoval
+     * @param int|null         $syncDelta
+     * @param int|null         $syncError
+     * @param int|null         $syncModified
+     * @param int|null         $syncDeleted
+     * @param int|null         $token
+     * @param bool             $saveOnlyIfexists
+     * @param null             $deletedRelatedId
+     * @param bool             $allowBatchRemoval
      */
     protected function _updateSyncData(
         $codeId,
@@ -281,7 +282,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $saveOnlyIfexists = false,
         $deletedRelatedId = null,
         $allowBatchRemoval = true
-) {
+    ) {
         $this->getMailChimpHelper()->saveEcommerceSyncData(
             $codeId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,

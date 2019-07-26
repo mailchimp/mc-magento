@@ -16,8 +16,8 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
 
     /**
      * @param array|string $email
-     * @param null $name
-     * @param array $variables
+     * @param null         $name
+     * @param array        $variables
      * @return bool
      * @throws Exception
      */

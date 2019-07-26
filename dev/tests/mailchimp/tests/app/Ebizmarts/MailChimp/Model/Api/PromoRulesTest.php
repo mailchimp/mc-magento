@@ -12,7 +12,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
     {
         Mage::app('default');
 
-        /** @var Ebizmarts_MailChimp_Model_Api_PromoRules $apiPromoRulesMock promoRulesApiMock */
+        /**
+         * @var Ebizmarts_MailChimp_Model_Api_PromoRules $apiPromoRulesMock promoRulesApiMock
+         */
         $this->_promoRulesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoRules::class);
     }
 
@@ -188,7 +190,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                     'target' => 'total',
                     'enabled' => true,
                 )
-                ),
+            ),
             'description empty' => array(
                 array(
                     'id' => self::PROMORULE_ID,
@@ -439,9 +441,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $allCases = array();
 
-        $allCases[] = array (
-            'amount null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'amount null' => array(
+                'params' => array(
                     'amount' => null,
                     'description' => 'desc',
                     'id' => 'id'
@@ -449,9 +451,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'all null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'all null' => array(
+                'params' => array(
                     'amount' => null,
                     'description' => null,
                     'id' => null
@@ -459,65 +461,65 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'description null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => null,
-                'id' => 'id'
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'description null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => null,
+                    'id' => 'id'
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'id null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => 'desc',
-                'id' => null
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'id null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => 'desc',
+                    'id' => null
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'none null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => 'desc',
-                'id' => 'id'
-            ),
-            'expected' => false,
-        ));
+        $allCases[] = array(
+            'none null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => 'desc',
+                    'id' => 'id'
+                ),
+                'expected' => false,
+            ));
 
-        $allCases[] = array (
-            'amount and id null' => array (
-            'params' => array (
-                'amount' => null,
-                'description' => 'desc',
-                'id' => null
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'amount and id null' => array(
+                'params' => array(
+                    'amount' => null,
+                    'description' => 'desc',
+                    'id' => null
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'amount only not null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => null,
-                'id' => null
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'amount only not null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => null,
+                    'id' => null
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'id only not null' => array (
-            'params' => array (
-                'amount' => null,
-                'description' => null,
-                'id' => 'id value'
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'id only not null' => array(
+                'params' => array(
+                    'amount' => null,
+                    'description' => null,
+                    'id' => 'id value'
+                ),
+                'expected' => true,
+            ));
 
         return $allCases;
     }
@@ -540,36 +542,36 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
     {
         $allCases = array();
 
-        $allCases[] = array (
-            'all null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'all null' => array(
+                'params' => array(
                     'target' => null,
                     'type' => null,
                 ),
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'type null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'type null' => array(
+                'params' => array(
                     'target' => 'total',
                     'type' => null,
                 ),
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'target null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'target null' => array(
+                'params' => array(
                     'target' => null,
                     'type' => 'percentage',
                 ),
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'none null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'none null' => array(
+                'params' => array(
                     'target' => 'total',
                     'type' => 'percentage',
                 ),
@@ -591,7 +593,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
      */
     public function invokeMethod(&$object, $methodName, array $parameters = array())
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 

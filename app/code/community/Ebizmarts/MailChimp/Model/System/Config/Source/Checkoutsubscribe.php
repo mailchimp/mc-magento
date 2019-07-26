@@ -2,7 +2,6 @@
 
 /**
  * Checkout subscribe available status options source
- *
  * @category   Ebizmarts
  * @package    Ebizmarts_MailChimp
  * @author     Ebizmarts Team <info@ebizmarts.com>

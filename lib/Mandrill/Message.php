@@ -81,8 +81,11 @@ class Mandrill_Message extends Mandrill_Mandrill
     public function getAttachments()
     {
         $_attachments = array();
+
         foreach ($this->_attachments as $attachment) {
-            /** @var Zend_Mime_Part $attachment */
+            /**
+             * @var Zend_Mime_Part $attachment
+             */
             $_attachments[] = array(
                 'type' => $attachment->type,
                 'name' => $attachment->filename,
@@ -158,6 +161,7 @@ class Mandrill_Message extends Mandrill_Mandrill
             $subject = $this->_filterOther($subject);
             $this->_subject = $subject;
         }
+
         return $this;
     }
 
@@ -170,10 +174,10 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
 
         $email = $this->_filterEmail($email);
-        //        $name  = $this->_filterName($name);
+        //$name  = $this->_filterName($name);
         $this->_from = $email;
         $this->_fromName = $name;
-        //        $this->_storeHeader('From', $this->_formatAddress($email, $name), true);
+        //$this->_storeHeader('From', $this->_formatAddress($email, $name), true);
 
         return $this;
     }
@@ -265,31 +269,40 @@ class Mandrill_Message extends Mandrill_Mandrill
     public function send()
     {
         $email = array();
+
         foreach ($this->_to as $to) {
             $email['to'][] = array(
                 'email' => $to
             );
         }
+
         foreach ($this->_bcc as $bcc) {
             $email['to'][] = array(
                 'email' => $bcc,
                 'type' => 'bcc'
             );
         }
+
         $email['subject'] = $this->_subject;
+
         if (isset($this->_fromName)) {
             $email['from_name'] = $this->_fromName;
         }
+
         $email['from_email'] = $this->_from;
+
         if ($headers = $this->getHeaders()) {
             $email['headers'] = $headers;
         }
+
         if ($att = $this->getAttachments()) {
             $email['attachments'] = $att;
         }
+
         if ($this->_bodyHtml) {
             $email['html'] = $this->_bodyHtml;
         }
+
         if ($this->_bodyText) {
             $email['text'] = $this->_bodyText;
         }
@@ -300,6 +313,7 @@ class Mandrill_Message extends Mandrill_Mandrill
             Mage::logException($e);
             return false;
         }
+
         return true;
     }
 }

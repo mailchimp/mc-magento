@@ -68,7 +68,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         $subscriberArray = array();
         if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag
-            || !$helper->getSubMinSyncDateFlag($this->getStoreId())) {
+            || !$helper->getSubMinSyncDateFlag($this->getStoreId())
+        ) {
             $realScope = $helper->getRealScopeForConfig(
                 Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
                 $this->getStoreId()
@@ -250,7 +251,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 $saveSubscriber = true;
             } catch (MailChimp_Error $e) {
                 if ($this->isSubscribed($newStatus) && $subscriber->getIsStatusChanged()
-                    && !$helper->isSubscriptionConfirmationEnabled($storeId)) {
+                    && !$helper->isSubscriptionConfirmationEnabled($storeId)
+                ) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
                             $this->_catchMailchompNewstellerConfirm(
@@ -336,7 +338,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $mailChimpTags,
         $subscriber,
         $interest
-) {
+    ) {
         $helper = $this->getMailchimpHelper();
         $api->getLists()->getMembers()->update(
             $listId, $emailHash, null, 'pending', $mailChimpTags->getMailchimpTags(), $interest
@@ -571,8 +573,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $mailChimpTags->setStoreId($storeId);
         $mailChimpTags->setSubscriber($subscriber);
         $mailChimpTags->setCustomer(
-            $this->getCustomerByWebsiteAndId()->
-            setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
+            $this->getCustomerByWebsiteAndId()
+                ->setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
         );
         $mailChimpTags->buildMailChimpTags();
         return $mailChimpTags;

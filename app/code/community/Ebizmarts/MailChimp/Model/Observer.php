@@ -106,7 +106,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle save of System -> Configuration, section <mailchimp>
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
@@ -124,8 +123,9 @@ class Ebizmarts_MailChimp_Model_Observer
                 : null;
             $oldMailchimpStoreId = $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']);
 
-            if (isset($configData['groups']['general']['fields']['apikey']['value']) &&
-                !$helper->isApiKeyObscure($configData['groups']['general']['fields']['apikey']['value'])) {
+            if (isset($configData['groups']['general']['fields']['apikey']['value'])
+                && !$helper->isApiKeyObscure($configData['groups']['general']['fields']['apikey']['value'])
+            ) {
                 $apiKey = $configData['groups']['general']['fields']['apikey']['value'];
             } else {
                 $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
@@ -172,7 +172,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * return true if list or store is selected but the other one is inheriting.
-     *
      * @param $configData
      * @return bool
      */
@@ -187,7 +186,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle confirmation emails and subscription to Mailchimp
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
@@ -204,8 +202,9 @@ class Ebizmarts_MailChimp_Model_Observer
             $statusChanged = $subscriber->getIsStatusChanged();
 
             //Override Magento status to always send double opt-in confirmation.
-            if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED &&
-                $helper->isSubscriptionConfirmationEnabled($storeId) && !$helper->isUseMagentoEmailsEnabled($storeId)) {
+            if ($statusChanged && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED
+                && $helper->isSubscriptionConfirmationEnabled($storeId) && !$helper->isUseMagentoEmailsEnabled($storeId)
+            ) {
                 $subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE);
                 $this->addSuccessIfRequired($helper);
             }
@@ -216,7 +215,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle interest groups for subscriber and allow Magento email to be sent if configured that way.
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
@@ -240,7 +238,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($helper->isUseMagentoEmailsEnabled($storeViewId) !== 1
                 && $this->isMagentoSubscription($subscriberSource)
-                || $this->isEmailConfirmationRequired($subscriberSource)) {
+                || $this->isEmailConfirmationRequired($subscriberSource)
+            ) {
                 if ($subscriber->getIsStatusChanged()) {
                     $apiSubscriber->updateSubscriber($subscriber, true);
                 } else {
@@ -262,7 +261,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle subscriber deletion from back end.
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -281,7 +279,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add Subscriber first name and last name to Newsletter Grid.
-     *
      * @param  Varien_Event_Observer $observer
      * @return $this|Varien_Event_Observer
      */
@@ -297,9 +294,9 @@ class Ebizmarts_MailChimp_Model_Observer
             $block->addColumnAfter(
                 'firstname',
                 array(
-                'header' => Mage::helper('newsletter')->__('Customer First Name'),
-                'index' => 'customer_firstname',
-                'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_firstname',
+                    'header' => Mage::helper('newsletter')->__('Customer First Name'),
+                    'index' => 'customer_firstname',
+                    'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_firstname',
                 ),
                 'type'
             );
@@ -307,9 +304,9 @@ class Ebizmarts_MailChimp_Model_Observer
             $block->addColumnAfter(
                 'lastname',
                 array(
-                'header' => Mage::helper('newsletter')->__('Customer Last Name'),
-                'index' => 'customer_lastname',
-                'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_lastname'
+                    'header' => Mage::helper('newsletter')->__('Customer Last Name'),
+                    'index' => 'customer_lastname',
+                    'renderer' => 'mailchimp/adminhtml_newsletter_subscriber_renderer_lastname'
                 ),
                 'firstname'
             );
@@ -320,7 +317,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Customer object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
-     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -396,7 +392,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products included the order to be updated on MailChimp on the next cron job run.
-     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
@@ -453,7 +448,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Catch order save before event, mark it as modified and associate the landing page to the order data.
-     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -474,7 +468,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Order object is saved add the campaign id if available in the cookies.
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -496,7 +489,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Delete campaign and landing cookies.
-     *
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -513,7 +505,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Get campaign cookie if available.
-     *
      * @return mixed
      */
     protected function _getCampaignCookie()
@@ -523,7 +514,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Get landing_page cookie if exists.
-     *
      * @return null
      */
     protected function _getLandingCookie()
@@ -533,7 +523,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add section in order view with MailChimp campaign data if available.
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -541,7 +530,8 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $block = $observer->getBlock();
         if (($block->getNameInLayout() == 'order_info')
-            && ($child = $block->getChild('mailchimp.order.info.monkey.block'))) {
+            && ($child = $block->getChild('mailchimp.order.info.monkey.block'))
+        ) {
             $order = $block->getOrder();
             $storeId = $order->getStoreId();
             $helper = $this->makeHelper();
@@ -562,7 +552,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add column to associate orders in grid gained from MailChimp campaigns and automations.
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
@@ -577,34 +566,36 @@ class Ebizmarts_MailChimp_Model_Observer
             && $ecommEnabledAnyScope && $addColumnConfig
         ) {
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_MAILCHIMP_LOGO_TO_GRID
-                || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
+                || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID
+            ) {
                 $block->addColumnAfter(
                     'mailchimp_campaign_id',
                     array(
-                    'header' => $helper->__('MailChimp'),
-                    'index' => 'mailchimp_campaign_id',
-                    'align' => 'center',
-                    'filter' => false,
-                    'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
-                    'sortable' => false,
-                    'width' => 70
+                        'header' => $helper->__('MailChimp'),
+                        'index' => 'mailchimp_campaign_id',
+                        'align' => 'center',
+                        'filter' => false,
+                        'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimp',
+                        'sortable' => false,
+                        'width' => 70
                     ),
                     'created_at'
                 );
             }
 
             if ($addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_SYNC_STATUS_TO_GRID
-                || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID) {
+                || $addColumnConfig == Ebizmarts_MailChimp_Model_Config::ADD_BOTH_TO_GRID
+            ) {
                 $block->addColumnAfter(
                     'mailchimp_synced_flag',
                     array(
-                    'header' => $helper->__('Synced to MailChimp'),
-                    'index' => 'mailchimp_synced_flag',
-                    'align' => 'center',
-                    'filter' => false,
-                    'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
-                    'sortable' => true,
-                    'width' => 70
+                        'header' => $helper->__('Synced to MailChimp'),
+                        'index' => 'mailchimp_synced_flag',
+                        'align' => 'center',
+                        'filter' => false,
+                        'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
+                        'sortable' => true,
+                        'width' => 70
                     ),
                     'created_at'
                 );
@@ -656,7 +647,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add customer to the cart if it placed the email address in the popup or footer subscription form.
-     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -704,7 +694,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
-     *
      * @param Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -748,8 +737,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
-     *
-     * @param Varien_Event_Observer $observer
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function cancelCreditMemo(Varien_Event_Observer $observer)
@@ -791,7 +779,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products canceled to be updated on MailChimp on the next cron job run.
-     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
@@ -824,7 +811,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Product object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
-     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -851,7 +837,8 @@ class Ebizmarts_MailChimp_Model_Observer
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
                     $errorMessage = $dataProduct->getMailchimpSyncError();
                     if ($isMarkedAsDeleted
-                        || $errorMessage == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO) {
+                        || $errorMessage == Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO
+                    ) {
                         $dataProduct->delete();
                     } else {
                         $apiProduct->update($product->getId(), $mailchimpStoreId);
@@ -1016,7 +1003,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Transform array in format scope_scopeId to array.
-     *
      * @param $scopeData
      * @return array
      */
@@ -1041,7 +1027,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add success message if subscribing from customer account.
-     *
      * @param $helper
      */
     protected function addSuccessIfRequired($helper)
@@ -1093,12 +1078,13 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($helper->getLocalInterestCategories($storeId)
                 && ($this->getRequest()->getActionName() == 'edit'
-                    || $this->getRequest()->getParam('type'))) {
+                || $this->getRequest()->getParam('type'))
+            ) {
                 $block->addTab(
                     'mailchimp', array(
-                    'label' => $helper->__('MailChimp'),
-                    'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
-                    'class' => 'ajax'
+                        'label' => $helper->__('MailChimp'),
+                        'url' => $block->getUrl('adminhtml/mailchimp/index', array('_current' => true)),
+                        'class' => 'ajax'
                     )
                 );
             }
@@ -1114,7 +1100,6 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle frontend customer interest groups only if is not subscribed and all admin customer groups.
-     *
      * @param $subscriberEmail
      * @param $params
      * @param $storeId

@@ -97,7 +97,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Get Config value for certain scope.
-
      * @param  $path
      * @param  $scopeId
      * @param  null    $scope
@@ -4123,9 +4122,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getSyncFlagDataHtml($dat, $string)
     {
         $syncFlagDataArray = $this->getSyncFlagDataArray($dat);
-        if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]!= Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS
+        $syncFlagStatus = Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS;
+        $inProgress = Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS;
+
+        if ($syncFlagDataArray[$syncFlagStatus] != $inProgress
         ) {
-            if ($syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]== Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED
+            if ($syncFlagDataArray[$syncFlagStatus]== Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED
             ) {
                 $string .=
                     "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]}"
@@ -4136,7 +4138,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     . ": <span style='color:forestgreen;font-weight: bold;'>"
                     . $this->__(
                         'Finished at %s',
-                        $syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_STATUS]
+                        $syncFlagDataArray[$syncFlagStatus]
                     ) . "</span></li>";
             }
         } else {
@@ -4339,6 +4341,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         try {
             $apiInterestCategory = $api->getLists()->getInterestCategory();
             $allInterest = $apiInterestCategory->getAll($listId);
+
             foreach ($allInterest['categories'] as $item) {
                 if (in_array($item['id'], $interest)) {
                     $rc[$item['id']]['interest'] =

@@ -17,7 +17,8 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
     public function sendUnsubscriptionEmail()
     {
         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)
-            && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL) != 1) {
+            && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL) != 1
+        ) {
             return $this;
         } else {
             return parent::sendUnsubscriptionEmail();
@@ -30,7 +31,8 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
     public function sendConfirmationRequestEmail()
     {
         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)
-            && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL) != 1) {
+            && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL) != 1
+        ) {
             return $this;
         } else {
             return parent::sendConfirmationRequestEmail();
@@ -43,7 +45,8 @@ class Ebizmarts_MailChimp_Model_Subscriber extends Mage_Newsletter_Model_Subscri
     public function sendConfirmationSuccessEmail()
     {
         if (Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE)
-            && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL) != 1) {
+            && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MAGENTO_MAIL) != 1
+        ) {
             return $this;
         } else {
             return parent::sendConfirmationSuccessEmail();

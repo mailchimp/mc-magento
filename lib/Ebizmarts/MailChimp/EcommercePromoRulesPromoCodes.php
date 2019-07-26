@@ -132,24 +132,31 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
         $updated_at_foreign = null
     ) {
         $_params = array();
+
         if ($code) {
             $_params['code'] = $code;
         }
+
         if ($redemption_url) {
             $_params['redemption_url'] = $redemption_url;
         }
+
         if ($usage_count) {
             $_params['usage_count'] = $usage_count;
         }
+
         if ($enabled) {
             $_params['enabled'] = $enabled;
         }
+
         if ($created_at_foreign) {
             $_params['created_at_foreign'] = $created_at_foreign;
         }
+
         if ($updated_at_foreign) {
             $_params['updated_at_foreign'] = $updated_at_foreign;
         }
+
         return $this->_master->call('ecommerce/stores/' . $storeId . '/promo-rules/' . $promoRuleId . '/promo-codes/' . $promoCodeId, $_params, Ebizmarts_MailChimp::PATCH);
     }
 
@@ -157,7 +164,6 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
      * @param int $storeId              The MailChimp store id.
      * @param int $promoRuleId          The id for the promo rule of a store.
      * @param int $promoCodeId          A unique identifier for the promo code associated to the rule above.
-     *
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError

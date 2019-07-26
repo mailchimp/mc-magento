@@ -274,14 +274,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * update customer sync data
      *
-     * @param int $customerId
-     * @param string $mailchimpStoreId
+     * @param int      $customerId
+     * @param string   $mailchimpStoreId
      * @param int|null $syncDelta
      * @param int|null $syncError
      * @param int|null $syncModified
      * @param int|null $syncedFlag
-     * @param bool $saveOnlyIfexists
-     * @param bool $allowBatchRemoval
+     * @param bool     $saveOnlyIfexists
+     * @param bool     $allowBatchRemoval
      */
     protected function _updateSyncData(
         $customerId,
@@ -292,7 +292,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $allowBatchRemoval = true
-) {
+    ) {
         $this->_mailchimpHelper->saveEcommerceSyncData(
             $customerId,
             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
@@ -465,7 +465,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     /**
      * @param $collection
-     * @param null $mailchimpStoreId
+     * @param null       $mailchimpStoreId
      */
     public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId = null)
     {
