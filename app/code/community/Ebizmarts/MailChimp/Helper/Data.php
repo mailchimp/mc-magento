@@ -4853,7 +4853,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $where = "mailchimp_sync_error <> ''";
         $storeIdsAsString = null;
-        
+
         if ($scopeId != 0) {
             $storeIds = $this->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
 
