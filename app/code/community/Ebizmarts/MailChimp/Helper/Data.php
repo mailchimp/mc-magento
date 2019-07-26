@@ -996,13 +996,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::log($message, null, 'MailChimp_Failing_Requests.log', true);
         } elseif ($logRequestEnabled) {
             $logDir = Mage::getBaseDir('var') . DS . 'log';
-            
+
             if (!file_exists($logDir)) {
                 mkdir($logDir, 0750);
             }
 
             $logDir .= DS . 'MailChimp_Requests';
-            
+
             if (!file_exists($logDir)) {
                 mkdir($logDir, 0750);
             }
