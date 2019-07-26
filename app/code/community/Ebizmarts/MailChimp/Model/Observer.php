@@ -106,7 +106,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle save of System -> Configuration, section <mailchimp>
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
      */
@@ -172,7 +173,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * return true if list or store is selected but the other one is inheriting.
-     * @param $configData
+     *
+     * @param  $configData
      * @return bool
      */
     protected function isListXorStoreInherited($configData)
@@ -186,7 +188,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle confirmation emails and subscription to Mailchimp
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
      */
@@ -215,7 +218,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle interest groups for subscriber and allow Magento email to be sent if configured that way.
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
      * @throws Mage_Core_Model_Store_Exception
@@ -261,7 +265,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle subscriber deletion from back end.
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function handleSubscriberDeletion(Varien_Event_Observer $observer)
@@ -279,6 +284,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add Subscriber first name and last name to Newsletter Grid.
+     *
      * @param  Varien_Event_Observer $observer
      * @return $this|Varien_Event_Observer
      */
@@ -317,6 +323,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Customer object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -392,6 +399,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products included the order to be updated on MailChimp on the next cron job run.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
@@ -448,6 +456,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Catch order save before event, mark it as modified and associate the landing page to the order data.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -468,7 +477,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Order object is saved add the campaign id if available in the cookies.
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function saveCampaignData(Varien_Event_Observer $observer)
@@ -489,6 +499,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Delete campaign and landing cookies.
+     *
      * @return Varien_Event_Observer
      * @throws Exception
      */
@@ -505,6 +516,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Get campaign cookie if available.
+     *
      * @return mixed
      */
     protected function _getCampaignCookie()
@@ -514,6 +526,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Get landing_page cookie if exists.
+     *
      * @return null
      */
     protected function _getLandingCookie()
@@ -523,7 +536,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add section in order view with MailChimp campaign data if available.
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function addOrderViewMonkey(Varien_Event_Observer $observer)
@@ -552,7 +566,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add column to associate orders in grid gained from MailChimp campaigns and automations.
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Mage_Core_Exception
      */
@@ -647,6 +662,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add customer to the cart if it placed the email address in the popup or footer subscription form.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -694,7 +710,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
-     * @param Varien_Event_Observer $observer
+     *
+     * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
     public function newCreditMemo(Varien_Event_Observer $observer)
@@ -737,6 +754,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -779,6 +797,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Set the products canceled to be updated on MailChimp on the next cron job run.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      * @throws Exception
@@ -811,6 +830,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * When Product object is saved set it to be updated on MailChimp if getMailchimpUpdateObserverRan() is false.
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
@@ -1003,7 +1023,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Transform array in format scope_scopeId to array.
-     * @param $scopeData
+     *
+     * @param  $scopeData
      * @return array
      */
     protected function getScopeArrayFromString($scopeData)
@@ -1027,6 +1048,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Add success message if subscribing from customer account.
+     *
      * @param $helper
      */
     protected function addSuccessIfRequired($helper)
@@ -1100,10 +1122,11 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * Handle frontend customer interest groups only if is not subscribed and all admin customer groups.
-     * @param $subscriberEmail
-     * @param $params
-     * @param $storeId
-     * @param null $customerId
+     *
+     * @param  $subscriberEmail
+     * @param  $params
+     * @param  $storeId
+     * @param  null            $customerId
      * @return Mage_Newsletter_Model_Subscriber
      * @throws Mage_Core_Model_Store_Exception
      */

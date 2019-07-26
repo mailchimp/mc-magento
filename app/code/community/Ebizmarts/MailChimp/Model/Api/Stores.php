@@ -14,6 +14,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
     /**
      * Create Mailchimp store.
+     *
      * @param  $apiKey
      * @param  $listId
      * @param  $storeName
@@ -96,6 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
     /**
      * Edit Mailchimp store.
+     *
      * @param  $mailchimpStoreId
      * @param  $apiKey
      * @param  $storeName
@@ -206,6 +208,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
     /**
      * Delete MailChimp store.
+     *
      * @param  $mailchimpStoreId
      * @param  $apiKey
      * @return mixed|string
@@ -253,6 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
     /**
      * Set is_syncing value for the given scope.
+     *
      * @param  $mailchimpApi Ebizmarts_MailChimp
      * @param  $isSincingValue
      * @param  $mailchimpStoreId

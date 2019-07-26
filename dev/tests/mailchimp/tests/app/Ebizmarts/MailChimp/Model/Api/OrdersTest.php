@@ -61,8 +61,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
     }
 
     /**
-    * @dataProvider getPromoDataProvider
-    */
+     * @dataProvider getPromoDataProvider
+     */
     public function testGetPromoData($type)
     {
 

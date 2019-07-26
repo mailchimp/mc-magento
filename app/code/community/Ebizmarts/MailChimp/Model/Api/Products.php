@@ -1228,6 +1228,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
     /**
      * Return price with tax if setting enabled.
+     *
      * @param  $product
      * @param  $magentoStoreId
      * @return float \ return the price of the product

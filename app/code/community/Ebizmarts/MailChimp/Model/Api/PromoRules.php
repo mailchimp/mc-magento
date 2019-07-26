@@ -215,6 +215,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
 
     /**
      * update promo rule sync data
+     *
      * @param int      $ruleId
      * @param string   $mailchimpStoreId
      * @param int|null $syncDelta
@@ -335,13 +336,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     {
         $mailChimpType = null;
         switch ($promoAction) {
-            case Mage_SalesRule_Model_Rule::BY_PERCENT_ACTION:
-                $mailChimpType = self::TYPE_PERCENTAGE;
-                break;
-            case Mage_SalesRule_Model_Rule::BY_FIXED_ACTION:
-            case Mage_SalesRule_Model_Rule::CART_FIXED_ACTION:
-                $mailChimpType = self::TYPE_FIXED;
-                break;
+        case Mage_SalesRule_Model_Rule::BY_PERCENT_ACTION:
+            $mailChimpType = self::TYPE_PERCENTAGE;
+            break;
+        case Mage_SalesRule_Model_Rule::BY_FIXED_ACTION:
+        case Mage_SalesRule_Model_Rule::CART_FIXED_ACTION:
+            $mailChimpType = self::TYPE_FIXED;
+            break;
         }
 
         return $mailChimpType;
@@ -355,13 +356,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
     {
         $mailChimpTarget = null;
         switch ($promoAction) {
-            case Mage_SalesRule_Model_Rule::CART_FIXED_ACTION:
-            case Mage_SalesRule_Model_Rule::BY_PERCENT_ACTION:
-                $mailChimpTarget = self::TARGET_TOTAL;
-                break;
-            case Mage_SalesRule_Model_Rule::BY_FIXED_ACTION:
-                $mailChimpTarget = self::TARGET_PER_ITEM;
-                break;
+        case Mage_SalesRule_Model_Rule::CART_FIXED_ACTION:
+        case Mage_SalesRule_Model_Rule::BY_PERCENT_ACTION:
+            $mailChimpTarget = self::TARGET_TOTAL;
+            break;
+        case Mage_SalesRule_Model_Rule::BY_FIXED_ACTION:
+            $mailChimpTarget = self::TARGET_PER_ITEM;
+            break;
         }
 
         return $mailChimpTarget;

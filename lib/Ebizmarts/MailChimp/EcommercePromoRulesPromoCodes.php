@@ -15,15 +15,15 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
 {
 
     /**
-     * @param string    $storeId            The MailChimp store id.
-     * @param int       $promoRuleId        A unique identifier for the promo rule.
-     * @param int       $promoCodeId        A unique identifier for the promo code associated to the rule above.
-     * @param string    $code               The discount code. Restricted to UTF-8 characters with max length 50.
-     * @param string    $redemption_url     The url that should be used in the promotion campaign restricted to UTF-8 characters with max length 2000.
-     * @param int       $usage_count        Number of times promo code has been used.
-     * @param null      $enabled            Whether the promo rule is currently enabled.
-     * @param null      $created_at_foreign The date and time the promotion was created in ISO 8601 format.
-     * @param null      $updated_at_foreign The date and time the promotion was updated in ISO 8601 format.
+     * @param string $storeId            The MailChimp store id.
+     * @param int    $promoRuleId        A unique identifier for the promo rule.
+     * @param int    $promoCodeId        A unique identifier for the promo code associated to the rule above.
+     * @param string $code               The discount code. Restricted to UTF-8 characters with max length 50.
+     * @param string $redemption_url     The url that should be used in the promotion campaign restricted to UTF-8 characters with max length 2000.
+     * @param int    $usage_count        Number of times promo code has been used.
+     * @param null   $enabled            Whether the promo rule is currently enabled.
+     * @param null   $created_at_foreign The date and time the promotion was created in ISO 8601 format.
+     * @param null   $updated_at_foreign The date and time the promotion was updated in ISO 8601 format.
      *
      * @return mixed
      * @throws MailChimp_Error
@@ -49,15 +49,15 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
     }
 
     /**
-     * @param string    $storeId        The MailChimp store id.
-     * @param int       $promoRuleId    A unique identifier for the promo rule.
-     * @param null      $fields         A comma-separated list of fields to return. Reference parameters of sub-objects
-     *                                  with dot notation.
-     * @param null      $excludeFields  A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                                  with dot notation.
-     * @param null      $count          The number of records to return.
-     * @param null      $offset         The number of records from a collection to skip. Iterating over large collections
-     *                                  with this parameter can be slow.
+     * @param string $storeId       The MailChimp store id.
+     * @param int    $promoRuleId   A unique identifier for the promo rule.
+     * @param null   $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null   $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null   $count         The number of records to return.
+     * @param null   $offset        The number of records from a collection to skip. Iterating over large collections
+     *                              with this parameter can be slow.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -81,13 +81,13 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
     }
 
     /**
-     * @param string    $storeId        The MailChimp store id.
-     * @param int       $promoRuleId    The id for the promo rule of a store.
-     * @param int       $promoCodeId    A unique identifier for the promo code associated to the rule above.
-     * @param null      $fields         A comma-separated list of fields to return. Reference parameters of sub-objects
-     *                                  with dot notation.
-     * @param null      $excludeFields  A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                                  with dot notation.
+     * @param string $storeId       The MailChimp store id.
+     * @param int    $promoRuleId   The id for the promo rule of a store.
+     * @param int    $promoCodeId   A unique identifier for the promo code associated to the rule above.
+     * @param null   $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                              with dot notation.
+     * @param null   $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                              with dot notation.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -106,15 +106,15 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
     }
 
     /**
-     * @param string    $storeId            The MailChimp store id.
-     * @param int       $promoRuleId        A unique identifier for the promo rule.
-     * @param int       $promoCodeId        A unique identifier for the promo code associated to the rule above.
-     * @param string    $code               The discount code. Restricted to UTF-8 characters with max length 50.
-     * @param string    $redemption_url     The url that should be used in the promotion campaign restricted to UTF-8 characters with max length 2000.
-     * @param int       $usage_count        Number of times promo code has been used.
-     * @param null      $enabled            Whether the promo rule is currently enabled.
-     * @param null      $created_at_foreign The date and time the promotion was created in ISO 8601 format.
-     * @param null      $updated_at_foreign The date and time the promotion was updated in ISO 8601 format.
+     * @param string $storeId            The MailChimp store id.
+     * @param int    $promoRuleId        A unique identifier for the promo rule.
+     * @param int    $promoCodeId        A unique identifier for the promo code associated to the rule above.
+     * @param string $code               The discount code. Restricted to UTF-8 characters with max length 50.
+     * @param string $redemption_url     The url that should be used in the promotion campaign restricted to UTF-8 characters with max length 2000.
+     * @param int    $usage_count        Number of times promo code has been used.
+     * @param null   $enabled            Whether the promo rule is currently enabled.
+     * @param null   $created_at_foreign The date and time the promotion was created in ISO 8601 format.
+     * @param null   $updated_at_foreign The date and time the promotion was updated in ISO 8601 format.
      *
      * @return mixed
      * @throws MailChimp_Error
@@ -161,9 +161,9 @@ class MailChimp_EcommercePromoRulesPromoCodes extends MailChimp_Abstract
     }
 
     /**
-     * @param int $storeId              The MailChimp store id.
-     * @param int $promoRuleId          The id for the promo rule of a store.
-     * @param int $promoCodeId          A unique identifier for the promo code associated to the rule above.
+     * @param int $storeId     The MailChimp store id.
+     * @param int $promoRuleId The id for the promo rule of a store.
+     * @param int $promoCodeId A unique identifier for the promo code associated to the rule above.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError

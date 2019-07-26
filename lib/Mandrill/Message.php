@@ -21,6 +21,7 @@ class Mandrill_Message extends Mandrill_Mandrill
 
     /**
      * Flag: whether or not email has attachments
+     *
      * @var boolean
      */
     public $hasAttachments = false;
@@ -49,7 +50,7 @@ class Mandrill_Message extends Mandrill_Mandrill
      * @param string $mimeType
      * @param string $disposition
      * @param string $encoding
-     * @param null $filename
+     * @param null   $filename
      * @return Zend_Mime_Part
      */
     public function createAttachment(

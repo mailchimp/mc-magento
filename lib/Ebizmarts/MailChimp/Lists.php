@@ -76,16 +76,16 @@ class MailChimp_Lists extends MailChimp_Abstract
      *          zip *       (The postal or zip code for the list contact)
      *          country *   (A two-character ISO3166 country code. Defaults to US if invalid.)
      * @param $permissionRemanider
-     * @param bool $useArchiveBar
+     * @param bool                $useArchiveBar
      * @param $campaingDefaults
      *          fromName * (The default from name for campaigns sent to this list)
      *          fromEmail * (The email address to send unsubscribe notifications to)
      *          subject * (The default subject line for campaigns sent to this list)
      *          language *(The default language for this lists’s forms)
-     * @param bool $notifyOnSubscribe
+     * @param bool                $notifyOnSubscribe
      * @param $notifyOnUnsubscribe
      * @param $emailTypeOption
-     * @param string $visibility
+     * @param string              $visibility
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -163,16 +163,16 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @param $contact                  Contact information displayed in campaign footers to comply with international
      *                                  spam laws.
      * @param $permissionReminder      The permission reminder for the list.
-     * @param null $useArchiveBar Whether campaigns for this list use the Archive Bar in archives by default.
-     * @param null $campaignDefaults Default values for campaigns created for this list.
-     * @param null $notifyOnSubscribe The email address to send subscribe notifications to.
-     * @param null $notifyOnUnsubscribe The email address to send unsubscribe notifications to.
+     * @param null                                                                                                    $useArchiveBar       Whether campaigns for this list use the Archive Bar in archives by default.
+     * @param null                                                                                                    $campaignDefaults    Default values for campaigns created for this list.
+     * @param null                                                                                                    $notifyOnSubscribe   The email address to send subscribe notifications to.
+     * @param null                                                                                                    $notifyOnUnsubscribe The email address to send unsubscribe notifications to.
      * @param $emailTypeOption          Whether the list supports multiple formats for emails.
      *                                  When set to true, subscribers can choose whether they want to receive HTML or
      *                                  plain-text emails.
      *                                  When set to false, subscribers will receive HTML emails, with a plain-text
      *                                  alternative backup.
-     * @param null $visibility Whether this list is public or private. (pub/prv)
+     * @param null                                                                                                    $visibility          Whether this list is public or private. (pub/prv)
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError

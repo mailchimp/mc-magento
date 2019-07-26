@@ -517,8 +517,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
     /**
      * Get URL for the cart.
+     *
      * @param  $cart
-     * @param $isModified
+     * @param  $isModified
      * @return string
      */
     protected function _getCheckoutUrl($cart, $isModified)

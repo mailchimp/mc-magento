@@ -39,6 +39,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * Get an array of customer entity IDs of the next batch of customers
      * to sync.
+     *
      * @return int[] Customer IDs to sync
      * @throws Mage_Core_Exception
      */

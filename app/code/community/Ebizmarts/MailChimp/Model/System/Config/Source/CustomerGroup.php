@@ -13,7 +13,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
 
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup constructor.
-     * @param $params
+     *
+     * @param  $params
      * @throws Mage_Core_Exception
      */
     public function __construct($params)

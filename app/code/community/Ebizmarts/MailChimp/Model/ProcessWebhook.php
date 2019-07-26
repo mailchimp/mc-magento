@@ -61,20 +61,20 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $data = unserialize($webhookRequest->getDataRequest());
             if ($data) {
                 switch ($webhookRequest->getType()) {
-                    case 'subscribe':
-                        $this->_subscribe($data);
-                        break;
-                    case 'unsubscribe':
-                        $this->_unsubscribe($data);
-                        break;
-                    case 'cleaned':
-                        $this->_clean($data);
-                        break;
-                    case 'upemail':
-                        $this->_updateEmail($data);
-                        break;
-                    case 'profile':
-                        $this->_profile($data);
+                case 'subscribe':
+                    $this->_subscribe($data);
+                    break;
+                case 'unsubscribe':
+                    $this->_unsubscribe($data);
+                    break;
+                case 'cleaned':
+                    $this->_clean($data);
+                    break;
+                case 'upemail':
+                    $this->_updateEmail($data);
+                    break;
+                case 'profile':
+                    $this->_profile($data);
                 }
             }
 
@@ -187,23 +187,23 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 $statusUnsubscribed = Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED;
 
                 switch ($action) {
-                    case 'delete':
-                        //if config setting "Webhooks Delete action" is set as "Delete customer account"
+                case 'delete':
+                    //if config setting "Webhooks Delete action" is set as "Delete customer account"
 
-                        if (Mage::getStoreConfig(
-                            Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $subscriber->getStoreId()
-                        )
-                        ) {
-                            $subscriber->delete();
-                        } elseif ($subscriberStatus != $statusUnsubscribed) {
-                            $helper->unsubscribeMember($subscriber);
-                        }
-                        break;
-                    case 'unsub':
-                        if ($subscriberStatus != $statusUnsubscribed) {
-                            $helper->unsubscribeMember($subscriber);
-                        }
-                        break;
+                    if (Mage::getStoreConfig(
+                        Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE, $subscriber->getStoreId()
+                    )
+                    ) {
+                        $subscriber->delete();
+                    } elseif ($subscriberStatus != $statusUnsubscribed) {
+                        $helper->unsubscribeMember($subscriber);
+                    }
+                    break;
+                case 'unsub':
+                    if ($subscriberStatus != $statusUnsubscribed) {
+                        $helper->unsubscribeMember($subscriber);
+                    }
+                    break;
                 }
             } catch (Exception $e) {
                 Mage::logException($e);

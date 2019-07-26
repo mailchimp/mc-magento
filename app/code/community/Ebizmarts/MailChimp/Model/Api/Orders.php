@@ -673,6 +673,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
     /**
      * update customer sync data
+     *
      * @param int      $orderId
      * @param string   $mailchimpStoreId
      * @param int|null $syncDelta
