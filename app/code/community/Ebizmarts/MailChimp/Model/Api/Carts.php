@@ -27,9 +27,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        /**
-         * @var Ebizmarts_MailChimp_Helper_Data $helper
-         */
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $allCarts = array();
