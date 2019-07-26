@@ -4864,7 +4864,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         $resource = $this->getCoreResource();
         $conn = $resource->getConnection('core_write');
-        $where = empty($storeIdsAsString) ? 
+        $where = empty($storeIdsAsString) ?
             $where : $conn->quoteInto($where . " AND store_id IN (?)", $storeIdsAsString);
         $conn->update(
             $resource->getTableName('newsletter/subscriber'),
