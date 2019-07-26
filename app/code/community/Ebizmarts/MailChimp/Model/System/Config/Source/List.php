@@ -29,7 +29,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_List
 
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_List constructor.
-     * @param $params
+     *
+     * @param  $params
      * @throws Exception
      */
     public function __construct($params)
