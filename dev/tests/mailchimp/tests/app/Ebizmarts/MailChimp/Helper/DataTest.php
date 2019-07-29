@@ -1881,8 +1881,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $scopeId = 0;
         $scope = 'stores';
-        $storeRelation = array();
-        $mailchimpStoreIdForScope = array();
+        $storeRelation = array(
+            'a1s2d3f4g5h6j7k8l9p0' => 1,
+            'a1s2d3f5h6h6j7k8l9p0' => 2
+            );
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -1892,13 +1894,13 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperDataMock
             ->expects($this->once())
             ->method('getStoreRelation')
-            ->willReturnSelf($storeRelation);
+            ->willReturn($storeRelation);
 
         $helperDataMock
             ->expects($this->once())
             ->method('getMCStoreId')
             ->with($scopeId, $scope)
-            ->willReturn($mailchimpStoreIdForScope);
+            ->willReturn('a1s2d3f4g5h6j7k8l9p0');
 
         $helperDataMock->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
     }
