@@ -213,3 +213,4 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $connection->delete($tableName, $where);
     }
 }
+
