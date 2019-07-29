@@ -437,6 +437,15 @@
                 </run>
                 <groups>ebizmarts_mailchimp</groups>
             </mailchimp_delete_webhook_processed>
+            <mailchimp_clear_ecommerce_data>
+                <schedule>
+                    <cron_expr>0 0 * * 0</cron_expr>
+                </schedule>
+                <run>
+                    <model>mailchimp/cron::cleanEcommerceData</model>
+                </run>
+                <groups>ebizmarts_mailchimp</groups>
+            </mailchimp_clear_ecommerce_data>
         </jobs>
     </crontab>
 </config>
