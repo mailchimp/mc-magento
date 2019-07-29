@@ -65,9 +65,9 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         );
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
-                ->disableOriginalConstructor()
-                ->setMethods(array('makeHelper', 'getAdminSession', 'addStore', 'makeDateHelper'))
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getAdminSession', 'addStore', 'makeDateHelper'))
+            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -143,9 +143,9 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $successMessage = "The Mailchimp store was successfully deleted.";
 
         $apiStoresMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Stores::class)
-                ->disableOriginalConstructor()
-                ->setMethods(array('makeHelper', 'getAdminSession'))
-                ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(array('makeHelper', 'getAdminSession'))
+            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()

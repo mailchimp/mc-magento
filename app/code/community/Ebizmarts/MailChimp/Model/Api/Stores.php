@@ -15,16 +15,16 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * Create Mailchimp store.
      *
-     * @param $apiKey
-     * @param $listId
-     * @param $storeName
-     * @param $currencyCode
-     * @param $storeDomain
-     * @param $storeEmail
-     * @param $primaryLocale
-     * @param $timeZone
-     * @param $storePhone
-     * @param $address
+     * @param  $apiKey
+     * @param  $listId
+     * @param  $storeName
+     * @param  $currencyCode
+     * @param  $storeDomain
+     * @param  $storeEmail
+     * @param  $primaryLocale
+     * @param  $timeZone
+     * @param  $storePhone
+     * @param  $address
      * @return mixed
      * @throws Exception
      */
@@ -98,16 +98,16 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * Edit Mailchimp store.
      *
-     * @param $mailchimpStoreId
-     * @param $apiKey
-     * @param $storeName
-     * @param $currencyCode
-     * @param $storeDomain
-     * @param $storeEmail
-     * @param $primaryLocale
-     * @param $timeZone
-     * @param $storePhone
-     * @param $address
+     * @param  $mailchimpStoreId
+     * @param  $apiKey
+     * @param  $storeName
+     * @param  $currencyCode
+     * @param  $storeDomain
+     * @param  $storeEmail
+     * @param  $primaryLocale
+     * @param  $timeZone
+     * @param  $storePhone
+     * @param  $address
      * @return mixed|string
      * @throws Mage_Core_Exception
      */
@@ -209,8 +209,8 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * Delete MailChimp store.
      *
-     * @param $mailchimpStoreId
-     * @param $apiKey
+     * @param  $mailchimpStoreId
+     * @param  $apiKey
      * @return mixed|string
      * @throws Mage_Core_Exception
      */
@@ -257,9 +257,9 @@ class Ebizmarts_MailChimp_Model_Api_Stores
     /**
      * Set is_syncing value for the given scope.
      *
-     * @param $mailchimpApi Ebizmarts_MailChimp
-     * @param $isSincingValue
-     * @param $mailchimpStoreId
+     * @param  $mailchimpApi Ebizmarts_MailChimp
+     * @param  $isSincingValue
+     * @param  $mailchimpStoreId
      * @throws MailChimp_Error
      */
     public function editIsSyncing($mailchimpApi, $isSincingValue, $mailchimpStoreId)
@@ -327,7 +327,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         $timeZone,
         $storePhone,
         $address
-) {
+    ) {
         return $api->getEcommerce()->getStores()->add(
             $mailchimpStoreId,
             $listId,
