@@ -80,7 +80,9 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             'method' => 'PATCH',
             'path' => '/lists/e4ef38998b/members/45c3ddfc868517aefd34ba8f122ad600',
             'operation_id' => '_SUB_45c3ddfc868517aefd34ba8f122ad600',
-            'body' => '{"merge_fields":{"WEBSITE":"1","STOREID":"1","STORENAME":"Default Store View","FNAME":"test","LNAME":"test","CGROUP":"General","CREATEDAT":"2019-07-25T07:05:34+13:00","GENDER":"Male","CUSBRAND":"brand pref."}}',
+            'body' => '{"merge_fields":{"WEBSITE":"1","STOREID":"1","STORENAME":"Default Store View","FNAME":"test",
+            "LNAME":"test","CGROUP":"General","CREATEDAT":"2019-07-25T07:05:34+13:00","GENDER":"Male",
+            "CUSBRAND":"brand pref."}}'
         );
 
         $mergeFields = array (
