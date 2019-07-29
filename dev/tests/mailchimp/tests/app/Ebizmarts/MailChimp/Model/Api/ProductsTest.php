@@ -426,6 +426,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
             ->disableOriginalConstructor()
+            ->setMethods(array('formatDate'))
             ->getMock();
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)

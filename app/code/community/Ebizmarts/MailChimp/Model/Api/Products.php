@@ -1255,11 +1255,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * Sync to mailchimp the special price of the products
-     *
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
-     */
+    * Sync to mailchimp the special price of the products
+    *
+    * @param $mailchimpStoreId
+    * @param $magentoStoreId
+    */
     public function _markSpecialPrices($mailchimpStoreId, $magentoStoreId)
     {
         /**
@@ -1279,7 +1279,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_from_date',
-            array('lteq' => $this->_mailchimpDateHelper->formatDate() . " 23:59:59"),
+            array('lteq' => $this->getMailChimpDateHelper()->formatDate() . " 23:59:59"),
             'left'
         )->addAttributeToFilter(
             'special_from_date',
