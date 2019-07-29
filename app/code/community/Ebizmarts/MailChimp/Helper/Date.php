@@ -62,9 +62,9 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     /**
      * Return date in given format and avoid timezone offset when avoidOffset(true)
      *
-     * @param string $format
-     * @param $date
-     * @param bool $avoidOffset
+     * @param  string $format
+     * @param  $date
+     * @param  bool   $avoidOffset
      * @return mixed
      * @throws Mage_Core_Model_Store_Exception
      */

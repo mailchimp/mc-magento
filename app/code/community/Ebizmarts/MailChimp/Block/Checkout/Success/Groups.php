@@ -3,10 +3,10 @@
 /**
  * Checkout subscribe interest groups block renderer
  *
- * @category   Ebizmarts
- * @package    Ebizmarts_MailChimp
- * @author     Ebizmarts Team <info@ebizmarts.com>
- * @license    http://opensource.org/licenses/osl-3.0.php
+ * @category Ebizmarts
+ * @package  Ebizmarts_MailChimp
+ * @author   Ebizmarts Team <info@ebizmarts.com>
+ * @license  http://opensource.org/licenses/osl-3.0.php
  */
 class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_Template
 {

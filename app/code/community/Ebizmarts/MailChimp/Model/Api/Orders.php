@@ -381,7 +381,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     continue;
                 }
             } elseif ($item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
-                || $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_GROUPED) {
+                || $item->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_GROUPED
+            ) {
                 continue;
             } else {
                 $variant = $productId;
@@ -635,7 +636,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         if ($items['invoicedItemAmount'] > 0) {
             if ($items['refundedItemAmount'] == 0
-                || $items['refundedItemAmount'] != $items['invoicedItemAmount']) {
+                || $items['refundedItemAmount'] != $items['invoicedItemAmount']
+            ) {
                 if ($totalItemsOrdered > $items['invoicedItemAmount']) {
                     $mailchimpStatus['financialStatus'] = self::PARTIALLY_PAID;
                 } else {
@@ -672,14 +674,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * update customer sync data
      *
-     * @param int $orderId
-     * @param string $mailchimpStoreId
+     * @param int      $orderId
+     * @param string   $mailchimpStoreId
      * @param int|null $syncDelta
      * @param int|null $syncError
      * @param int|null $syncModified
      * @param int|null $syncedFlag
-     * @param bool $saveOnlyIfexists
-     * @param bool $allowBatchRemoval
+     * @param bool     $saveOnlyIfexists
+     * @param bool     $allowBatchRemoval
      */
     protected function _updateSyncData(
         $orderId,
@@ -690,7 +692,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $allowBatchRemoval = true
-) {
+    ) {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
             $orderId,
@@ -1027,7 +1029,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $api = $helper->getApi($magentoStoreId);
                         $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
                         if (isset($campaignData['recipients']['list_id'])
-                            && $campaignData['recipients']['list_id'] == $listId) {
+                            && $campaignData['recipients']['list_id'] == $listId
+                        ) {
                             $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] =
                             $isCampaingFromCurrentList =
                                 true;

@@ -38,8 +38,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
         }
 
         if ((!is_array($this->_accountDetails)
-                || isset($this->_accountDetails['status']))
-            && $mandillHelper->getMandrillApiKey($storeId)) {
+            || isset($this->_accountDetails['status']))
+            && $mandillHelper->getMandrillApiKey($storeId)
+        ) {
             $api = new Mandrill_Message($mandillHelper->getMandrillApiKey($storeId));
             try {
                 $this->_accountDetails = $api->users->info();
@@ -63,10 +64,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
                     array(
                         'value' => 0,
                         'label' => $helper->__(
-    "<strong>Username</strong>: %s %s",
-    $this->_accountDetails["username"],
-    "<small>used for SMTP authentication</small>"
-)
+                            "<strong>Username</strong>: %s %s",
+                            $this->_accountDetails["username"],
+                            "<small>used for SMTP authentication</small>"
+                        )
                     ),
                     array(
                         'value' => 1,
@@ -79,12 +80,12 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
                     array(
                         'value' => 2,
                         'label' => $helper->__(
-    '<strong>Hourly Quota</strong>: %s %s',
-    $this->_accountDetails['hourly_quota'],
-    "<small>the maximum number of emails Mandrill will deliver for this user each hour. "
+                            '<strong>Hourly Quota</strong>: %s %s',
+                            $this->_accountDetails['hourly_quota'],
+                            "<small>the maximum number of emails Mandrill will deliver for this user each hour. "
                                 . "Any emails beyond that will be accepted and queued for later delivery. "
                                 . "Users with higher reputations will have higher hourly quotas</small>"
-)
+                        )
                     ),
                     array(
                         'value' => 3,

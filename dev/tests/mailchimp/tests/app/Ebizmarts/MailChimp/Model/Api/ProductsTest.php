@@ -12,7 +12,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     {
         Mage::app('default');
 
-        /** @var Ebizmarts_MailChimp_Model_Api_Products $apiProductsMock productsApiMock */
+        /**
+         * @var Ebizmarts_MailChimp_Model_Api_Products $apiProductsMock productsApiMock
+         */
         $this->_productsApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Products::class);
     }
 
@@ -58,16 +60,16 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
-                'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
-                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
-                '_updateSyncData', '_markSpecialPrices')
+                    'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
+                    'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
+                    '_updateSyncData', '_markSpecialPrices')
             )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->setMethods(
                 array(
-                    'getCurrentStoreId','setCurrentStore',
+                    'getCurrentStoreId', 'setCurrentStore',
                     'getEcommerceSyncDataItem', 'modifyCounterSentPerBatch'
                 )
             )
@@ -279,7 +281,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
     public function testGetProductCategories()
     {
-        $catArray = array(13,14);
+        $catArray = array(13, 14);
         $magentoStoreId = '1';
         $result = 'catO - catR';
         $categories = array();
@@ -299,7 +301,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $categoryMockGeneric = $this->getMockBuilder(Mage_Catalog_Model_Category::class)
-          ->disableOriginalConstructor()
+            ->disableOriginalConstructor()
             ->setMethods(array('getCollection'))
             ->getMock();
 
@@ -632,7 +634,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
-                'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
+                    'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
             )
             ->getMock();
 
@@ -700,7 +702,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $propertyName = $parameters[2];
         $propertyValue = $parameters[3];
 
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 
@@ -759,7 +761,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $entityId = 145;
 
         $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
-        $offSet   = Mage::getSingleton('core/date')->calculateOffset($timeZone);
+        $offSet = Mage::getSingleton('core/date')->calculateOffset($timeZone);
         $time = Mage::getSingleton('core/date')->gmtTimestamp() + $offSet;
 
 
@@ -785,7 +787,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $collectiontMock = $this
             ->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('addStoreFilter', 'addAttributeToFilter', 'getIterator','getSelect'))
+            ->setMethods(array('addStoreFilter', 'addAttributeToFilter', 'getIterator', 'getSelect'))
             ->getMock();
 
         $itemMock = $this
@@ -810,7 +812,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method("quoteInto")
             ->with(
                 'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
-                Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time) ." 00:00:00"
+                Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time) . " 00:00:00"
             );
 
 
@@ -842,14 +844,14 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $collectiontMock->expects($this->exactly(6))
             ->method('addAttributeToFilter')
             ->withConsecutive(
-                array('special_price',  array('gt' => 0) , 'left'),
+                array('special_price', array('gt' => 0), 'left'),
                 array('special_from_date',
-                    array('lteq' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time)." 23:59:59"),
+                    array('lteq' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time) . " 23:59:59"),
                     'left'),
-                array('special_from_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')) , 'left'),
+                array('special_from_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')), 'left'),
                 array('special_price', array('gt' => 0), 'left'),
                 array('special_to_date',
-                    array('lt' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time)." 00:00:00"),
+                    array('lt' => Mage::getSingleton('core/date')->gmtDate('Y-m-d', $time) . " 00:00:00"),
                     'left'),
                 array('special_to_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')), 'left')
             )->willReturnOnConsecutiveCalls(
@@ -878,7 +880,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
 
         $productsApiMock = $this->_productsApiMock
-            ->setMethods(array("buildMailchimpDataJoin","executeMailchimpDataJoin","buildMailchimpDataWhere"))
+            ->setMethods(array("buildMailchimpDataJoin", "executeMailchimpDataJoin", "buildMailchimpDataWhere"))
             ->getMock();
 
         $collectionMock = $this->getMockBuilder(Mage_Catalog_Model_Resource_Product_Collection::class)

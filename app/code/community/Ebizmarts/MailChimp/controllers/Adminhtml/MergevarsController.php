@@ -74,10 +74,10 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
     protected function _isAllowed()
     {
         switch ($this->getRequest()->getActionName()) {
-            case 'addmergevar':
-            case 'saveadd':
-                $acl = 'system/config/mailchimp';
-                break;
+        case 'addmergevar':
+        case 'saveadd':
+            $acl = 'system/config/mailchimp';
+            break;
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);
