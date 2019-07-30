@@ -589,7 +589,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function makeBatchId($magentoStoreId)
     {
         $batchId = 'storeid-' . $magentoStoreId . '_' . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
-        $batchId .= '_' . $this->_mailchimpDateHelper->getDateMicrotime();
+        $batchId .= '_' . $this->getMailChimpDateHelper()->getDateMicrotime();
 
         return $batchId;
     }
@@ -1256,11 +1256,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * Sync to mailchimp the special price of the products
-     *
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
-     */
+    * Sync to mailchimp the special price of the products
+    *
+    * @param $mailchimpStoreId
+    * @param $magentoStoreId
+    */
     public function _markSpecialPrices($mailchimpStoreId, $magentoStoreId)
     {
         /**
@@ -1280,7 +1280,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_from_date',
-            array('lteq' => $this->_mailchimpDateHelper->formatDate() . " 23:59:59"),
+            array('lteq' => $this->getMailChimpDateHelper()->formatDate() . " 23:59:59"),
             'left'
         )->addAttributeToFilter(
             'special_from_date',
@@ -1290,8 +1290,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $whereCondition = $connection->quoteInto(
             'm4m.mailchimp_sync_delta IS NOT NULL '
-            . 'AND m4m.mailchimp_sync_delta < ?',
-            $this->_mailchimpDateHelper->formatDate() . " 00:00:00"
+                . 'AND m4m.mailchimp_sync_delta < ?',
+            $this->getMailChimpDateHelper()->formatDate() . " 00:00:00"
         );
         $collection->getSelect()->where($whereCondition);
 
@@ -1312,7 +1312,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         )->addAttributeToFilter(
             'special_to_date',
-            array('lt' => $this->_mailchimpDateHelper->formatDate() . " 00:00:00"),
+            array('lt' => $this->getMailChimpDateHelper()->formatDate() . " 00:00:00"),
             'left'
         )->addAttributeToFilter(
             'special_to_date',
