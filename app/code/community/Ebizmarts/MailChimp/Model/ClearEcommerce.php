@@ -12,9 +12,6 @@
  */
 class Ebizmarts_MailChimp_Model_ClearEcommerce
 {
-    const DISABLED_STATUS = 2;
-    const NOT_ACTIVE_STATUS = 0;
-
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
@@ -180,7 +177,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
             ->setPageSize(100)
             ->setCurPage(1);
         if ($filter) {
-            $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
+            $collection->addFieldToFilter('is_active', array('eq' => 0));
         }
 
         return $collection->getItems();
@@ -200,7 +197,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         if ($filter) {
             $customers = $collection->getItems();
             foreach ($customers as $item) {
-                if ($item->getIsActive() == self::NOT_ACTIVE_STATUS) {
+                if ($item->getIsActive() == 0) {
                     $items [] = $item;
                 }
             }
@@ -220,7 +217,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
             ->setPageSize(100)
             ->setCurPage(1);
         if ($filter) {
-            $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
+            $collection->addFieldToFilter('is_active', array('eq' => 0));
         }
 
         return $collection->getItems();
