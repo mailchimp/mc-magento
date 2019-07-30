@@ -1,299 +1,151 @@
 <?php
 
-class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_TestCase
+class Ebizmarts_MailChimp_Model_ClearEcommerce extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
         Mage::app('default');
     }
 
-    public function testWebhookProfileCustomerExists()
+    public function testClearEcommerce()
     {
-        $data = array();
-        $listId = $data['list_id'] = 'a1s2d3f4t5';
-        $email  = $data['email'] = 'pepe@ebizmarts.com';
-        $fname  = $data['merges']['FNAME'] = 'pepe';
-        $lname  = $data['merges']['LNAME'] = 'Perez';
+        $items = array(1, 2);
+        $itemsDeleted = array(3, 4);
+        $itemsDeletedUnprocessed = array(array('related_id' => 3), array('related_id' => 4));
 
-        $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getHelper'))
-            ->getMock();
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('loadListCustomer'))
-            ->getMock();
+        $tableName = 'mailchimp_ecommerce_sync_data';
 
-        $customerMock = $this->getMockBuilder(Mage_Customer_Model_Customer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getFirstName','setFirstName','getLastName','setLastName','save'))
-            ->getMock();
-
-        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-        $helperMock
-            ->expects($this->once())
-            ->method('loadListCustomer')
-            ->with($listId, $email)
-            ->willReturn($customerMock);
-
-        $customerMock->expects($this->once())->method('setFirstName')->with($fname)->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('setLastName')->with($lname)->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getFirstName')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('getLastName')->willReturn($customerMock);
-        $customerMock->expects($this->once())->method('save')->willReturn($customerMock);
-
-        $processWebhookMock->_profile($data);
-    }
-
-    public function testWebhookProfileSubscriberExists()
-    {
-        $data = array();
-        $listId = $data['list_id'] = 'e4ef38998b';
-        $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
-        $fname  = $data['merges']['FNAME'] = 'Enterprise1';
-        $lname  = $data['merges']['LNAME'] = 'enterprise11';
-        $subscribeSource = Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE;
-
-        $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getHelper'))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('loadListCustomer', 'loadListSubscriber'))
-            ->getMock();
-
-        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
+        $clearEcommerce = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ClearEcommerce::class)
             ->disableOriginalConstructor()
             ->setMethods(
-                array('getId','getSubscriberFirstname','setSubscriberFirstname',
-                'getSubscriberLastname','setSubscriberLastname','setSubscriberSource',
-                'save')
-            )
-            ->getMock();
-
-        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-
-        $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
-        $helperMock
-            ->expects($this->once())
-            ->method('loadListSubscriber')
-            ->with($listId, $email)
-            ->willReturn($subscriberMock);
-
-        $subscriberMock
-            ->expects($this->once())
-            ->method('getId')
-            ->willReturn($subscriberMock);
-        $subscriberMock
-            ->expects($this->once())
-            ->method('getSubscriberLastname')
-            ->willReturn($subscriberMock);
-        $subscriberMock
-            ->expects($this->once())
-            ->method('setSubscriberFirstname')
-            ->with($fname)
-            ->willReturn($subscriberMock);
-        $subscriberMock
-            ->expects($this->once())
-            ->method('setSubscriberLastname')
-            ->with($lname)
-            ->willReturn($subscriberMock);
-        $subscriberMock
-            ->expects($this->once())
-            ->method('setSubscriberSource')
-            ->with($subscribeSource)
-            ->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('save')->willReturn($subscriberMock);
-
-        $processWebhookMock->_profile($data);
-    }
-
-
-    public function testWebhookProfileSubscriberNotExistsMemberSubscribed()
-    {
-        $data = array();
-        $listId = $data['list_id'] = 'e4ef38998b';
-        $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
-        $fname  = $data['merges']['FNAME'] = 'Enterprise1';
-        $lname  = $data['merges']['LNAME'] = 'enterprise11';
-
-        $generalList = Ebizmarts_MailChimp_Model_Config::GENERAL_LIST;
-        $scope = 'stores';
-        $scopeId = 1;
-        $member['status'] = 'subscribed';
-        $cryptHashEmail = md5(strtolower($email));
-
-        $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getHelper'))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array('getFirstScopeFromConfig'
-                , 'getApi'
-                , 'loadListCustomer'
-                , 'loadListSubscriber'
-                , 'subscribeMember'
+                array(
+                    'getHelper', 'getDateHelper', 'cleanEcommerceData', 'processData', 'processDeletedData',
+                    'getItemsToDelete', 'getProductItems', 'getQuoteItems', 'getCustomerItems',
+                    'getPromoRuleItems', 'getPromoCodeItems', 'getDeletedRows', 'deleteEcommerceRows'
                 )
             )
             ->getMock();
-
-        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array('setSubscriberFirstname'
-                , 'setSubscriberLastname'
-                , 'getId'
-                )
-            )
-            ->getMock();
-
-        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getLists'))
-            ->getMock();
-
-        $listsMock = $this->getMockBuilder(MailChimp_Lists::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMembers'))
-            ->getMock();
-
-        $memberMock = $this->getMockBuilder(MailChimp_ListsMembers::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('get'))
-            ->getMock();
-
-        $processWebhookMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
-        $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
-        $helperMock
-            ->expects($this->once())
-            ->method('loadListSubscriber')
-            ->with($listId, $email)
-            ->willReturn($subscriberMock);
-        $helperMock->expects($this->once())->method('getFirstScopeFromConfig')
-            ->with($generalList, $listId)
-            ->willReturn(array('scope'=>$scope,'scope_id'=>$scopeId));
-
-        $helperMock->expects($this->once())->method('getApi')
-            ->with($scopeId, $scope)
-            ->willReturn($apiMock);
-
-        $subscriberMock
-            ->expects($this->once())
-            ->method('setSubscriberFirstname')
-            ->with($fname)
-            ->willReturn($subscriberMock);
-        $subscriberMock
-            ->expects($this->once())
-            ->method('setSubscriberLastname')
-            ->with($lname)
-            ->willReturn($subscriberMock);
-
-        $apiMock->expects($this->once())
-            ->method('getLists')
-            ->willReturn($listsMock);
-
-        $listsMock->expects($this->once())
-            ->method('getMembers')
-            ->willReturn($memberMock);
-
-        $memberMock->expects($this->once())
-            ->method('get')
-            ->with($listId, $cryptHashEmail, null, null)
-            ->willReturn($member);
-
-        $helperMock->expects($this->once())->method('subscribeMember')
-            ->with($subscriberMock)
-            ->willReturn(null);
-
-        $processWebhookMock->_profile($data);
-    }
-
-    public function testWebhookProfileSubscriberNotExistsMemberUnsubscribed()
-    {
-        $data = array();
-        $listId = $data['list_id'] = 'e4ef38998b';
-        $email  = $data['email'] = 'brian+enterprisex1@ebizmarts.com';
-        $fname  = $data['merges']['FNAME'] = 'Enterprise1';
-        $lname  = $data['merges']['LNAME'] = 'enterprise11';
-        $generalList = Ebizmarts_MailChimp_Model_Config::GENERAL_LIST;
-        $scope = 'stores';
-        $scopeId = 1;
-        $member['status'] = 'unsubscribed';
-        $cryptHashEmail = md5(strtolower($email));
-        $webhookDeleteActionReturn = 0;
-
-        $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
-            ->disableOriginalConstructor()->setMethods(array('getHelper'))->getMock();
-
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(
-                array('getFirstScopeFromConfig'
-                , 'getApi'
-                , 'loadListCustomer'
-                , 'loadListSubscriber'
-                , 'unsubscribeMember'
-                , 'getWebhookDeleteAction'
-                )
-            )->getMock();
-
-        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array('setSubscriberFirstname'
-                , 'setSubscriberLastname'
-                , 'getStoreId'
-                , 'getId'
-                )
-            )->getMock();
-
-        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)->disableOriginalConstructor()
-            ->setMethods(array('getLists'))->getMock();
-
-        $listsMock = $this->getMockBuilder(MailChimp_Lists::class)->disableOriginalConstructor()
-            ->setMethods(array('getMembers'))->getMock();
-
-        $memberMock = $this->getMockBuilder(MailChimp_ListsMembers::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('get'))
+            ->setMethods(array('getCoreResource'))
             ->getMock();
+        $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('formatDate'))
+            ->getMock();
+        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getConnection'))
+            ->getMock();
+        $writeAdapterMock = $this->getMockForAbstractClass(Varien_Db_Adapter_Interface::class);
 
-        $processWebhookMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
-        $helperMock->expects($this->once())->method('loadListCustomer')->with($listId, $email)->willReturn(null);
-        $helperMock->expects($this->once())->method('loadListSubscriber')->with($listId, $email)
-            ->willReturn($subscriberMock);
-        $helperMock->expects($this->once())->method('getFirstScopeFromConfig')
-            ->with($generalList, $listId)
-            ->willReturn(array('scope'=>$scope,'scope_id'=>$scopeId));
+        $helperMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
 
-        $helperMock->expects($this->once())->method('getApi')
-            ->with($scopeId, $scope)
-            ->willReturn($apiMock);
-
-        $subscriberMock->expects($this->once())->method('setSubscriberFirstname')->with($fname)
-            ->willReturn($subscriberMock);
-        $subscriberMock->expects($this->once())->method('setSubscriberLastname')->with($lname)
-            ->willReturn($subscriberMock);
-
-        $apiMock->expects($this->once())->method('getLists')->willReturn($listsMock);
-        $listsMock->expects($this->once())->method('getMembers')->willReturn($memberMock);
-        $memberMock
+        $coreResourceMock
             ->expects($this->once())
-            ->method('get')
-            ->with($listId, $cryptHashEmail, null, null)
-            ->willReturn($member);
+            ->method('getConnection')
+            ->with('core_write')
+            ->willReturn($writeAdapterMock);
 
-        $helperMock->expects($this->once())->method('unsubscribeMember')->with($subscriberMock)->willReturn(null);
-        $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($scopeId);
+        $coreResourceMock
+            ->expects($this->once())
+            ->method('getTableName')
+            ->with('mailchimp/ecommercesyncdata')
+            ->willReturn($tableName);
 
-        $helperMock->expects($this->once())->method('getWebhookDeleteAction')->with($scopeId)
-            ->willReturn($webhookDeleteActionReturn);
+        $writeAdapterMock
+            ->expects($this->once())
+            ->method("delete")
+            ->with(
+                $tableName,
+                ""
+            );
 
-        $processWebhookMock->_profile($data);
+        $clearEcommerce->expects($this->exactly(5))->method('getHelper')->willReturn($helperMock);
+        $clearEcommerce->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
+
+        $clearEcommerce->expects($this->once())->method('cleanEcommerceData');
+
+        $clearEcommerce->expects($this->once())->method('getProductItems')->willReturn($itemsPro);
+        $clearEcommerce->expects($this->once())->method('getCustomerItems')->willReturn($itemsCus);
+        $clearEcommerce->expects($this->once())->method('getQuoteItems')->willReturn($itemsQuo);
+        $clearEcommerce->expects($this->once())->method('getPromoRuleItems')->willReturn($itemsRul);
+        $clearEcommerce->expects($this->once())->method('getPromoCodeItems')->willReturn($itemsCod);
+
+        $clearEcommerce
+            ->expects($this->exactly(5))
+            ->method('getItemsToDelete')
+            ->withConsecutive(
+                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT),
+                array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER),
+                array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
+            )
+            ->willReturnOnConsecutiveCalls(
+                array($items),
+                array($items),
+                array($items),
+                array($items),
+                array($items)
+            );
+        $clearEcommerce
+            ->expects($this->exactly(5))
+            ->method('processData')
+            ->withConsecutive(
+                array($items, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT),
+                array($items, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER),
+                array($items, Ebizmarts_MailChimp_Model_Config::IS_QUOTE),
+                array($items, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE),
+                array($items, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
+            );
+
+
+        $clearEcommerce
+            ->expects($this->exactly(5))
+            ->method('processDeletedData')
+            ->withConsecutive(
+                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT),
+                array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER),
+                array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
+            )
+            ->willReturnOnConsecutiveCalls(
+                array($itemsDeleted),
+                array($itemsDeleted),
+                array($itemsDeleted),
+                array($itemsDeleted),
+                array($itemsDeleted)
+            );
+
+        $clearEcommerce
+            ->expects($this->exactly(5))
+            ->method('getDeletedRows')
+            ->withConsecutive(
+                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT),
+                array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER),
+                array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
+            )
+            ->willReturnOnConsecutiveCalls(
+                array($itemsDeletedUnprocessed),
+                array($itemsDeletedUnprocessed),
+                array($itemsDeletedUnprocessed),
+                array($itemsDeletedUnprocessed),
+                array($itemsDeletedUnprocessed)
+            );
+
+        $clearEcommerce
+            ->expects($this->exactly(5))
+            ->method('deleteEcommerceRows')
+            ->withConsecutive(
+                array(array_merge($itemsPro, $itemsDeleted), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT),
+                array(array_merge($itemsCus, $itemsDeleted), Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER),
+                array(array_merge($itemsQuo, $itemsDeleted), Ebizmarts_MailChimp_Model_Config::IS_QUOTE),
+                array(array_merge($itemsRul, $itemsDeleted), Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE),
+                array(array_merge($itemsCod, $itemsDeleted), Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
+            );
     }
 }
