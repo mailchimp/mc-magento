@@ -158,7 +158,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function getProductItems($filter)
     {
-        $collection = Mage::getModel('catalog/product')->getCollection();
+        $collection = Mage::getModel('catalog/product')
+            ->getCollection()
+            ->setPageSize(100);
         if ($filter) {
             $collection->addFieldToFilter('status', array('eq' => self::DISABLED_STATUS));
         }
@@ -172,7 +174,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function getQuoteItems($filter)
     {
-        $collection = Mage::getModel('sales/quote')->getCollection();
+        $collection = Mage::getModel('sales/quote')
+            ->getCollection()
+            ->setPageSize(100);
         if ($filter) {
             $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
         }
@@ -187,7 +191,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     protected function getCustomerItems($filter)
     {
         $items = array();
-        $collection = Mage::getModel('customer/customer')->getCollection();
+        $collection = Mage::getModel('customer/customer')
+            ->getCollection()
+            ->setPageSize(100);
         if ($filter) {
             $customers = $collection->getItems();
             foreach ($customers as $item) {
@@ -206,7 +212,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function getPromoRuleItems($filter)
     {
-        $collection = Mage::getModel('salesrule/rule')->getCollection();
+        $collection = Mage::getModel('salesrule/rule')
+            ->getCollection()
+            ->setPageSize(100);
         if ($filter) {
             $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
         }
@@ -221,7 +229,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function getPromoCodeItems($filter)
     {
-        $collection = Mage::getModel('salesrule/coupon')->getCollection();
+        $collection = Mage::getModel('salesrule/coupon')
+            ->getCollection()
+            ->setPageSize(100);
         if ($filter) {
             $date = $this->getDateHelper()->formatDate(null, 'YYYY-mm-dd H:i:s');
             $collection->addFieldToFilter('expiration_date', array('lteq' => $date));
@@ -261,7 +271,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
 
         $ecommerceData = Mage::getModel('mailchimp/ecommercesyncdata')
             ->getCollection()
-            ->addFieldToSelect('related_id');
+            ->addFieldToSelect('related_id')
+            ->setPageSize(100);
         $ecommerceData->addFieldToFilter('type', array('eq' => $type));
         $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
         $ecommerceData->getSelect()->joinLeft(
@@ -278,6 +289,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function deleteEcommerceRows($ids, $type)
     {
+        var_dump($ids);die;
         $ids = implode($ids, ', ');
         $where = array(
             "related_id IN ($ids)",
