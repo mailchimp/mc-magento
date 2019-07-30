@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_Grid_Renderer_Mailchimp
                     . '" width="40" title="hep hep thanks MailChimp" />';
             }
         } catch (Exception $e) {
-            Mage:throwException($e->getMessage());
+            Mage::throwException($e->getMessage());
         }
 
         return $result;
