@@ -289,7 +289,6 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function deleteEcommerceRows($ids, $type)
     {
-        var_dump($ids);die;
         $ids = implode($ids, ', ');
         $where = array(
             "related_id IN ($ids)",
