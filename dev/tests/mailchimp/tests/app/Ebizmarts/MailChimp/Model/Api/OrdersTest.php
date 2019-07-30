@@ -379,9 +379,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $orderMock->expects($this->once())
             ->method('getAllVisibleItems')
             ->willReturn($itemsOrderCollection);
-        $orderMock->expects($this->exactly(3))
+        $orderMock->expects($this->exactly(4))
             ->method('getCustomerEmail')
             ->willReturnOnConsecutiveCalls(
+                $customerEmail,
                 $customerEmail,
                 $customerEmail,
                 $customerEmail

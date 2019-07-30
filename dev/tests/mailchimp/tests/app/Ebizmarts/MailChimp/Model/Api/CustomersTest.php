@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->with(1)
             ->willReturn('1');
 
-        $this->assertTrue($this->_customersApiMock->getOptin(1));
+        $this->assertTrue($this->_customersApiMock->getOption(1));
     }
 
     public function testGetOptInNo()
@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->with(1)
             ->willReturn('0');
 
-        $this->assertFalse($this->_customersApiMock->getOptin(1));
+        $this->assertFalse($this->_customersApiMock->getOption(1));
     }
 
     public function testGetOptInNoDefaultStore()
@@ -60,9 +60,9 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->with(0)
             ->willReturn('0');
 
-        $this->assertFalse($this->_customersApiMock->getOptin(0));
+        $this->assertFalse($this->_customersApiMock->getOption(0));
 
-        $this->assertFalse($this->_customersApiMock->getOptin(0));
+        $this->assertFalse($this->_customersApiMock->getOption(0));
     }
 
     public function testCreateBatchJson()
@@ -95,7 +95,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         );
 
         $this->_customersApiMock = $this->_customersApiMock->setMethods(
-            array('getCustomersToSync', 'makeBatchId', 'makeCustomersNotSentCollection', 'getOptin',
+            array('getCustomersToSync', 'makeBatchId', 'makeCustomersNotSentCollection', 'getOption',
                 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
                 'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper'
@@ -146,7 +146,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->willReturn($customerCollectionMock);
         $this->_customersApiMock->expects($this->once())->method('makeBatchId');
         $this->_customersApiMock->expects($this->once())->method('getBatchMagentoStoreId')->willReturn($storeId);
-        $this->_customersApiMock->expects($this->once())->method('getOptin')->with($storeId)->willReturn($optInStatus);
+        $this->_customersApiMock->expects($this->once())->method('getOption')->with($storeId)->willReturn($optInStatus);
         $this->_customersApiMock->expects($this->once())->method('getSubscriberModel')->willReturn($subscriberMock);
         $customerCollectionMock
             ->expects($this->once())

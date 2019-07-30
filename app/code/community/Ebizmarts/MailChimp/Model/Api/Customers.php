@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $customerArray = array();
         $this->makeBatchId();
-        $this->_optInStatusForStore = $this->getOptin($this->getBatchMagentoStoreId());
+        $this->_optInStatusForStore = $this->getOption($this->getBatchMagentoStoreId());
         $subscriber = $this->getSubscriberModel();
 
         $counter = 0;
@@ -252,7 +252,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $magentoStoreId
      * @return array
      */
-    public function getOptin($magentoStoreId)
+    public function getOption($magentoStoreId)
     {
         return $this->getOptionConfiguration($magentoStoreId);
     }

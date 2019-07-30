@@ -222,7 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data["customer"]["email_address"] = $order->getCustomerEmail();
         $data["customer"]["opt_in_status"] = false;
 
-        if ($this->getCustomerModel()->getOptin($magentoStoreId)) {
+        if ($this->getCustomerModel()->getOption($magentoStoreId)) {
             $subscriber = $this->getSubscriberModel();
             $isSubscribed = $subscriber->loadByEmail($order->getCustomerEmail())->getSubscriberId();
             if (!$isSubscribed) {

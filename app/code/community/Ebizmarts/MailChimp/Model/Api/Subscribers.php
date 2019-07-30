@@ -255,7 +255,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 ) {
                     if (strstr($e->getMailchimpDetails(), 'is in a compliance state')) {
                         try {
-                            $this->_catchMailchompNewstellerConfirm(
+                            $this->_catchMailchimpNewstellerConfirm(
                                 $api, $listId, $emailHash, $mailChimpTags, $subscriber, $interest
                             );
                             $saveSubscriber = true;
@@ -331,7 +331,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
      * @param $subscriber
      * @param $interest
      */
-    protected function _catchMailchompNewstellerConfirm(
+    protected function _catchMailchimpNewstellerConfirm(
         $api,
         $listId,
         $emailHash,
