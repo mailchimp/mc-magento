@@ -125,24 +125,24 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @return array
      * @throws Mage_Core_Model_Store_Exception
      */
-    protected function getItemsToDelete($type, $filter = true)
+    protected function getItemsToDelete($type)
     {
         $items = array();
         switch ($type) {
             case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
-                $items = $this->getProductItems($filter);
+                $items = $this->getProductItems();
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
-                $items = $this->getQuoteItems($filter);
+                $items = $this->getQuoteItems();
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
-                $items = $this->getCustomerItems($filter);
+                $items = $this->getCustomerItems();
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE:
-                $items = $this->getPromoRuleItems($filter);
+                $items = $this->getPromoRuleItems();
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
-                $items = $this->getPromoCodeItems($filter);
+                $items = $this->getPromoCodeItems();
                 break;
         }
 
@@ -153,15 +153,13 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @param $filter
      * @return array
      */
-    protected function getProductItems($filter)
+    protected function getProductItems()
     {
         $collection = Mage::getModel('catalog/product')
             ->getCollection()
             ->setPageSize(100)
-            ->setCurPage(1);
-        if ($filter) {
-            $collection->addFieldToFilter('status', array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED));
-        }
+            ->setCurPage(1)
+            ->addFieldToFilter('status', array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED));
 
         return $collection->getItems();
     }
@@ -170,15 +168,13 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @param $filter
      * @return array
      */
-    protected function getQuoteItems($filter)
+    protected function getQuoteItems()
     {
         $collection = Mage::getModel('sales/quote')
             ->getCollection()
             ->setPageSize(100)
-            ->setCurPage(1);
-        if ($filter) {
-            $collection->addFieldToFilter('is_active', array('eq' => 0));
-        }
+            ->setCurPage(1)
+            ->addFieldToFilter('is_active', array('eq' => 0));
 
         return $collection->getItems();
     }
@@ -187,19 +183,18 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @param $filter
      * @return array
      */
-    protected function getCustomerItems($filter)
+    protected function getCustomerItems()
     {
         $items = array();
         $collection = Mage::getModel('customer/customer')
             ->getCollection()
             ->setPageSize(100)
             ->setCurPage(1);
-        if ($filter) {
-            $customers = $collection->getItems();
-            foreach ($customers as $item) {
-                if ($item->getIsActive() == 0) {
-                    $items [] = $item;
-                }
+
+        $customers = $collection->getItems();
+        foreach ($customers as $item) {
+            if ($item->getIsActive() == 0) {
+                $items [] = $item;
             }
         }
 
@@ -210,15 +205,13 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @param $filter
      * @return array
      */
-    protected function getPromoRuleItems($filter)
+    protected function getPromoRuleItems()
     {
         $collection = Mage::getModel('salesrule/rule')
             ->getCollection()
             ->setPageSize(100)
-            ->setCurPage(1);
-        if ($filter) {
-            $collection->addFieldToFilter('is_active', array('eq' => 0));
-        }
+            ->setCurPage(1)
+            ->addFieldToFilter('is_active', array('eq' => 0));
 
         return $collection->getItems();
     }
@@ -228,16 +221,15 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @return mixed
      * @throws Mage_Core_Model_Store_Exception
      */
-    protected function getPromoCodeItems($filter)
+    protected function getPromoCodeItems()
     {
         $collection = Mage::getModel('salesrule/coupon')
             ->getCollection()
             ->setPageSize(100)
             ->setCurPage(1);
-        if ($filter) {
-            $date = $this->getDateHelper()->formatDate(null, 'YYYY-mm-dd H:i:s');
-            $collection->addFieldToFilter('expiration_date', array('lteq' => $date));
-        }
+
+        $date = $this->getDateHelper()->formatDate(null, 'YYYY-mm-dd H:i:s');
+        $collection->addFieldToFilter('expiration_date', array('lteq' => $date));
 
         return $collection->getItems();
     }
