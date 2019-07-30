@@ -70,7 +70,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
     protected function _renderCellTemplate($columnName)
     {
         if (empty($this->_columns[$columnName])) {
-            Mage:throwException('Wrong column name specified.');
+            Mage::throwException('Wrong column name specified.');
         }
 
         $column = $this->_columns[$columnName];
