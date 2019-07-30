@@ -160,9 +160,10 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     {
         $collection = Mage::getModel('catalog/product')
             ->getCollection()
-            ->setPageSize(100);
+            ->setPageSize(100)
+            ->setCurPage(1);
         if ($filter) {
-            $collection->addFieldToFilter('status', array('eq' => self::DISABLED_STATUS));
+            $collection->addFieldToFilter('status', array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED));
         }
 
         return $collection->getItems();
@@ -176,7 +177,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     {
         $collection = Mage::getModel('sales/quote')
             ->getCollection()
-            ->setPageSize(100);
+            ->setPageSize(100)
+            ->setCurPage(1);
         if ($filter) {
             $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
         }
@@ -193,7 +195,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $items = array();
         $collection = Mage::getModel('customer/customer')
             ->getCollection()
-            ->setPageSize(100);
+            ->setPageSize(100)
+            ->setCurPage(1);
         if ($filter) {
             $customers = $collection->getItems();
             foreach ($customers as $item) {
@@ -214,7 +217,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     {
         $collection = Mage::getModel('salesrule/rule')
             ->getCollection()
-            ->setPageSize(100);
+            ->setPageSize(100)
+            ->setCurPage(1);
         if ($filter) {
             $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
         }
@@ -231,7 +235,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     {
         $collection = Mage::getModel('salesrule/coupon')
             ->getCollection()
-            ->setPageSize(100);
+            ->setPageSize(100)
+            ->setCurPage(1);
         if ($filter) {
             $date = $this->getDateHelper()->formatDate(null, 'YYYY-mm-dd H:i:s');
             $collection->addFieldToFilter('expiration_date', array('lteq' => $date));
