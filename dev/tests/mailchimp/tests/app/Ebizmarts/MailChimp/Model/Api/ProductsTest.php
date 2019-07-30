@@ -60,9 +60,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
-                    'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
-                    'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
-                    '_updateSyncData', '_markSpecialPrices')
+                'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
+                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
+                '_updateSyncData', '_markSpecialPrices')
             )
             ->getMock();
 
@@ -634,7 +634,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
-                    'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
+                'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
             )
             ->getMock();
 

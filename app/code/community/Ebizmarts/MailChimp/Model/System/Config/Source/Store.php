@@ -23,6 +23,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
 
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_Store constructor.
+     *
      * @param  $params
      * @throws Exception
      */

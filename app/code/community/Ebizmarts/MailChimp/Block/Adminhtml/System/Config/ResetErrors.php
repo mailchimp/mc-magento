@@ -44,6 +44,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
             return $button->toHtml();
         }
     }
+
     public function getAjaxCheckUrl()
     {
         $helper = $this->makeHelper();

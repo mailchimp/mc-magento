@@ -439,12 +439,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $magentoStoreId
      * @throws Mage_Core_Exception
      */
-    protected function _updateSyncingFlag($customerAmount, $productAmount, $orderAmount, $mailchimpStoreId, $magentoStoreId)
-    {
+    protected function _updateSyncingFlag(
+        $customerAmount,
+        $productAmount,
+        $orderAmount,
+        $mailchimpStoreId,
+        $magentoStoreId
+    ) {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
         $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
+
         if ($this->shouldFlagAsSyncing(
             $magentoStoreId,
             $syncingFlag,
@@ -890,6 +896,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                  * @var $mailchimpApi Ebizmarts_MailChimp
                  */
                 $mailchimpApi = $helper->getApi($magentoStoreId);
+
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
                     if (!$batchJson || $batchJson == '') {
