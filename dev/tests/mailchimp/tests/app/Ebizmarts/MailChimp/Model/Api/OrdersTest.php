@@ -297,7 +297,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $customerModelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Customers::class)
-            ->setMethods(array('getOptin'))
+            ->setMethods(array('getOptIn'))
             ->getMock();
 
         $storeMock = $this->getMockBuilder(Mage_Core_Model_Resource_Store::class)
@@ -379,10 +379,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $orderMock->expects($this->once())
             ->method('getAllVisibleItems')
             ->willReturn($itemsOrderCollection);
-        $orderMock->expects($this->exactly(4))
+        $orderMock->expects($this->exactly(3))
             ->method('getCustomerEmail')
             ->willReturnOnConsecutiveCalls(
-                $customerEmail,
                 $customerEmail,
                 $customerEmail,
                 $customerEmail
@@ -522,7 +521,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->willReturn($mailchimpSyncError);
 
         $customerModelMock->expects($this->once())
-            ->method('getOptin')
+            ->method('getOptIn')
             ->willReturn($optInStatus);
 
         $storeMock->expects($this->once())
