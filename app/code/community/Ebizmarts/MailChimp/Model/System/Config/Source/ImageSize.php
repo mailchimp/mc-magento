@@ -14,7 +14,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_ImageSize
     const THUMBNAIL = 2;
     const ORIGINAL = 3;
 
-
     /**
      * Options getter
      *

@@ -244,6 +244,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         ) {
             $variantProducts[] = $product;
             $parentIds = $this->_productTypeConfigurableResource->getParentIdsByChild($product->getId());
+
             foreach ($parentIds as $parentId) {
                 $helper = $this->getMailChimpHelper();
                 $productSyncDataItem = $helper->getEcommerceSyncDataItem(
@@ -259,6 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         true
                     );
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
+
                     try {
                         $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
                     } catch (Exception $e) {
@@ -737,7 +739,6 @@ class Ebizmarts_MailChimp_Model_Api_Products
             'left'
         );
     }
-
 
     /**
      * @param $product
