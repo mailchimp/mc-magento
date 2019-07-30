@@ -12,6 +12,9 @@
  */
 class Ebizmarts_MailChimp_Model_ClearEcommerce
 {
+    const DISABLED_STATUS = 2;
+    const NOT_ACTIVE_STATUS = 0;
+
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
@@ -50,11 +53,36 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     public function cleanEcommerceData()
     {
-        $this->processData($this->getData('QUO'), 'QUO');
-        $this->processData($this->getData('PRO'), 'PRO');
-        $this->processData($this->getData('CUS'), 'CUS');
-        $this->processData($this->getData('PRL'), 'PRL');
-        $this->processData($this->getData('PCD'), 'PCD');
+        $this->processData(
+            $this->getItemsToDelete(
+                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+            ),
+            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+        );
+        $this->processData(
+            $this->getItemsToDelete(
+                Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+            ),
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+        );
+        $this->processData(
+            $this->getItemsToDelete(
+                Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            ),
+            Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+        );
+        $this->processData(
+            $this->getItemsToDelete(
+                Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
+            ),
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
+        );
+        $this->processData(
+            $this->getItemsToDelete(
+                Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
+            ),
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
+        );
     }
 
     /**
@@ -68,7 +96,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
             $ids []= $item->getId();
         }
 
-        $reverseIds = $this->processReverseData($type);
+        $reverseIds = $this->processDeletedData($type);
         $ids = array_merge($ids, $reverseIds);
 
         if (!empty($ids)) {
@@ -76,10 +104,14 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         }
     }
 
-    protected function processReverseData($type)
+    /**
+     * @param $type
+     * @return array
+     */
+    protected function processDeletedData($type)
     {
         $ids = array();
-        $eData = $this->getEcommerceRows($type);
+        $eData = $this->getDeletedRows($type);
 
         foreach ($eData as $eItem) {
             $ids []= $eItem['related_id'];
@@ -89,63 +121,77 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     }
 
     /**
+     * Get the items from eCommerce data that had been disabled.
+     *
      * @param $type
      * @param bool $filter
      * @return array
      * @throws Mage_Core_Model_Store_Exception
      */
-    protected function getData($type, $filter = true)
+    protected function getItemsToDelete($type, $filter = true)
     {
         $items = array();
         switch ($type) {
-            case 'PRO':
-                $items = $this->getPROItems($filter);
+            case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
+                $items = $this->getProductItems($filter);
                 break;
-            case 'QUO':
-                $items = $this->getQUOItems($filter);
+            case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
+                $items = $this->getQuoteItems($filter);
                 break;
-            case 'CUS':
-                $items = $this->getCUSItems($filter);
+            case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
+                $items = $this->getCustomerItems($filter);
                 break;
-            case 'PRL':
-                $items = $this->getPRLItems($filter);
+            case Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE:
+                $items = $this->getPromoRuleItems($filter);
                 break;
-            case 'PCD':
-                $items = $this->getPCDItems($filter);
+            case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
+                $items = $this->getPromoCodeItems($filter);
                 break;
         }
 
         return $items;
     }
 
-    protected function getPROItems($filter)
+    /**
+     * @param $filter
+     * @return array
+     */
+    protected function getProductItems($filter)
     {
         $collection = Mage::getModel('catalog/product')->getCollection();
         if ($filter) {
-            $collection->addFieldToFilter('status', array('eq' => 2));
+            $collection->addFieldToFilter('status', array('eq' => self::DISABLED_STATUS));
         }
 
         return $collection->getItems();
     }
 
-    protected function getQUOItems($filter)
+    /**
+     * @param $filter
+     * @return array
+     */
+    protected function getQuoteItems($filter)
     {
         $collection = Mage::getModel('sales/quote')->getCollection();
         if ($filter) {
-            $collection->addFieldToFilter('is_active', array('eq' => 0));
+            $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
         }
 
         return $collection->getItems();
     }
 
-    protected function getCUSItems($filter)
+    /**
+     * @param $filter
+     * @return array
+     */
+    protected function getCustomerItems($filter)
     {
         $items = array();
         $collection = Mage::getModel('customer/customer')->getCollection();
         if ($filter) {
             $customers = $collection->getItems();
             foreach ($customers as $item) {
-                if ($item->getIsActive() == 0) {
+                if ($item->getIsActive() == self::NOT_ACTIVE_STATUS) {
                     $items [] = $item;
                 }
             }
@@ -154,17 +200,26 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         return $items;
     }
 
-    protected function getPRLItems($filter)
+    /**
+     * @param $filter
+     * @return array
+     */
+    protected function getPromoRuleItems($filter)
     {
         $collection = Mage::getModel('salesrule/rule')->getCollection();
         if ($filter) {
-            $collection->addFieldToFilter('is_active', array('eq' => 0));
+            $collection->addFieldToFilter('is_active', array('eq' => self::NOT_ACTIVE_STATUS));
         }
 
         return $collection->getItems();
     }
 
-    protected function getPCDItems($filter)
+    /**
+     * @param $filter
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    protected function getPromoCodeItems($filter)
     {
         $collection = Mage::getModel('salesrule/coupon')->getCollection();
         if ($filter) {
@@ -176,19 +231,42 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     }
 
     /**
+     * Returns the rows that still exist in eCommerce data but
+     * that had been deleted in it respective entity (product,
+     * quote, promo code, etc.)
+     *
      * @param $type
      * @return array
      */
-    protected function getEcommerceRows($type)
+    protected function getDeletedRows($type)
     {
+        $resource = Mage::getSingleton('core/resource');
+        switch ($type) {
+            case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
+                $entityTable = $resource->getTableName('catalog/product');
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
+                $entityTable = $resource->getTableName('sales/quote');
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
+                $entityTable = $resource->getTableName('customer/customer');
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE:
+                $entityTable = $resource->getTableName('salesrule/rule');
+                break;
+            case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
+                $entityTable = $resource->getTableName('salesrule/coupon');
+                break;
+        }
+
         $ecommerceData = Mage::getModel('mailchimp/ecommercesyncdata')
             ->getCollection()
             ->addFieldToSelect('related_id');
         $ecommerceData->addFieldToFilter('type', array('eq' => $type));
-        $ecommerceData->addFieldToFilter('product.entity_id', array('null' => true));
+        $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
         $ecommerceData->getSelect()->joinLeft(
-            array('product' => 'catalog_product_entity'),
-            'main_table.related_id = product.entity_id'
+            array('ent' => $entityTable),
+            'main_table.related_id = ent.entity_id'
         );
 
         return $ecommerceData->getData();
