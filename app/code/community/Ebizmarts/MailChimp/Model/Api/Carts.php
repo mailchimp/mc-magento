@@ -829,7 +829,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     protected function getApiCustomersOptIn($magentoStoreId)
     {
-        return Mage::getModel('mailchimp/api_customers')->getOption($magentoStoreId);
+        return Mage::getModel('mailchimp/api_customers')->getOptIn($magentoStoreId);
     }
 
     /**
