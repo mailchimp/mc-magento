@@ -11,7 +11,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     public function testCustomMergeFieldAlreadyExists()
     {
         /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+         * @var Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $scopeId = 1;
         $scope = 'stores';
         /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+         * @var Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -55,7 +55,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeId = 1;
         $lastItemSent = 100;
         /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+         * @var Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -84,7 +84,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $scopeId = 1;
         $scope = 'stores';
         /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+         * @var Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -226,7 +226,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $configEntries = array();
 
         /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+         * @var Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -265,7 +265,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $configEntries = array();
 
         /**
-         * @var \Ebizmarts_MailChimp_Helper_Data $helperMock
+         * @var Ebizmarts_MailChimp_Helper_Data $helperMock
          */
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -1849,7 +1849,60 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
          $this->assertInternalType('int', $return);
     }
 
+    public function testResetErrors()
+    {
+        $scopeId = 0;
+        $scope = 'stores';
 
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('removeErrorsFromSubscribers', 'removeEcommerceSyncData', 'clearErrorGrid'))
+            ->getMock();
 
+        $helperDataMock
+            ->expects($this->once())
+            ->method('removeErrorsFromSubscribers')
+            ->with($scopeId, $scope);
+
+        $helperDataMock
+            ->expects($this->once())
+            ->method('removeEcommerceSyncData')
+            ->with($scopeId, $scope);
+
+        $helperDataMock
+            ->expects($this->once())
+            ->method('clearErrorGrid')
+            ->with($scopeId, $scope);
+
+        $helperDataMock->resetErrors($scopeId, $scope);
+    }
+
+    public function testGetMagentoStoresForMCStoreIdByScope()
+    {
+        $scopeId = 0;
+        $scope = 'stores';
+        $storeRelation = array(
+            'a1s2d3f4g5h6j7k8l9p0' => 1,
+            'a1s2d3f5h6h6j7k8l9p0' => 2
+            );
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStoreRelation', 'getMCStoreId'))
+            ->getMock();
+
+        $helperDataMock
+            ->expects($this->once())
+            ->method('getStoreRelation')
+            ->willReturn($storeRelation);
+
+        $helperDataMock
+            ->expects($this->once())
+            ->method('getMCStoreId')
+            ->with($scopeId, $scope)
+            ->willReturn('a1s2d3f4g5h6j7k8l9p0');
+
+        $helperDataMock->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
+    }
 
 }
