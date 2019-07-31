@@ -49,16 +49,17 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $mageApp = $helper->getMageApp();
         $request = $this->getRequest();
         $filters = $request->getParam('filter');
-        $scopeArray = $helper->getCurrentScope();
-        $success = 0;
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
 
+        $success = 0;
         if (is_array($filters) && empty($filters)) {
             $this->addWarning($helper->__('At least one type of eCommerce data should be selected to Resend.'));
             $success = $helper->__('Redirecting... ')
                 . '<script type="text/javascript">window.top.location.reload();</script>';
         } else {
             try {
-                $helper->resendMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
+                $helper->resendMCEcommerceData($scopeId, $scope, $filters);
 
                 $this->addSuccess($helper->__('Ecommerce data resent succesfully'));
                 $success = $helper->__('Redirecting... ')

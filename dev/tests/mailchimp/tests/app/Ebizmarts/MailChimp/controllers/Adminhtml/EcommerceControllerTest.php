@@ -136,17 +136,25 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
-        $helperMock
-            ->expects($this->once())
-            ->method('getCurrentScope')
-            ->willReturn(array('scope_id'=>$scopeId, 'scope'=>$scope));
+
         $helperMock
             ->expects($this->once())
             ->method('resendMCEcommerceData')
             ->with($scopeId, $scope, $filter)
             ->willReturnSelf();
 
-        $requestMock->expects($this->once())->method('getParam')->with($paramFilters)->willReturn($filter);
+        $requestMock->expects($this->exactly(3))
+            ->method('getParam')
+            ->withConsecutive(
+                $paramFilters,
+                'scope',
+                'scope_id'
+            )
+            ->willReturnOnConsecutiveCalls(
+                $filter,
+                $scope,
+                $scopeId
+            );
         $responseMock->expects($this->once())->method('setBody')->with($result);
 
         $ecommerceControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
