@@ -1204,35 +1204,35 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($isSyncing != 1) {
             $configValues = array();
 
-            if ($this->getCustomerResendLastId($scopeId, $scope) !== null
+            if ($this->getCustomerResendLastId($scopeId, $scope) === null
                 && in_array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $filters)
             ) {
                 $customerLastId = $this->getLastCustomerSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CUSTOMER_LAST_ID, $customerLastId);
             }
 
-            if ($this->getProductResendLastId($scopeId, $scope) !== null
+            if ($this->getProductResendLastId($scopeId, $scope) === null
                 && in_array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)
             ) {
                 $productLastId = $this->getLastProductSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_PRODUCT_LAST_ID, $productLastId);
             }
 
-            if ($this->getOrderResendLastId($scopeId, $scope) !== null
+            if ($this->getOrderResendLastId($scopeId, $scope) === null
                 && in_array(Ebizmarts_MailChimp_Model_Config::IS_ORDER, $filters)
             ) {
                 $orderLastId = $this->getLastOrderSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_ORDER_LAST_ID, $orderLastId);
             }
 
-            if ($this->getCartResendLastId($scopeId, $scope) !== null
+            if ($this->getCartResendLastId($scopeId, $scope) === null
                 && in_array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $filters)
             ) {
                 $cartLastId = $this->getLastCartSent($scopeId, $scope);
                 $configValues[] = array(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_CART_LAST_ID, $cartLastId);
             }
 
-            if ($this->getPromoCodeResendLastId($scopeId, $scope) !== null
+            if ($this->getPromoCodeResendLastId($scopeId, $scope) === null
                 && in_array(
                     Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE .', '
                     . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $filters
@@ -1255,7 +1255,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getLastCustomerSent($scopeId, $scope)
     {
-        $lastCustomerSent = 0;
+        $lastCustomerSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
@@ -1278,7 +1278,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getLastProductSent($scopeId, $scope)
     {
-        $lastProductSent = 0;
+        $lastProductSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
@@ -1301,7 +1301,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getLastOrderSent($scopeId, $scope)
     {
-        $lastOrderSent = 0;
+        $lastOrderSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
@@ -1324,7 +1324,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getLastCartSent($scopeId, $scope)
     {
-        $lastCartSent = 0;
+        $lastCartSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
@@ -1347,7 +1347,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getLastPromoCodeSent($scopeId, $scope)
     {
-        $lastPromoCodeSent = 0;
+        $lastPromoCodeSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
@@ -3392,7 +3392,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             if ($resendTurn) {
                 $collection->addFieldToFilter($keyCol, array('lteq' => $lastItemSent));
-            } else {
+            } elseif ($lastItemSent !== null) {
                 $collection->addFieldToFilter($keyCol, array('gt' => $lastItemSent));
             }
         }
@@ -3477,7 +3477,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function handleResendDataAfter()
     {
         $configCollection = $this->getResendTurnConfigCollection();
-
         foreach ($configCollection as $config) {
             $scope = $config->getScope();
             $scopeId = $config->getScopeId();
@@ -3626,6 +3625,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         Mage::getModel('mailchimp/api_customers')
             ->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
         $customerCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
+
         if ($customerCollection->getSize()) {
             $isMissing = true;
         } else {
@@ -3648,8 +3648,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addStoreFilter($storeId)
             ->addFieldToFilter('entity_id', array('lteq' => $itemId));
         $apiProducts->joinQtyAndBackorders($productCollection);
-        $apiProducts->joinMailchimpSyncDataWithoutWhere($productCollection, $mailchimpStoreId);
+        $apiProducts->joinMailchimpSyncData($productCollection, $mailchimpStoreId);
         $productCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
+
         if ($productCollection->getSize()) {
             $isMissing = true;
         } else {
@@ -4028,6 +4029,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $this->logError($e->getMessage());
         }
+
         return $api;
     }
 
