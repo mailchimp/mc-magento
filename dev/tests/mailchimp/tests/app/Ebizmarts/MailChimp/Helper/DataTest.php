@@ -1095,11 +1095,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->with($mailchimpStoreId, $scopeId, $scope)
             ->willReturn(false);
 
-        $helperMock->expects($this->once())->method('getCustomerResendLastId')->willReturn($customerLastId);
-        $helperMock->expects($this->once())->method('getProductResendLastId')->willReturn($productLastId);
-        $helperMock->expects($this->once())->method('getOrderResendLastId')->willReturn($orderLastId);
-        $helperMock->expects($this->once())->method('getCartResendLastId')->willReturn($cartLastId);
-        $helperMock->expects($this->once())->method('getPromoCodeResendLastId')->willReturn($promoCodeLastId);
+        $helperMock->expects($this->once())->method('getCustomerResendLastId')->willReturn(null);
+        $helperMock->expects($this->once())->method('getProductResendLastId')->willReturn(null);
+        $helperMock->expects($this->once())->method('getOrderResendLastId')->willReturn(null);
+        $helperMock->expects($this->once())->method('getCartResendLastId')->willReturn(null);
+        $helperMock->expects($this->once())->method('getPromoCodeResendLastId')->willReturn(null);
 
         $helperMock
             ->expects($this->once())
@@ -1378,7 +1378,9 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('getAll', 'getInterests'))
             ->getMock();
 
-        $apiListsInterestCategoryInterestsMock = $this->getMockBuilder(MailChimp_ListInterestCategoryInterests::class)
+        $apiListsInterestCategoryInterestsMock = $this->getMockBuilder(
+            MailChimp_ListInterestCategoryInterests::class
+        )
             ->disableOriginalConstructor()
             ->setMethods(array('getAll'))
             ->getMock();
