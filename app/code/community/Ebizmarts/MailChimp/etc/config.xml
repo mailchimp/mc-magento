@@ -442,7 +442,7 @@
                     <cron_expr>0 0 * * 0</cron_expr>
                 </schedule>
                 <run>
-                    <model>mailchimp/cron::cleanEcommerceData</model>
+                    <model>mailchimp/cron::clearEcommerceData</model>
                 </run>
                 <groups>ebizmarts_mailchimp</groups>
             </mailchimp_clear_ecommerce_data>

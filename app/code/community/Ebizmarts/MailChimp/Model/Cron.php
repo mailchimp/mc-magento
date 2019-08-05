@@ -46,9 +46,9 @@ class Ebizmarts_MailChimp_Model_Cron
         Mage::getModel('mailchimp/processWebhook')->deleteProcessed();
     }
 
-    public function cleanEcommerceData()
+    public function clearEcommerceData()
     {
-        Mage::getModel('mailchimp/clearEcommerce')->cleanEcommerceData();
+        Mage::getModel('mailchimp/clearEcommerce')->clearEcommerceData();
     }
 
     protected function getHelper()

@@ -48,45 +48,26 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * Process all types of data from eCommerce data to delete
      * non active products, quotes, customers, etc. from the table.
      */
-    public function cleanEcommerceData()
+    public function clearEcommerceData()
     {
-        $this->processData(
-            $this->getItemsToDelete(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
-            ),
-            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
-        );
-        $this->processData(
-            $this->getItemsToDelete(
-                Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
-            ),
-            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
-        );
-        $this->processData(
-            $this->getItemsToDelete(
-                Ebizmarts_MailChimp_Model_Config::IS_QUOTE
-            ),
-            Ebizmarts_MailChimp_Model_Config::IS_QUOTE
-        );
-        $this->processData(
-            $this->getItemsToDelete(
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
-            ),
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
-        );
-        $this->processData(
-            $this->getItemsToDelete(
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
-            ),
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
-        );
+        $itemsPRO = $this->getItemsToDelete(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
+        $itemsCUS = $this->getItemsToDelete(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
+        $itemsQUO = $this->getItemsToDelete(Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
+        $itemsPRL = $this->getItemsToDelete(Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
+        $itemsPCD = $this->getItemsToDelete(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
+
+        $this->processData($itemsPRO, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
+        $this->processData($itemsCUS, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
+        $this->processData($itemsQUO, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
+        $this->processData($itemsPRL, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
+        $this->processData($itemsPCD, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
     }
 
     /**
      * @param $data
      * @param $type
      */
-    protected function processData($data, $type)
+    public function processData($data, $type)
     {
         $ids = array();
         foreach ($data as $item) {
@@ -105,7 +86,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @param $type
      * @return array
      */
-    protected function processDeletedData($type)
+    public function processDeletedData($type)
     {
         $ids = array();
         $eData = $this->getDeletedRows($type);
@@ -281,7 +262,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      * @param $ids
      * @param $type
      */
-    protected function deleteEcommerceRows($ids, $type)
+    public function deleteEcommerceRows($ids, $type)
     {
         $ids = implode($ids, ', ');
         $where = array(
