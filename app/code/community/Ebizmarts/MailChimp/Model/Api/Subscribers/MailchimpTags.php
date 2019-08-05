@@ -582,6 +582,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
     /**
      * return the latest order for this subscriber
+     *
      * @return Mage_Sales_Model_Order
      */
     protected function getLastOrderByEmail()

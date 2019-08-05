@@ -44,6 +44,22 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
         return $helper->getUrlForNotification();
     }
 
+    public function getUrlForResendEcommerce()
+    {
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        $url = Mage::helper('adminhtml')
+            ->getUrl(
+                'adminhtml/ecommerce/renderresendecom',
+                array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']
+                )
+            );
+
+        return $url;
+    }
+
+
+
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */

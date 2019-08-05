@@ -60,10 +60,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
     }
 
-      /**
-       * @dataProvider getPromoDataProvider
-       */
-
+    /**
+     * @dataProvider getPromoDataProvider
+     */
     public function testGetPromoData($type)
     {
 
