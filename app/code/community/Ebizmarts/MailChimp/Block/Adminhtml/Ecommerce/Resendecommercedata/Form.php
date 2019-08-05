@@ -5,6 +5,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form
 {
     protected function _prepareForm()
     {
+        $request = $this->getRequest();
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
+
         $form = new Varien_Data_Form(
             array(
                 'id' => 'edit_form',
@@ -86,6 +90,25 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Ecommerce_Resendecommercedata_Form
                 'checked'  => '1',
             )
         );
+        $fieldset->addField(
+            'scope',
+            'hidden',
+            array(
+                'name' => 'scope',
+                'id' => 'scope',
+                'value' => $scope
+            )
+        );
+        $fieldset->addField(
+            'scopeId',
+            'hidden',
+            array(
+                'name' => 'scope_id',
+                'id' => 'scopeId',
+                'value' => $scopeId
+            )
+        );
+
 
         $form->setUseContainer(true);
         $this->setForm($form);
