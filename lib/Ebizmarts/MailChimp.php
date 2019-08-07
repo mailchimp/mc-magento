@@ -214,7 +214,7 @@ class Ebizmarts_MailChimp
     public function __construct($apiKey = null, $opts = array(), $userAgent = null)
     {
         if (!$apiKey) {
-            throw new MailChimp_Error('You must provide a MailChimp API key');
+            throw new MailChimp_Error("", "","", 'You must provide a MailChimp API key');
         }
 
         $this->_apiKey = $apiKey;
