@@ -49,7 +49,7 @@ class MailChimp_Error extends Exception
      */
     protected $_mailchimpParams;
 
-    public function __construct($method = "", $params = "", $url = "", $title = "", $details = "", $errors = null)
+    public function __construct($url = "", $method = "", $params = "", $title = "", $details = "", $errors = null)
     {
         $titleComplete = $title . " for Api Call: " . $url;
         parent::__construct($titleComplete . " - " . $details);
@@ -64,7 +64,9 @@ class MailChimp_Error extends Exception
 
     public function getFriendlyMessage()
     {
-        $friendlyMessage = $this->_mailchimpTitle . " for Api Call: [" . $this->_mailchimpUrl. "] using method [".$this->_mailchimpMethod."]\n";
+        $friendlyMessage = $this->_mailchimpTitle . " for Api Call: ["
+            . $this->_mailchimpUrl. "] using method ["
+            .$this->_mailchimpMethod."]\n";
         $friendlyMessage .= "\tDetail: [".$this->_mailchimpDetails."]\n";
         if (!empty($this->_mailchimpErrors)) {
             $errorDetails = "";
@@ -74,10 +76,16 @@ class MailChimp_Error extends Exception
                 $line = "\t\t field [$field] : $message\n";
                 $errorDetails .= $line;
             }
+
             $friendlyMessage .= "\tErrors:\n".$errorDetails;
         }
 
-        $friendlyMessage .= "\tParams:\n\t\t".$this->_mailchimpParams;
+        if (!is_array($this->_mailchimpParams)) {
+            $friendlyMessage .= "\tParams:\n\t\t".$this->_mailchimpParams;
+        } elseif (!empty($this->_mailchimpParams)) {
+            $friendlyMessage .= "\tParams:\n\t\t" . json_encode($this->_mailchimpParams) . "\n";
+        }
+
         return $friendlyMessage;
     }
 
