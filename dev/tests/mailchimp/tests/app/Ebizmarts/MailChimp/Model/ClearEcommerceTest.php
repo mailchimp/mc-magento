@@ -10,8 +10,6 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
     public function testClearEcommerce()
     {
         $ids = array(1, 3, 4);
-//        $itemsDeleted = array(3, 4);
-//        $itemsDeletedUnprocessed = array(array('related_id' => 3), array('related_id' => 4));
 
         $clearEcommerce = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ClearEcommerce::class)
             ->setMethods(
@@ -19,30 +17,11 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
             )
             ->getMock();
 
-//                array(
-//                    'getHelper', 'getDateHelper', 'processData', 'processDeletedData',
-//                    'getItemsToDelete', 'getProductItems', 'getQuoteItems', 'getCustomerItems',
-//                    'getPromoRuleItems', 'getPromoCodeItems', 'getDeletedRows', 'deleteEcommerceRows'
-//                )
-
         $itemMock = $this
             ->getMockBuilder(Mage_Catalog_Model_Resource_Product::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getId'))
             ->getMock();
-
-//        $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
-//            ->disableOriginalConstructor()
-//            ->setMethods(array('formatDate'))
-//            ->getMock();
-//
-//        $clearEcommerce->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
-//
-//        $clearEcommerce->expects($this->once())->method('getProductItems')->willReturn($itemMock);
-//        $clearEcommerce->expects($this->once())->method('getCustomerItems')->willReturn($itemMock);
-//        $clearEcommerce->expects($this->once())->method('getQuoteItems')->willReturn($itemMock);
-//        $clearEcommerce->expects($this->once())->method('getPromoRuleItems')->willReturn($itemMock);
-//        $clearEcommerce->expects($this->once())->method('getPromoCodeItems')->willReturn($itemMock);
 
         $clearEcommerce
             ->expects($this->exactly(5))
