@@ -17,6 +17,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AutomationEmails.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AutomationEmailsQueue.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Exceptions.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/MailChimp_HttpError.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AuthorizedApps.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Automation.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/BatchOperations.php';
@@ -75,6 +76,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/MailChimp/AutomationEmails.php';
     include_once dirname(__FILE__) . '/MailChimp/AutomationEmailsQueue.php';
     include_once dirname(__FILE__) . '/MailChimp/Exceptions.php';
+    include_once dirname(__FILE__) . '/MailChimp/MailChimp_HttpError.php';
     include_once dirname(__FILE__) . '/MailChimp/AuthorizedApps.php';
     include_once dirname(__FILE__) . '/MailChimp/Automation.php';
     include_once dirname(__FILE__) . '/MailChimp/BatchOperations.php';
@@ -214,7 +216,7 @@ class Ebizmarts_MailChimp
     public function __construct($apiKey = null, $opts = array(), $userAgent = null)
     {
         if (!$apiKey) {
-            throw new MailChimp_Error("", "", "", 'You must provide a MailChimp API key');
+            throw new MailChimp_Error('You must provide a MailChimp API key');
         }
 
         $this->_apiKey = $apiKey;
@@ -398,7 +400,7 @@ class Ebizmarts_MailChimp
 
 
         if (curl_error($ch)) {
-            throw new MailChimp_Error($url, $method, $params, "API call to $url failed: " . curl_error($ch));
+            throw new MailChimp_HttpError($url, $method, $params, "API call to $url failed: " . curl_error($ch));
         }
 
         if (floor($info['http_code'] / 100) >= 4) {
@@ -406,7 +408,7 @@ class Ebizmarts_MailChimp
             $errors = array_key_exists('errors', $result) ? $result['errors'] : null;
             $title = array_key_exists('title', $result) ? $result['title'] : '';
 
-            throw new MailChimp_Error($this->_root . $url, $method, $params, $title, $detail, $errors);
+            throw new MailChimp_HttpError($this->_root . $url, $method, $params, $title, $detail, $errors);
         }
 
         return $result;
