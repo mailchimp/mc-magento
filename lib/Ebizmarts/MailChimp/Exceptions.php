@@ -15,125 +15,20 @@ class MailChimp_Error extends Exception
 {
 
     /**
-     * @var array
-     */
-    protected $_mailchimpErrors;
-
-    /**
      * @var string
      */
-    protected $_mailchimpTitleComplete;
+    protected $_mailchimpMessage;
 
-    /**
-     * @var string
-     */
-    protected $_mailchimpDetails;
-
-    /**
-     * @var string
-     */
-    protected $_mailchimpTitle;
-
-    /**
-     * @var string
-     */
-    protected $_mailchimpUrl;
-
-    /**
-     * @var string
-     */
-    protected $_mailchimpMethod;
-
-    /**
-     * @var string
-     */
-    protected $_mailchimpParams;
-
-    public function __construct($method = "", $params = "", $url = "", $title = "", $details = "", $errors = null)
+    public function __construct($message = "")
     {
-        $titleComplete = $title . " for Api Call: " . $url;
-        parent::__construct($titleComplete . " - " . $details);
-        $this->_mailchimpTitleComplete = $titleComplete;
-        $this->_mailchimpDetails = $details;
-        $this->_mailchimpErrors = $errors;
-        $this->_mailchimpUrl = $url;
-        $this->_mailchimpTitle = $title;
-        $this->_mailchimpMethod = $method;
-        $this->_mailchimpParams = $params;
+        $this->_mailchimpMessage = $message;
+        parent::__construct($message);
     }
 
     public function getFriendlyMessage()
     {
-        $friendlyMessage = $this->_mailchimpTitle . " for Api Call: [" . $this->_mailchimpUrl. "] using method [".$this->_mailchimpMethod."]\n";
-        $friendlyMessage .= "\tDetail: [".$this->_mailchimpDetails."]\n";
-        if (!empty($this->_mailchimpErrors)) {
-            $errorDetails = "";
-            foreach ($this->_mailchimpErrors as $error) {
-                $field = array_key_exists('field', $error) ? $error['field'] : '';
-                $message = array_key_exists('message', $error) ? $error['message'] : '';
-                $line = "\t\t field [$field] : $message\n";
-                $errorDetails .= $line;
-            }
-            $friendlyMessage .= "\tErrors:\n".$errorDetails;
-        }
+        $friendlyMessage = "Mailchimp error with the next message: " . $this->_mailchimpMessage;
 
-        $friendlyMessage .= "\tParams:\n\t\t".$this->_mailchimpParams;
         return $friendlyMessage;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailchimpTitleComplete()
-    {
-        return $this->_mailchimpTitleComplete;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailchimpDetails()
-    {
-        return $this->_mailchimpDetails;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getMailchimpErrors()
-    {
-        return $this->_mailchimpErrors;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailchimpTitle()
-    {
-        return $this->_mailchimpTitle;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailchimpUrl()
-    {
-        return $this->_mailchimpUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailchimpMethod()
-    {
-        return $this->_mailchimpMethod;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMailchimpParams()
-    {
-        return $this->_mailchimpParams;
     }
 }
