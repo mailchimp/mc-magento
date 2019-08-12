@@ -4983,8 +4983,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Generates a storable representation of a value using the default adapter.
      *
-     * @param mixed $value
-     * @param array $options
+     * @param  mixed $value
+     * @param  array $options
      * @return string
      * @throws Zend_Serializer_Exception
      */
@@ -4996,8 +4996,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Creates a PHP value from a stored representation using the default adapter.
      *
-     * @param string $serialized
-     * @param array $options
+     * @param  string $serialized
+     * @param  array  $options
      * @return mixed
      * @throws Zend_Serializer_Exception
      */
