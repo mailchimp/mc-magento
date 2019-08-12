@@ -415,9 +415,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if (!empty($batchArray['operations'])) {
             $batchJson = json_encode($batchArray);
             if (!$batchJson || $batchJson == '') {
-                $helper->logRequest('An empty operation was detected');
+                $helper->logError('Empty batch operations detected or failed to JSON encode the following batch operations: ' . print_r($batchArray, true));
             } else {
+                $helper->logDebug("MC-API Request: Sending e-commerce batch");
                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
+                $helper->logInfo("MC-API Request: Sent e-commerce batch as ID {$batchResponse['id']}");
                 $helper->logRequest($batchJson, $batchResponse['id']);
                 //save batch id to db
                 $batch = $this->getSyncBatchesModel();
