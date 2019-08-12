@@ -2999,7 +2999,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $apiKey = $this->getApiKey($scopeId, $scope);
             if ($webhookId && $apiKey && $listId) {
                 try {
+                    $this->logDebug(
+                        "MC-API Request: Removing web hook ID $webhookId for list $listId"
+                    );
                     $api->lists->webhooks->delete($listId, $webhookId);
+                    $this->logNotice(
+                        "MC-API Request: Removed web hook ID $webhookId for list $listId"
+                    );
                 } catch (MailChimp_Error $e) {
                     $this->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
@@ -3030,7 +3036,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $webhooks = $api->lists->webhooks->getAll($listId);
         foreach ($webhooks['webhooks'] as $webhook) {
             if (strpos($webhook['url'], $webhookUrl) !== false) {
+                $this->logDebug(
+                    "MC-API Request: Removing web hook url $webhookUrl for list $listId"
+                );
                 $api->lists->webhooks->delete($listId, $webhook['id']);
+                $this->logNotice(
+                    "MC-API Request: Removed web hook url $webhookUrl for list $listId"
+                );
             }
         }
     }
