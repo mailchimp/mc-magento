@@ -252,7 +252,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function unserializeMapFields($mapFields)
     {
-        return unserialize($mapFields);
+        return $this->_mcHelper->unserialize($mapFields);
     }
 
     /**
