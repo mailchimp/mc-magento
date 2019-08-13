@@ -512,7 +512,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             }
         }
 
-        return array('lines' => $lines, $count = $itemCount);
+        return array('lines' => $lines, 'count' => $itemCount);
     }
 
     /**
