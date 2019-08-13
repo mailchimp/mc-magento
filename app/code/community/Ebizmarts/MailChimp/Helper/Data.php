@@ -4990,7 +4990,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function serialize($value, array $options = array())
     {
-        Zend_Serializer::serialize($value, $options);
+        return Zend_Serializer::serialize($value, $options);
     }
 
     /**
@@ -5003,6 +5003,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function unserialize($serialized, array $options = array())
     {
-        Zend_Serializer::unserialize($serialized, $options);
+        return Zend_Serializer::unserialize($serialized, $options);
     }
 }
