@@ -135,7 +135,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpMethod;
     }
-
+    
     /**
      * @return string
      */
