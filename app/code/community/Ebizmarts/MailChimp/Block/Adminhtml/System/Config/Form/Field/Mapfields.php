@@ -15,21 +15,26 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
 {
     protected $_customerAttributes;
 
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
+    protected $_helper;
+
     public function __construct()
     {
-        $helper = $this->makeHelper();
+        $this->_helper = $this->makeHelper();
 
         $this->addColumn(
             'mailchimp',
             array(
-            'label' => $helper->__('Mailchimp'),
+            'label' => $this->_helper->__('Mailchimp'),
             'style' => 'width:120px',
             )
         );
         $this->addColumn(
             'magento',
             array(
-            'label' => $helper->__('Customer'),
+            'label' => $this->_helper->__('Customer'),
             'style' => 'width:120px',
             )
         );
@@ -49,9 +54,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
             }
         }
 
-        $scopeArray = $helper->getCurrentScope();
-        $mapFields = $helper->getCustomMergeFieldsSerialized($scopeArray['scope_id'], $scopeArray['scope']);
-        $customFieldTypes = unserialize($mapFields);
+        $scopeArray = $this->_helper->getCurrentScope();
+        $mapFields = $this->_helper->getCustomMergeFieldsSerialized($scopeArray['scope_id'], $scopeArray['scope']);
+        $customFieldTypes = $this->_helper->unserialize($mapFields);
+
         if (is_array($customFieldTypes)) {
             foreach ($customFieldTypes as $customFieldType) {
                 $label = $customFieldType['label'];
