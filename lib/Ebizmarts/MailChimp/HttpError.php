@@ -10,36 +10,44 @@
  * @date:     4/27/16 4:45 PM
  * @file:     Exceptions.php
  */
+
 class MailChimp_HttpError extends MailChimp_Error
 {
     /**
      * @var array
      */
     protected $_mailchimpErrors;
+
     /**
      * @var string
      */
     protected $_mailchimpTitleComplete;
+
     /**
      * @var string
      */
     protected $_mailchimpDetails;
+
     /**
      * @var string
      */
     protected $_mailchimpTitle;
+
     /**
      * @var string
      */
     protected $_mailchimpUrl;
+
     /**
      * @var string
      */
     protected $_mailchimpMethod;
+
     /**
      * @var string
      */
     protected $_mailchimpParams;
+
     public function __construct($url = "", $method = "", $params = "", $title = "", $details = "", $errors = null)
     {
         $titleComplete = $title . " for Api Call: " . $url;
@@ -52,6 +60,7 @@ class MailChimp_HttpError extends MailChimp_Error
         $this->_mailchimpMethod = $method;
         $this->_mailchimpParams = $params;
     }
+
     public function getFriendlyMessage()
     {
         $friendlyMessage = $this->_mailchimpTitle . " for Api Call: ["
@@ -66,15 +75,19 @@ class MailChimp_HttpError extends MailChimp_Error
                 $line = "\t\t field [$field] : $message\n";
                 $errorDetails .= $line;
             }
+
             $friendlyMessage .= "\tErrors:\n".$errorDetails;
         }
+
         if (!is_array($this->_mailchimpParams)) {
             $friendlyMessage .= "\tParams:\n\t\t".$this->_mailchimpParams;
         } elseif (!empty($this->_mailchimpParams)) {
             $friendlyMessage .= "\tParams:\n\t\t" . json_encode($this->_mailchimpParams) . "\n";
         }
+
         return $friendlyMessage;
     }
+
     /**
      * @return string
      */
@@ -82,6 +95,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpTitleComplete;
     }
+
     /**
      * @return string
      */
@@ -89,6 +103,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpDetails;
     }
+
     /**
      * @return array|null
      */
@@ -96,6 +111,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpErrors;
     }
+
     /**
      * @return string
      */
@@ -103,6 +119,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpTitle;
     }
+
     /**
      * @return string
      */
@@ -110,6 +127,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpUrl;
     }
+
     /**
      * @return string
      */
@@ -117,6 +135,7 @@ class MailChimp_HttpError extends MailChimp_Error
     {
         return $this->_mailchimpMethod;
     }
+    
     /**
      * @return string
      */
