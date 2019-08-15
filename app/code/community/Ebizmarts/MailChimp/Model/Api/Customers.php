@@ -138,12 +138,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                             /**
                              * send merge fields for customers currently not subscribed (transactional)
                              */
-                            $subscriber->setSubscriberEmail($customer->getEmail());
-                            $subscriber->setCustomerId($customer->getId());
-                            $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
-                            $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
-
-                            $batchData = $this->getCustomerPatchBatch($mergeFields, $customer, $listId, $counter);
+                            $batchData = $this->makeMailchimpTagsBatchStructure(
+                                $magentoStoreId,
+                                $subscriber,
+                                $customer,
+                                $listId,
+                                $counter
+                            );
 
                             if ($batchData !== null) {
                                 $customerArray[$counter] = $batchData;
@@ -684,8 +685,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $mergeFields
      * @param $customer
      * @param $listId
-     * @param $counter
-     * @return array
+     * @return array|null
      */
     protected function getCustomerPatchBatch($mergeFields, $customer, $listId)
     {
@@ -694,6 +694,25 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $batchData = $this->makePatchBatchStructure($customer, $listId, $mergeFields);
         }
 
+        return $batchData;
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @param $subscriber
+     * @param $customer
+     * @param $listId
+     * @param $counter
+     * @return array|null
+     */
+    protected function makeMailchimpTagsBatchStructure($magentoStoreId, $subscriber, $customer, $listId, $counter)
+    {
+        $subscriber->setSubscriberEmail($customer->getEmail());
+        $subscriber->setCustomerId($customer->getId());
+        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
+        $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
+
+        $batchData = $this->getCustomerPatchBatch($mergeFields, $customer, $listId, $counter);
         return $batchData;
     }
 

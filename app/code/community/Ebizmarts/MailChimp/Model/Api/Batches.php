@@ -735,6 +735,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $files
      * @param $batchId
      * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @throws Mage_Core_Exception
      */
     protected function processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
@@ -798,12 +800,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
 
                         if (!$syncDataItem->getMailchimpSyncModified()) {
-                            $syncModified = 0 ;
-
-                            if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
-                                && !$syncDataItem->getMailchimpSyncedFlag() ) {
-                                $syncModified = 1;
-                            }
+                            $syncModified = $this->enableMergeFieldsSending($type, $syncDataItem);
 
                             $this->saveSyncData(
                                 $id,
@@ -1222,5 +1219,29 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             || isset($counter['ORD']['NOT SENT'])
             || isset($counter['PRO']['NOT SENT'])
             || isset($counter['QUO']['NOT SENT']);
+    }
+
+    /**
+     * @param Varien_Object $syncDataItem
+     * @return bool
+     */
+    protected function isFirstArrival(Varien_Object $syncDataItem)
+    {
+        return $syncDataItem->getMailchimpSyncedFlag() !== 1;
+    }
+
+    /**
+     * @param $type
+     * @param Varien_Object $syncDataItem
+     * @return int
+     */
+    protected function enableMergeFieldsSending($type, Varien_Object $syncDataItem)
+    {
+        $syncModified = 0 ;
+        if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+            && $this->isFirstArrival($syncDataItem)) {
+            $syncModified = 1;
+        }
+        return $syncModified;
     }
 }
