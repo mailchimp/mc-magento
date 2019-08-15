@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         Mage::getModel('mailchimp/webhookrequest')
             ->setType($data['type'])
             ->setFiredAt($data['fired_at'])
-            ->setDataRequest(serialize($data['data']))
+            ->setDataRequest($this->_helper->serialize($data['data']))
             ->save();
     }
 
@@ -57,8 +57,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $collection = Mage::getModel('mailchimp/webhookrequest')->getCollection();
         $collection->addFieldToFilter('processed', array('eq' => 0));
         $collection->getSelect()->limit(self::BATCH_LIMIT);
+
         foreach ($collection as $webhookRequest) {
-            $data = unserialize($webhookRequest->getDataRequest());
+            $data = $this->_helper->unserialize($webhookRequest->getDataRequest());
+
             if ($data) {
                 switch ($webhookRequest->getType()) {
                 case 'subscribe':
@@ -78,8 +80,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 }
             }
 
-            $webhookRequest->setProcessed(1)
-                ->save();
+            $webhookRequest->setProcessed(1)->save();
         }
     }
 

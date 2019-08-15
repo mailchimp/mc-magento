@@ -1907,4 +1907,176 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $helperDataMock->getMagentoStoresForMCStoreIdByScope($scopeId, $scope);
     }
 
+    public function testCreateMergeFields()
+    {
+        $scopeId = 0;
+        $scope = 'stores';
+        $listId = "b514eebd1a";
+        $mapFieldsSerialized = 'a:10:{s:18:"_1468601283719_719";a:2:{s:9:"mailchimp";s:7:"WEBSITE";' .
+            's:7:"magento";s:1:"1";}s:18:"_1468609069544_544";a:2:{s:9:"mailchimp";s:7:"STOREID";' .
+            's:7:"magento";s:1:"2";}s:18:"_1469026825907_907";a:2:{s:9:"mailchimp";s:9:"STORENAME";' .
+            's:7:"magento";s:1:"3";}s:18:"_1469027411717_717";a:2:{s:9:"mailchimp";s:6:"PREFIX";' .
+            's:7:"magento";s:1:"4";}s:18:"_1469027418285_285";a:2:{s:9:"mailchimp";s:5:"FNAME";' .
+            's:7:"magento";s:1:"5";}}';
+
+        $mapFieldsUnserialized = array(
+                "_1468601283719_719", array("mailchimp", "WEBSITE", "magento", "1"), "_1468609069544_544",
+                array("mailchimp", "STOREID", "magento", "2"), "_1469026825907_907",
+                array("mailchimp", "STORENAME", "magento", "3"),
+                "_1469027411717_717", array("mailchimp","PREFIX","magento", "4"), "_1469027418285_285",
+                array("mailchimp", "FNAME", "magento", "5")
+        );
+
+        $arrayMergeFieldsGetAll = array
+        (
+            "merge_fields" => array
+            (
+                0 => array
+                (
+                    "merge_id" => 3,
+                    "tag" => "ADDRESS",
+                    "name" => "Address",
+                    "type" => "address",
+                    "required" => "",
+                    "default_value" => "",
+                    "public" => "",
+                    "display_order" => 4,
+                    "options" => array("default_country" => 164),
+                    "help_text" => "",
+                    "list_id" => "b514eebd1a",
+                    "_links" => array
+                    (
+                        0 => array
+                        (
+                            "rel" => "self",
+                            "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
+                            "method" => "GET",
+                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                        ),
+
+                        1 => array
+                        (
+                            "rel" => "parent",
+                            "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields",
+                            "method" => "GET",
+                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
+                            "schema" => "https://us20.api.mailchimp.com/schema/3.0/CollectionLinks/Lists/MergeFields.json",
+                        ),
+
+                        2 => array
+                        (
+                            "rel" => "update",
+                            "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
+                            "method" => "PATCH",
+                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                            "schema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/PATCH.json",
+                        ),
+
+                        3 => array
+                        (
+                            "rel" => "delete",
+                            "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
+                            "method" => "DELETE",
+                        )
+
+                    )
+
+                )
+            )
+        );
+
+        $ebizmartsMailchimpMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
+                ->disableOriginalConstructor()->setMethods(array('getLists'))
+                ->getMock();
+
+        $mailchimpListsMock = $this->getMockBuilder(MailChimp_Lists::class)
+                ->disableOriginalConstructor()->setMethods(array('getMergeFields'))
+                ->getMock();
+
+        $mailchimpListsMergeFieldsMock = $this->getMockBuilder(MailChimp_ListsMergeFields::class)
+                ->disableOriginalConstructor()->setMethods(array('getAll'))
+                ->getMock();
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(
+                array(
+                    'getGeneralList', 'getMapFields', 'unserialize', 'getCustomMergeFieldsSerialized',
+                    'getApi', '_createCustomFieldTypes',
+                )
+            )
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
+
+        $helperDataMock->expects($this->once())->method('getMapFields')
+            ->with($scopeId, $scope)->willReturn($mapFieldsSerialized);
+
+        $helperDataMock->expects($this->exactly(2))->method('unserialize')
+            ->withConsecutive(array($mapFieldsSerialized), array($mapFieldsSerialized))
+            ->willReturnOnConsecutiveCalls($mapFieldsUnserialized, $mapFieldsUnserialized);
+
+        $helperDataMock->expects($this->once())->method('getCustomMergeFieldsSerialized')
+            ->with($scopeId, $scope)->willReturn($mapFieldsSerialized);
+
+        $helperDataMock->expects($this->once())->method('getApi')->with($scopeId, $scope)
+            ->willReturn($ebizmartsMailchimpMock);
+
+        $ebizmartsMailchimpMock->expects($this->once())->method('getLists')
+        ->willReturn($mailchimpListsMock);
+
+        $mailchimpListsMock->expects($this->once())->method('getMergeFields')
+        ->willReturn($mailchimpListsMergeFieldsMock);
+
+        $mailchimpListsMergeFieldsMock->expects($this->once())->method('getAll')
+            ->with($listId, null, null, 50)
+            ->willReturn($arrayMergeFieldsGetAll);
+
+        $times = 10;//count($mapFieldsUnserialized) * count($arrayMergeFieldsGetAll);
+
+        $helperDataMock->expects($this->exactly($times))->method('_createCustomFieldTypes')
+            ->withConsecutive(
+                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized), array($mapFieldsUnserialized)
+            );
+
+        $helperDataMock->createMergeFields($scopeId, $scope);
+    }
+
+    public function testGetCustomMergeFields()
+    {
+        $scopeId = 0;
+        $scope = 'stores';
+        $mapFieldsSerialized = 'a:10:{s:18:"_1468601283719_719";a:2:{s:9:"mailchimp";s:7:"WEBSITE";' .
+            's:7:"magento";s:1:"1";}s:18:"_1468609069544_544";a:2:{s:9:"mailchimp";s:7:"STOREID";' .
+            's:7:"magento";s:1:"2";}s:18:"_1469026825907_907";a:2:{s:9:"mailchimp";s:9:"STORENAME";' .
+            's:7:"magento";s:1:"3";}s:18:"_1469027411717_717";a:2:{s:9:"mailchimp";s:6:"PREFIX";' .
+            's:7:"magento";s:1:"4";}s:18:"_1469027418285_285";a:2:{s:9:"mailchimp";s:5:"FNAME";' .
+            's:7:"magento";s:1:"5";}}';
+
+        $mapFieldsUnserialized = array(
+            "_1468601283719_719", array("mailchimp", "WEBSITE", "magento", "1"), "_1468609069544_544",
+            array("mailchimp", "STOREID", "magento", "2"), "_1469026825907_907",
+            array("mailchimp", "STORENAME", "magento", "3"),
+            "_1469027411717_717", array("mailchimp","PREFIX","magento", "4"), "_1469027418285_285",
+            array("mailchimp", "FNAME", "magento", "5")
+        );
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('unserialize', 'getCustomMergeFieldsSerialized'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getCustomMergeFieldsSerialized')
+            ->with($scopeId, $scope)->willReturn($mapFieldsSerialized);
+
+        $helperDataMock->expects($this->once())->method('unserialize')
+            ->with($mapFieldsSerialized)
+            ->willReturn($mapFieldsUnserialized);
+
+        $helperDataMock->getCustomMergeFields($scopeId, $scope);
+    }
 }
