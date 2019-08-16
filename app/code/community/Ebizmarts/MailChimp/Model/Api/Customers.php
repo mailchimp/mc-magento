@@ -633,7 +633,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function isSubscribed($subscriber, $customer)
     {
         if ($subscriber->loadByEmail($customer->getEmail())->getSubscriberId()
-            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED 
+            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED
         ) {
             return true;
         } else {
@@ -667,8 +667,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function getCustomerPatchBatch($mergeFields, $customer, $listId, $counter)
     {
         $batchData = null;
+
         if (!empty($mergeFields["merge_fields"])) {
             $batchData = $this->makePatchBatchStructure($customer, $listId, $mergeFields);
+
             if ($batchData !== null) {
                 $counter++;
             }
