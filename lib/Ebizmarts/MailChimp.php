@@ -17,7 +17,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AutomationEmails.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AutomationEmailsQueue.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Exceptions.php';
-    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/MailChimp_HttpError.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/HttpError.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AuthorizedApps.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Automation.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/BatchOperations.php';
@@ -76,7 +76,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/MailChimp/AutomationEmails.php';
     include_once dirname(__FILE__) . '/MailChimp/AutomationEmailsQueue.php';
     include_once dirname(__FILE__) . '/MailChimp/Exceptions.php';
-    include_once dirname(__FILE__) . '/MailChimp/MailChimp_HttpError.php';
+    include_once dirname(__FILE__) . '/MailChimp/HttpError.php';
     include_once dirname(__FILE__) . '/MailChimp/AuthorizedApps.php';
     include_once dirname(__FILE__) . '/MailChimp/Automation.php';
     include_once dirname(__FILE__) . '/MailChimp/BatchOperations.php';
