@@ -115,11 +115,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                     $mailchimpStoreId
                 );
-                if ($dataCustomer->getId()) {
-                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
-                } else {
-                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
-                }
+                $this->incrementCounterSentPerBatch($dataCustomer, $helper);
 
                 $customerArray[$counter] = $this->makePutBatchStructure($customerJson, $customer);
                 $this->_updateSyncData(
@@ -134,23 +130,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     if ($this->getOptInStatusForStore()) {
                         $subscriber->subscribe($customer->getEmail());
                     } else {
-                        if ($dataCustomer->getMailchimpSyncedFlag()) {
-                            /**
-                             * send merge fields for customers currently not subscribed (transactional)
-                             */
-                            $batchData = $this->makeMailchimpTagsBatchStructure(
-                                $magentoStoreId,
-                                $subscriber,
-                                $customer,
-                                $listId,
-                                $counter
-                            );
-
-                            if ($batchData !== null) {
-                                $customerArray[$counter] = $batchData;
-                                $counter++;
-                            }
-                        }
+                        /**
+                         * send merge fields for customers currently not subscribed (transactional)
+                         */
+                        list($customerArray, $counter) = $this->sendMailchimpTags($magentoStoreId, $dataCustomer, $subscriber, $customer, $listId, $counter, $customerArray);
                     }
                 }
             } else {
@@ -443,7 +426,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     /**
      * @param $magentoStoreId
-     * @return mixed
+     * @return bool
+     * @throws Mage_Core_Exception
      */
     protected function isEcommerceCustomerOptInConfigEnabled($magentoStoreId)
     {
@@ -714,6 +698,60 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $batchData = $this->getCustomerPatchBatch($mergeFields, $customer, $listId, $counter);
         return $batchData;
+    }
+
+    /**
+     * @param Varien_Object $dataCustomer
+     * @param Ebizmarts_MailChimp_Helper_Data $helper
+     */
+    protected function incrementCounterSentPerBatch(
+        Varien_Object $dataCustomer,
+        Ebizmarts_MailChimp_Helper_Data $helper
+    ) {
+        if ($dataCustomer->getId()) {
+            $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
+        } else {
+            $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
+        }
+    }
+
+    /**
+     * Send merge fields for transactional members
+     *
+     * @param $magentoStoreId
+     * @param Varien_Object $dataCustomer
+     * @param $subscriber
+     * @param $customer
+     * @param $listId
+     * @param $counter
+     * @param array $customerArray
+     * @return array
+     */
+    protected function sendMailchimpTags(
+        $magentoStoreId,
+        Varien_Object $dataCustomer,
+        $subscriber,
+        $customer,
+        $listId,
+        $counter,
+        array $customerArray
+    ) {
+        if ($dataCustomer->getMailchimpSyncedFlag()) {
+            $batchData = $this->makeMailchimpTagsBatchStructure(
+                $magentoStoreId,
+                $subscriber,
+                $customer,
+                $listId,
+                $counter
+            );
+
+            if ($batchData !== null) {
+                $customerArray[$counter] = $batchData;
+                $counter++;
+            }
+        }
+
+        return array($customerArray, $counter);
     }
 
 }
