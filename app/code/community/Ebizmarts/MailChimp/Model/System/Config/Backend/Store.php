@@ -28,6 +28,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
         $isSyncing = $helper->getMCIsSyncing($newMailchimpStoreId, $scopeId, $scope);
         $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($newMailchimpStoreId, $scopeId, $scope);
 
+        $helper->cancelAllPendingBatches($oldMailchimpStoreId);
+        $helper->restoreAllCanceledBatches($newMailchimpStoreId);
         if ($this->isValueChanged() && $this->getValue()) {
                 $helper->deletePreviousConfiguredMCStoreLocalData($oldMailchimpStoreId, $scopeId, $scope);
             if ($ecommMinSyncDate === null) {

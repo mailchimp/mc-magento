@@ -220,6 +220,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
         try {
             $api = $helper->getApiByKey($apiKey);
             $response = $api->getEcommerce()->getStores()->delete($mailchimpStoreId);
+            $helper->cancelAllPendingBatches($mailchimpStoreId);
             $successMessage = $helper->__("The Mailchimp store was successfully deleted.");
             $adminSession = $this->getAdminSession();
             $adminSession->addSuccess($successMessage);
