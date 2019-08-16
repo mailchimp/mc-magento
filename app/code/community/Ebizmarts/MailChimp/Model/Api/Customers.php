@@ -73,7 +73,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection->addFieldToFilter('entity_id', array('in' => $customerIdsToSync));
         $collection->addNameToSelect();
         $this->joinDefaultBillingAddress($collection);
-        $this->joinSalesData($collection);
         $collection->getSelect()->group("e.entity_id");
 
         return $collection;
@@ -170,8 +169,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $mailChimpTags->setStoreId($storeId);
         $mailChimpTags->setSubscriber($subscriber);
         $mailChimpTags->setCustomer(
-            $this->getCustomerByWebsiteAndId()->
-            setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
+            $this->getCustomerByWebsiteAndId()
+                ->setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
         );
         $mailChimpTags->buildMailChimpTags();
 
@@ -222,9 +221,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
-
-        $data["orders_count"] = (int)$customer->getOrdersCount();
-        $data["total_spent"] = (float)$customer->getTotalSpent();
         $data["opt_in_status"] = false;
 
         $data += $this->getCustomerAddressData($customer);
@@ -391,21 +387,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $collection->joinAttribute('country_id', 'customer_address/country_id', 'default_billing', null, 'left');
         $collection->joinAttribute('street', 'customer_address/street', 'default_billing', null, 'left');
         $collection->joinAttribute('company', 'customer_address/company', 'default_billing', null, 'left');
-    }
-
-    /**
-     * @param $collection
-     */
-    protected function joinSalesData($collection)
-    {
-        $collection->getSelect()->joinLeft(
-            array('s' => $collection->getTable('sales/order')),
-            'e.entity_id = s.customer_id',
-            array(
-                new Zend_Db_Expr("SUM(s.grand_total) AS total_spent"),
-                new Zend_Db_Expr("COUNT(s.entity_id) AS orders_count"),
-            )
-        );
     }
 
     /**
@@ -652,7 +633,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function isSubscribed($subscriber, $customer)
     {
         if ($subscriber->loadByEmail($customer->getEmail())->getSubscriberId()
-            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED ) {
+            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED 
+        ) {
             return true;
         } else {
             return false;
