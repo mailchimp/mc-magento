@@ -193,6 +193,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                     if (isset($error['field'])) {
                         $errorDetail .= "<br />    Field: " . $error['field'];
                     }
+
                     if (isset($error['message'])) {
                         $errorDetail .= " Message: " . $error['message'];
                     }
@@ -203,6 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
                 }
             }
         }
+
         return $errorMessage;
     }
 

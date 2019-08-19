@@ -4994,7 +4994,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function cancelAllPendingBatches($mailchimpStore)
     {
-        $this->markAllBatchesAs($mailchimpStore,self::BATCH_PENDING, self::BATCH_CANCELED);
+        $this->markAllBatchesAs($mailchimpStore, self::BATCH_PENDING, self::BATCH_CANCELED);
     }
 
     /**
@@ -5002,6 +5002,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function restoreAllCanceledBatches($mailchimpStore)
     {
-        $this->markAllBatchesAs($mailchimpStore,self::BATCH_CANCELED, self::BATCH_PENDING);
+        $this->markAllBatchesAs($mailchimpStore, self::BATCH_CANCELED, self::BATCH_PENDING);
     }
 }
