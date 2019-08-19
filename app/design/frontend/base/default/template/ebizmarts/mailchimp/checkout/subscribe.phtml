@@ -71,7 +71,7 @@ endif; ?>>
     <?php echo $this->getBlockHtml('formkey'); ?>
     <div class="mailchimp-multisubscribe">
         <ul class="mailchimp-general-list">
-            <li class="listdata"><input<?php if ($check): ?> checked="checked"<?php 
+            <li class="listdata"><input<?php if ($check): ?> checked="checked"<?php
            endif; ?> type="checkbox"
                      onchange="addSubscribeToPost(this);"
                      name="list[<?php echo $this->escapeHtml($generalList); ?>][subscribed]"
