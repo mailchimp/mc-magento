@@ -5019,13 +5019,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->markAllBatchesAs($mailchimpStore, self::BATCH_CANCELED, self::BATCH_PENDING);
     }
 
-     * Generates a storable representation of a value using the default adapter.
-     *
-     * @param  mixed $value
-     * @param  array $options
-     * @return string
-     * @throws Zend_Serializer_Exception
-     */
+     /** Generates a storable representation of a value using the default adapter.
+      *
+      * @param  mixed $value
+      * @param  array $options
+      * @return string
+      * @throws Zend_Serializer_Exception
+      */
     public function serialize($value, array $options = array())
     {
         return Zend_Serializer::serialize($value, $options);
