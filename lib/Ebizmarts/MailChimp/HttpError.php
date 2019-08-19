@@ -13,7 +13,6 @@
 
 class MailChimp_HttpError extends MailChimp_Error
 {
-
     /**
      * @var array
      */
