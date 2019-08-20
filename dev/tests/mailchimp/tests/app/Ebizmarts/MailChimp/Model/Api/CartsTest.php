@@ -268,8 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $customerId = 1;
         $arrayAddFieldToFilter = array('eq' => 1);
         $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
-        $where = "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at";
+        $where = "m4m.mailchimp_sync_delta < updated_at";
         $arrayTableName = array('m4m' => $mcTableName);
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
@@ -459,8 +458,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $stringStoreId = 'store_id';
         $arrayAddFieldToFilter = array('eq' => 1);
         $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
-        $where = "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at";
+        $where = "m4m.mailchimp_sync_delta < updated_at";
         $arrayTableName = array('m4m' => $mcTableName);
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
@@ -585,8 +583,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $customerId = 1;
         $arrayAddFieldToFilter = array('eq' => 1);
         $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
-        $where = "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at";
+        $where = "m4m.mailchimp_sync_delta < updated_at";
         $arrayTableName = array('m4m' => $mcTableName);
         $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
             . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
@@ -676,7 +673,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('getAllCartsByEmail')
             ->with(self::CUSTOMER_EMAIL_BY_CART, self::MAILCHIMP_STORE_ID, self::MAGENTO_STORE_ID)
             ->willReturn($quoteByEmailResoureceCollectionMock);
-        $cartsApiMock->expects($this->exactly(2))
+        $cartsApiMock->expects($this->exactly(4))
             ->method('getCounter')
             ->willReturnOnConsecutiveCalls(
                 self::COUNTER,
@@ -688,7 +685,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 array(self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, 1),
                 array(self::CART_ID, self::MAILCHIMP_STORE_ID)
             );
-        $cartsApiMock->expects($this->once())
+        $cartsApiMock->expects($this->exactly(2))
             ->method('setCounter')
             ->with(self::COUNTER + 1);
         $cartsApiMock->expects($this->once())

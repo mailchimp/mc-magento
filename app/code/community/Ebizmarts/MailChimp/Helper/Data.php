@@ -19,14 +19,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     const SUB_MOD          = "SubscriberModified";
     const SUB_NEW          = "SubscriberNew";
+
     const PRO_MOD          = "ProductModified";
     const PRO_NEW          = "ProductNew";
+
     const CUS_MOD          = "CustomerModified";
     const CUS_NEW          = "CustomerNew";
+
     const ORD_MOD          = "OrderModified";
     const ORD_NEW          = "OrderNew";
+
     const QUO_MOD          = "QuoteModified";
     const QUO_NEW          = "QuoteNew";
+    const QUO_DEL          = "QuoteDeleted";
 
     const DATA_NOT_SENT_TO_MAILCHIMP = 'NOT SENT';
     const DATA_SENT_TO_MAILCHIMP     = 'SENT';
@@ -1556,6 +1561,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param bool             $saveOnlyIfexists
      * @param null             $deletedRelatedId
      * @param bool             $allowBatchRemoval
+     * @param bool             $invalidOrEmpty
      */
     public function saveEcommerceSyncData(
         $itemId,
@@ -1569,17 +1575,31 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $deletedRelatedId = null,
-        $allowBatchRemoval = true
+        $allowBatchRemoval = true,
+        $invalidOrEmpty = false
     ) {
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
-            if ($syncDelta) {
+            if ($invalidOrEmpty) {
+                /*
+                 * Item is invalid or empty so ensure batch ID is not null to
+                 * prevent it from being deleted as an unsent item in future.
+                 */
+                if (!$syncDelta) {
+                    $dateHelper = $this->getDateHelper();
+                    $syncDelta = $dateHelper->formatDate(null, 'Y-m-d H:i:s');
+                }
+                $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
+                if ($ecommerceSyncDataItem->getData("batch_id") === null) {
+                    $ecommerceSyncDataItem->setData("batch_id", "ignored");
+                }
+            } elseif ($syncDelta) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
             } elseif ($allowBatchRemoval) {
                 $ecommerceSyncDataItem->setData("batch_id", null);
             }
 
-            if ($syncError) {
+            if ($syncError !== null) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
             }
 
@@ -4997,7 +5017,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Creates a PHP value from a stored representation using the default adapter.
      *
      * @param  string $serialized
-     * @param  array  $options
+     * @param  array  $optionssaveEcommerceSyncData
      * @return mixed
      * @throws Zend_Serializer_Exception
      */

@@ -166,8 +166,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         );
         // be sure that the quotes are already in mailchimp and not deleted
         $modifiedCarts->getSelect()->where(
-            "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at"
+            "m4m.mailchimp_sync_delta < updated_at"
         );
         // limit the collection
         $modifiedCarts->getSelect()->limit($this->getBatchLimitFromConfig());
@@ -224,14 +223,26 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
+
+            /*
+             * If item was deleted for an emptied cart or cart containing
+             * only unsupported products then re-create cart if new cart
+             * contains at least one supported product.
+             */
+            $action = ($cart->getMailchimpSyncDeleted() ? 'POST' : 'PATCH');
+            $path = '/ecommerce/stores/' . $mailchimpStoreId . '/carts';
+            if ($action == 'PATCH') {
+                $path .= '/' . $cartId;
+            }
+
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
 
             if ($cartJson != "") {
                 $this->getHelper()->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_MOD);
 
                 $counter = $this->getCounter();
-                $allCarts[$counter]['method'] = 'PATCH';
-                $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
+                $allCarts[$counter]['method'] = $action;
+                $allCarts[$counter]['path'] = $path;
                 $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                 $allCarts[$counter]['body'] = $cartJson;
                 $this->setCounter($this->getCounter() + 1);
@@ -242,11 +253,52 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     null,
                     0,
                     null,
-                    null,
+                    0,
                     $this->getToken()
                 );
             } else {
-                $this->_updateSyncData($cartId, $mailchimpStoreId);
+                /*
+                 * Item is empty or has no supported products
+                 */
+                if (!$cart->getMailchimpSyncDeleted()) {
+                    /*
+                     * Cart previously existed so we need to delete it.
+                     */
+                    $this->getHelper()->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_DEL);
+
+                    $counter = $this->getCounter();
+                    $allCarts[$counter]['method'] = 'DELETE';
+                    $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
+                    $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
+                    $allCarts[$counter]['body'] = '';
+                    $this->_updateSyncData(
+                        $cartId,
+                        $mailchimpStoreId,
+                        null,
+                        null,
+                        0,
+                        null,
+                        1
+                    );
+                    $this->setCounter($this->getCounter() + 1);
+                } else {
+                    /*
+                     * Cart was previously empty so we just mark the sync
+                     * item as invalid or empty so that it isn't deleted
+                     * as an unsent item.
+                     */
+                    $this->_updateSyncData(
+                        $cartId,
+                        $mailchimpStoreId,
+                        null,
+                        null,
+                        0,
+                        null,
+                        null,
+                        null,
+                        true
+                    );
+                }
             }
 
             $this->setToken(null);
@@ -363,7 +415,23 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     $this->getToken()
                 );
             } else {
-                $this->_updateSyncData($cartId, $mailchimpStoreId);
+                /*
+                 * Item contains only unsupported products. Mark it as
+                 * unsupported so that the item is not deleted with any other
+                 * unsent items (batch ID null) or it will synchronise
+                 * indefinitely.
+                 */
+                $this->_updateSyncData(
+                    $cartId,
+                    $mailchimpStoreId,
+                    null,
+                    null,
+                    0,
+                    null,
+                    1,
+                    null,
+                    true
+                );
             }
 
             $this->setToken(null);
@@ -646,6 +714,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      * @param int|null         $syncedFlag
      * @param int|null         $syncDeleted
      * @param string|null      $token
+     * @param bool             $invalidOrEmpty
      */
     protected function _updateSyncData(
         $cartId,
@@ -655,7 +724,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $syncModified = 0,
         $syncedFlag = null,
         $syncDeleted = null,
-        $token = null
+        $token = null,
+        $invalidOrEmpty = false
     ) {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
@@ -667,7 +737,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $syncModified,
             $syncDeleted,
             $token,
-            $syncedFlag
+            $syncedFlag,
+            false,
+            null,
+            !$invalidOrEmpty,
+            $invalidOrEmpty
         );
     }
 
