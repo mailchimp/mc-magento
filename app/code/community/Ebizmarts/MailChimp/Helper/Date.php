@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     {
         $storeCount = count(Mage::app()->getStores());
         $timePassed = false;
-        $finalTime = time();
+        $finalTime = $this->getTimestamp();
         $difference = $finalTime - $initialTime;
         //Set minimum of 30 seconds per store view.
         $timeForAllStores = (30 * $storeCount);
