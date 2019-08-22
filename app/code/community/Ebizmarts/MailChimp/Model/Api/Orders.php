@@ -53,7 +53,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
         // get new orders
-
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
 
         return $batchArray;
@@ -96,19 +95,32 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
 
-                if (!empty($orderJson)) {
-                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
+                if ($orderJson !== false) {
+                    if (!empty($orderJson)) {
+                        $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_MOD);
 
-                    $batchArray[$this->_counter]['method'] = "PATCH";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId
-                        . '/orders/' . $incrementId;
-                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
-                    $batchArray[$this->_counter]['body'] = $orderJson;
-                    //update order delta
-                    $this->_updateSyncData($orderId, $mailchimpStoreId);
-                    $this->_counter++;
+                        $batchArray[$this->_counter]['method'] = "PATCH";
+                        $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId
+                            . '/orders/' . $incrementId;
+                        $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
+                        $batchArray[$this->_counter]['body'] = $orderJson;
+                        //update order delta
+                        $this->_updateSyncData($orderId, $mailchimpStoreId);
+                        $this->_counter++;
+                    } else {
+                        $error = $helper->__('Something went wrong when retrieving product information.');
+                        $this->_updateSyncData(
+                            $orderId,
+                            $mailchimpStoreId,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
+                            $error,
+                            0,
+                            0
+                        );
+                        continue;
+                    }
                 } else {
-                    $error = $helper->__('Something went wrong when retrieving product information.');
+                    $error = $helper->__('Json error');
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
@@ -117,7 +129,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         0,
                         0
                     );
-                    continue;
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
@@ -163,18 +174,31 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
 
-                if (!empty($orderJson)) {
-                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
+                if ($orderJson !== false) {
+                    if (!empty($orderJson)) {
+                        $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::ORD_NEW);
 
-                    $batchArray[$this->_counter]['method'] = "POST";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
-                    $batchArray[$this->_counter]['body'] = $orderJson;
-                    //update order delta
-                    $this->_updateSyncData($orderId, $mailchimpStoreId);
-                    $this->_counter++;
+                        $batchArray[$this->_counter]['method'] = "POST";
+                        $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                        $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
+                        $batchArray[$this->_counter]['body'] = $orderJson;
+                        //update order delta
+                        $this->_updateSyncData($orderId, $mailchimpStoreId);
+                        $this->_counter++;
+                    } else {
+                        $error = $helper->__('Something went wrong when retrieving product information.');
+                        $this->_updateSyncData(
+                            $orderId,
+                            $mailchimpStoreId,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
+                            $error,
+                            0,
+                            0
+                        );
+                        continue;
+                    }
                 } else {
-                    $error = $helper->__('Something went wrong when retrieving product information.');
+                    $error = $helper->__('Json error');
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
@@ -183,7 +207,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         0,
                         0
                     );
-                    continue;
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
@@ -196,10 +219,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * Set all the data for each order to be sent
      *
-     * @param  $order
-     * @param  $mailchimpStoreId
-     * @param  $magentoStoreId
-     * @return string
+     * @param $order
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return false|string
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
@@ -285,12 +309,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data["customer"]["orders_count"] = (int)$totalOrders;
         $data["customer"]["total_spent"] = $totalAmountSpent;
         $jsonData = "";
-        //enconde to JSON
-        try {
-            $jsonData = json_encode($data);
-        } catch (Exception $e) {
-            //json encode failed
-            $helper->logError("Order " . $order->getEntityId() . " json encode failed");
+        //encode to JSON
+        $jsonData = json_encode($data);
+
+        if ($jsonData === false) {
+            $jsonErrorMessage = json_last_error_msg();
+            $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMessage.")");
         }
 
         $helper->setCurrentStore($oldStore);
@@ -767,16 +791,30 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
                 //Create order
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
-                if (!empty($orderJson)) {
-                    $batchArray[$this->_counter]['method'] = "POST";
-                    $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
-                    $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
-                    $batchArray[$this->_counter]['body'] = $orderJson;
-                    $this->_counter += 1;
+
+                if ($orderJson !== false) {
+                    if (!empty($orderJson)) {
+                        $batchArray[$this->_counter]['method'] = "POST";
+                        $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders';
+                        $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
+                        $batchArray[$this->_counter]['body'] = $orderJson;
+                        $this->_counter += 1;
+                    } else {
+                        $error = $helper->__(
+                            'Something went wrong when retrieving product information during migration from 1.1.6.'
+                        );
+                        $this->_updateSyncData(
+                            $orderId,
+                            $mailchimpStoreId,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
+                            $error,
+                            0,
+                            0
+                        );
+                        continue;
+                    }
                 } else {
-                    $error = $helper->__(
-                        'Something went wrong when retrieving product information during migration from 1.1.6.'
-                    );
+                    $error = $helper->__("Json error during migration from 1.1.6");
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
@@ -884,6 +922,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
         }
+
         return $promo;
     }
 

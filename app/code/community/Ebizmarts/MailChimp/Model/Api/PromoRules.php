@@ -95,27 +95,39 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
         try {
             $ruleData = $this->generateRuleData($promoRule);
             $promoRuleJson = json_encode($ruleData);
-            if (!empty($ruleData)) {
-                $promoData['method'] = "POST";
-                $promoData['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules';
-                $promoData['operation_id'] = 'storeid-'
-                    . $magentoStoreId . '_'
-                    . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_'
-                    . $dateHelper->getDateMicrotime() . '_' . $ruleId;
-                $promoData['body'] = $promoRuleJson;
-                //update promo rule delta
-                $this->_updateSyncData($ruleId, $mailchimpStoreId);
-            } else {
-                $error = $promoRule->getMailchimpSyncError();
-                if (!$error) {
-                    $error = $helper->__('Something went wrong when retrieving the information.');
-                }
 
+            if ($promoRuleJson !== false) {
+                if (!empty($ruleData)) {
+                    $promoData['method'] = "POST";
+                    $promoData['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules';
+                    $promoData['operation_id'] = 'storeid-'
+                        . $magentoStoreId . '_'
+                        . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_'
+                        . $dateHelper->getDateMicrotime() . '_' . $ruleId;
+                    $promoData['body'] = $promoRuleJson;
+                    //update promo rule delta
+                    $this->_updateSyncData($ruleId, $mailchimpStoreId);
+                } else {
+                    $error = $promoRule->getMailchimpSyncError();
+                    if (!$error) {
+                        $error = $helper->__('Something went wrong when retrieving the information.');
+                    }
+
+                    $this->_updateSyncData(
+                        $ruleId,
+                        $mailchimpStoreId,
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
+                        $error
+                    );
+                }
+            } else {
+                $error = json_last_error_msg();
                 $this->_updateSyncData(
                     $ruleId,
                     $mailchimpStoreId,
                     $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                    $error
+                    $error,
+                    0
                 );
             }
         } catch (Exception $e) {

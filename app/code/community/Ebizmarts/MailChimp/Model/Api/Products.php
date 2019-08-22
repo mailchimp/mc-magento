@@ -212,11 +212,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
-        try {
-            $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
-        } catch (Exception $e) {
+
+        $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
+        if ($body === false) {
             //json encode failed
-            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed (".json_last_error_msg().")");
             return array();
         }
 
@@ -261,11 +261,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     );
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
 
-                    try {
-                        $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
-                    } catch (Exception $e) {
+
+                    $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
+                    if ($body === false) {
                         //json encode failed
-                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
+                        $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed (".json_last_error_msg().")");
                         return array();
                     }
 
@@ -288,11 +288,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
-        try {
-            $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
-        } catch (Exception $e) {
+
+        $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
+        if ($body === false) {
             //json encode failed
-            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed");
+            $this->getMailChimpHelper()->logError("Product " . $product->getId() . " json encode failed (".json_last_error_msg().")");
             return array();
         }
 

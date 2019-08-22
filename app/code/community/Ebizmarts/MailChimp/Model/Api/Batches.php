@@ -899,7 +899,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
-                    if (!$batchJson || $batchJson == '') {
+                    if ($batchJson === false ) {
+                        $helper->logRequest('Json error: '.json_last_error_msg());
+                    } elseif ($batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
                         $batchResponse = $mailchimpApi->batchOperation->add($batchJson);

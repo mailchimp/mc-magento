@@ -108,51 +108,56 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $customerJson = json_encode($data);
 
             if (false !== $customerJson) {
-                $isSubscribed = $this->isSubscribed($subscriber, $customer);
-                $dataCustomer = $helper->getEcommerceSyncDataItem(
-                    $customer->getId(),
-                    Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
-                    $mailchimpStoreId
-                );
-                if ($dataCustomer->getId()) {
-                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
-                } else {
-                    $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
-                }
-
-                $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
-                $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
-                $counter++;
-
-                if (!$isSubscribed) {
-                    /**
-                     * subscribe all customers to the newsletter
-                     */
-                    if ($this->getOptInStatusForStore()) {
-                            $subscriber->subscribe($customer->getEmail());
+                if (!empty($customerJson)) {
+                    $isSubscribed = $this->isSubscribed($subscriber, $customer);
+                    $dataCustomer = $helper->getEcommerceSyncDataItem(
+                        $customer->getId(),
+                        Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+                        $mailchimpStoreId
+                    );
+                    if ($dataCustomer->getId()) {
+                        $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
                     } else {
+                        $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
+                    }
+
+                    $customerArray[$counter] = $this->makePutBatchStructure($customerJson);
+                    $this->_updateSyncData($customer->getId(), $mailchimpStoreId);
+                    $counter++;
+
+                    if (!$isSubscribed) {
                         /**
-                         * send merge fields for customers currently not subscribed (transactional)
+                         * subscribe all customers to the newsletter
                          */
-                        $subscriber->setSubscriberEmail($customer->getEmail());
-                        $subscriber->setCustomerId($customer->getId());
-                        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
-                        $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
+                        if ($this->getOptInStatusForStore()) {
+                            $subscriber->subscribe($customer->getEmail());
+                        } else {
+                            /**
+                             * send merge fields for customers currently not subscribed (transactional)
+                             */
+                            $subscriber->setSubscriberEmail($customer->getEmail());
+                            $subscriber->setCustomerId($customer->getId());
+                            $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
+                            $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
 
-                        list($batchData, $counter) = $this->getCustomerPatchBatch(
-                            $mergeFields,
-                            $customer,
-                            $listId,
-                            $counter
-                        );
+                            list($batchData, $counter) = $this->getCustomerPatchBatch(
+                                $mergeFields,
+                                $customer,
+                                $listId,
+                                $counter
+                            );
 
-                        if ($batchData !== null) {
-                            $customerArray[$counter] = $batchData;
+                            if ($batchData !== null) {
+                                $customerArray[$counter] = $batchData;
+                            }
                         }
                     }
+                } else {
+                    $this->_updateSyncData($customer->getId(), $mailchimpStoreId, $this->getMailChimpDateHelper()->getCurrentDateTime(), 'Customer with no data', 0);
                 }
             } else {
-                $this->logCouldNotEncodeCustomerError($customer);
+                $jsonErrorMessage = $this->logCouldNotEncodeCustomerError($customer);
+                $this->_updateSyncData($customer->getId(), $mailchimpStoreId, $this->getMailChimpDateHelper()->getCurrentDateTime(), $jsonErrorMessage, 0);
             }
         }
 
@@ -499,12 +504,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     /**
      * @param $customer
+     * @return string
      */
     protected function logCouldNotEncodeCustomerError($customer)
     {
+        $jsonErrorMessage = json_last_error_msg();
         $this->_mailchimpHelper->logError(
-            "Customer " . $customer->getId() . " json encode failed on store " . $this->getBatchMagentoStoreId()
+            "Customer " . $customer->getId() . " json encode failed (".$jsonErrorMessage.") on store "
+            . $this->getBatchMagentoStoreId()
         );
+        return $jsonErrorMessage;
     }
 
     /**

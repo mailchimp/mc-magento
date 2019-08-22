@@ -137,32 +137,44 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
 
                 $promoCodeData = $this->generateCodeData($promoCode, $magentoStoreId);
                 $promoCodeJson = json_encode($promoCodeData);
-                if (!empty($promoCodeData)) {
-                    $batchArray[$counter]['method'] = "POST";
-                    $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId
-                        . '/promo-rules/' . $ruleId . '/promo-codes';
-                    $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $codeId;
-                    $batchArray[$counter]['body'] = $promoCodeJson;
 
-                    $this->_updateSyncData(
-                        $codeId,
-                        $mailchimpStoreId,
-                        null,
-                        null,
-                        0,
-                        null,
-                        $promoCode->getToken()
-                    );
-                    $counter++;
+                if ($promoCodeJson !== false) {
+                    if (!empty($promoCodeData)) {
+                        $batchArray[$counter]['method'] = "POST";
+                        $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId
+                            . '/promo-rules/' . $ruleId . '/promo-codes';
+                        $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $codeId;
+                        $batchArray[$counter]['body'] = $promoCodeJson;
+
+                        $this->_updateSyncData(
+                            $codeId,
+                            $mailchimpStoreId,
+                            null,
+                            null,
+                            0,
+                            null,
+                            $promoCode->getToken()
+                        );
+                        $counter++;
+                    } else {
+                        $error = $helper->__('Something went wrong when retrieving the information.');
+                        $this->_updateSyncData(
+                            $codeId,
+                            $mailchimpStoreId,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
+                            $error
+                        );
+                        continue;
+                    }
                 } else {
-                    $error = $helper->__('Something went wrong when retrieving the information.');
+                    $error = json_last_error_msg();
                     $this->_updateSyncData(
                         $codeId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                        $error
+                        $error,
+                        0
                     );
-                    continue;
                 }
             } catch (Exception $e) {
                 $helper->logError($e->getMessage());
