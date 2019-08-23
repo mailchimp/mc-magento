@@ -22,8 +22,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @param null                                                  $company     The customer’s company.
      * @param null                                                  $firstName   The customer’s first name.
      * @param null                                                  $lastName    The customer’s last name.
-     * @param null                                                  $ordersCount The customer’s total order count.
-     * @param null                                                  $totalSpent  The total amount the customer has spent.
      * @param null                                                  $address     The customer’s address.
      * @return mixed
      * @throws MailChimp_Error
@@ -37,8 +35,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
         $company = null,
         $firstName = null,
         $lastName = null,
-        $ordersCount = null,
-        $totalSpent = null,
         $address = null
     ) {
 
@@ -51,12 +47,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
         }
         if ($lastName) {
             $_params['last_name'] = $lastName;
-        }
-        if ($ordersCount) {
-            $_params['orders_count'] = $ordersCount;
-        }
-        if ($totalSpent) {
-            $_params['total_spent'] = $totalSpent;
         }
         if ($address) {
             $_params['address'] = $address;
@@ -150,8 +140,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @param null                                                  $company     The customer’s company.
      * @param null                                                  $firstName   The customer’s first name.
      * @param null                                                  $lastName    The customer’s last name.
-     * @param null                                                  $ordersCount The customer’s total order count.
-     * @param null                                                  $totalSpent  The total amount the customer has spent.
      * @param null                                                  $address     The customer’s address.
      * @return mixed
      * @throws MailChimp_Error
@@ -164,8 +152,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
         $company = null,
         $firstName = null,
         $lastName = null,
-        $ordersCount = null,
-        $totalSpent = null,
         $address = null
     ) {
 
@@ -181,12 +167,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
         }
         if ($lastName) {
             $_params['last_name'] = $lastName;
-        }
-        if ($ordersCount) {
-            $_params['orders_count'] = $ordersCount;
-        }
-        if ($totalSpent) {
-            $_params['total_spent'] = $totalSpent;
         }
         if ($address) {
             $_params['address'] = $address;
@@ -205,8 +185,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
      * @param null                                                  $company     The customer’s company.
      * @param null                                                  $firstName   The customer’s first name.
      * @param null                                                  $lastName    The customer’s last name.
-     * @param null                                                  $ordersCount The customer’s total order count.
-     * @param null                                                  $totalSpent  The total amount the customer has spent.
      * @param null                                                  $address     The customer’s address.
      * @return mixed
      * @throws MailChimp_Error
@@ -220,8 +198,6 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
         $company = null,
         $firstName = null,
         $lastName = null,
-        $ordersCount = null,
-        $totalSpent = null,
         $address = null
     ) {
 
@@ -235,12 +211,7 @@ class MailChimp_EcommerceCustomers extends MailChimp_Abstract
         if ($lastName) {
             $_params['last_name'] = $lastName;
         }
-        if ($ordersCount) {
-            $_params['orders_count'] = $ordersCount;
-        }
-        if ($totalSpent) {
-            $_params['total_spent'] = $totalSpent;
-        }
+
         if ($address) {
             $_params['address'] = $address;
         }

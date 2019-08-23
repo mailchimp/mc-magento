@@ -102,18 +102,16 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             'email_address' => 'newcusto@ebizmarts.com',
             'first_name' => 'FirstName',
             'last_name' => 'LastName',
-            'opt_in_status' => false,
-            'orders_count' => 0,
-            'total_spent' => 0
+            'opt_in_status' => false
         );
         $customerJson = '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",'
-            . '"last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}';
+            . '"last_name":"LastName","opt_in_status":false}';
         $operationData = array(
             'method' => 'PUT',
             'path' => '/ecommerce/stores/00ee7808cc513ee772f209d63c034f1f/customers/142',
             'operation_id' => 'storeid-1_CUS_2018-03-14-20-15-03-44361800_142',
             'body' => '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",'
-                . '"last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}'
+                . '"last_name":"LastName","opt_in_status":false}'
         );
 
         $this->_customersApiMock = $this->_customersApiMock->setMethods(
@@ -269,18 +267,16 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             'email_address' => 'newcusto@ebizmarts.com',
             'first_name' => 'FirstName',
             'last_name' => 'LastName',
-            'opt_in_status' => false,
-            'orders_count' => 0,
-            'total_spent' => 0
+            'opt_in_status' => false
         );
         $customerJson = '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",'
-            . '"last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}';
+            . '"last_name":"LastName","opt_in_status":false}';
         $operationData = array(
             'method' => 'PUT',
             'path' => '/ecommerce/stores/00ee7808cc513ee772f209d63c034f1f/customers/142',
             'operation_id' => 'storeid-1_CUS_2018-03-14-20-15-03-44361800_142',
             'body' => '{"id":"142","email_address":"newcusto@ebizmarts.com","first_name":"FirstName",'
-                . '"last_name":"LastName","opt_in_status":false,"orders_count":0,"total_spent":0}'
+                . '"last_name":"LastName","opt_in_status":false}'
         );
 
         $this->_customersApiMock = $this->_customersApiMock->setMethods(
@@ -406,8 +402,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->_customersApiMock = $this->_customersApiMock->setMethods(
             array(
                 'getCustomerResourceCollection',
-                'joinDefaultBillingAddress',
-                'joinSalesData'
+                'joinDefaultBillingAddress'
             )
         )
             ->getMock();
@@ -428,7 +423,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->_customersApiMock->expects($this->once())->method('getCustomerResourceCollection')
             ->willReturn($customersResourceCollectionMock);
         $this->_customersApiMock->expects($this->once())->method('joinDefaultBillingAddress');
-        $this->_customersApiMock->expects($this->once())->method('joinSalesData');
 
         $collectionFrontEnd = $this->_customersApiMock->makeCustomersNotSentCollection($customerIds);
 
