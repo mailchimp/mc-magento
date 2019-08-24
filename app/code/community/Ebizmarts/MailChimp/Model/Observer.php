@@ -609,7 +609,7 @@ class Ebizmarts_MailChimp_Model_Observer
                         'align' => 'center',
                         'filter' => false,
                         'renderer' => 'mailchimp/adminhtml_sales_order_grid_renderer_mailchimpOrder',
-                        'sortable' => true,
+                        'sortable' => false,
                         'width' => 70
                     ),
                     'created_at'
