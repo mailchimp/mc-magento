@@ -32,9 +32,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     /**
      * Set the request for orders to be created on MailChimp
      *
-     * @param  $mailchimpStoreId
-     * @param  $magentoStoreId
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
      * @return array
+     * @throws Mage_Core_Exception
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
@@ -48,6 +49,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             . Ebizmarts_MailChimp_Model_Config::IS_ORDER
             . '_' . $dateHelper->getDateMicrotime();
         $resendTurn = $helper->getResendTurn($magentoStoreId);
+
         if (!$resendTurn) {
             // get all the orders modified
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
@@ -253,6 +255,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $subscriber->subscribe($order->getCustomerEmail());
             }
         }
+        $subscriber = null;
 
         $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);
         $data['order_url'] = $store->getUrl(
@@ -272,42 +275,19 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data["customer"]["last_name"] = $order->getCustomerLastname();
         }
 
-
         $billingAddress = $order->getBillingAddress();
+
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
             $this->_getPayloadBilling($data, $billingAddress, $street);
         }
 
-        $shippingAddress = $order->getShippingAddress();
+       $shippingAddress = $order->getShippingAddress();
+
         if ($shippingAddress) {
             $this->_getPayloadShipping($data, $shippingAddress);
         }
 
-        //customer orders data
-        $orderCollection = $this->getResourceModelOrderCollection()
-            ->addFieldToFilter(
-                'state',
-                array(
-                    array('neq' => Mage_Sales_Model_Order::STATE_CANCELED),
-                    array('neq' => Mage_Sales_Model_Order::STATE_CLOSED)
-                )
-            )
-            ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()));
-        $totalOrders = 0;
-        $totalAmountSpent = 0;
-
-        foreach ($orderCollection as $customerOrder) {
-            $totalOrders++;
-            $totalAmountSpent += (
-                $customerOrder->getGrandTotal()
-                - $customerOrder->getTotalRefunded()
-                - $customerOrder->getTotalCanceled()
-            );
-        }
-
-        $data["customer"]["orders_count"] = (int)$totalOrders;
-        $data["customer"]["total_spent"] = $totalAmountSpent;
         $jsonData = "";
         //encode to JSON
         $jsonData = json_encode($data);
