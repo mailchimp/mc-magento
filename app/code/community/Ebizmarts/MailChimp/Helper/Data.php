@@ -4879,12 +4879,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $str
+     * @param string $prefix
      * @return string
      */
-    public function mask($str)
+    public function mask($str, $prefix = '')
     {
-        return substr($str, 0, 6)
-            . str_repeat('*', strlen($str) - 4)
+        return $prefix . substr($str, 0, 6)
+            . str_repeat('*', strlen($str) - 4 - strlen($prefix))
             . substr($str, -4);
     }
 
@@ -5004,5 +5005,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function unserialize($serialized, array $options = array())
     {
         return Zend_Serializer::unserialize($serialized, $options);
+    }
+
+    /**
+     * Check if Mailchimp API is available
+     *
+     * @param  $storeId
+     * @return boolean
+     */
+    public function ping($storeId)
+    {
+        try {
+            $api = $this->getApi($storeId);
+            $api->getRoot()->info();
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 }
