@@ -4855,13 +4855,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function modifyCounterDataSentToMailchimp($index, $hasError = false, $increment = 1)
     {
+        $dataNotSent = isset($this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP])
+                        ? $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP]
+                        : false;
+        $dataSent = isset($this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP])
+                        ? $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP]
+                        : false;
+
         if (array_key_exists($index, $this->_countersGetResponseBatch)) {
-            if ($hasError) {
-                $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] =
-                    $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] + $increment;
-            } else {
-                $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] =
-                    $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] + $increment;
+            if ($hasError && $dataNotSent !== false) {
+                $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] = $dataNotSent + $increment;
+            } elseif(!$hasError && $dataSent !== false) {
+                $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] = $dataSent + $increment;
             }
         } else {
             if ($hasError) {
@@ -5021,7 +5026,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $this->markAllBatchesAs($mailchimpStore, self::BATCH_CANCELED, self::BATCH_PENDING);
     }
 
-     /** Generates a storable representation of a value using the default adapter.
+     /**
+      * Generates a storable representation of a value using the default adapter.
       *
       * @param  mixed $value
       * @param  array $options
