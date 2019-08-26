@@ -149,7 +149,7 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getApiByKey'))
+            ->setMethods(array('getApiByKey', 'cancelAllPendingBatches'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
@@ -176,6 +176,11 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
         $apiStoresMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
 
         $helperMock->expects($this->once())->method('getApiByKey')->with($apiKey)->willReturn($apiMock);
+        $helperMock
+            ->expects($this->once())
+            ->method('cancelAllPendingBatches')
+            ->with($mailChimpStoreId)
+            ->willReturnSelf();
 
         $apiMock->expects($this->once())->method('getEcommerce')->willReturn($ecommerceMock);
 
