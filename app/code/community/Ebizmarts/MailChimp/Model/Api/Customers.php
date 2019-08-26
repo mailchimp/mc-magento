@@ -129,23 +129,22 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                     if ($this->getOptInStatusForStore()) {
                         $subscriber->subscribe($customer->getEmail());
                     } else {
-                        /**
-                         * send merge fields for customers currently not subscribed (transactional)
-                         */
-                        $subscriber->setSubscriberEmail($customer->getEmail());
-                        $subscriber->setCustomerId($customer->getId());
-                        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
-                        $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
+                        if ($dataCustomer->getMailchimpSyncedFlag()) {
+                            /**
+                             * send merge fields for customers currently not subscribed (transactional)
+                             */
+                            $batchData = $this->makeMailchimpTagsBatchStructure(
+                                $magentoStoreId,
+                                $subscriber,
+                                $customer,
+                                $listId,
+                                $counter
+                            );
 
-                        list($batchData, $counter) = $this->getCustomerPatchBatch(
-                            $mergeFields,
-                            $customer,
-                            $listId,
-                            $counter
-                        );
-
-                        if ($batchData !== null) {
-                            $customerArray[$counter] = $batchData;
+                            if ($batchData !== null) {
+                                $customerArray[$counter] = $batchData;
+                                $counter++;
+                            }
                         }
                     }
                 }
@@ -664,10 +663,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $mergeFields
      * @param $customer
      * @param $listId
-     * @param $counter
-     * @return array
+     * @return array|null
      */
-    protected function getCustomerPatchBatch($mergeFields, $customer, $listId, $counter)
+    protected function getCustomerPatchBatch($mergeFields, $customer, $listId)
     {
         $batchData = null;
 
