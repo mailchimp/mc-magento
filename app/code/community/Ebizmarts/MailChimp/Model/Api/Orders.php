@@ -196,12 +196,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * Set all the data for each order to be sent
+     *  Set all the data for each order to be sent
      *
-     * @param  $order
-     * @param  $mailchimpStoreId
-     * @param  $magentoStoreId
-     * @return string
+     * @param $order
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return false|string
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
