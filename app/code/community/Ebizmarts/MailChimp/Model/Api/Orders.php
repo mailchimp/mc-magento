@@ -53,6 +53,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             // get all the orders modified
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
+
         // get new orders
 
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
@@ -864,6 +865,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
         }
+
         return $promo;
     }
 

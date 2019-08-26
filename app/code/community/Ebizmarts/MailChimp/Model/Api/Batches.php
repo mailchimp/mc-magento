@@ -270,12 +270,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param  bool           $isEcommerceData
      * @throws Mage_Core_Exception
      */
-    public function _getResults($magentoStoreId, $isEcommerceData = true)
-    {
+    public function _getResults(
+        $magentoStoreId,
+        $isEcommerceData = true,
+        $status = Ebizmarts_MailChimp_Helper_Data::BATCH_PENDING
+    ) {
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
-            ->addFieldToFilter('status', array('eq' => 'pending'));
+            ->addFieldToFilter('status', array('eq' => $status));
         if ($isEcommerceData) {
             $collection->addFieldToFilter('store_id', array('eq' => $mailchimpStoreId));
             $enabled = $helper->isEcomSyncDataEnabled($magentoStoreId);
@@ -476,6 +479,19 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $helper->saveMailchimpConfig($configValue, $magentoStoreId, 'stores');
             }
         }
+    }
+
+    /**
+     * @param $batchId
+     */
+    protected function deleteBatchItems($batchId)
+    {
+        $helper = $this->getHelper();
+        $resource = $helper->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
+        $where = array("batch_id = '$batchId'");
+        $connection->delete($tableName, $where);
     }
 
     protected function deleteUnsentItems()
@@ -690,6 +706,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $helper->logError($e->getMessage());
             $files['error'] = $e->getMessage();
         } catch (MailChimp_Error $e) {
+            $this->deleteBatchItems($batchId);
             $files['error'] = $e->getFriendlyMessage();
             $helper->logError($e->getFriendlyMessage());
         } catch (Exception $e) {
