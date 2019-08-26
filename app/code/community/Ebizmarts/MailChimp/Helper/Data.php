@@ -31,7 +31,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     const DATA_NOT_SENT_TO_MAILCHIMP = 'NOT SENT';
     const DATA_SENT_TO_MAILCHIMP     = 'SENT';
 
-    const BATCH_STATUS_LOG = 'Mailchimp_Batch_Status.log';
+    const BATCH_STATUS_LOG  = 'Mailchimp_Batch_Status.log';
+
+    const BATCH_CANCELED    = 'canceled';
+    const BATCH_COMPLETED   = 'completed';
+    const BATCH_PENDING     = 'pending';
+    const BATCH_ERROR       = 'error';
+
 
     protected $_countersSendBatch        = array();
     protected $_countersSubscribers      = array();
@@ -4981,13 +4987,45 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Generates a storable representation of a value using the default adapter.
-     *
-     * @param  mixed $value
-     * @param  array $options
-     * @return string
-     * @throws Zend_Serializer_Exception
+     * @param $mailchimpStore
+     * @param $fromStatus
+     * @param $toStatus
      */
+    public function markAllBatchesAs($mailchimpStore, $fromStatus, $toStatus)
+    {
+        $resource = $this->getCoreResource();
+        $connection = $resource->getConnection('core_write');
+        $tableName = $resource->getTableName('mailchimp/synchbatches');
+        $connection->update(
+            $tableName,
+            array('status' => $toStatus),
+            "store_id = '" . $mailchimpStore . "' and status = '" . $fromStatus . "'"
+        );
+    }
+
+    /**
+     * @param $mailchimpStore
+     */
+    public function cancelAllPendingBatches($mailchimpStore)
+    {
+        $this->markAllBatchesAs($mailchimpStore, self::BATCH_PENDING, self::BATCH_CANCELED);
+    }
+
+    /**
+     * @param $mailchimpStore
+     */
+    public function restoreAllCanceledBatches($mailchimpStore)
+    {
+        $this->markAllBatchesAs($mailchimpStore, self::BATCH_CANCELED, self::BATCH_PENDING);
+    }
+
+     /** Generates a storable representation of a value using the default adapter.
+      *
+      * @param  mixed $value
+      * @param  array $options
+      * @return string
+      * @throws Zend_Serializer_Exception
+      */
     public function serialize($value, array $options = array())
     {
         return Zend_Serializer::serialize($value, $options);
