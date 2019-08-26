@@ -4498,7 +4498,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
 
             if ($interestGroup->getId()) {
-                $this->_getInsterestChecked($interestGroup, $interest);
+                $interest = $this->_getInsterestChecked($interestGroup, $interest);
             }
 
             return $interest;
@@ -4515,7 +4515,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             if (isset($interest[$key])) {
                 if (is_array($value)) {
                     foreach ($value as $groupId) {
-                        $this->_getInterestCheckedByGroupId($interest, $key, $groupId);
+                        $interest = $this->_getInterestCheckedByGroupId($interest, $key, $groupId);
                     }
                 } else {
                     foreach ($interest[$key]['category'] as $gkey => $gvalue) {
@@ -4535,6 +4535,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _getInterestCheckedByGroupId($interest, $key, $groupId)
     {
         foreach ($interest[$key]['category'] as $gkey => $gvalue) {
+
             if ($gvalue['id'] == $groupId) {
                 $interest[$key]['category'][$gkey]['checked'] = true;
             } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {
