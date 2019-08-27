@@ -1986,16 +1986,16 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         );
 
         $ebizmartsMailchimpMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
-                ->disableOriginalConstructor()->setMethods(array('getLists'))
-                ->getMock();
+            ->disableOriginalConstructor()->setMethods(array('getLists'))
+            ->getMock();
 
         $mailchimpListsMock = $this->getMockBuilder(MailChimp_Lists::class)
-                ->disableOriginalConstructor()->setMethods(array('getMergeFields'))
-                ->getMock();
+            ->disableOriginalConstructor()->setMethods(array('getMergeFields'))
+            ->getMock();
 
         $mailchimpListsMergeFieldsMock = $this->getMockBuilder(MailChimp_ListsMergeFields::class)
-                ->disableOriginalConstructor()->setMethods(array('getAll'))
-                ->getMock();
+            ->disableOriginalConstructor()->setMethods(array('getAll'))
+            ->getMock();
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -2023,10 +2023,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->willReturn($ebizmartsMailchimpMock);
 
         $ebizmartsMailchimpMock->expects($this->once())->method('getLists')
-        ->willReturn($mailchimpListsMock);
+            ->willReturn($mailchimpListsMock);
 
         $mailchimpListsMock->expects($this->once())->method('getMergeFields')
-        ->willReturn($mailchimpListsMergeFieldsMock);
+            ->willReturn($mailchimpListsMergeFieldsMock);
 
         $mailchimpListsMergeFieldsMock->expects($this->once())->method('getAll')
             ->with($listId, null, null, 50)
@@ -2078,5 +2078,33 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->willReturn($mapFieldsUnserialized);
 
         $helperDataMock->getCustomMergeFields($scopeId, $scope);
+    }
+
+    public function testping()
+    {
+        $storeId = 6;
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getApi'))
+            ->getMock();
+
+        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
+            ->disableOriginalConstructor()->setMethods(array('getRoot'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getApi')->with($storeId)
+            ->willReturn($apiMock);
+
+        $apiRootMock = $this->getMockBuilder(MailChimp_Root::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('info'))
+            ->getMock();
+
+        $apiMock->expects($this->once())->method('getRoot')->willReturn($apiRootMock);
+
+        $apiRootMock->expects($this->once())->method('info');
+
+        $helperDataMock->ping($storeId);
     }
 }
