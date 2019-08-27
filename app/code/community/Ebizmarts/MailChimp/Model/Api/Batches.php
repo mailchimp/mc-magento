@@ -735,6 +735,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $files
      * @param $batchId
      * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @throws Mage_Core_Exception
      */
     protected function processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
@@ -750,6 +752,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $store = explode('-', $line[0]);
                     $type = $line[1];
                     $id = $line[3];
+
                     if ($item->status_code != 200) {
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
@@ -764,7 +767,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         }
 
                         $error = $this->_getError($type, $mailchimpStoreId, $id, $response);
-
                         $this->saveSyncData(
                             $id,
                             $type,
@@ -774,7 +776,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             0,
                             null,
                             null,
-                            0,
+                            null,
                             true
                         );
 
@@ -796,14 +798,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $helper->logError($error);
                     } else {
                         $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
+
                         if (!$syncDataItem->getMailchimpSyncModified()) {
+                            $syncModified = $this->enableMergeFieldsSending($type, $syncDataItem);
+
                             $this->saveSyncData(
                                 $id,
                                 $type,
                                 $mailchimpStoreId,
                                 null,
                                 '',
-                                0,
+                                $syncModified,
                                 null,
                                 null,
                                 1,
@@ -1214,5 +1219,29 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             || isset($counter['ORD']['NOT SENT'])
             || isset($counter['PRO']['NOT SENT'])
             || isset($counter['QUO']['NOT SENT']);
+    }
+
+    /**
+     * @param Varien_Object $syncDataItem
+     * @return bool
+     */
+    protected function isFirstArrival(Varien_Object $syncDataItem)
+    {
+        return $syncDataItem->getMailchimpSyncedFlag() !== 1;
+    }
+
+    /**
+     * @param $type
+     * @param Varien_Object $syncDataItem
+     * @return int
+     */
+    protected function enableMergeFieldsSending($type, Varien_Object $syncDataItem)
+    {
+        $syncModified = 0 ;
+        if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+            && $this->isFirstArrival($syncDataItem)) {
+            $syncModified = 1;
+        }
+        return $syncModified;
     }
 }
