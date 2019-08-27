@@ -4857,24 +4857,17 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $dataNotSent = isset($this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP])
                         ? $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP]
-                        : false;
+                        : 0;
         $dataSent = isset($this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP])
                         ? $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP]
-                        : false;
+                        : 0;
 
-        if (array_key_exists($index, $this->_countersGetResponseBatch)) {
-            if ($hasError && $dataNotSent !== false) {
-                $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] = $dataNotSent + $increment;
-            } elseif(!$hasError && $dataSent !== false) {
-                $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] = $dataSent + $increment;
-            }
+        if ($hasError === true) {
+            $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] = $dataNotSent + $increment;
         } else {
-            if ($hasError) {
-                $this->_countersGetResponseBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP] = 1;
-            } else {
-                $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] = 1;
-            }
+            $this->_countersGetResponseBatch[$index][self::DATA_SENT_TO_MAILCHIMP] = $dataSent + $increment;
         }
+
     }
 
     public function resetCountersDataSentToMailchimp()
