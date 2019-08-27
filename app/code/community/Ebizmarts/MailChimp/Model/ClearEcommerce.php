@@ -225,54 +225,22 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
      */
     protected function getDeletedRows($type)
     {
-        $resource = Mage::getSingleton('core/resource');
-
-        $ecommerceData = Mage::getModel('mailchimp/ecommercesyncdata')
-            ->getCollection()
-            ->addFieldToSelect('related_id')
-            ->setPageSize(100);
-        $ecommerceData->addFieldToFilter('main_table.type', array('eq' => $type));
-
         switch ($type) {
             case Ebizmarts_MailChimp_Model_Config::IS_PRODUCT:
-                $entityTable = $resource->getTableName('catalog/product');
-                $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
-                $ecommerceData->getSelect()->joinLeft(
-                    array('ent' => $entityTable),
-                    'main_table.related_id = ent.entity_id'
-                );
+                $ecommerceData = $this->getJoin($type, 'catalog/product');
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_QUOTE:
-                $entityTable = $resource->getTableName('sales/quote');
-                $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
-                $ecommerceData->getSelect()->joinLeft(
-                    array('ent' => $entityTable),
-                    'main_table.related_id = ent.entity_id'
-                );
+                $ecommerceData = $this->getJoin($type, 'sales/quote');
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER:
-                $entityTable = $resource->getTableName('customer/entity');
-                $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
-                $ecommerceData->getSelect()->joinLeft(
-                    array('ent' => $entityTable),
-                    'main_table.related_id = ent.entity_id'
-                );
+                $ecommerceData = $this->getJoin($type, 'customer/entity');
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE:
-                $entityTable = $resource->getTableName('salesrule/rule');
-                $ecommerceData->addFieldToFilter('ent.rule_id', array('null' => true));
-                $ecommerceData->getSelect()->joinLeft(
-                    array('ent' => $entityTable),
-                    'main_table.related_id = ent.rule_id'
-                );
+                $ecommerceData = $this->getJoin($type, 'salesrule/rule', 'rule');
                 break;
             case Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE:
-                $entityTable = $resource->getTableName('salesrule/coupon');
-                $ecommerceData->addFieldToFilter('ent.coupon_id', array('null' => true));
-                $ecommerceData->getSelect()->joinLeft(
-                    array('ent' => $entityTable),
-                    'main_table.related_id = ent.coupon_id'
-                );
+                $ecommerceData = $this->getJoin($type, 'salesrule/coupon', 'coupon');
+
                 break;
         }
 
@@ -296,6 +264,24 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
         $connection->delete($tableName, $where);
+    }
+
+    protected function getJoin($type, $model, $entity = 'entity')
+    {
+        $resource = Mage::getSingleton('core/resource');
+        $ecommerceData = Mage::getModel('mailchimp/ecommercesyncdata')
+            ->getCollection()
+            ->addFieldToSelect('related_id')
+            ->setPageSize(100);
+        $ecommerceData->addFieldToFilter('main_table.type', array('eq' => $type));
+
+        $entityTable = $resource->getTableName($model);
+        $ecommerceData->addFieldToFilter('ent.' . $entity . '_id', array('null' => true));
+
+        return $ecommerceData->getSelect()->joinLeft(
+            array('ent' => $entityTable),
+            'main_table.related_id = ent.' . $entity . '_id'
+        );
     }
 }
 
