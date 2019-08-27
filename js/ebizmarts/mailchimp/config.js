@@ -107,14 +107,15 @@ function loadList()
                     for (var i = 0; i < json.length; i++) {
                         if (json[i].value === listSelected || (json.length === 1)) {
                             var inheritField = $('mailchimp_general_list_inherit');
+                            var option = null;
 
                             if (inheritField && inheritField.checked === true) {
                                 inheritField.checked = false;
                                 $("mailchimp_general_list").disabled = false;
                             }
-                            var option = new Option(json[i].label, json[i].value, true, true);
+                            option = new Option(json[i].label, json[i].value, true, true);
                         } else {
-                            var option = new Option(json[i].label, json[i].value);
+                            option = new Option(json[i].label, json[i].value);
                         }
                         listId.options.add(option);
                     }
@@ -141,6 +142,7 @@ function loadInterest()
             i.remove();
         }
     );
+
     new Ajax.Request(
         MGETINTERESTURL, {
             method: 'get',
@@ -151,6 +153,7 @@ function loadInterest()
                 if (json.length) {
                     for (var i = 0; i < json.length; i++) {
                         var option = null;
+
                         if (interestSelected[json[i].value] === true) {
                             option = new Option(json[i].label, json[i].value, true, true);
                         } else {
@@ -186,7 +189,7 @@ function initAdmin()
 
 
 if (document.loaded) {
-    initAdmin;
+    initAdmin();
 } else {
     document.observe('dom:loaded', initAdmin);
 }
