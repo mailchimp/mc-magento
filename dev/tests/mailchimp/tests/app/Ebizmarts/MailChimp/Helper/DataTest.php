@@ -2107,4 +2107,40 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->ping($storeId);
     }
+
+    public function testmodifyCounterDataSentToMailchimp()
+    {
+        $index = 0;
+        $statusChanged = "SENT";
+        $count = 1;
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCountersDataSentToMailchimp', 'setCountersDataSentToMailchimp'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
+        $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
+            ->with($index, $statusChanged, $count);
+
+        $helperDataMock->modifyCounterDataSentToMailchimp($index);
+    }
+
+    public function testmodifyCounterDataNotSentToMailchimp()
+    {
+        $index = 0;
+        $statusChanged = "NOT SENT";
+        $count = 1;
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCountersDataSentToMailchimp', 'setCountersDataSentToMailchimp'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
+        $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
+            ->with($index, $statusChanged, $count);
+
+        $helperDataMock->modifyCounterDataSentToMailchimp($index, true);
+    }
 }
