@@ -1227,7 +1227,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function isFirstArrival(Varien_Object $syncDataItem)
     {
-        return $syncDataItem->getMailchimpSyncedFlag() !== 1;
+        return (int)$syncDataItem->getMailchimpSyncedFlag() !== 1;
     }
 
     /**
