@@ -48,10 +48,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             . Ebizmarts_MailChimp_Model_Config::IS_ORDER
             . '_' . $dateHelper->getDateMicrotime();
         $resendTurn = $helper->getResendTurn($magentoStoreId);
+
         if (!$resendTurn) {
             // get all the orders modified
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
+
         // get new orders
 
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
@@ -194,12 +196,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * Set all the data for each order to be sent
+     *  Set all the data for each order to be sent
      *
-     * @param  $order
-     * @param  $mailchimpStoreId
-     * @param  $magentoStoreId
-     * @return string
+     * @param $order
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @return false|string
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
@@ -222,22 +225,24 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data["customer"]["email_address"] = $order->getCustomerEmail();
         $data["customer"]["opt_in_status"] = false;
 
-        if ($this->getCustomerModel()->getOptIn($magentoStoreId)) {
-            $subscriber = $this->getSubscriberModel();
+        $subscriber = $this->getSubscriberModel();
+
+        if ($subscriber->getOptIn($magentoStoreId)) {
             $isSubscribed = $subscriber->loadByEmail($order->getCustomerEmail())->getSubscriberId();
             if (!$isSubscribed) {
                 $subscriber->subscribe($order->getCustomerEmail());
             }
         }
+        $subscriber = null;
 
         $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);
         $data['order_url'] = $store->getUrl(
             'sales/order/view/',
             array(
-                'order_id' => $order->getId(),
-                '_nosid' => true,
-                '_secure' => true
-            )
+                       'order_id' => $order->getId(),
+                       '_nosid' => true,
+                       '_secure' => true
+                   )
         );
 
         if ($order->getCustomerFirstname()) {
@@ -248,42 +253,19 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $data["customer"]["last_name"] = $order->getCustomerLastname();
         }
 
-
         $billingAddress = $order->getBillingAddress();
+
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
             $this->_getPayloadBilling($data, $billingAddress, $street);
         }
 
-        $shippingAddress = $order->getShippingAddress();
+       $shippingAddress = $order->getShippingAddress();
+
         if ($shippingAddress) {
             $this->_getPayloadShipping($data, $shippingAddress);
         }
 
-        //customer orders data
-        $orderCollection = $this->getResourceModelOrderCollection()
-            ->addFieldToFilter(
-                'state',
-                array(
-                    array('neq' => Mage_Sales_Model_Order::STATE_CANCELED),
-                    array('neq' => Mage_Sales_Model_Order::STATE_CLOSED)
-                )
-            )
-            ->addAttributeToFilter('customer_email', array('eq' => $order->getCustomerEmail()));
-        $totalOrders = 0;
-        $totalAmountSpent = 0;
-
-        foreach ($orderCollection as $customerOrder) {
-            $totalOrders++;
-            $totalAmountSpent += (
-                $customerOrder->getGrandTotal()
-                - $customerOrder->getTotalRefunded()
-                - $customerOrder->getTotalCanceled()
-            );
-        }
-
-        $data["customer"]["orders_count"] = (int)$totalOrders;
-        $data["customer"]["total_spent"] = $totalAmountSpent;
         $jsonData = "";
         //enconde to JSON
         try {
@@ -884,6 +866,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 }
             }
         }
+
         return $promo;
     }
 

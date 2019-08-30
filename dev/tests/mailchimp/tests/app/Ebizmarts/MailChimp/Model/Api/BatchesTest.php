@@ -113,7 +113,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
                     . '"customer":{"id":"137","email_address":"santiago+testtest@ebizmarts.com","opt_in_status":false,'
                     . '"first_name":"Santiago","last_name":"Paragarino","address":{"address1":"address","city":"city",'
                     . '"province":"Alabama","province_code":"AL","postal_code":"123456","country":"United States",'
-                    . '"country_code":"US"},"orders_count":1,"total_spent":600},"order_url":"http:\/\/127.0.0.1'
+                    . '"country_code":"US"}},"order_url":"http:\/\/127.0.0.1'
                     . '\/mcmagento-1937\/sales\/order\/view\/order_id\/195\/?___store=default","billing_address":'
                     . '{"address1":"address","city":"city","province":"Alabama","province_code":"AL",'
                     . '"postal_code":"123456","country":"United States","country_code":"US",'
@@ -210,7 +210,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
                 'method' => 'PUT', 'path' => '/ecommerce/stores/ef3bf57fb9bd695a02b7f7c7fb0d2db5/customers/137',
                 'operation_id' => 'storeid-1_CUS_2018-01-16-14-28-01-17117500_137',
                 'body' => '{"id":"137","email_address":"santiago+testtest@ebizmarts.com","first_name":"Santiago",'
-                    . '"last_name":"Paragarino","opt_in_status":false,"orders_count":1,"total_spent":300,'
+                    . '"last_name":"Paragarino","opt_in_status":false'
                     . '"address":{"address1":"address","city":"city","province":"Alabama","province_code":"AL",'
                     . '"postal_code":"123456","country":"United States","country_code":"US"}}'
             )
@@ -258,15 +258,14 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
                     '_sendEcommerceBatch',
                     'addSyncValueToArray',
                     'handleSyncingValue',
-                    'getStores',
-                    '_ping'
+                    'getStores'
                 )
             )
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('handleResendDataBefore', 'handleResendDataAfter', 'isEcomSyncDataEnabled'))
+            ->setMethods(array('handleResendDataBefore', 'handleResendDataAfter', 'isEcomSyncDataEnabled', 'ping'))
             ->getMock();
 
         $storeArrayMock = $this->getMockBuilder(Mage_Core_Model_Resource_Store_Collection::class)
@@ -305,7 +304,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->method('addSyncValueToArray')
             ->with($storeId, $syncedArray)
             ->willReturn($syncedArray);
-        $apiBatchesMock->expects($this->once())->method('_ping')->with($storeId)->willReturn($apiStatus);
+        $helperMock->expects($this->once())->method('ping')->with($storeId)->willReturn($apiStatus);
 
         $apiBatchesMock->handleEcommerceBatches();
     }

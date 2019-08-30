@@ -47,14 +47,24 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
             'class'     => 'fieldset',
             )
         );
+
         if (!$store->getId()) {
             $stores = Mage::app()->getStores();
             $apikeys = array();
+
             foreach ($stores as $s) {
-                $apikey = $helper->getApiKey($s->getStoreId());
+                $prefix = '';
+                $storeId = $s->getStoreId();
+
+                if(!$helper->ping($storeId)) {
+                    $prefix = '[Invalid]: ';
+                }
+
+                $apikey = $helper->getApiKey($storeId);
+
                 if (!array_key_exists($apikey, $apikeys)) {
                     $encryptedApiKey = $helper->encryptData($apikey);
-                    $apikeys[$encryptedApiKey] = $helper->mask($apikey);
+                    $apikeys[$encryptedApiKey] = $helper->mask($apikey, $prefix);
                 }
             }
 
@@ -67,6 +77,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
                 'options'   => $apikeys,
                 )
             );
+
             $getStoresUrl = Mage::helper('adminhtml')->getUrl('adminhtml/mailchimpstores/getstores');
             $apikeyField->setAfterElementHtml("<script>var GET_STORES_URL = '".$getStoresUrl."';</script>");
 
