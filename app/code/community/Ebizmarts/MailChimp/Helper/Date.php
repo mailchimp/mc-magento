@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     {
         $storeCount = count(Mage::app()->getStores());
         $timePassed = false;
-        $finalTime = time();
+        $finalTime = $this->getTimestamp();
         $difference = $finalTime - $initialTime;
         //Set minimum of 30 seconds per store view.
         $timeForAllStores = (30 * $storeCount);
@@ -60,7 +60,8 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Return date in given format and avoid timezone offset when avoidOffset(true)
+     * Return date in given format in UTC
+     * or the timezone of the current store ($useStoreTime = true).
      *
      * @param  string $format
      * @param  $date
@@ -68,12 +69,12 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
      * @return mixed
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function formatDate($date = null, $format = 'Y-m-d', $avoidOffset = 1)
+    public function formatDate($date = null, $format = 'Y-m-d', $useStoreTime = false)
     {
         $gmtTimestamp = Mage::getModel('core/date')->gmtTimestamp($date);
         $currentTimestamp = $this->getTimestamp($gmtTimestamp);
-        if ($avoidOffset) {
-            $currentTimestamp = $this->avoidTimeZoneOffset($currentTimestamp);
+        if ($useStoreTime) {
+            $currentTimestamp = $this->_convertUTCToStoreTimestamp($currentTimestamp);
         }
 
         $newDate = Mage::getModel('core/date')->gmtDate($format, $currentTimestamp);
@@ -85,7 +86,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
      * @return mixed
      * @throws Mage_Core_Model_Store_Exception
      */
-    protected function avoidTimeZoneOffset($timestamp)
+    protected function _convertUTCToStoreTimestamp($timestamp)
     {
         $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
         $offSet   = Mage::getModel('core/date')->calculateOffset($timeZone);
