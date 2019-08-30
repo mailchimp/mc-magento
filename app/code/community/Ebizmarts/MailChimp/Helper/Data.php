@@ -4534,7 +4534,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _getInterestCheckedByGroupId($interest, $key, $groupId)
     {
         foreach ($interest[$key]['category'] as $gkey => $gvalue) {
-
             if ($gvalue['id'] == $groupId) {
                 $interest[$key]['category'][$gkey]['checked'] = true;
             } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {

@@ -671,7 +671,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         if (!empty($mergeFields["merge_fields"])) {
             $batchData = $this->makePatchBatchStructure($customer, $listId, $mergeFields);
-
         }
 
         return $batchData;
@@ -691,8 +690,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $subscriber->setCustomerId($customer->getId());
         $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
         $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
-
         $batchData = $this->getCustomerPatchBatch($mergeFields, $customer, $listId, $counter);
+
         return $batchData;
     }
 

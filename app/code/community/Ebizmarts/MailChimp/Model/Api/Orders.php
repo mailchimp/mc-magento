@@ -229,10 +229,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         if ($subscriber->getOptIn($magentoStoreId)) {
             $isSubscribed = $subscriber->loadByEmail($order->getCustomerEmail())->getSubscriberId();
+
             if (!$isSubscribed) {
                 $subscriber->subscribe($order->getCustomerEmail());
             }
         }
+
         $subscriber = null;
 
         $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);

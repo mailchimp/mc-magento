@@ -1242,6 +1242,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             && $this->isFirstArrival($syncDataItem)) {
             $syncModified = 1;
         }
+
         return $syncModified;
     }
 }
