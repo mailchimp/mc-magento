@@ -1951,7 +1951,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "rel" => "self",
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
                             "method" => "GET",
-                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                            "targetSchema" => "https://us20.api.mailchimp.com"
+                                . "/schema/3.0/Definitions/Lists/MergeFields/Response.json",
                         ),
 
                         1 => array
@@ -1959,8 +1960,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "rel" => "parent",
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields",
                             "method" => "GET",
-                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
-                            "schema" => "https://us20.api.mailchimp.com/schema/3.0/CollectionLinks/Lists/MergeFields.json",
+                            "targetSchema" => "https://us20.api.mailchimp.com"
+                                                . "/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
+                            "schema" => "https://us20.api.mailchimp.com"
+                                                . "/schema/3.0/CollectionLinks/Lists/MergeFields.json",
                         ),
 
                         2 => array
@@ -1968,8 +1971,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "rel" => "update",
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
                             "method" => "PATCH",
-                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/Response.json",
-                            "schema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/PATCH.json",
+                            "targetSchema" => "https://us20.api.mailchimp.com"
+                                                . "/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                            "schema" => "https://us20.api.mailchimp.com"
+                                . "/schema/3.0/Definitions/Lists/MergeFields/PATCH.json",
                         ),
 
                         3 => array
@@ -2032,7 +2037,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->with($listId, null, null, 50)
             ->willReturn($arrayMergeFieldsGetAll);
 
-        $times = 10;//count($mapFieldsUnserialized) * count($arrayMergeFieldsGetAll);
+        $times = 10;
 
         $helperDataMock->expects($this->exactly($times))->method('_createCustomFieldTypes')
             ->withConsecutive(
