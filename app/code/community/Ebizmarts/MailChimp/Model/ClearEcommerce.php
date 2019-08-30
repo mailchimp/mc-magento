@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     {
         $ids = array();
         foreach ($data as $item) {
-            $ids []= $item->getId();
+            $ids [] = $item->getId();
         }
 
         $reverseIds = $this->processDeletedData($type);
@@ -89,6 +89,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
 
         if (!empty($ids)) {
             $this->deleteEcommerceRows($ids, $type);
+        } else {
+            $this->clearEcommerceCollection();
         }
     }
 
@@ -102,7 +104,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $eData = $this->getDeletedRows($type);
 
         foreach ($eData as $eItem) {
-            $ids []= $eItem['related_id'];
+            $ids [] = $eItem['related_id'];
         }
 
         return $ids;
@@ -253,7 +255,23 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
                 break;
         }
 
-        return $this->_ecommerceData->getData();
+        return $this->getData();
+    }
+
+    /**
+     * Gets the deleted rows from Collection
+     *
+     * @return array
+     */
+    protected function getData()
+    {
+        $data = array();
+
+        foreach ($this->_ecommerceData as $item) {
+            $data [] = $item->getData();
+        }
+
+        return $data;
     }
 
     /**
@@ -277,25 +295,61 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $this->clearEcommerceCollection();
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection
+     */
     protected function getEcommerceCollection()
     {
         return $this->_ecommerceData;
     }
 
+    /**
+     * Deletes entity type filters and joins
+     *
+     * @throws Zend_Db_Select_Exception
+     */
     protected function clearEcommerceCollection()
     {
-        $this->_ecommerceData->getSelect()->reset(Zend_Db_Select::FROM);
-        $this->_ecommerceData->getSelect()->reset(Zend_Db_Select::WHERE);
+        $selectPart = $this->_ecommerceData->getSelect()->getPart(Zend_Db_Select::COLUMNS);
+
+        if (empty($selectPart)) {
+            $this->_ecommerceData->addFieldToSelect('related_id');
+        }
+
+        $fromPart = $this->_ecommerceData->getSelect()->getPart(Zend_Db_Select::FROM);
+        unset($fromPart['ent']);
+
+        $this->_ecommerceData->getSelect()->setPart(Zend_Db_Select::FROM, $fromPart);
+        $this->_ecommerceData->getSelect()->setPart(Zend_Db_Select::WHERE, array());
+        $this->_ecommerceData->clear();
     }
 
+    /**
+     * @param string $entityTable
+     * @param string $entity
+     * @throws Zend_Db_Select_Exception
+     */
     protected function joinMagentoEntityTable($entityTable, $entity = 'entity')
     {
+        $cols = '*';
+        $selectPart = $this->_ecommerceData->getSelect()->getPart(Zend_Db_Select::COLUMNS);
+
+        foreach ($selectPart as $p) {
+            if (in_array('ent', $p)) {
+                $cols = null;
+            }
+        }
+
         $this->_ecommerceData->getSelect()->joinLeft(
             array('ent' => $entityTable),
-            'main_table.related_id = ent.' . $entity . '_id'
+            'main_table.related_id = ent.' . $entity . '_id',
+            $cols
         );
     }
 
+    /**
+     * Adds filter to get only deleted Products
+     */
     protected function addProductDeletedRowsToFilter()
     {
         $resource = Mage::getSingleton('core/resource');
@@ -305,12 +359,15 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
             array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PRODUCT)
         );
 
-        $entityTable = $resource->getTableName('customer/entity');
+        $entityTable = $resource->getTableName('catalog/product');
         $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
 
         $this->joinMagentoEntityTable($entityTable, 'entity');
     }
 
+    /**
+     * Adds filter to get only deleted Quotes
+     */
     protected function addQuoteDeletedRowsToFilter()
     {
         $resource = Mage::getSingleton('core/resource');
@@ -326,6 +383,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $this->joinMagentoEntityTable($entityTable, 'entity');
     }
 
+    /**
+     * Adds filter to get only deleted Customers
+     */
     protected function addCustomerDeletedRowsToFilter()
     {
         $resource = Mage::getSingleton('core/resource');
@@ -335,12 +395,15 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
             array('eq' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER)
         );
 
-        $entityTable = $resource->getTableName('catalog/product');
+        $entityTable = $resource->getTableName('customer/entity');
         $ecommerceData->addFieldToFilter('ent.entity_id', array('null' => true));
 
         $this->joinMagentoEntityTable($entityTable, 'entity');
     }
 
+    /**
+     * Adds filter to get only deleted Rules
+     */
     protected function addRuleDeletedRowsToFilter()
     {
         $resource = Mage::getSingleton('core/resource');
@@ -356,6 +419,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
         $this->joinMagentoEntityTable($entityTable, 'rule');
     }
 
+    /**
+     * Adds filter to get only deleted Coupons
+     */
     protected function addCouponDeletedRowsToFilter()
     {
         $resource = Mage::getSingleton('core/resource');
