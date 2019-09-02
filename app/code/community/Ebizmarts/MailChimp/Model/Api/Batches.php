@@ -213,8 +213,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $this->_sendEcommerceBatch($storeId);
                 } else {
                     $helper->logError(
-                        'Could not connect to MailChimp: Make sure the API Key is correct "
-                        . "and there is an internet connection'
+                        "Could not connect to MailChimp: Make sure the API Key is correct "
+                        . "and there is an internet connection"
                     );
                     return;
                 }
