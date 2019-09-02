@@ -26,13 +26,17 @@ class MailChimp_ListsMembersActivity extends MailChimp_Abstract
     public function get($listId, $subscriberHash, $fields, $excludeFields)
     {
         $_params = array();
+
         if ($fields) {
             $_params['fields'] = $fields;
         }
+
         if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
-        $url = 'lists/'.$listId.'/members/'.$subscriberHash.'/activity';
+
+        $url = 'lists/' . $listId . '/members/' . $subscriberHash . '/activity';
+
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }
 }

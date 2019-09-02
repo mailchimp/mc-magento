@@ -204,8 +204,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     }
 
     /**
-     * @param $subscriber
-     * @param bool       $updateStatus If set to true, it will force the status update even for those already subscribed.
+     * @param       $subscriber
+     * @param bool  $updateStatus If set to true, it will force the status update even for those already subscribed.
      */
     public function updateSubscriber($subscriber, $updateStatus = false)
     {
