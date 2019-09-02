@@ -114,6 +114,7 @@ class MailChimp_Lists extends MailChimp_Abstract
             'use_archive_bar' => $useArchiveBar, 'campaign_defaults' => $campaingDefaults,
             'notify_on_subscribe' => $notifyOnSubscribe, 'notify_on_unsubscribe' => $notifyOnUnsubscribe,
             'email_type_option' => $emailTypeOption, 'visibility' => $visibility);
+
         return $this->_master->call('lists', $_params, Ebizmarts_MailChimp::POST);
     }
 
@@ -131,33 +132,43 @@ class MailChimp_Lists extends MailChimp_Abstract
     ) {
 
         $_params = array();
+
         if ($fields) {
             $_params['fields'] = $fields;
         }
+
         if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
+
         if ($count) {
             $_params['count'] = $count;
         }
+
         if ($offset) {
             $_params['offset'] = $offset;
         }
+
         if ($beforeDateCreated) {
             $_params['before_date_created'] = $beforeDateCreated;
         }
+
         if ($sinceDateCreated) {
             $_params['since_date_created'] = $sinceDateCreated;
         }
+
         if ($beforeCampaignLastSent) {
             $_params['before_campaigns_last_sent'] = $beforeCampaignLastSent;
         }
+
         if ($sinceCampaignLastSent) {
             $_params['since_campaign_last_sent'] = $sinceCampaignLastSent;
         }
+
         if ($email) {
             $_params['email'] = $email;
         }
+
         if ($id) {
             return $this->_master->call('lists/' . $id, $_params, Ebizmarts_MailChimp::GET);
         } else {
@@ -169,18 +180,18 @@ class MailChimp_Lists extends MailChimp_Abstract
      * @param $listId                   The unique id for the list.
      * @param $name                     The name of the list.
      * @param $contact                  Contact information displayed in campaign footers to comply with international
-     *                                  spam laws.
-     * @param $permissionReminder      The permission reminder for the list.
-     * @param null                                                                                                    $useArchiveBar       Whether campaigns for this list use the Archive Bar in archives by default.
-     * @param null                                                                                                    $campaignDefaults    Default values for campaigns created for this list.
-     * @param null                                                                                                    $notifyOnSubscribe   The email address to send subscribe notifications to.
-     * @param null                                                                                                    $notifyOnUnsubscribe The email address to send unsubscribe notifications to.
+     *                                      spam laws.
+     * @param $permissionReminder       The permission reminder for the list.
+     * @param null $useArchiveBar       Whether campaigns for this list use the Archive Bar in archives by default.
+     * @param null $campaignDefaults    Default values for campaigns created for this list.
+     * @param null $notifyOnSubscribe   The email address to send subscribe notifications to.
+     * @param null $notifyOnUnsubscribe The email address to send unsubscribe notifications to.
      * @param $emailTypeOption          Whether the list supports multiple formats for emails.
-     *                                  When set to true, subscribers can choose whether they want to receive HTML or
-     *                                  plain-text emails.
-     *                                  When set to false, subscribers will receive HTML emails, with a plain-text
-     *                                  alternative backup.
-     * @param null                                                                                                    $visibility          Whether this list is public or private. (pub/prv)
+     *                                      When set to true, subscribers can choose whether they want to receive HTML or
+     *                                      plain-text emails.
+     *                                      When set to false, subscribers will receive HTML emails, with a plain-text
+     *                                      alternative backup.
+     * @param null $visibility          Whether this list is public or private. (pub/prv)
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -200,21 +211,27 @@ class MailChimp_Lists extends MailChimp_Abstract
 
         $_params = array('name' => $name, 'contact' => $contact, 'permission_reminder' => $permissionReminder,
             'email_type_option' => $emailTypeOption);
+
         if ($useArchiveBar) {
             $_params['use_archive_bar'] = $useArchiveBar;
         }
+
         if ($campaignDefaults) {
             $_params['campaign_defaults'] = $campaignDefaults;
         }
+
         if ($notifyOnSubscribe) {
             $_params['notify_on_subscribe'] = $notifyOnSubscribe;
         }
+
         if ($notifyOnUnsubscribe) {
             $_params['notify_on_unsubscribe'] = $notifyOnUnsubscribe;
         }
+
         if ($visibility) {
             $_params['visibility'] = $visibility;
         }
+
         return $this->_master->call('lists/' . $listId, $_params, Ebizmarts_MailChimp::PATCH);
     }
 

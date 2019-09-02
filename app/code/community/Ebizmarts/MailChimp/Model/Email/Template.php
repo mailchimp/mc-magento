@@ -171,9 +171,11 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $fromEmail = $this->getSenderEmail();
         $mandrillSenders = $this->getSendersDomains($mail);
         $senderExists = false;
+
         foreach ($mandrillSenders as $sender) {
             if (isset($sender['domain'])) {
                 $emailArray = explode('@', $fromEmail);
+
                 if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
                     $senderExists = true;
                 }
@@ -200,6 +202,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         } else {
             $templateId = (string)$this->getId();
             $templates = parent::getDefaultTemplates();
+
             if (isset($templates[$templateId]) && isset($templates[$templateId]['label'])) {
                 $tags = array(substr($templates[$templateId]['label'], 0, 50));
             } else {
@@ -228,6 +231,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $helper = $this->makeMandrillHelper();
         $emailConfig = $this->getDesignConfig();
         $storeId = (integer) $emailConfig->getStore();
+
         if (!$this->isMandrillEnabled($storeId)) {
             return parent::getMail();
         }
