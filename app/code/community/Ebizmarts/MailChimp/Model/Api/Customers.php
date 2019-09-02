@@ -133,22 +133,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                         if ($this->getOptInStatusForStore()) {
                             $subscriber->subscribe($customer->getEmail());
                         } else {
-                            if ($dataCustomer->getMailchimpSyncedFlag()) {
-                                /**
-                                 * send merge fields for customers currently not subscribed (transactional)
-                                 */
-                                $batchData = $this->makeMailchimpTagsBatchStructure(
-                                    $magentoStoreId,
-                                    $subscriber,
-                                    $customer,
-                                    $listId
-                                );
-
-                                if ($batchData !== null) {
-                                    $customerArray[$counter] = $batchData;
-                                    $counter++;
-                                }
-                            }
+                            /**
+                             * send merge fields for customers currently not subscribed (transactional)
+                             */
+                            list($customerArray, $counter) = $this->sendMailchimpTags(
+                                $magentoStoreId, $dataCustomer,
+                                $subscriber, $customer, $listId, $counter, $customerArray
+                            );
                         }
                     }
                 } else {

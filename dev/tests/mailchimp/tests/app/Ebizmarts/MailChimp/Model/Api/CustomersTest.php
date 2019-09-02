@@ -121,8 +121,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 'getOptInStatusForStore', 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
                 'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper',
-                'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch',
-                'makeMailchimpTagsBatchStructure'
+                'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch','sendMailchimpTags'
             )
         )
             ->getMock();
@@ -226,20 +225,22 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->with($storeId)
             ->willReturn($listId);
 
-        $syncDataItemMock
+        $rtnArray[0] = $operationData;
+        $rtnArray[1] = $patchBatchData;
+
+        $this->_customersApiMock
             ->expects($this->once())
-            ->method('getMailchimpSyncedFlag')
-            ->willReturn(true);
-
-
-        $this->_customersApiMock->expects($this->once())->method('makeMailchimpTagsBatchStructure')
+            ->method('sendMailchimpTags')
             ->with(
                 $storeId,
+                $syncDataItemMock,
                 $subscriberMock,
                 $customerMock,
-                $listId
+                $listId,
+                1,
+                array( 0 => $operationData)
             )
-            ->willReturnSelf($patchBatchData);
+            ->willReturn(array( 0 => $rtnArray, 1 => 2 ));
 
         $return = $this->_customersApiMock->createBatchJson($mailchimpStoreId, $storeId);
 
