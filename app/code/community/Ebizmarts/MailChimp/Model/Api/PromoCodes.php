@@ -167,13 +167,19 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                         continue;
                     }
                 } else {
-                    $error = json_last_error_msg();
+                    $jsonErrorMsg = json_last_error_msg();
+                    $helper->logError("Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")");
                     $this->_updateSyncData(
                         $codeId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                        $error,
-                        0
+                        $jsonErrorMsg,
+                        0,
+                        null,
+                        null,
+                        false,
+                        null,
+                        -1
                     );
                 }
             } catch (Exception $e) {

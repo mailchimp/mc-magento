@@ -221,6 +221,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->setMethods(array('getOptIn', 'loadByEmail', 'subscribe', 'getSubscriberId'))
             ->getMock();
 
+        $ordersApiMock->expects($this->once())
+            ->method('getSubscriberModel')
+            ->willReturn($subscriberMock);
+
         $ordersApiMock->expects($this->exactly(1))
             ->method('getHelper')
             ->willReturn($helperMock);
@@ -266,13 +270,13 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $customerEmail
             );
 
-        $ordersApiMock->expects($this->once())
-            ->method('getSubscriberModel')
-            ->willReturn($subscriberMock);
-
         $subscriberMock->expects($this->once())
             ->method('getOptIn')->with($magentoStoreId)
             ->willReturn(true);
+
+        $ordersApiMock->expects($this->once())
+            ->method('getSubscriberModel')
+            ->willReturn($subscriberMock);
 
         $subscriberMock->expects($this->once())
             ->method('loadByEmail')->with($customerEmail)

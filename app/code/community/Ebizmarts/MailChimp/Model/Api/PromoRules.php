@@ -121,13 +121,18 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                     );
                 }
             } else {
-                $error = json_last_error_msg();
+                $jsonErrorMsg = json_last_error_msg();
+                $helper->logError("Promo rule " . $ruleId . " json encode failed (".$jsonErrorMsg.")");
+
                 $this->_updateSyncData(
                     $ruleId,
                     $mailchimpStoreId,
                     $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                    $error,
-                    0
+                    $jsonErrorMsg,
+                    0,
+                    null,
+                    false,
+                    -1
                 );
             }
         } catch (Exception $e) {

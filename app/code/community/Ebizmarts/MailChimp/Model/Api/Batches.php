@@ -209,8 +209,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         $stores = $this->getStores();
         $helper->handleResendDataBefore();
+
         foreach ($stores as $store) {
             $storeId = $store->getId();
+
             if ($helper->isEcomSyncDataEnabled($storeId)) {
                 if ($this->_ping($storeId)) {
                     $this->_getResults($storeId);
@@ -226,8 +228,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         $helper->handleResendDataAfter();
-
         $syncedDateArray = array();
+
         foreach ($stores as $store) {
             $storeId = $store->getId();
             $syncedDateArray = $this->addSyncValueToArray($storeId, $syncedDateArray);
@@ -1250,7 +1252,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function isFirstArrival(Varien_Object $syncDataItem)
     {
-        return $syncDataItem->getMailchimpSyncedFlag() !== 1;
+        return (int)$syncDataItem->getMailchimpSyncedFlag() !== 1;
     }
 
     /**
@@ -1265,6 +1267,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             && $this->isFirstArrival($syncDataItem)) {
             $syncModified = 1;
         }
+
         return $syncModified;
     }
 }

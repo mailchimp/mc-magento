@@ -54,6 +54,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             // get all the orders modified
             $batchArray = array_merge($batchArray, $this->_getModifiedOrders($mailchimpStoreId, $magentoStoreId));
         }
+
         // get new orders
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
 
@@ -94,7 +95,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                 $incrementId = $order->getIncrementId();
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
-
                 $orderJson = $this->GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId);
 
                 if ($orderJson !== false) {
@@ -122,14 +122,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         continue;
                     }
                 } else {
-                    $error = $helper->__('Json error');
+                    $jsonErrorMsg = json_last_error_msg();
+                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
+
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                        $error,
+                        $jsonErrorMsg,
                         0,
-                        0
+                        0,
+                        false,
+                        -1
                     );
                 }
             } catch (Exception $e) {
@@ -200,14 +204,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         continue;
                     }
                 } else {
-                    $error = $helper->__('Json error');
+                    $jsonErrorMsg = json_last_error_msg();
+                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
+
                     $this->_updateSyncData(
                         $orderId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                        $error,
+                        $jsonErrorMsg,
                         0,
-                        0
+                        0,
+                        false,
+                        -1
                     );
                 }
             } catch (Exception $e) {
@@ -248,13 +256,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $data["customer"]["email_address"] = $order->getCustomerEmail();
         $data["customer"]["opt_in_status"] = false;
 
-        if ($this->getCustomerModel()->getOptIn($magentoStoreId)) {
-            $subscriber = $this->getSubscriberModel();
+        $subscriber = $this->getSubscriberModel();
+
+        if ($subscriber->getOptIn($magentoStoreId)) {
             $isSubscribed = $subscriber->loadByEmail($order->getCustomerEmail())->getSubscriberId();
             if (!$isSubscribed) {
                 $subscriber->subscribe($order->getCustomerEmail());
             }
         }
+
         $subscriber = null;
 
         $store = $this->getStoreModelFromMagentoStoreId($magentoStoreId);
@@ -291,11 +301,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $jsonData = "";
         //encode to JSON
         $jsonData = json_encode($data);
-
-        if ($jsonData === false) {
-            $jsonErrorMessage = json_last_error_msg();
-            $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMessage.")");
-        }
 
         $helper->setCurrentStore($oldStore);
         return $jsonData;

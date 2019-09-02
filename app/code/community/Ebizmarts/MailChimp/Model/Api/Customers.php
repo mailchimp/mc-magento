@@ -141,8 +141,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                     $magentoStoreId,
                                     $subscriber,
                                     $customer,
-                                    $listId,
-                                    $counter
+                                    $listId
                                 );
 
                                 if ($batchData !== null) {
@@ -151,13 +150,25 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                                 }
                             }
                         }
-                    } else {
-                        $this->_updateSyncData($customer->getId(), $mailchimpStoreId, $this->getMailChimpDateHelper()->getCurrentDateTime(), 'Customer with no data', 0);
                     }
+                } else {
+                    $this->_updateSyncData(
+                        $customer->getId(), $mailchimpStoreId,
+                        $this->getMailChimpDateHelper()->getCurrentDateTime(), 'Customer with no data', 0
+                    );
                 }
             } else {
                 $jsonErrorMessage = $this->logCouldNotEncodeCustomerError($customer);
-                $this->_updateSyncData($customer->getId(), $mailchimpStoreId, $this->getMailChimpDateHelper()->getCurrentDateTime(), $jsonErrorMessage, 0);
+                $this->_updateSyncData(
+                    $customer->getId(),
+                    $mailchimpStoreId,
+                    $this->getMailChimpDateHelper()->getCurrentDateTime(),
+                    $jsonErrorMessage,
+                    0,
+                    null,
+                    false,
+                    -1
+                );
             }
         }
 
@@ -641,6 +652,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $batchData = null;
         $mergeFieldJSON = json_encode($mergeFields);
+        $customerId = $customer->getId();
 
         if ($mergeFieldJSON === false) {
             $this->logCouldNotEncodeMailchimpTags($customer, $mergeFields);
@@ -649,7 +661,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
             $batchData = array();
             $batchData['method'] = "PATCH";
             $batchData['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
-            $batchData['operation_id'] = "{$this->batchId}_SUB_" . $md5HashEmail;
+            $batchData['operation_id'] = "{$this->_batchId}_{$customerId}_SUB";
             $batchData['body'] = $mergeFieldJSON;
         }
 
@@ -691,20 +703,90 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param $mergeFields
      * @param $customer
      * @param $listId
-     * @param $counter
-     * @return array
+     * @return array|null
      */
-    protected function getCustomerPatchBatch($mergeFields, $customer, $listId, $counter)
+    protected function getCustomerPatchBatch($mergeFields, $customer, $listId)
     {
         $batchData = null;
+
         if (!empty($mergeFields["merge_fields"])) {
             $batchData = $this->makePatchBatchStructure($customer, $listId, $mergeFields);
+        }
+
+        return $batchData;
+    }
+
+    /**
+     * @param $magentoStoreId
+     * @param $subscriber
+     * @param $customer
+     * @param $listId
+     * @param $counter
+     * @return array|null
+     */
+    protected function makeMailchimpTagsBatchStructure($magentoStoreId, $subscriber, $customer, $listId)
+    {
+        $subscriber->setSubscriberEmail($customer->getEmail());
+        $subscriber->setCustomerId($customer->getId());
+        $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
+        $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
+
+        $batchData = $this->getCustomerPatchBatch($mergeFields, $customer, $listId);
+        return $batchData;
+    }
+
+    /**
+     * @param Varien_Object $dataCustomer
+     * @param Ebizmarts_MailChimp_Helper_Data $helper
+     */
+    protected function incrementCounterSentPerBatch(
+        Varien_Object $dataCustomer,
+        Ebizmarts_MailChimp_Helper_Data $helper
+    ) {
+        if ($dataCustomer->getId()) {
+            $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_MOD);
+        } else {
+            $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::CUS_NEW);
+        }
+    }
+
+    /**
+     * Send merge fields for transactional members
+     *
+     * @param $magentoStoreId
+     * @param Varien_Object $dataCustomer
+     * @param $subscriber
+     * @param $customer
+     * @param $listId
+     * @param $counter
+     * @param array $customerArray
+     * @return array
+     */
+    protected function sendMailchimpTags(
+        $magentoStoreId,
+        Varien_Object $dataCustomer,
+        $subscriber,
+        $customer,
+        $listId,
+        $counter,
+        array $customerArray
+    ) {
+        if ($dataCustomer->getMailchimpSyncedFlag()) {
+            $batchData = $this->makeMailchimpTagsBatchStructure(
+                $magentoStoreId,
+                $subscriber,
+                $customer,
+                $listId,
+                $counter
+            );
+
             if ($batchData !== null) {
+                $customerArray[$counter] = $batchData;
                 $counter++;
             }
         }
 
-        return array($batchData, $counter);
+        return array($customerArray, $counter);
     }
 
 }

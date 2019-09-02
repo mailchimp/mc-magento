@@ -105,8 +105,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $collection->getSelect()->limit($limit);
         $date = $dateHelper->getDateMicrotime();
         $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
-
         $counter = 0;
+
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
             $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
@@ -137,11 +137,15 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 }
             } else {
                 //json encode failed
-                $jsonErrorMessage = json_last_error_msg();
-                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed (".$jsonErrorMessage.")";
+                $jsonErrorMsg = json_last_error_msg();
+                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed (".$jsonErrorMsg.")";
                 $helper->logError($errorMessage);
 
+                $subscriber->setData("mailchimp_sync_error", $jsonErrorMsg);
+                $subscriber->setData("mailchimp_sync_modified", 0);
+                $subscriber->save();
             }
+
             $counter++;
         }
 

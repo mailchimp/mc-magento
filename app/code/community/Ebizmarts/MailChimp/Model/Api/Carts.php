@@ -252,17 +252,23 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 }
             }
             else {
-                $error = $helper->__('Json error');
+                $jsonErrorMessage = json_last_error_msg();
+
                 $this->_updateSyncData(
                     $cartId,
                     $mailchimpStoreId,
                     null,
-                    $error,
+                    $jsonErrorMessage,
                     0,
                     null,
                     null,
-                    $this->getToken()
+                    $this->getToken(),
+                    false,
+                    -1
                 );
+
+                //json encode failed
+                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
             }
 
             $this->setToken(null);
@@ -383,11 +389,23 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $this->getToken()
                     );
                 } else {
-                    $this->_updateSyncData($cartId, $mailchimpStoreId, $dateHelper->getCurrentDateTime(), "Cart is empty", 0);
+                    $this->_updateSyncData($cartId, $mailchimpStoreId, $dateHelper->getCurrentDateTime(),
+                        "Cart is empty", 0);
                 }
             } else {
                 $jsonErrorMessage = json_last_error_msg();
-                $this->_updateSyncData($cartId, $mailchimpStoreId, $dateHelper->getCurrentDateTime(), $jsonErrorMessage, 0);
+                $this->_updateSyncData($cartId, $mailchimpStoreId,
+                    $dateHelper->getCurrentDateTime(),
+                    $jsonErrorMessage,
+                    0,
+                    null,
+                    null,
+                    null,
+                    false,
+                    -1
+                );
+                //json encode failed
+                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
             }
 
             $this->setToken(null);
@@ -435,7 +453,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts
      */
     public function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
     {
-        $helper = $this->getHelper();
         $apiProduct = $this->getApiProducts();
         $campaignId = $cart->getMailchimpCampaignId();
         $oneCart = array();
@@ -465,14 +482,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts
 
         if ($lines['count']) {
             $oneCart['lines'] = $lines['lines'];
-            //enconde to JSON
+            //encode to JSON
             $jsonData = json_encode($oneCart);
-
-            if ($jsonData === false) {
-                $jsonErrorMessage = json_last_error_msg();
-                //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
-            }
         }
 
         return $jsonData;
@@ -661,16 +672,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * update product sync data
-     *
      * @param $cartId
      * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncedFlag
-     * @param int|null         $syncDeleted
-     * @param string|null      $token
+     * @param null $syncDelta
+     * @param null $syncError
+     * @param int $syncModified
+     * @param null $syncedFlag
+     * @param null $syncDeleted
+     * @param null $token
+     * @param bool $saveOnlyIfExists
+     * @param bool $allowBatchRemoval
      */
     protected function _updateSyncData(
         $cartId,
@@ -680,7 +691,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
         $syncModified = 0,
         $syncedFlag = null,
         $syncDeleted = null,
-        $token = null
+        $token = null,
+        $saveOnlyIfExists = false,
+        $allowBatchRemoval = true
     ) {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
@@ -692,7 +705,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $syncModified,
             $syncDeleted,
             $token,
-            $syncedFlag
+            $syncedFlag,
+            $saveOnlyIfExists,
+            null,
+            $allowBatchRemoval
         );
     }
 
