@@ -214,7 +214,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $storeId = $store->getId();
 
             if ($helper->isEcomSyncDataEnabled($storeId)) {
-                if ($this->_ping($storeId)) {
+                if ($helper->ping($storeId)) {
                     $this->_getResults($storeId);
                     $this->_sendEcommerceBatch($storeId);
                 } else {
@@ -236,25 +236,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         $this->handleSyncingValue($syncedDateArray);
-    }
-
-    /**
-     * Check if Mailchimp API is available
-     *
-     * @param  $storeId
-     * @return boolean
-     */
-    protected function _ping($storeId)
-    {
-        $helper = $this->getHelper();
-        try {
-            $api = $helper->getApi($storeId);
-            $api->root->info();
-        } catch (Exception $e) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

@@ -1951,7 +1951,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "rel" => "self",
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
                             "method" => "GET",
-                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                            "targetSchema" => "https://us20.api.mailchimp.com"
+                                . "/schema/3.0/Definitions/Lists/MergeFields/Response.json",
                         ),
 
                         1 => array
@@ -1959,8 +1960,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "rel" => "parent",
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields",
                             "method" => "GET",
-                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
-                            "schema" => "https://us20.api.mailchimp.com/schema/3.0/CollectionLinks/Lists/MergeFields.json",
+                            "targetSchema" => "https://us20.api.mailchimp.com"
+                                                . "/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
+                            "schema" => "https://us20.api.mailchimp.com"
+                                                . "/schema/3.0/CollectionLinks/Lists/MergeFields.json",
                         ),
 
                         2 => array
@@ -1968,8 +1971,10 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "rel" => "update",
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
                             "method" => "PATCH",
-                            "targetSchema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/Response.json",
-                            "schema" => "https://us20.api.mailchimp.com/schema/3.0/Definitions/Lists/MergeFields/PATCH.json",
+                            "targetSchema" => "https://us20.api.mailchimp.com"
+                                                . "/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                            "schema" => "https://us20.api.mailchimp.com"
+                                . "/schema/3.0/Definitions/Lists/MergeFields/PATCH.json",
                         ),
 
                         3 => array
@@ -1986,16 +1991,16 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         );
 
         $ebizmartsMailchimpMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
-                ->disableOriginalConstructor()->setMethods(array('getLists'))
-                ->getMock();
+            ->disableOriginalConstructor()->setMethods(array('getLists'))
+            ->getMock();
 
         $mailchimpListsMock = $this->getMockBuilder(MailChimp_Lists::class)
-                ->disableOriginalConstructor()->setMethods(array('getMergeFields'))
-                ->getMock();
+            ->disableOriginalConstructor()->setMethods(array('getMergeFields'))
+            ->getMock();
 
         $mailchimpListsMergeFieldsMock = $this->getMockBuilder(MailChimp_ListsMergeFields::class)
-                ->disableOriginalConstructor()->setMethods(array('getAll'))
-                ->getMock();
+            ->disableOriginalConstructor()->setMethods(array('getAll'))
+            ->getMock();
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -2023,16 +2028,16 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->willReturn($ebizmartsMailchimpMock);
 
         $ebizmartsMailchimpMock->expects($this->once())->method('getLists')
-        ->willReturn($mailchimpListsMock);
+            ->willReturn($mailchimpListsMock);
 
         $mailchimpListsMock->expects($this->once())->method('getMergeFields')
-        ->willReturn($mailchimpListsMergeFieldsMock);
+            ->willReturn($mailchimpListsMergeFieldsMock);
 
         $mailchimpListsMergeFieldsMock->expects($this->once())->method('getAll')
             ->with($listId, null, null, 50)
             ->willReturn($arrayMergeFieldsGetAll);
 
-        $times = 10;//count($mapFieldsUnserialized) * count($arrayMergeFieldsGetAll);
+        $times = 10;
 
         $helperDataMock->expects($this->exactly($times))->method('_createCustomFieldTypes')
             ->withConsecutive(
@@ -2078,5 +2083,69 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->willReturn($mapFieldsUnserialized);
 
         $helperDataMock->getCustomMergeFields($scopeId, $scope);
+    }
+
+    public function testping()
+    {
+        $storeId = 6;
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getApi'))
+            ->getMock();
+
+        $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)
+            ->disableOriginalConstructor()->setMethods(array('getRoot'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getApi')->with($storeId)
+            ->willReturn($apiMock);
+
+        $apiRootMock = $this->getMockBuilder(MailChimp_Root::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('info'))
+            ->getMock();
+
+        $apiMock->expects($this->once())->method('getRoot')->willReturn($apiRootMock);
+
+        $apiRootMock->expects($this->once())->method('info');
+
+        $helperDataMock->ping($storeId);
+    }
+
+    public function testmodifyCounterDataSentToMailchimp()
+    {
+        $index = 0;
+        $statusChanged = "SENT";
+        $count = 1;
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCountersDataSentToMailchimp', 'setCountersDataSentToMailchimp'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
+        $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
+            ->with($index, $statusChanged, $count);
+
+        $helperDataMock->modifyCounterDataSentToMailchimp($index);
+    }
+
+    public function testmodifyCounterDataNotSentToMailchimp()
+    {
+        $index = 0;
+        $statusChanged = "NOT SENT";
+        $count = 1;
+
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCountersDataSentToMailchimp', 'setCountersDataSentToMailchimp'))
+            ->getMock();
+
+        $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
+        $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
+            ->with($index, $statusChanged, $count);
+
+        $helperDataMock->modifyCounterDataSentToMailchimp($index, true);
     }
 }

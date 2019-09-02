@@ -497,7 +497,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             $api = $helper->getApiByMailChimpStoreId($mailchimpStoreId);
             if ($api !== null) {
                 try {
-                    $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes->getAll($mailchimpStoreId, $promoRuleId);
+                    $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes
+                                            ->getAll($mailchimpStoreId, $promoRuleId);
+
                     foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
                         $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
                     }

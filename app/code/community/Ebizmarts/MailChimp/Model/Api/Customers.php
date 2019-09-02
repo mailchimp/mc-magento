@@ -241,9 +241,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
-
-        $data["orders_count"] = (int)$customer->getOrdersCount();
-        $data["total_spent"] = (float)$customer->getTotalSpent();
         $data["opt_in_status"] = false;
 
         $data += $this->getCustomerAddressData($customer);
@@ -415,21 +412,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * @param $collection
      */
-    protected function joinSalesData($collection)
-    {
-        $collection->getSelect()->joinLeft(
-            array('s' => $collection->getTable('sales/order')),
-            'e.entity_id = s.customer_id',
-            array(
-                new Zend_Db_Expr("SUM(s.grand_total) AS total_spent"),
-                new Zend_Db_Expr("COUNT(s.entity_id) AS orders_count"),
-            )
-        );
-    }
-
-    /**
-     * @param $collection
-     */
     protected function joinMailchimpSyncData($collection)
     {
         $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
@@ -457,7 +439,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
     /**
      * @param $magentoStoreId
-     * @return mixed
+     * @return bool
+     * @throws Mage_Core_Exception
      */
     protected function isEcommerceCustomerOptInConfigEnabled($magentoStoreId)
     {
@@ -730,7 +713,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $subscriber->setCustomerId($customer->getId());
         $mailChimpTags = $this->_buildMailchimpTags($subscriber, $magentoStoreId);
         $mergeFields["merge_fields"] = $mailChimpTags->getMailchimpTags();
-
         $batchData = $this->getCustomerPatchBatch($mergeFields, $customer, $listId);
         return $batchData;
     }

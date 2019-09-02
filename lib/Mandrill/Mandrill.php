@@ -80,12 +80,15 @@ class Mandrill_Mandrill
         if (!$apikey) {
             $apikey = getenv('MANDRILL_APIKEY');
         }
+
         if (!$apikey) {
             $apikey = $this->readConfigs();
         }
+
         if (!$apikey) {
             throw new Mandrill_Error('You must provide a Mandrill API key');
         }
+
         $this->apikey = $apikey;
 
         $this->ch = curl_init();

@@ -260,6 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         if ($subscriber->getOptIn($magentoStoreId)) {
             $isSubscribed = $subscriber->loadByEmail($order->getCustomerEmail())->getSubscriberId();
+
             if (!$isSubscribed) {
                 $subscriber->subscribe($order->getCustomerEmail());
             }
@@ -735,7 +736,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $this->_batchId = 'storeid-'
             . $magentoStoreId . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_ORDER . '_'
-            . $helper->getDateMicrotime();
+            . $dateHelper->getDateMicrotime();
         $lastId = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID,
             $magentoStoreId,
