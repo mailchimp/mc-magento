@@ -4232,7 +4232,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $inProgress = Ebizmarts_MailChimp_Model_System_Config_Source_Account::IN_PROGRESS;
 
         if ($syncFlagDataArray[$syncFlagStatus] != $inProgress) {
-            if ($syncFlagDataArray[$syncFlagStatus] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED) {
+            $FINISHED = Ebizmarts_MailChimp_Model_System_Config_Source_Account::FINISHED;
+
+            if ($syncFlagDataArray[$syncFlagStatus] == $FINISHED) {
                 $string .=
                     "<li>{$syncFlagDataArray[Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_FLAG_LABEL]}"
                     . ": <span style='color:forestgreen;font-weight: bold;'>{$this->__('Finished')}</span></li>";
@@ -4534,7 +4536,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     protected function _getInterestCheckedByGroupId($interest, $key, $groupId)
     {
         foreach ($interest[$key]['category'] as $gkey => $gvalue) {
-
             if ($gvalue['id'] == $groupId) {
                 $interest[$key]['category'][$gkey]['checked'] = true;
             } elseif (!isset($interest[$key]['category'][$gkey]['checked'])) {

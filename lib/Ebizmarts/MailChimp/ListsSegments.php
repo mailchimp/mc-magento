@@ -23,23 +23,24 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
         if ($fields) {
             $_params['fields'] = $fields;
         }
-        return $this->_master->call('lists/'.$listId.'/segments', $_params, Ebizmarts_MailChimp::GET);
+
+        return $this->_master->call('lists/' . $listId . '/segments', $_params, Ebizmarts_MailChimp::GET);
     }
 
     /**
-     * @param $listId                   The unique id for the list.
-     * @param null                                                $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
-     *                                                                             with dot notation.
-     * @param null                                                $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                                                                             with dot notation.
-     * @param null                                                $count           The number of records to return.
-     * @param null                                                $offset          The number of records from a collection to skip. Iterating over large
-     *                                                                             collections with this parameter can be slow.
-     * @param null                                                $type            Limit results based on segment type.
-     * @param null                                                $sinceCreatedAt  Restrict results to segments created after the set time.
-     * @param null                                                $beforeCreatedAt Restrict results to segments created before the set time.
-     * @param null                                                $sinceUpdatedAt  Restrict results to segments update after the set time.
-     * @param null                                                $beforeUpdatedAt Restrict results to segments update before the set time.
+     * @param       $listId             The unique id for the list.
+     * @param null  $fields             A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                                      with dot notation.
+     * @param null  $excludeFields      A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                                      with dot notation.
+     * @param null  $count              The number of records to return.
+     * @param null  $offset             The number of records from a collection to skip. Iterating over large
+     *                                       collections with this parameter can be slow.
+     * @param null  $type               Limit results based on segment type.
+     * @param null  $sinceCreatedAt     Restrict results to segments created after the set time.
+     * @param null  $beforeCreatedAt    Restrict results to segments created before the set time.
+     * @param null  $sinceUpdatedAt     Restrict results to segments update after the set time.
+     * @param null  $beforeUpdatedAt    Restrict results to segments update before the set time.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -61,31 +62,40 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
         if ($fields) {
             $_params['fields'] = $fields;
         }
+
         if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
+
         if ($count) {
             $_params['count'] = $count;
         }
+
         if ($offset) {
             $_params['offset'] = $offset;
         }
+
         if ($type) {
             $_params['type'] = $type;
         }
+
         if ($sinceCreatedAt) {
             $_params['since_created_at'] = $sinceCreatedAt;
         }
+
         if ($beforeCreatedAt) {
             $_params['before_created_at'] = $beforeCreatedAt;
         }
+
         if ($sinceUpdatedAt) {
             $_params['since_updated_at'] = $sinceUpdatedAt;
         }
+
         if ($beforeUpdatedAt) {
             $_params['before_updated_at'] = $beforeUpdatedAt;
         }
-        return $this->_master->call('lists/'.$listId.'/segments', $_params, Ebizmarts_MailChimp::GET);
+
+        return $this->_master->call('lists/' . $listId . '/segments', $_params, Ebizmarts_MailChimp::GET);
     }
 
     /**
@@ -97,17 +107,17 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      */
     public function get($listId, $segmentId)
     {
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, null, Ebizmarts_MailChimp::GET);
+        return $this->_master->call('lists/' . $listId . '/segments/' . $segmentId, null, Ebizmarts_MailChimp::GET);
     }
 
     /**
-     * @param $listId                   The unique id for the list.
-     * @param $name                     The name of the segment.
-     * @param null                                                $staticSegment An array of emails to be used for a static segment. Any emails provided that are
-     *                                                                           not present on the list will be ignored. Passing an empty array will create a
-     *                                                                           static segment without any subscribers. This field cannot be provided with the
-     *                                                                           options field.
-     * @param null                                                $options
+     * @param $listId               The unique id for the list.
+     * @param $name                 The name of the segment.
+     * @param null $staticSegment   An array of emails to be used for a static segment. Any emails provided that are
+     *                                  not present on the list will be ignored. Passing an empty array will create a
+     *                                  static segment without any subscribers. This field cannot be provided with the
+     *                                  options field.
+     * @param null $options
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -115,23 +125,26 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
     public function add($listId, $name, $staticSegment = null, $options = null)
     {
         $_params = array('name'=>$name);
+
         if ($staticSegment) {
             $_params['static_segment'] = $staticSegment;
         }
+
         if ($options) {
             $_params['options'] = $options;
         }
-        return $this->_master->call('lists/'.$listId.'/segments', $_params, Ebizmarts_MailChimp::POST);
+
+        return $this->_master->call('lists/' . $listId . '/segments', $_params, Ebizmarts_MailChimp::POST);
     }
     /**
-     * @param $listId                   The unique id for the list.
-     * @param $segmentId                The unique id for the segment.
-     * @param $name                     The name of the segment.
-     * @param null                                                   $staticSegment An array of emails to be used for a static segment. Any emails provided that are
-     *                                                                              not present on the list will be ignored. Passing an empty array will create a
-     *                                                                              static segment without any subscribers. This field cannot be provided with the
-     *                                                                              options field.
-     * @param null                                                   $options
+     * @param $listId               The unique id for the list.
+     * @param $segmentId            The unique id for the segment.
+     * @param $name                 The name of the segment.
+     * @param null $staticSegment   An array of emails to be used for a static segment. Any emails provided that are
+     *                                  not present on the list will be ignored. Passing an empty array will create a
+     *                                  static segment without any subscribers. This field cannot be provided with the
+     *                                  options field.
+     * @param null $options
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -142,13 +155,18 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
         if ($name) {
             $_params['name'] =$name;
         }
+
         if ($staticSegment) {
             $_params['static_segment'] = $staticSegment;
         }
+
         if ($options) {
             $_params['options'] = $options;
         }
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, $_params, Ebizmarts_MailChimp::PATCH);
+
+        return $this->_master->call(
+            'lists/' . $listId . '/segments/' . $segmentId, $_params, Ebizmarts_MailChimp::PATCH
+        );
     }
 
     /**
@@ -160,6 +178,6 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
      */
     public function delete($listId, $segmentId)
     {
-        return $this->_master->call('lists/'.$listId.'/segments/'.$segmentId, null, Ebizmarts_MailChimp::DELETE);
+        return $this->_master->call('lists/' . $listId . '/segments/' . $segmentId, null, Ebizmarts_MailChimp::DELETE);
     }
 }
