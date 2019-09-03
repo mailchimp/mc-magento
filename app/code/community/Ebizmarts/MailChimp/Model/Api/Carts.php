@@ -248,7 +248,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $this->getToken()
                     );
                 } else {
-                    $this->_updateSyncData($cartId, $mailchimpStoreId, null, "Cart is empty", 0);
+                    $error = $helper->__('There is not supported products in this cart.');
+
+                    $this->_updateSyncData($cartId, $mailchimpStoreId, null, $error, 0);
                 }
             } else {
                 $jsonErrorMessage = json_last_error_msg();
@@ -388,9 +390,10 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $this->getToken()
                     );
                 } else {
+                    $error = $helper->__('There is not supported products in this cart.');
                     $this->_updateSyncData(
                         $cartId, $mailchimpStoreId, $dateHelper->getCurrentDateTime(),
-                        "Cart is empty", 0
+                        $error, 0
                     );
                 }
             } else {
