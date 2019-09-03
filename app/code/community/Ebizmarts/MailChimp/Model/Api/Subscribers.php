@@ -138,7 +138,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             } else {
                 //json encode failed
                 $jsonErrorMsg = json_last_error_msg();
-                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed (".$jsonErrorMsg.")";
+                $errorMessage = "Subscriber " . $subscriber->getSubscriberId()
+                    . " json encode failed (".$jsonErrorMsg.")";
                 $helper->logError($errorMessage);
 
                 $subscriber->setData("mailchimp_sync_error", $jsonErrorMsg);

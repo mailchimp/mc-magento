@@ -388,9 +388,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
         //data applied for both root and varient products
         $data["id"] = $productId;
         $data["title"] = $rc->getAttributeRawValue($productId, 'name', $magentoStoreId);
-        if($break)  $data["title"] = $rc->getAttributeRawValue($productId, 'name', $magentoStoreId) ."\xB1\x31";
         $this->_visibility = $rc->getAttributeRawValue($productId, 'visibility', $magentoStoreId);
         $url = null;
+
         if (!$this->currentProductIsVisible()) {
             $url = $this->getNotVisibleProductUrl($product->getId(), $magentoStoreId);
         } else {
@@ -402,9 +402,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         $data["url"] = $url;
-
         //image
         $imageUrl = $this->getMailChimpImageUrl($product, $magentoStoreId);
+
         if ($imageUrl) {
             $data["image_url"] = $imageUrl;
         }
@@ -422,6 +422,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             //mailchimp product type and vendor (magento category)
             $categoryName = $this->getProductCategories($product, $magentoStoreId);
+
             if ($categoryName) {
                 $data["type"] = $categoryName;
                 $data["vendor"] = $data["type"];

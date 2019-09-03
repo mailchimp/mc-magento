@@ -250,8 +250,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 } else {
                     $this->_updateSyncData($cartId, $mailchimpStoreId, null, "Cart is empty", 0);
                 }
-            }
-            else {
+            } else {
                 $jsonErrorMessage = json_last_error_msg();
 
                 $this->_updateSyncData(
@@ -369,7 +368,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
 
             if ($cartJson !== false) {
-                if(!empty($cartJson)) {
+                if (!empty($cartJson)) {
                     $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::QUO_NEW);
 
                     $counter = $this->getCounter();
@@ -389,12 +388,15 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                         $this->getToken()
                     );
                 } else {
-                    $this->_updateSyncData($cartId, $mailchimpStoreId, $dateHelper->getCurrentDateTime(),
-                        "Cart is empty", 0);
+                    $this->_updateSyncData(
+                        $cartId, $mailchimpStoreId, $dateHelper->getCurrentDateTime(),
+                        "Cart is empty", 0
+                    );
                 }
             } else {
                 $jsonErrorMessage = json_last_error_msg();
-                $this->_updateSyncData($cartId, $mailchimpStoreId,
+                $this->_updateSyncData(
+                    $cartId, $mailchimpStoreId,
                     $dateHelper->getCurrentDateTime(),
                     $jsonErrorMessage,
                     0,

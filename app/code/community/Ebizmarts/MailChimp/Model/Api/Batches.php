@@ -58,11 +58,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected $_apiSubscribers;
 
-    /**
-     * @var Ebizmarts_MailChimp_Model_Synchbatches
-     */
-    protected $_syncBatchesModel;
-
     public function __construct()
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
@@ -74,7 +69,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $this->_apiPromoRules = Mage::getModel('mailchimp/api_promoRules');
         $this->_apiPromoCodes = Mage::getModel('mailchimp/api_promoCodes');
         $this->_apiSubscribers = Mage::getModel('mailchimp/api_subscribers');
-        $this->_syncBatchesModel = Mage::getModel('mailchimp/synchbatches');
     }
 
     /**
@@ -162,7 +156,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function getSyncBatchesModel()
     {
-        return $this->_syncBatchesModel;
+        return Mage::getModel('mailchimp/synchbatches');
     }
 
     /**
@@ -219,8 +213,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $this->_sendEcommerceBatch($storeId);
                 } else {
                     $helper->logError(
-                        'Could not connect to MailChimp: Make sure the API Key is correct "
-                        . "and there is an internet connection'
+                        "Could not connect to MailChimp: Make sure the API Key is correct "
+                        . "and there is an internet connection"
                     );
                     return;
                 }
@@ -262,6 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
             ->addFieldToFilter('status', array('eq' => $status));
+
         if ($isEcommerceData) {
             $collection->addFieldToFilter('store_id', array('eq' => $mailchimpStoreId));
             $enabled = $helper->isEcomSyncDataEnabled($magentoStoreId);
@@ -272,10 +267,12 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         if ($enabled) {
             $helper->logBatchStatus('Get results from Mailchimp');
+
             foreach ($collection as $item) {
                 try {
                     $batchId = $item->getBatchId();
                     $files = $this->getBatchResponse($batchId, $magentoStoreId);
+
                     if (!empty($files)) {
                         if (isset($files['error'])) {
                             $item->setStatus('error');
@@ -289,6 +286,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     }
 
                     $baseDir = $this->getMagentoBaseDir();
+
                     if ($this->batchDirExists($baseDir, $batchId)) {
                         $this->removeBatchDir($baseDir, $batchId);
                     }
@@ -400,6 +398,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         if (!empty($batchArray['operations'])) {
             $batchJson = json_encode($batchArray);
+
             if ($batchJson === false) {
                 $helper->logRequest('Json encode error '.json_last_error_msg());
             } elseif (empty($batchJson)) {
@@ -908,6 +907,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
+
                     if ($batchJson === false ) {
                         $helper->logRequest('Json encode error: '.json_last_error_msg());
                     } elseif ($batchJson == '') {
