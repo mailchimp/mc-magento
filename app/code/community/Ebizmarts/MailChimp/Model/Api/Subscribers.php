@@ -115,7 +115,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             //encode to JSON
             $subscriberJson = json_encode($data);
 
-            if ($subscriberJson !== false ) {
+            if ($subscriberJson !== false) {
                 if (!empty($subscriberJson)) {
                     if ($subscriber->getMailchimpSyncModified()) {
                         $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
