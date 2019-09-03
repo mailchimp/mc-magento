@@ -12,6 +12,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
         $ids = array(1, 3, 4);
 
         $clearEcommerce = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ClearEcommerce::class)
+            ->disableOriginalConstructor()
             ->setMethods(
                 array('processData', 'getItemsToDelete')
             )
@@ -27,11 +28,11 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
             ->expects($this->exactly(5))
             ->method('getItemsToDelete')
             ->withConsecutive(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
-                Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
+                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT),
+                array(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER),
+                array(Ebizmarts_MailChimp_Model_Config::IS_QUOTE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE),
+                array(Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
             )
             ->willReturnOnConsecutiveCalls(
                 array($itemMock),
@@ -68,6 +69,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
         $itemsDeleted = array(3, 4);
 
         $clearEcommerce = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ClearEcommerce::class)
+            ->disableOriginalConstructor()
             ->setMethods(
                 array('processDeletedData', 'deleteEcommerceRows')
             )
@@ -100,8 +102,9 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
         $itemsDeleted = array();
 
         $clearEcommerce = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ClearEcommerce::class)
+            ->disableOriginalConstructor()
             ->setMethods(
-                array('processDeletedData', 'deleteEcommerceRows')
+                array('processDeletedData', 'deleteEcommerceRows', 'clearEcommerceCollection')
             )
             ->getMock();
 
@@ -115,6 +118,11 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
             ->expects($this->never())
             ->method('deleteEcommerceRows');
 
+        $clearEcommerce
+            ->expects($this->once())
+            ->method('clearEcommerceCollection')
+            ->willReturnSelf();
+
         $clearEcommerce->processData(array(), Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
     }
 
@@ -126,7 +134,8 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
         $tableName = 'mailchimp_ecommerce_sync_data';
 
         $clearEcommerce = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ClearEcommerce::class)
-            ->setMethods(array('getHelper'))
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHelper', 'clearEcommerceCollection'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -158,6 +167,11 @@ class Ebizmarts_MailChimp_Model_ClearEcommerceTest extends PHPUnit_Framework_Tes
             ->expects($this->once())
             ->method("delete")
             ->with($tableName, $where);
+
+        $clearEcommerce
+            ->expects($this->once())
+            ->method('clearEcommerceCollection')
+            ->willReturnSelf();
 
         $clearEcommerce->deleteEcommerceRows($idsArray, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
     }
