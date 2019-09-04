@@ -1580,40 +1580,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
 
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
-            if ($syncDelta) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
-            } elseif ($allowBatchRemoval === true) {
-                $ecommerceSyncDataItem->setData("batch_id", null);
-            }
-
-            if ($allowBatchRemoval === -1) {
-                $ecommerceSyncDataItem->setData("batch_id", '-1');
-            }
-
-            if ($syncError) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
-            }
-
-            //Always set modified value to 0 when saving sync delta or errors.
-            $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
-            if ($syncDeleted !== null) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
-                if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
-                    $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
-                }
-            }
-
-            if ($token) {
-                $ecommerceSyncDataItem->setData("mailchimp_token", $token);
-            }
-
-            if ($deletedRelatedId) {
-                $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
-            }
-
-            if ($syncedFlag !== null) {
-                $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
-            }
+            $this->setEcommerceSyncDataItemValues(
+                $itemType, $syncDelta, $syncError, $syncModified, $syncDeleted,
+                $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, $ecommerceSyncDataItem
+            );
 
             $ecommerceSyncDataItem->save();
         }
@@ -5081,5 +5051,55 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return true;
+    }
+
+    /**
+     * @param $itemType
+     * @param $syncDelta
+     * @param $syncError
+     * @param $syncModified
+     * @param $syncDeleted
+     * @param $token
+     * @param $syncedFlag
+     * @param $deletedRelatedId
+     * @param $allowBatchRemoval
+     * @param Varien_Object $ecommerceSyncDataItem
+     */
+    protected function setEcommerceSyncDataItemValues($itemType, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, Varien_Object $ecommerceSyncDataItem)
+    {
+        if ($syncDelta) {
+            $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
+        } elseif ($allowBatchRemoval === true) {
+            $ecommerceSyncDataItem->setData("batch_id", null);
+        }
+
+        if ($allowBatchRemoval === -1) {
+            $ecommerceSyncDataItem->setData("batch_id", '-1');
+        }
+
+        if ($syncError) {
+            $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+        }
+
+        //Always set modified value to 0 when saving sync delta or errors.
+        $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
+        if ($syncDeleted !== null) {
+            $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
+            if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
+                $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+            }
+        }
+
+        if ($token) {
+            $ecommerceSyncDataItem->setData("mailchimp_token", $token);
+        }
+
+        if ($deletedRelatedId) {
+            $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
+        }
+
+        if ($syncedFlag !== null) {
+            $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
+        }
     }
 }
