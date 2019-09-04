@@ -112,42 +112,50 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
         rowsCount : 0,
         add : function(templateData, insertAfterId)
         {
-            // generate default template data
-            if ('' == templateData) {
-                var d = new Date();
-                templateData = {
+            if (this.rowsCount >= 30) {
+                alert('Max. merge fields reached. \nOnly up to 30 merge fields are allowed.');
+            } else {
+                // generate default template data
+                if ('' == templateData) {
+                    var d = new Date();
+                    templateData = {
+                    <?php foreach ($this->_columns as $columnName => $column):?>
+                    <?php echo $this->quoteEscape($columnName) ?> :
+                    '',
+                    <?php endforeach;?>
+                        _id
+                :
+                    '_' + d.getTime() + '_' + d.getMilliseconds()
+                }
+                    ;
+                }
+                // insert before last row
+                if ('' == insertAfterId) {
+                    Element.insert(
+                        $('addRow<?php echo $this->quoteEscape($htmlId) ?>'),
+                        {before: this.template.evaluate(templateData)});
+                }
+                // insert after specified row
+                else {
+                    Element.insert($(insertAfterId), {after: this.template.evaluate(templateData)});
+                }
+                // set the selected drop-down list item
                 <?php foreach ($this->_columns as $columnName => $column):?>
-                    <?php echo $this->quoteEscape($columnName) ?> : '',
+                <?php if($columnName == 'magento'):?>
+                $$('select[name*=' + templateData._id + ']').each(function (row) {
+                    var oldText = 'value="' + templateData.<?php echo $this->quoteEscape($columnName) ?>+ '"';
+                    var newText = 'selected="selected" value="'
+                        + templateData.<?php echo $this->quoteEscape($columnName) ?>
+                        + '"';
+                    row.innerHTML = row.innerHTML.replace(oldText, newText);
+                });
+                <?php endif; ?>
                 <?php endforeach;?>
-                    _id : '_' + d.getTime() + '_' + d.getMilliseconds()
-            };
+                <?php if ($this->_addAfter):?>
+                Event.observe('addAfterBtn' + templateData._id, 'click', this.add.bind(this, '', templateData._id));
+                <?php endif;?>
+                this.rowsCount += 1;
             }
-            // insert before last row
-            if ('' == insertAfterId) {
-                Element.insert(
-                    $('addRow<?php echo $this->quoteEscape($htmlId) ?>'),
-                    {before: this.template.evaluate(templateData)});
-            }
-            // insert after specified row
-            else {
-                Element.insert($(insertAfterId), {after: this.template.evaluate(templateData)});
-            }
-            // set the selected drop-down list item
-            <?php foreach ($this->_columns as $columnName => $column):?>
-            <?php if($columnName == 'magento'):?>
-            $$('select[name*=' + templateData._id +']').each(function(row){
-                var oldText = 'value="'+templateData.<?php echo $this->quoteEscape($columnName) ?>+'"';
-                var newText = 'selected="selected" value="'
-                    +templateData.<?php echo $this->quoteEscape($columnName) ?>
-                    +'"';
-                row.innerHTML = row.innerHTML.replace(oldText,newText);
-            });
-            <?php endif; ?>
-            <?php endforeach;?>
-            <?php if ($this->_addAfter):?>
-            Event.observe('addAfterBtn' + templateData._id, 'click', this.add.bind(this, '', templateData._id));
-            <?php endif;?>
-            this.rowsCount += 1;
         },
         open: function () {
             var url = '<?php echo $this->escapeUrl($this->getUrl("adminhtml/mergevars/addmergevar/")) ?>?';

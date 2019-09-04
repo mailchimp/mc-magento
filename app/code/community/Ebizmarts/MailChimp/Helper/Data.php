@@ -1378,40 +1378,52 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function createMergeFields($scopeId, $scope)
     {
+        $success = 1;
         $listId = $this->getGeneralList($scopeId, $scope);
         $maps = $this->unserialize($this->getMapFields($scopeId, $scope));
         $customFieldTypes = $this->unserialize($this->getCustomMergeFieldsSerialized($scopeId, $scope));
 
-        try {
-            $api = $this->getApi($scopeId, $scope);
-            $mailchimpFields = array();
-
+        if (count($maps) > 30 ) {
+            $success = 2;
+        } else {
             try {
-                $mailchimpFields = $api->getLists()->getMergeFields()->getAll($listId, null, null, 50);
-            } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage());
-            }
+                $api = $this->getApi($scopeId, $scope);
+                $mailchimpFields = array();
 
-            if (!empty($mailchimpFields)) {
-                foreach ($maps as $map) {
-                    $customAtt = $map['magento'];
-                    $chimpTag = $map['mailchimp'];
-                    $alreadyExists = false;
+                try {
+                    $mailchimpFields = $api->getLists()->getMergeFields()->getAll(
+                        $listId,
+                        null,
+                        null,
+                        50
+                    );
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage());
+                }
 
-                    foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
-                        if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
-                            $alreadyExists = true;
+                if (!empty($mailchimpFields)) {
+                    foreach ($maps as $map) {
+                        $customAtt = $map['magento'];
+                        $chimpTag = $map['mailchimp'];
+                        $alreadyExists = false;
+
+                        foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
+                            if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
+                                $alreadyExists = true;
+                            }
+                        }
+
+                        if (!$alreadyExists) {
+                            $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
                         }
                     }
-
-                    if (!$alreadyExists) {
-                        $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
-                    }
                 }
+            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                $this->logError($e->getMessage());
             }
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage());
         }
+
+        return $success;
     }
 
     protected function _createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag)
