@@ -213,3 +213,6 @@
 "Redirecting... ","Redirecting... "
 "At least one type of eCommerce data should be selected to Resend.","At least one type of eCommerce data should be selected to Resend."
 "Ecommerce data resent succesfully","Ecommerce data resent succesfully"
+"Json error","Json error"
+"Json error during migration from 1.1.6","Json error during migration from 1.1.6"
+"There is not supported products in this cart.","There is not supported products in this cart."

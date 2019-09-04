@@ -105,39 +105,45 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $collection->getSelect()->limit($limit);
         $date = $dateHelper->getDateMicrotime();
         $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
-
         $counter = 0;
+
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
             $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
-            //enconde to JSON
-            try {
-                $subscriberJson = json_encode($data);
-            } catch (Exception $e) {
-                //json encode failed
-                $errorMessage = "Subscriber " . $subscriber->getSubscriberId() . " json encode failed";
-                $helper->logError($errorMessage);
-            }
+            //encode to JSON
+            $subscriberJson = json_encode($data);
 
-            if (!empty($subscriberJson)) {
-                if ($subscriber->getMailchimpSyncModified()) {
-                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
-                } else {
-                    $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
+            if ($subscriberJson !== false) {
+                if (!empty($subscriberJson)) {
+                    if ($subscriber->getMailchimpSyncModified()) {
+                        $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_MOD);
+                    } else {
+                        $helper->modifyCounterSubscribers(Ebizmarts_MailChimp_Helper_Data::SUB_NEW);
+                    }
+
+                    $subscriberArray[$counter]['method'] = "PUT";
+                    $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $emailHash;
+                    $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
+                    $subscriberArray[$counter]['body'] = $subscriberJson;
+
+                    //update subscribers delta
+                    $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
+                    $subscriber->setData("mailchimp_sync_error", "");
+                    $subscriber->setData("mailchimp_sync_modified", 0);
+                    $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
+                    $subscriber->save();
                 }
+            } else {
+                //json encode failed
+                $jsonErrorMsg = json_last_error_msg();
+                $errorMessage = "Subscriber " . $subscriber->getSubscriberId()
+                    . " json encode failed (".$jsonErrorMsg.")";
+                $helper->logError($errorMessage);
 
-                $subscriberArray[$counter]['method'] = "PUT";
-                $subscriberArray[$counter]['path'] = "/lists/" . $listId . "/members/" . $emailHash;
-                $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
-                $subscriberArray[$counter]['body'] = $subscriberJson;
-
-                //update subscribers delta
-                $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
-                $subscriber->setData("mailchimp_sync_error", "");
+                $subscriber->setData("mailchimp_sync_error", $jsonErrorMsg);
                 $subscriber->setData("mailchimp_sync_modified", 0);
-                $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
                 $subscriber->save();
             }
 

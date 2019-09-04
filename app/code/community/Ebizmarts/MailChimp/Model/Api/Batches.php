@@ -270,26 +270,26 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
             foreach ($collection as $item) {
                 try {
-                        $batchId = $item->getBatchId();
-                        $files = $this->getBatchResponse($batchId, $magentoStoreId);
+                    $batchId = $item->getBatchId();
+                    $files = $this->getBatchResponse($batchId, $magentoStoreId);
 
-                        if (!empty($files)) {
-                            if (isset($files['error'])) {
-                                $item->setStatus('error');
-                                $item->save();
-                                $helper->logBatchStatus('There was an error getting the result ');
-                            } else {
-                                $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
-                                $item->setStatus('completed');
-                                $item->save();
-                            }
+                    if (!empty($files)) {
+                        if (isset($files['error'])) {
+                            $item->setStatus('error');
+                            $item->save();
+                            $helper->logBatchStatus('There was an error getting the result ');
+                        } else {
+                            $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
+                            $item->setStatus('completed');
+                            $item->save();
                         }
+                    }
 
-                        $baseDir = $this->getMagentoBaseDir();
+                    $baseDir = $this->getMagentoBaseDir();
 
-                        if ($this->batchDirExists($baseDir, $batchId)) {
-                            $this->removeBatchDir($baseDir, $batchId);
-                        }
+                    if ($this->batchDirExists($baseDir, $batchId)) {
+                        $this->removeBatchDir($baseDir, $batchId);
+                    }
                 } catch (Exception $e) {
                     Mage::log("Error with a response: " . $e->getMessage());
                 }
@@ -399,7 +399,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if (!empty($batchArray['operations'])) {
             $batchJson = json_encode($batchArray);
 
-            if (!$batchJson || $batchJson == '') {
+            if ($batchJson === false) {
+                $helper->logRequest('Json encode error '.json_last_error_msg());
+            } elseif (empty($batchJson)) {
                 $helper->logRequest('An empty operation was detected');
             } else {
                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
@@ -610,22 +612,24 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
-                    if (!$batchJson || $batchJson == '') {
+                    if ($batchJson === false) {
+                        $helper->logRequest('Json encode error '.json_last_error_msg());
+                    } elseif ($batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
                         try {
-                                $mailchimpApi = $helper->getApi($storeId);
-                                $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
-                                $helper->logRequest($batchJson, $batchResponse['id']);
+                            $mailchimpApi = $helper->getApi($storeId);
+                            $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
+                            $helper->logRequest($batchJson, $batchResponse['id']);
 
-                                //save batch id to db
-                                $batch = $this->getSyncBatchesModel();
-                                $batch->setStoreId($storeId)
-                                    ->setBatchId($batchResponse['id'])
-                                    ->setStatus($batchResponse['status']);
-                                $batch->save();
-                                $this->_showResumeSubscriber($batchResponse['id'], $storeId);
-                                return array($batchResponse, $limit);
+                            //save batch id to db
+                            $batch = $this->getSyncBatchesModel();
+                            $batch->setStoreId($storeId)
+                                ->setBatchId($batchResponse['id'])
+                                ->setStatus($batchResponse['status']);
+                            $batch->save();
+                            $this->_showResumeSubscriber($batchResponse['id'], $storeId);
+                            return array($batchResponse, $limit);
                         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                             $helper->logError($e->getMessage());
                         } catch (MailChimp_Error $e) {
@@ -904,7 +908,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
 
-                    if (!$batchJson || $batchJson == '') {
+                    if ($batchJson === false ) {
+                        $helper->logRequest('Json encode error: '.json_last_error_msg());
+                    } elseif ($batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
                         $batchResponse = $mailchimpApi->batchOperation->add($batchJson);

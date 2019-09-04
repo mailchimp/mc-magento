@@ -1582,8 +1582,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
             if ($syncDelta) {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
-            } elseif ($allowBatchRemoval) {
+            } elseif ($allowBatchRemoval === true) {
                 $ecommerceSyncDataItem->setData("batch_id", null);
+            }
+
+            if ($allowBatchRemoval === -1) {
+                $ecommerceSyncDataItem->setData("batch_id", '-1');
             }
 
             if ($syncError) {
