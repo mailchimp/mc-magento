@@ -320,7 +320,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
             //if cart is empty or customer has an order made after the abandonment skip current cart.
             $allVisibleItems = $cart->getAllVisibleItems();
 
-            if (empty($allVisibleItems ) || $orderCollection->getSize()) {
+            if (empty($allVisibleItems) || $orderCollection->getSize()) {
                 $this->_updateSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
