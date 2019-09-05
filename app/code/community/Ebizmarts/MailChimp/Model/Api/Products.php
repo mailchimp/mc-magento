@@ -642,46 +642,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     }
 
     /**
-     * update product sync data
-     *
-     * @param $productId
-     * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncDeleted
-     * @param int|null         $syncedFlag
-     * @param bool             $saveOnlyIfexists
-     * @param bool             $allowBatchRemoval
-     */
-//    protected function _updateSyncData(
-//        $productId,
-//        $mailchimpStoreId,
-//        $syncDelta = null,
-//        $syncError = null,
-//        $syncModified = 0,
-//        $syncDeleted = null,
-//        $syncedFlag = null,
-//        $saveOnlyIfexists = false,
-//        $allowBatchRemoval = true
-//    ) {
-//        $this->getHelper()->saveEcommerceSyncData(
-//            $productId,
-//            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-//            $mailchimpStoreId,
-//            $syncDelta,
-//            $syncError,
-//            $syncModified,
-//            $syncDeleted,
-//            null,
-//            $syncedFlag,
-//            $saveOnlyIfexists,
-//            null,
-//            $allowBatchRemoval
-//        );
-//    }
-
-    /**
      * @param $magentoStoreId
      * @return string
      */
