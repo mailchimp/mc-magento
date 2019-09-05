@@ -86,13 +86,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $success = 0;
         $subEnabled = $helper->isSubscriptionEnabled($scopeId, $scope);
         if ($subEnabled) {
-            try {
-                $success = $helper->createMergeFields($scopeId, $scope);
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-            } catch (Exception $e) {
-                $helper->logError($e->getMessage());
-            }
+            $success = $helper->createMergeFields($scopeId, $scope);
         }
 
         $mageApp->getResponse()->setBody($success);

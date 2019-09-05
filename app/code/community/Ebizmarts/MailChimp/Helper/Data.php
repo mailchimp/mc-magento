@@ -1399,6 +1399,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     );
                 } catch (MailChimp_Error $e) {
                     $this->logError($e->getFriendlyMessage());
+                    $success = 0;
                 }
 
                 if (!empty($mailchimpFields)) {
@@ -1420,6 +1421,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->logError($e->getMessage());
+                $success = 0;
             }
         }
 
