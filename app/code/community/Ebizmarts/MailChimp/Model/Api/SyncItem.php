@@ -12,6 +12,22 @@
 class Ebizmarts_MailChimp_Model_Api_SyncItem
 {
     /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
+    protected $_mailchimpHelper;
+
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Date
+     */
+    protected $_mailchimpDateHelper;
+
+    public function __construct()
+    {
+        $this->_mailchimpHelper = Mage::helper('mailchimp');
+        $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
+    }
+
+    /**
      * @param $cartId
      * @param $mailchimpStoreId
      * @param null $syncDelta
@@ -24,21 +40,22 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
      * @param bool $allowBatchRemoval
      */
     protected function _updateSyncData(
-        $cartId,
+        $type,
+        $id,
         $mailchimpStoreId,
         $syncDelta = null,
         $syncError = null,
         $syncModified = 0,
-        $syncedFlag = null,
         $syncDeleted = null,
+        $syncedFlag = null,
         $token = null,
         $saveOnlyIfExists = false,
         $allowBatchRemoval = true
     ) {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
-            $cartId,
-            Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
+            $id,
+            $type,
             $mailchimpStoreId,
             $syncDelta,
             $syncError,
@@ -57,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
      */
     protected function getHelper()
     {
-        return Mage::helper('mailchimp');
+        return $this->_mailchimpHelper;
     }
 
     /**
@@ -65,7 +82,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
      */
     protected function getDateHelper()
     {
-        return Mage::helper('mailchimp/date');
+        return $this->_mailchimpDateHelper;
     }
 
     /**
@@ -83,5 +100,13 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     public function getWebSiteIdFromMagentoStoreId($magentoStoreId)
     {
         return Mage::getModel('core/store')->load($magentoStoreId)->getWebsiteId();
+    }
+
+    /**
+     * @return Mage_Core_Model_Resource
+     */
+    public function getCoreResource()
+    {
+        return Mage::getSingleton('core/resource');
     }
 }
