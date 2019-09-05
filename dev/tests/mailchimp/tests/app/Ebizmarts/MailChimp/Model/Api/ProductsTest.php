@@ -126,8 +126,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $helperMock->expects($this->exactly(2))
             ->method('setCurrentStore')
             ->withConsecutive(
-                $magentoStoreId,
-                $oldStore
+                array($magentoStoreId),
+                array($oldStore)
             );
 
         $helperMock->expects($this->once())
