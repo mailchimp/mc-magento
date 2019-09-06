@@ -50,7 +50,8 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         $syncedFlag = null,
         $token = null,
         $saveOnlyIfExists = false,
-        $allowBatchRemoval = true
+        $allowBatchRemoval = true,
+        $deletedRelatedId = null
     ) {
         $helper = $this->getHelper();
         $helper->saveEcommerceSyncData(
@@ -64,7 +65,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
             $token,
             $syncedFlag,
             $saveOnlyIfExists,
-            null,
+            $deletedRelatedId,
             $allowBatchRemoval
         );
     }

@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->setMethods(
                 array(
                     'getPromoCodeResourceCollection', 'addWebsiteColumn',
-                    'joinPromoRuleData', 'getMailChimpHelper'
+                    'joinPromoRuleData', 'getHelper'
                 )
             )
             ->getMock();
@@ -70,7 +70,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->setMethods(array('addResendFilter'))
             ->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $promoCodesApiMock->expects($this->once())->method('getHelper')->willReturn($mailChimpHelperMock);
 
         $promoCodesApiMock
             ->expects($this->once())
@@ -130,7 +130,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $syncDataItems = array();
 
         $promoCodesApiMock = $this->_promoCodesApiMock
-            ->setMethods(array('getPromoCodesForRule', 'getMailChimpHelper'))
+            ->setMethods(array('getPromoCodesForRule', 'getHelper'))
             ->getMock();
 
         $promoRuleMock = $this->getMockBuilder(Mage_SalesRule_Model_Rule::class)
@@ -161,7 +161,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->method('getPromoCodesForRule')
             ->with($promoRuleId)
             ->willReturn($promoCodesIds);
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $promoCodesApiMock->expects($this->once())->method('getHelper')->willReturn($mailChimpHelperMock);
 
         $mailChimpHelperMock
             ->expects($this->once())
@@ -182,7 +182,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
     public function testDeletePromoCodeSyncData()
     {
         $promoCodesApiMock = $this->_promoCodesApiMock
-            ->setMethods(array('getMailChimpHelper'))
+            ->setMethods(array('getHelper'))
             ->getMock();
 
         $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -195,7 +195,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->setMethods(array('delete'))
             ->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $promoCodesApiMock->expects($this->once())->method('getHelper')->willReturn($mailChimpHelperMock);
 
         $mailChimpHelperMock
             ->expects($this->once())
