@@ -25,7 +25,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     public function __construct()
     {
         parent::__construct();
-        
+
         $this->_optInConfiguration = array();
         $this->_locale = Mage::app()->getLocale();
         $this->_directoryRegionModel = Mage::getModel('directory/region');
