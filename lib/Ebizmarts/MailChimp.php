@@ -239,21 +239,24 @@ class Ebizmarts_MailChimp
             $this->_debug = true;
         }
 
+        $curlOptions = array();
+
         if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
-            $this->curlOptions[CURLOPT_FOLLOWLOCATION] = true;
+            $curlOptions[CURLOPT_FOLLOWLOCATION] = true;
         }
 
         if ($userAgent) {
-            $this->curlOptions[CURLOPT_USERAGENT] = $userAgent;
+            $curlOptions[CURLOPT_USERAGENT] = $userAgent;
         } else {
-            $this->curlOptions[CURLOPT_USERAGENT] = 'Ebizmart-MailChimp-PHP/3.0.0';
+            $curlOptions[CURLOPT_USERAGENT] = 'Ebizmart-MailChimp-PHP/3.0.0';
         }
 
-        $this->curlOptions[CURLOPT_HEADER] = false;
-        $this->curlOptions[CURLOPT_RETURNTRANSFER] = true;
-        $this->curlOptions[CURLOPT_CONNECTTIMEOUT] = $opts['timeout'];
-        $this->curlOptions[CURLOPT_TIMEOUT] = $opts['timeout'];
-        $this->curlOptions[CURLOPT_USERPWD] = "noname:" . $this->_apiKey;
+        $curlOptions[CURLOPT_HEADER] = false;
+        $curlOptions[CURLOPT_RETURNTRANSFER] = true;
+        $curlOptions[CURLOPT_CONNECTTIMEOUT] = $opts['timeout'];
+        $curlOptions[CURLOPT_TIMEOUT] = $opts['timeout'];
+        $curlOptions[CURLOPT_USERPWD] = "noname:" . $this->_apiKey;
+        $this->setCurlOptionsAddOptions($curlOptions);
 
         $this->root = new MailChimp_Root($this);
         $this->authorizedApps = new MailChimp_AuthorizedApps($this);
@@ -373,10 +376,12 @@ class Ebizmarts_MailChimp
             $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
         }
 
+        $curlOptions = array();
+
         if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
-            $this->curlOptions[CURLOPT_POSTFIELDS] = $params;
+            $curlOptions[CURLOPT_POSTFIELDS] = $params;
         } else {
-            $this->curlOptions[CURLOPT_POSTFIELDS] = null;
+            $curlOptions[CURLOPT_POSTFIELDS] = null;
 
             if ($hasParams) {
                 $_params = http_build_query($params);
@@ -384,15 +389,16 @@ class Ebizmarts_MailChimp
             }
         }
 
-        $this->curlOptions[CURLOPT_URL] = $this->_root . $url;
-        $this->curlOptions[CURLOPT_HTTPHEADER] = $headers;
-        $this->curlOptions[CURLOPT_VERBOSE] = $this->_debug;
-        $this->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
+        $curlOptions[CURLOPT_URL] = $this->_root . $url;
+        $curlOptions[CURLOPT_HTTPHEADER] = $headers;
+        $curlOptions[CURLOPT_VERBOSE] = $this->_debug;
+        $curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
 
         /**
          * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
          */
         $curlHelper = Mage::helper('mailchimp/curl');
+        $this->setCurlOptionsAddOptions($curlOptions);
         $curlResult = $curlHelper->curlExec($this->curlOptions);
 
         $responseBody = $curlResult['response'];
@@ -416,5 +422,38 @@ class Ebizmarts_MailChimp
         }
 
         return $result;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCurlOptions()
+    {
+        return $this->curlOptions;
+    }
+
+    /**
+     * @param array $curlOptions
+     */
+    protected function setCurlOptions($curlOptions)
+    {
+        $this->curlOptions = $curlOptions;
+    }
+
+    /**
+     * @param $index
+     * @param $value
+     */
+    protected function setCurlOptionsIndexValue($index, $value)
+    {
+        $this->curlOptions[$index] = $value;
+    }
+
+    /**
+     * @param array $curlOptions
+     */
+    protected function setCurlOptionsAddOptions($curlOptions = array())
+    {
+        $this->curlOptions += $curlOptions;
     }
 }
