@@ -203,7 +203,7 @@ class Ebizmarts_MailChimp
     public $templates;
 
     protected $_apiKey;
-    protected $_ch;
+    protected $curlOptions = array();
     protected $_root = 'https://api.mailchimp.com/3.0';
     protected $_debug = false;
 
@@ -239,24 +239,21 @@ class Ebizmarts_MailChimp
             $this->_debug = true;
         }
 
-
-        $this->_ch = curl_init();
-
         if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
-            curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, true);
+            $this->curlOptions[CURLOPT_FOLLOWLOCATION] = true;
         }
 
         if ($userAgent) {
-            curl_setopt($this->_ch, CURLOPT_USERAGENT, $userAgent);
+            $this->curlOptions[CURLOPT_USERAGENT] = $userAgent;
         } else {
-            curl_setopt($this->_ch, CURLOPT_USERAGENT, 'Ebizmart-MailChimp-PHP/3.0.0');
+            $this->curlOptions[CURLOPT_USERAGENT] = 'Ebizmart-MailChimp-PHP/3.0.0';
         }
 
-        curl_setopt($this->_ch, CURLOPT_HEADER, false);
-        curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT, $opts['timeout']);
-        curl_setopt($this->_ch, CURLOPT_TIMEOUT, $opts['timeout']);
-        curl_setopt($this->_ch, CURLOPT_USERPWD, "noname:" . $this->_apiKey);
+        $this->curlOptions[CURLOPT_HEADER] = false;
+        $this->curlOptions[CURLOPT_RETURNTRANSFER] = true;
+        $this->curlOptions[CURLOPT_CONNECTTIMEOUT] = $opts['timeout'];
+        $this->curlOptions[CURLOPT_TIMEOUT] = $opts['timeout'];
+        $this->curlOptions[CURLOPT_USERPWD] = "noname:" . $this->_apiKey;
 
         $this->root = new MailChimp_Root($this);
         $this->authorizedApps = new MailChimp_AuthorizedApps($this);
@@ -376,31 +373,35 @@ class Ebizmarts_MailChimp
             $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
         }
 
-        $ch = $this->_ch;
         if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            $this->curlOptions[CURLOPT_POSTFIELDS] = $params;
         } else {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, null);
+            $this->curlOptions[CURLOPT_POSTFIELDS] = null;
+
             if ($hasParams) {
                 $_params = http_build_query($params);
                 $url .= '?' . $_params;
             }
         }
 
-        curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        $this->curlOptions[CURLOPT_URL] = $this->_root . $url;
+        $this->curlOptions[CURLOPT_HTTPHEADER] = $headers;
+        $this->curlOptions[CURLOPT_VERBOSE] = $this->_debug;
+        $this->curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
 
-        $responseBody = curl_exec($ch);
+        /**
+         * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
+         */
+        $curlHelper = Mage::helper('mailchimp/curl');
+        $curlResult = $curlHelper->curlExec($this->curlOptions);
 
-        $info = curl_getinfo($ch);
-
+        $responseBody = $curlResult['response'];
+        $info = $curlResult['info'];
+        $curlError = $curlResult['error'];
         $result = json_decode($responseBody, true);
 
-        $curlError = curl_error($ch);
         if (!empty($curlError)) {
-            throw new MailChimp_HttpError($url, $method, $params, '', "API call to $url failed: " . curl_error($ch));
+            throw new MailChimp_HttpError($url, $method, $params, '', "API call to $url failed: " . $curlError);
         }
 
         if (floor($info['http_code'] / 100) >= 4) {
@@ -408,7 +409,6 @@ class Ebizmarts_MailChimp
                 $detail = array_key_exists('detail', $result) ? $result['detail'] : '';
                 $errors = array_key_exists('errors', $result) ? $result['errors'] : null;
                 $title = array_key_exists('title', $result) ? $result['title'] : '';
-
                 throw new MailChimp_HttpError($this->_root . $url, $method, $params, $title, $detail, $errors);
             } else {
                 throw new MailChimp_HttpError($this->_root . $url, $method, $params, $result);

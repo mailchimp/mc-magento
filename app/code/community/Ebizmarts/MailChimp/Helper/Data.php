@@ -4866,15 +4866,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if ($hasError === true) {
             $count = isset($counterGetResponsesBatchAtIndex[self::DATA_NOT_SENT_TO_MAILCHIMP])
                 ? $counterGetResponsesBatchAtIndex[self::DATA_NOT_SENT_TO_MAILCHIMP]
-                : $increment;
+                : 0;
             $statusChanged = self::DATA_NOT_SENT_TO_MAILCHIMP;
         } else {
             $count = isset($counterGetResponsesBatchAtIndex[self::DATA_SENT_TO_MAILCHIMP])
                 ? $counterGetResponsesBatchAtIndex[self::DATA_SENT_TO_MAILCHIMP]
-                : $increment;
+                : 0;
         }
 
-        $this->setCountersDataSentToMailchimp($index, $statusChanged, $count);
+        $this->setCountersDataSentToMailchimp($index, $statusChanged, $count + $increment);
     }
 
     public function resetCountersDataSentToMailchimp()

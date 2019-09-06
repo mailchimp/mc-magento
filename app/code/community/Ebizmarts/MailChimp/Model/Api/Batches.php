@@ -24,6 +24,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected $_mailchimpDateHelper;
 
     /**
+     * @var Ebizmarts_MailChimp_Helper_Curl
+     */
+    protected $_mailchimpCurlHelper;
+
+    /**
      * @var Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected $_apiCustomers;
@@ -62,6 +67,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
         $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
+        $this->_mailchimpCurlHelper = Mage::helper('mailchimp/curl');
+
         $this->_apiCustomers = Mage::getModel('mailchimp/api_customers');
         $this->_apiProducts = Mage::getModel('mailchimp/api_products');
         $this->_apiCarts = Mage::getModel('mailchimp/api_carts');
@@ -77,6 +84,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function getHelper()
     {
         return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Curl
+     */
+    protected function getMailchimpCurlHelper()
+    {
+        return $this->_mailchimpCurlHelper;
     }
 
     /**
@@ -310,6 +325,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         try {
             $this->deleteUnsentItems();
+
             if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
                 $helper->resetCountersSentPerBatch();
                 $batchArray = array();
@@ -336,6 +352,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
+
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
                     $helper->logBatchStatus('Generate Promo Rules Payload');
@@ -596,6 +613,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function sendStoreSubscriberBatch($storeId, $limit)
     {
         $helper = $this->getHelper();
+
         try {
             if ($helper->isSubscriptionEnabled($storeId)) {
                 $helper->resetCountersSubscribers();
@@ -657,32 +675,39 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         $files = array();
+
         try {
             $baseDir = $this->getMagentoBaseDir();
             $api = $helper->getApi($magentoStoreId);
+
             if ($api) {
                 // check the status of the job
                 $response = $api->batchOperation->status($batchId);
+
                 if (isset($response['status']) && $response['status'] == 'finished') {
                     // get the tar.gz file with the results
                     $fileUrl = urldecode($response['response_body_url']);
                     $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
                     $fd = fopen($fileName, 'w');
 
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $fileUrl);
-                    curl_setopt($ch, CURLOPT_FILE, $fd);
-                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-                    $r = curl_exec($ch);
+                    $curlOptions = array(
+                        CURLOPT_URL => $fileUrl,
+                        CURLOPT_FILE => $fd,
+                        CURLOPT_FOLLOWLOCATION => true, // this will follow redirects
+                    );
 
-                    curl_close($ch);
+                    $curlHelper = $this->getMailchimpCurlHelper();
+                    $curlResults = $curlHelper->curlExec($curlOptions);
+                    $r = $curlResults['response'];
                     fclose($fd);
                     mkdir(
                         $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId,
                         0750,
                         true
                     );
+
                     $archive = new Mage_Archive();
+
                     if (file_exists($fileName)) {
                         $files = $this->_unpackBatchFile($files, $batchId, $archive, $fileName, $baseDir);
                     }
@@ -1165,7 +1190,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         $countersSentPerBatch = $helper->getCountersSentPerBatch();
 
-        if (!empty($countersSentPerBatch) || $helper->getCountersSentPerBatch() != null) {
+        if (!empty($countersSentPerBatch) || $countersSentPerBatch != null) {
             $helper->logBatchStatus("Sent batch $batchId for store $storeId");
             $helper->logBatchQuantity($helper->getCountersSentPerBatch());
         } else {
