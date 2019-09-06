@@ -734,14 +734,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     }
 
     /**
-     * @return mixed
-     */
-    public function getMailchimpEcommerceDataTableName()
-    {
-        return Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
-    }
-
-    /**
      * @return Mage_Sales_Model_Resource_Quote_Collection
      */
     public function getQuoteCollection()

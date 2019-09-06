@@ -75,7 +75,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $batchArray = array();
         $modifiedOrders = $this->getResourceModelOrderCollection();
         // select orders for the current Magento store id
@@ -721,7 +721,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $magentoStoreId,
             'stores'
         );
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $batchArray = array();
         $config = array();
         $orderCollection = $this->getResourceModelOrderCollection();
@@ -832,7 +832,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function joinMailchimpSyncDataWithoutWhere($newOrders, $mailchimpStoreId)
     {
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $newOrders->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '"

@@ -247,23 +247,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     }
 
     /**
-     * @return string
-     */
-    public function getSyncDataTableName()
-    {
-        $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
-
-        return $mailchimpTableName;
-    }
-
-    /**
      * @param $collection
      * @param $mailchimpStoreId
      */
     public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId)
     {
         $joinCondition = "m4m.related_id = main_table.coupon_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getSyncDataTableName();
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
             sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, $mailchimpStoreId),

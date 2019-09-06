@@ -90,27 +90,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $this->assertContains(Mage_SalesRule_Model_Resource_Coupon_Collection::class, get_class($return));
     }
 
-    public function testGetSyncDataTableName()
-    {
-        $promoCodesApiMock = $this->_promoCodesApiMock
-            ->setMethods(array('getCoreResource'))
-            ->getMock();
-
-        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
-            ->setMethods(array('getTableName'))
-            ->getMock();
-
-        $promoCodesApiMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
-
-        $coreResourceMock
-            ->expects($this->once())
-            ->method('getTableName')
-            ->with('mailchimp/ecommercesyncdata')
-            ->willReturn('mailchimp_ecommerce_sync_data');
-
-        $promoCodesApiMock->getSyncDataTableName();
-    }
-
     public function testMarkAsDeleted()
     {
         $promoRuleId = 1;

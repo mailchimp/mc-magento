@@ -693,17 +693,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     }
 
     /**
-     * @return string
-     */
-    public function getSyncDataTableName()
-    {
-        $mailchimpTableName = Mage::getSingleton('core/resource')
-            ->getTableName('mailchimp/ecommercesyncdata');
-
-        return $mailchimpTableName;
-    }
-
-    /**
      * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @param $product
@@ -941,7 +930,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     protected function executeMailchimpDataJoin($collection, $mailchimpStoreId, $joinCondition)
     {
-        $mailchimpTableName = $this->getSyncDataTableName();
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
             sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId),
@@ -1244,7 +1233,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     protected function joinMailchimpSyncDataDeleted($mailchimpStoreId, $deletedProducts)
     {
-        $mailchimpTableName = $this->getSyncDataTableName();
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $deletedProducts->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT

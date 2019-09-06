@@ -379,27 +379,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $this->assertContains(Mage_SalesRule_Model_Resource_Rule_Collection::class, get_class($return));
     }
 
-    public function testGetSyncDataTableName()
-    {
-        $promoRulesApiMock = $this->_promoRulesApiMock
-            ->setMethods(array('getCoreResource'))
-            ->getMock();
-
-        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
-            ->setMethods(array('getTableName'))
-            ->getMock();
-
-        $promoRulesApiMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
-
-        $coreResourceMock
-            ->expects($this->once())
-            ->method('getTableName')
-            ->with('mailchimp/ecommercesyncdata')
-            ->willReturn('mailchimp_ecommerce_sync_data');
-
-        $promoRulesApiMock->getSyncDataTableName();
-    }
-
     public function testUpdate()
     {
         $promoRulesApiMock = $this->_promoRulesApiMock

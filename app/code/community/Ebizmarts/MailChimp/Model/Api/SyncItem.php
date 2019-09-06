@@ -91,7 +91,8 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
      */
     public function getMailchimpEcommerceDataTableName()
     {
-        return Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        return $this->getCoreResource()
+            ->getTableName('mailchimp/ecommercesyncdata');
     }
 
     /**
