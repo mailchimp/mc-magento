@@ -13,7 +13,7 @@
 class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_Api_SyncItem
 {
     const BATCH_LIMIT = 100;
-    
+
     protected $_optInConfiguration;
     protected $_optInStatusForStore;
     protected $_locale;

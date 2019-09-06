@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     const TARGET_SHIPPING = 'shipping';
 
     protected $_batchId;
-    
+
     /**
      * @var Ebizmarts_MailChimp_Model_Api_PromoCodes
      */
