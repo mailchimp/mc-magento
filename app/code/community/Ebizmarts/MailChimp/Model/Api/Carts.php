@@ -335,7 +335,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
             );
             $orderCollection->addFieldToFilter('main_table.updated_at', array('from' => $cart->getUpdatedAt()));
             //if cart is empty or customer has an order made after the abandonment skip current cart.
-            if (empty($cart->getAllVisibleItems()) || $orderCollection->getSize()) {
+            $allVisibleItems = $cart->getAllVisibleItems();
+
+            if (empty($allVisibleItems) || $orderCollection->getSize()) {
                 $this->_updateSyncData(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $cartId, $mailchimpStoreId);
                 continue;
             }
