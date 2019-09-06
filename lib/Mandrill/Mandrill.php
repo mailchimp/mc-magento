@@ -39,7 +39,7 @@ class Mandrill_Mandrill
 {
 
     public $apikey;
-    protected $curlOptions;
+    protected $curlOptions = array();
     public $root = 'https://mandrillapp.com/api/1.0';
     public $debug = false;
 
