@@ -203,7 +203,7 @@ class Ebizmarts_MailChimp
     public $templates;
 
     protected $_apiKey;
-    protected $curlOptions = array();
+    protected $_curlOptions = array();
     protected $_root = 'https://api.mailchimp.com/3.0';
     protected $_debug = false;
 
@@ -399,7 +399,7 @@ class Ebizmarts_MailChimp
          */
         $curlHelper = Mage::helper('mailchimp/curl');
         $this->setCurlOptionsAddOptions($curlOptions);
-        $curlResult = $curlHelper->curlExec($this->curlOptions);
+        $curlResult = $curlHelper->curlExec($this->_curlOptions);
 
         $responseBody = $curlResult['response'];
         $info = $curlResult['info'];
@@ -429,15 +429,15 @@ class Ebizmarts_MailChimp
      */
     public function getCurlOptions()
     {
-        return $this->curlOptions;
+        return $this->_curlOptions;
     }
 
     /**
-     * @param array $curlOptions
+     * @param array $_curlOptions
      */
     protected function setCurlOptions($curlOptions)
     {
-        $this->curlOptions = $curlOptions;
+        $this->_curlOptions = $curlOptions;
     }
 
     /**
@@ -446,7 +446,7 @@ class Ebizmarts_MailChimp
      */
     protected function setCurlOptionsIndexValue($index, $value)
     {
-        $this->curlOptions[$index] = $value;
+        $this->_curlOptions[$index] = $value;
     }
 
     /**
@@ -454,6 +454,6 @@ class Ebizmarts_MailChimp
      */
     protected function setCurlOptionsAddOptions($curlOptions = array())
     {
-        $this->curlOptions += $curlOptions;
+        $this->_curlOptions += $curlOptions;
     }
 }

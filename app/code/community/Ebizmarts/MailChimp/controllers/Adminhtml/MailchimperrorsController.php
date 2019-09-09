@@ -136,6 +136,14 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
      */
     protected function unlink($file)
     {
-        unlink($file);
+        return $this->getFileHelper()->unlink($file);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_File
+     */
+    protected function getFileHelper()
+    {
+        return Mage::helper('mailchimp/file');
     }
 }

@@ -48,7 +48,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @var array
      */
-    public static $MAILCHIMP_LANGUAGES = array(
+    public static $mailchimpLanguages = array(
         'en', // English
         'ar', // Arabic
         'af', // Afrikaans
@@ -1038,15 +1038,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             Mage::log($message, null, 'MailChimp_Failing_Requests.log', true);
         } elseif ($logRequestEnabled) {
             $logDir = Mage::getBaseDir('var') . DS . 'log';
+            $fileHelper = $this->getFileHelper();
 
-            if (!file_exists($logDir)) {
-                mkdir($logDir, 0750);
+            if (!$fileHelper->fileExists($logDir, false)) {
+                $fileHelper->mkDir($logDir, 0750);
             }
 
             $logDir .= DS . 'MailChimp_Requests';
 
-            if (!file_exists($logDir)) {
-                mkdir($logDir, 0750);
+            if (!$fileHelper->fileExists($logDir, false)) {
+                $fileHelper->mkDir($logDir, 0750);
             }
 
             $fileName = $logDir . DS . $batchId . '.Request.log';
@@ -4182,11 +4183,12 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpLanguage = '';
 
-        if (in_array($languageCode, self::$MAILCHIMP_LANGUAGES)) {
+        if (in_array($languageCode, self::$mailchimpLanguages)) {
             $mailchimpLanguage = $languageCode;
         } else {
             $langIso = substr($languageCode, 0, 2);
-            if (in_array($langIso, self::$MAILCHIMP_LANGUAGES)) {
+
+            if (in_array($langIso, self::$mailchimpLanguages)) {
                 $mailchimpLanguage = $langIso;
             }
         }
@@ -5080,5 +5082,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return true;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_File
+     */
+    protected function getFileHelper()
+    {
+        return Mage::helper('mailchimp/helper');
     }
 }

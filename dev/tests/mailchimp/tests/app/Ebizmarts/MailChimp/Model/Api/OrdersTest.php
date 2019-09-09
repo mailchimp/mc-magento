@@ -167,7 +167,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $customerEmail = 'test@ebizmarts.com';
         $customerFirstName = 'testFirstName';
         $billingAddressStreet = array('billingAddress1', 'billingAddress2');
-        $currentDate = date("yyyy-mm-dd");
+        $currentDate =  Mage::getSingleton('core/date');
 
         $lines['itemsCount'] = 9;
         $lines[0] = array(

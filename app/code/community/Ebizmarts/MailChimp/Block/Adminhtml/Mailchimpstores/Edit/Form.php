@@ -56,9 +56,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit_Form extends Mage
                 $prefix = '';
                 $storeId = $s->getStoreId();
 
-                if(!$helper->ping($storeId)) {
+                if(!$helper->ping($storeId))
                     $prefix = '[Invalid]: ';
-                }
 
                 $apikey = $helper->getApiKey($storeId);
 
