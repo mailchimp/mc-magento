@@ -98,7 +98,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                         . $dateHelper->getDateMicrotime() . '_' . $ruleId;
                     $promoData['body'] = $promoRuleJson;
                     //update promo rule delta
-                    $this->_updateSyncData(Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $ruleId, $mailchimpStoreId);
+                    $this->_updateSyncData($ruleId, $mailchimpStoreId);
                 } else {
                     $error = $promoRule->getMailchimpSyncError();
                     if (!$error) {
@@ -106,7 +106,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                     }
 
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                         $ruleId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, "Y-m-d H:i:s"),
@@ -118,7 +117,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                 $helper->logError("Promo rule " . $ruleId . " json encode failed (".$jsonErrorMsg.")");
 
                 $this->_updateSyncData(
-                    Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                     $ruleId,
                     $mailchimpStoreId,
                     $dateHelper->formatDate(null, "Y-m-d H:i:s"),
@@ -338,7 +336,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                 $ruleId,
                 $mailchimpStoreId,
                 null,
@@ -374,7 +371,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                 $ruleId,
                 $mailchimpStoreId,
                 null,
