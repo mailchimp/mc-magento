@@ -117,7 +117,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
 
                     $customerArray[$counter] = $this->makePutBatchStructure($customerJson, $customer);
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                         $customer->getId(),
                         $mailchimpStoreId,
                         null,
@@ -146,7 +145,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                     }
                 } else {
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                         $customer->getId(),
                         $mailchimpStoreId,
                         $this->getDateHelper()->getCurrentDateTime(),
@@ -157,7 +155,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
             } else {
                 $jsonErrorMessage = $this->logCouldNotEncodeCustomerError($customer);
                 $this->_updateSyncData(
-                    Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                     $customer->getId(),
                     $mailchimpStoreId,
                     $this->getDateHelper()->getCurrentDateTime(),
@@ -321,7 +318,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     {
         $mailchimpStoreId = $this->getHelper()->getMCStoreId($storeId);
         $this->_updateSyncData(
-            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
             $customerId,
             $mailchimpStoreId,
             null,

@@ -212,7 +212,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->expects($this->once())
             ->method('_updateSyncData')
             ->with(
-                Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                 $customerId,
                 $mailchimpStoreId,
                 null,
@@ -408,7 +407,6 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->expects($this->once())
             ->method('_updateSyncData')
             ->with(
-                Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                 $customerId, $mailchimpStoreId,
                 null,
                 null,
