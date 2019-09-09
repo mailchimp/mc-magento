@@ -144,7 +144,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                         $batchArray[$counter]['body'] = $promoCodeJson;
 
                         $this->_updateSyncData(
-                            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                             $codeId,
                             $mailchimpStoreId,
                             null,
@@ -158,7 +157,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                     } else {
                         $error = $helper->__('Something went wrong when retrieving the information.');
                         $this->_updateSyncData(
-                            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                             $codeId,
                             $mailchimpStoreId,
                             $dateHelper->formatDate(null, "Y-m-d H:i:s"),
@@ -170,7 +168,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                     $jsonErrorMsg = json_last_error_msg();
                     $helper->logError("Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")");
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                         $codeId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, "Y-m-d H:i:s"),
@@ -264,50 +261,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                 "m4m.mailchimp_sync_delta",
                 "m4m.mailchimp_sync_modified"
             )
-        );
-    }
-
-    /**
-     * update product sync data
-     *
-     * @param $codeId
-     * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncDeleted
-     * @param int|null         $token
-     * @param bool             $saveOnlyIfexists
-     * @param null             $deletedRelatedId
-     * @param bool             $allowBatchRemoval
-     */
-    protected function _updateSyncData(
-        $type,           // NEW
-        $codeId,
-        $mailchimpStoreId,
-        $syncDelta = null,
-        $syncError = null,
-        $syncModified = 0,
-        $syncDeleted = null,
-        $syncedFlag = null,     // NEW
-        $token = null,
-        $saveOnlyIfexists = false,
-        $allowBatchRemoval = true,
-        $deletedRelatedId = null
-    ) {
-        $this->getHelper()->saveEcommerceSyncData(
-            $codeId,
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
-            $mailchimpStoreId,
-            $syncDelta,
-            $syncError,
-            $syncModified,
-            $syncDeleted,
-            $token,
-            null,
-            $saveOnlyIfexists,
-            $deletedRelatedId,
-            $allowBatchRemoval
         );
     }
 
@@ -412,7 +365,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         foreach ($promoCodes as $promoCode) {
             $mailchimpStoreId = $promoCode->getMailchimpStoreId();
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                 $codeId,
                 $mailchimpStoreId,
                 null,
@@ -514,7 +466,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
             'Parent rule with id ' . $ruleId . ' has not been correctly sent.'
         );
         $this->_updateSyncData(
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
             $codeId,
             $mailchimpStoreId,
             $dateHelper->formatDate(null, "Y-m-d H:i:s"),
