@@ -688,7 +688,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     protected function getBatchLimitFromConfig()
     {
-        $helper = $this->getHelper;
+        $helper = $this->getHelper();
         return $helper->getProductAmountLimit();
     }
 

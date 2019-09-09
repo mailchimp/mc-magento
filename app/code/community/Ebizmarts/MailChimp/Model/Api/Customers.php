@@ -389,7 +389,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function joinMailchimpSyncData($collection)
     {
         $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getSyncdataTableName();
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
 
         $collection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
