@@ -1063,4 +1063,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     {
         return Mage::getModel('newsletter/subscriber');
     }
+
+    /**
+     * @return string
+     */
+    protected function getClassConstant()
+    {
+        return Ebizmarts_MailChimp_Model_Config::IS_ORDER;
+    }
 }

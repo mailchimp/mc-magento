@@ -873,4 +873,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     {
         return Mage::getModel('mailchimp/api_products');
     }
+
+    /**
+     * @return string
+     */
+    protected function getClassConstant()
+    {
+        return Ebizmarts_MailChimp_Model_Config::IS_QUOTE;
+    }
 }

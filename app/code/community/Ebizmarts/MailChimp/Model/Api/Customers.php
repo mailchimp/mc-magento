@@ -702,4 +702,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         return array($customerArray, $counter);
     }
 
+    /**
+     * @return string
+     */
+    protected function getClassConstant()
+    {
+        return Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER;
+    }
+
 }
