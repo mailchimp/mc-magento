@@ -1163,7 +1163,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _showResumeEcommerce($batchId, $storeId)
     {
         $helper = $this->getHelper();
-        if (!empty($helper->getCountersSentPerBatch()) || $helper->getCountersSentPerBatch() != null) {
+        $countersSentPerBatch = $helper->getCountersSentPerBatch();
+
+        if (!empty($countersSentPerBatch) || $helper->getCountersSentPerBatch() != null) {
             $helper->logBatchStatus("Sent batch $batchId for store $storeId");
             $helper->logBatchQuantity($helper->getCountersSentPerBatch());
         } else {
@@ -1179,7 +1181,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _showResumeSubscriber($batchId, $storeId)
     {
         $helper = $this->getHelper();
-        if (!empty($helper->getCountersSubscribers()) || $helper->getCountersSubscribers() != null) {
+        $countersSubscribers = $helper->getCountersSubscribers();
+
+        if (!empty($countersSubscribers) || $helper->getCountersSubscribers() != null) {
             $helper->logBatchStatus("Sent batch $batchId for store $storeId");
             $helper->logBatchQuantity($helper->getCountersSubscribers());
         } else {
@@ -1194,7 +1198,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _showResumeDataSentToMailchimp($storeId)
     {
         $helper = $this->getHelper();
-        if (!empty($helper->getCountersDataSentToMailchimp()) || $helper->getCountersDataSentToMailchimp() != null) {
+        $countersDataSentToMailchimp = $helper->getCountersDataSentToMailchimp();
+
+        if (!empty($countersDataSentToMailchimp) || $helper->getCountersDataSentToMailchimp() != null) {
             $helper->logBatchStatus("Processed data sent to Mailchimp for store $storeId");
             $counter = $helper->getCountersDataSentToMailchimp();
             $helper->logBatchQuantity($counter);
