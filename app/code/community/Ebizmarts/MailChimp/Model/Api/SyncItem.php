@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     }
 
     /**
-     * @param $cartId
+     * @param $id
      * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
@@ -38,9 +38,9 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
      * @param null $token
      * @param bool $saveOnlyIfExists
      * @param bool $allowBatchRemoval
+     * @param int $deletedRelatedId
      */
     protected function _updateSyncData(
-        $type,
         $id,
         $mailchimpStoreId,
         $syncDelta = null,
@@ -53,21 +53,25 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         $allowBatchRemoval = true,
         $deletedRelatedId = null
     ) {
-        $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData(
-            $id,
-            $type,
-            $mailchimpStoreId,
-            $syncDelta,
-            $syncError,
-            $syncModified,
-            $syncDeleted,
-            $token,
-            $syncedFlag,
-            $saveOnlyIfExists,
-            $deletedRelatedId,
-            $allowBatchRemoval
-        );
+        $type = $this->getClassConstant();
+
+        if (!empty($type)) {
+            $helper = $this->getHelper();
+            $helper->saveEcommerceSyncData(
+                $id,
+                $type,
+                $mailchimpStoreId,
+                $syncDelta,
+                $syncError,
+                $syncModified,
+                $syncDeleted,
+                $token,
+                $syncedFlag,
+                $saveOnlyIfExists,
+                $deletedRelatedId,
+                $allowBatchRemoval
+            );
+        }
     }
 
     /**
@@ -110,5 +114,13 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     public function getCoreResource()
     {
         return Mage::getSingleton('core/resource');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getClassConstant()
+    {
+        return null;
     }
 }

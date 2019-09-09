@@ -194,13 +194,11 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('_updateSyncData')
             ->withConsecutive(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::ALREADY_SENT_CART_ID,
                     self::MAILCHIMP_STORE_ID,
                     null, null, null, 1, null
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::CART_ID,
                     self::MAILCHIMP_STORE_ID,
                     null, null, null, 1, null
@@ -378,11 +376,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('_updateSyncData')
             ->withConsecutive(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, null, $token
                 )
             );
@@ -517,7 +513,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
         $cartsApiMock->expects($this->once())
             ->method('_updateSyncData')
-            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, self::CART_ID, self::MAILCHIMP_STORE_ID);
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())
             ->method('getCustomerModel')
             ->willReturn($customerModelMock);
@@ -694,11 +690,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('_updateSyncData')
             ->withConsecutive(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::CART_ID, self::MAILCHIMP_STORE_ID
                 )
             );
@@ -894,11 +888,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('_updateSyncData')
             ->withConsecutive(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, null, $token
                 )
             );
@@ -1097,7 +1089,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
         $cartsApiMock->expects($this->once())
             ->method('_updateSyncData')
-            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, self::CART_ID, self::MAILCHIMP_STORE_ID);
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())
             ->method('getOrderCollection')
             ->willReturn($orderCollectionMock);
@@ -1222,7 +1214,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
         $cartsApiMock->expects($this->once())
             ->method('_updateSyncData')
-            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, self::CART_ID, self::MAILCHIMP_STORE_ID);
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())
             ->method('getOrderCollection')
             ->willReturn($orderCollectionMock);
@@ -1355,7 +1347,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
         $cartsApiMock->expects($this->once())
             ->method('_updateSyncData')
-            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, self::CART_ID, self::MAILCHIMP_STORE_ID);
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())
             ->method('getCustomerModel')
             ->willReturn($customerModelMock);
@@ -1550,11 +1542,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->method('_updateSyncData')
             ->withConsecutive(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     self::CART_ID, self::MAILCHIMP_STORE_ID
                 )
             );
