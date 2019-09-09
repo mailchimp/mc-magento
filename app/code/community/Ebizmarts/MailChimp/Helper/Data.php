@@ -1378,7 +1378,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function createMergeFields($scopeId, $scope)
     {
-        $success = 1;
+        $success = 0;
         $listId = $this->getGeneralList($scopeId, $scope);
         $maps = $this->unserialize($this->getMapFields($scopeId, $scope));
         $customFieldTypes = $this->unserialize($this->getCustomMergeFieldsSerialized($scopeId, $scope));
@@ -1399,7 +1399,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     );
                 } catch (MailChimp_Error $e) {
                     $this->logError($e->getFriendlyMessage());
-                    $success = 0;
                 }
 
                 if (!empty($mailchimpFields)) {
@@ -1418,10 +1417,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
                         }
                     }
+
+                    $success = 1;
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->logError($e->getMessage());
-                $success = 0;
             }
         }
 
