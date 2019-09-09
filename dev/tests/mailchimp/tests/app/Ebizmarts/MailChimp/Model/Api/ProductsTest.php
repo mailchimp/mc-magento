@@ -116,7 +116,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock
             ->expects($this->once())
             ->method('_updateSyncData')
-            ->with(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $productId, $mailchimpStoreId);
+            ->with($productId, $mailchimpStoreId);
 
         $helperMock->expects($this->once())
             ->method('getCurrentStoreId')
@@ -535,9 +535,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->expects($this->exactly(3))
             ->method('_updateSyncData')
             ->withConsecutive(
-                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $groupedProductId, $mailchimpStoreId),
-                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $oldProductId, $mailchimpStoreId),
-                array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $newProductId, $mailchimpStoreId)
+                array($groupedProductId, $mailchimpStoreId),
+                array($oldProductId, $mailchimpStoreId),
+                array($newProductId, $mailchimpStoreId)
             );
 
         $return = $productsApiMock->sendModifiedProduct($orderMock, $mailchimpStoreId, $magentoStoreId);
@@ -679,7 +679,6 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->expects($this->once())
             ->method('_updateSyncData')
             ->with(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $productMock->getId(),
                 $mailchimpStoreId,
                 null,
@@ -745,39 +744,30 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method('_updateSyncData')
             ->withConsecutive(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[0], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[1], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[2], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[3], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[4], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[5], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[6], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $parentIdArray[7], $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 ),
                 array(
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $productId, $mailchimpStoreId, null, null, 1, null, null, null, true, false
                 )
             );

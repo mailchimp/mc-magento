@@ -92,7 +92,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                         $batchArray
                     );
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $productId,
                         $mailchimpStoreId
                     );
@@ -122,13 +121,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
 
                     //update product delta
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $productId,
                         $mailchimpStoreId
                     );
                 } else {
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $productId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, 'Y-m-d H:i:s'),
@@ -169,7 +166,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             }
 
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $product->getId(),
                 $mailchimpStoreId,
                 null,
@@ -235,7 +231,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             );
 
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $product->getId(),
                 $mailchimpStoreId,
                 $this->getDateHelper()->getCurrentDateTime(),
@@ -305,7 +300,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                             . " json encode failed (".$jsonErrorMsg.")"
                         );
                         $this->_updateSyncData(
-                            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                             $parent->getId(),
                             $mailchimpStoreId,
                             $this->getDateHelper()->getCurrentDateTime(),
@@ -354,7 +348,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                 . " json encode failed (".$jsonErrorMsg.")"
             );
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $product->getId(),
                 $mailchimpStoreId,
                 $this->getDateHelper()->getCurrentDateTime(),
@@ -500,7 +493,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $parentIdArray = $this->getAllParentIds($productId);
         foreach ($parentIdArray as $parentId) {
             $this->_updateSyncData(
-                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $parentId,
                 $mailchimpStoreId,
                 null,
@@ -515,7 +507,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         }
 
         $this->_updateSyncData(
-            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
             $productId,
             $mailchimpStoreId,
             null,
@@ -538,7 +529,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     public function updateDisabledProducts($productId, $mailchimpStoreId)
     {
         $this->_updateSyncData(
-            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
             $productId,
             $mailchimpStoreId,
             null,
@@ -583,7 +573,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             ) {
                 if ($productId) {
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $productId,
                         $mailchimpStoreId,
                         $dateHelper->formatDate(null, 'Y-m-d H:i:s'),
@@ -616,7 +605,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                         $data
                     );
                     $this->_updateSyncData(
-                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $productId,
                         $mailchimpStoreId
                     );
@@ -629,7 +617,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     // avoid update for disabled products to prevent send the product as modified
                     if ($isProductEnabled) {
                         $this->_updateSyncData(
-                            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                             $productId,
                             $mailchimpStoreId
                         );
