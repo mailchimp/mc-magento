@@ -128,7 +128,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
      */
     protected function getFileContent($file)
     {
-        return json_decode(file_get_contents($file));
+        $fileContent = $this->getFileHelper()->read($file);
+        return json_decode($fileContent);
     }
 
     /**
