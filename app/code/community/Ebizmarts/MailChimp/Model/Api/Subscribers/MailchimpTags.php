@@ -592,7 +592,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
             $helper = $this->getMailchimpHelper();
             $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
             if ($this->isNotEmptyOrderCollection($orderCollection)) {
-                $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->getFirstItem();
+                $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->setPageSize(1);
                 $this->setLastOrder($lastOrder);
             }
         }

@@ -102,7 +102,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 )
             );
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
-        $collection->getSelect()->limit($limit);
+        $collection->setPageSize(1);
         $date = $dateHelper->getDateMicrotime();
         $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
         $counter = 0;
@@ -547,11 +547,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $collection = Mage::getResourceModel('newsletter/subscriber_collection')
             ->addFieldToFilter('subscriber_id', array('eq' => $itemId))
             ->addFieldToFilter('store_id', array('eq' => $magentoStoreId))
-            ->setCurPage(1)
-            ->setPageSize(1);
+            ->setCurPage(1);
 
         if ($collection->getSize()) {
-            $subscriberSyncDataItem = $collection->getFirstItem();
+            $subscriberSyncDataItem = $collection->setPageSize(1);
         }
 
         return $subscriberSyncDataItem;
