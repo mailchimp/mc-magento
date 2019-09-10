@@ -1052,7 +1052,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             $fileName = $logDir . DS . $batchId . '.Request.log';
             $oldPermission = umask(0033);
-            file_put_contents($fileName, $message);
+            $fileHelper->filePutContent($fileName, $message);
             umask($oldPermission);
         }
     }
@@ -1267,10 +1267,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER))
-            ->setOrder('related_id', 'DESC');
+            ->setOrder('related_id', 'DESC')
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
-            $customerSyncData = $syncDataCollection->setPageSize(1);
+            $customerSyncData = $syncDataCollection->getLastItem();
             $lastCustomerSent = $customerSyncData->getRelatedId();
         }
 
@@ -1289,10 +1290,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PRODUCT))
-            ->setOrder('related_id', 'DESC');
+            ->setOrder('related_id', 'DESC')
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
-            $productSyncData = $syncDataCollection->setPageSize(1);
+            $productSyncData = $syncDataCollection->getLastItem();
             $lastProductSent = $productSyncData->getRelatedId();
         }
 
@@ -1311,10 +1313,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_ORDER))
-            ->setOrder('related_id', 'DESC');
+            ->setOrder('related_id', 'DESC')
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
-            $orderSyncData = $syncDataCollection->setPageSize(1);
+            $orderSyncData = $syncDataCollection->getLastItem();
             $lastOrderSent = $orderSyncData->getRelatedId();
         }
 
@@ -1333,10 +1336,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_QUOTE))
-            ->setOrder('related_id', 'DESC');
+            ->setOrder('related_id', 'DESC')
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
-            $cartSyncData = $syncDataCollection->setPageSize(1);
+            $cartSyncData = $syncDataCollection->getLastItem();
             $lastCartSent = $cartSyncData->getRelatedId();
         }
 
@@ -1355,10 +1359,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncDataCollection = Mage::getResourceModel('mailchimp/ecommercesyncdata_collection')
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE))
-            ->setOrder('related_id', 'DESC');
+            ->setOrder('related_id', 'DESC')
+            ->setPageSize(1);
 
         if ($syncDataCollection->getSize()) {
-            $promoCodeSyncData = $syncDataCollection->setPageSize(1);
+            $promoCodeSyncData = $syncDataCollection->getLastItem();
             $lastPromoCodeSent = $promoCodeSyncData->getRelatedId();
         }
 
@@ -1629,10 +1634,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             ->addFieldToFilter('related_id', array('eq' => $itemId))
             ->addFieldToFilter('type', array('eq' => $itemType))
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId))
-            ->setCurPage(1);
+            ->setCurPage(1)
+            ->setPageSize(1);
 
         if ($collection->getSize()) {
-            $ecommerceSyndDataItem = $collection->setPageSize(1);
+            $ecommerceSyndDataItem = $collection->getLastItem();
         } else {
             $ecommerceSyndDataItem = $this->getModelMailchimpEcommerceSyncData()
                 ->setData("related_id", $itemId)
@@ -2760,7 +2766,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $subscriber = Mage::getModel('newsletter/subscriber')->getCollection()
                 ->addFieldToFilter('store_id', array('in' => $storeIds))
                 ->addFieldToFilter('subscriber_email', $email)
-                ->setPageSize(1);
+                ->setPageSize(1, 1)->getLastItem();
 
             if (!$subscriber->getId()) {
                 /**
@@ -2806,7 +2812,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $customer = Mage::getResourceModel('customer/customer_collection')
                 ->addFieldToFilter('store_id', array('in' => $storeIds))
                 ->addFieldToFilter('email', array('eq' => $email))
-                ->setPageSize(1);
+                ->setPageSize(1, 1)->getLastItem();
+
             if ($customer->getId()) {
                 $customer = Mage::getModel('customer/customer')->load($customer->getId());
             } else {
@@ -3090,8 +3097,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
             ->addFieldToFilter('value', array('eq' => $mailChimpStoreId));
+
         if ($collection->getSize()) {
-            $configEntry = $collection->setPageSize(1);
+            $configEntry = $collection->setPageSize(1, 1)->getLastItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
 
@@ -3111,8 +3119,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => $path))
             ->addFieldToFilter('value', array('eq' => $value));
+
         if ($collection->getSize()) {
-            $configEntry = $collection->setPageSize(1);
+            $configEntry = $collection->setPageSize(1, 1)->getLastItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
 

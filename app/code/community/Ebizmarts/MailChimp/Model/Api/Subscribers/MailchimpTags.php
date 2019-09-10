@@ -588,11 +588,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     protected function getLastOrderByEmail()
     {
         $lastOrder = $this->getLastOrder();
+
         if ($lastOrder === null) {
             $helper = $this->getMailchimpHelper();
             $orderCollection = $helper->getOrderCollectionByCustomerEmail($this->getSubscriber()->getSubscriberEmail());
+
             if ($this->isNotEmptyOrderCollection($orderCollection)) {
-                $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->setPageSize(1);
+                $lastOrder = $orderCollection->setOrder('created_at', 'DESC')->setPageSize(1, 1)->getLastItem();
                 $this->setLastOrder($lastOrder);
             }
         }
