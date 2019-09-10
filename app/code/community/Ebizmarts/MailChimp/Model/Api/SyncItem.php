@@ -75,6 +75,79 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     }
 
     /**
+     * @param $error
+     * @param null $mailchimpStoreId
+     * @param string $type
+     * @param null $title
+     * @param null $status
+     * @param null $originalId
+     * @param int $batchId
+     * @param null $storeId
+     * @param null $regType
+     */
+    protected function logSyncError(
+        $error,
+        $mailchimpStoreId = null,
+        $type = 'magento_side_error',
+        $title = null,
+        $status = null,
+        $originalId = null,
+        $batchId = -1,
+        $storeId = null,
+        $regType = null
+    ) {
+        $this->getHelper()->logError($error);
+
+        try {
+            $this->_logMailchimpError(
+                $error, $mailchimpStoreId, $type, $title,
+                $status, $originalId, $batchId, $storeId, $regType
+            );
+        } catch (Exception $e) {
+            $this->getHelper()->logError($e->getMessage());
+        }
+    }
+
+    /**
+     * @param $error
+     * @param $mailchimpStoreId
+     * @param $type
+     * @param $title
+     * @param $status
+     * @param $originalId
+     * @param $batchId
+     * @param $storeId
+     * @param $regType
+     *
+     * @throws Exception
+     */
+    protected function _logMailchimpError(
+        $error,
+        $mailchimpStoreId,
+        $type,
+        $title,
+        $status,
+        $originalId,
+        $batchId,
+        $storeId,
+        $regType
+    ) {
+        $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
+
+        $mailchimpErrors->setType($type);
+        $mailchimpErrors->setTitle($title);
+        $mailchimpErrors->setStatus($status);
+        $mailchimpErrors->setErrors($error);
+        $mailchimpErrors->setRegtype($regType);
+        $mailchimpErrors->setOriginalId($originalId);
+        $mailchimpErrors->setBatchId($batchId);
+        $mailchimpErrors->setStoreId($storeId);
+        $mailchimpErrors->setMailchimpStoreId($mailchimpStoreId);
+
+        $mailchimpErrors->save();
+    }
+
+    /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
     protected function getHelper()
