@@ -5093,6 +5093,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function getFileHelper()
     {
-        return Mage::helper('mailchimp/helper');
+        return Mage::helper('mailchimp/file');
     }
 }
