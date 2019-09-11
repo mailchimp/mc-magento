@@ -55,6 +55,14 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     ) {
         $type = $this->getClassConstant();
 
+        if ($syncError !== null) {
+            $this->logSyncError(
+                "Update Sync Data error: " . $syncError,
+                $type,
+                $mailchimpStoreId
+            );
+        }
+
         if (!empty($type)) {
             $helper = $this->getHelper();
             $helper->saveEcommerceSyncData(
