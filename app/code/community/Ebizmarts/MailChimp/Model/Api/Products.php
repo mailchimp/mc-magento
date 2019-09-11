@@ -225,9 +225,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         if ($body === false) {
             //json encode failed
             $jsonErrorMsg = json_last_error_msg();
-            $this->getHelper()->logError(
-                "Product " . $product->getId()
-                . " json encode failed (".$jsonErrorMsg.")"
+            $this->logSyncError(
+                "Product " . $product->getId() . " json encode failed (".$jsonErrorMsg.")",
+                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+                $mailchimpStoreId, $magentoStoreId
             );
 
             $this->_updateSyncData(
@@ -295,10 +296,12 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
                     if ($body === false) {
                         $jsonErrorMsg = json_last_error_msg();
-                        $this->getHelper()->logError(
-                            "Product " . $parent->getId()
-                            . " json encode failed (".$jsonErrorMsg.")"
+                        $this->logSyncError(
+                            "Product " . $parent->getId() . " json encode failed (".$jsonErrorMsg.")",
+                            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+                            $mailchimpStoreId, $magentoStoreId
                         );
+
                         $this->_updateSyncData(
                             $parent->getId(),
                             $mailchimpStoreId,
@@ -337,16 +340,19 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
         if ($body === false) {
             //json encode failed
-            $this->getHelper()->logError(
-                "Product " . $product->getId()
-                . " json encode failed (".json_last_error_msg().")"
+            $this->logSyncError(
+                "Product " . $product->getId() . " json encode failed (".json_last_error_msg().")",
+                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+                null, $magentoStoreId
             );
 
             $jsonErrorMsg = json_last_error_msg();
-            $this->getHelper()->logError(
-                "Product " . $product->getId()
-                . " json encode failed (".$jsonErrorMsg.")"
+            $this->logSyncError(
+                "Product " . $product->getId() . " json encode failed (".$jsonErrorMsg.")",
+                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+                null, $magentoStoreId
             );
+
             $this->_updateSyncData(
                 $product->getId(),
                 $mailchimpStoreId,

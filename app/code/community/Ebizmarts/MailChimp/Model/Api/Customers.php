@@ -465,9 +465,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function logCouldNotEncodeCustomerError($customer)
     {
         $jsonErrorMessage = json_last_error_msg();
-        $this->getHelper()->logError(
+        $this->logSyncError(
             "Customer " . $customer->getId() . " json encode failed (".$jsonErrorMessage.") on store "
-            . $this->getBatchMagentoStoreId()
+            . $this->getBatchMagentoStoreId(),
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
         );
         return $jsonErrorMessage;
     }
@@ -478,11 +479,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      */
     protected function logCouldNotEncodeMailchimpTags($customer, $mailchimpTags)
     {
-        $this->getHelper()->logError(
+        $this->logSyncError(
             "MailChimp tags encode failed, Customer " . $customer->getId() . " on store " .
-            $this->getBatchMagentoStoreId()." mergeFields:"
+            $this->getBatchMagentoStoreId()." mergeFields: " . $mailchimpTags,
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
         );
-        $this->getHelper()->logError($mailchimpTags);
     }
 
     /**

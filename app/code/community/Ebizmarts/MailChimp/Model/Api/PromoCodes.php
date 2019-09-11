@@ -166,7 +166,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                     }
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
-                    $helper->logError("Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")");
+                    $this->logSyncError(
+                        "Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")",
+                        Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
+                        $mailchimpStoreId, $magentoStoreId
+                    );
+
                     $this->_updateSyncData(
                         $codeId,
                         $mailchimpStoreId,
@@ -182,7 +187,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                     );
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage());
+                $this->logSyncError(
+                    $e->getMessage(),
+                    Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
+                    $mailchimpStoreId, $magentoStoreId
+                );
             }
         }
 
@@ -436,7 +445,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                         $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
                     }
                 } catch (MailChimp_Error $e) {
-                    $helper->logError($e->getFriendlyMessage());
+                    $this->logSyncError(
+                        $e->getFriendlyMessage(),
+                        Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
+                        $mailchimpStoreId
+                    );
                 }
             }
         }

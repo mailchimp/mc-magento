@@ -87,14 +87,14 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
      */
     protected function logSyncError(
         $error,
+        $regType = null,
         $mailchimpStoreId = null,
+        $storeId = null,
         $type = 'magento_side_error',
         $title = null,
         $status = null,
         $originalId = null,
-        $batchId = -1,
-        $storeId = null,
-        $regType = null
+        $batchId = -1
     ) {
         $this->getHelper()->logError($error);
 
