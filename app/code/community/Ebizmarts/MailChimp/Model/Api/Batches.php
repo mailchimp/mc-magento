@@ -251,7 +251,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $magentoStoreId,
         $isEcommerceData = true,
         $status = Ebizmarts_MailChimp_Helper_Data::BATCH_PENDING
-    ) {
+    )
+    {
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
@@ -432,7 +433,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $orderAmount,
         $mailchimpStoreId,
         $magentoStoreId
-    ) {
+    )
+    {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
@@ -908,7 +910,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
 
-                    if ($batchJson === false ) {
+                    if ($batchJson === false) {
                         $helper->logRequest('Json encode error: '.json_last_error_msg());
                     } elseif ($batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
@@ -962,7 +964,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $token = null,
         $syncedFlag = null,
         $saveOnlyIfexists = false
-    ) {
+    )
+    {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
