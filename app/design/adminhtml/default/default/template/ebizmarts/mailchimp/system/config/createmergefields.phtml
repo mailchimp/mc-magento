@@ -7,6 +7,9 @@
                 if (transport.responseText == 1) {
                     alert('The merge fields were successfully created.')
                 }
+                else if (transport.responseText == 2) {
+                    alert("Max. merge fields reached. \nOnly up to 30 merge fields are allowed.");
+                }
                 else {
                     alert('<?php echo $this->escapeHtml($this->getMessageForMailchimpErrorLog()) ?>')
                 }
