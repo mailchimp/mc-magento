@@ -74,6 +74,60 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         }
     }
 
+    protected function addSyncDataError(
+        $id,
+        $mailchimpStoreId,
+        $error,
+        $token = null,
+        $saveOnlyIfExists = false,
+        $syncDelta = null
+    ) {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            $syncDelta,
+            $error,
+            0,
+            null,
+            null,
+            $token,
+            $saveOnlyIfExists,
+            -1
+        );
+    }
+
+    protected function addSyncData($id, $mailchimpStoreId)
+    {
+        $this->_updateSyncData($id, $mailchimpStoreId);
+    }
+
+    protected function addSyncDataToken($id, $mailchimpStoreId, $token)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            0,
+            null,
+            null,
+            $token
+        );
+    }
+
+    protected function markSyncDataAsDeleted($id, $mailchimpStoreId)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            0,
+            1,
+            null
+        );
+    }
+
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
