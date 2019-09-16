@@ -300,7 +300,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getCounter',
                 '_makeCart',
                 'getAllCartsByEmail',
-                'addProductNotSentData'
+                'addProductNotSentData',
+                'addSyncDataToken',
+                'markSyncDataAsDeleted'
             )
         )
             ->getMock();
@@ -372,16 +374,22 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 self::COUNTER,
                 self::COUNTER
             );
-        $cartsApiMock->expects($this->exactly(2))
-            ->method('_updateSyncData')
-            ->withConsecutive(
-                array(
-                    self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
-                ),
-                array(
-                    self::CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, null, $token
-                )
-            );
+        $cartsApiMock->expects($this->once())
+            ->method('markSyncDataAsDeleted')
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
+        $cartsApiMock->expects($this->once())
+            ->method('addSyncDataToken')
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID, $token);
+//        $cartsApiMock->expects($this->exactly(2))
+//            ->method('_updateSyncData')
+//            ->withConsecutive(
+//                array(
+//                    self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
+//                ),
+//                array(
+//                    self::CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, null, $token
+//                )
+//            );
         $cartsApiMock->expects($this->exactly(2))
             ->method('setCounter')
             ->withConsecutive(
@@ -619,7 +627,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getCounter',
                 '_makeCart',
                 'getAllCartsByEmail',
-                'addProductNotSentData'
+                'addProductNotSentData',
+                'markSyncDataAsDeleted',
+                'addSyncDataError'
             )
         )
             ->getMock();
@@ -686,16 +696,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 self::COUNTER,
                 self::COUNTER
             );
-        $cartsApiMock->expects($this->exactly(2))
-            ->method('_updateSyncData')
-            ->withConsecutive(
-                array(
-                    self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
-                ),
-                array(
-                    self::CART_ID, self::MAILCHIMP_STORE_ID
-                )
-            );
+        $cartsApiMock->expects($this->once())
+            ->method('markSyncDataAsDeleted')
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
+        $cartsApiMock->expects($this->once())
+            ->method('addSyncDataError')
+            ->with(self::CART_ID, self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())
             ->method('setCounter')
             ->with(self::COUNTER + 1);
