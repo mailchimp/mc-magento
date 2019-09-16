@@ -112,18 +112,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                         $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                         $batchArray[$this->_counter]['body'] = $orderJson;
                         //update order delta
-                        $this->_updateSyncData($orderId, $mailchimpStoreId);
+                        $this->addSyncData($orderId, $mailchimpStoreId);
                         $this->_counter++;
                     } else {
                         $error = $helper->__('Something went wrong when retrieving product information.');
-                        $this->_updateSyncData(
+
+                        $this->addSyncDataError(
                             $orderId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                             $error,
-                            0,
                             null,
-                            0
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
@@ -131,17 +131,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                     $jsonErrorMsg = json_last_error_msg();
                     $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
 
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $orderId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $jsonErrorMsg,
-                        0,
-                        null,
-                        0,
                         null,
                         false,
-                        -1
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                 }
             } catch (Exception $e) {
@@ -197,18 +193,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                         $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                         $batchArray[$this->_counter]['body'] = $orderJson;
                         //update order delta
-                        $this->_updateSyncData($orderId, $mailchimpStoreId);
+                        $this->addSyncData($orderId, $mailchimpStoreId);
                         $this->_counter++;
                     } else {
                         $error = $helper->__('Something went wrong when retrieving product information.');
-                        $this->_updateSyncData(
+
+                        $this->addSyncDataError(
                             $orderId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                             $error,
-                            0,
                             null,
-                            0
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
@@ -216,17 +212,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                     $jsonErrorMsg = json_last_error_msg();
                     $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
 
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $orderId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $jsonErrorMsg,
-                        0,
-                        null,
-                        0,
                         null,
                         false,
-                        -1
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                 }
             } catch (Exception $e) {
@@ -679,18 +671,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $helper = $this->getHelper();
         if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
             $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
-            $this->_updateSyncData(
-                $orderId,
-                $mailchimpStoreId,
-                null,
-                null,
-                1,
-                null,
-                null,
-                null,
-                true,
-                false
-            );
+            $this->markSyncDataAsModified($orderId, $mailchimpStoreId);
         }
     }
 
@@ -763,27 +744,25 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                         $error = $helper->__(
                             'Something went wrong when retrieving product information during migration from 1.1.6.'
                         );
-                        $this->_updateSyncData(
+                        $this->addSyncDataError(
                             $orderId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                             $error,
-                            0,
                             null,
-                            0
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
                 } else {
                     $error = $helper->__("Json error during migration from 1.1.6");
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $orderId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $error,
-                        0,
                         null,
-                        0
+                        false,
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                     continue;
                 }

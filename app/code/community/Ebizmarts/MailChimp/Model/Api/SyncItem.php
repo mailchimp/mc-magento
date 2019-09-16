@@ -115,6 +115,17 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         );
     }
 
+    protected function markSyncDataAsModified($id, $mailchimpStoreId)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            1
+        );
+    }
+
     protected function markSyncDataAsDeleted($id, $mailchimpStoreId)
     {
         $this->_updateSyncData(
@@ -123,8 +134,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
             null,
             null,
             0,
-            1,
-            null
+            1
         );
     }
 

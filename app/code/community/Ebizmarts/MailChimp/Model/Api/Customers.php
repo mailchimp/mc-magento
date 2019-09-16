@@ -116,15 +116,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                     );
 
                     $customerArray[$counter] = $this->makePutBatchStructure($customerJson, $customer);
-                    $this->_updateSyncData(
-                        $customer->getId(),
-                        $mailchimpStoreId,
-                        null,
-                        null,
-                        0,
-                        null,
-                        null
-                    );
+                    $this->addSyncData($customer->getId(), $mailchimpStoreId);
                     $counter++;
 
                     if (!$isSubscribed) {
@@ -144,27 +136,24 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                         }
                     }
                 } else {
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $customer->getId(),
                         $mailchimpStoreId,
-                        $this->getDateHelper()->getCurrentDateTime(),
                         'Customer with no data',
-                        0
+                        null,
+                        false,
+                        $this->getDateHelper()->getCurrentDateTime()
                     );
                 }
             } else {
                 $jsonErrorMessage = $this->logCouldNotEncodeCustomerError($customer);
-                $this->_updateSyncData(
+                $this->addSyncDataError(
                     $customer->getId(),
                     $mailchimpStoreId,
-                    $this->getDateHelper()->getCurrentDateTime(),
                     $jsonErrorMessage,
-                    0,
-                    null,
-                    null,
                     null,
                     false,
-                    -1
+                    $this->getDateHelper()->getCurrentDateTime()
                 );
             }
         }
@@ -317,18 +306,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     public function update($customerId, $storeId)
     {
         $mailchimpStoreId = $this->getHelper()->getMCStoreId($storeId);
-        $this->_updateSyncData(
-            $customerId,
-            $mailchimpStoreId,
-            null,
-            null,
-            1,
-            null,
-            null,
-            null,
-            true,
-            false
-        );
+        $this->markSyncDataAsModified($customerId, $mailchimpStoreId);
     }
 
     /**
