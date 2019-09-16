@@ -383,12 +383,13 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $itemOneSyncDelta = '2018-03-14 15:03:37';
         $itemTwoSyncDelta = '2018-03-14 15:03:35';
         $isProductEnabled = false;
+        $error = "This product type is not supported on MailChimp.";
 
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
-                array('makeBatchId', '_updateSyncData', 'loadProductById', 'isGroupedProduct',
+                array('makeBatchId', 'loadProductById', 'isGroupedProduct',
                      'isBundleProduct', '_buildUpdateProductRequest', '_buildNewProductRequest',
-                    'isProductEnabled', 'getHelper', 'getDateHelper'
+                    'isProductEnabled', 'getHelper', 'getDateHelper', 'addSyncData', 'addSyncDataError'
                 )
             )
             ->getMock();
@@ -461,6 +462,11 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             $newProductId
         );
 
+        $dateHelperMock->expects($this->once())
+            ->method('formatDate')
+            ->with(null, 'Y-m-d H:i:s')
+            ->willReturn($ecomSyncDateFlag);
+
         $productsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $productsApiMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
 
@@ -532,10 +538,14 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->willReturn(array());
 
         $productsApiMock
-            ->expects($this->exactly(3))
-            ->method('_updateSyncData')
+            ->expects($this->once())
+            ->method('addSyncDataError')
+            ->with($groupedProductId, $mailchimpStoreId, $error, null, null, $ecomSyncDateFlag);
+
+        $productsApiMock
+            ->expects($this->exactly(2))
+            ->method('addSyncData')
             ->withConsecutive(
-                array($groupedProductId, $mailchimpStoreId),
                 array($oldProductId, $mailchimpStoreId),
                 array($newProductId, $mailchimpStoreId)
             );
@@ -723,7 +733,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
 
         $productsApiMock = $this->_productsApiMock
-            ->setMethods(array('getAllParentIds', '_updateSyncData'))
+            ->setMethods(array('getAllParentIds', 'markSyncDataAsModified'))
             ->getMock();
 
         $productIdArrayMock = $this->getMockBuilder(ArrayObject::class)
@@ -741,35 +751,17 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->willReturn(new ArrayIterator($parentIdArray));
 
         $productsApiMock->expects($this->exactly(9))
-            ->method('_updateSyncData')
+            ->method('markSyncDataAsModified')
             ->withConsecutive(
-                array(
-                    $parentIdArray[0], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[1], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[2], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[3], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[4], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[5], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[6], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $parentIdArray[7], $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                ),
-                array(
-                    $productId, $mailchimpStoreId, null, null, 1, null, null, null, true, false
-                )
+                array($parentIdArray[0], $mailchimpStoreId),
+                array($parentIdArray[1], $mailchimpStoreId),
+                array($parentIdArray[2], $mailchimpStoreId),
+                array($parentIdArray[3], $mailchimpStoreId),
+                array($parentIdArray[4], $mailchimpStoreId),
+                array($parentIdArray[5], $mailchimpStoreId),
+                array($parentIdArray[6], $mailchimpStoreId),
+                array($parentIdArray[7], $mailchimpStoreId),
+                array($productId, $mailchimpStoreId)
             );
 
         $productsApiMock->update($productId, $mailchimpStoreId);
