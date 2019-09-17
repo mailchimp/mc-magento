@@ -74,6 +74,23 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         }
     }
 
+    protected function addDeletedRelatedId($id, $mailchimpStoreId, $relatedId)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            0,
+            1,
+            null,
+            null,
+            true,
+            false,
+            $relatedId
+        );
+    }
+
     protected function addSyncDataError(
         $id,
         $mailchimpStoreId,

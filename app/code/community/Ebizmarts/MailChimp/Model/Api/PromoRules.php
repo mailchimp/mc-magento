@@ -98,35 +98,33 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                         . $dateHelper->getDateMicrotime() . '_' . $ruleId;
                     $promoData['body'] = $promoRuleJson;
                     //update promo rule delta
-                    $this->_updateSyncData($ruleId, $mailchimpStoreId);
+                    $this->addSyncData($ruleId, $mailchimpStoreId);
                 } else {
                     $error = $promoRule->getMailchimpSyncError();
                     if (!$error) {
                         $error = $helper->__('Something went wrong when retrieving the information.');
                     }
 
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $ruleId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                        $error
+                        $error,
+                        null,
+                        false,
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                 }
             } else {
                 $jsonErrorMsg = json_last_error_msg();
                 $helper->logError("Promo rule " . $ruleId . " json encode failed (".$jsonErrorMsg.")");
 
-                $this->_updateSyncData(
+                $this->addSyncDataError(
                     $ruleId,
                     $mailchimpStoreId,
-                    $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                     $jsonErrorMsg,
-                    0,
-                    null,
-                    null,
                     null,
                     false,
-                    -1
+                    $dateHelper->formatDate(null, "Y-m-d H:i:s")
                 );
             }
         } catch (Exception $e) {
@@ -335,18 +333,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         );
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $this->_updateSyncData(
-                $ruleId,
-                $mailchimpStoreId,
-                null,
-                null,
-                1,
-                null,
-                null,
-                null,
-                true,
-                false
-            );
+            $this->markSyncDataAsModified($ruleId, $mailchimpStoreId);
         }
     }
 
@@ -370,18 +357,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         );
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $this->_updateSyncData(
-                $ruleId,
-                $mailchimpStoreId,
-                null,
-                null,
-                0,
-                1,
-                null,
-                null,
-                true,
-                false
-            );
+            $this->markSyncDataAsDeleted($ruleId, $mailchimpStoreId);
         }
     }
 

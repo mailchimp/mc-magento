@@ -143,42 +143,30 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                         $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $codeId;
                         $batchArray[$counter]['body'] = $promoCodeJson;
 
-                        $this->_updateSyncData(
-                            $codeId,
-                            $mailchimpStoreId,
-                            null,
-                            null,
-                            0,
-                            null,
-                            null,
-                            $promoCode->getToken()
-                        );
+                        $this->addSyncDataToken($codeId, $mailchimpStoreId, $promoCode->getToken());
                         $counter++;
                     } else {
                         $error = $helper->__('Something went wrong when retrieving the information.');
-                        $this->_updateSyncData(
+                        $this->addSyncDataError(
                             $codeId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-                            $error
+                            $error,
+                            null,
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
                     $helper->logError("Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")");
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $codeId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $jsonErrorMsg,
-                        0,
-                        null,
-                        null,
                         null,
                         false,
-                        -1,
-                        null
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                 }
             } catch (Exception $e) {
@@ -364,19 +352,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         );
         foreach ($promoCodes as $promoCode) {
             $mailchimpStoreId = $promoCode->getMailchimpStoreId();
-            $this->_updateSyncData(
-                $codeId,
-                $mailchimpStoreId,
-                null,
-                null,
-                0,
-                1,
-                null,
-                null,
-                true,
-                false,
-                $promoRuleId
-            );
+            $this->addDeletedRelatedId($codeId, $mailchimpStoreId, $promoRuleId);
         }
     }
 
@@ -465,11 +441,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $error = Mage::helper('mailchimp')->__(
             'Parent rule with id ' . $ruleId . ' has not been correctly sent.'
         );
-        $this->_updateSyncData(
+        $this->addSyncDataError(
             $codeId,
             $mailchimpStoreId,
-            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
-            $error
+            $error,
+            null,
+            false,
+            $dateHelper->formatDate(null, "Y-m-d H:i:s")
         );
     }
 
