@@ -72,9 +72,9 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $collection = $this->makeProductsNotSentCollection($magentoStoreId);
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId);
         $batchArray = array();
-
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
+
         foreach ($collection as $product) {
             $productId = $product->getId();
 
@@ -486,7 +486,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     public function updateDisabledProducts($productId, $mailchimpStoreId)
     {
-        $this->markSyncDataAsDeleted($productId, $mailchimpStoreId);
+        $this->markSyncDataAsDeleted($productId, $mailchimpStoreId, 0);
     }
 
     /**
@@ -629,12 +629,9 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     protected function shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)
     {
-        $helper = $this->getHelper();
-        $resendTurn = $helper->getResendTurn($magentoStoreId);
-        return !$resendTurn
-            && $product->getMailchimpSyncModified()
+        return $product->getMailchimpSyncModified()
             && $product->getMailchimpSyncDelta()
-            && $product->getMailchimpSyncDelta() > $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)
+            && $product->getMailchimpSyncedFlag()
             && $product->getMailchimpSyncError() == '';
     }
 
@@ -867,7 +864,8 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                 "m4m.type",
                 "m4m.mailchimp_store_id",
                 "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified"
+                "m4m.mailchimp_sync_modified",
+                "m4m.mailchimp_synced_flag"
             )
         );
     }
@@ -1243,7 +1241,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
 
         $whereCondition = $connection->quoteInto(
             'm4m.mailchimp_sync_delta IS NOT NULL '
-                . 'AND m4m.mailchimp_sync_delta < ?',
+            . 'AND m4m.mailchimp_sync_delta < ?',
             $this->getDateHelper()->formatDate() . " 00:00:00"
         );
         $collection->getSelect()->where($whereCondition);

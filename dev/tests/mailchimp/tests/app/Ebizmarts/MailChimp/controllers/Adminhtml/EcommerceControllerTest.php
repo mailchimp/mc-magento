@@ -212,7 +212,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
             );
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(true);
-        $helperMock->expects($this->once())->method('createMergeFields')->with($scopeId, $scope);
+        $helperMock->expects($this->once())->method('createMergeFields')->with($scopeId, $scope)->willReturn($result);
 
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 

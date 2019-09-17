@@ -143,7 +143,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         );
     }
 
-    protected function markSyncDataAsDeleted($id, $mailchimpStoreId)
+    protected function markSyncDataAsDeleted($id, $mailchimpStoreId, $syncedFlag = null)
     {
         $this->_updateSyncData(
             $id,
@@ -151,7 +151,8 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
             null,
             null,
             0,
-            1
+            1,
+            $syncedFlag
         );
     }
 
