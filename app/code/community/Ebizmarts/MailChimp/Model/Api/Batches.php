@@ -251,8 +251,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $magentoStoreId,
         $isEcommerceData = true,
         $status = Ebizmarts_MailChimp_Helper_Data::BATCH_PENDING
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
@@ -311,6 +310,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         try {
             $this->deleteUnsentItems();
+
             if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
                 $helper->resetCountersSentPerBatch();
                 $batchArray = array();
@@ -326,17 +326,22 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productsArray = $apiProducts->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
+
                 //cart operations
-                $helper->logBatchStatus('Generate Carts Payload');
-                $apiCarts = $this->getApiCarts();
-                $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
-                //order operations
-                $helper->logBatchStatus('Generate Orders Payload');
-                $apiOrders = $this->getApiOrders();
-                $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                $orderAmount = count($ordersArray);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
+                if ($helper->getMCIsSyncing($mailchimpStoreId)) {
+                    $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
+                } else {
+                    $helper->logBatchStatus('Generate Carts Payload');
+                    $apiCarts = $this->getApiCarts();
+                    $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);//order operations
+                    $helper->logBatchStatus('Generate Orders Payload');
+                    $apiOrders = $this->getApiOrders();
+                    $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $orderAmount = count($ordersArray);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
+                }
+
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
                     $helper->logBatchStatus('Generate Promo Rules Payload');
@@ -433,8 +438,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $orderAmount,
         $mailchimpStoreId,
         $magentoStoreId
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
@@ -964,8 +968,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $token = null,
         $syncedFlag = null,
         $saveOnlyIfexists = false
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);

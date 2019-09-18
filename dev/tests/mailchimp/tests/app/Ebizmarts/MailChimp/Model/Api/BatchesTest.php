@@ -353,6 +353,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $sendPromo = $data['sendPromo'];
         $batchArray = array();
         $batchArray['operations'] = $data['batchArray'];
+        $isSyncyng = null;
 
         $customerArray = $this->getCustomerArray();
 
@@ -380,7 +381,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
                 array('getHelper', 'getApiCustomers', 'getApiProducts',
                     'getApiCarts', 'getApiOrders', 'deleteUnsentItems',
                     'markItemsAsSent', 'getApiPromoRules', 'getApiPromoCodes',
-                    'getSyncBatchesModel', '_showResumeEcommerce')
+                    'getSyncBatchesModel')
             )
             ->getMock();
 
@@ -440,7 +441,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->setMethods(array('setStoreId', 'setBatchId', 'setStatus', 'save'))
             ->getMock();
 
-        $apiBatchesMock->expects($this->exactly(3))->method('getHelper')->willReturn($helperMock);
+        $apiBatchesMock->expects($this->exactly(4))->method('getHelper')->willReturn($helperMock);
         $helperMock
             ->expects($this->once())
             ->method('getMCStoreId')
@@ -448,8 +449,6 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->willReturn($mailchimpStoreId);
 
         $apiBatchesMock->expects($this->once())->method('deleteUnsentItems');
-
-        $apiBatchesMock->expects($this->once())->method('_showResumeEcommerce')->with($batchResponse['id']);
 
         $helperMock
             ->expects($this->once())
@@ -531,10 +530,11 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->with($batchResponse['id'], $mailchimpStoreId);
 
         $helperMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getMCIsSyncing')
-            ->with($mailchimpStoreId, $magentoStoreId)
+            ->with($mailchimpStoreId)
             ->willReturn($syncingFlag);
+
         $helperMock->expects($this->once())->method('validateDate')->with($syncingFlag)->willReturn(true);
         $helperMock
             ->expects($this->once())
@@ -556,7 +556,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $batchArray = array();
 
         return array(
-            array(array('sendPromo' => 0,
+            array(
+                array('sendPromo' => 0,
                 'customerArray' => $batchArray['operations'] = $this->getCustomerArray(),
                 'productsArray' => $batchArray['operations'] = array_merge(
                     $batchArray['operations'],
@@ -575,7 +576,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
                     $this->getDeletedProductArray()
                 ),
                 'batchArray' => $batchArray['operations'])),
-            array(array('sendPromo' => 1,
+            array(
+                array('sendPromo' => 1,
                 'customerArray' => $batchArray['operations'] = $this->getCustomerArray(),
                 'productsArray' => $batchArray['operations'] = array_merge(
                     $batchArray['operations'],
