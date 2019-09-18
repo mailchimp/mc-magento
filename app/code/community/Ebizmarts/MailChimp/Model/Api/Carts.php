@@ -112,15 +112,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                         . $alreadySentCartId;
                     $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                     $allCarts[$counter]['body'] = '';
-                    $this->_updateSyncData(
-                        $alreadySentCartId,
-                        $mailchimpStoreId,
-                        null,
-                        null,
-                        0,
-                        1,
-                        null
-                    );
+
+                    $this->markSyncDataAsDeleted($alreadySentCartId, $mailchimpStoreId);
                     $this->setCounter($this->getCounter() + 1);
                 }
             }
@@ -131,15 +124,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
             $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
             $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
             $allCarts[$counter]['body'] = '';
-            $this->_updateSyncData(
-                $cartId,
-                $mailchimpStoreId,
-                null,
-                null,
-                0,
-                1,
-                null
-            );
+
+            $this->markSyncDataAsDeleted($cartId, $mailchimpStoreId);
             $this->setCounter($this->getCounter() + 1);
         }
 
@@ -206,15 +192,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                             . $alreadySentCartId;
                         $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                         $allCarts[$counter]['body'] = '';
-                        $this->_updateSyncData(
-                            $alreadySentCartId,
-                            $mailchimpStoreId,
-                            null,
-                            null,
-                            0,
-                            1,
-                            null
-                        );
+
+                        $this->markSyncDataAsDeleted($cartId, $mailchimpStoreId);
                         $this->setCounter($this->getCounter() + 1);
                     }
                 }
@@ -224,7 +203,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // avoid carts abandoned as guests when customer email associated to a registered customer.
             if (!$cart->getCustomerId() && $customer->getEmail() == $cart->getCustomerEmail()) {
-                $this->_updateSyncData($cartId, $mailchimpStoreId);
+                $this->addSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
 
@@ -242,42 +221,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                     $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                     $allCarts[$counter]['body'] = $cartJson;
                     $this->setCounter($this->getCounter() + 1);
-                    $this->_updateSyncData(
-                        $cartId,
-                        $mailchimpStoreId,
-                        null,
-                        null,
-                        0,
-                        null,
-                        null,
-                        $this->getToken()
-                    );
+
+                    $this->addSyncDataToken($cartId, $mailchimpStoreId, $this->getToken());
                 } else {
                     $error = $helper->__('There is not supported products in this cart.');
 
-                    $this->_updateSyncData(
-                        $cartId,
-                        $mailchimpStoreId,
-                        null,
-                        $error,
-                        0
-                    );
+                    $this->addSyncDataError($cartId, $mailchimpStoreId, $error);
                 }
             } else {
                 $jsonErrorMessage = json_last_error_msg();
-
-                $this->_updateSyncData(
-                    $cartId,
-                    $mailchimpStoreId,
-                    null,
-                    $jsonErrorMessage,
-                    0,
-                    null,
-                    null,
-                    $this->getToken(),
-                    false,
-                    -1
-                );
+                $this->addSyncDataError($cartId, $mailchimpStoreId, $jsonErrorMessage, $this->getToken());
 
                 //json encode failed
                 $this->logSyncError(
@@ -336,7 +289,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
             $allVisibleItems = $cart->getAllVisibleItems();
 
             if (empty($allVisibleItems) || $orderCollection->getSize()) {
-                $this->_updateSyncData($cartId, $mailchimpStoreId);
+                $this->addSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
 
@@ -361,15 +314,8 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                         . $alreadySentCartId;
                     $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                     $allCarts[$counter]['body'] = '';
-                    $this->_updateSyncData(
-                        $alreadySentCartId,
-                        $mailchimpStoreId,
-                        null,
-                        null,
-                        0,
-                        1,
-                        null
-                    );
+
+                    $this->markSyncDataAsDeleted($alreadySentCartId, $mailchimpStoreId);
                     $this->setCounter($this->getCounter() + 1);
                 }
 
@@ -378,7 +324,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // don't send the carts for guest customers who are registered
             if (!$cart->getCustomerId() && $customer->getEmail() == $cart->getCustomerEmail()) {
-                $this->_updateSyncData($cartId, $mailchimpStoreId);
+                $this->addSyncData($cartId, $mailchimpStoreId);
                 continue;
             }
 
@@ -396,40 +342,32 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                     $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
                     $allCarts[$counter]['body'] = $cartJson;
                     $this->setCounter($this->getCounter() + 1);
-                    $this->_updateSyncData(
-                        $cartId,
-                        $mailchimpStoreId,
-                        null,
-                        null,
-                        0,
-                        null,
-                        null,
-                        $this->getToken()
-                    );
+
+                    $this->addSyncDataToken($cartId, $mailchimpStoreId, $this->getToken());
                 } else {
                     $error = $helper->__('There is not supported products in this cart.');
-                    $this->_updateSyncData(
+
+                    $this->addSyncDataError(
                         $cartId,
                         $mailchimpStoreId,
-                        $dateHelper->getCurrentDateTime(),
                         $error,
-                        0
+                        null,
+                        false,
+                        $dateHelper->getCurrentDateTime()
                     );
                 }
             } else {
                 $jsonErrorMessage = json_last_error_msg();
-                $this->_updateSyncData(
+
+                $this->addSyncDataError(
                     $cartId,
                     $mailchimpStoreId,
-                    $dateHelper->getCurrentDateTime(),
                     $jsonErrorMessage,
-                    0,
-                    null,
-                    null,
                     null,
                     false,
-                    -1
+                    $dateHelper->getCurrentDateTime()
                 );
+
                 //json encode failed
                 $this->logSyncError(
                     "Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")",

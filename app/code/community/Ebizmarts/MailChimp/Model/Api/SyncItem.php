@@ -82,6 +82,88 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         }
     }
 
+    protected function addDeletedRelatedId($id, $mailchimpStoreId, $relatedId)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            0,
+            1,
+            null,
+            null,
+            true,
+            false,
+            $relatedId
+        );
+    }
+
+    protected function addSyncDataError(
+        $id,
+        $mailchimpStoreId,
+        $error,
+        $token = null,
+        $saveOnlyIfExists = false,
+        $syncDelta = null
+    ) {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            $syncDelta,
+            $error,
+            0,
+            null,
+            null,
+            $token,
+            $saveOnlyIfExists,
+            -1
+        );
+    }
+
+    protected function addSyncData($id, $mailchimpStoreId)
+    {
+        $this->_updateSyncData($id, $mailchimpStoreId);
+    }
+
+    protected function addSyncDataToken($id, $mailchimpStoreId, $token)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            0,
+            null,
+            null,
+            $token
+        );
+    }
+
+    protected function markSyncDataAsModified($id, $mailchimpStoreId)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            1
+        );
+    }
+
+    protected function markSyncDataAsDeleted($id, $mailchimpStoreId, $syncedFlag = null)
+    {
+        $this->_updateSyncData(
+            $id,
+            $mailchimpStoreId,
+            null,
+            null,
+            0,
+            1,
+            $syncedFlag
+        );
+    }
+
     /**
      * @param $error
      * @param null $mailchimpStoreId
