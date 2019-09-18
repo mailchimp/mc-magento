@@ -347,13 +347,10 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
     {
         $mailchimpStoreId = 'ef3bf57fb9bd695a02b7f7c7fb0d2db5';
         $magentoStoreId = 1;
-        $syncingFlag = '2018-02-01 00:00:00';
-        $ecomSyncDateFlag = '2018-02-02 00:00:00';
-        $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1));
+        $syncingFlag = null;
         $sendPromo = $data['sendPromo'];
         $batchArray = array();
         $batchArray['operations'] = $data['batchArray'];
-        $isSyncyng = null;
 
         $customerArray = $this->getCustomerArray();
 
@@ -388,9 +385,8 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(
-                array('getMCStoreId', 'getEcommMinSyncDateFlag', 'isEcomSyncDataEnabled',
-                    'getApi', 'getMCIsSyncing', 'logRequest', 'validateDate',
-                    'saveMailchimpConfig', 'getPromoConfig')
+                array('getMCStoreId', 'isEcomSyncDataEnabled',
+                    'getApi', 'getMCIsSyncing', 'logRequest', 'validateDate', 'getPromoConfig')
             )
             ->getMock();
 
@@ -534,18 +530,6 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->method('getMCIsSyncing')
             ->with($mailchimpStoreId)
             ->willReturn($syncingFlag);
-
-        $helperMock->expects($this->once())->method('validateDate')->with($syncingFlag)->willReturn(true);
-        $helperMock
-            ->expects($this->once())
-            ->method('getEcommMinSyncDateFlag')
-            ->with($mailchimpStoreId, $magentoStoreId)
-            ->willReturn($ecomSyncDateFlag);
-        $helperMock
-            ->expects($this->once())
-            ->method('saveMailchimpConfig')
-            ->with($configValue, $magentoStoreId, 'stores');
-
 
         $apiBatchesMock->_sendEcommerceBatch($magentoStoreId);
     }
