@@ -62,8 +62,9 @@ function getCampaign()
                 mc_cid = urlparams[mccidIndex + 1];
             }
         }
-        if (mc_cid && !isMailchimp) {
 
+        if (mc_cid && !isMailchimp) {
+            Mage.Cookies.clear('mailchimp_campaign_id');
         }
     }
 
