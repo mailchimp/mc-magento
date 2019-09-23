@@ -77,9 +77,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $collection = $this->makeProductsNotSentCollection($magentoStoreId);
         $this->joinMailchimpSyncData($collection, $mailchimpStoreId);
         $batchArray = array();
-
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
+
         foreach ($collection as $product) {
             $productId = $product->getId();
 
@@ -529,7 +529,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             '',
             0,
             1,
-            null,
+            0,
             false,
             false
         );
@@ -726,12 +726,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
      */
     protected function shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)
     {
-        $helper = $this->getMailChimpHelper();
-        $resendTurn = $helper->getResendTurn($magentoStoreId);
-        return !$resendTurn
-            && $product->getMailchimpSyncModified()
+        return $product->getMailchimpSyncModified()
             && $product->getMailchimpSyncDelta()
-            && $product->getMailchimpSyncDelta() > $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId)
+            && $product->getMailchimpSyncedFlag()
             && $product->getMailchimpSyncError() == '';
     }
 
@@ -980,7 +977,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 "m4m.type",
                 "m4m.mailchimp_store_id",
                 "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified"
+                "m4m.mailchimp_sync_modified",
+                "m4m.mailchimp_synced_flag"
             )
         );
     }
@@ -1364,7 +1362,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         $whereCondition = $connection->quoteInto(
             'm4m.mailchimp_sync_delta IS NOT NULL '
-                . 'AND m4m.mailchimp_sync_delta < ?',
+            . 'AND m4m.mailchimp_sync_delta < ?',
             $this->getMailChimpDateHelper()->formatDate() . " 00:00:00"
         );
         $collection->getSelect()->where($whereCondition);
