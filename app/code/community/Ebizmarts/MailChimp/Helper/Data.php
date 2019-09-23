@@ -1379,40 +1379,54 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function createMergeFields($scopeId, $scope)
     {
+        $success = 0;
         $listId = $this->getGeneralList($scopeId, $scope);
         $maps = $this->unserialize($this->getMapFields($scopeId, $scope));
         $customFieldTypes = $this->unserialize($this->getCustomMergeFieldsSerialized($scopeId, $scope));
 
-        try {
-            $api = $this->getApi($scopeId, $scope);
-            $mailchimpFields = array();
-
+        if (count($maps) > 30 ) {
+            $success = 2;
+        } else {
             try {
-                $mailchimpFields = $api->getLists()->getMergeFields()->getAll($listId, null, null, 50);
-            } catch (MailChimp_Error $e) {
-                $this->logError($e->getFriendlyMessage());
-            }
+                $api = $this->getApi($scopeId, $scope);
+                $mailchimpFields = array();
 
-            if (!empty($mailchimpFields)) {
-                foreach ($maps as $map) {
-                    $customAtt = $map['magento'];
-                    $chimpTag = $map['mailchimp'];
-                    $alreadyExists = false;
+                try {
+                    $mailchimpFields = $api->getLists()->getMergeFields()->getAll(
+                        $listId,
+                        null,
+                        null,
+                        50
+                    );
+                } catch (MailChimp_Error $e) {
+                    $this->logError($e->getFriendlyMessage());
+                }
 
-                    foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
-                        if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
-                            $alreadyExists = true;
+                if (!empty($mailchimpFields)) {
+                    foreach ($maps as $map) {
+                        $customAtt = $map['magento'];
+                        $chimpTag = $map['mailchimp'];
+                        $alreadyExists = false;
+
+                        foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
+                            if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
+                                $alreadyExists = true;
+                            }
+                        }
+
+                        if (!$alreadyExists) {
+                            $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
                         }
                     }
 
-                    if (!$alreadyExists) {
-                        $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
-                    }
+                    $success = 1;
                 }
+            } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+                $this->logError($e->getMessage());
             }
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage());
         }
+
+        return $success;
     }
 
     protected function _createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag)
@@ -1581,40 +1595,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
 
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
-            if ($syncDelta) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
-            } elseif ($allowBatchRemoval === true) {
-                $ecommerceSyncDataItem->setData("batch_id", null);
-            }
-
-            if ($allowBatchRemoval === -1) {
-                $ecommerceSyncDataItem->setData("batch_id", '-1');
-            }
-
-            if ($syncError) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
-            }
-
-            //Always set modified value to 0 when saving sync delta or errors.
-            $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
-            if ($syncDeleted !== null) {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
-                if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
-                    $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
-                }
-            }
-
-            if ($token) {
-                $ecommerceSyncDataItem->setData("mailchimp_token", $token);
-            }
-
-            if ($deletedRelatedId) {
-                $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
-            }
-
-            if ($syncedFlag !== null) {
-                $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
-            }
+            $this->setEcommerceSyncDataItemValues(
+                $itemType, $syncDelta, $syncError, $syncModified, $syncDeleted,
+                $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, $ecommerceSyncDataItem
+            );
 
             $ecommerceSyncDataItem->save();
         }
@@ -3678,6 +3662,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $productCollection = Mage::getResourceModel('catalog/product_collection')
             ->addStoreFilter($storeId)
             ->addFieldToFilter('entity_id', array('lteq' => $itemId));
+        $productCollection->addFinalPrice();
         $apiProducts->joinQtyAndBackorders($productCollection);
         $apiProducts->joinMailchimpSyncData($productCollection, $mailchimpStoreId);
         $productCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
@@ -5086,6 +5071,56 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return true;
+    }
+
+    /**
+     * @param $itemType
+     * @param $syncDelta
+     * @param $syncError
+     * @param $syncModified
+     * @param $syncDeleted
+     * @param $token
+     * @param $syncedFlag
+     * @param $deletedRelatedId
+     * @param $allowBatchRemoval
+     * @param Varien_Object $ecommerceSyncDataItem
+     */
+    protected function setEcommerceSyncDataItemValues($itemType, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, Varien_Object $ecommerceSyncDataItem)
+    {
+        if ($syncDelta) {
+            $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
+        } elseif ($allowBatchRemoval === true) {
+            $ecommerceSyncDataItem->setData("batch_id", null);
+        }
+
+        if ($allowBatchRemoval === -1) {
+            $ecommerceSyncDataItem->setData("batch_id", '-1');
+        }
+
+        if ($syncError) {
+            $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+        }
+
+        //Always set modified value to 0 when saving sync delta or errors.
+        $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
+        if ($syncDeleted !== null) {
+            $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
+            if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
+                $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
+            }
+        }
+
+        if ($token) {
+            $ecommerceSyncDataItem->setData("mailchimp_token", $token);
+        }
+
+        if ($deletedRelatedId) {
+            $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
+        }
+
+        if ($syncedFlag !== null) {
+            $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
+        }
     }
 
     /**
