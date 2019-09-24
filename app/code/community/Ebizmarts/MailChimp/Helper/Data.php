@@ -5086,7 +5086,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param Varien_Object $ecommerceSyncDataItem
      */
     protected function setEcommerceSyncDataItemValues(
-        $itemType, $syncDelta,
+        $itemType,
+        $syncDelta,
         $syncError,
         $syncModified,
         $syncDeleted,
@@ -5094,8 +5095,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncedFlag,
         $deletedRelatedId,
         $allowBatchRemoval,
-        Varien_Object $ecommerceSyncDataItem)
-    {
+        Varien_Object $ecommerceSyncDataItem
+        ){
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
         } elseif ($allowBatchRemoval === true) {
@@ -5112,8 +5113,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         //Always set modified value to 0 when saving sync delta or errors.
         $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
+
         if ($syncDeleted !== null) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
+
             if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
                 $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
             }
