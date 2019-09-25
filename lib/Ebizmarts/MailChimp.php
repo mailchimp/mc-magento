@@ -376,7 +376,7 @@ class Ebizmarts_MailChimp
             $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
         }
 
-        $curlOptions = array();
+        $curlOptions = $this->_curlOptions;
 
         if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
             $curlOptions[CURLOPT_POSTFIELDS] = $params;
@@ -398,8 +398,8 @@ class Ebizmarts_MailChimp
          * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
          */
         $curlHelper = Mage::helper('mailchimp/curl');
-        $this->setCurlOptionsAddOptions($curlOptions);
-        $curlResult = $curlHelper->curlExec($this->_curlOptions);
+        //$this->setCurlOptionsAddOptions($curlOptions);
+        $curlResult = $curlHelper->curlExec($curlOptions);
 
         $responseBody = $curlResult['response'];
         $info = $curlResult['info'];
