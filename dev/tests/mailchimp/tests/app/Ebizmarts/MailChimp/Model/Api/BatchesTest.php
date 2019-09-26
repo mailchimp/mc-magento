@@ -647,7 +647,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $syncBatches[] = $syncBatchesTwoMock;
 
         $apiBatchesMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getHelper')
             ->willReturnOnConsecutiveCalls($helperMock);
         $apiBatchesMock
