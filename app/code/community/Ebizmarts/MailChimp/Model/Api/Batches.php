@@ -771,7 +771,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $id = $line[3];
 
                     if ($item->status_code != 200) {
-
                         //parse error
                         $response = json_decode($item->response);
                         $errorDetails = $this->_processFileErrors($response);
@@ -1012,8 +1011,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $token = null,
         $syncedFlag = null,
         $saveOnlyIfexists = false
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
