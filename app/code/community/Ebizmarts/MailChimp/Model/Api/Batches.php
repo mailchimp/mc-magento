@@ -251,8 +251,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $magentoStoreId,
         $isEcommerceData = true,
         $status = Ebizmarts_MailChimp_Helper_Data::BATCH_PENDING
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
@@ -273,18 +272,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 try {
                     $batchId = $item->getBatchId();
                     $files = $this->getBatchResponse($batchId, $magentoStoreId);
-
-                    if (!empty($files)) {
-                        if (isset($files['error'])) {
-                            $item->setStatus('error');
-                            $item->save();
-                            $helper->logBatchStatus('There was an error getting the result ');
-                        } else {
-                            $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
-                            $item->setStatus('completed');
-                            $item->save();
-                        }
-                    }
+                    $this->_saveItemStatus($item, $files, $batchId, $mailchimpStoreId, $magentoStoreId);
 
                     $baseDir = $this->getMagentoBaseDir();
 
@@ -294,6 +282,31 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 } catch (Exception $e) {
                     Mage::log("Error with a response: " . $e->getMessage());
                 }
+            }
+        }
+    }
+
+    /**
+     * @param $item
+     * @param $files
+     * @param $batchId
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @throws Mage_Core_Exception
+     */
+    protected function _saveItemStatus($item, $files, $batchId, $mailchimpStoreId, $magentoStoreId)
+    {
+        $helper = $this->getHelper();
+
+        if (!empty($files)) {
+            if (isset($files['error'])) {
+                $item->setStatus('error');
+                $item->save();
+                $helper->logBatchStatus('There was an error getting the result ');
+            } else {
+                $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
+                $item->setStatus('completed');
+                $item->save();
             }
         }
     }
@@ -433,8 +446,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $orderAmount,
         $mailchimpStoreId,
         $magentoStoreId
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
@@ -759,7 +771,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $id = $line[3];
 
                     if ($item->status_code != 200) {
-                        $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
                         //parse error
                         $response = json_decode($item->response);
@@ -785,20 +796,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             true
                         );
 
-                        $mailchimpErrors->setType($response->type);
-                        $mailchimpErrors->setTitle($response->title);
-                        $mailchimpErrors->setStatus($item->status_code);
-                        $mailchimpErrors->setErrors($errorDetails);
-                        $mailchimpErrors->setRegtype($type);
-                        $mailchimpErrors->setOriginalId($id);
-                        $mailchimpErrors->setBatchId($batchId);
-                        $mailchimpErrors->setStoreId($store[1]);
+                        $this->_saveMailchimpError(
+                            $response,
+                            $item,
+                            $errorDetails,
+                            $type,
+                            $id,
+                            $batchId,
+                            $store,
+                            $mailchimpStoreId
+                        );
 
-                        if ($type != Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
-                            $mailchimpErrors->setMailchimpStoreId($mailchimpStoreId);
-                        }
-
-                        $mailchimpErrors->save();
                         $helper->modifyCounterDataSentToMailchimp($type, true);
                         $helper->logError($error);
                     } else {
@@ -829,6 +837,45 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         $this->_showResumeDataSentToMailchimp($magentoStoreId);
+    }
+
+    /**
+     * @param $response
+     * @param $item
+     * @param $errorDetails
+     * @param $type
+     * @param $id
+     * @param $batchId
+     * @param $store
+     * @param $mailchimpStoreId
+     * @throws Exception
+     */
+    protected function _saveMailchimpError(
+        $response,
+        $item,
+        $errorDetails,
+        $type,
+        $id,
+        $batchId,
+        $store,
+        $mailchimpStoreId
+    ) {
+        $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
+
+        $mailchimpErrors->setType($response->type);
+        $mailchimpErrors->setTitle($response->title);
+        $mailchimpErrors->setStatus($item->status_code);
+        $mailchimpErrors->setErrors($errorDetails);
+        $mailchimpErrors->setRegtype($type);
+        $mailchimpErrors->setOriginalId($id);
+        $mailchimpErrors->setBatchId($batchId);
+        $mailchimpErrors->setStoreId($store[1]);
+
+        if ($type != Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
+            $mailchimpErrors->setMailchimpStoreId($mailchimpStoreId);
+        }
+
+        $mailchimpErrors->save();
     }
 
     /**
@@ -864,9 +911,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _processFileErrors($response)
     {
         $errorDetails = "";
+        $errors = $response->errors;
 
-        if (!empty($response->errors)) {
-            foreach ($response->errors as $error) {
+        if (!empty($errors)) {
+            foreach ($errors as $error) {
                 if (isset($error->field) && isset($error->message)) {
                     $errorDetails .= $errorDetails != "" ? " / " : "";
                     $errorDetails .= $error->field . " : " . $error->message;

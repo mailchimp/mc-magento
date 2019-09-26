@@ -170,7 +170,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @param $e MailChimp_Error
      * @return string
      */
-    private function getUserFriendlyMessage($e)
+    protected function getUserFriendlyMessage($e)
     {
         $helper = $this->makeHelper();
         $errorMessage = $e->getFriendlyMessage();

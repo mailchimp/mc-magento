@@ -128,12 +128,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     $subscriberArray[$counter]['operation_id'] = $batchId . '_' . $subscriber->getSubscriberId();
                     $subscriberArray[$counter]['body'] = $subscriberJson;
 
-                    //update subscribers delta
-                    $subscriber->setData("mailchimp_sync_delta", $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'));
-                    $subscriber->setData("mailchimp_sync_error", "");
-                    $subscriber->setData("mailchimp_sync_modified", 0);
-                    $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
-                    $subscriber->save();
+                    $this->_saveSubscriber(
+                        $subscriber,
+                        '',
+                        $this->_mcDateHelper->formatDate(null, 'Y-m-d H:i:s'),
+                        true
+                    );
                 }
             } else {
                 //json encode failed
@@ -142,15 +142,31 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     . " json encode failed (".$jsonErrorMsg.")";
                 $helper->logError($errorMessage);
 
-                $subscriber->setData("mailchimp_sync_error", $jsonErrorMsg);
-                $subscriber->setData("mailchimp_sync_modified", 0);
-                $subscriber->save();
+                $this->_saveSubscriber($subscriber, $jsonErrorMsg);
             }
 
             $counter++;
         }
 
         return $subscriberArray;
+    }
+
+    /**
+     * @param $subscriber
+     * @param $error
+     * @param null $syncDelta
+     * @param bool $setSource
+     */
+    protected function _saveSubscriber($subscriber, $error, $syncDelta = null, $setSource = false)
+    {
+        if ($setSource) {
+            $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
+        }
+
+        $subscriber->setData("mailchimp_sync_delta", $syncDelta);
+        $subscriber->setData("mailchimp_sync_error", $error);
+        $subscriber->setData("mailchimp_sync_modified", 0);
+        $subscriber->save();
     }
 
     /**

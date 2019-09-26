@@ -83,7 +83,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $product) {
             $productId = $product->getId();
 
-            if ($this->shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)) {
+            if ($this->shouldSendProductUpdate($product)) {
                 $buildUpdateOperations = $this->_buildUpdateProductRequest(
                     $product,
                     $batchId,
@@ -99,7 +99,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     $this->_updateSyncData($productId, $mailchimpStoreId);
                 }
 
-                $counter = count($batchArray);
+                $counter = $this->_getBatchCounter($batchArray);
                 continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
@@ -140,6 +140,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $helper->setCurrentStore($oldStore);
 
         return $batchArray;
+    }
+
+    /**
+     * @param $batchArray
+     * @return int
+     */
+    protected function _getBatchCounter($batchArray)
+    {
+        return count($batchArray);
     }
 
     /**
@@ -282,7 +291,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     $mailchimpStoreId
                 );
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
-                    $parent = Mage::getModel('catalog/product')->load($parentId);
+                    $parent = $this->_getParentProduct($parentId);
                     $variantProducts = $this->makeProductChildrenArray(
                         $product,
                         $magentoStoreId,
@@ -367,6 +376,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $operations[] = $data;
 
         return $operations;
+    }
+
+    /**
+     * @param $id
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _getParentProduct($id)
+    {
+        return Mage::getModel('catalog/product')->load($id);
     }
 
     /**
@@ -724,7 +742,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
      * @return bool
      * @throws Mage_Core_Exception
      */
-    protected function shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)
+    protected function shouldSendProductUpdate($product)
     {
         return $product->getMailchimpSyncModified()
             && $product->getMailchimpSyncDelta()

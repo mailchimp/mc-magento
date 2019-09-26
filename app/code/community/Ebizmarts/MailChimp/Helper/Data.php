@@ -1191,10 +1191,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $storeId = $error->getStoreId();
             $mailchimpStoreId = $this->getMCStoreId($storeId);
             if ($mailchimpStoreId) {
-                $error->setMailchimpStoreId($mailchimpStoreId)
-                    ->save();
+                $this->_saveErrorItem($error, $mailchimpStoreId);
             }
         }
+    }
+
+    /**
+     * @param $error
+     * @param $mailchimpStoreId
+     */
+    protected function _saveErrorItem($error, $mailchimpStoreId)
+    {
+        $error->setMailchimpStoreId($mailchimpStoreId)->save();
     }
 
     /**
@@ -1402,23 +1410,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
 
                 if (!empty($mailchimpFields)) {
-                    foreach ($maps as $map) {
-                        $customAtt = $map['magento'];
-                        $chimpTag = $map['mailchimp'];
-                        $alreadyExists = false;
-
-                        foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
-                            if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
-                                $alreadyExists = true;
-                            }
-                        }
-
-                        if (!$alreadyExists) {
-                            $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
-                        }
-                    }
-
-                    $success = 1;
+                    $success = $this->_mapFieldsIteration($maps, $mailchimpFields, $customFieldTypes, $api, $listId);
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->logError($e->getMessage());
@@ -1428,6 +1420,44 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $success;
     }
 
+    /**
+     * @param $maps
+     * @param $mailchimpFields
+     * @param $customFieldTypes
+     * @param $api
+     * @param $listId
+     * @return int
+     */
+    protected function _mapFieldsIteration($maps, $mailchimpFields, $customFieldTypes, $api, $listId)
+    {
+        foreach ($maps as $map) {
+            $customAtt = $map['magento'];
+            $chimpTag = $map['mailchimp'];
+            $alreadyExists = false;
+
+            foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
+                if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
+                    $alreadyExists = true;
+                }
+            }
+
+            if (!$alreadyExists) {
+                $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
+            }
+        }
+
+        $success = 1;
+
+        return $success;
+    }
+
+    /**
+     * @param $customFieldTypes
+     * @param $api
+     * @param $customAtt
+     * @param $listId
+     * @param $chimpTag
+     */
     protected function _createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag)
     {
         $created = false;
@@ -2510,7 +2540,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         do {
             $collection->setCurPage($currentPage);
-            $collection->load();
+            $this->_loadItemCollection($collection);
 
             foreach ($collection as $collectionItem) {
                 $callback($collectionItem, $mailchimpStoreId);
@@ -2530,6 +2560,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
         } while ($currentPage <= $pages);
         return $finished;
+    }
+
+    /**
+     * @param $collection
+     */
+    protected function _loadItemCollection(&$collection)
+    {
+        $collection->load();
     }
 
     /**
@@ -2868,9 +2906,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $webhooks = $api->lists->webhooks->getAll($listId);
         foreach ($webhooks['webhooks'] as $webhook) {
             if (strpos($webhook['url'], $webhookUrl) !== false) {
-                $api->lists->webhooks->delete($listId, $webhook['id']);
+                $this->_deleteWebhookFromList($api->lists->webhooks, $listId, $webhook['id']);
             }
         }
+    }
+
+    /**
+     * @param $apiWebhook
+     * @param $listId
+     * @param $webhookId
+     */
+    protected function _deleteWebhookFromList($apiWebhook, $listId, $webhookId)
+    {
+        $apiWebhook->delete($listId, $webhookId);
     }
 
     /**
@@ -5079,8 +5127,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $allowBatchRemoval
      * @param Varien_Object $ecommerceSyncDataItem
      */
-    protected function setEcommerceSyncDataItemValues($itemType, $syncDelta, $syncError, $syncModified, $syncDeleted, $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, Varien_Object $ecommerceSyncDataItem)
-    {
+    protected function setEcommerceSyncDataItemValues(
+        $itemType,
+        $syncDelta,
+        $syncError,
+        $syncModified,
+        $syncDeleted,
+        $token,
+        $syncedFlag,
+        $deletedRelatedId,
+        $allowBatchRemoval,
+        Varien_Object $ecommerceSyncDataItem
+    ) {
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
         } elseif ($allowBatchRemoval === true) {
