@@ -2921,6 +2921,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                     foreach ($response['webhooks'] as $webhook) {
                         if ($webhook['url'] == $hookUrl) {
                             $createWebhook = false;
+                            break;
                         }
                     }
                 }
