@@ -495,6 +495,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     public function update($productId, $mailchimpStoreId)
     {
         $parentIdArray = $this->getAllParentIds($productId);
+
         foreach ($parentIdArray as $parentId) {
             $this->_updateSyncData(
                 $parentId,
@@ -831,6 +832,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $data["sku"] = $sku ? $sku : '';
 
         $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
+
         if ($price) {
             $data["price"] = $price;
         }
@@ -1010,6 +1012,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $helper = $this->getMailChimpHelper();
         $parentId = null;
+
         if (!$this->_parentId) {
             $parentId = $this->getParentId($childId);
         } else {
@@ -1018,8 +1021,8 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
         if ($parentId) {
             $collection = $this->getProductWithAttributesById($magentoStoreId, $parentId);
-
             $rc = $helper->getProductResourceModel();
+
             if ($this->_parentUrl) {
                 $url = $this->_parentUrl;
             } else {
@@ -1029,6 +1032,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
 
             $tailUrl = '#';
             $count = 0;
+
             foreach ($collection as $attribute) {
                 if ($attribute->getAttributeId()) {
                     $attributeId = $attribute->getAttributeId();
@@ -1067,6 +1071,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $imageUrl = null;
         $parentId = null;
+
         if (!$this->_parentId) {
             $parentId = $this->getParentId($childId);
         } else {
@@ -1100,6 +1105,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $categoryIds = $product->getResource()->getCategoryIds($product);
         $categoryNames = array();
         $categoryName = null;
+
         if (is_array($categoryIds) && !empty($categoryIds)) {
             $collection = $this->makeCatalogCategory()->getCollection();
             $collection->addAttributeToSelect(array('name'))
@@ -1127,6 +1133,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $parentId = null;
         $parentIds = $this->getAllParentIds($childId);
+
         if (!empty($parentIds)) {
             $parentId = $parentIds[0];
         }

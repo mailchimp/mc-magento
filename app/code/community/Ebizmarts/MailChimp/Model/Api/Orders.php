@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     }
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
-                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
+                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (" . $jsonErrorMsg . ")");
 
                     $this->_updateSyncData(
                         $orderId,
@@ -205,7 +205,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     }
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
-                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
+                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (" . $jsonErrorMsg . ")");
 
                     $this->_updateSyncData(
                         $orderId,
@@ -293,7 +293,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $this->_getPayloadBilling($data, $billingAddress, $street);
         }
 
-       $shippingAddress = $order->getShippingAddress();
+        $shippingAddress = $order->getShippingAddress();
 
         if ($shippingAddress) {
             $this->_getPayloadShipping($data, $shippingAddress);
@@ -748,6 +748,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $orderCollection = $this->getResourceModelOrderCollection();
         // select carts for the current Magento store id
         $orderCollection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
+
         if ($lastId) {
             $orderCollection->addFieldToFilter('entity_id', array('gt' => $lastId));
         }
@@ -764,10 +765,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             "m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''"
         );
         $orderCollection->getSelect()->limit(self::BATCH_LIMIT_ONLY_ORDERS);
+
         foreach ($orderCollection as $order) {
             //Delete order
             $orderId = $order->getEntityId();
             $config = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID, $orderId));
+
             if (!$dateHelper->timePassed($initialTime)) {
                 $batchArray[$this->_counter]['method'] = "DELETE";
                 $batchArray[$this->_counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/orders/' . $orderId;

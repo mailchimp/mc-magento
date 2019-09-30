@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
                 }
             } else {
                 $jsonErrorMsg = json_last_error_msg();
-                $helper->logError("Promo rule " . $ruleId . " json encode failed (".$jsonErrorMsg.")");
+                $helper->logError("Promo rule " . $ruleId . " json encode failed (" . $jsonErrorMsg . ")");
 
                 $this->_updateSyncData(
                     $ruleId,

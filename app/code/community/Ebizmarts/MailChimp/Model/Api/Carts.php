@@ -269,7 +269,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                 );
 
                 //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
+                $helper->logError("Carts " . $cart->getId() . " json encode failed (" . $jsonErrorMessage . ")");
             }
 
             $this->setToken(null);
@@ -412,7 +412,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
                     -1
                 );
                 //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
+                $helper->logError("Carts " . $cart->getId() . " json encode failed (" . $jsonErrorMessage . ")");
             }
 
             $this->setToken(null);
@@ -679,16 +679,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     }
 
     /**
-     * @param $cartId
-     * @param $mailchimpStoreId
-     * @param null $syncDelta
-     * @param null $syncError
-     * @param int $syncModified
-     * @param null $syncedFlag
-     * @param null $syncDeleted
-     * @param null $token
-     * @param bool $saveOnlyIfExists
-     * @param bool $allowBatchRemoval
+     * @param       $cartId
+     * @param       $mailchimpStoreId
+     * @param null  $syncDelta
+     * @param null  $syncError
+     * @param int   $syncModified
+     * @param null  $syncedFlag
+     * @param null  $syncDeleted
+     * @param null  $token
+     * @param bool  $saveOnlyIfExists
+     * @param bool  $allowBatchRemoval
      */
     protected function _updateSyncData(
         $cartId,

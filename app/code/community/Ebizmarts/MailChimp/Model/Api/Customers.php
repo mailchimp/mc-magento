@@ -92,6 +92,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         $customersCollection = array();
         $customerIds = $this->getCustomersToSync();
+
         if (!empty($customerIds)) {
             $customersCollection = $this->makeCustomersNotSentCollection($customerIds);
         }
@@ -101,8 +102,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $this->setOptInStatusForStore($this->getOptIn($this->getBatchMagentoStoreId()));
         $subscriber = $this->getSubscriberModel();
         $listId = $helper->getGeneralList($magentoStoreId);
-
         $counter = 0;
+
         foreach ($customersCollection as $customer) {
             $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
@@ -251,8 +252,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $data = array();
         $customerAddress = array();
-
         $street = explode("\n", $customer->getStreet());
+
         if (count($street) > 1) {
             $customerAddress["address1"] = $street[0];
             $customerAddress["address2"] = $street[1];
@@ -272,6 +273,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
 
         if ($customer->getRegionId()) {
             $customerAddress["province_code"] = $this->_directoryRegionModel->load($customer->getRegionId())->getCode();
+
             if (!$customerAddress["province_code"]) {
                 unset($customerAddress["province_code"]);
             }
@@ -347,8 +349,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      * @param int|null $syncError
      * @param int|null $syncModified
      * @param int|null $syncedFlag
-     * @param bool     $saveOnlyIfexists
-     * @param bool     $allowBatchRemoval
+     * @param bool $saveOnlyIfexists
+     * @param bool $allowBatchRemoval
      */
     protected function _updateSyncData(
         $customerId,
@@ -359,7 +361,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $allowBatchRemoval = true
-    ) {
+    )
+    {
         $this->_mailchimpHelper->saveEcommerceSyncData(
             $customerId,
             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
@@ -405,7 +408,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected function joinMailchimpSyncData($collection)
     {
-        $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
+        $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getSyncdataTableName();
 
         $collection->getSelect()->joinLeft(
@@ -498,7 +501,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $jsonErrorMessage = json_last_error_msg();
         $this->_mailchimpHelper->logError(
-            "Customer " . $customer->getId() . " json encode failed (".$jsonErrorMessage.") on store "
+            "Customer " . $customer->getId() . " json encode failed (" . $jsonErrorMessage . ") on store "
             . $this->getBatchMagentoStoreId()
         );
         return $jsonErrorMessage;
@@ -512,7 +515,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     {
         $this->_mailchimpHelper->logError(
             "MailChimp tags encode failed, Customer " . $customer->getId() . " on store " .
-            $this->getBatchMagentoStoreId()." mergeFields:"
+            $this->getBatchMagentoStoreId() . " mergeFields:"
         );
         $this->_mailchimpHelper->logError($mailchimpTags);
     }
@@ -534,8 +537,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     }
 
     /**
-     * @param $collection
-     * @param null       $mailchimpStoreId
+     * @param       $collection
+     * @param null  $mailchimpStoreId
      */
     public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId = null)
     {
@@ -650,7 +653,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     protected function isSubscribed($subscriber, $customer)
     {
         if ($subscriber->loadByEmail($customer->getEmail())->getSubscriberId()
-            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED ) {
+            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
             return true;
         } else {
             return false;
@@ -726,12 +729,12 @@ class Ebizmarts_MailChimp_Model_Api_Customers
     /**
      * Send merge fields for transactional members
      *
-     * @param $magentoStoreId
+     * @param               $magentoStoreId
      * @param Varien_Object $dataCustomer
-     * @param $subscriber
-     * @param $customer
-     * @param $listId
-     * @param $counter
+     * @param               $subscriber
+     * @param               $customer
+     * @param               $listId
+     * @param               $counter
      * @param array $customerArray
      * @return array
      */

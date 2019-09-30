@@ -67,6 +67,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         );
 
         $subscriberArray = array();
+
         if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag
             || !$helper->getSubMinSyncDateFlag($this->getStoreId())
         ) {
@@ -104,7 +105,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
         $collection->getSelect()->limit($limit);
         $date = $dateHelper->getDateMicrotime();
-        $batchId = 'storeid-'.$this->getStoreId(). '_' .Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_'.$date;
+        $batchId = 'storeid-' . $this->getStoreId() . '_'
+            . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
         $counter = 0;
 
         foreach ($collection as $subscriber) {
@@ -139,7 +141,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 //json encode failed
                 $jsonErrorMsg = json_last_error_msg();
                 $errorMessage = "Subscriber " . $subscriber->getSubscriberId()
-                    . " json encode failed (".$jsonErrorMsg.")";
+                    . " json encode failed (" . $jsonErrorMsg . ")";
                 $helper->logError($errorMessage);
 
                 $subscriber->setData("mailchimp_sync_error", $jsonErrorMsg);
@@ -174,12 +176,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         $status = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus());
         $data["status_if_new"] = $status;
+
         if ($subscriber->getMailchimpSyncModified()) {
             $data["status"] = $status;
         }
 
         $data["language"] = $helper->getStoreLanguageCode($storeId);
         $interest = $this->_getInterest($subscriber);
+
         if (!empty($interest)) {
             $data['interests'] = $interest;
         }
@@ -200,6 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $interestsAvailable = $helper->getInterest($storeId);
         $interest = $helper->getInterestGroups(null, $subscriber->getSubscriberId(), $storeId, $interestsAvailable);
+
         foreach ($interest as $i) {
             foreach ($i['category'] as $key => $value) {
                 $rc[$value['id']] = $value['checked'];
@@ -220,10 +225,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $storeId = $subscriber->getStoreId();
         $subscriptionEnabled = $helper->isSubscriptionEnabled($storeId);
+
         if ($subscriptionEnabled) {
             $listId = $helper->getGeneralList($storeId);
             $newStatus = $this->translateMagentoStatusToMailchimpStatus($subscriber->getStatus());
             $forceStatus = ($updateStatus) ? $newStatus : null;
+
             try {
                 $api = $helper->getApi($storeId);
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
@@ -299,6 +306,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $errorMessage = $e->getFriendlyMessage();
         $helper->logError($errorMessage);
+
         if ($isAdmin) {
             $this->addError($errorMessage);
         } else {
@@ -319,6 +327,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $errorMessage = $e->getFriendlyMessage();
         $helper->logError($errorMessage);
+
         if ($isAdmin) {
             $this->addError($errorMessage);
         } else {
@@ -459,6 +468,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     public function update($emailAddress)
     {
         $subscriber = Mage::getSingleton('newsletter/subscriber')->loadByEmail($emailAddress);
+
         if ($subscriber->getId()) {
             $subscriber->setMailchimpSyncModified(1)
                 ->save();
@@ -529,6 +539,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected function getAddressFromLastOrder($lastOrder)
     {
         $addressData = array();
+
         if ($lastOrder && $lastOrder->getShippingAddress()) {
             $addressData = $lastOrder->getShippingAddress();
         }

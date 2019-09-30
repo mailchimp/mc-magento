@@ -168,7 +168,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
                     }
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
-                    $helper->logError("Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")");
+                    $helper->logError("Promo code" . $codeId . " json encode failed (" . $jsonErrorMsg . ")");
                     $this->_updateSyncData(
                         $codeId,
                         $mailchimpStoreId,
@@ -278,16 +278,16 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
     /**
      * update product sync data
      *
-     * @param $codeId
-     * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncDeleted
-     * @param int|null         $token
-     * @param bool             $saveOnlyIfexists
-     * @param null             $deletedRelatedId
-     * @param bool             $allowBatchRemoval
+     * @param           $codeId
+     * @param           $mailchimpStoreId
+     * @param int|null  $syncDelta
+     * @param int|null  $syncError
+     * @param int|null  $syncModified
+     * @param int|null  $syncDeleted
+     * @param int|null  $token
+     * @param bool      $saveOnlyIfexists
+     * @param null      $deletedRelatedId
+     * @param bool      $allowBatchRemoval
      */
     protected function _updateSyncData(
         $codeId,
@@ -375,18 +375,19 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $token = $this->getToken();
         $promoCode->setToken($token);
         $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl(
-            'mailchimp/cart/loadcoupon',
-            array(
-                '_nosid' => true,
-                '_secure' => true,
-                'coupon_id' =>$promoCode->getCouponId(),
-                'coupon_token' => $token
+                'mailchimp/cart/loadcoupon',
+                array(
+                    '_nosid' => true,
+                    '_secure' => true,
+                    'coupon_id' => $promoCode->getCouponId(),
+                    'coupon_token' => $token
+                )
             )
-        )
             . 'mailchimp/cart/loadcoupon?coupon_id='
             . $promoCode->getCouponId()
             . '&coupon_token='
             . $token;
+
         return $url;
     }
 
@@ -498,7 +499,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
             if ($api !== null) {
                 try {
                     $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes
-                                            ->getAll($mailchimpStoreId, $promoRuleId);
+                        ->getAll($mailchimpStoreId, $promoRuleId);
 
                     foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
                         $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);
