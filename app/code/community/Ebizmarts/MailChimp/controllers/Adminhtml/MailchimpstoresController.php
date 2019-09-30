@@ -47,7 +47,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     protected function _initStore($idFieldName = 'id')
     {
         $this->_title($this->__('Mailchimp Stores'))->_title($this->__('Manage Mailchimp Stores'));
-
         $storeId = (int)$this->getRequest()->getParam($idFieldName);
 
         if ($storeId) {
@@ -65,8 +64,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $mailchimpStore = $this->loadMailchimpStore($id);
         $this->sessionregisterStore($mailchimpStore);
         $title = $id ? $this->__('Edit Store') : $this->__('New Store');
-
         $this->_initAction();
+
         $block = $this->getLayout()
             ->createBlock('mailchimp/adminhtml_mailchimpstores_edit')
             ->setData('action', $this->getUrl('*/*/save'));
@@ -332,6 +331,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $address['postal_code'] = $formData['address_postal_code'];
         $address['country'] = '';
         $address['country_code'] = $formData['address_country_code'];
+
         return $address;
     }
 }

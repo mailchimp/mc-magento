@@ -40,6 +40,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         $batchId = $error->getBatchId();
         $storeId = $error->getStoreId();
         $mailchimpStoreId = $error->getMailchimpStoreId();
+
         if ($mailchimpStoreId) {
             $enabled = $helper->isEcomSyncDataEnabled($storeId);
         } else {
@@ -51,6 +52,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
             $response->setHeader('Content-disposition', 'attachment; filename=' . $batchId . '.json');
             $response->setHeader('Content-type', 'application/json');
             $counter = 0;
+
             do {
                 $counter++;
                 $files = $apiBatches->getBatchResponse($batchId, $storeId);
@@ -62,6 +64,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
 
                 foreach ($files as $file) {
                     $items = $this->getFileContent($file);
+
                     foreach ($items as $item) {
                         $fileContent[] = array(
                             'status_code' => $item->status_code,
@@ -74,6 +77,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
                 }
 
                 $baseDir = $apiBatches->getMagentoBaseDir();
+
                 if ($apiBatches->batchDirExists($baseDir, $batchId)) {
                     $apiBatches->removeBatchDir($baseDir, $batchId);
                 }
@@ -129,6 +133,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     protected function getFileContent($file)
     {
         $fileContent = $this->getFileHelper()->read($file);
+
         return json_decode($fileContent);
     }
 
