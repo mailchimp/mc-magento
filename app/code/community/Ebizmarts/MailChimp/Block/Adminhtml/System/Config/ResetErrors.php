@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -28,6 +29,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_ResetErrors
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
+
         if ($helper->isSubscriptionEnabled($scopeArray['scope_id'], $scopeArray['scope'])
             || $scopeArray['scope_id'] == 0
         ) {
