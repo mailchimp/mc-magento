@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Author : Ebizmarts <info@ebizmarts.com>
  * File   : Fieldtype.php

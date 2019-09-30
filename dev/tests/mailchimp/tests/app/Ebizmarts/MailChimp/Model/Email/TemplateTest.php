@@ -21,7 +21,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
         $senderEmail = 'sender@email.com';
         $bcc = array('bcc@email.com');
         $userAgent = 'Ebizmarts_Mandrill1.1.12/MageCE1.9.3.7';
-        $emailArray = array (
+        $emailArray = array(
             'subject' => 'subject',
             'to' => array(
                 array('email' => $email, 'name' => $name),
@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
         $mandrillSenders = array(array('domain' => 'email.com'));
 
         /**
-         * @var \Ebizmarts_MailChimp_Model_Email_Template $templateMock
+         * @var Ebizmarts_MailChimp_Model_Email_Template $templateMock
          */
         $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
             ->disableOriginalConstructor()

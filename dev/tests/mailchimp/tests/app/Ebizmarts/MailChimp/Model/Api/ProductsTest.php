@@ -60,9 +60,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array('makeBatchId', 'makeProductsNotSentCollection', 'joinMailchimpSyncData',
-                'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
-                'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
-                '_updateSyncData', '_markSpecialPrices')
+                    'shouldSendProductUpdate', 'getChildrenIdsForConfigurable',
+                    'getMailChimpHelper', 'isProductFlatTableEnabled', '_buildNewProductRequest',
+                    '_updateSyncData', '_markSpecialPrices')
             )
             ->getMock();
 
@@ -635,7 +635,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array('getProductResourceCollection', 'joinMailchimpSyncDataDeleted',
-                'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
+                    'makeBatchId', '_updateSyncData', '_buildDeleteProductRequest')
             )
             ->getMock();
 
@@ -692,9 +692,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
     /**
      * Call protected/private method of a class.
      *
-     * @param object &$object    Instantiated object that we will run method on.
-     * @param string $methodName Method name to call
-     * @param array  $parameters Array of parameters to pass into method.
+     * @param object    &$object Instantiated object that we will run method on.
+     * @param string    $methodName Method name to call
+     * @param array     $parameters Array of parameters to pass into method.
      *
      * @return mixed Method return.
      */
@@ -833,7 +833,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->method("quoteInto")
             ->with(
                 'm4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_delta < ?',
-                $dateToday ." 00:00:00"
+                $dateToday . " 00:00:00"
             );
 
 
@@ -867,12 +867,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->withConsecutive(
                 array('special_price', array('gt' => 0), 'left'),
                 array('special_from_date',
-                    array('lteq' => $dateToday." 23:59:59"),
+                    array('lteq' => $dateToday . " 23:59:59"),
                     'left'),
                 array('special_from_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')), 'left'),
                 array('special_price', array('gt' => 0), 'left'),
                 array('special_to_date',
-                    array('lt' => $dateToday." 00:00:00"),
+                    array('lt' => $dateToday . " 00:00:00"),
                     'left'),
                 array('special_to_date', array('gt' => new Zend_Db_Expr('m4m.mailchimp_sync_delta')), 'left')
             )->willReturnOnConsecutiveCalls(

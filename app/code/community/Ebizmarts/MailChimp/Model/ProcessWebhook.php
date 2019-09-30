@@ -87,7 +87,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * Update customer email <upemail>
      *
-     * @param  array $data
+     * @param array $data
      * @return void
      */
     protected function _updateEmail(array $data)
@@ -116,7 +116,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * Add "Cleaned Emails" notification to Adminnotification Inbox <cleaned>
      *
-     * @param  array $data
+     * @param array $data
      * @return void
      */
     protected function _clean(array $data)
@@ -137,7 +137,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * Subscribe email to Magento list, store aware
      *
-     * @param  array $data
+     * @param array $data
      * @return void
      */
     protected function _subscribe(array $data)
@@ -174,7 +174,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * Unsubscribe or delete email from Magento list, store aware
      *
-     * @param  array $data
+     * @param array $data
      * @return void
      */
     protected function _unsubscribe(array $data)

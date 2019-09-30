@@ -77,7 +77,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $listId = "e4ef38998b";
         $isSubscribed = false;
 
-        $patchBatchData = array (
+        $patchBatchData = array(
             'method' => 'PATCH',
             'path' => '/lists/e4ef38998b/members/45c3ddfc868517aefd34ba8f122ad600',
             'operation_id' => '_SUB_45c3ddfc868517aefd34ba8f122ad600',
@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             "CUSBRAND":"brand pref."}}'
         );
 
-        $mergeFields = array (
+        $mergeFields = array(
             'WEBSITE' => '1',
             'STOREID' => '1',
             'STORENAME' => 'Default Store View',
@@ -121,7 +121,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 'getOptInStatusForStore', 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
                 'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper',
-                'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch','sendMailchimpTags'
+                'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch', 'sendMailchimpTags'
             )
         )
             ->getMock();
@@ -147,7 +147,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getId','getMailchimpSyncedFlag'))
+            ->setMethods(array('getId', 'getMailchimpSyncedFlag'))
             ->getMock();
 
         $customerArray = array($customerMock);
@@ -238,9 +238,9 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 $customerMock,
                 $listId,
                 1,
-                array( 0 => $operationData)
+                array(0 => $operationData)
             )
-            ->willReturn(array( 0 => $rtnArray, 1 => 2 ));
+            ->willReturn(array(0 => $rtnArray, 1 => 2));
 
         $return = $this->_customersApiMock->createBatchJson($mailchimpStoreId, $storeId);
 
@@ -262,7 +262,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $listId = "e4ef38998b";
         $isSubscribed = false;
 
-        $patchBatchData = array (
+        $patchBatchData = array(
             'method' => 'PATCH',
             'path' => '/lists/e4ef38998b/members/45c3ddfc868517aefd34ba8f122ad600',
             'operation_id' => '_SUB_45c3ddfc868517aefd34ba8f122ad600',
@@ -271,7 +271,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             "CUSBRAND":"brand pref."}}'
         );
 
-        $mergeFields = array (
+        $mergeFields = array(
             'WEBSITE' => '1',
             'STOREID' => '1',
             'STORENAME' => 'Default Store View',
@@ -334,7 +334,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
         $syncDataItemMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getId','getMailchimpSyncedFlag'))
+            ->setMethods(array('getId', 'getMailchimpSyncedFlag'))
             ->getMock();
 
         $customerArray = array($customerMock);

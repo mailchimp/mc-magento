@@ -40,8 +40,8 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getSessionLastRealOrder', 'getCoreSession', 'getHelper', 'getRequest',
-                'getInterestGroupModel', 'getSubscriberModel', 'getApiSubscriber', '_redirect',
-                'getCurrentDateTime','__')
+                    'getInterestGroupModel', 'getSubscriberModel', 'getApiSubscriber', '_redirect',
+                    'getCurrentDateTime', '__')
             )
             ->getMock();
 
@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getSubscriberId', 'setSubscriberEmail', 'setSubscriberFirstname',
-                'setSubscriberLastname', 'subscribe', 'getSubscriberEmail', 'loadByEmail')
+                    'setSubscriberLastname', 'subscribe', 'getSubscriberEmail', 'loadByEmail')
             )
             ->getMock();
 
@@ -77,7 +77,7 @@ class Ebizmarts_MailChimp_GroupControllerTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getByRelatedIdStoreId', 'setGroupdata', 'setSubscriberId', 'setCustomerId',
-                'setStoreId', 'setUpdatedAt', 'save')
+                    'setStoreId', 'setUpdatedAt', 'save')
             )
             ->getMock();
 

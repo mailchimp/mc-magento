@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsControllerTest extends PHPUni
             ->disableOriginalConstructor()
             ->setMethods(
                 array('makeHelper', 'getRequest', 'getResponse', 'getMailchimperrorsModel', 'getApiBatches',
-                'getFileContent', 'unlink')
+                    'getFileContent', 'unlink')
             )
             ->getMock();
 

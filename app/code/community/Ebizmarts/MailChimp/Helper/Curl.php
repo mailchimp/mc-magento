@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
         $headers = isset($options[CURLOPT_HTTPHEADER]) ? $options[CURLOPT_HTTPHEADER] : array();
         $body = isset($options[CURLOPT_POSTFIELDS]) ? $options[CURLOPT_POSTFIELDS] : '';
 
-        if($url === false)
+        if ($url === false)
             return array();
 
         $curl = new Varien_Http_Adapter_Curl();

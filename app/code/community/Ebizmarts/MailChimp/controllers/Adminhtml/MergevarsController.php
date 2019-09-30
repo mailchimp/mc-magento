@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
