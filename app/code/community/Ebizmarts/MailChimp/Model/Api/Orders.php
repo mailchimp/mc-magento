@@ -41,6 +41,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
+        $oldStore = $helper->getCurrentStoreId();
+        $helper->setCurrentStore($magentoStoreId);
+
         $batchArray = array();
         $this->_firstDate = $helper->getEcommerceFirstDate($magentoStoreId);
         $this->_counter = 0;
@@ -57,6 +60,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
 
         // get new orders
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
+        $helper->setCurrentStore($oldStore);
 
         return $batchArray;
     }
