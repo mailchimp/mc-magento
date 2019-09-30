@@ -83,7 +83,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         foreach ($collection as $product) {
             $productId = $product->getId();
 
-            if ($this->shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)) {
+            if ($this->shouldSendProductUpdate($product)) {
                 $buildUpdateOperations = $this->_buildUpdateProductRequest(
                     $product,
                     $batchId,
@@ -115,6 +115,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $mailchimpStoreId
                     );
+
                     if ($dataProduct->getId()) {
                         $helper->modifyCounterSentPerBatch(Ebizmarts_MailChimp_Helper_Data::PRO_MOD);
                     } else {
@@ -156,6 +157,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $batchArray = array();
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
+
         foreach ($deletedProducts as $product) {
             $data = $this->_buildDeleteProductRequest($product, $batchId, $mailchimpStoreId);
 
@@ -208,6 +210,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function _buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId)
     {
         $variantProducts = array();
+
         if ($this->isSimpleProduct($product)) {
             $variantProducts[] = $product;
         } elseif ($this->isConfigurableProduct($product)) {
@@ -219,14 +222,14 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
-
         $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
+
         if ($body === false) {
             //json encode failed
             $jsonErrorMsg = json_last_error_msg();
             $this->getMailChimpHelper()->logError(
                 "Product " . $product->getId()
-                . " json encode failed (".$jsonErrorMsg.")"
+                . " json encode failed (" . $jsonErrorMsg . ")"
             );
 
             $this->_updateSyncData(
@@ -281,6 +284,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $mailchimpStoreId
                 );
+
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
                     $parent = Mage::getModel('catalog/product')->load($parentId);
                     $variantProducts = $this->makeProductChildrenArray(
@@ -289,13 +293,13 @@ class Ebizmarts_MailChimp_Model_Api_Products
                         true
                     );
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
-
                     $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
+
                     if ($body === false) {
                         $jsonErrorMsg = json_last_error_msg();
                         $this->getMailChimpHelper()->logError(
                             "Product " . $parent->getId()
-                            . " json encode failed (".$jsonErrorMsg.")"
+                            . " json encode failed (" . $jsonErrorMsg . ")"
                         );
                         $this->_updateSyncData(
                             $parent->getId(),
@@ -330,19 +334,19 @@ class Ebizmarts_MailChimp_Model_Api_Products
         }
 
         $bodyData = $this->_buildProductData($product, $magentoStoreId, false, $variantProducts);
-
         $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
+
         if ($body === false) {
             //json encode failed
             $this->getMailChimpHelper()->logError(
                 "Product " . $product->getId()
-                . " json encode failed (".json_last_error_msg().")"
+                . " json encode failed (" . json_last_error_msg() . ")"
             );
 
             $jsonErrorMsg = json_last_error_msg();
             $this->getMailChimpHelper()->logError(
                 "Product " . $product->getId()
-                . " json encode failed (".$jsonErrorMsg.")"
+                . " json encode failed (" . $jsonErrorMsg . ")"
             );
             $this->_updateSyncData(
                 $product->getId(),
@@ -370,10 +374,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $product
-     * @param $magentoStoreId
-     * @param bool           $isVariant
-     * @param array          $variants
+     * @param       $product
+     * @param       $magentoStoreId
+     * @param bool  $isVariant
+     * @param array $variants
      * @return array
      * @throws Mage_Core_Exception
      * @throws Mage_Core_Model_Store_Exception
@@ -416,6 +420,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
             $data += $this->getProductVariantData($product, $magentoStoreId);
         } else {
             $description = $rc->getAttributeRawValue($productId, 'description', $magentoStoreId);
+
             if (is_string($description)) {
                 $data["description"] = $description;
             }
@@ -452,16 +457,19 @@ class Ebizmarts_MailChimp_Model_Api_Products
     protected function _processVariants($data, $variants, $product, $magentoStoreId)
     {
         $data["variants"] = array();
+
         if (isset($data["image_url"])) {
             $this->_parentImageUrl = $data["image_url"];
         }
 
         $this->_parentId = $product->getId();
+
         if ($this->currentProductIsVisible()) {
             $this->_parentUrl = $data['url'];
         }
 
         $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
+
         if ($price) {
             $this->_parentPrice = $price;
         }
@@ -551,6 +559,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $helper = $this->getMailChimpHelper();
         $dateHelper = $this->getMailChimpDateHelper();
         $syncDateFlag = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
             $product = $this->loadProductById($itemProductId);
@@ -560,6 +569,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $mailchimpStoreId
             );
+
             if ($productId != $itemProductId
                 || $this->isBundleProduct($product)
                 || $this->isGroupedProduct($product)
@@ -618,15 +628,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * update product sync data
      *
-     * @param $productId
-     * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncDeleted
-     * @param int|null         $syncedFlag
-     * @param bool             $saveOnlyIfexists
-     * @param bool             $allowBatchRemoval
+     * @param           $productId
+     * @param           $mailchimpStoreId
+     * @param int|null  $syncDelta
+     * @param int|null  $syncError
+     * @param int|null  $syncModified
+     * @param int|null  $syncDeleted
+     * @param int|null  $syncedFlag
+     * @param bool      $saveOnlyIfexists
+     * @param bool      $allowBatchRemoval
      */
     protected function _updateSyncData(
         $productId,
@@ -677,6 +687,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
         $collection = $this->getProductResourceCollection();
+
         if (!$isParentProduct) {
             $collection->addFinalPrice();
         }
@@ -718,13 +729,11 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @param $product
      * @return bool
      * @throws Mage_Core_Exception
      */
-    protected function shouldSendProductUpdate($mailchimpStoreId, $magentoStoreId, $product)
+    protected function shouldSendProductUpdate($product)
     {
         return $product->getMailchimpSyncModified()
             && $product->getMailchimpSyncDelta()
@@ -859,9 +868,9 @@ class Ebizmarts_MailChimp_Model_Api_Products
     }
 
     /**
-     * @param $product
-     * @param $magentoStoreId
-     * @param bool           $isBuildUpdateProductRequest
+     * @param       $product
+     * @param       $magentoStoreId
+     * @param bool  $isBuildUpdateProductRequest
      * @return array | return an array with the childs of the product passed by parameter
      */
     public function makeProductChildrenArray($product, $magentoStoreId, $isBuildUpdateProductRequest = false)
@@ -1393,6 +1402,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         );
 
         $collectionNoSpecialPrice->getSelect()->where($whereCondition);
+
         foreach ($collectionNoSpecialPrice as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
         }
@@ -1406,6 +1416,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
     {
         $isProductEnabled = false;
         $status = $this->getCatalogProductStatusModel()->getProductStatus($productId, $magentoStoreId);
+
         if ($status[$productId] == self::PRODUCT_IS_ENABLED) {
             $isProductEnabled = true;
         }

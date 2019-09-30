@@ -110,7 +110,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock
             ->expects($this->once())
             ->method('shouldSendProductUpdate')
-            ->with($mailchimpStoreId, $magentoStoreId, $productMock)
+            ->with($productMock)
             ->willReturn(false);
         $productsApiMock
             ->expects($this->once())
