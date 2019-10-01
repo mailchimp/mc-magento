@@ -32,12 +32,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     const DATA_SENT_TO_MAILCHIMP = 'SENT';
 
     const BATCH_STATUS_LOG = 'Mailchimp_Batch_Status.log';
-
     const BATCH_CANCELED = 'canceled';
     const BATCH_COMPLETED = 'completed';
     const BATCH_PENDING = 'pending';
     const BATCH_ERROR = 'error';
-
 
     protected $_countersSendBatch = array();
     protected $_countersSubscribers = array();
@@ -156,6 +154,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $scopeIdArray = $this->getConfigScopeId();
         $scopeArray = array();
+
         if (isset($scopeIdArray['websiteId'])) {
             $scopeArray['scope'] = 'websites';
             $scopeArray['scope_id'] = $scopeIdArray['websiteId'];
@@ -212,6 +211,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $scopeId,
             $scope
         );
+
         if ($storeName == '') {
             $usingConfigName = false;
         } else {
