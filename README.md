@@ -10,7 +10,7 @@ Integration to sync all the Magento data (Newsletter subscriber, Customers, Orde
 The integration includes a Mandrill SMTP module that overrides the one integrated from Magento, you will need to enable Mandrill with its API key from your Mandrill account (mandrillapp.com) for the transactional emails to work.
 If you want to use the Mailchimp integration without Mandrill for SMTP, contact our support so we can tell you how to set that up.
 
-## Features
+## Main Features
 
 * Two way sync between a MailChimp list and Magento’s newsletter
 * Responsive Email Catcher Popup when accessing the site
@@ -22,7 +22,7 @@ Magento Community Edition (1.7 or above) or Magento Enterprise (1.11 or above)
 
 <a href="http://www.mailchimp.com/signup?pid=ebizmarts&source=website" target="_blank">MailChimp Account</a>
 
-## Installation
+## Step Installation
 
 To get a copy of the project up and running on your local machine for development and testing purposes, just clone this repository on your Magento’s root directory and flush the Magento’s cache.
 
@@ -30,7 +30,7 @@ Alternatively, use modman to install this module.
 
 ``modman clone https://github.com/mailchimp/mc-magento.git -b 'master'``
 
-## Module Configuriation
+## Module Configuration
 
 To enable MailChimp For Magento:
 
@@ -42,7 +42,7 @@ To enable MailChimp For Magento:
 
 More guides and tutorials about the Mailchimp integration with Magento can be found on the [tutorial page of Mailchimp](https://mailchimp.com/help/connect-or-disconnect-mailchimp-for-magento/).
 
-## Report issues
+## Report Issues
 
 For reporting issues, follow this [guidelines](https://github.com/mailchimp/mc-magento/wiki/Issue-reporting-guidelines) or your issue will be rejected.
 
