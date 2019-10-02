@@ -243,16 +243,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     /**
      * Get results of batch operations sent to MailChimp.
      *
-     * @param  $magentoStoreId
-     * @param  bool           $isEcommerceData
+     * @param           $magentoStoreId
+     * @param  bool     $isEcommerceData
      * @throws Mage_Core_Exception
      */
     public function _getResults(
         $magentoStoreId,
         $isEcommerceData = true,
         $status = Ebizmarts_MailChimp_Helper_Data::BATCH_PENDING
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
         $collection = $this->getSyncBatchesModel()->getCollection()
@@ -433,21 +432,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $orderAmount,
         $mailchimpStoreId,
         $magentoStoreId
-    )
-    {
+    ) {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
         $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
 
-        if ($this->shouldFlagAsSyncing(
-            $magentoStoreId,
-            $syncingFlag,
-            $itemAmount,
-            $helper,
-            $mailchimpStoreId
-        )
-        ) {
+        if ($this->shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)) {
             //Set is syncing per scope in 1 until sync finishes.
             $configValue = array(
                 array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1)
@@ -942,16 +933,16 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $itemId
-     * @param $itemType
-     * @param $mailchimpStoreId
-     * @param null             $syncDelta
-     * @param null             $syncError
-     * @param int              $syncModified
-     * @param null             $syncDeleted
-     * @param null             $token
-     * @param null             $syncedFlag
-     * @param bool             $saveOnlyIfexists
+     * @param       $itemId
+     * @param       $itemType
+     * @param       $mailchimpStoreId
+     * @param null  $syncDelta
+     * @param null  $syncError
+     * @param int   $syncModified
+     * @param null  $syncDeleted
+     * @param null  $token
+     * @param null  $syncedFlag
+     * @param bool  $saveOnlyIfExists
      */
     protected function saveSyncData(
         $itemId,
@@ -963,9 +954,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncDeleted = null,
         $token = null,
         $syncedFlag = null,
-        $saveOnlyIfexists = false
-    )
-    {
+        $saveOnlyIfExists = false
+    ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
@@ -980,7 +970,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $syncDeleted,
                 $token,
                 $syncedFlag,
-                $saveOnlyIfexists,
+                $saveOnlyIfExists,
                 null,
                 false
             );
@@ -1121,19 +1111,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $magentoStoreId
      * @param $syncingFlag
      * @param $itemAmount
      * @param $helper
-     * @param $mailchimpStoreId
      * @return bool
      */
-    protected function shouldFlagAsSyncing($magentoStoreId, $syncingFlag, $itemAmount, $helper, $mailchimpStoreId)
+    protected function shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)
     {
-        return $syncingFlag === null
-            && $itemAmount !== 0
-            || $helper->validateDate($syncingFlag)
-            && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+        return $syncingFlag === null && $itemAmount !== 0 || $helper->validateDate($syncingFlag);
     }
 
     /**

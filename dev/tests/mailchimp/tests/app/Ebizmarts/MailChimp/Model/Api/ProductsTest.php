@@ -380,10 +380,8 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $oldProductId = 2;
         $newProductId = 3;
         $batchId = 'storeid-1_PRO_2018-03-15-19-16-36-84319400_';
-        $ecomSyncDateFlag = '2018-03-14 15:03:36';
         $itemOneSyncDelta = '2018-03-14 15:03:37';
         $itemTwoSyncDelta = '2018-03-14 15:03:35';
-        $isProductEnabled = false;
 
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
@@ -421,7 +419,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerceSyncDataItem', 'getEcommMinSyncDateFlag'))
+            ->setMethods(array('getEcommerceSyncDataItem'))
             ->getMock();
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
@@ -472,14 +470,9 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                 array($newProductId)
             )->willReturnOnConsecutiveCalls(
                 true,
-                true
+                false
             );
 
-        $helperMock
-            ->expects($this->once())
-            ->method('getEcommMinSyncDateFlag')
-            ->with($mailchimpStoreId, $magentoStoreId)
-            ->willReturn($ecomSyncDateFlag);
         $helperMock->expects($this->exactly(3))->method('getEcommerceSyncDataItem')->withConsecutive(
             array($groupedProductId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId),
             array($oldProductId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId),
@@ -532,13 +525,13 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->with($productMock, $batchId, $mailchimpStoreId, $magentoStoreId)
             ->willReturn(array());
 
-        $productsApiMock->expects($this->exactly(3))->method('_updateSyncData')->withConsecutive(
+        $productsApiMock->expects($this->exactly(2))->method('_updateSyncData')->withConsecutive(
             array($groupedProductId, $mailchimpStoreId),
             array($oldProductId, $mailchimpStoreId),
             array($newProductId, $mailchimpStoreId)
         );
 
-        $return = $productsApiMock->sendModifiedProduct($orderMock, $mailchimpStoreId, $magentoStoreId);
+        return $productsApiMock->sendModifiedProduct($orderMock, $mailchimpStoreId, $magentoStoreId);
     }
 
     /**
