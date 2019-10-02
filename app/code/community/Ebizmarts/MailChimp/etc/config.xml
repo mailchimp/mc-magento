@@ -129,10 +129,10 @@
         <models>
             <mailchimp>
                 <class>Ebizmarts_MailChimp_Model</class>
-                <resourceModel>mailchimp_mysql4</resourceModel>
+                <resourceModel>mailchimp_resource</resourceModel>
             </mailchimp>
-            <mailchimp_mysql4>
-                <class>Ebizmarts_MailChimp_Model_Mysql4</class>
+            <mailchimp_resource>
+                <class>Ebizmarts_MailChimp_Model_Resource</class>
                 <entities>
                     <synchbatches>
                         <table>mailchimp_sync_batches</table>
@@ -153,7 +153,7 @@
                         <table>mailchimp_stores</table>
                     </stores>
                 </entities>
-            </mailchimp_mysql4>
+            </mailchimp_resource>
             <newsletter>
                 <rewrite>
                     <subscriber>Ebizmarts_MailChimp_Model_Subscriber</subscriber>
