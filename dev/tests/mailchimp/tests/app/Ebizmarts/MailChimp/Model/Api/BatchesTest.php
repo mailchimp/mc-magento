@@ -497,7 +497,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->method('getMCIsSyncing')
             ->with($mailchimpStoreId)
             ->willReturn($syncingFlag);
-      
+
         $apiBatchesMock
             ->expects($this->once())
             ->method('_processBatchOperations')
