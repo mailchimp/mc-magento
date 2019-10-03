@@ -1,54 +1,37 @@
-function getCampaign()
-{
-    let urlparams = location.search.substr(1).split('&');
-    let params = [];
+function getCampaign() {
+    let urlparams = null;
+    let isGet = location.search.search('\\?');
     let mc_cid = null;
-    let campaign = null;
     let isMailchimp = false;
-    let mc_eid = null;
-    let paramsLength = urlparams.length;
 
-    if (paramsLength > 0) {
-        for (let i = 0; i < paramsLength; i++) {
-            let param = urlparams[i].split('=');
-            let key = param[0];
-            let val = param[1];
+    var mc_eid = null;
 
-            if (key && val) {
-                params[key] = val;
-            } else {
-                continue;
-            }
+    if (isGet !== -1) {
+        urlparams = getUrlVars();
+        urlparams.forEach(
+            function (item) {
+                if (item.key === 'utm_source') {
+                    let reg = /^mailchimp$/;
 
-            if (key === 'utm_source') {
-                let reg = /^mailchimp$/;
+                    if (reg.exec(item.value)) {
+                        isMailchimp = true;
+                    }
+                } else {
+                    if (item.key === 'mc_cid') {
+                        mc_cid = item.value;
+                    }
 
-                if (reg.exec(val)) {
-                    isMailchimp = true;
+                    if (item.key == 'mc_eid') {
+                        mc_eid = item.value;
+                    }
                 }
             }
-
-            if (key === 'mc_cid') {
-                mc_cid = val;
-            }
-
-            if (key === 'utm_campaign') {
-                let campaignArray = val.split("-");
-                let campaignValue = campaignArray[0];
-
-                if (campaignValue.length === 10) {
-                    campaign = campaignValue;
-                }
-            }
-
-            if (key === 'mc_eid') {
-                mc_eid = val;
-            }
-        }
+        );
     } else {
-        urlparams = location.pathname.split('/');
+        urlparams = location.href.split('/');
         let utmIndex = $.inArray('utm_source', urlparams);
         let mccidIndex = $.inArray('mc_cid', urlparams);
+        let mceidIndex = $.inArray('mc_eid', urlparams);
 
         if (utmIndex !== -1) {
             let value = urlparams[utmIndex + 1];
@@ -61,35 +44,49 @@ function getCampaign()
             if (mccidIndex !== -1) {
                 mc_cid = urlparams[mccidIndex + 1];
             }
-        }
 
-        if (mc_cid && !isMailchimp) {
-            Mage.Cookies.clear('mailchimp_campaign_id');
+            if (mceidIndex !== -1) {
+                mc_eid = urlparams[mceidIndex + 1];
+            }
+
         }
     }
 
-    if (mc_cid) {
+    if (mc_cid && !isMailchimp) {
         Mage.Cookies.clear('mailchimp_campaign_id');
         Mage.Cookies.set('mailchimp_campaign_id', mc_cid);
-    } else {
-        if (campaign) {
-            Mage.Cookies.clear('mailchimp_campaign_id');
-            Mage.Cookies.set('mailchimp_campaign_id', campaign);
-        }
     }
+
+    if (mc_eid) {
+        Mage.Cookies.set('mailchimp_email_id', mc_eid);
+    }
+
     let landingPage = Mage.Cookies.get('mailchimp_landing_page');
 
     if (!landingPage) {
         Mage.Cookies.set('mailchimp_landing_page', location);
     }
 
-    if (mc_eid) {
-        Mage.Cookies.set('mailchimp_email_id', mc_eid);
+    if (isMailchimp) {
+        Mage.Cookies.clear('mailchimp_campaign_id');
+        Mage.Cookies.set('mailchimp_landing_page', location);
     }
 }
 
+function getUrlVars() {
+    let vars = [];
+    let i = 0;
+    window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+        function (m, key, value) {
+            vars[i] = {'value': value, 'key': key};
+            i++;
+        }
+    );
+    return vars;
+}
+
 if (document.loaded) {
-    getCampaign;
+    getCampaign();
 } else {
     document.observe('dom:loaded', getCampaign);
 }
