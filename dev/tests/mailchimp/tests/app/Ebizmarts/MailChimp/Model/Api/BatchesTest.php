@@ -497,19 +497,11 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->method('getMCIsSyncing')
             ->with($mailchimpStoreId)
             ->willReturn($syncingFlag);
-
+      
         $apiBatchesMock
             ->expects($this->once())
             ->method('_processBatchOperations')
             ->with($batchArray, $mailchimpStoreId, $magentoStoreId);
-
-        $apiBatchesMock
-            ->expects($this->once())
-            ->method('_updateSyncingFlag')
-            ->with(
-                count($customerArray), count($productsArray),
-                count($ordersArray), $mailchimpStoreId, $magentoStoreId
-            );
 
         $apiBatchesMock->_sendEcommerceBatch($magentoStoreId);
     }
@@ -566,7 +558,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
                     $batchArray['operations'],
                     $this->getDeletedProductArray()
                 ),
-                'batchArray' => $batchArray['operations'])),
+                'batchArray' => $batchArray['operations']))
         );
     }
 
@@ -584,7 +576,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getHelper', 'getSyncBatchesModel', 'getMagentoBaseDir', 'getBatchResponse',
-                'processEachResponseFile', 'batchDirExists', 'removeBatchDir')
+                    'processEachResponseFile', 'batchDirExists', 'removeBatchDir')
             )
             ->getMock();
 
@@ -788,8 +780,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(
-                array('isEcomSyncDataEnabled', 'getApi',
-                'saveMailchimpConfig', 'getDateSyncFinishByMailChimpStoreId')
+                array('isEcomSyncDataEnabled', 'getApi', 'saveMailchimpConfig', 'getDateSyncFinishByMailChimpStoreId')
             )
             ->getMock();
 
