@@ -241,17 +241,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
      */
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
-        $helper = $this->getHelper();
-        $oldStore = $helper->getCurrentStoreId();
-        $helper->setCurrentStore($magentoStoreId);
-
         $data = $this->_getPayloadData($order, $magentoStoreId);
         $lines = $this->_getPayloadDataLines($order, $mailchimpStoreId, $magentoStoreId);
         $data['lines'] = $lines['lines'];
 
         if (!$lines['itemsCount']) {
             unset($data['lines']);
-            $helper->setCurrentStore($oldStore);
             return "";
         }
 
@@ -307,7 +302,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         //encode to JSON
         $jsonData = json_encode($data);
 
-        $helper->setCurrentStore($oldStore);
         return $jsonData;
     }
 
