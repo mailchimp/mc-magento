@@ -749,8 +749,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
                 $magentoStoreId,
                 $subscriber,
                 $customer,
-                $listId,
-                $counter
+                $listId
             );
 
             if ($batchData !== null) {
