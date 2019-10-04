@@ -746,20 +746,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper->resetCountersDataSentToMailchimp();
 
         foreach ($files as $file) {
-            $items = json_decode(file_get_contents($file));
+            $items = json_decode(file_get_contents($file), true);
 
             if ($items !== false) {
                 foreach ($items as $item) {
-                    $line = explode('_', $item->operation_id);
+                    $line = explode('_', $item['operation_id']);
                     $store = explode('-', $line[0]);
                     $type = $line[1];
                     $id = $line[3];
 
-                    if ($item->status_code != 200) {
+                    if ($item['status_code'] != 200) {
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
                         //parse error
-                        $response = json_decode($item->response);
+                        $response = json_decode($item['response'], true);
                         $errorDetails = $this->_processFileErrors($response);
 
                         if (strstr($errorDetails, 'already exists')) {
@@ -782,9 +782,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             true
                         );
 
-                        $mailchimpErrors->setType($response->type);
-                        $mailchimpErrors->setTitle($response->title);
-                        $mailchimpErrors->setStatus($item->status_code);
+                        $mailchimpErrors->setType($response['type']);
+                        $mailchimpErrors->setTitle($response['title']);
+                        $mailchimpErrors->setStatus($item['status_code']);
                         $mailchimpErrors->setErrors($errorDetails);
                         $mailchimpErrors->setRegtype($type);
                         $mailchimpErrors->setOriginalId($id);
@@ -862,17 +862,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $errorDetails = "";
 
-        if (!empty($response->errors)) {
-            foreach ($response->errors as $error) {
-                if (isset($error->field) && isset($error->message)) {
+        if (!empty($response['errors'])) {
+            foreach ($response['errors'] as $error) {
+                if (isset($error['field']) && isset($error['message'])) {
                     $errorDetails .= $errorDetails != "" ? " / " : "";
-                    $errorDetails .= $error->field . " : " . $error->message;
+                    $errorDetails .= $error['field'] . " : " . $error['message'];
                 }
             }
         }
 
         if ($errorDetails == "") {
-            $errorDetails = $response->detail;
+            $errorDetails = $response['detail'];
         }
 
         return $errorDetails;

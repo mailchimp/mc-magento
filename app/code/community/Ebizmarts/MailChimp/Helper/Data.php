@@ -48,7 +48,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @var array
      */
-    public static $MAILCHIMP_LANGUAGES = array(
+    public static $LANGUAGES = array(
         'en', // English
         'ar', // Arabic
         'af', // Afrikaans
@@ -2595,9 +2595,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $dateHelper = $this->getDateHelper();
         if (!$dateHelper->timePassed($initialTime)) {
-            $write_connection = $this->getCoreResource()->getConnection('core_write');
+            $writeConnection = $this->getCoreResource()->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-            $write_connection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
+            $writeConnection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
             $arrayMigrationConfigData = array('115' => false, '116' => false, '1164' => true);
             $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
         }
@@ -4109,11 +4109,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpLanguage = '';
 
-        if (in_array($languageCode, self::$MAILCHIMP_LANGUAGES)) {
+        if (in_array($languageCode, self::$LANGUAGES)) {
             $mailchimpLanguage = $languageCode;
         } else {
             $langIso = substr($languageCode, 0, 2);
-            if (in_array($langIso, self::$MAILCHIMP_LANGUAGES)) {
+            if (in_array($langIso, self::$LANGUAGES)) {
                 $mailchimpLanguage = $langIso;
             }
         }
