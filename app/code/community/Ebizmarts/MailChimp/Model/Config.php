@@ -21,7 +21,6 @@ class Ebizmarts_MailChimp_Model_Config
     const GENERAL_CHECKOUT_SUBSCRIBE            = 'mailchimp/general/checkout_subscribe';
     const GENERAL_MCSTOREID                     = 'mailchimp/general/storeid';
     const GENERAL_MCISSYNCING                   = 'mailchimp/general/is_syicing';
-    const GENERAL_ECOMMMINSYNCDATEFLAG          = 'mailchimp/general/mcminsyncdateflag';
     const GENERAL_SUBMINSYNCDATEFLAG            = 'mailchimp/general/subminsyncdateflag';
     const GENERAL_TWO_WAY_SYNC                  = 'mailchimp/general/webhook_active';
     const GENERAL_UNSUBSCRIBE                   = 'mailchimp/general/webhook_delete';
