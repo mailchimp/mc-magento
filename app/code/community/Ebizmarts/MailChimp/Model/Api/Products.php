@@ -550,7 +550,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
         $items = $order->getAllVisibleItems();
         $helper = $this->getMailChimpHelper();
         $dateHelper = $this->getMailChimpDateHelper();
-        $syncDateFlag = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
             $product = $this->loadProductById($itemProductId);
@@ -560,6 +560,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $mailchimpStoreId
             );
+
             if ($productId != $itemProductId
                 || $this->isBundleProduct($product)
                 || $this->isGroupedProduct($product)
@@ -580,10 +581,10 @@ class Ebizmarts_MailChimp_Model_Api_Products
             }
 
             $syncModified = $productSyncData->getMailchimpSyncModified();
-            $syncDelta = $productSyncData->getMailchimpSyncDelta();
+            $productSyncDelta = $productSyncData->getMailchimpSyncDelta();
             $isProductEnabled = $this->isProductEnabled($productId, $magentoStoreId);
 
-            if ($syncModified && $syncDelta > $syncDateFlag && $isProductEnabled) {
+            if ($syncModified && $isProductEnabled) {
                 $buildUpdateOperations = $this->_buildUpdateProductRequest(
                     $product,
                     $batchId,
@@ -599,7 +600,7 @@ class Ebizmarts_MailChimp_Model_Api_Products
                     );
                     $this->_updateSyncData($productId, $mailchimpStoreId);
                 }
-            } elseif (!$syncDelta || $syncDelta < $syncDateFlag || !$isProductEnabled) {
+            } elseif (!$productSyncDelta || !$isProductEnabled) {
                 $bodyData = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
 
                 if ($bodyData !== false) {
@@ -618,15 +619,15 @@ class Ebizmarts_MailChimp_Model_Api_Products
     /**
      * update product sync data
      *
-     * @param $productId
-     * @param $mailchimpStoreId
-     * @param int|null         $syncDelta
-     * @param int|null         $syncError
-     * @param int|null         $syncModified
-     * @param int|null         $syncDeleted
-     * @param int|null         $syncedFlag
-     * @param bool             $saveOnlyIfexists
-     * @param bool             $allowBatchRemoval
+     * @param           $productId
+     * @param           $mailchimpStoreId
+     * @param int|null  $syncDelta
+     * @param int|null  $syncError
+     * @param int|null  $syncModified
+     * @param int|null  $syncDeleted
+     * @param int|null  $syncedFlag
+     * @param bool      $saveOnlyIfexists
+     * @param bool      $allowBatchRemoval
      */
     protected function _updateSyncData(
         $productId,
