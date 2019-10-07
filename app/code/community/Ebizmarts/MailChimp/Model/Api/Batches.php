@@ -344,20 +344,22 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
-                //cart operations
                 if ($helper->getMCIsSyncing($mailchimpStoreId)) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
-                } else {$helper->logBatchStatus('Generate Carts Payload');
-                $apiCarts = $this->getApiCarts();
-                $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
-                //order operations
-                $helper->logBatchStatus('Generate Orders Payload');
-                $apiOrders = $this->getApiOrders();
-                $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                $orderAmount = count($ordersArray);
-                $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-}
+                } else {
+                    //cart operations
+                    $helper->logBatchStatus('Generate Carts Payload');
+                    $apiCarts = $this->getApiCarts();
+                    $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
+                    //order operations
+                    $helper->logBatchStatus('Generate Orders Payload');
+                    $apiOrders = $this->getApiOrders();
+                    $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $orderAmount = count($ordersArray);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
+                }
+
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
                     $helper->logBatchStatus('Generate Promo Rules Payload');
@@ -698,14 +700,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     );
 
                     $curlHelper = $this->getMailchimpCurlHelper();
-                    $curlResults = $curlHelper->curlExec($curlOptions);
-                    $r = $curlResults['response'];
+                    $curlHelper->curlExec($curlOptions);
                     fclose($fd);
-                    $fileHelper->mkDir(
-                        $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId,
-                        0750,
-                        true
-                    );
+                    $fileHelper->mkDir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
 
                     $archive = new Mage_Archive();
 
@@ -741,11 +738,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $path = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId;
         $archive->unpack($fileName, $path);
-        $archive->unpack(
-            $path . '/' . $batchId . '.tar',
-            $path
-        );
-
+        $archive->unpack($path . '/' . $batchId . '.tar', $path);
         $fileHelper = $this->getMailchimpFileHelper();
         $dirItems = new DirectoryIterator($path);
 
@@ -778,7 +771,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         foreach ($files as $file) {
             $fileContent = $fileHelper->read($file);
-            $items = json_decode($fileContent, true);
+            $items = json_decode($fileContent);
 
             if ($items !== false) {
                 foreach ($items as $item) {
@@ -992,7 +985,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncDeleted = null,
         $token = null,
         $syncedFlag = null,
-        $saveOnlyIfexists = false
+        $saveOnlyIfExists = false
     ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
