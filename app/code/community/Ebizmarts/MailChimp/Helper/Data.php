@@ -481,7 +481,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return Ebizmarts_MailChimp_Model_Mysql4_SynchBatches
+     * @return Ebizmarts_MailChimp_Model_Resource_SynchBatches
      */
     protected function getSyncBatchesResource()
     {

@@ -185,7 +185,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules
 
     /**
      * @param $mailchimpStoreId
-     * @return Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
      */
     protected function makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId)
     {
