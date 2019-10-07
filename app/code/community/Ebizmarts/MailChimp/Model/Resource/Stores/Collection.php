@@ -11,7 +11,7 @@
  * @date:     2019-10-02 15:57
  */
 
-class Ebizmarts_MailChimp_Model_Resource_Stores_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
+class Ebizmarts_MailChimp_Model_Resource_Stores_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
 
     /**

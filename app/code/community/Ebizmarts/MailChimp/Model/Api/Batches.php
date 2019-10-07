@@ -461,14 +461,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
         $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
 
-        if ($this->shouldFlagAsSyncing(
-            $magentoStoreId,
-            $syncingFlag,
-            $itemAmount,
-            $helper,
-            $mailchimpStoreId
-        )
-        ) {
+        if ($this->shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)) {
             //Set is syncing per scope in 1 until sync finishes.
             $configValue = array(
                 array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1)
