@@ -344,10 +344,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
-                //cart operations
                 if ($helper->getMCIsSyncing($mailchimpStoreId)) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
                 } else {
+                    //cart operations
                     $helper->logBatchStatus('Generate Carts Payload');
                     $apiCarts = $this->getApiCarts();
                     $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
@@ -699,14 +699,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     );
 
                     $curlHelper = $this->getMailchimpCurlHelper();
-                    $curlResults = $curlHelper->curlExec($curlOptions);
-                    $r = $curlResults['response'];
+                    $curlHelper->curlExec($curlOptions);
                     fclose($fd);
-                    $fileHelper->mkDir(
-                        $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId,
-                        0750,
-                        true
-                    );
+                    $fileHelper->mkDir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
 
                     $archive = new Mage_Archive();
 
@@ -742,11 +737,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $path = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId;
         $archive->unpack($fileName, $path);
-        $archive->unpack(
-            $path . '/' . $batchId . '.tar',
-            $path
-        );
-
+        $archive->unpack($path . '/' . $batchId . '.tar', $path);
         $fileHelper = $this->getMailchimpFileHelper();
         $dirItems = new DirectoryIterator($path);
 
@@ -895,17 +886,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $errorDetails = "";
 
-        if (!empty($response->errors)) {
-            foreach ($response->errors as $error) {
-                if (isset($error->field) && isset($error->message)) {
+        if (!empty($response['errors'])) {
+            foreach ($response['errors'] as $error) {
+                if (isset($error['field']) && isset($error['message'])) {
                     $errorDetails .= $errorDetails != "" ? " / " : "";
-                    $errorDetails .= $error->field . " : " . $error->message;
+                    $errorDetails .= $error['field'] . " : " . $error['message'];
                 }
             }
         }
 
         if ($errorDetails == "") {
-            $errorDetails = $response->detail;
+            $errorDetails = $response['detail'];
         }
 
         return $errorDetails;
@@ -1150,19 +1141,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $magentoStoreId
      * @param $syncingFlag
      * @param $itemAmount
      * @param $helper
-     * @param $mailchimpStoreId
      * @return bool
      */
-    protected function shouldFlagAsSyncing($magentoStoreId, $syncingFlag, $itemAmount, $helper, $mailchimpStoreId)
+    protected function shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)
     {
-        return $syncingFlag === null
-            && $itemAmount !== 0
-            || $helper->validateDate($syncingFlag)
-            && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+        return $syncingFlag === null && $itemAmount !== 0 || $helper->validateDate($syncingFlag);
     }
 
     /**

@@ -493,14 +493,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         //Delete default configurations for this store.
         $config = $this->getConfig();
         $config->deleteConfig(
-            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId",
-            'default',
-            0
+            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0
         );
         $config->deleteConfig(
-            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId",
-            'default',
-            0
+            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", 'default', 0
         );
 
         //Delete local ecommerce data and errors for this store.
@@ -509,6 +505,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         //Delete particular scopes configuraion flags for this store
         $scopeArrayIfExist = $this->getScopeByMailChimpStoreId($mailchimpStoreId);
+
         if ($scopeArrayIfExist !== false) {
             $this->deleteAllConfiguredMCStoreLocalData(
                 $mailchimpStoreId,
@@ -3201,7 +3198,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3216,7 +3213,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return bool
      * @throws Mage_Core_Exception
      */
@@ -3232,7 +3229,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param           $syncValue
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @throws Mage_Core_Exception
      */
     protected function setIsSyncingIfFinishedPerScope($syncValue, $scopeId, $scope = 'stores')
@@ -3253,7 +3250,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param           $value
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      */
     public function setResendTurn($value, $scopeId, $scope = 'stores')
     {
@@ -3263,7 +3260,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3278,7 +3275,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3293,7 +3290,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3308,7 +3305,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3323,7 +3320,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3338,7 +3335,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3353,7 +3350,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3417,7 +3414,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Check if all items have been sent and delete config values used in the resend process
      *
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      */
     public function handleResendFinish($scopeId, $scope = 'stores')
     {
@@ -3430,7 +3427,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      */
     protected function deleteResendConfigValues($scopeId, $scope = 'stores')
     {
@@ -3447,7 +3444,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return bool
      */
     protected function allResendItemsSent($scopeId, $scope = 'stores')
@@ -3752,7 +3749,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param           $campaignId
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return null
      */
     public function getMailChimpCampaignNameById($campaignId, $scopeId, $scope = 'stores')
@@ -3862,7 +3859,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return string
      * @throws Mage_Core_Exception
      * @throws Mage_Core_Model_Store_Exception
@@ -3887,7 +3884,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3898,7 +3895,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -3926,7 +3923,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param       $subscriber
-     * @param bool $forceUpdateStatus
+     * @param bool  $forceUpdateStatus
      */
     public function subscribeMember($subscriber, $forceUpdateStatus = false)
     {
@@ -4107,8 +4104,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param $scopeId
-     * @param string $scope
+     * @param           $scopeId
+     * @param string    $scope
      */
     public function resendSubscribers($scopeId, $scope = 'stores')
     {
@@ -4200,6 +4197,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $mailchimpLanguage = $languageCode;
         } else {
             $langIso = substr($languageCode, 0, 2);
+
             if (in_array($langIso, self::$LANGUAGES)) {
                 $mailchimpLanguage = $langIso;
             }
@@ -4210,7 +4208,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return bool
      * @throws Mage_Core_Exception
      */
@@ -4225,7 +4223,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param       $scopeId
-     * @param null $scope
+     * @param null  $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -4422,7 +4420,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -4437,7 +4435,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param           $scopeId
-     * @param string $scope
+     * @param string    $scope
      * @return mixed
      * @throws Mage_Core_Exception
      */
@@ -4506,10 +4504,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param       $customerId
-     * @param       $subscriberId
-     * @param       $storeId
-     * @param null $interest
+     * @param           $customerId
+     * @param           $subscriberId
+     * @param           $storeId
+     * @param null      $interest
      * @return array|null
      * @throws Mage_Core_Exception
      * @throws MailChimp_Error
@@ -4727,8 +4725,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param int       $scopeId
-     * @param string    $scope
+     * @param int    $scopeId
+     * @param string $scope
      * @return bool \ return true if image cache was flushed
      * @throws Mage_Core_Exception
      */
@@ -4825,7 +4823,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param       $index
-     * @param int $increment
+     * @param int   $increment
      */
     public function modifyCounterSentPerBatch($index, $increment = 1)
     {
@@ -4851,7 +4849,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param       $index
-     * @param int $increment
+     * @param int   $increment
      */
     public function modifyCounterSubscribers($index, $increment = 1)
     {
@@ -4877,8 +4875,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param       $index
-     * @param bool $hasError
-     * @param int $increment
+     * @param bool  $hasError
+     * @param int   $increment
      */
     public function modifyCounterDataSentToMailchimp($index, $hasError = false, $increment = 1)
     {
