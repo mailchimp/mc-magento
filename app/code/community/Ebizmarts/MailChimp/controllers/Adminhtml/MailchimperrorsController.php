@@ -67,9 +67,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
 
                     foreach ($items as $item) {
                         $fileContent[] = array(
-                            'status_code' => $item->status_code,
-                            'operation_id' => $item->operation_id,
-                            'response' => json_decode($item->response)
+                            'status_code' => $item['status_code'],
+                            'operation_id' => $item['operation_id'],
+                            'response' => json_decode($item['response'])
                         );
                     }
 
@@ -134,7 +134,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
     {
         $fileContent = $this->getFileHelper()->read($file);
 
-        return json_decode($fileContent);
+        return json_decode($fileContent, true);
     }
 
     /**

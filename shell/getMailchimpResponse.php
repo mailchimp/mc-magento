@@ -48,10 +48,10 @@ curl_close($curl);
 if ($err) {
     printf("cURL Error #:" . $err);
 } else {
-    $jsonResponse = json_decode($response);
+    $jsonResponse = json_decode($response, true);
 
-    if ($jsonResponse->status == 'finished') {
-        $fileUrl = $jsonResponse->response_body_url;
+    if ($jsonResponse['status'] == 'finished') {
+        $fileUrl = $jsonResponse['response_body_url'];
         // check if the file is not expired
         parse_str($fileUrl, $fileParams);
 
