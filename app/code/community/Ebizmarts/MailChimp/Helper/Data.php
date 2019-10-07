@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @var array
      */
-    public static $mailchimpLanguages = array(
+    public static $LANGUAGES = array(
         'en', // English
         'ar', // Arabic
         'af', // Afrikaans
@@ -493,19 +493,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         //Delete default configurations for this store.
         $config = $this->getConfig();
         $config->deleteConfig(
-            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId",
-            'default',
-            0
+            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 'default', 0
         );
         $config->deleteConfig(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId",
-            'default',
-            0
-        );
-        $config->deleteConfig(
-            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId",
-            'default',
-            0
+            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId", 'default', 0
         );
 
         //Delete local ecommerce data and errors for this store.
@@ -3108,6 +3099,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 foreach ($collection as $config) {
                     if ($config->getValue() !== null) {
                         $configAssociatedToScope = true;
+                        break;
                     }
                 }
             }
@@ -4254,12 +4246,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpLanguage = '';
 
-        if (in_array($languageCode, self::$mailchimpLanguages)) {
+        if (in_array($languageCode, self::$LANGUAGES)) {
             $mailchimpLanguage = $languageCode;
         } else {
             $langIso = substr($languageCode, 0, 2);
-
-            if (in_array($langIso, self::$mailchimpLanguages)) {
+            if (in_array($langIso, self::$LANGUAGES)) {
                 $mailchimpLanguage = $langIso;
             }
         }

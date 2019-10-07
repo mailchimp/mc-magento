@@ -343,8 +343,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productsArray = $apiProducts->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
+
                 //cart operations
-                $helper->logBatchStatus('Generate Carts Payload');
+                if ($helper->getMCIsSyncing($mailchimpStoreId)) {
+                    $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
+                } else {$helper->logBatchStatus('Generate Carts Payload');
                 $apiCarts = $this->getApiCarts();
                 $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
@@ -354,7 +357,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
                 $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-
+}
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
                     $helper->logBatchStatus('Generate Promo Rules Payload');
@@ -457,14 +460,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $itemAmount = ($customerAmount + $productAmount + $orderAmount);
         $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
 
-        if ($this->shouldFlagAsSyncing(
-            $magentoStoreId,
-            $syncingFlag,
-            $itemAmount,
-            $helper,
-            $mailchimpStoreId
-        )
-        ) {
+        if ($this->shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)) {
             //Set is syncing per scope in 1 until sync finishes.
             $configValue = array(
                 array(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING . "_$mailchimpStoreId", 1)
@@ -782,20 +778,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         foreach ($files as $file) {
             $fileContent = $fileHelper->read($file);
-            $items = json_decode($fileContent);
+            $items = json_decode($fileContent, true);
 
             if ($items !== false) {
                 foreach ($items as $item) {
-                    $line = explode('_', $item->operation_id);
+                    $line = explode('_', $item['operation_id']);
                     $store = explode('-', $line[0]);
                     $type = $line[1];
                     $id = $line[3];
 
-                    if ($item->status_code != 200) {
+                    if ($item['status_code'] != 200) {
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
 
                         //parse error
-                        $response = json_decode($item->response);
+                        $response = json_decode($item['response'], true);
                         $errorDetails = $this->_processFileErrors($response);
 
                         if (strstr($errorDetails, 'already exists')) {
@@ -818,9 +814,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             true
                         );
 
-                        $mailchimpErrors->setType($response->type);
-                        $mailchimpErrors->setTitle($response->title);
-                        $mailchimpErrors->setStatus($item->status_code);
+                        $mailchimpErrors->setType($response['type']);
+                        $mailchimpErrors->setTitle($response['title']);
+                        $mailchimpErrors->setStatus($item['status_code']);
                         $mailchimpErrors->setErrors($errorDetails);
                         $mailchimpErrors->setRegtype($type);
                         $mailchimpErrors->setOriginalId($id);
@@ -898,17 +894,17 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $errorDetails = "";
 
-        if (!empty($response->errors)) {
-            foreach ($response->errors as $error) {
-                if (isset($error->field) && isset($error->message)) {
+        if (!empty($response['errors'])) {
+            foreach ($response['errors'] as $error) {
+                if (isset($error['field']) && isset($error['message'])) {
                     $errorDetails .= $errorDetails != "" ? " / " : "";
-                    $errorDetails .= $error->field . " : " . $error->message;
+                    $errorDetails .= $error['field'] . " : " . $error['message'];
                 }
             }
         }
 
         if ($errorDetails == "") {
-            $errorDetails = $response->detail;
+            $errorDetails = $response['detail'];
         }
 
         return $errorDetails;
@@ -984,7 +980,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param null  $syncDeleted
      * @param null  $token
      * @param null  $syncedFlag
-     * @param bool  $saveOnlyIfexists
+     * @param bool  $saveOnlyIfExists
      */
     protected function saveSyncData(
         $itemId,
@@ -1012,7 +1008,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $syncDeleted,
                 $token,
                 $syncedFlag,
-                $saveOnlyIfexists,
+                $saveOnlyIfExists,
                 null,
                 false
             );
@@ -1153,19 +1149,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $magentoStoreId
      * @param $syncingFlag
      * @param $itemAmount
      * @param $helper
-     * @param $mailchimpStoreId
      * @return bool
      */
-    protected function shouldFlagAsSyncing($magentoStoreId, $syncingFlag, $itemAmount, $helper, $mailchimpStoreId)
+    protected function shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)
     {
-        return $syncingFlag === null
-            && $itemAmount !== 0
-            || $helper->validateDate($syncingFlag)
-            && $syncingFlag < $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+        return $syncingFlag === null && $itemAmount !== 0 || $helper->validateDate($syncingFlag);
     }
 
     /**
