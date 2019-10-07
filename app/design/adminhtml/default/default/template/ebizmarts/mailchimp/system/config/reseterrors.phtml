@@ -1,7 +1,7 @@
 <script type="text/javascript">
     //<![CDATA[
     function reseterrors() {
-        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+        new Ajax.Request('<?php echo $this->escapeUrl($this->getAjaxCheckUrl()) ?>', {
             method: 'get',
             onSuccess: function (transport) {
 

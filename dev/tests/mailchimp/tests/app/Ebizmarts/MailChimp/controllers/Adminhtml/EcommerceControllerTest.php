@@ -7,17 +7,17 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
     /**
      * @var Ebizmarts_MailChimp_Adminhtml_EcommerceController $ecommerceController
      */
-    private $ecommerceController;
+    protected $_ecommerceController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->ecommerceController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_EcommerceController::class);
+        $this->_ecommerceController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_EcommerceController::class);
     }
 
     public function tearDown()
     {
-        $this->ecommerceController = null;
+        $this->_ecommerceController = null;
     }
 
     public function testResetLocalErrorsAction()
@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $storeId = 1;
         $result = 1;
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -108,7 +108,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
 
         $result = 'Redirecting... <script type="text/javascript">window.top.location.reload();</script>';
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper', 'getRequest', 'addSuccess'))
             ->getMock();
@@ -136,10 +136,25 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
-        $helperMock->expects($this->once())->method('getCurrentScope')->willReturn(array('scope_id'=>$scopeId, 'scope'=>$scope));
-        $helperMock->expects($this->once())->method('resendMCEcommerceData')->with($scopeId, $scope, $filter)->willReturnSelf();
 
-        $requestMock->expects($this->once())->method('getParam')->with($paramFilters)->willReturn($filter);
+        $helperMock
+            ->expects($this->once())
+            ->method('resendMCEcommerceData')
+            ->with($scopeId, $scope, $filter)
+            ->willReturnSelf();
+
+        $requestMock->expects($this->exactly(3))
+            ->method('getParam')
+            ->withConsecutive(
+                $paramFilters,
+                'scope',
+                'scope_id'
+            )
+            ->willReturnOnConsecutiveCalls(
+                $filter,
+                $scope,
+                $scopeId
+            );
         $responseMock->expects($this->once())->method('setBody')->with($result);
 
         $ecommerceControllerMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
@@ -156,7 +171,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $scopeId = 1;
         $result = 1;
 
-        $ecommerceControllerMock = $this->ecommerceController
+        $ecommerceControllerMock = $this->_ecommerceController
             ->disableOriginalConstructor()
             ->setMethods(array('makeHelper'))
             ->getMock();
@@ -197,7 +212,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
             );
 
         $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(true);
-        $helperMock->expects($this->once())->method('createMergeFields')->with($scopeId, $scope);
+        $helperMock->expects($this->once())->method('createMergeFields')->with($scopeId, $scope)->willReturn($result);
 
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 

@@ -2,7 +2,7 @@
 
 class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_TestCase
 {
-    private $promoRulesApiMock;
+    protected $_promoRulesApiMock;
 
     const BATCH_ID = 'storeid-1_PRL_2017-05-18-14-45-54-38849500';
 
@@ -12,13 +12,15 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
     {
         Mage::app('default');
 
-        /** @var Ebizmarts_MailChimp_Model_Api_PromoRules $apiPromoRulesMock promoRulesApiMock */
-        $this->promoRulesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoRules::class);
+        /**
+         * @var Ebizmarts_MailChimp_Model_Api_PromoRules $apiPromoRulesMock promoRulesApiMock
+         */
+        $this->_promoRulesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoRules::class);
     }
 
     public function tearDown()
     {
-        $this->promoRulesApiMock = null;
+        $this->_promoRulesApiMock = null;
     }
 
     public function testCreateBatchJson()
@@ -34,18 +36,28 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             )
         );
 
-        $promoRulesApiMock = $this->promoRulesApiMock
-            ->setMethods(array('getMailChimpHelper', '_getModifiedAndDeletedPromoRules'))
+        $promoRulesApiMock = $this->_promoRulesApiMock
+            ->setMethods(array('getMailChimpDateHelper', '_getModifiedAndDeletedPromoRules'))
             ->getMock();
 
-        $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+        $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
             ->setMethods(array('getDateMicrotime'))
             ->disableOriginalConstructor()
             ->getMock();
 
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
-        $mailChimpHelperMock->expects($this->once())->method('getDateMicrotime')->willReturn('2017-10-23-19-34-31-92333600');
-        $promoRulesApiMock->expects($this->once())->method('_getModifiedAndDeletedPromoRules')->with($mailchimpStoreId)->willReturn($promoRulesArray);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpDateHelper')
+            ->willReturn($mailChimpDateHelperMock);
+        $mailChimpDateHelperMock
+            ->expects($this->once())
+            ->method('getDateMicrotime')
+            ->willReturn('2017-10-23-19-34-31-92333600');
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('_getModifiedAndDeletedPromoRules')
+            ->with($mailchimpStoreId)
+            ->willReturn($promoRulesArray);
 
         $promoRulesApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
     }
@@ -64,41 +76,79 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $ruleSimpleAction = 'by_percent';
         $ruleIsActive = true;
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->disableOriginalConstructor()
-            ->setMethods(array('getPromoRule', 'getMailChimpHelper', '_updateSyncData', 'getMailChimpDiscountAmount',
-                'getMailChimpType', 'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation'))
+            ->setMethods(
+                array('getPromoRule', 'getMailChimpHelper', '_updateSyncData', 'getMailChimpDiscountAmount',
+                    'getMailChimpType', 'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation',
+                    'getMailchimpDateHelper')
+            )
             ->getMock();
 
         $promoRuleMock = $this->getMockBuilder(Mage_SalesRule_Model_Rule::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRuleId', 'getName', 'getDescription', 'getFromDate', 'getToDate', 'getSimpleAction', 'getIsActive', 'setMailchimpSyncError'))
+            ->setMethods(
+                array(
+                    'getRuleId', 'getName', 'getDescription',
+                    'getFromDate', 'getToDate', 'getSimpleAction',
+                    'getIsActive', 'setMailchimpSyncError'
+                )
+            )
             ->getMock();
 
-        $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+        $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
             ->setMethods(array('getDateMicrotime'))
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mailChimpHelperMock->expects($this->once())->method('getDateMicrotime')->willReturn('2017-05-18-14-45-54-38849500');
+        $mailChimpDateHelperMock
+            ->expects($this->once())
+            ->method('getDateMicrotime')
+            ->willReturn('2017-05-18-14-45-54-38849500');
 
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
-        $promoRulesApiMock->expects($this->once())->method('getPromoRule')->with(self::PROMORULE_ID)->willReturn($promoRuleMock);
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpDiscountAmount')->with($promoRuleMock)->willReturn($promoRuleData['amount']);
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpType')->with($ruleSimpleAction)->willReturn($promoRuleData['type']);
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpTarget')->with($ruleSimpleAction)->willReturn($promoRuleData['target']);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpDateHelper')
+            ->willReturn($mailChimpDateHelperMock);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getPromoRule')
+            ->with(self::PROMORULE_ID)
+            ->willReturn($promoRuleMock);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpDiscountAmount')
+            ->with($promoRuleMock)
+            ->willReturn($promoRuleData['amount']);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpType')
+            ->with($ruleSimpleAction)
+            ->willReturn($promoRuleData['type']);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpTarget')
+            ->with($ruleSimpleAction)
+            ->willReturn($promoRuleData['target']);
         $promoRulesApiMock->expects($this->once())->method('ruleIsNotCompatible')->willReturn(false);
         $promoRulesApiMock->expects($this->once())->method('ruleHasMissingInformation')->willReturn(false);
 
         $promoRuleMock->expects($this->once())->method('getRuleId')->willReturn(self::PROMORULE_ID);
         $promoRuleMock->expects($this->exactly($promoRuleData['countName']))->method('getName')->willReturn($ruleName);
-        $promoRuleMock->expects($this->exactly($promoRuleData['countDesc']))->method('getDescription')->willReturn($promoRuleData['description']);
+        $promoRuleMock
+            ->expects($this->exactly($promoRuleData['countDesc']))
+            ->method('getDescription')
+            ->willReturn($promoRuleData['description']);
         $promoRuleMock->expects($this->once())->method('getFromDate')->willReturn($promoRuleData['starts_at']);
         $promoRuleMock->expects($this->once())->method('getToDate')->willReturn($promoRuleData['ends_at']);
         $promoRuleMock->expects($this->once())->method('getSimpleAction')->willReturn($ruleSimpleAction);
         $promoRuleMock->expects($this->once())->method('getIsActive')->willReturn($ruleIsActive);
 
-        $return = $promoRulesApiMock->getNewPromoRule(self::PROMORULE_ID, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId);
+        $return = $promoRulesApiMock->getNewPromoRule(
+            self::PROMORULE_ID,
+            $mailchimpStoreId,
+            $magentoStoreId
+        );
         $this->assertEquals(4, count($return));
         $this->assertArrayHasKey("method", $return);
         $this->assertArrayHasKey("path", $return);
@@ -140,7 +190,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                     'target' => 'total',
                     'enabled' => true,
                 )
-                ),
+            ),
             'description empty' => array(
                 array(
                     'id' => self::PROMORULE_ID,
@@ -174,38 +224,85 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $ruleIsActive = true;
         $error = $promoRuleData['error'];
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->disableOriginalConstructor()
-            ->setMethods(array('getPromoRule', '_updateSyncData', 'getMailChimpHelper', 'getMailChimpDiscountAmount', 'getMailChimpType', 'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation'))
+            ->setMethods(
+                array(
+                    'getPromoRule', '_updateSyncData', 'getMailChimpHelper',
+                    'getMailChimpDiscountAmount', 'getMailChimpType', 'getMailchimpDateHelper',
+                    'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation'
+                )
+            )
             ->getMock();
 
         $promoRuleMock = $this->getMockBuilder(Mage_SalesRule_Model_Rule::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRuleId', 'getName', 'getDescription', 'getFromDate', 'getToDate', 'getSimpleAction', 'getIsActive', 'setMailchimpSyncError'))
+            ->setMethods(
+                array(
+                    'getRuleId', 'getName', 'getDescription',
+                    'getFromDate', 'getToDate', 'getSimpleAction',
+                    'getIsActive', 'setMailchimpSyncError'
+                )
+            )
             ->getMock();
 
         $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
             ->setMethods(array('getDateMicrotime'))
             ->disableOriginalConstructor()
             ->getMock();
 
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
-        $promoRulesApiMock->expects($this->once())->method('getPromoRule')->with(self::PROMORULE_ID)->willReturn($promoRuleMock);
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpDiscountAmount')->with($promoRuleMock)->willReturn($promoRuleData['amount']);
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpType')->with($ruleSimpleAction)->willReturn($promoRuleData['type']);
-        $promoRulesApiMock->expects($this->once())->method('getMailChimpTarget')->with($ruleSimpleAction)->willReturn($promoRuleData['target']);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpHelper')
+            ->willReturn($mailChimpHelperMock);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpDateHelper')
+            ->willReturn($mailChimpDateHelperMock);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getPromoRule')
+            ->with(self::PROMORULE_ID)
+            ->willReturn($promoRuleMock);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpDiscountAmount')
+            ->with($promoRuleMock)
+            ->willReturn($promoRuleData['amount']);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpType')
+            ->with($ruleSimpleAction)
+            ->willReturn($promoRuleData['type']);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getMailChimpTarget')
+            ->with($ruleSimpleAction)
+            ->willReturn($promoRuleData['target']);
         $promoRulesApiMock->expects($this->once())->method('ruleIsNotCompatible')->willReturn(true);
 
         $promoRuleMock->expects($this->once())->method('getRuleId')->willReturn(self::PROMORULE_ID);
         $promoRuleMock->expects($this->exactly($promoRuleData['countName']))->method('getName')->willReturn($ruleName);
-        $promoRuleMock->expects($this->exactly($promoRuleData['countDesc']))->method('getDescription')->willReturn($promoRuleData['description']);
+        $promoRuleMock
+            ->expects($this->exactly($promoRuleData['countDesc']))
+            ->method('getDescription')
+            ->willReturn($promoRuleData['description']);
         $promoRuleMock->expects($this->once())->method('getFromDate')->willReturn($promoRuleData['starts_at']);
         $promoRuleMock->expects($this->once())->method('getToDate')->willReturn($promoRuleData['ends_at']);
         $promoRuleMock->expects($this->once())->method('getSimpleAction')->willReturn($ruleSimpleAction);
         $promoRuleMock->expects($this->once())->method('getIsActive')->willReturn($ruleIsActive);
         $promoRuleMock->expects($this->once())->method('setMailchimpSyncError')->with($error);
 
-        $return = $promoRulesApiMock->getNewPromoRule(self::PROMORULE_ID, self::BATCH_ID, $mailchimpStoreId, $magentoStoreId);
+        $return = $promoRulesApiMock->getNewPromoRule(
+            self::PROMORULE_ID,
+            self::BATCH_ID,
+            $mailchimpStoreId,
+            $magentoStoreId
+        );
 
         $this->assertEquals(0, count($return));
     }
@@ -256,7 +353,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $magentoStoreId = 1;
         $websiteId = 1;
 
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('getPromoRuleResourceCollection', 'getWebsiteIdByStoreId'))
             ->getMock();
 
@@ -265,8 +362,15 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->setMethods(array('addWebsiteFilter'))
             ->getMock();
 
-        $promoRulesApiMock->expects($this->once())->method('getPromoRuleResourceCollection')->willReturn($promoRulesCollectionMock);
-        $promoRulesApiMock->expects($this->once())->method('getWebsiteIdByStoreId')->with($magentoStoreId)->willReturn($websiteId);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getPromoRuleResourceCollection')
+            ->willReturn($promoRulesCollectionMock);
+        $promoRulesApiMock
+            ->expects($this->once())
+            ->method('getWebsiteIdByStoreId')
+            ->with($magentoStoreId)
+            ->willReturn($websiteId);
 
         $promoRulesCollectionMock->expects($this->once())->method('addWebsiteFilter')->with($websiteId);
 
@@ -277,7 +381,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
     public function testGetSyncDataTableName()
     {
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('getCoreResource'))
             ->getMock();
 
@@ -287,14 +391,18 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
 
-        $coreResourceMock->expects($this->once())->method('getTableName')->with('mailchimp/ecommercesyncdata')->willReturn('mailchimp_ecommerce_sync_data');
+        $coreResourceMock
+            ->expects($this->once())
+            ->method('getTableName')
+            ->with('mailchimp/ecommercesyncdata')
+            ->willReturn('mailchimp_ecommerce_sync_data');
 
         $promoRulesApiMock->getSyncDataTableName();
     }
 
     public function testUpdate()
     {
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('_setModified'))
             ->getMock();
 
@@ -305,7 +413,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
     public function testMarkAsDeleted()
     {
-        $promoRulesApiMock = $this->promoRulesApiMock
+        $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(array('_setDeleted'))
             ->getMock();
 
@@ -333,9 +441,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $allCases = array();
 
-        $allCases[] = array (
-            'amount null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'amount null' => array(
+                'params' => array(
                     'amount' => null,
                     'description' => 'desc',
                     'id' => 'id'
@@ -343,9 +451,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'all null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'all null' => array(
+                'params' => array(
                     'amount' => null,
                     'description' => null,
                     'id' => null
@@ -353,65 +461,65 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'description null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => null,
-                'id' => 'id'
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'description null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => null,
+                    'id' => 'id'
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'id null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => 'desc',
-                'id' => null
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'id null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => 'desc',
+                    'id' => null
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'none null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => 'desc',
-                'id' => 'id'
-            ),
-            'expected' => false,
-        ));
+        $allCases[] = array(
+            'none null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => 'desc',
+                    'id' => 'id'
+                ),
+                'expected' => false,
+            ));
 
-        $allCases[] = array (
-            'amount and id null' => array (
-            'params' => array (
-                'amount' => null,
-                'description' => 'desc',
-                'id' => null
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'amount and id null' => array(
+                'params' => array(
+                    'amount' => null,
+                    'description' => 'desc',
+                    'id' => null
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'amount only not null' => array (
-            'params' => array (
-                'amount' => 'amount value',
-                'description' => null,
-                'id' => null
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'amount only not null' => array(
+                'params' => array(
+                    'amount' => 'amount value',
+                    'description' => null,
+                    'id' => null
+                ),
+                'expected' => true,
+            ));
 
-        $allCases[] = array (
-            'id only not null' => array (
-            'params' => array (
-                'amount' => null,
-                'description' => null,
-                'id' => 'id value'
-            ),
-            'expected' => true,
-        ));
+        $allCases[] = array(
+            'id only not null' => array(
+                'params' => array(
+                    'amount' => null,
+                    'description' => null,
+                    'id' => 'id value'
+                ),
+                'expected' => true,
+            ));
 
         return $allCases;
     }
@@ -434,36 +542,36 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
     {
         $allCases = array();
 
-        $allCases[] = array (
-            'all null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'all null' => array(
+                'params' => array(
                     'target' => null,
                     'type' => null,
                 ),
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'type null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'type null' => array(
+                'params' => array(
                     'target' => 'total',
                     'type' => null,
                 ),
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'target null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'target null' => array(
+                'params' => array(
                     'target' => null,
                     'type' => 'percentage',
                 ),
                 'expected' => true,
             ));
 
-        $allCases[] = array (
-            'none null' => array (
-                'params' => array (
+        $allCases[] = array(
+            'none null' => array(
+                'params' => array(
                     'target' => 'total',
                     'type' => 'percentage',
                 ),
@@ -485,7 +593,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
      */
     public function invokeMethod(&$object, $methodName, array $parameters = array())
     {
-        $reflection = new \ReflectionClass(get_class($object));
+        $reflection = new ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
         $method->setAccessible(true);
 

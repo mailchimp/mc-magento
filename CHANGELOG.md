@@ -1,6 +1,45 @@
 # Changelog
-## [1.1.17](https://github.com/mailchimp/mc-magento/releases/tag/1.1.17) - 2019-07-04
+## [1.1.18](https://github.com/mailchimp/mc-magento/releases/tag/1.1.18) - 2019-09-13
 **Fixed**
+- Product resend internal problem [\#1066](https://github.com/mailchimp/mc-magento/issues/1066)
+- Notice: Undefined index: NOT SENT  in app/code/community/Ebizmarts/MailChimp/Helper/Data.php [\#1050](https://github.com/mailchimp/mc-magento/issues/1050)
+- Use empty function correctly [\#1039](https://github.com/mailchimp/mc-magento/issues/1039)
+- Fix for bug preventing carts from synchronising [\#1029](https://github.com/mailchimp/mc-magento/issues/1029)
+- Problems when resending Ecommerce Data [\#1024](https://github.com/mailchimp/mc-magento/issues/1024)
+- PHP notice when MC API call fails [\#1021](https://github.com/mailchimp/mc-magento/issues/1021)
+- Cannot resend Ecommerce data from particular scope [\#1017](https://github.com/mailchimp/mc-magento/issues/1017)
+- Handle json_encode errors correctly [\#1010](https://github.com/mailchimp/mc-magento/issues/1010)
+
+**Changed**
+- Fix for re-using synch batch models causing batch responses to not be processed [\#1057](https://github.com/mailchimp/mc-magento/issues/1057)
+- Apply MEQP1 code standar [\#1055](https://github.com/mailchimp/mc-magento/issues/1055)
+- Validate API key field at Mailchimp configuration [\#1052](https://github.com/mailchimp/mc-magento/issues/1052)
+- Add Invalid API Key message when adding a new Mailchimp Store [\#1045](https://github.com/mailchimp/mc-magento/issues/1045)
+- Remove redundant system config and template file [\#1043](https://github.com/mailchimp/mc-magento/pull/1043)
+- Stop flagging Customers as modified after an order is made. [\#1027](https://github.com/mailchimp/mc-magento/issues/1027)
+- Improve batch behavior [\#1025](https://github.com/mailchimp/mc-magento/issues/1025)
+- Serialize/Unserialize deprecated - MEQP [\#1019](https://github.com/mailchimp/mc-magento/issues/1019)
+- Improve performance when resetting errors [\#975](https://github.com/mailchimp/mc-magento/issues/975)
+- Maximum # Merge fields in MC [\#957](https://github.com/mailchimp/mc-magento/issues/957)
+- How can we clean the table mailchimp_ecommerce_sync_data [\#897](https://github.com/mailchimp/mc-magento/issues/897)
+- Certain Merge fields not transferred [\#425](https://github.com/mailchimp/mc-magento/issues/425)
+
+## [1.1.17](https://github.com/mailchimp/mc-magento/releases/tag/1.1.17) - 2019-07-23
+**Changed**
+- Avoid sending Subscriber via cron job when setting "Use Magento Emails" enabled. [\#996](https://github.com/mailchimp/mc-magento/issues/996)
+- Rename delete customer account option [\#992](https://github.com/mailchimp/mc-magento/issues/992)
+- Coding standards fix [\#989](https://github.com/mailchimp/mc-magento/pull/989)
+- Change "List" appearances to "Audience" [\#977](https://github.com/mailchimp/mc-magento/issues/977)
+- Encrypt sensitive data [\#955](https://github.com/mailchimp/mc-magento/issues/955)
+- Improve logging [\#947](https://github.com/mailchimp/mc-magento/pull/947)
+- Add default merge var for province/state [\#937](https://github.com/mailchimp/mc-magento/issues/937)
+- Add the options to resend all the ecommerce data or resend only the products, customers, orders or quotes [\#891](https://github.com/mailchimp/mc-magento/issues/891)
+- Improve logging [\#886](https://github.com/mailchimp/mc-magento/issues/886)
+- Add some js in the admin to avoid save before continue [\#649](https://github.com/mailchimp/mc-magento/issues/649)
+- Get guest information from orders made with the same email address [\#545](https://github.com/mailchimp/mc-magento/issues/545)
+
+**Fixed**
+- Error subscribing customer from backend. [\#990](https://github.com/mailchimp/mc-magento/issues/990)
 - Currency discrepancy in order confirmation email  [\#982](https://github.com/mailchimp/mc-magento/issues/982)
 - Fix subscription confirmation email when "Subscribe all customers to the newsletter" is enabled [\#978](https://github.com/mailchimp/mc-magento/issues/978)
 - Errors saved in mailchimp_sync_ecommerce_data table may not set the sync_modified value to 0 [\#976](https://github.com/mailchimp/mc-magento/issues/976)
@@ -10,16 +49,6 @@
 - Remove error message when resend an item with error [\#963](https://github.com/mailchimp/mc-magento/issues/963)
 - Customer and subscriber with same email sent to mailchimp with different id [\#952](https://github.com/mailchimp/mc-magento/issues/952)
 - getLastRealOrder() doesn't exist [\#946](https://github.com/mailchimp/mc-magento/issues/946)
-
-**Changed**
-- Change "List" appearances to "Audience" [\#977](https://github.com/mailchimp/mc-magento/issues/977)
-- Encrypt sensitive data [\#955](https://github.com/mailchimp/mc-magento/issues/955)
-- Improve logging [\#947](https://github.com/mailchimp/mc-magento/pull/947)
-- Add default merge var for province/state [\#937](https://github.com/mailchimp/mc-magento/issues/937)
-- Add the options to resend all the ecommerce data or resend only the products, customers, orders or quotes [\#891](https://github.com/mailchimp/mc-magento/issues/891)
-- Improve logging [\#886](https://github.com/mailchimp/mc-magento/issues/886)
-- Add some js in the admin to avoid save before continue [\#649](https://github.com/mailchimp/mc-magento/issues/649)
-- Get guest information from orders made with the same email address [\#545](https://github.com/mailchimp/mc-magento/issues/545)
 
 ## [1.1.16](https://github.com/mailchimp/mc-magento/releases/tag/1.1.16) - 2019-04-30
 **Fixed**

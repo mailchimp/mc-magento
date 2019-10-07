@@ -28,10 +28,10 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
     /**
      * @param $listId             The unique id for the list.
      * @param $title              The text description of this category. This field appears on signup forms and is
-     *                            often phrased as a question.
-     * @param null                                                                                        $displayOrder The order that the categories are displayed in the list. Lower numbers display first.
+     *                              often phrased as a question.
+     * @param null $displayOrder  The order that the categories are displayed in the list. Lower numbers display first.
      * @param $type               Determines how this category’s interests are displayed on signup forms.
-     *                            (checkboxes | dropdown | radio | hidden)
+     *                              (checkboxes | dropdown | radio | hidden)
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -39,22 +39,24 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
     public function add($listId, $title, $type, $displayOrder = null)
     {
         $_params = array('title'=>$title,'type'=>$type);
+
         if ($displayOrder) {
             $_params['display_order'] = $displayOrder;
         }
-        return $this->_master->call('lists/'.$listId.'/interest-categories', $_params, Ebizmarts_MailChimp::POST);
+
+        return $this->_master->call('lists/' . $listId . '/interest-categories', $_params, Ebizmarts_MailChimp::POST);
     }
 
     /**
      * @param $listId               The unique id for the list.
-     * @param null                                            $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
-     *                                                                       with dot notation.
-     * @param null                                            $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                                                                       with dot notation.
-     * @param null                                            $count         The number of records to return.
-     * @param null                                            $offset        The number of records from a collection to skip. Iterating over large collections
-     *                                                                       with this parameter can be slow.
-     * @param null                                            $type          Restrict results a type of interest group
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                                     with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                                     with dot notation.
+     * @param null $count           The number of records to return.
+     * @param null $offset          The number of records from a collection to skip. Iterating over large collections
+     *                                     with this parameter can be slow.
+     * @param null $type            Restrict results a type of interest group
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -65,28 +67,33 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
         if ($fields) {
             $_params['fields'] = $fields;
         }
+
         if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
+
         if ($count) {
             $_params['count'] = $count;
         }
+
         if ($offset) {
             $_params['offset'] = $offset;
         }
+
         if ($type) {
             $_params['type'] = $type;
         }
-        return $this->_master->call('lists/'.$listId.'/interest-categories', $_params, Ebizmarts_MailChimp::GET);
+
+        return $this->_master->call('lists/' . $listId . '/interest-categories', $_params, Ebizmarts_MailChimp::GET);
     }
 
     /**
      * @param $listId               The unique id for the list.
      * @param $interestCategoryId   The unique id for the interest category.
-     * @param null                                                         $fields        A comma-separated list of fields to return. Reference parameters of sub-objects
-     *                                                                                    with dot notation.
-     * @param null                                                         $excludeFields A comma-separated list of fields to exclude. Reference parameters of sub-objects
-     *                                                                                    with dot notation.
+     * @param null $fields          A comma-separated list of fields to return. Reference parameters of sub-objects
+     *                                     with dot notation.
+     * @param null $excludeFields   A comma-separated list of fields to exclude. Reference parameters of sub-objects
+     *                                     with dot notation.
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -97,21 +104,23 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
         if ($fields) {
             $_params['fields'] = $fields;
         }
+
         if ($excludeFields) {
             $_params['exclude_fields'] = $excludeFields;
         }
-        $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId;
+
+        $url = 'lists/' . $listId . '/interest-categories/' . $interestCategoryId;
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::GET);
     }
 
     /**
-     * @param $listId             The unique id for the list.
-     * @param $interestCategoryId The unique id for the interest category.
-     * @param $title              The text description of this category. This field appears on signup forms and is
-     *                            often phrased as a question.
-     * @param null                                                                                        $displayOrder The order that the categories are displayed in the list. Lower numbers display first.
-     * @param $type               Determines how this category’s interests are displayed on signup forms.
-     *                            (checkboxes | dropdown | radio | hidden)
+     * @param $listId               The unique id for the list.
+     * @param $interestCategoryId   The unique id for the interest category.
+     * @param $title                The text description of this category. This field appears on signup forms and is
+     *                                  often phrased as a question.
+     * @param null $displayOrder    The order that the categories are displayed in the list. Lower numbers display first.
+     * @param $type                 Determines how this category’s interests are displayed on signup forms.
+     *                                  (checkboxes | dropdown | radio | hidden)
      * @return mixed
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
@@ -119,10 +128,13 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
     public function modify($listId, $interestCategoryId, $title, $type, $displayOrder = null)
     {
         $_params = array('title'=>$title,'type'=>$type);
+
         if ($displayOrder) {
             $_params['display_order'] = $displayOrder;
         }
-        $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId;
+
+        $url = 'lists/' . $listId . '/interest-categories/' . $interestCategoryId;
+
         return $this->_master->call($url, $_params, Ebizmarts_MailChimp::PATCH);
     }
 
@@ -135,7 +147,8 @@ class MailChimp_ListsInterestCategory extends MailChimp_Abstract
      */
     public function delete($listId, $interestCategoryId)
     {
-        $url = 'lists/'.$listId.'/interest-categories/'.$interestCategoryId;
+        $url = 'lists/' . $listId . '/interest-categories/' . $interestCategoryId;
+
         return $this->_master->call($url, null, Ebizmarts_MailChimp::DELETE);
     }
 }

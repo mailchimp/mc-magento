@@ -1,20 +1,38 @@
 <?php if($this->isReferred()) : ?>
 <div class="entry-edit box-right">
     <div class="entry-edit-head">
-        <h4 class="icon-head"><?php echo $this->__('MailChimp') ?></h4>
+        <h4 class="icon-head"><?php echo $this->quoteEscape($this->__('MailChimp')) ?></h4>
     </div>
     <fieldset>
         <div id="mailchimp_monkey">
             <table class="form-list" cellspacing="0">
                 <tr>
                     <td class="label">
-                        <img src="<?php echo $this->getSkinUrl('ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png')?>" width="40" title="hep hep thanks Mailchimp" />
+                        <img src="<?php echo $this->escapeHtml(
+                            $this->getSkinUrl('ebizmarts/mailchimp/images/logo-freddie-monocolor-200.png')
+                        ) ?>"
+                             width="40"
+                             title="hep hep thanks Mailchimp" />
                     </td>
                     <td class="value">
                         <?php if ($this->isDataAvailable()): ?>
-                            <strong><?php echo $this->__("Yaay! Recovered by Mailchimp's campaign.") . "<br />" . $this->__("Name") . ": " . $this->getCampaignName() . "<br />" . $this->__("Id") . ": " . $this->getCampaignId(); ?></strong>
+                            <strong><?php echo $this->quoteEscape(
+                                $this->__("Yaay! Recovered by Mailchimp's campaign.") .
+                                    "<br />" .
+                                    $this->__("Name") .
+                                    ": " .
+                                    $this->getCampaignName() .
+                                    "<br />" .
+                                $this->__("Id") . ": " . $this->getCampaignId()
+                            ); ?>
+                            </strong>
                         <?php else: ?>
-                            <strong><?php echo $this->__("The campaign does not belong to the audience configured for ").$this->getStoreCodeFromOrder().$this->__(" view."); ?></strong>
+                            <strong><?php echo $this->quoteEscape(
+                                $this->__("The campaign does not belong to the audience configured for ") .
+                                    $this->getStoreCodeFromOrder() .
+                                $this->__(" view.")
+                            ); ?>
+                            </strong>
                         <?php endif; ?>
                     </td>
                 </tr>

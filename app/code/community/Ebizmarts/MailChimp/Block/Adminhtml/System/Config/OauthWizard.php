@@ -9,7 +9,8 @@
  * @date:     4/29/16 3:55 PM
  * @file:     OauthWizard.php
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_OauthWizard extends Mage_Adminhtml_Block_System_Config_Form_Field
+class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_OauthWizard
+    extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
 
     /**

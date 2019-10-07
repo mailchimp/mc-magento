@@ -67,7 +67,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
         $title = $id ? $this->__('Edit Store') : $this->__('New Store');
 
         $this->_initAction();
-        $block = $this->getLayout()->createBlock('mailchimp/adminhtml_mailchimpstores_edit')->setData('action', $this->getUrl('*/*/save'));
+        $block = $this->getLayout()
+            ->createBlock('mailchimp/adminhtml_mailchimpstores_edit')
+            ->setData('action', $this->getUrl('*/*/save'));
 
         $this->_addBreadcrumb($title, $title)
             ->_addContent($block)
@@ -156,6 +158,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
                 $helper->logError($e->getMessage());
                 continue;
             }
+
             try {
                 $root = $api->getRoot()->info();
                 $stores = $api->getEcommerce()->getStores()->get(null, null, null, 100);
@@ -270,15 +273,15 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
     {
         $acl = '';
         switch ($this->getRequest()->getActionName()) {
-            case 'index':
-            case 'grid':
-            case 'edit':
-            case 'new':
-            case 'save':
-            case 'getstores':
-            case 'delete':
-                $acl = 'newsletter/mailchimp/mailchimpstores';
-                break;
+        case 'index':
+        case 'grid':
+        case 'edit':
+        case 'new':
+        case 'save':
+        case 'getstores':
+        case 'delete':
+            $acl = 'newsletter/mailchimp/mailchimpstores';
+            break;
         }
 
         return Mage::getSingleton('admin/session')->isAllowed($acl);

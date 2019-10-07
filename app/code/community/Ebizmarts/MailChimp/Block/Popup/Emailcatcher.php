@@ -15,7 +15,11 @@ class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Templ
     protected function _canCancel()
     {
         $storeId = Mage::app()->getStore()->getId();
-        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $storeId) && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::POPUP_CAN_CANCEL, $storeId);
+        return Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $storeId)
+                    && Mage::getStoreConfig(
+                        Ebizmarts_MailChimp_Model_Config::POPUP_CAN_CANCEL,
+                        $storeId
+                    );
     }
 
     protected function _popupHeading()

@@ -2,7 +2,9 @@
 
 $installer = $this;
 
-/** @var Mage_Eav_Model_Entity_Setup $installer */
+/**
+ * @var Mage_Eav_Model_Entity_Setup $installer
+ */
 $installer->startSetup();
 
 try {
@@ -18,23 +20,26 @@ try {
 } catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
+
 $setup = new Mage_Eav_Model_Entity_Setup('core_setup');
 
-$entityTypeId     = $setup->getEntityTypeId('customer');
-$attributeSetId   = $setup->getDefaultAttributeSetId($entityTypeId);
+$entityTypeId = $setup->getEntityTypeId('customer');
+$attributeSetId = $setup->getDefaultAttributeSetId($entityTypeId);
 $attributeGroupId = $setup->getDefaultAttributeGroupId($entityTypeId, $attributeSetId);
 
-$setup->addAttribute("customer", "mailchimp_store_view", array(
-    "type"     => "int",
-    "label"    => "Store View (For MailChimp)",
-    "input"    => "select",
-    "source"   => "mailchimp/system_config_source_mailchimpStoreView",
-    "visible"  => true,
-    "required" => false,
-    "unique"     => false,
-    "note"       => "A store view must be specified to sync this customer to MailChimp"
+$setup->addAttribute(
+    "customer", "mailchimp_store_view", array(
+        "type" => "int",
+        "label" => "Store View (For MailChimp)",
+        "input" => "select",
+        "source" => "mailchimp/system_config_source_mailchimpStoreView",
+        "visible" => true,
+        "required" => false,
+        "unique" => false,
+        "note" => "A store view must be specified to sync this customer to MailChimp"
 
-));
+    )
+);
 
 try {
     $attribute = Mage::getSingleton("eav/config")->getAttribute("customer", "mailchimp_store_view");
@@ -48,11 +53,11 @@ try {
         '999'  //sort_order
     );
 
-    $used_in_forms = array();
+    $usedInForms = array();
 
-    $used_in_forms[] = "adminhtml_customer";
+    $usedInForms[] = "adminhtml_customer";
 
-    $attribute->setData("used_in_forms", $used_in_forms)
+    $attribute->setData("used_in_forms", $usedInForms)
         ->setData("is_used_for_customer_segment", true)
         ->setData("is_system", 0)
         ->setData("is_user_defined", 1)

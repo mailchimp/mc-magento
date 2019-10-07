@@ -17,31 +17,36 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     /**
      * @var int
      */
-    private $_storeId;
+    protected $_storeId;
     /**
      * @var array
      */
-    private $_mailChimpTags;
+    protected $_mailChimpTags;
     /**
      * @var Mage_Newsletter_Model_Subscriber
      */
-    private $_subscriber;
+    protected $_subscriber;
     /**
      * @var Mage_Customer_Model_Customer
      */
-    private $_customer;
+    protected $_customer;
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    private $_mcHelper;
+    protected $_mcHelper;
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Date
+     */
+    protected $_mcDateHelper;
     /**
      * @var Mage_Sales_Model_Order
      */
-    private $_lastOrder;
+    protected $_lastOrder;
 
     public function __construct()
     {
         $this->setMailChimpHelper();
+        $this->setMailChimpDateHelper();
     }
 
     /**
@@ -198,9 +203,27 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
         $eventValue = null;
 
-        if ($attributeCode == 'email') {
-            return $eventValue;
-        } elseif ($attributeCode == 'default_billing' || $attributeCode == 'default_shipping') {
+        if ($attributeCode != 'email') {
+            $this->_addTags($attributeCode, $subscriber, $customer, $key, $attribute);
+        }
+
+        if ($this->getMailChimpTagValue($key) !== null) {
+            $eventValue = $this->getMailChimpTagValue($key);
+        }
+
+        return $eventValue;
+    }
+
+    /**
+     * @param $attributeCode
+     * @param $subscriber
+     * @param $customer
+     * @param $key
+     * @param $attribute
+     */
+    protected function _addTags($attributeCode, $subscriber, $customer, $key, $attribute)
+    {
+        if ($attributeCode == 'default_billing' || $attributeCode == 'default_shipping') {
             $this->addDefaultShipping($attributeCode, $key, $customer);
         } elseif ($attributeCode == 'gender') {
             $this->addGender($attributeCode, $key, $customer);
@@ -221,12 +244,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         } else {
             $this->addUnknownMergeField($attributeCode, $key, $attribute, $customer);
         }
-
-        if ($this->getMailChimpTagValue($key) !== null) {
-            $eventValue = $this->getMailChimpTagValue($key);
-        }
-
-        return $eventValue;
     }
 
     /**
@@ -235,9 +252,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function unserializeMapFields($mapFields)
     {
-        return unserialize($mapFields);
+        return $this->_mcHelper->unserialize($mapFields);
     }
 
+    /**
+     * @return Object
+     */
     protected function getEntityAttributeCollection()
     {
         return Mage::getResourceModel('eav/entity_attribute_collection');
@@ -518,7 +538,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function getDateOfBirth($attributeCode, $customer)
     {
-        return $this->getMailchimpHelper()->formatDate(
+        return $this->getMailchimpDateHelper()->formatDate(
             $this->getCustomerGroupLabel($attributeCode, $customer),
             'm/d', 1
         );
@@ -562,6 +582,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
     /**
      * return the latest order for this subscriber
+     *
      * @return Mage_Sales_Model_Order
      */
     protected function getLastOrderByEmail()
@@ -602,6 +623,22 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     protected function setMailChimpHelper()
     {
         $this->_mcHelper = Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Date
+     */
+    public function getMailchimpDateHelper()
+    {
+        return $this->_mcDateHelper;
+    }
+
+    /**
+     * @param $mageMCDateHelper
+     */
+    protected function setMailChimpDateHelper()
+    {
+        $this->_mcDateHelper = Mage::helper('mailchimp/date');
     }
 
     /**
@@ -663,7 +700,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         $address = $customer->getPrimaryAddress($attributeCode);
         $addressData = $this->getAddressData($address);
 
-        if (count($addressData)) {
+        if (!empty($addressData)) {
             $this->addMailChimpTag($key, $addressData);
         }
     }

@@ -23,7 +23,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
 
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_Store constructor.
-     * @param $params
+     *
+     * @param  $params
      * @throws Exception
      */
     public function __construct($params)
@@ -31,7 +32,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
         $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
         if (empty($this->_stores)) {
-            $apiKey = (empty($params)) ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']) : $params['api_key'];
+            $apiKey = (empty($params))
+                ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope'])
+                : $params['api_key'];
 
             if ($apiKey) {
                 try {
@@ -58,6 +61,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
                     if ($store['list_id']=='') {
                         continue;
                     }
+
                     if (isset($store['connected_site'])) {
                         $label = $store['name'];
                     } else {
@@ -70,6 +74,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Store
         } else {
             $stores[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
+
         return $stores;
     }
 

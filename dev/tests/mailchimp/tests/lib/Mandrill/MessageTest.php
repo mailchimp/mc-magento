@@ -14,7 +14,9 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
     {
         $apiKey = 'a1s2d3f4g5';
 
-        /** @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock */
+        /**
+         * @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock
+         */
         $messageMock = $this->getMockBuilder('Mandrill_Message')
             ->setConstructorArgs(array($apiKey))
             ->getMock();
@@ -26,7 +28,9 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
     {
         $apiKey = 'a1s2d3f4g5';
 
-        /** @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock */
+        /**
+         * @var Mandrill_Message|PHPUnit_Framework_MockObject_MockObject $messageMock
+         */
         $messageMock = $this->getMockBuilder('Mandrill_Message')
             ->setConstructorArgs(array($apiKey))
             ->setMethods(array('getMail'))
@@ -56,13 +60,13 @@ class Ebizmarts_MailChimp_Model_MessageTest extends PHPUnit_Framework_TestCase
     /**
      * @return Zend_Mime_Part
      */
-    private function createAttachment()
+    public function createAttachment()
     {
-        $mp              = new Zend_Mime_Part(self::ATTACHMENT_TEST_CONTENT);
-        $mp->encoding    = Zend_Mime::ENCODING_BASE64;
-        $mp->type        = Zend_Mime::TYPE_TEXT;
+        $mp = new Zend_Mime_Part(self::ATTACHMENT_TEST_CONTENT);
+        $mp->encoding = Zend_Mime::ENCODING_BASE64;
+        $mp->type = Zend_Mime::TYPE_TEXT;
         $mp->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
-        $mp->filename    = self::ATTACHMENT_TEST_NAME;
+        $mp->filename = self::ATTACHMENT_TEST_NAME;
 
         return $mp;
     }
