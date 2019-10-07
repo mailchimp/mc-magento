@@ -361,8 +361,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers
         $syncedFlag = null,
         $saveOnlyIfexists = false,
         $allowBatchRemoval = true
-    )
-    {
+    ) {
         $this->_mailchimpHelper->saveEcommerceSyncData(
             $customerId,
             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,

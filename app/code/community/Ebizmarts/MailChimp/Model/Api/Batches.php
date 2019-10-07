@@ -358,7 +358,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
                     $orderAmount = count($ordersArray);
                     $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
-}
+                }
+
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
                     $helper->logBatchStatus('Generate Promo Rules Payload');

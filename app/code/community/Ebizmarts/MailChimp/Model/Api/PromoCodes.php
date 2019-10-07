@@ -375,14 +375,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
         $token = $this->getToken();
         $promoCode->setToken($token);
         $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl(
-                'mailchimp/cart/loadcoupon',
-                array(
+            'mailchimp/cart/loadcoupon',
+            array(
                     '_nosid' => true,
                     '_secure' => true,
                     'coupon_id' => $promoCode->getCouponId(),
                     'coupon_token' => $token
                 )
-            )
+        )
             . 'mailchimp/cart/loadcoupon?coupon_id='
             . $promoCode->getCouponId()
             . '&coupon_token='

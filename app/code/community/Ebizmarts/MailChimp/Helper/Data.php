@@ -664,10 +664,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         //Delete old entry if exists particularly in this scope.
         if ($oldSyncingFlag !== null && $this->getIfConfigExistsForScope(
-                Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING,
-                $scopeId,
-                $scope
-            )
+            Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING,
+            $scopeId,
+            $scope
+        )
         ) {
             $config = $this->getConfig();
             $config->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_MCISSYNCING, $scope, $scopeId);
@@ -5127,8 +5127,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $deletedRelatedId,
         $allowBatchRemoval,
         Varien_Object $ecommerceSyncDataItem
-    )
-    {
+    ) {
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
         } elseif ($allowBatchRemoval === true) {
