@@ -504,7 +504,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $items = $order->getAllVisibleItems();
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $syncDateFlag = $helper->getEcommMinSyncDateFlag($mailchimpStoreId, $magentoStoreId);
+
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
             $product = $this->loadProductById($itemProductId);
@@ -534,10 +534,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             }
 
             $syncModified = $productSyncData->getMailchimpSyncModified();
-            $syncDelta = $productSyncData->getMailchimpSyncDelta();
+            $productSyncDelta = $productSyncData->getMailchimpSyncDelta();
             $isProductEnabled = $this->isProductEnabled($productId, $magentoStoreId);
 
-            if ($syncModified && $syncDelta > $syncDateFlag && $isProductEnabled) {
+            if ($syncModified && $isProductEnabled) {
                 $buildUpdateOperations = $this->_buildUpdateProductRequest(
                     $product,
                     $batchId,
@@ -553,7 +553,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     );
                     $this->addSyncData($productId, $mailchimpStoreId);
                 }
-            } elseif (!$syncDelta || $syncDelta < $syncDateFlag || !$isProductEnabled) {
+            } elseif (!$productSyncDelta || !$isProductEnabled) {
                 $bodyData = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
 
                 if ($bodyData !== false) {
