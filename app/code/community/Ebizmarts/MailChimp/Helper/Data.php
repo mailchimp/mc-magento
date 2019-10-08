@@ -48,7 +48,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @var array
      */
-    public static $MAILCHIMP_LANGUAGES = array(
+    public static $LANGUAGES = array(
         'en', // English
         'ar', // Arabic
         'af', // Afrikaans
@@ -494,11 +494,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             0
         );
         $config->deleteConfig(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId",
-            'default',
-            0
-        );
-        $config->deleteConfig(
             Ebizmarts_MailChimp_Model_Config::ECOMMERCE_MC_JS_URL . "_$mailchimpStoreId",
             'default',
             0
@@ -682,60 +677,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Minimum date for which ecommerce data needs to be uploaded.
-     * If data was saved in the old way get it from the scope and update it to the new way.
-     *
-     * @param  $mailchimpStoreId
-     * @param  $scopeId
-     * @param  null             $scope
-     * @return mixed|null
-     * @throws Mage_Core_Exception
-     */
-    public function getEcommMinSyncDateFlag($mailchimpStoreId, $scopeId, $scope = null)
-    {
-        $oldEcommMinsyncDateFlag = $this->getConfigValueForScope(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG,
-            $scopeId,
-            $scope
-        );
-        $ecommMinsyncDateFlag = $this->getConfigValueForScope(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId",
-            0,
-            'stores'
-        );
-
-        //Save old value in new place.
-        if ($ecommMinsyncDateFlag === null && $this->validateDate($oldEcommMinsyncDateFlag)) {
-            $configValue = array(
-                array(
-                    Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG . "_$mailchimpStoreId",
-                    $oldEcommMinsyncDateFlag
-                )
-            );
-            $this->saveMailchimpConfig($configValue, 0, 'default');
-        }
-
-        //Delete old entry if exists particularly in this scope.
-        if ($oldEcommMinsyncDateFlag !== null
-            && $this->getIfConfigExistsForScope(
-                Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG,
-                $scopeId,
-                $scope
-            )
-        ) {
-            $config = $this->getConfig();
-            $config->deleteConfig(
-                Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG,
-                $scope,
-                $scopeId
-            );
-            $config->cleanCache();
-        }
-
-        return ($ecommMinsyncDateFlag !== null) ? $ecommMinsyncDateFlag : $oldEcommMinsyncDateFlag;
-    }
-
-    /**
      * Get if logs are enabled.
      * Logs can only be enabled in default scope.
      *
@@ -842,10 +783,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Set the values to send all the items again.
-     *
-     * @param  $scopeId
-     * @param  $scope
+     * @param $scopeId
+     * @param $scope
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function resendMCEcommerceData($scopeId, $scope, $filters = null)
@@ -858,7 +798,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $this->removeEcommerceSyncData($scopeId, $scope, false, $filters);
             $this->clearErrorGrid($scopeId, $scope, true, $filters);
 
-            if (in_array('PRO', $filters)) {
+            if ($filters !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)) {
                 $this->deleteFlushMagentoCacheFlag();
             }
         }
@@ -868,9 +808,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Remove items from mailchimp_ecommerce_sync_data table to allow them to be sent.
      * If scopeId is 0 remova from all scopes.
      *
-     * @param  $scopeId
-     * @param  $scope
-     * @param  bool    $deleteErrorsOnly
+     * @param $scopeId
+     * @param $scope
+     * @param bool $deleteErrorsOnly
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false, $filters = null)
@@ -884,7 +825,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @throws Mage_Core_Exception
+     * @param null $filters
      */
     public function removeAllEcommerceSyncDataErrors($filters = null)
     {
@@ -907,8 +848,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $mailchimpStoreId
-     * @param bool             $deleteErrorsOnly
-     * @throws Mage_Core_Exception
+     * @param bool $deleteErrorsOnly
+     * @param null $filters
      */
     public function removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly = false, $filters = null)
     {
@@ -1122,9 +1063,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Clear mailchimp_errors grid for given scope.
      * Exclude subscriber if flag set to true.
      *
-     * @param  $scopeId
-     * @param  $scope
-     * @param  bool    $excludeSubscribers
+     * @param $scopeId
+     * @param $scope
+     * @param bool $excludeSubscribers
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false, $filters = null)
@@ -1142,6 +1084,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $mailchimpStoreId
+     * @param null $filters
      */
     public function clearErrorGridByMCStore($mailchimpStoreId, $filters = null)
     {
@@ -1160,6 +1103,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $scopeId
+     * @param null $filters
      */
     public function clearErrorGridByStoreId($scopeId, $filters = null)
     {
@@ -1200,6 +1144,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param $scopeId
      * @param $scope
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function saveLastItemsSent($scopeId, $scope, $filters = null)
@@ -1207,7 +1152,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $isSyncing = $this->getMCIsSyncing($mailchimpStoreId, $scopeId, $scope);
 
-        if ($isSyncing != 1) {
+        if ($isSyncing != 1 && $filters !== null) {
             $configValues = array();
 
             if ($this->getCustomerResendLastId($scopeId, $scope) === null
@@ -2654,9 +2599,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $dateHelper = $this->getDateHelper();
         if (!$dateHelper->timePassed($initialTime)) {
-            $write_connection = $this->getCoreResource()->getConnection('core_write');
+            $writeConnection = $this->getCoreResource()->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
-            $write_connection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
+            $writeConnection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
             $arrayMigrationConfigData = array('115' => false, '116' => false, '1164' => true);
             $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
         }
@@ -3051,6 +2996,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 foreach ($collection as $config) {
                     if ($config->getValue() !== null) {
                         $configAssociatedToScope = true;
+                        break;
                     }
                 }
             }
@@ -4167,11 +4113,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $mailchimpLanguage = '';
 
-        if (in_array($languageCode, self::$MAILCHIMP_LANGUAGES)) {
+        if (in_array($languageCode, self::$LANGUAGES)) {
             $mailchimpLanguage = $languageCode;
         } else {
             $langIso = substr($languageCode, 0, 2);
-            if (in_array($langIso, self::$MAILCHIMP_LANGUAGES)) {
+            if (in_array($langIso, self::$LANGUAGES)) {
                 $mailchimpLanguage = $langIso;
             }
         }
@@ -4845,17 +4791,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function modifyCounterDataSentToMailchimp($index, $hasError = false, $increment = 1)
     {
         $counterGetResponsesBatch = $this->getCountersDataSentToMailchimp();
-        $counterGetResponsesBatchAtIndex = $counterGetResponsesBatch[$index];
         $statusChanged = self::DATA_SENT_TO_MAILCHIMP;
 
         if ($hasError === true) {
-            $count = isset($counterGetResponsesBatchAtIndex[self::DATA_NOT_SENT_TO_MAILCHIMP])
-                ? $counterGetResponsesBatchAtIndex[self::DATA_NOT_SENT_TO_MAILCHIMP]
+            $count = isset($counterGetResponsesBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP])
+                ? $counterGetResponsesBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP]
                 : $increment;
             $statusChanged = self::DATA_NOT_SENT_TO_MAILCHIMP;
         } else {
-            $count = isset($counterGetResponsesBatchAtIndex[self::DATA_SENT_TO_MAILCHIMP])
-                ? $counterGetResponsesBatchAtIndex[self::DATA_SENT_TO_MAILCHIMP]
+            $count = isset($counterGetResponsesBatch[$index][self::DATA_SENT_TO_MAILCHIMP])
+                ? $counterGetResponsesBatch[$index][self::DATA_SENT_TO_MAILCHIMP]
                 : $increment;
         }
 

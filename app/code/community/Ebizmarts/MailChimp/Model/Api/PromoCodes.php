@@ -99,25 +99,25 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         // limit the collection
         $newPromoCodes->getSelect()->limit($this->getBatchLimitFromConfig());
         $counter = 0;
+
         foreach ($newPromoCodes as $promoCode) {
             $codeId = $promoCode->getCouponId();
             $ruleId = $promoCode->getRuleId();
+
             try {
                 $promoRuleSyncData = $this->getHelper()->getEcommerceSyncDataItem(
                     $ruleId,
                     Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
                     $mailchimpStoreId
                 );
-                if (!$promoRuleSyncData->getId()
-                    || $promoRuleSyncData->getMailchimpSyncDelta() < $helper->getEcommMinSyncDateFlag(
-                        $mailchimpStoreId, $magentoStoreId
-                    )
-                ) {
+
+                if (!$promoRuleSyncData->getId()) {
                     $promoRuleMailchimpData = $this->getApiPromoRules()->getNewPromoRule(
                         $ruleId,
                         $mailchimpStoreId,
                         $magentoStoreId
                     );
+
                     if (!empty($promoRuleMailchimpData)) {
                         $batchArray[$counter] = $promoRuleMailchimpData;
                         $counter++;
