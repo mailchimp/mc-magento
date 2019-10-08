@@ -170,7 +170,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $currentDate = date("yyyy-mm-dd");
 
         $lines['itemsCount'] = 9;
-        $lines[0] = array(
+        $lines['lines'][] = array(
             "id" => 1,
             "product_id" => 2,
             "product_variant_id" => 2,
@@ -192,7 +192,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $data['processed_at_foreign'] = $currentDate;
         $data['updated_at_foreign'] = $currentDate;
         $data['cancelled_at_foreign'] = $currentDate;
-        $data['lines'] = null;
+        $data['lines'] = $lines['lines'];
         $data['customer'] = array(
             'id' => '66ceb8736aefb347ac63da0d588b29a6',
             'email_address' => 'test@ebizmarts.com',
