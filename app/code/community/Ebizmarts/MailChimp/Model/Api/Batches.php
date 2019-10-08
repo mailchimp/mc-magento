@@ -807,7 +807,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         if ($type != Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
                             $mailchimpErrors->setMailchimpStoreId($mailchimpStoreId);
                         }
-                        
+
                         $mailchimpErrors->save();
 
                         $helper->modifyCounterDataSentToMailchimp($type, true);
