@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_Orders
+class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api_SyncItem
 {
 
     const BATCH_LIMIT = 50;
@@ -28,6 +28,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected $_batchId;
     protected $_api = null;
     protected $_listsCampaignIds = array();
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     /**
      * Set the request for orders to be created on MailChimp
@@ -70,7 +75,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $batchArray = array();
         $modifiedOrders = $this->getResourceModelOrderCollection();
         // select orders for the current Magento store id
@@ -107,17 +112,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                         $batchArray[$this->_counter]['body'] = $orderJson;
                         //update order delta
-                        $this->_updateSyncData($orderId, $mailchimpStoreId);
+                        $this->addSyncData($orderId, $mailchimpStoreId);
                         $this->_counter++;
                     } else {
                         $error = $helper->__('Something went wrong when retrieving product information.');
-                        $this->_updateSyncData(
+
+                        $this->addSyncDataError(
                             $orderId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                             $error,
-                            0,
-                            0
+                            null,
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
@@ -125,15 +131,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $jsonErrorMsg = json_last_error_msg();
                     $helper->logError("Order " . $order->getEntityId() . " json encode failed (" . $jsonErrorMsg . ")");
 
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $orderId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $jsonErrorMsg,
-                        0,
-                        0,
+                        null,
                         false,
-                        -1
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                 }
             } catch (Exception $e) {
@@ -189,17 +193,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $batchArray[$this->_counter]['operation_id'] = $this->_batchId . '_' . $orderId;
                         $batchArray[$this->_counter]['body'] = $orderJson;
                         //update order delta
-                        $this->_updateSyncData($orderId, $mailchimpStoreId);
+                        $this->addSyncData($orderId, $mailchimpStoreId);
                         $this->_counter++;
                     } else {
                         $error = $helper->__('Something went wrong when retrieving product information.');
-                        $this->_updateSyncData(
+
+                        $this->addSyncDataError(
                             $orderId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                             $error,
-                            0,
-                            0
+                            null,
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
@@ -207,15 +212,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                     $jsonErrorMsg = json_last_error_msg();
                     $helper->logError("Order " . $order->getEntityId() . " json encode failed (" . $jsonErrorMsg . ")");
 
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $orderId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $jsonErrorMsg,
-                        0,
-                        0,
+                        null,
                         false,
-                        -1
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                 }
             } catch (Exception $e) {
@@ -668,56 +671,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders
         $helper = $this->getHelper();
         if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
             $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
-            $this->_updateSyncData(
-                $orderId,
-                $mailchimpStoreId,
-                null,
-                null,
-                1,
-                null,
-                true,
-                false
-            );
+            $this->markSyncDataAsModified($orderId, $mailchimpStoreId);
         }
-    }
-
-    /**
-     * update customer sync data
-     *
-     * @param int      $orderId
-     * @param string   $mailchimpStoreId
-     * @param int|null $syncDelta
-     * @param int|null $syncError
-     * @param int|null $syncModified
-     * @param int|null $syncedFlag
-     * @param bool     $saveOnlyIfexists
-     * @param bool     $allowBatchRemoval
-     */
-    protected function _updateSyncData(
-        $orderId,
-        $mailchimpStoreId,
-        $syncDelta = null,
-        $syncError = null,
-        $syncModified = 0,
-        $syncedFlag = null,
-        $saveOnlyIfexists = false,
-        $allowBatchRemoval = true
-    ) {
-        $helper = $this->getHelper();
-        $helper->saveEcommerceSyncData(
-            $orderId,
-            Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-            $mailchimpStoreId,
-            $syncDelta,
-            $syncError,
-            $syncModified,
-            null,
-            null,
-            $syncedFlag,
-            $saveOnlyIfexists,
-            null,
-            $allowBatchRemoval
-        );
     }
 
     /**
@@ -742,7 +697,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders
             $magentoStoreId,
             'stores'
         );
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $batchArray = array();
         $config = array();
         $orderCollection = $this->getResourceModelOrderCollection();
@@ -792,25 +747,25 @@ class Ebizmarts_MailChimp_Model_Api_Orders
                         $error = $helper->__(
                             'Something went wrong when retrieving product information during migration from 1.1.6.'
                         );
-                        $this->_updateSyncData(
+                        $this->addSyncDataError(
                             $orderId,
                             $mailchimpStoreId,
-                            $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                             $error,
-                            0,
-                            0
+                            null,
+                            false,
+                            $dateHelper->formatDate(null, "Y-m-d H:i:s")
                         );
                         continue;
                     }
                 } else {
                     $error = $helper->__("Json error during migration from 1.1.6");
-                    $this->_updateSyncData(
+                    $this->addSyncDataError(
                         $orderId,
                         $mailchimpStoreId,
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s"),
                         $error,
-                        0,
-                        0
+                        null,
+                        false,
+                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
                     );
                     continue;
                 }
@@ -847,28 +802,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     }
 
     /**
-     * @return Ebizmarts_MailChimp_Helper_Data
-     */
-    protected function getHelper()
-    {
-        return Mage::helper('mailchimp');
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Helper_Date
-     */
-    protected function getDateHelper()
-    {
-        return Mage::helper('mailchimp/date');
-    }
-
-    /**
      * @param $newOrders
      * @param $mailchimpStoreId
      */
     public function joinMailchimpSyncDataWithoutWhere($newOrders, $mailchimpStoreId)
     {
-        $mailchimpTableName = Mage::getSingleton('core/resource')->getTableName('mailchimp/ecommercesyncdata');
+        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $newOrders->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '"
@@ -1098,5 +1037,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders
     protected function getSubscriberModel()
     {
         return Mage::getModel('newsletter/subscriber');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getClassConstant()
+    {
+        return Ebizmarts_MailChimp_Model_Config::IS_ORDER;
     }
 }

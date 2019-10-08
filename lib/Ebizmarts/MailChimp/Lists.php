@@ -122,7 +122,7 @@ class MailChimp_Lists extends MailChimp_Abstract
         $id = null,
         $fields = null,
         $excludeFields = null,
-        $count = null,
+        $count = 100,
         $offset = null,
         $beforeDateCreated = null,
         $sinceDateCreated = null,
