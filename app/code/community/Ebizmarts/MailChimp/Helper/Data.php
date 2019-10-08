@@ -783,10 +783,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Set the values to send all the items again.
-     *
-     * @param  $scopeId
-     * @param  $scope
+     * @param $scopeId
+     * @param $scope
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function resendMCEcommerceData($scopeId, $scope, $filters = null)
@@ -799,7 +798,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $this->removeEcommerceSyncData($scopeId, $scope, false, $filters);
             $this->clearErrorGrid($scopeId, $scope, true, $filters);
 
-            if (in_array('PRO', $filters)) {
+            if ($filters !== null && in_array(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $filters)) {
                 $this->deleteFlushMagentoCacheFlag();
             }
         }
@@ -809,9 +808,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Remove items from mailchimp_ecommerce_sync_data table to allow them to be sent.
      * If scopeId is 0 remova from all scopes.
      *
-     * @param  $scopeId
-     * @param  $scope
-     * @param  bool    $deleteErrorsOnly
+     * @param $scopeId
+     * @param $scope
+     * @param bool $deleteErrorsOnly
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false, $filters = null)
@@ -825,7 +825,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @throws Mage_Core_Exception
+     * @param null $filters
      */
     public function removeAllEcommerceSyncDataErrors($filters = null)
     {
@@ -848,8 +848,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $mailchimpStoreId
-     * @param bool             $deleteErrorsOnly
-     * @throws Mage_Core_Exception
+     * @param bool $deleteErrorsOnly
+     * @param null $filters
      */
     public function removeEcommerceSyncDataByMCStore($mailchimpStoreId, $deleteErrorsOnly = false, $filters = null)
     {
@@ -1063,9 +1063,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * Clear mailchimp_errors grid for given scope.
      * Exclude subscriber if flag set to true.
      *
-     * @param  $scopeId
-     * @param  $scope
-     * @param  bool    $excludeSubscribers
+     * @param $scopeId
+     * @param $scope
+     * @param bool $excludeSubscribers
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false, $filters = null)
@@ -1083,6 +1084,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $mailchimpStoreId
+     * @param null $filters
      */
     public function clearErrorGridByMCStore($mailchimpStoreId, $filters = null)
     {
@@ -1101,6 +1103,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param $scopeId
+     * @param null $filters
      */
     public function clearErrorGridByStoreId($scopeId, $filters = null)
     {
@@ -1149,6 +1152,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param $scopeId
      * @param $scope
+     * @param null $filters
      * @throws Mage_Core_Exception
      */
     public function saveLastItemsSent($scopeId, $scope, $filters = null)
@@ -1156,7 +1160,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $mailchimpStoreId = $this->getMCStoreId($scopeId, $scope);
         $isSyncing = $this->getMCIsSyncing($mailchimpStoreId, $scopeId, $scope);
 
-        if ($isSyncing != 1) {
+        if ($isSyncing != 1 && $filters !== null) {
             $configValues = array();
 
             if ($this->getCustomerResendLastId($scopeId, $scope) === null
@@ -4835,17 +4839,16 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function modifyCounterDataSentToMailchimp($index, $hasError = false, $increment = 1)
     {
         $counterGetResponsesBatch = $this->getCountersDataSentToMailchimp();
-        $counterGetResponsesBatchAtIndex = $counterGetResponsesBatch[$index];
         $statusChanged = self::DATA_SENT_TO_MAILCHIMP;
 
         if ($hasError === true) {
-            $count = isset($counterGetResponsesBatchAtIndex[self::DATA_NOT_SENT_TO_MAILCHIMP])
-                ? $counterGetResponsesBatchAtIndex[self::DATA_NOT_SENT_TO_MAILCHIMP]
+            $count = isset($counterGetResponsesBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP])
+                ? $counterGetResponsesBatch[$index][self::DATA_NOT_SENT_TO_MAILCHIMP]
                 : $increment;
             $statusChanged = self::DATA_NOT_SENT_TO_MAILCHIMP;
         } else {
-            $count = isset($counterGetResponsesBatchAtIndex[self::DATA_SENT_TO_MAILCHIMP])
-                ? $counterGetResponsesBatchAtIndex[self::DATA_SENT_TO_MAILCHIMP]
+            $count = isset($counterGetResponsesBatch[$index][self::DATA_SENT_TO_MAILCHIMP])
+                ? $counterGetResponsesBatch[$index][self::DATA_SENT_TO_MAILCHIMP]
                 : $increment;
         }
 
