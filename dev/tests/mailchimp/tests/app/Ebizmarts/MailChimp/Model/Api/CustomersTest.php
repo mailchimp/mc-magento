@@ -120,8 +120,8 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 'getOptIn',
                 'getOptInStatusForStore', 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
-                'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper',
-                'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch', 'sendMailchimpTags'
+                'getCustomerResourceCollection', 'getSubscriberModel', 'getHelper',
+                'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch','sendMailchimpTags'
             )
         )
             ->getMock();
@@ -152,7 +152,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
         $customerArray = array($customerMock);
 
-        $this->_customersApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
+        $this->_customersApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $this->_customersApiMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
         $this->_customersApiMock->expects($this->once())->method('setMagentoStoreId')->with($storeId);
         $this->_customersApiMock->expects($this->once())
@@ -211,7 +211,15 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->_customersApiMock
             ->expects($this->once())
             ->method('_updateSyncData')
-            ->with($customerId, $mailchimpStoreId, null, null, 0, null)
+            ->with(
+                $customerId,
+                $mailchimpStoreId,
+                null,
+                null,
+                0,
+                null,
+                null
+            )
             ->willReturnSelf();
 
         $helperMock->expects($this->once())
@@ -305,7 +313,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
                 'getOptIn',
                 'getOptInStatusForStore', 'getBatchMagentoStoreId', '_buildCustomerData', 'makePutBatchStructure',
                 '_updateSyncData', 'setMailchimpStoreId', 'setMagentoStoreId',
-                'getCustomerResourceCollection', 'getSubscriberModel', 'getMailChimpHelper',
+                'getCustomerResourceCollection', 'getSubscriberModel', 'getHelper',
                 'isSubscribed', 'makePatchBatchStructure', 'incrementCounterSentPerBatch',
                 'makeMailchimpTagsBatchStructure'
             )
@@ -339,7 +347,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
 
         $customerArray = array($customerMock);
 
-        $this->_customersApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($helperMock);
+        $this->_customersApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $this->_customersApiMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
         $this->_customersApiMock->expects($this->once())->method('setMagentoStoreId')->with($storeId);
         $this->_customersApiMock->expects($this->once())
@@ -398,7 +406,14 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
         $this->_customersApiMock
             ->expects($this->once())
             ->method('_updateSyncData')
-            ->with($customerId, $mailchimpStoreId, null, null, 0, null)
+            ->with(
+                $customerId, $mailchimpStoreId,
+                null,
+                null,
+                0,
+                null,
+                null
+            )
             ->willReturnSelf();
 
         $helperMock->expects($this->once())

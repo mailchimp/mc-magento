@@ -146,9 +146,9 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceControllerTest extends PHPUnit_Fram
         $requestMock->expects($this->exactly(3))
             ->method('getParam')
             ->withConsecutive(
-                $paramFilters,
-                'scope',
-                'scope_id'
+                array($paramFilters),
+                array('scope'),
+                array('scope_id')
             )
             ->willReturnOnConsecutiveCalls(
                 $filter,
