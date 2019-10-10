@@ -1916,11 +1916,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             's:7:"magento";s:1:"5";}}';
 
         $mapFieldsUnserialized = array(
-            "_1468601283719_719", array("mailchimp", "WEBSITE", "magento", "1"), "_1468609069544_544",
-            array("mailchimp", "STOREID", "magento", "2"), "_1469026825907_907",
-            array("mailchimp", "STORENAME", "magento", "3"),
-            "_1469027411717_717", array("mailchimp", "PREFIX", "magento", "4"), "_1469027418285_285",
-            array("mailchimp", "FNAME", "magento", "5")
+            "_1468601283719_719" => array("mailchimp" => "WEBSITE", "magento" => "1"),
+            "_1468609069544_544" => array("mailchimp" => "STOREID", "magento"=>  "2"),
+            "_1469026825907_907" => array("mailchimp" => "STORENAME", "magento" => "3"),
+            "_1469027411717_717" => array("mailchimp" => "PREFIX","magento" => "4"),
+            "_1469027418285_285" => array("mailchimp" => "FNAME", "magento" => "5")
         );
 
         $arrayMergeFieldsGetAll = array
@@ -2033,15 +2033,15 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->with($listId, null, null, 50)
             ->willReturn($arrayMergeFieldsGetAll);
 
-        $times = 10;
+        $times = 5;
 
         $helperDataMock->expects($this->exactly($times))->method('_createCustomFieldTypes')
             ->withConsecutive(
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized)
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized)
             );
 
         $helperDataMock->createMergeFields($scopeId, $scope);
