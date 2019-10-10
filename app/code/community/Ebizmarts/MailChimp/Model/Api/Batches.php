@@ -975,7 +975,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncDeleted = null,
         $token = null,
         $syncedFlag = null,
-        $saveOnlyIfexists = false
+        $saveOnlyIfExists = false
     ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
