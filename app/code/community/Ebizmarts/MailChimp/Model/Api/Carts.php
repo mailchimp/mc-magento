@@ -568,7 +568,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     protected function _getCheckoutUrl($cart, $isModified)
     {
         if (!$isModified) {
-            $token = md5(rand(0, 9999999));
+            $token = hash('md5', rand(0, 9999999));
         } else {
             $token = $cart->getMailchimpToken();
         }
@@ -601,7 +601,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts
     public function _getCustomer($cart, $magentoStoreId)
     {
         $customer = array(
-            "id" => md5(strtolower($cart->getCustomerEmail())),
+            "id" => hash('md5', strtolower($cart->getCustomerEmail())),
             "email_address" => $cart->getCustomerEmail(),
             "opt_in_status" => $this->getApiCustomersOptIn($magentoStoreId)
         );

@@ -287,7 +287,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         try {
             $subscriber->setSubscriberFirstname($fname);
             $subscriber->setSubscriberLastname($lname);
-            $md5HashEmail = md5(strtolower($email));
+            $md5HashEmail = hash('md5', strtolower($email));
             $member = $api->getLists()->getMembers()->get(
                 $listId,
                 $md5HashEmail,

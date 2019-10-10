@@ -1042,7 +1042,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getWebhooksKey()
     {
-        $crypt = md5((string)$this->getConfig()->getNode('global/crypt/key'));
+        $crypt = hash('md5', (string)$this->getConfig()->getNode('global/crypt/key'));
         $key = substr($crypt, 0, (strlen($crypt) / 2));
 
         return $key;

@@ -111,7 +111,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
 
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
-            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
+            $emailHash = hash('md5', strtolower($subscriber->getSubscriberEmail()));
             $subscriberJson = "";
 
             //encode to JSON
@@ -243,7 +243,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
 
-            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
+            $emailHash = hash('md5', strtolower($subscriber->getSubscriberEmail()));
             try {
                 $api->lists->members->addOrUpdate(
                     $listId,
@@ -450,7 +450,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $listId = $helper->getGeneralList($storeId);
         try {
             $api = $helper->getApi($storeId);
-            $emailHash = md5(strtolower($subscriber->getSubscriberEmail()));
+            $emailHash = hash('md5', strtolower($subscriber->getSubscriberEmail()));
             $api->getLists()->getMembers()->update($listId, $emailHash, null, 'unsubscribed');
         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
             $helper->logError($e->getMessage());

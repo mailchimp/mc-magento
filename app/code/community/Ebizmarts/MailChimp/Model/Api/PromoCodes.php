@@ -396,7 +396,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes
      */
     protected function getToken()
     {
-        $token = md5(rand(0, 9999999));
+        $token = hash('md5', rand(0, 9999999));
         return $token;
     }
 
