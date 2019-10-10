@@ -233,7 +233,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                 $this->addSyncDataError($cartId, $mailchimpStoreId, $jsonErrorMessage, $this->getToken());
 
                 //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
+                $this->logSyncError(
+                    "Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")",
+                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
+                    $mailchimpStoreId
+                );
             }
 
             $this->setToken(null);
@@ -365,7 +369,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                 );
 
                 //json encode failed
-                $helper->logError("Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")");
+                $this->logSyncError(
+                    "Carts " . $cart->getId() . " json encode failed (".$jsonErrorMessage.")",
+                    Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
+                    $mailchimpStoreId
+                );
             }
 
             $this->setToken(null);
