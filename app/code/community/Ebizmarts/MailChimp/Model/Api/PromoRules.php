@@ -116,7 +116,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                 }
             } else {
                 $jsonErrorMsg = json_last_error_msg();
-                $helper->logError("Promo rule " . $ruleId . " json encode failed (".$jsonErrorMsg.")");
+                $this->logSyncError(
+                    "Promo rule " . $ruleId . " json encode failed (".$jsonErrorMsg.")",
+                    Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
+                    $mailchimpStoreId, $magentoStoreId
+                );
 
                 $this->addSyncDataError(
                     $ruleId,
@@ -128,7 +132,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                 );
             }
         } catch (Exception $e) {
-            $helper->logError($e->getMessage());
+            $this->logSyncError(
+                $e->getMessage(),
+                Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
+                $mailchimpStoreId, $magentoStoreId
+            );
         }
 
         return $promoData;

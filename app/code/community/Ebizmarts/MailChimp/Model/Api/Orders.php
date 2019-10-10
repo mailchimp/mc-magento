@@ -128,8 +128,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                         continue;
                     }
                 } else {
-                    $jsonErrorMsg = json_last_error_msg();
-                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
+                    $jsonErrorMsg = json_last_error_msg();$this->logSyncError(
+                        "Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")",
+                        Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                        $mailchimpStoreId, $magentoStoreId
+                    );
 
                     $this->addSyncDataError(
                         $orderId,
@@ -141,7 +144,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                     );
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage());
+                $this->logSyncError(
+                    $e->getMessage(),
+                    Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                    $mailchimpStoreId, $magentoStoreId
+                );
             }
         }
 
@@ -210,7 +217,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                     }
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
-                    $helper->logError("Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")");
+                    $this->logSyncError(
+                        "Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")",
+                        Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                        $mailchimpStoreId, $magentoStoreId
+                    );
 
                     $this->addSyncDataError(
                         $orderId,
@@ -222,7 +233,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                     );
                 }
             } catch (Exception $e) {
-                $helper->logError($e->getMessage());
+                $this->logSyncError(
+                    $e->getMessage(),
+                    Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                    $mailchimpStoreId, $magentoStoreId
+                );
             }
         }
 
@@ -1007,13 +1022,25 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
-                $helper->logError($e->getMessage());
+                $this->logSyncError(
+                    $e->getMessage(),
+                    Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                    null, $magentoStoreId
+                );
             } catch (MailChimp_Error $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
-                $helper->logError($e->getFriendlyMessage());
+                $this->logSyncError(
+                    $e->getFriendlyMessage(),
+                    Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                    null, $magentoStoreId
+                );
             } catch (Exception $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
-                $helper->logError($e->getMessage());
+                $this->logSyncError(
+                    $e->getMessage(),
+                    Ebizmarts_MailChimp_Model_Config::IS_ORDER,
+                    null, $magentoStoreId
+                );
             }
         }
 
