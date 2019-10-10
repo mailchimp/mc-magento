@@ -266,7 +266,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         }
 
         if ($enabled) {
-            $helper->logBatchStatus('Get results from Mailchimp');
+            $helper->logBatchStatus('Get results from Mailchimp for Magento store '.$magentoStoreId);
 
             foreach ($collection as $item) {
                 try {
@@ -960,7 +960,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $syncDeleted = null,
         $token = null,
         $syncedFlag = null,
-        $saveOnlyIfexists = false
+        $saveOnlyIfExists = false
     ) {
         $helper = $this->getHelper();
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
@@ -1160,7 +1160,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $countersSentPerBatch = $helper->getCountersSentPerBatch();
 
         if (!empty($countersSentPerBatch) || $helper->getCountersSentPerBatch() != null) {
-            $helper->logBatchStatus("Sent batch $batchId for store $storeId");
+            $helper->logBatchStatus("Sent batch $batchId for Magento store $storeId");
             $helper->logBatchQuantity($helper->getCountersSentPerBatch());
         } else {
             $helper->logBatchStatus("Nothing to sync for store $storeId");
@@ -1178,7 +1178,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $countersSubscribers = $helper->getCountersSubscribers();
 
         if (!empty($countersSubscribers) || $helper->getCountersSubscribers() != null) {
-            $helper->logBatchStatus("Sent batch $batchId for store $storeId");
+            $helper->logBatchStatus("Sent batch $batchId for Magento store $storeId");
             $helper->logBatchQuantity($helper->getCountersSubscribers());
         } else {
             $helper->logBatchStatus("Nothing to sync for store $storeId");
