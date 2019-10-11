@@ -34,6 +34,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
+        $oldStore = $helper->getCurrentStoreId();
+        $helper->setCurrentStore($magentoStoreId);
+
         $allCarts = array();
 
         if (!$helper->isAbandonedCartEnabled($magentoStoreId)) {
@@ -61,6 +64,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
         // get new carts
         $allCarts = array_merge($allCarts, $this->_getNewQuotes($mailchimpStoreId, $magentoStoreId));
+        $helper->setCurrentStore($oldStore);
 
         return $allCarts;
     }

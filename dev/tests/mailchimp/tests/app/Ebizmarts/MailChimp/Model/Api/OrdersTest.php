@@ -204,7 +204,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock = $this->_ordersApiMock
             ->setMethods(
                 array(
-                    'getHelper', '_getPayloadData', '_getPayloadDataLines', '_getPayloadBilling',
+                    '_getPayloadData', '_getPayloadDataLines', '_getPayloadBilling',
                     '_getPayloadShipping', 'getCustomerModel', 'getStoreModelFromMagentoStoreId',
                     'getSubscriberModel'
                 )
@@ -224,18 +224,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())
             ->method('getSubscriberModel')
             ->willReturn($subscriberMock);
-
-        $ordersApiMock->expects($this->exactly(1))
-            ->method('getHelper')
-            ->willReturn($helperMock);
-
-        $helperMock->expects($this->once())
-            ->method('getCurrentStoreId')
-            ->willReturn($magentoStoreId);
-
-        $helperMock->expects($this->exactly(2))
-            ->method('setCurrentStore')
-            ->withConsecutive(array($magentoStoreId), array($oldStore));
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
             ->disableOriginalConstructor()
@@ -307,9 +295,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getUrl')
             ->with(
                 'sales/order/view/', array(
-                    'order_id' => null,
-                    '_nosid' => true,
-                    '_secure' => true
+                'order_id' => null,
+                '_nosid' => true,
+                '_secure' => true
                 )
             )
             ->willReturn('http://somedomain.com');
@@ -367,9 +355,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->disableOriginalConstructor()
             ->setMethods(
                 array(
-                    'getGeneralList',
-                    'getApiKey',
-                    'getApi')
+                'getGeneralList',
+                'getApiKey',
+                'getApi')
             )
             ->getMock();
 
