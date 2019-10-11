@@ -334,13 +334,15 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $helper->logBatchStatus('Generate Carts Payload');
                     $apiCarts = $this->getApiCarts();
                     $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);//order operations
-                    $helper->logBatchStatus('Generate Orders Payload');
-                    $apiOrders = $this->getApiOrders();
-                    $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                    $orderAmount = count($ordersArray);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
                 }
+
+                //order operations
+                $helper->logBatchStatus('Generate Orders Payload');
+                $apiOrders = $this->getApiOrders();
+                $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $orderAmount = count($ordersArray);
+                $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
 
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
