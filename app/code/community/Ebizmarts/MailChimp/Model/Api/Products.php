@@ -1106,7 +1106,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         if (!$this->currentProductIsVisible()) {
             $parentId = $this->getParentId($product->getId());
             if ($parentId) {
-                $price = $this->getProductPrice($product, $magentoStoreId);
+                $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
             }
         } else {
             if ($this->_parentPrice) {
@@ -1123,19 +1123,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected function currentProductIsVisible()
     {
         return $this->_visibility != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE;
-    }
-
-    /**
-     * @param $product
-     * @return float
-     * @throws Mage_Core_Exception
-     */
-    protected function getProductPrice($product, $magentoStoreId)
-    {
-        $helper = $this->getHelper();
-        $rc = $helper->getProductResourceModel();
-        $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
-        return $price;
     }
 
     /**
