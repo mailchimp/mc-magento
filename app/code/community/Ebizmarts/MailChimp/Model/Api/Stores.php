@@ -177,10 +177,10 @@ class Ebizmarts_MailChimp_Model_Api_Stores
 
         if (strstr($errorMessage, 'A store with the domain')) {
             $errorMessage = $helper->__(
-                    'A Mailchimp store with the same domain already exists in this account. '
+                'A Mailchimp store with the same domain already exists in this account. '
                     . 'You need to have a different URLs for each scope you set up the ecommerce data. '
                     . 'Possible solutions '
-                )
+            )
                 . "<a href='https://docs.magento.com/m1/ce/user_guide/search_seo/seo-url-rewrite-configure.html'>"
                 . "HERE</a> and "
                 . "<a href='https://docs.magento.com/m1/ce/user_guide/configuration/url-secure-unsecure.html'>"
