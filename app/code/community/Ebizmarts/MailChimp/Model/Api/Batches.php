@@ -344,21 +344,22 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
+                //cart operations
                 if ($helper->getMCIsSyncing($mailchimpStoreId)) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
                 } else {
-                    //cart operations
                     $helper->logBatchStatus('Generate Carts Payload');
                     $apiCarts = $this->getApiCarts();
                     $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
                     $batchArray['operations'] = array_merge($batchArray['operations'], $cartsArray);
-                    //order operations
-                    $helper->logBatchStatus('Generate Orders Payload');
-                    $apiOrders = $this->getApiOrders();
-                    $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                    $orderAmount = count($ordersArray);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
                 }
+
+                //order operations
+                $helper->logBatchStatus('Generate Orders Payload');
+                $apiOrders = $this->getApiOrders();
+                $ordersArray = $apiOrders->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                $orderAmount = count($ordersArray);
+                $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
 
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations

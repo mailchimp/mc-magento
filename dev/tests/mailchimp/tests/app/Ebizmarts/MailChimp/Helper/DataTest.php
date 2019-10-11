@@ -2122,7 +2122,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
         $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
-            ->with($index, $statusChanged, $count);
+            ->with($index, $statusChanged, 2);
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index);
     }
@@ -2140,7 +2140,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
         $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
-            ->with($index, $statusChanged, $count);
+            ->with($index, $statusChanged, 2);
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index, true);
     }

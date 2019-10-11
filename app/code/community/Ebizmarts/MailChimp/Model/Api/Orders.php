@@ -46,6 +46,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
+        $oldStore = $helper->getCurrentStoreId();
+        $helper->setCurrentStore($magentoStoreId);
+
         $batchArray = array();
         $this->_firstDate = $helper->getEcommerceFirstDate($magentoStoreId);
         $this->_counter = 0;
@@ -62,6 +65,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
         // get new orders
         $batchArray = array_merge($batchArray, $this->_getNewOrders($mailchimpStoreId, $magentoStoreId));
+        $helper->setCurrentStore($oldStore);
 
         return $batchArray;
     }
@@ -255,17 +259,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function GeneratePOSTPayload($order, $mailchimpStoreId, $magentoStoreId)
     {
-        $helper = $this->getHelper();
-        $oldStore = $helper->getCurrentStoreId();
-        $helper->setCurrentStore($magentoStoreId);
-
         $data = $this->_getPayloadData($order, $magentoStoreId);
         $lines = $this->_getPayloadDataLines($order, $mailchimpStoreId, $magentoStoreId);
         $data['lines'] = $lines['lines'];
 
         if (!$lines['itemsCount']) {
             unset($data['lines']);
-            $helper->setCurrentStore($oldStore);
             return "";
         }
 
@@ -321,7 +320,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         //encode to JSON
         $jsonData = json_encode($data);
 
-        $helper->setCurrentStore($oldStore);
         return $jsonData;
     }
 
