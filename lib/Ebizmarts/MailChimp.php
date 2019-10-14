@@ -425,31 +425,6 @@ class Ebizmarts_MailChimp
     }
 
     /**
-     * @return array
-     */
-    public function getCurlOptions()
-    {
-        return $this->_curlOptions;
-    }
-
-    /**
-     * @param array $_curlOptions
-     */
-    protected function setCurlOptions($curlOptions)
-    {
-        $this->_curlOptions = $curlOptions;
-    }
-
-    /**
-     * @param $index
-     * @param $value
-     */
-    protected function setCurlOptionsIndexValue($index, $value)
-    {
-        $this->_curlOptions[$index] = $value;
-    }
-
-    /**
      * @param array $curlOptions
      */
     protected function setCurlOptionsAddOptions($curlOptions = array())

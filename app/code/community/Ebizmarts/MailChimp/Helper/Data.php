@@ -2737,7 +2737,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $subscriber = Mage::getModel('newsletter/subscriber')->getCollection()
                 ->addFieldToFilter('store_id', array('in' => $storeIds))
                 ->addFieldToFilter('subscriber_email', $email)
-                ->setPageSize(1, 1)->getLastItem();
+                ->setPageSize(1)->getLastItem();
 
             if (!$subscriber->getId()) {
                 /**
@@ -2784,7 +2784,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $customer = Mage::getResourceModel('customer/customer_collection')
                 ->addFieldToFilter('store_id', array('in' => $storeIds))
                 ->addFieldToFilter('email', array('eq' => $email))
-                ->setPageSize(1, 1)->getLastItem();
+                ->setPageSize(1)->getLastItem();
 
             if ($customer->getId()) {
                 $customer = Mage::getModel('customer/customer')->load($customer->getId());
@@ -3080,10 +3080,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $mailchimpScope = null;
         $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => Ebizmarts_MailChimp_Model_Config::GENERAL_MCSTOREID))
-            ->addFieldToFilter('value', array('eq' => $mailChimpStoreId));
+            ->addFieldToFilter('value', array('eq' => $mailChimpStoreId))
+            ->setPageSize(1);
 
         if ($collection->getSize()) {
-            $configEntry = $collection->setPageSize(1, 1)->getLastItem();
+            $configEntry = $collection->getLastItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
 
@@ -3102,10 +3103,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $mailchimpScope = null;
         $collection = Mage::getResourceModel('core/config_data_collection')
             ->addFieldToFilter('path', array('eq' => $path))
-            ->addFieldToFilter('value', array('eq' => $value));
+            ->addFieldToFilter('value', array('eq' => $value))
+            ->setPageSize(1);
 
         if ($collection->getSize()) {
-            $configEntry = $collection->setPageSize(1, 1)->getLastItem();
+            $configEntry = $collection->getLastItem();
             $mailchimpScope = array('scope' => $configEntry->getScope(), 'scope_id' => $configEntry->getScopeId());
         }
 

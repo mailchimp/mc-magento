@@ -229,31 +229,6 @@ class Mandrill_Mandrill
     }
 
     /**
-     * @return array
-     */
-    protected function getCurlOptions()
-    {
-        return $this->_curlOptions;
-    }
-
-    /**
-     * @param array $curlOptions
-     */
-    protected function setCurlOptions($curlOptions)
-    {
-        $this->_curlOptions = $curlOptions;
-    }
-
-    /**
-     * @param $index
-     * @param $value
-     */
-    protected function setCurlOptionsIndexValue($index, $value)
-    {
-        $this->_curlOptions[$index] = $value;
-    }
-
-    /**
      * @param array $curlOptions
      */
     protected function setCurlOptionsAddOptions($curlOptions = array())
