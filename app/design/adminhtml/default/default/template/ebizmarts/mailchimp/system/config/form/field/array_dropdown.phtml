@@ -116,20 +116,17 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
                 alert("Max. merge fields reached. \nOnly up to 30 merge fields are allowed.");
             } else {
                 // generate default template data
-                if ('' == templateData) {
+                if ('' === templateData) {
                     var d = new Date();
                     templateData = {;
-                    <?php foreach ($this->_columns as $columnName => $column):?>
-                    <?php echo $this->quoteEscape($columnName) ?> :
-                    '',
-                    <?php endforeach;?>
-                        _id;
-                :
-                    '_' + d.getTime() + '_' + d.getMilliseconds()
-                }
+                        <?php foreach ($this->_columns as $columnName => $column):?>
+                        <?php echo $this->quoteEscape($columnName) ?> : '',
+                        <?php endforeach;?>
+                            _id;: '_' + d.getTime() + '_' + d.getMilliseconds()
+                    }
                 }
                 // insert before last row
-                if ('' == insertAfterId) {
+                if ('' === insertAfterId) {
                     Element.insert(
                         $('addRow<?php echo $this->quoteEscape($htmlId) ?>'),
                         {before: this.template.evaluate(templateData)});

@@ -5122,7 +5122,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $syncedFlag
      * @param $deletedRelatedId
      * @param $allowBatchRemoval
-     * @param Varien_Object $ecommerceSyncDataItem
+     * @param Ebizmarts_MailChimp_Model_Api_SyncItem $ecommerceSyncDataItem
      */
     protected function setEcommerceSyncDataItemValues(
         $itemType,
@@ -5134,7 +5134,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncedFlag,
         $deletedRelatedId,
         $allowBatchRemoval,
-        Varien_Object $ecommerceSyncDataItem
+        Ebizmarts_MailChimp_Model_Api_SyncItem $ecommerceSyncDataItem
     ) {
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
