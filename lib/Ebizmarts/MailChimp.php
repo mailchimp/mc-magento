@@ -398,7 +398,6 @@ class Ebizmarts_MailChimp
          * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
          */
         $curlHelper = Mage::helper('mailchimp/curl');
-        //$this->setCurlOptionsAddOptions($curlOptions);
         $curlResult = $curlHelper->curlExec($curlOptions);
 
         $responseBody = $curlResult['response'];
