@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cron Process available count limits options source
  *
@@ -13,7 +14,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_MailchimpStoreView
 
     public function getAllOptions()
     {
-
         return Mage::getSingleton('adminhtml/system_store')->getStoreValuesForForm(false, true);
     }
 }

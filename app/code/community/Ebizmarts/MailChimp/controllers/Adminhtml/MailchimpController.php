@@ -25,6 +25,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     public function indexAction()
     {
         $customerId = (int)$this->getRequest()->getParam('id');
+
         if ($customerId) {
             $block = $this->getLayout()
                 ->createBlock(
@@ -99,8 +100,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
         }
 
         $data = $this->getSourceAccountInfoOptions($apiKey, $mcStoreId);
+
         foreach ($data as $key => $element) {
             $liElement = '';
+
             if ($element['value'] == Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY) {
                 $liElement = $helper->getSyncFlagDataHtml($element, $liElement);
                 $data[$key]['label'] = $liElement;
@@ -268,6 +271,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     {
         $helper = $this->getHelper();
         $scopeArray = $helper->getCurrentScope();
+
         return $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
     }
 }

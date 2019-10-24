@@ -87,6 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
 
         $customersCollection = array();
         $customerIds = $this->getCustomersToSync();
+
         if (!empty($customerIds)) {
             $customersCollection = $this->makeCustomersNotSentCollection($customerIds);
         }
@@ -96,8 +97,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         $this->setOptInStatusForStore($this->getOptIn($this->getBatchMagentoStoreId()));
         $subscriber = $this->getSubscriberModel();
         $listId = $helper->getGeneralList($magentoStoreId);
-
         $counter = 0;
+
         foreach ($customersCollection as $customer) {
             $data = $this->_buildCustomerData($customer);
             $customerJson = json_encode($data);
@@ -223,7 +224,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function _buildCustomerData($customer)
     {
         $data = array();
-        $data["id"] = md5(strtolower($this->getCustomerEmail($customer)));
+        $data["id"] = hash('md5', strtolower($this->getCustomerEmail($customer)));
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
@@ -246,8 +247,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     {
         $data = array();
         $customerAddress = array();
-
         $street = explode("\n", $customer->getStreet());
+
         if (count($street) > 1) {
             $customerAddress["address1"] = $street[0];
             $customerAddress["address2"] = $street[1];
@@ -267,6 +268,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
 
         if ($customer->getRegionId()) {
             $customerAddress["province_code"] = $this->_directoryRegionModel->load($customer->getRegionId())->getCode();
+
             if (!$customerAddress["province_code"]) {
                 unset($customerAddress["province_code"]);
             }
@@ -481,8 +483,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @param $collection
-     * @param null       $mailchimpStoreId
+     * @param       $collection
+     * @param null  $mailchimpStoreId
      */
     public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId = null)
     {
@@ -546,7 +548,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         if ($mergeFieldJSON === false) {
             $this->logCouldNotEncodeMailchimpTags($customer, $mergeFields);
         } else {
-            $md5HashEmail = md5(strtolower($customer->getEmail()));
+            $md5HashEmail = hash('md5', strtolower($customer->getEmail()));
             $batchData = array();
             $batchData['method'] = "PATCH";
             $batchData['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
@@ -565,7 +567,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function isSubscribed($subscriber, $customer)
     {
         if ($subscriber->loadByEmail($customer->getEmail())->getSubscriberId()
-            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED ) {
+            && $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
             return true;
         } else {
             return false;
@@ -641,13 +643,13 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     /**
      * Send merge fields for transactional members
      *
-     * @param $magentoStoreId
+     * @param               $magentoStoreId
      * @param Varien_Object $dataCustomer
-     * @param $subscriber
-     * @param $customer
-     * @param $listId
-     * @param $counter
-     * @param array $customerArray
+     * @param               $subscriber
+     * @param               $customer
+     * @param               $listId
+     * @param               $counter
+     * @param array         $customerArray
      * @return array
      */
     protected function sendMailchimpTags(

@@ -119,15 +119,11 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
                 if ('' == templateData) {
                     var d = new Date();
                     templateData = {
-                    <?php foreach ($this->_columns as $columnName => $column):?>
-                    <?php echo $this->quoteEscape($columnName) ?> :
-                    '',
-                    <?php endforeach;?>
-                        _id
-                :
-                    '_' + d.getTime() + '_' + d.getMilliseconds()
-                }
-                    ;
+                        <?php foreach ($this->_columns as $columnName => $column):?>
+                        <?php echo $this->quoteEscape($columnName) ?> : '',
+                        <?php endforeach;?>
+                            _id: '_' + d.getTime() + '_' + d.getMilliseconds()
+                    };
                 }
                 // insert before last row
                 if ('' == insertAfterId) {
@@ -193,7 +189,7 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
             $('grid<?php echo $this->quoteEscape($htmlId) ?>').hide();
             $('empty<?php echo $this->quoteEscape($htmlId) ?>').show();
         }
-    }
+    };
     // bind add action to "Add" button in last row
     Event.observe(
         'addToEndBtn<?php echo $this->quoteEscape($htmlId) ?>',

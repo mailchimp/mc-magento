@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_StoreTest extends PHPUnit_F
                     'email_address' => 'email@example.com',
                     'currency_code' => 'USD',
                     'connected_site' => array(
-                        'site_foreign_id'  => 'a1s2d3f4g5h6j7k8l9p0',
+                        'site_foreign_id' => 'a1s2d3f4g5h6j7k8l9p0',
                         'site_script' => array(
                             'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9'
                                 . '/a946187aed2d57d15cdac9987.js',

@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $scope = 'stores';
         $scopeId = 1;
         $member['status'] = 'subscribed';
-        $cryptHashEmail = md5(strtolower($email));
+        $cryptHashEmail = hash('md5', strtolower($email));
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
@@ -224,7 +224,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $scope = 'stores';
         $scopeId = 1;
         $member['status'] = 'unsubscribed';
-        $cryptHashEmail = md5(strtolower($email));
+        $cryptHashEmail = hash('md5', strtolower($email));
         $webhookDeleteActionReturn = 0;
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -26,8 +27,10 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
         $success = 1;
+
         try {
             $stores = $mageApp->getStores();
+
             if ($scopeId == 0) {
                 foreach ($stores as $store) {
                     $helper->resetErrors($store->getId());
@@ -51,8 +54,8 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $filters = $request->getParam('filter');
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
-
         $success = 0;
+
         if (is_array($filters) && empty($filters)) {
             $this->addWarning($helper->__('At least one type of eCommerce data should be selected to Resend.'));
             $success = $helper->__('Redirecting... ')
@@ -85,6 +88,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scopeId = $request->getParam('scope_id');
         $success = 0;
         $subEnabled = $helper->isSubscriptionEnabled($scopeId, $scope);
+
         if ($subEnabled) {
             $success = $helper->createMergeFields($scopeId, $scope);
         }

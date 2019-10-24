@@ -176,7 +176,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             if (isset($sender['domain'])) {
                 $emailArray = explode('@', $fromEmail);
 
-                if (count($emailArray) > 1 && $emailArray[1] == $sender['domain']) {
+                if (isset($emailArray[1]) && $emailArray[1] == $sender['domain']) {
                     $senderExists = true;
                 }
             }

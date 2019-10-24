@@ -63,9 +63,9 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
      * Return date in given format in UTC
      * or the timezone of the current store ($useStoreTime = true).
      *
-     * @param  string $format
-     * @param  $date
-     * @param  bool   $avoidOffset
+     * @param string    $format
+     * @param           $date
+     * @param bool      $avoidOffset
      * @return mixed
      * @throws Mage_Core_Model_Store_Exception
      */
@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_Helper_Date extends Mage_Core_Helper_Abstract
     protected function _convertUTCToStoreTimestamp($timestamp)
     {
         $timeZone = Mage::app()->getStore()->getConfig('general/locale/timezone');
-        $offSet   = Mage::getModel('core/date')->calculateOffset($timeZone);
+        $offSet = Mage::getModel('core/date')->calculateOffset($timeZone);
         return ($timestamp + $offSet);
     }
 

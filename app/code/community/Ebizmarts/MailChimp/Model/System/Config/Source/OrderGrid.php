@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Cron Process available count limits options source
  *
@@ -28,7 +29,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_OrderGrid
             array('value' => self::ICON, 'label' => $helper->__('Icon for Mailchimp orders')),
             array('value' => self::SYNCED, 'label' => $helper->__('If orders are synced to Mailchimp')),
             array('value' => self::BOTH, 'label' => $helper->__('Both'))
-
         );
     }
 }
