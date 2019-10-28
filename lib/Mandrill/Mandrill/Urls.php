@@ -116,5 +116,4 @@ class Mandrill_Urls
         $_params = array("domain" => $domain);
         return $this->master->call('urls/check-tracking-domain', $_params);
     }
-
 }

@@ -19,17 +19,12 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mergevars_Add extends Mage_Adminhtml_B
         $this->_removeButton("back");
         $this->_removeButton("reset");
     }
-    //    public function getMovtypes()
-    //    {
-    //        $types = Mage::getSingleton('mailchimp/system_config_source_movtype')->getMovtypes();
-    //        return $types;
-    //    }
+
+    /**
+     * @return string
+     */
     public function getHeaderText()
     {
         return Mage::helper('mailchimp')->__('New Field Type');
     }
-    public function _prepareForm()
-    {
-    }
-
 }

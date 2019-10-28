@@ -12,17 +12,18 @@
  */
 class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_Action
 {
-    private $mailchimpHelper = null;
+    protected $_mailchimpHelper = null;
 
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
      */
     protected function getHelper()
     {
-        if (!$this->mailchimpHelper) {
-            $this->mailchimpHelper = Mage::helper('mailchimp');
+        if (!$this->_mailchimpHelper) {
+            $this->_mailchimpHelper = Mage::helper('mailchimp');
         }
-        return $this->mailchimpHelper;
+
+        return $this->_mailchimpHelper;
     }
 
     /**
@@ -35,38 +36,21 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         $moduleName = $request->getModuleName();
         $data = $request->getPost();
         $helper = $this->getHelper();
-        if ($moduleName == 'monkey') {
 
+        if ($moduleName == 'monkey') {
             if (isset($data['data']['list_id'])) {
                 $listId = $data['data']['list_id'];
                 $storeIds = $helper->getMagentoStoreIdsByListId($listId);
-                if (count($storeIds)) {
-                    $storeId = $storeIds[0];
-                    if ($helper->isSubscriptionEnabled($storeId)) {
-                        try {
-                            $api = $helper->getApi($storeId);
-                        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-                            $helper->logError($e->getMessage());
-                            $api = null;
-                        }
-                        if (!$api) {
-                            try {
-                                $webhooks = $api->lists->webhooks->getAll($listId);
-                                foreach ($webhooks['webhooks'] as $webhook) {
-                                    if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                                        $api->lists->webhooks->delete($listId, $webhook['id']);
-                                    }
-                                }
-                            } catch (MailChimp_Error $e) {
-                                $helper->logError($e->getFriendlyMessage());
 
-                            }
-                        }
+                if (!empty($storeIds)) {
+                    $storeId = $storeIds[0];
+
+                    if ($helper->isSubscriptionEnabled($storeId)) {
+                        $this->_deleteWebhook($storeId, $listId);
                     }
                 }
             }
         } else {
-
             //Checking if "wkey" para is present on request, we cannot check for !isPost()
             //because Mailchimp pings the URL (GET request) to validate webhook
             if (!$requestKey) {
@@ -92,4 +76,33 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         }
     }
 
+    /**
+     * @param $storeId
+     * @param $listId
+     * @throws Exception
+     */
+    protected function _deleteWebhook($storeId, $listId)
+    {
+        $helper = $this->getHelper();
+
+        try {
+            $api = $helper->getApi($storeId);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $helper->logError($e->getMessage());
+            $api = null;
+        }
+
+        if (!$api) {
+            try {
+                $webhooks = $api->lists->webhooks->getAll($listId);
+                foreach ($webhooks['webhooks'] as $webhook) {
+                    if (strpos($webhook['url'], 'monkey/webhook') !== false) {
+                        $api->lists->webhooks->delete($listId, $webhook['id']);
+                    }
+                }
+            } catch (MailChimp_Error $e) {
+                $helper->logError($e->getFriendlyMessage());
+            }
+        }
+    }
 }

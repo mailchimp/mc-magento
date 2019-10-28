@@ -11,12 +11,12 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_GroupsTest extends PHPUnit_Fram
     /**
      * @var \Ebizmarts_MailChimp_Block_Checkout_Success_GroupsTest $_block
      */
-    private $_block;
+    protected $_block;
 
     /**
      * @var \Ebizmarts_MailChimp_Block_Checkout_Success_Groups
      */
-    private $_groupsMock;
+    protected $_groupsMock;
 
     public function setUp()
     {
@@ -73,9 +73,12 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_GroupsTest extends PHPUnit_Fram
 
         $orderMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
 
-        $helperMock->expects($this->once())->method('getInterestGroups')->with($customerId, $subscriberId, $storeId)->willReturn($interest);
+        $helperMock
+            ->expects($this->once())
+            ->method('getInterestGroups')
+            ->with($customerId, $subscriberId, $storeId)
+            ->willReturn($interest);
 
         $groupsMock->getInterest();
     }
-
 }

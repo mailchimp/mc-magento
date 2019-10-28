@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -26,16 +27,18 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scope = $request->getParam('scope');
         $scopeId = $request->getParam('scope_id');
         $success = 1;
+
         try {
             $stores = $mageApp->getStores();
+
             if ($scopeId == 0) {
                 foreach ($stores as $store) {
                     $helper->resetErrors($store->getId());
                 }
             }
+
             $helper->resetErrors($scopeId, $scope);
-        } catch(Exception $e)
-        {
+        } catch (Exception $e) {
             $helper->logError($e->getMessage());
             $success = 0;
         }
@@ -49,18 +52,21 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $mageApp = $helper->getMageApp();
         $request = $this->getRequest();
         $filters = $request->getParam('filter');
-        $scopeArray = $helper->getCurrentScope();
+        $scope = $request->getParam('scope');
+        $scopeId = $request->getParam('scope_id');
         $success = 0;
 
         if (is_array($filters) && empty($filters)) {
             $this->addWarning($helper->__('At least one type of eCommerce data should be selected to Resend.'));
-            $success = $helper->__('Redirecting... ') . '<script type="text/javascript">window.top.location.reload();</script>';
+            $success = $helper->__('Redirecting... ')
+                . '<script type="text/javascript">window.top.location.reload();</script>';
         } else {
             try {
-                $helper->resendMCEcommerceData($scopeArray['scope_id'], $scopeArray['scope'], $filters);
+                $helper->resendMCEcommerceData($scopeId, $scope, $filters);
 
                 $this->addSuccess($helper->__('Ecommerce data resent succesfully'));
-                $success = $helper->__('Redirecting... ') . '<script type="text/javascript">window.top.location.reload();</script>';
+                $success = $helper->__('Redirecting... ')
+                    . '<script type="text/javascript">window.top.location.reload();</script>';
             } catch (MailChimp_Error $e) {
                 $helper->logError($e->getFriendlyMessage());
                 $this->addError($e->getFriendlyMessage());
@@ -69,6 +75,7 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
                 $this->addError($e->getMessage());
             }
         }
+
         $mageApp->getResponse()->setBody($success);
     }
 
@@ -81,15 +88,9 @@ class Ebizmarts_MailChimp_Adminhtml_EcommerceController extends Mage_Adminhtml_C
         $scopeId = $request->getParam('scope_id');
         $success = 0;
         $subEnabled = $helper->isSubscriptionEnabled($scopeId, $scope);
+
         if ($subEnabled) {
-            try {
-                $helper->createMergeFields($scopeId, $scope);
-                $success = 1;
-            } catch (MailChimp_Error $e) {
-                $helper->logError($e->getFriendlyMessage());
-            } catch (Exception $e) {
-                $helper->logError($e->getMessage());
-            }
+            $success = $helper->createMergeFields($scopeId, $scope);
         }
 
         $mageApp->getResponse()->setBody($success);

@@ -17,14 +17,23 @@ try {
         ->getCollection()
         ->addFieldToFilter('path', 'mailchimp/general/apikey');
 
+    $mailchimpShards = array('us');
     foreach ($configDataCollection as $data) {
-        $encryptedApiKey = Mage::helper('core')->encrypt($data->getValue());
-        $installer->setConfigData(
-            'mailchimp/general/apikey',
-            $encryptedApiKey,
-            $data->getScope(),
-            $data->getScopeId()
-        );
+        $dbApiKey = $data->getValue();
+        foreach ($mailchimpShards as $shard) {
+            if (strpos($dbApiKey, "-$shard") !== false) {
+                list($hash, $server) = explode("-$shard", $dbApiKey);
+                if (is_numeric($server) && strlen($hash) === 32) {
+                    $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
+                    $installer->setConfigData(
+                        'mailchimp/general/apikey',
+                        $encryptedApiKey,
+                        $data->getScope(),
+                        $data->getScopeId()
+                    );
+                }
+            }
+        }
     }
 
     /* Mandrill migration */
@@ -33,15 +42,17 @@ try {
         ->addFieldToFilter('path', 'mandrill/general/apikey');
 
     foreach ($configDataCollection as $data) {
-        $encryptedApiKey = Mage::helper('core')->encrypt($data->getValue());
-        $installer->setConfigData(
-            'mandrill/general/apikey',
-            $encryptedApiKey,
-            $data->getScope(),
-            $data->getScopeId()
-        );
+        $dbApiKey = $data->getValue();
+        if (strlen($dbApiKey) == 22) {
+            $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
+            $installer->setConfigData(
+                'mandrill/general/apikey',
+                $encryptedApiKey,
+                $data->getScope(),
+                $data->getScopeId()
+            );
+        }
     }
-
 } catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }

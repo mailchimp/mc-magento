@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -14,7 +15,6 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
 
     public function addmergevarAction()
     {
-
         $this->loadLayout();
         $this->renderLayout();
     }
@@ -30,15 +30,37 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
         $blankSpacesAmount = (count(explode(' ', $value)) - 1);
 
         if (is_numeric($value)) {
-            Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value can not be numeric.'));
+            Mage::getSingleton('adminhtml/session')
+                ->addError(
+                    $this->__(
+                        'There was an error processing the new field. '
+                        . 'MailChimp tag value can not be numeric.'
+                    )
+                );
         } elseif ($helper->customMergeFieldAlreadyExists($value, $scopeArray['scope_id'], $scopeArray['scope'])) {
-            Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value already exists.'));
+            Mage::getSingleton('adminhtml/session')
+                ->addError(
+                    $this->__(
+                        'There was an error processing the new field. '
+                        . 'MailChimp tag value already exists.'
+                    )
+                );
         } elseif ($blankSpacesAmount > 0) {
-            Mage::getSingleton('adminhtml/session')->addError($this->__('There was an error processing the new field. MailChimp tag value can not contain blank spaces.'));
+            Mage::getSingleton('adminhtml/session')
+                ->addError(
+                    $this->__(
+                        'There was an error processing the new field. '
+                        . 'MailChimp tag value can not contain blank spaces.'
+                    )
+                );
         } else {
             $customMergeFields = $helper->getCustomMergeFields($scopeArray['scope_id'], $scopeArray['scope']);
             $customMergeFields[] = array('label' => $label, 'value' => $value, 'field_type' => $fieldType);
-            $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS, serialize($customMergeFields)));
+            $configValues = array(
+                array(
+                    Ebizmarts_MailChimp_Model_Config::GENERAL_CUSTOM_MAP_FIELDS, $helper->serialize($customMergeFields)
+                )
+            );
             $helper->saveMailchimpConfig($configValues, $scopeArray['scope_id'], $scopeArray['scope']);
             Mage::getSingleton('core/session')->setMailChimpValue($value);
             Mage::getSingleton('core/session')->setMailChimpLabel($label);
@@ -46,7 +68,6 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
         }
 
         $this->_redirect("*/*/addmergevar");
-
     }
 
     protected function _isAllowed()

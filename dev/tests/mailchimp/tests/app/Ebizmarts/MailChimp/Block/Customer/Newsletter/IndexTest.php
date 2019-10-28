@@ -11,12 +11,12 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_IndexTest extends PHPUnit_Fr
     /**
      * @var \Ebizmarts_MailChimp_Block_Customer_Newsletter_Index $_block
      */
-    private $_block;
+    protected $_block;
 
     /**
      * @var \Ebizmarts_MailChimp_Block_Customer_Newsletter_Index
      */
-    private $_indexMock;
+    protected $_indexMock;
 
     public function setUp()
     {
@@ -84,9 +84,12 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_IndexTest extends PHPUnit_Fr
 
         $subscriberMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
 
-        $helperMock->expects($this->once())->method('getInterestGroups')->with($customerId, $subscriberId, $storeId)->willReturn($interest);
+        $helperMock
+            ->expects($this->once())
+            ->method('getInterestGroups')
+            ->with($customerId, $subscriberId, $storeId)
+            ->willReturn($interest);
 
         $indexMock->getInterest();
     }
-
 }

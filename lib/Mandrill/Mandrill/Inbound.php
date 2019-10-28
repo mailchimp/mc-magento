@@ -137,7 +137,7 @@ class Mandrill_Inbound
      *
      * @param  string     $raw_message    the full MIME document of an email message
      * @param  array|null $to             optionally define the recipients to receive the message - otherwise we'll use the To, Cc, and Bcc headers provided in the document
-     *                                   - to[] string the email address of the recipient
+     *                                    - to[] string the email address of the recipient
      * @param  string     $mail_from      the address specified in the MAIL FROM stage of the SMTP conversation. Required for the SPF check.
      * @param  string     $helo           the identification provided by the client mta in the MTA state of the SMTP conversation. Required for the SPF check.
      * @param  string     $client_address the remote MTA's ip address. Optional; required for the SPF check.
@@ -152,5 +152,4 @@ class Mandrill_Inbound
         $_params = array("raw_message" => $raw_message, "to" => $to, "mail_from" => $mail_from, "helo" => $helo, "client_address" => $client_address);
         return $this->master->call('inbound/send-raw', $_params);
     }
-
 }

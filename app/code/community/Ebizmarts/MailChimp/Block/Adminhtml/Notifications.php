@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -17,8 +18,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
     {
         $helper = $this->makeHelper();
         if ($helper->isImageCacheFlushed() && $helper->isEcomSyncDataEnabledInAnyScope()) {
-            $message = '<strong style=color:red>Important: </strong>'.
-                '<span>Image cache has been flushed please <a href="#" onclick="openResendEcommerceDialog();">resend the products</a> in order to update image URL</span>';
+            $message = '<strong style=color:red>Important: </strong>' .
+                '<span>Image cache has been flushed please '
+                . '<a href="#" onclick="openResendEcommerceDialog();">'
+                . 'resend the products</a> in order to update image URL</span>';
             return $message;
         }
     }
@@ -29,7 +32,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
     public function getMessage()
     {
         $helper = $this->makeHelper();
-        $message = 'Are you sure you want to delete the local data in order to send all items again?\nAutomations will work normally but the synchronization process for the old data will take longer than resetting the MailChimp store.';
+        $message = 'Are you sure you want to delete the local data in order to send all items again?\n'
+            . 'Automations will work normally but the synchronization process for the old data will take '
+            . 'longer than resetting the MailChimp store.';
         return $helper->__($message);
     }
 
@@ -39,6 +44,21 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
 
         return $helper->getUrlForNotification();
     }
+
+    public function getUrlForResendEcommerce()
+    {
+        $helper = $this->makeHelper();
+        $scopeArray = $helper->getCurrentScope();
+        $url = Mage::helper('adminhtml')
+            ->getUrl(
+                'adminhtml/ecommerce/renderresendecom',
+                array('scope' => $scopeArray['scope'], 'scope_id' => $scopeArray['scope_id']
+                )
+            );
+
+        return $url;
+    }
+
 
     /**
      * @return Ebizmarts_MailChimp_Helper_Data

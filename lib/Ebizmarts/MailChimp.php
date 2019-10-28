@@ -17,6 +17,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AutomationEmails.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AutomationEmailsQueue.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Exceptions.php';
+    include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/HttpError.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/AuthorizedApps.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/Automation.php';
     include_once dirname(__FILE__) . '/Ebizmarts/MailChimp/BatchOperations.php';
@@ -75,6 +76,7 @@ if (defined("COMPILER_INCLUDE_PATH")) {
     include_once dirname(__FILE__) . '/MailChimp/AutomationEmails.php';
     include_once dirname(__FILE__) . '/MailChimp/AutomationEmailsQueue.php';
     include_once dirname(__FILE__) . '/MailChimp/Exceptions.php';
+    include_once dirname(__FILE__) . '/MailChimp/HttpError.php';
     include_once dirname(__FILE__) . '/MailChimp/AuthorizedApps.php';
     include_once dirname(__FILE__) . '/MailChimp/Automation.php';
     include_once dirname(__FILE__) . '/MailChimp/BatchOperations.php';
@@ -130,67 +132,95 @@ if (defined("COMPILER_INCLUDE_PATH")) {
 
 class Ebizmarts_MailChimp
 {
-    /** @var MailChimp_BatchOperations */
+    /**
+     * @var MailChimp_BatchOperations
+     */
     public $batchOperation;
 
-    /** @var MailChimp_Root */
+    /**
+     * @var MailChimp_Root
+     */
     public $root;
 
-    /** @var MailChimp_AuthorizedApps */
+    /**
+     * @var MailChimp_AuthorizedApps
+     */
     public $authorizedApps;
 
-    /** @var MailChimp_Automation */
+    /**
+     * @var MailChimp_Automation
+     */
     public $automation;
 
-    /** @var MailChimp_CampaignFolders */
+    /**
+     * @var MailChimp_CampaignFolders
+     */
     public $campaignFolders;
 
-    /** @var MailChimp_Campaigns */
+    /**
+     * @var MailChimp_Campaigns
+     */
     public $campaigns;
 
-    /** @var MailChimp_Conversations  */
+    /**
+     * @var MailChimp_Conversations
+     */
     public $conversations;
 
-    /** @var MailChimp_Ecommerce  */
+    /**
+     * @var MailChimp_Ecommerce
+     */
     public $ecommerce;
 
-    /** @var MailChimp_FileManagerFiles  */
+    /**
+     * @var MailChimp_FileManagerFiles
+     */
     public $fileManagerFiles;
 
-    /** @var MailChimp_FileManagerFolders  */
+    /**
+     * @var MailChimp_FileManagerFolders
+     */
     public $fileManagerFolders;
 
-    /** @var MailChimp_Lists  */
+    /**
+     * @var MailChimp_Lists
+     */
     public $lists;
 
-    /** @var MailChimp_Reports  */
+    /**
+     * @var MailChimp_Reports
+     */
     public $reports;
 
-    /** @var MailChimp_TemplateFolders  */
+    /**
+     * @var MailChimp_TemplateFolders
+     */
     public $templateFolders;
 
-    /** @var MailChimp_Templates  */
+    /**
+     * @var MailChimp_Templates
+     */
     public $templates;
 
     protected $_apiKey;
-    protected $_ch;
-    protected $_root    = 'https://api.mailchimp.com/3.0';
-    protected $_debug   = false;
+    protected $_curlOptions = array();
+    protected $_root = 'https://api.mailchimp.com/3.0';
+    protected $_debug = false;
 
-    const POST      = 'POST';
-    const GET       = 'GET';
-    const PATCH     = 'PATCH';
-    const DELETE    = 'DELETE';
-    const PUT       = 'PUT';
+    const POST = 'POST';
+    const GET = 'GET';
+    const PATCH = 'PATCH';
+    const DELETE = 'DELETE';
+    const PUT = 'PUT';
 
-    public function __construct($apiKey=null,$opts=array(),$userAgent=null)
+    public function __construct($apiKey = null, $opts = array(), $userAgent = null)
     {
         if (!$apiKey) {
             throw new MailChimp_Error('You must provide a MailChimp API key');
         }
 
-        $this->_apiKey   = $apiKey;
-        $dc             = 'us1';
+        $this->_apiKey = $apiKey;
+        $dc = 'us1';
         if (strstr($this->_apiKey, "-")) {
             list($key, $dc) = explode("-", $this->_apiKey, 2);
             if (!$dc) {
@@ -209,79 +239,79 @@ class Ebizmarts_MailChimp
             $this->_debug = true;
         }
 
-
-        $this->_ch = curl_init();
+        $curlOptions = array();
 
         if (isset($opts['CURLOPT_FOLLOWLOCATION']) && $opts['CURLOPT_FOLLOWLOCATION'] === true) {
-            curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, true);
+            $curlOptions[CURLOPT_FOLLOWLOCATION] = true;
         }
 
         if ($userAgent) {
-            curl_setopt($this->_ch, CURLOPT_USERAGENT, $userAgent);
+            $curlOptions[CURLOPT_USERAGENT] = $userAgent;
         } else {
-            curl_setopt($this->_ch, CURLOPT_USERAGENT, 'Ebizmart-MailChimp-PHP/3.0.0');
+            $curlOptions[CURLOPT_USERAGENT] = 'Ebizmart-MailChimp-PHP/3.0.0';
         }
 
-        curl_setopt($this->_ch, CURLOPT_HEADER, false);
-        curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->_ch, CURLOPT_CONNECTTIMEOUT,  $opts['timeout']);
-        curl_setopt($this->_ch, CURLOPT_TIMEOUT, $opts['timeout']);
-        curl_setopt($this->_ch, CURLOPT_USERPWD, "noname:".$this->_apiKey);
+        $curlOptions[CURLOPT_HEADER] = false;
+        $curlOptions[CURLOPT_RETURNTRANSFER] = true;
+        $curlOptions[CURLOPT_CONNECTTIMEOUT] = $opts['timeout'];
+        $curlOptions[CURLOPT_TIMEOUT] = $opts['timeout'];
+        $curlOptions[CURLOPT_USERPWD] = "noname:" . $this->_apiKey;
+        $this->setCurlOptionsAddOptions($curlOptions);
 
-        $this->root                                         = new MailChimp_Root($this);
-        $this->authorizedApps                               = new MailChimp_AuthorizedApps($this);
-        $this->automation                                   = new MailChimp_Automation($this);
-        $this->automation->emails                           = new MailChimp_AutomationEmails($this);
-        $this->automation->emails->queue                    = new MailChimp_AutomationEmailsQuque($this);
-        $this->batchOperation                               = new MailChimp_BatchOperations($this);
-        $this->campaignFolders                              = new MailChimp_CampaignFolders($this);
-        $this->campaigns                                    = new MailChimp_Campaigns($this);
-        $this->campaigns->content                           = new MailChimp_CampaignsContent($this);
-        $this->campaigns->feedback                          = new MailChimp_CampaignsFeedback($this);
-        $this->campaigns->sendChecklist                     = new MailChimp_CampaignsSendChecklist($this);
-        $this->conversations                                = new MailChimp_Conversations($this);
-        $this->conversations->messages                      = new MailChimp_ConversationsMessages($this);
-        $this->ecommerce                                    = new MailChimp_Ecommerce($this);
-        $this->ecommerce->stores                            = new MailChimp_EcommerceStore($this);
-        $this->ecommerce->carts                             = new MailChimp_EcommerceCarts($this);
-        $this->ecommerce->customers                         = new MailChimp_EcommerceCustomers($this);
-        $this->ecommerce->orders                            = new MailChimp_EcommerceOrders($this);
-        $this->ecommerce->orders->lines                     = new MailChimp_EcommerceOrdersLines($this);
-        $this->ecommerce->products                          = new MailChimp_EcommerceProducts($this);
-        $this->ecommerce->products->variants                = new MailChimp_EcommerceProductsVariants($this);
-        $this->ecommerce->promoRules                        = new MailChimp_EcommercePromoRules($this);
-        $this->ecommerce->promoRules->promoCodes            = new MailChimp_EcommercePromoRulesPromoCodes($this);
-        $this->fileManagerFiles                             = new MailChimp_FileManagerFiles($this);
-        $this->fileManagerFolders                           = new MailChimp_FileManagerFolders($this);
-        $this->lists                                        = new MailChimp_Lists($this);
-        $this->lists->abuseReports                          = new MailChimp_ListsAbuseReports($this);
-        $this->lists->activity                              = new MailChimp_ListsActivity($this);
-        $this->lists->clients                               = new MailChimp_ListsClients($this);
-        $this->lists->growthHistory                         = new MailChimp_ListsGrowthHistory($this);
-        $this->lists->interestCategory                      = new MailChimp_ListsInterestCategory($this);
-        $this->lists->interestCategory->interests           = new MailChimp_ListInterestCategoryInterests($this);
-        $this->lists->members                               = new MailChimp_ListsMembers($this);
-        $this->lists->members->memberActivity               = new MailChimp_ListsMembersActivity($this);
-        $this->lists->members->memberGoal                   = new MailChimp_ListsMembersGoals($this);
-        $this->lists->members->memberNotes                  = new MailChimp_ListsMembersNotes($this);
-        $this->lists->mergeFields                           = new MailChimp_ListsMergeFields($this);
-        $this->lists->segments                              = new MailChimp_ListsSegments($this);
-        $this->lists->segments->segmentMembers              = new MailChimp_ListsSegmentsMembers($this);
-        $this->lists->webhooks                              = new MailChimp_ListsWebhooks($this);
-        $this->reports                                      = new MailChimp_Reports($this);
-        $this->reports->campaignAdvice                      = new MailChimp_ReportsCampaignAdvice($this);
-        $this->reports->clickReports                        = new MailChimp_ReportsClickReports($this);
-        $this->reports->clickReports->clickReportMembers    = new MailChimp_ReportsClickReportsMembers($this);
-        $this->reports->domainPerformance                   = new MailChimp_ReportsDomainPerformance($this);
-        $this->reports->eapURLReport                        = new MailChimp_ReportsEapURLReport($this);
-        $this->reports->emailActivity                       = new MailChimp_ReportsEmailActivity($this);
-        $this->reports->location                            = new MailChimp_ReportsLocation($this);
-        $this->reports->sentTo                              = new MailChimp_ReportsSentTo($this);
-        $this->reports->subReports                          = new MailChimp_ReportsSubReports($this);
-        $this->reports->unsubscribes                        = new MailChimp_ReportsUnsubscribes($this);
-        $this->templateFolders                              = new MailChimp_TemplateFolders($this);
-        $this->templates                                    = new MailChimp_Templates($this);
-        $this->templates->defaultContent                    = new MailChimp_TemplatesDefaultContent($this);
+        $this->root = new MailChimp_Root($this);
+        $this->authorizedApps = new MailChimp_AuthorizedApps($this);
+        $this->automation = new MailChimp_Automation($this);
+        $this->automation->emails = new MailChimp_AutomationEmails($this);
+        $this->automation->emails->queue = new MailChimp_AutomationEmailsQuque($this);
+        $this->batchOperation = new MailChimp_BatchOperations($this);
+        $this->campaignFolders = new MailChimp_CampaignFolders($this);
+        $this->campaigns = new MailChimp_Campaigns($this);
+        $this->campaigns->content = new MailChimp_CampaignsContent($this);
+        $this->campaigns->feedback = new MailChimp_CampaignsFeedback($this);
+        $this->campaigns->sendChecklist = new MailChimp_CampaignsSendChecklist($this);
+        $this->conversations = new MailChimp_Conversations($this);
+        $this->conversations->messages = new MailChimp_ConversationsMessages($this);
+        $this->ecommerce = new MailChimp_Ecommerce($this);
+        $this->ecommerce->stores = new MailChimp_EcommerceStore($this);
+        $this->ecommerce->carts = new MailChimp_EcommerceCarts($this);
+        $this->ecommerce->customers = new MailChimp_EcommerceCustomers($this);
+        $this->ecommerce->orders = new MailChimp_EcommerceOrders($this);
+        $this->ecommerce->orders->lines = new MailChimp_EcommerceOrdersLines($this);
+        $this->ecommerce->products = new MailChimp_EcommerceProducts($this);
+        $this->ecommerce->products->variants = new MailChimp_EcommerceProductsVariants($this);
+        $this->ecommerce->promoRules = new MailChimp_EcommercePromoRules($this);
+        $this->ecommerce->promoRules->promoCodes = new MailChimp_EcommercePromoRulesPromoCodes($this);
+        $this->fileManagerFiles = new MailChimp_FileManagerFiles($this);
+        $this->fileManagerFolders = new MailChimp_FileManagerFolders($this);
+        $this->lists = new MailChimp_Lists($this);
+        $this->lists->abuseReports = new MailChimp_ListsAbuseReports($this);
+        $this->lists->activity = new MailChimp_ListsActivity($this);
+        $this->lists->clients = new MailChimp_ListsClients($this);
+        $this->lists->growthHistory = new MailChimp_ListsGrowthHistory($this);
+        $this->lists->interestCategory = new MailChimp_ListsInterestCategory($this);
+        $this->lists->interestCategory->interests = new MailChimp_ListInterestCategoryInterests($this);
+        $this->lists->members = new MailChimp_ListsMembers($this);
+        $this->lists->members->memberActivity = new MailChimp_ListsMembersActivity($this);
+        $this->lists->members->memberGoal = new MailChimp_ListsMembersGoals($this);
+        $this->lists->members->memberNotes = new MailChimp_ListsMembersNotes($this);
+        $this->lists->mergeFields = new MailChimp_ListsMergeFields($this);
+        $this->lists->segments = new MailChimp_ListsSegments($this);
+        $this->lists->segments->segmentMembers = new MailChimp_ListsSegmentsMembers($this);
+        $this->lists->webhooks = new MailChimp_ListsWebhooks($this);
+        $this->reports = new MailChimp_Reports($this);
+        $this->reports->campaignAdvice = new MailChimp_ReportsCampaignAdvice($this);
+        $this->reports->clickReports = new MailChimp_ReportsClickReports($this);
+        $this->reports->clickReports->clickReportMembers = new MailChimp_ReportsClickReportsMembers($this);
+        $this->reports->domainPerformance = new MailChimp_ReportsDomainPerformance($this);
+        $this->reports->eapURLReport = new MailChimp_ReportsEapURLReport($this);
+        $this->reports->emailActivity = new MailChimp_ReportsEmailActivity($this);
+        $this->reports->location = new MailChimp_ReportsLocation($this);
+        $this->reports->sentTo = new MailChimp_ReportsSentTo($this);
+        $this->reports->subReports = new MailChimp_ReportsSubReports($this);
+        $this->reports->unsubscribes = new MailChimp_ReportsUnsubscribes($this);
+        $this->templateFolders = new MailChimp_TemplateFolders($this);
+        $this->templates = new MailChimp_Templates($this);
+        $this->templates->defaultContent = new MailChimp_TemplatesDefaultContent($this);
     }
 
     /**
@@ -324,7 +354,7 @@ class Ebizmarts_MailChimp
         return $this->campaigns;
     }
 
-    public function call($url,$params,$method=Ebizmarts_MailChimp::GET,$encodeJson=true)
+    public function call($url, $params, $method = Ebizmarts_MailChimp::GET, $encodeJson = true)
     {
         $paramsOrig = $params;
 
@@ -333,7 +363,7 @@ class Ebizmarts_MailChimp
             $hasParams = false;
         }
 
-        if ($hasParams && $encodeJson && $method!=Ebizmarts_MailChimp::GET) {
+        if ($hasParams && $encodeJson && $method != Ebizmarts_MailChimp::GET) {
             $params = json_encode($params);
         }
 
@@ -346,41 +376,58 @@ class Ebizmarts_MailChimp
             $headers[] = 'Accept-Language: ' . $paramsOrig['language'];
         }
 
-        $ch = $this->_ch;
+        $curlOptions = $this->_curlOptions;
+
         if ($hasParams && $method != Ebizmarts_MailChimp::GET) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            $curlOptions[CURLOPT_POSTFIELDS] = $params;
         } else {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, null);
+            $curlOptions[CURLOPT_POSTFIELDS] = null;
+
             if ($hasParams) {
                 $_params = http_build_query($params);
                 $url .= '?' . $_params;
             }
         }
 
-        curl_setopt($ch, CURLOPT_URL, $this->_root . $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        $curlOptions[CURLOPT_URL] = $this->_root . $url;
+        $curlOptions[CURLOPT_HTTPHEADER] = $headers;
+        $curlOptions[CURLOPT_VERBOSE] = $this->_debug;
+        $curlOptions[CURLOPT_CUSTOMREQUEST] = $method;
 
-        $responseBody = curl_exec($ch);
+        /**
+         * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
+         */
+        $curlHelper = Mage::helper('mailchimp/curl');
+        $curlResult = $curlHelper->curlExec($curlOptions);
 
-        $info = curl_getinfo($ch);
-
+        $responseBody = $curlResult['response'];
+        $info = $curlResult['info'];
+        $curlError = $curlResult['error'];
         $result = json_decode($responseBody, true);
 
-
-        if (curl_error($ch)) {
-            throw new MailChimp_Error("API call to $url failed: " . curl_error($ch));
+        if (!empty($curlError)) {
+            throw new MailChimp_HttpError($url, $method, $params, '', "API call to $url failed: " . $curlError);
         }
 
         if (floor($info['http_code'] / 100) >= 4) {
-            $detail = array_key_exists('detail', $result) ? $result['detail'] : '';
-            $errors = array_key_exists('errors',$result) ? $result['errors'] : null;
-            $title = array_key_exists('title',$result) ? $result['title'] : '';
-
-            throw new MailChimp_Error($this->_root . $url, $method, $params, $title, $detail, $errors);
+            if (is_array($result)) {
+                $detail = array_key_exists('detail', $result) ? $result['detail'] : '';
+                $errors = array_key_exists('errors', $result) ? $result['errors'] : null;
+                $title = array_key_exists('title', $result) ? $result['title'] : '';
+                throw new MailChimp_HttpError($this->_root . $url, $method, $params, $title, $detail, $errors);
+            } else {
+                throw new MailChimp_HttpError($this->_root . $url, $method, $params, $result);
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $curlOptions
+     */
+    protected function setCurlOptionsAddOptions($curlOptions = array())
+    {
+        $this->_curlOptions += $curlOptions;
     }
 }

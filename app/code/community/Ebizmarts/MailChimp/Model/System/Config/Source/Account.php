@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected $helper;
+    protected $_helper;
 
     const USERNAME_KEY = 0;
     const TOTAL_ACCOUNT_SUB_KEY = 1;
@@ -48,38 +48,48 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
 
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_Account constructor.
-     * @param $params
+     *
+     * @param  $params
      * @throws Exception
      */
     public function __construct($params)
     {
         $mcStore = null;
-        $helper = $this->helper = $this->makeHelper();
+        $helper = $this->_helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        $apiKey = (empty($params)) ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']) : $params['api_key'];
+        $apiKey = (empty($params))
+            ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope'])
+            : $params['api_key'];
         if ($apiKey) {
             try {
                 $api = $helper->getApiByKey($apiKey);
                 try {
                     $this->_accountDetails = $api->getRoot()->info('account_name,total_subscribers');
 
-                    $mcStoreId = (empty($params)) ? $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope']) : $params['mailchimp_store_id'];
+                    $mcStoreId = (empty($params))
+                        ? $helper->getMCStoreId($scopeArray['scope_id'], $scopeArray['scope'])
+                        : $params['mailchimp_store_id'];
                     try {
-                        $mcStore = (!empty($mcStoreId)) ? $api->getEcommerce()->getStores()->get($mcStoreId, 'list_id,name,is_syncing') : array();
+                        $mcStore = (!empty($mcStoreId))
+                            ? $api->getEcommerce()->getStores()->get($mcStoreId, 'list_id,name,is_syncing')
+                            : array();
 
                         if (empty($mcStore)) {
                             $this->_accountDetails['store_exists'] = false;
                         }
-
                     } catch (MailChimp_Error $e) {
                         if ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
-                            $message = $helper->__('Looks like your Mailchimp store was deleted. Please create a new one and associate it in order to get your Ecommerce data synced.');
+                            $message = $helper->__(
+                                'It seems your Mailchimp store was deleted. '
+                                . 'Please create a new one and associate it in order to get your Ecommerce data synced.'
+                            );
                             Mage::getSingleton('adminhtml/session')->addWarning($message);
                         }
+
                         $this->_accountDetails['store_exists'] = false;
                     }
-                    try {
 
+                    try {
                         $listId = (isset($mcStore['list_id']) && $mcStore['list_id']) ? $mcStore['list_id'] : null;
 
 
@@ -104,7 +114,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                             $totalCarts = $ecommerceApi->getCarts()->getAll($mcStoreId, 'total_items');
                             $this->_accountDetails['total_carts'] = $totalCarts['total_items'];
                         }
-
                     } catch (MailChimp_Error $e) {
                         $helper->logError($e->getMessage());
                     }
@@ -128,16 +137,17 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      */
     public function toOptionArray()
     {
-        $helper = $this->helper;
+        $helper = $this->_helper;
         $scopeArray = $helper->getCurrentScope();
         if (is_array($this->_accountDetails)) {
             $totalAccountSubscribersText = $helper->__('Total Account Subscribers:');
             $totalAccountSubscribers = $totalAccountSubscribersText . ' ' . $this->_accountDetails['total_subscribers'];
             $totalListSubscribers = null;
             if (isset($this->_accountDetails['list_subscribers'])) {
-                $totalListSubscribersText = $helper->__('Total List Subscribers:');
+                $totalListSubscribersText = $helper->__('Total Audience Subscribers:');
                 $totalListSubscribers = $totalListSubscribersText . ' ' . $this->_accountDetails['list_subscribers'];
             }
+
             $username = $helper->__('Username:') . ' ' . $this->_accountDetails['account_name'];
             $returnArray = array(
                 array('value' => self::USERNAME_KEY, 'label' => $username),
@@ -146,6 +156,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
             if ($totalListSubscribers) {
                 $returnArray[] = array('value' => self::TOTAL_LIST_SUB_KEY, 'label' => $totalListSubscribers);
             }
+
             if ($this->_accountDetails['store_exists']) {
                 $totalCustomersText = $helper->__('  Total Customers:');
                 $totalCustomers = $totalCustomersText . ' ' . $this->_accountDetails['total_customers'];
@@ -155,8 +166,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 $totalOrders = $totalOrdersText . ' ' . $this->_accountDetails['total_orders'];
                 $totalCartsText = $helper->__('  Total Carts:');
                 $totalCarts = $totalCartsText . ' ' . $this->_accountDetails['total_carts'];
-                $title = $helper->__('Ecommerce Data uploaded to Mailchimp store ') . $this->_accountDetails['store_name'] . ':';
-                if ($this->_accountDetails['store_sync_flag'] && !$this->_accountDetails['store_sync_date'] && !$helper->getResendEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
+                $title = $helper->__('Ecommerce Data uploaded to Mailchimp store ')
+                    . $this->_accountDetails['store_name']
+                    . ':';
+                if ($this->_accountDetails['store_sync_flag']
+                    && !$this->_accountDetails['store_sync_date']
+                    && !$helper->getResendEnabled($scopeArray['scope_id'], $scopeArray['scope'])
+                ) {
                     $syncValue = self::IN_PROGRESS;
                 } else {
                     $syncData = $this->_accountDetails['store_sync_date'];
@@ -166,6 +182,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                         $syncValue = self::FINISHED;
                     }
                 }
+
                 $syncLabel = $helper->__('Initial sync') . ': ' . $syncValue;
                 $returnArray = array_merge(
                     $returnArray,
@@ -179,7 +196,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     )
                 );
             } elseif ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'], true)) {
-                $noStoreText = $helper->__('No MailChimp store was configured for this scope, parent scopes might be sending data for this store anyways.');
+                $noStoreText = $helper->__(
+                    'No MailChimp store was configured for this scope, parent scopes might be '
+                    . 'sending data for this store anyways.'
+                );
                 $returnArray = array_merge(
                     $returnArray,
                     array(
@@ -188,8 +208,13 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 );
             }
 
-            if (!$helper->migrationFinished() && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
-                $storeMigrationText = $helper->__('The store data is currently being migrated to the new version. This process might take a while depending on the amount of data in Magento.');
+            if (!$helper->migrationFinished()
+                && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])
+            ) {
+                $storeMigrationText = $helper->__(
+                    'The store data is currently being migrated to the new version. This process '
+                    . 'might take a while depending on the amount of data in Magento.'
+                );
                 $returnArray = array_merge(
                     $returnArray,
                     array(
@@ -214,10 +239,18 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
         return Mage::helper('mailchimp');
     }
 
+    /**
+     * @param $mailchimpStoreId
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     protected function getDateSync($mailchimpStoreId)
     {
-        $date = $this->makeHelper()->getConfigValueForScope(Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId", 0, 'default');
+        $date = $this->makeHelper()->getConfigValueForScope(
+            Ebizmarts_MailChimp_Model_Config::ECOMMERCE_SYNC_DATE . "_$mailchimpStoreId",
+            0,
+            'default'
+        );
         return $date;
     }
-
 }

@@ -40,6 +40,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
         $batchId = $error->getBatchId();
         $storeId = $error->getStoreId();
         $mailchimpStoreId = $error->getMailchimpStoreId();
+
         if ($mailchimpStoreId) {
             $enabled = $helper->isEcomSyncDataEnabled($storeId);
         } else {
@@ -51,6 +52,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
             $response->setHeader('Content-disposition', 'attachment; filename=' . $batchId . '.json');
             $response->setHeader('Content-type', 'application/json');
             $counter = 0;
+
             do {
                 $counter++;
                 $files = $apiBatches->getBatchResponse($batchId, $storeId);
@@ -59,16 +61,23 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
                     $fileContent = $this->__("Response was deleted from MailChimp server.");
                     break;
                 }
+
                 foreach ($files as $file) {
                     $items = $this->getFileContent($file);
+
                     foreach ($items as $item) {
-                        $fileContent[] = array('status_code' => $item->status_code, 'operation_id' => $item->operation_id, 'response' => json_decode($item->response));
+                        $fileContent[] = array(
+                            'status_code' => $item['status_code'],
+                            'operation_id' => $item['operation_id'],
+                            'response' => json_decode($item['response'])
+                        );
                     }
 
                     $this->unlink($file);
                 }
 
                 $baseDir = $apiBatches->getMagentoBaseDir();
+
                 if ($apiBatches->batchDirExists($baseDir, $batchId)) {
                     $apiBatches->removeBatchDir($baseDir, $batchId);
                 }
@@ -76,6 +85,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
 
             $response->setBody(json_encode($fileContent, JSON_PRETTY_PRINT));
         }
+
         return;
     }
 
@@ -122,7 +132,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
      */
     protected function getFileContent($file)
     {
-        return json_decode(file_get_contents($file));
+        $fileContent = $this->getFileHelper()->read($file);
+
+        return json_decode($fileContent, true);
     }
 
     /**
@@ -130,6 +142,14 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimperrorsController extends Mage_Admin
      */
     protected function unlink($file)
     {
-        unlink($file);
+        return $this->getFileHelper()->unlink($file);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_File
+     */
+    protected function getFileHelper()
+    {
+        return Mage::helper('mailchimp/file');
     }
 }

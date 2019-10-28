@@ -29,7 +29,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_CreateWebhook
                         'id' => 'createwebhook_button',
                         'label' => $helper->__('Create Webhook'),
                         'onclick' => 'javascript:createwebhook(); return false;',
-                        'title' => $helper->__('Create the webhook for the list in current scope')
+                        'title' => $helper->__('Create the webhook for the audience in current scope')
                     )
                 );
 

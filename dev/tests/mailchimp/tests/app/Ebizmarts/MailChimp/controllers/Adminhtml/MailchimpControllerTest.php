@@ -7,17 +7,17 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
     /**
      * @var Ebizmarts_MailChimp_Adminhtml_MailchimpController $mailchimpController
      */
-    private $mailchimpController;
+    protected $_mailchimpController;
 
     public function setUp()
     {
         Mage::app('default');
-        $this->mailchimpController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimpController::class);
+        $this->_mailchimpController = $this->getMockBuilder(Ebizmarts_MailChimp_Adminhtml_MailchimpController::class);
     }
 
     public function tearDown()
     {
-        $this->mailchimpController = null;
+        $this->_mailchimpController = null;
     }
 
     public function testIndexAction()
@@ -27,7 +27,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $name = 'admin.customer.mailchimp';
         $result = '<body></body>';
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'getResponse', 'getLayout', 'getHtml'))
             ->getMock();
@@ -79,7 +79,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $scopeId = 1;
         $result = 1;
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getHelper'))
             ->getMock();
@@ -112,7 +112,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
@@ -135,7 +136,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $listId = 'ca841a1103';
         $message = 1;
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getHelper'))
             ->getMock();
@@ -169,13 +170,18 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $requestMock->expects($this->exactly(2))->method('getParam')->withConsecutive(
             array($paramScope),
-            array($paramScopeId))
+            array($paramScopeId)
+        )
             ->willReturnOnConsecutiveCalls(
                 $scope,
                 $scopeId
             );
 
-        $helperMock->expects($this->once())->method('createNewWebhook')->with($scopeId, $scope, $listId)->willReturn($message);
+        $helperMock
+            ->expects($this->once())
+            ->method('createNewWebhook')
+            ->with($scopeId, $scope, $listId)
+            ->willReturn($message);
         $mageAppMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $responseMock->expects($this->once())->method('setBody')->with($message);
@@ -188,10 +194,14 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $apiKeyParam = 'api_key';
         $apiKey = 'a1s2d3f4g5h6j7k8l9z1x2c3v4v4-us1';
 
-        $data = array(array('id' => '', 'name' => '--- Select a Mailchimp Store ---'), array('id' => 'a1s2d3f4g5h6j7k8l9p0', 'name' => 'Madison Island - English'));
-        $jsonData = '[{"id":"","name":"--- Select a Mailchimp Store ---"},{"id":"a1s2d3f4g5h6j7k8l9p0","name":"Madison Island - English"}]';
+        $data = array(
+            array('id' => '', 'name' => '--- Select a Mailchimp Store ---'),
+            array('id' => 'a1s2d3f4g5h6j7k8l9p0', 'name' => 'Madison Island - English')
+        );
+        $jsonData = '[{"id":"","name":"--- Select a Mailchimp Store ---"},'
+            . '{"id":"a1s2d3f4g5h6j7k8l9p0","name":"Madison Island - English"}]';
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'getResponse', 'getSourceStoreOptions', 'getHelper'))
             ->getMock();
@@ -217,7 +227,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $requestMock->expects($this->once())->method('getParam')->with($apiKeyParam)->willReturn($apiKey);
         $helperMock->expects($this->once())->method('isApiKeyObscure')->with($apiKey)->willReturn(false);
 
-        $mailchimpControllerMock->expects($this->once())->method('getSourceStoreOptions')->with($apiKey)->willReturn($data);
+        $mailchimpControllerMock
+            ->expects($this->once())
+            ->method('getSourceStoreOptions')
+            ->with($apiKey)
+            ->willReturn($data);
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $responseMock->expects($this->once())->method('setHeader')->with('Content-type', 'application/json');
@@ -235,10 +249,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $syncDate = "2019-02-01 20:00:05";
         $optionSyncFlag = array(
             'value' => Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY,
-            'label' => 'Initial sync: '.$syncDate
+            'label' => 'Initial sync: ' . $syncDate
         );
         $liElement = "<li>Initial sync: <span style='color: forestgreen;font-weight: bold;'>$syncDate</span></li>";
-        $liElementEscaped = "<li>Initial sync: <span style='color: forestgreen;font-weight: bold;'>$syncDate<\/span><\/li>";
+        $liElementEscaped = "<li>Initial sync: <span style='color: forestgreen;font-weight: bold;'>"
+            . "$syncDate<\/span><\/li>";
         $data = array(
             array(
                 'value' => Ebizmarts_MailChimp_Model_System_Config_Source_Account::USERNAME_KEY,
@@ -268,17 +283,26 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
                 'label' => '  Total Carts: 10'
             )
         );
-        $jsonData = '[{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::USERNAME_KEY.',"label":"Username: Ebizmarts Corp."},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ACCOUNT_SUB_KEY.',"label":"Total Account Subscribers: 104"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_LIST_SUB_KEY.',"label":"Total List Subscribers: 18"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::STORENAME_KEY.',"label":"Ecommerce Data uploaded to MailChimp store Madison Island - English:"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY.',"label":"'.$liElementEscaped.'"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_CUS_KEY.',"label":"  Total Customers: 10"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_PRO_KEY.',"label":"  Total Products: 10"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ORD_KEY.',"label":"  Total Orders: 10"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_QUO_KEY.',"label":"  Total Carts: 10"}]';
+        $jsonData = '[{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::USERNAME_KEY
+            . ',"label":"Username: Ebizmarts Corp."},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ACCOUNT_SUB_KEY
+            . ',"label":"Total Account Subscribers: 104"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_LIST_SUB_KEY
+            . ',"label":"Total List Subscribers: 18"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::STORENAME_KEY
+            . ',"label":"Ecommerce Data uploaded to MailChimp store Madison Island - English:"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY
+            . ',"label":"' . $liElementEscaped . '"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_CUS_KEY
+            . ',"label":"  Total Customers: 10"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_PRO_KEY
+            . ',"label":"  Total Products: 10"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ORD_KEY
+            . ',"label":"  Total Orders: 10"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_QUO_KEY
+            . ',"label":"  Total Carts: 10"}]';
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getHelper', 'getRequest', 'getSourceAccountInfoOptions', 'getResponse'))
             ->getMock();
@@ -309,9 +333,17 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             $apiKey
         );
 
-        $mailchimpControllerMock->expects($this->once())->method('getSourceAccountInfoOptions')->with($apiKey, $mcStoreId)->willReturn($data);
+        $mailchimpControllerMock
+            ->expects($this->once())
+            ->method('getSourceAccountInfoOptions')
+            ->with($apiKey, $mcStoreId)
+            ->willReturn($data);
 
-        $helperMock->expects($this->once())->method('getSyncFlagDataHtml')->with($optionSyncFlag, "")->willReturn($liElement);
+        $helperMock
+            ->expects($this->once())
+            ->method('getSyncFlagDataHtml')
+            ->with($optionSyncFlag, "")
+            ->willReturn($liElement);
 
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
@@ -330,9 +362,9 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $listId = 'a1s2d3f4g5';
 
         $data = array(array('id' => $listId, 'name' => 'Newsletter'));
-        $jsonData = '[{"id":"'.$listId.'","name":"Newsletter"}]';
+        $jsonData = '[{"id":"' . $listId . '","name":"Newsletter"}]';
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'getSourceListOptions', 'getResponse', 'getHelper'))
             ->getMock();
@@ -365,7 +397,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $helperMock->expects($this->once())->method('isApiKeyObscure')->with($apiKey)->willReturn(false);
 
-        $mailchimpControllerMock->expects($this->once())->method('getSourceListOptions')->with($apiKey, $mcStoreId)->willReturn($data);
+        $mailchimpControllerMock
+            ->expects($this->once())
+            ->method('getSourceListOptions')
+            ->with($apiKey, $mcStoreId)
+            ->willReturn($data);
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $responseMock->expects($this->once())->method('setHeader')->with('Content-type', 'application/json');
@@ -387,7 +423,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         );
         $jsonData = '[{"value":"bc15dbe6a5","label":"Checkboxes"},{"value":"2a2f23d671","label":"DropDown"}]';
 
-        $mailchimpControllerMock = $this->mailchimpController
+        $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'getSourceInterestOptions', 'getResponse', 'getHelper'))
             ->getMock();
@@ -420,7 +456,11 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $helperMock->expects($this->once())->method('isApiKeyObscure')->with($apiKey)->willReturn(false);
 
-        $mailchimpControllerMock->expects($this->once())->method('getSourceInterestOptions')->with($apiKey, $listId)->willReturn($data);
+        $mailchimpControllerMock
+            ->expects($this->once())
+            ->method('getSourceInterestOptions')
+            ->with($apiKey, $listId)
+            ->willReturn($data);
         $mailchimpControllerMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
 
         $responseMock->expects($this->once())->method('setHeader')->with('Content-type', 'application/json');

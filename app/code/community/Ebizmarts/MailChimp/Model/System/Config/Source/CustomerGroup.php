@@ -14,16 +14,19 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     /**
      * Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup constructor.
      *
-     * Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup constructor.
-     * @param $params
+     * @param  $params
      * @throws Mage_Core_Exception
      */
     public function __construct($params)
     {
         $helper = $this->makeHelper();
         $scopeArray = $helper->getCurrentScope();
-        $apiKey = (!empty($params)) ? $params['api_key'] : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
-        $listId = (!empty($params)) ? $params['list_id'] : $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
+        $apiKey = (!empty($params))
+            ? $params['api_key']
+            : $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope']);
+        $listId = (!empty($params))
+            ? $params['list_id']
+            : $helper->getGeneralList($scopeArray['scope_id'], $scopeArray['scope']);
 
         if (!empty($apiKey) && !empty($listId)) {
             $this->_categories = $helper->getListInterestCategoriesByKeyAndList($apiKey, $listId);
@@ -46,6 +49,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
         } else {
             $groups[] = array('value' => '', 'label' => $helper->__('--- No data ---'));
         }
+
         return $groups;
     }
 
@@ -56,5 +60,4 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_CustomerGroup
     {
         return Mage::helper('mailchimp');
     }
-
 }

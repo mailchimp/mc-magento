@@ -10,8 +10,7 @@
  * @file:     Hint.php
  */
 class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
-    extends Mage_Adminhtml_Block_Abstract
-    implements Varien_Data_Form_Element_Renderer_Interface
+    extends Mage_Adminhtml_Block_Abstract implements Varien_Data_Form_Element_Renderer_Interface
 {
     protected $_template = 'ebizmarts/mailchimp/system/config/fieldset/hint.phtml';
 
@@ -98,7 +97,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    private function makeHelper()
+    protected function makeHelper()
     {
         return Mage::helper('mailchimp');
     }

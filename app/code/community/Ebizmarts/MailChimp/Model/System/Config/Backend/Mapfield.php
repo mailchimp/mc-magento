@@ -10,10 +10,18 @@
  * @date:     8/4/16 5:56 PM
  * @file:     Apikey.php
  */
-class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield extends Mage_Adminhtml_Model_System_Config_Backend_Serialized_Array
+class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield
+    extends Mage_Adminhtml_Model_System_Config_Backend_Serialized_Array
 {
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Data
+     */
+    protected $_helper;
+
     protected function _afterLoad()
     {
+        $this->_helper = Mage::helper('mailchimp');
+
         if (!is_array($this->getValue())) {
             if (is_object($this->getValue())) {
                 $serializedValue = $this->getValue()->asArray();
@@ -22,9 +30,10 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Mapfield extends Mage_Admi
             }
 
             $unserializedValue = false;
+
             if (!empty($serializedValue)) {
                 try {
-                    $unserializedValue = unserialize($serializedValue);
+                    $unserializedValue = $this->_helper->unserialize($serializedValue);
                 } catch (Exception $e) {
                     Mage::logException($e);
                 }

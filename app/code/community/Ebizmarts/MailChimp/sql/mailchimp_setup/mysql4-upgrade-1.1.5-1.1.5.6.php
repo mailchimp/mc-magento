@@ -39,13 +39,20 @@ try {
  ADD column `store_id` INT(5) DEFAULT 0;
  "
     );
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }
 
-Mage::helper('mailchimp')->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115, 1)), 0, 'default');
+Mage::helper('mailchimp')
+    ->saveMailChimpConfig(
+        array(
+            array(
+                Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
+                1)
+        ),
+        0,
+        'default'
+    );
 
 
 $installer->endSetup();

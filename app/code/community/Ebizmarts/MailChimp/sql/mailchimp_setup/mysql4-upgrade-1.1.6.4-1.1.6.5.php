@@ -10,7 +10,16 @@ try {
 "
     );
 
-    Mage::helper('mailchimp')->saveMailChimpConfig(array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164, 1)), 0, 'default');
+    Mage::helper('mailchimp')
+        ->saveMailChimpConfig(
+            array(
+                array(
+                    Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164,
+                    1)
+            ),
+            0,
+            'default'
+        );
 } catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }

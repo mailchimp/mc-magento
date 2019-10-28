@@ -1,19 +1,20 @@
 <?php
+
 /**
  * Created by Ebizmarts Team.
  * Date: 2/20/19
  * Time: 3:11 PM
  */
-class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest  extends PHPUnit_Framework_TestCase
+class Ebizmarts_MailChimp_Block_Adminhtml_NotificationsTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Ebizmarts_MailChimp_Block_Adminhtml_Notifications $_block
+     * @var Ebizmarts_MailChimp_Block_Adminhtml_Notifications $_block
      */
-    private $_block;
+    protected $_block;
     /**
-     * @var \Ebizmarts_MailChimp_Helper_Data $_helperMock
+     * @var Ebizmarts_MailChimp_Helper_Data $_helperMock
      */
-    private $_helperMock;
+    protected $_helperMock;
 
     public function setUp()
     {

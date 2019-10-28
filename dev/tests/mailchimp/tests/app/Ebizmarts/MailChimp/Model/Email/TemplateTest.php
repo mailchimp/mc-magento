@@ -21,18 +21,33 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
         $senderEmail = 'sender@email.com';
         $bcc = array('bcc@email.com');
         $userAgent = 'Ebizmarts_Mandrill1.1.12/MageCE1.9.3.7';
-        $emailArray = array ('subject' => 'subject', 'to' => array(array('email' => $email, 'name' => $name), array('email' => 'bcc@email.com', 'type' => 'bcc')), 'from_name' => 'name',
-            'from_email' => $senderEmail, 'headers' => array($userAgent), 'tags' => array('tagOne', 'tagTwo'), 'html' => 'message');
+        $emailArray = array(
+            'subject' => 'subject',
+            'to' => array(
+                array('email' => $email, 'name' => $name),
+                array('email' => 'bcc@email.com', 'type' => 'bcc')
+            ),
+            'from_name' => 'name',
+            'from_email' => $senderEmail,
+            'headers' => array($userAgent),
+            'tags' => array('tagOne', 'tagTwo'),
+            'html' => 'message');
         $mandrillSenders = array(array('domain' => 'email.com'));
 
         /**
-         * @var \Ebizmarts_MailChimp_Model_Email_Template $templateMock
+         * @var Ebizmarts_MailChimp_Model_Email_Template $templateMock
          */
         $templateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Email_Template::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getDesignConfig', 'isValidForSend', 'setUseAbsoluteLinks', 'getProcessedTemplate',
-                'getProcessedTemplateSubject', 'getSenderEmail', 'getMail', 'getSenderName', 'isPlain', 'makeMandrillHelper',
-                'hasQueue', 'getQueue', 'makeHelper', 'getSendingSetReturnPath', 'getSendersDomains', 'sendMail'))
+            ->setMethods(
+                array(
+                    'getDesignConfig', 'isValidForSend', 'setUseAbsoluteLinks',
+                    'getProcessedTemplate', 'getProcessedTemplateSubject', 'getSenderEmail',
+                    'getMail', 'getSenderName', 'isPlain', 'makeMandrillHelper',
+                    'hasQueue', 'getQueue', 'makeHelper', 'getSendingSetReturnPath',
+                    'getSendersDomains', 'sendMail'
+                )
+            )
             ->getMock();
 
         $varienObjectMock = $this->getMockBuilder(Varien_Object::class)
@@ -60,16 +75,31 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
 
         $templateMock->expects($this->once())->method('isValidForSend')->willReturn(true);
         $templateMock->expects($this->once())->method('setUseAbsoluteLinks')->willReturn(true);
-        $templateMock->expects($this->once())->method('getProcessedTemplate')->with($variables, true)->willReturn($message);
-        $templateMock->expects($this->once())->method('getProcessedTemplateSubject')->with($variables)->willReturn($subject);
+        $templateMock
+            ->expects($this->once())
+            ->method('getProcessedTemplate')
+            ->with($variables, true)
+            ->willReturn($message);
+        $templateMock
+            ->expects($this->once())
+            ->method('getProcessedTemplateSubject')
+            ->with($variables)
+            ->willReturn($subject);
         $templateMock->expects($this->once())->method('getSendingSetReturnPath')->willReturn($returnPath);
-        $templateMock->expects($this->exactly(2))->method('getSenderEmail')->willReturnOnConsecutiveCalls($senderEmail, $senderEmail);
+        $templateMock
+            ->expects($this->exactly(2))
+            ->method('getSenderEmail')
+            ->willReturnOnConsecutiveCalls($senderEmail, $senderEmail);
         $templateMock->expects($this->once())->method('getMail')->willReturn($mailObjectMock);
 
         $mailObjectMock->expects($this->once())->method('getBcc')->willReturn($bcc);
 
         $templateMock->expects($this->once())->method('getSenderName')->willReturn($name);
-        $templateMock->expects($this->once())->method('getSendersDomains')->with($mailObjectMock)->willReturn($mandrillSenders);
+        $templateMock
+            ->expects($this->once())
+            ->method('getSendersDomains')
+            ->with($mailObjectMock)
+            ->willReturn($mandrillSenders);
 
         $mailObjectMock->expects($this->once())->method('getHeaders')->willReturn(array());
 
@@ -100,10 +130,14 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
 
         $templateMock->expects($this->once())->method('getDesignConfig')->willReturn($varienObjectMock);
         $templateMock->expects($this->once())->method('createMandrillMessage')->with($storeId);
-        $templateMock->expects($this->once())->method('isMandrillEnabled')->with($storeId)->willReturnOnConsecutiveCalls(
-            true,
-            true
-        );
+        $templateMock
+            ->expects($this->once())
+            ->method('isMandrillEnabled')
+            ->with($storeId)
+            ->willReturnOnConsecutiveCalls(
+                true,
+                true
+            );
 
         $varienObjectMock->expects($this->once())->method('getStore')->willReturn($storeId);
 

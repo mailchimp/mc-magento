@@ -232,7 +232,7 @@ class Mandrill_Templates
      *
      * @param  string $template_name    the immutable name of a template that exists in the user's account
      * @param  array  $template_content an array of template content to render.  Each item in the array should be a struct with two keys - name: the name of the content block to set the content for, and content: the actual content to put into the block
-     *                                 - template_content[] struct the injection of a single piece of content into a single editable region - name string the name of the mc:edit editable region to inject into - content string the content to inject
+     *                                  - template_content[] struct the injection of a single piece of content into a single editable region - name string the name of the mc:edit editable region to inject into - content string the content to inject
      * @param  array  $merge_vars       optional merge variables to use for injecting merge field content.  If this is not provided, no merge fields will be replaced.
      *                                  - merge_vars[] struct a single merge variable - name string the merge variable's name. Merge variable names are
      *                                  case-insensitive and may not start with _ - content string the merge variable's content
@@ -244,5 +244,4 @@ class Mandrill_Templates
         $_params = array("template_name" => $template_name, "template_content" => $template_content, "merge_vars" => $merge_vars);
         return $this->master->call('templates/render', $_params);
     }
-
 }

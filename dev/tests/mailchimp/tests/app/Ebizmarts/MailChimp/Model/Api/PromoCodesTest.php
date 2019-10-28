@@ -2,7 +2,7 @@
 
 class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_TestCase
 {
-    private $promoCodesApiMock;
+    protected $_promoCodesApiMock;
 
     const BATCH_ID = 'storeid-1_PCD_2017-05-18-14-45-54-38849500';
 
@@ -14,25 +14,35 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
     {
         Mage::app('default');
 
-        /** @var Ebizmarts_MailChimp_Model_Api_PromoCodes $apiPromoCodesMock promoCodesApiMock */
-        $this->promoCodesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoCodes::class);
+        /**
+         * @var Ebizmarts_MailChimp_Model_Api_PromoCodes $apiPromoCodesMock promoCodesApiMock
+         */
+        $this->_promoCodesApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_PromoCodes::class);
     }
 
     public function tearDown()
     {
-        $this->promoCodesApiMock = null;
+        $this->_promoCodesApiMock = null;
     }
 
     public function testCreateBatchJson()
     {
         $magentoStoreId = 1;
         $batchArray = array();
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('_getDeletedPromoCodes', '_getNewPromoCodes'))
             ->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('_getDeletedPromoCodes')->with(self::MC_STORE_ID)->willReturn($batchArray);
-        $promoCodesApiMock->expects($this->once())->method('_getNewPromoCodes')->with(self::MC_STORE_ID, $magentoStoreId)->willReturn($batchArray);
+        $promoCodesApiMock
+            ->expects($this->once())
+            ->method('_getDeletedPromoCodes')
+            ->with(self::MC_STORE_ID)
+            ->willReturn($batchArray);
+        $promoCodesApiMock
+            ->expects($this->once())
+            ->method('_getNewPromoCodes')
+            ->with(self::MC_STORE_ID, $magentoStoreId)
+            ->willReturn($batchArray);
 
         $promoCodesApiMock->createBatchJson(self::MC_STORE_ID, $magentoStoreId);
     }
@@ -42,8 +52,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
     {
         $magentoStoreId = 0;
 
-        $promoCodesApiMock = $this->promoCodesApiMock
-            ->setMethods(array('getPromoCodeResourceCollection', 'addWebsiteColumn', 'joinPromoRuleData', 'getMailChimpHelper'))
+        $promoCodesApiMock = $this->_promoCodesApiMock
+            ->setMethods(
+                array(
+                    'getPromoCodeResourceCollection', 'addWebsiteColumn',
+                    'joinPromoRuleData', 'getHelper'
+                )
+            )
             ->getMock();
 
         $promoCodesCollectionMock = $this->getMockBuilder(Mage_SalesRule_Model_Resource_Coupon_Collection::class)
@@ -55,11 +70,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->setMethods(array('addResendFilter'))
             ->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $promoCodesApiMock->expects($this->once())->method('getHelper')->willReturn($mailChimpHelperMock);
 
-        $promoCodesApiMock->expects($this->once())->method('getPromoCodeResourceCollection')->willReturn($promoCodesCollectionMock);
+        $promoCodesApiMock
+            ->expects($this->once())
+            ->method('getPromoCodeResourceCollection')
+            ->willReturn($promoCodesCollectionMock);
 
-        $mailChimpHelperMock->expects($this->once())->method('addResendFilter')->with($promoCodesCollectionMock, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
+        $mailChimpHelperMock
+            ->expects($this->once())
+            ->method('addResendFilter')
+            ->with($promoCodesCollectionMock, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
 
         $promoCodesApiMock->expects($this->once())->method('addWebsiteColumn')->with($promoCodesCollectionMock);
         $promoCodesApiMock->expects($this->once())->method('joinPromoRuleData')->with($promoCodesCollectionMock);
@@ -69,27 +90,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $this->assertContains(Mage_SalesRule_Model_Resource_Coupon_Collection::class, get_class($return));
     }
 
-    public function testGetSyncDataTableName()
-    {
-        $promoCodesApiMock = $this->promoCodesApiMock
-            ->setMethods(array('getCoreResource'))
-            ->getMock();
-
-        $coreResourceMock = $this->getMockBuilder(Mage_Core_Model_Resource::class)
-            ->setMethods(array('getTableName'))
-            ->getMock();
-
-        $promoCodesApiMock->expects($this->once())->method('getCoreResource')->willReturn($coreResourceMock);
-
-        $coreResourceMock->expects($this->once())->method('getTableName')->with('mailchimp/ecommercesyncdata')->willReturn('mailchimp_ecommerce_sync_data');
-
-        $promoCodesApiMock->getSyncDataTableName();
-    }
-
     public function testMarkAsDeleted()
     {
         $promoRuleId = 1;
-        $promoCodesApiMock = $this->promoCodesApiMock
+        $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(array('_setDeleted'))
             ->getMock();
 
@@ -104,8 +108,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $promoCodesIds = array();
         $syncDataItems = array();
 
-        $promoCodesApiMock = $this->promoCodesApiMock
-            ->setMethods(array('getPromoCodesForRule', 'getMailChimpHelper'))
+        $promoCodesApiMock = $this->_promoCodesApiMock
+            ->setMethods(array('getPromoCodesForRule', 'getHelper'))
             ->getMock();
 
         $promoRuleMock = $this->getMockBuilder(Mage_SalesRule_Model_Rule::class)
@@ -118,7 +122,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->setMethods(array('getAllEcommerceSyncDataItemsPerId'))
             ->getMock();
 
-        $syncDataItemCollectionMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection::class)
+        $syncDataItemCollectionMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -130,12 +135,23 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $promoRuleMock->expects($this->once())->method('getRelatedId')->willReturn($promoRuleId);
 
         $promoCodesIds[] = self::PROMOCODE_ID;
-        $promoCodesApiMock->expects($this->once())->method('getPromoCodesForRule')->with($promoRuleId)->willReturn($promoCodesIds);
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $promoCodesApiMock
+            ->expects($this->once())
+            ->method('getPromoCodesForRule')
+            ->with($promoRuleId)
+            ->willReturn($promoCodesIds);
+        $promoCodesApiMock->expects($this->once())->method('getHelper')->willReturn($mailChimpHelperMock);
 
-        $mailChimpHelperMock->expects($this->once())->method('getAllEcommerceSyncDataItemsPerId')->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)->willReturn($syncDataItemCollectionMock);
+        $mailChimpHelperMock
+            ->expects($this->once())
+            ->method('getAllEcommerceSyncDataItemsPerId')
+            ->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
+            ->willReturn($syncDataItemCollectionMock);
         $syncDataItems[] = $syncDataItemMock;
-        $syncDataItemCollectionMock->expects($this->once())->method("getIterator")->willReturn(new ArrayIterator($syncDataItems));
+        $syncDataItemCollectionMock
+            ->expects($this->once())
+            ->method("getIterator")
+            ->willReturn(new ArrayIterator($syncDataItems));
 
         $syncDataItemMock->expects($this->once())->method('delete');
 
@@ -144,8 +160,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
     public function testDeletePromoCodeSyncData()
     {
-        $promoCodesApiMock = $this->promoCodesApiMock
-            ->setMethods(array('getMailChimpHelper'))
+        $promoCodesApiMock = $this->_promoCodesApiMock
+            ->setMethods(array('getHelper'))
             ->getMock();
 
         $mailChimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -158,9 +174,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->setMethods(array('delete'))
             ->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('getMailChimpHelper')->willReturn($mailChimpHelperMock);
+        $promoCodesApiMock->expects($this->once())->method('getHelper')->willReturn($mailChimpHelperMock);
 
-        $mailChimpHelperMock->expects($this->once())->method('getEcommerceSyncDataItem')->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, self::MC_STORE_ID)->willReturn($syncDataItemMock);
+        $mailChimpHelperMock
+            ->expects($this->once())
+            ->method('getEcommerceSyncDataItem')
+            ->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, self::MC_STORE_ID)
+            ->willReturn($syncDataItemMock);
 
         $syncDataItemMock->expects($this->once())->method('delete');
 

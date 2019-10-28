@@ -23,18 +23,18 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected $helper;
-    protected $storeId;
+    protected $_helper;
+    protected $_storeId;
 
     public function __construct()
     {
         parent::__construct();
         $this->setTemplate('ebizmarts/mailchimp/customer/tab/mailchimp.phtml');
-        $this->helper = $this->makeHelper();
+        $this->_helper = $this->makeHelper();
         $customerId = (int) $this->getRequest()->getParam('id');
         if ($customerId) {
             $this->_customer = $this->getCustomerModel()->load($customerId);
-            $this->storeId = $this->getCustomer()->getStoreId();
+            $this->_storeId = $this->getCustomer()->getStoreId();
         }
     }
 
@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
         $subscriberId = $subscriber->getSubscriberId();
         $customerId = $customer->getId();
         $storeId = $this->getStoreId();
-        $interest = $this->helper->getInterestGroups($customerId, $subscriberId, $storeId);
+        $interest = $this->_helper->getInterestGroups($customerId, $subscriberId, $storeId);
 
         return $interest;
     }
@@ -90,10 +90,11 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
      */
     protected function getStoreId()
     {
-        $storeId = $this->storeId;
+        $storeId = $this->_storeId;
         if (!$storeId) {
             $storeId = $this->_customer->getMailchimpStoreView();
         }
+
         return $storeId;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -20,5 +21,4 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores extends Mage_Adminhtml
 
         parent::__construct();
     }
-
 }

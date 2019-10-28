@@ -39,11 +39,11 @@ class Mandrill_Mandrill
 {
 
     public $apikey;
-    public $ch;
+    protected $_curlOptions = array();
     public $root = 'https://mandrillapp.com/api/1.0';
     public $debug = false;
 
-    public static $error_map = array(
+    public static $errorMap = array(
         "ValidationError" => "Mandrill_ValidationError",
         "Invalid_Key" => "Mandrill_Invalid_Key",
         "PaymentRequired" => "Mandrill_PaymentRequired",
@@ -77,25 +77,35 @@ class Mandrill_Mandrill
 
     public function __construct($apikey = null)
     {
-        if (!$apikey) { $apikey = getenv('MANDRILL_APIKEY');
+        if (!$apikey) {
+            $apikey = getenv('MANDRILL_APIKEY');
         }
-        if (!$apikey) { $apikey = $this->readConfigs();
+
+        if (!$apikey) {
+            $apikey = $this->readConfigs();
         }
-        if (!$apikey) { throw new Mandrill_Error('You must provide a Mandrill API key');
+
+        if (!$apikey) {
+            throw new Mandrill_Error('You must provide a Mandrill API key');
         }
+
         $this->apikey = $apikey;
 
-        $this->ch = curl_init();
-        curl_setopt($this->ch, CURLOPT_USERAGENT, 'Mandrill-PHP/1.0.53');
-        curl_setopt($this->ch, CURLOPT_POST, true);
+        $curlOptions = array(
+            CURLOPT_USERAGENT => 'Mandrill-PHP/1.0.53',
+            CURLOPT_POST => true
+        );
+
         if (!ini_get('open_basedir')) {
-            curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+            $curlOptions[CURLOPT_FOLLOWLOCATION] = true;
         }
 
-        curl_setopt($this->ch, CURLOPT_HEADER, false);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, 600);
+        $curlOptions[CURLOPT_HEADER] = false;
+        $curlOptions[CURLOPT_RETURNTRANSFER] = true;
+        $curlOptions[CURLOPT_CONNECTTIMEOUT] =  30;
+        $curlOptions[CURLOPT_TIMEOUT] = 600;
+
+        $this->setCurlOptionsAddOptions($curlOptions);
 
         $this->root = rtrim($this->root, '/') . '/';
 
@@ -118,45 +128,58 @@ class Mandrill_Mandrill
 
     public function __destruct()
     {
-        curl_close($this->ch);
+        $this->_curlOptions = array();
     }
 
     public function call($url, $params)
     {
         $params['key'] = $this->apikey;
         $params = json_encode($params);
-        $ch = $this->ch;
 
-        curl_setopt($ch, CURLOPT_URL, $this->root . $url . '.json');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_VERBOSE, $this->debug);
+        $curlOptions = array();
+        $curlOptions[CURLOPT_URL] = $this->root . $url . '.json';
+        $curlOptions[CURLOPT_HTTPHEADER] = array('Content-Type: application/json');
+        $curlOptions[CURLOPT_POSTFIELDS] = $params;
+        $curlOptions[CURLOPT_VERBOSE] = $this->debug;
 
         $start = microtime(true);
         $this->log('Call to ' . $this->root . $url . '.json: ' . $params);
+
         if ($this->debug) {
-            $curl_buffer = fopen('php://memory', 'w+');
-            curl_setopt($ch, CURLOPT_STDERR, $curl_buffer);
+            $curlBuffer = fopen('php://memory', 'w+');
+            $curlOptions[CURLOPT_STDERR] = $curlBuffer;
         }
 
-        $response_body = curl_exec($ch);
-        $info = curl_getinfo($ch);
+        /**
+         * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
+         */
+        $curlHelper = Mage::helper('mailchimp/curl');
+        $this->setCurlOptionsAddOptions($curlOptions);
+        $curlFullResponse = $curlHelper->curlExec($this->_curlOptions);
+        $info = $curlFullResponse['info'];
+        $responseBody = $curlFullResponse['response'];
+        $curlError = $curlFullResponse['error'];
         $time = microtime(true) - $start;
+
         if ($this->debug) {
-            rewind($curl_buffer);
-            $this->log(stream_get_contents($curl_buffer));
-            fclose($curl_buffer);
+            rewind($curlBuffer);
+            $this->log(stream_get_contents($curlBuffer));
+            fclose($curlBuffer);
         }
 
         $this->log('Completed in ' . number_format($time * 1000, 2) . 'ms');
-        $this->log('Got response: ' . $response_body);
+        $this->log('Got response: ' . $responseBody);
 
-        if (curl_error($ch)) {
-            throw new Mandrill_HttpError("API call to $url failed: " . curl_error($ch));
+        if (!empty($curlError)) {
+            throw new Mandrill_HttpError("API call to $url failed: " . $curlError);
         }
 
-        $result = json_decode($response_body, true);
-        if ($result === null) { throw new Mandrill_Error('We were unable to decode the JSON response from the Mandrill API: ' . $response_body);
+        $result = json_decode($responseBody, true);
+
+        if ($result === null) {
+            throw new Mandrill_Error(
+                'We were unable to decode the JSON response from the Mandrill API: ' . $responseBody
+            );
         }
 
         try {
@@ -173,10 +196,14 @@ class Mandrill_Mandrill
     public function readConfigs()
     {
         $paths = array('~/.mandrill.key', '/etc/mandrill.key');
+        $fileHelper = $this->getFileHelper();
+
         foreach ($paths as $path) {
-            if (file_exists($path)) {
-                $apikey = trim(file_get_contents($path));
-                if ($apikey) { return $apikey;
+            if ($fileHelper->fileExists($path)) {
+                $apikey = trim($fileHelper->read($path));
+
+                if ($apikey) {
+                    return $apikey;
                 }
             }
         }
@@ -186,16 +213,34 @@ class Mandrill_Mandrill
 
     public function castError($result)
     {
-        if ($result['status'] !== 'error' || !$result['name']) { throw new Mandrill_Error('We received an unexpected error: ' . json_encode($result));
+        if ($result['status'] !== 'error' || !$result['name']) {
+            throw new Mandrill_Error('We received an unexpected error: ' . json_encode($result));
         }
 
-        $class = (isset(self::$error_map[$result['name']])) ? self::$error_map[$result['name']] : 'Mandrill_Error';
+        $class = (isset(self::$errorMap[$result['name']])) ? self::$errorMap[$result['name']] : 'Mandrill_Error';
         return new $class($result['message'], $result['code']);
     }
 
     public function log($msg)
     {
-        if ($this->debug) { error_log($msg);
+        if ($this->debug) {
+            error_log($msg);
         }
+    }
+
+    /**
+     * @param array $curlOptions
+     */
+    protected function setCurlOptionsAddOptions($curlOptions = array())
+    {
+        $this->_curlOptions += $curlOptions;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_File
+     */
+    protected function getFileHelper()
+    {
+        return Mage::helper('mailchimp/file');
     }
 }

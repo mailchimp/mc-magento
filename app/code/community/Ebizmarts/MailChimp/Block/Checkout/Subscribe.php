@@ -3,10 +3,10 @@
 /**
  * Checkout subscribe checkbox block renderer
  *
- * @category   Ebizmarts
- * @package    Ebizmarts_MageMonkey
- * @author     Ebizmarts Team <info@ebizmarts.com>
- * @license    http://opensource.org/licenses/osl-3.0.php
+ * @category Ebizmarts
+ * @package  Ebizmarts_MageMonkey
+ * @author   Ebizmarts Team <info@ebizmarts.com>
+ * @license  http://opensource.org/licenses/osl-3.0.php
  */
 class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Template
 {
@@ -20,14 +20,14 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected $helper;
-    protected $storeId;
+    protected $_helper;
+    protected $_storeId;
 
     public function __construct()
     {
         parent::__construct();
-        $this->helper = Mage::helper('mailchimp');
-        $this->storeId = Mage::app()->getStore()->getId();
+        $this->_helper = Mage::helper('mailchimp');
+        $this->_storeId = Mage::app()->getStore()->getId();
     }
 
     /**
@@ -37,8 +37,8 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
      */
     protected function _toHtml()
     {
-        $helper = $this->helper;
-        $storeId = $this->storeId;
+        $helper = $this->_helper;
+        $storeId = $this->_storeId;
 
         $alreadySubscribed = Mage::getModel('newsletter/subscriber')
             ->loadByEmail($this->getQuote()->getCustomerEmail())
@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
 
     protected function getCurrentCheckoutSubscribeValue()
     {
-        return $this->helper->getCheckoutSubscribeValue($this->storeId);
+        return $this->_helper->getCheckoutSubscribeValue($this->_storeId);
     }
 
     protected function isForceHidden($currentValue = null)
@@ -72,6 +72,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         if (!$currentValue) {
             $currentValue = $this->getCurrentCheckoutSubscribeValue();
         }
+
         return ($currentValue == Ebizmarts_MailChimp_Model_System_Config_Source_Checkoutsubscribe::FORCE_HIDDEN);
     }
 
@@ -91,6 +92,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         if ($this->isForceHidden($currentValue) || $this->isForceVisible($currentValue)) {
             return true;
         }
+
         return false;
     }
 
@@ -100,6 +102,7 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         if ($this->isCheckedByDefault($currentValue) || $this->isForceVisible($currentValue)) {
             return true;
         }
+
         return false;
     }
 
@@ -115,8 +118,8 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
      */
     public function getGeneralList()
     {
-        $storeId = $this->storeId;
-        $helper = $this->helper;
+        $storeId = $this->_storeId;
+        $helper = $this->_helper;
         $listId = $helper->getGeneralList($storeId);
 
         return $listId;

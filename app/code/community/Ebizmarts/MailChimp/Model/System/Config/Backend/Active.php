@@ -20,7 +20,9 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
         $scope = $this->getScope();
         $groups = $this->getData('groups');
 
-        $apiKey = (isset($groups['general']['fields']['apikey']['value'])) ? $groups['general']['fields']['apikey']['value'] : $helper->getApiKey($scopeId, $scope);
+        $apiKey = (isset($groups['general']['fields']['apikey']['value']))
+            ? $groups['general']['fields']['apikey']['value']
+            : $helper->getApiKey($scopeId, $scope);
         //If settings are inherited get from config.
         if (isset($groups['general']['fields']['list']) && isset($groups['general']['fields']['list']['value'])) {
             $listId = $groups['general']['fields']['list']['value'];
@@ -34,7 +36,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Active extends Mage_Core_M
             } else {
                 $configValue = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_ACTIVE, false));
                 $helper->saveMailchimpConfig($configValue, $scopeId, $scope);
-                $message = $helper->__('Please add an api key and select a list before enabling the extension.');
+                $message = $helper->__('Please add an api key and select an audience before enabling the extension.');
                 $this->getAdminSession()->addError($message);
             }
         }

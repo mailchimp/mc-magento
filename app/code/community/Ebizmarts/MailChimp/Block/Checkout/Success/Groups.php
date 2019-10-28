@@ -3,10 +3,10 @@
 /**
  * Checkout subscribe interest groups block renderer
  *
- * @category   Ebizmarts
- * @package    Ebizmarts_MailChimp
- * @author     Ebizmarts Team <info@ebizmarts.com>
- * @license    http://opensource.org/licenses/osl-3.0.php
+ * @category Ebizmarts
+ * @package  Ebizmarts_MailChimp
+ * @author   Ebizmarts Team <info@ebizmarts.com>
+ * @license  http://opensource.org/licenses/osl-3.0.php
  */
 class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_Template
 {
@@ -14,27 +14,39 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected $helper;
-    protected $storeId;
+    protected $_helper;
+    protected $_toreId;
 
     public function __construct()
     {
         parent::__construct();
-        $this->helper = Mage::helper('mailchimp');
-        $this->storeId = Mage::app()->getStore()->getId();
+        $this->_helper = Mage::helper('mailchimp');
+        $this->_storeId = Mage::app()->getStore()->getId();
     }
 
+    /**
+     * @return string
+     */
     public function getFormUrl()
     {
         return $this->getSuccessInterestUrl();
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function getSuccessInterestUrl()
     {
         $url = 'mailchimp/group/index';
         return Mage::app()->getStore()->getUrl($url);
     }
 
+    /**
+     * @return array|null
+     * @throws Mage_Core_Exception
+     * @throws MailChimp_Error
+     */
     public function getInterest()
     {
         $subscriber = $this->getSubscriberModel();
@@ -47,16 +59,24 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         return $interest;
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     public function getMessageBefore()
     {
-        $storeId = $this->storeId;
+        $storeId = $this->_storeId;
         $message = $this->getMailChimpHelper()->getCheckoutSuccessHtmlBefore($storeId);
         return $message;
     }
 
+    /**
+     * @return string
+     * @throws Mage_Core_Exception
+     */
     public function getMessageAfter()
     {
-        $storeId = $this->storeId;
+        $storeId = $this->_storeId;
         $message = $this->getMailChimpHelper()->getCheckoutSuccessHtmlAfter($storeId);
         return $message;
     }
@@ -75,11 +95,11 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     }
 
     /**
-     * @return mixed
+     * @return Mage_Sales_Model_Order
      */
     protected function getSessionLastRealOrder()
     {
-        return Mage::getSingleton('checkout/session')->getLastRealOrder();
+        return $this->getMailChimpHelper()->getSessionLastRealOrder();
     }
 
     /**
@@ -87,6 +107,6 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
      */
     protected function getMailChimpHelper()
     {
-        return $this->helper;
+        return $this->_helper;
     }
 }
