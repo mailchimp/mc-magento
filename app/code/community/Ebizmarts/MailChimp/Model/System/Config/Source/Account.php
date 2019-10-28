@@ -80,8 +80,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                     } catch (MailChimp_Error $e) {
                         if ($helper->isEcomSyncDataEnabled($scopeArray['scope_id'], $scopeArray['scope'])) {
                             $message = $helper->__(
-                                'Looks like your Mailchimp store was deleted. Please create a new one and associate '
-                                . 'it in order to get your Ecommerce data synced.'
+                                'It seems your Mailchimp store was deleted. '
+                                . 'Please create a new one and associate it in order to get your Ecommerce data synced.'
                             );
                             Mage::getSingleton('adminhtml/session')->addWarning($message);
                         }

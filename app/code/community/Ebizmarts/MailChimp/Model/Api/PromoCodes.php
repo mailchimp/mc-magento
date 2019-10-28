@@ -305,16 +305,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl(
             'mailchimp/cart/loadcoupon',
             array(
-                '_nosid' => true,
-                '_secure' => true,
-                'coupon_id' =>$promoCode->getCouponId(),
-                'coupon_token' => $token
-            )
+                    '_nosid' => true,
+                    '_secure' => true,
+                    'coupon_id' => $promoCode->getCouponId(),
+                    'coupon_token' => $token
+                )
         )
             . 'mailchimp/cart/loadcoupon?coupon_id='
             . $promoCode->getCouponId()
             . '&coupon_token='
             . $token;
+
         return $url;
     }
 
@@ -323,7 +324,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
      */
     protected function getToken()
     {
-        $token = md5(rand(0, 9999999));
+        $token = hash('md5', rand(0, 9999999));
         return $token;
     }
 
@@ -415,7 +416,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
             if ($api !== null) {
                 try {
                     $mailChimpPromoCodes = $api->ecommerce->promoRules->promoCodes
-                                            ->getAll($mailchimpStoreId, $promoRuleId);
+                        ->getAll($mailchimpStoreId, $promoRuleId);
 
                     foreach ($mailChimpPromoCodes['promo_codes'] as $promoCode) {
                         $this->deletePromoCodeSyncData($promoCode['id'], $mailchimpStoreId);

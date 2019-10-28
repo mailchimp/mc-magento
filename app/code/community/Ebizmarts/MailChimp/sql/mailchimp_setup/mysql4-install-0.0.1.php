@@ -31,7 +31,11 @@ $installer->run(
 $baseDir = Mage::getBaseDir();
 
 try {
-    mkdir($baseDir . DS . 'var' . DS . 'mailchimp');
+    /**
+     * @var $fileHelper Ebizmarts_MailChimp_Helper_File
+     */
+    $fileHelper = Mage::helper('mailchimp/file');
+    $fileHelper->mkDir($baseDir . DS . 'var' . DS . 'mailchimp');
 } catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);
 }

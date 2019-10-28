@@ -107,9 +107,9 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Handle save of System -> Configuration, section <mailchimp>
      *
-     * @param  Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     * @throws Mage_Core_Exception
+     * @param   Varien_Event_Observer $observer
+     * @return  Varien_Event_Observer
+     * @throws  Mage_Core_Exception
      */
     public function saveConfigBefore(Varien_Event_Observer $observer)
     {
@@ -189,9 +189,9 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Handle confirmation emails and subscription to Mailchimp
      *
-     * @param  Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     * @throws Mage_Core_Exception
+     * @param   Varien_Event_Observer $observer
+     * @return  Varien_Event_Observer
+     * @throws  Mage_Core_Exception
      */
     public function subscriberSaveBefore(Varien_Event_Observer $observer)
     {
@@ -219,10 +219,10 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Handle interest groups for subscriber and allow Magento email to be sent if configured that way.
      *
-     * @param  Varien_Event_Observer $observer
-     * @return Varien_Event_Observer
-     * @throws Mage_Core_Exception
-     * @throws Mage_Core_Model_Store_Exception
+     * @param   Varien_Event_Observer $observer
+     * @return  Varien_Event_Observer
+     * @throws  Mage_Core_Exception
+     * @throws  Mage_Core_Model_Store_Exception
      */
     public function subscriberSaveAfter(Varien_Event_Observer $observer)
     {
@@ -1123,10 +1123,10 @@ class Ebizmarts_MailChimp_Model_Observer
     /**
      * Handle frontend customer interest groups only if is not subscribed and all admin customer groups.
      *
-     * @param  $subscriberEmail
-     * @param  $params
-     * @param  $storeId
-     * @param  null            $customerId
+     * @param       $subscriberEmail
+     * @param       $params
+     * @param       $storeId
+     * @param null  $customerId
      * @return Mage_Newsletter_Model_Subscriber
      * @throws Mage_Core_Model_Store_Exception
      */

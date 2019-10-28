@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MailChimp For Magento
  *

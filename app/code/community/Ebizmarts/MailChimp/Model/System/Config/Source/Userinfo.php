@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
         }
 
         if ((!is_array($this->_accountDetails)
-            || isset($this->_accountDetails['status']))
+                || isset($this->_accountDetails['status']))
             && $mandillHelper->getMandrillApiKey($storeId)
         ) {
             $api = new Mandrill_Message($mandillHelper->getMandrillApiKey($storeId));
@@ -83,8 +83,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Userinfo
                             '<strong>Hourly Quota</strong>: %s %s',
                             $this->_accountDetails['hourly_quota'],
                             "<small>the maximum number of emails Mandrill will deliver for this user each hour. "
-                                . "Any emails beyond that will be accepted and queued for later delivery. "
-                                . "Users with higher reputations will have higher hourly quotas</small>"
+                            . "Any emails beyond that will be accepted and queued for later delivery. "
+                            . "Users with higher reputations will have higher hourly quotas</small>"
                         )
                     ),
                     array(

@@ -74,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Orders::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('makeSalesRuleCoupon','makeSalesRule','getSimpleAction'))
+            ->setMethods(array('makeSalesRuleCoupon', 'makeSalesRule', 'getSimpleAction'))
             ->getMock();
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
@@ -167,7 +167,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $customerEmail = 'test@ebizmarts.com';
         $customerFirstName = 'testFirstName';
         $billingAddressStreet = array('billingAddress1', 'billingAddress2');
-        $currentDate = date("yyyy-mm-dd");
+        $currentDate = Mage::getSingleton('core/date');
 
         $lines['itemsCount'] = 9;
         $lines['lines'][] = array(
@@ -209,6 +209,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                     'getSubscriberModel'
                 )
             )
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCurrentStoreId', 'setCurrentStore'))
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)

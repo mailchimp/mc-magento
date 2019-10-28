@@ -24,6 +24,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected $_mailchimpDateHelper;
 
     /**
+     * @var Ebizmarts_MailChimp_Helper_Curl
+     */
+    protected $_mailchimpCurlHelper;
+
+    /**
      * @var Ebizmarts_MailChimp_Model_Api_Customers
      */
     protected $_apiCustomers;
@@ -62,6 +67,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
         $this->_mailchimpDateHelper = Mage::helper('mailchimp/date');
+        $this->_mailchimpCurlHelper = Mage::helper('mailchimp/curl');
+
         $this->_apiCustomers = Mage::getModel('mailchimp/api_customers');
         $this->_apiProducts = Mage::getModel('mailchimp/api_products');
         $this->_apiCarts = Mage::getModel('mailchimp/api_carts');
@@ -77,6 +84,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function getHelper()
     {
         return $this->_mailchimpHelper;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Curl
+     */
+    protected function getMailchimpCurlHelper()
+    {
+        return $this->_mailchimpCurlHelper;
     }
 
     /**
@@ -182,7 +197,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function batchDirExists($baseDir, $batchId)
     {
-        return is_dir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+        return $this->getMailchimpFileHelper()
+            ->fileExists($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, false);
     }
 
     /**
@@ -192,7 +208,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function removeBatchDir($baseDir, $batchId)
     {
-        return rmdir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
+        return $this->getMailchimpFileHelper()
+            ->rmDir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
     }
 
     /**
@@ -243,8 +260,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     /**
      * Get results of batch operations sent to MailChimp.
      *
-     * @param           $magentoStoreId
-     * @param  bool     $isEcommerceData
+     * @param       $magentoStoreId
+     * @param bool  $isEcommerceData
      * @throws Mage_Core_Exception
      */
     public function _getResults(
@@ -341,10 +358,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
-                //cart operations
                 if ($helper->getMCIsSyncing($mailchimpStoreId)) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
                 } else {
+                    //cart operations
                     $helper->logBatchStatus('Generate Carts Payload');
                     $apiCarts = $this->getApiCarts();
                     $cartsArray = $apiCarts->createBatchJson($mailchimpStoreId, $magentoStoreId);
@@ -422,7 +439,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             $batchJson = json_encode($batchArray);
 
             if ($batchJson === false) {
-                $helper->logRequest('Json encode error '.json_last_error_msg());
+                $helper->logRequest('Json encode error ' . json_last_error_msg());
             } elseif (empty($batchJson)) {
                 $helper->logRequest('An empty operation was detected');
             } else {
@@ -611,6 +628,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function sendStoreSubscriberBatch($storeId, $limit)
     {
         $helper = $this->getHelper();
+
         try {
             if ($helper->isSubscriptionEnabled($storeId)) {
                 $helper->resetCountersSubscribers();
@@ -627,8 +645,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                 if (!empty($batchArray['operations'])) {
                     $batchJson = json_encode($batchArray);
+
                     if ($batchJson === false) {
-                        $helper->logRequest('Json encode error '.json_last_error_msg());
+                        $helper->logRequest('Json encode error ' . json_last_error_msg());
                     } elseif ($batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
@@ -644,6 +663,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 ->setStatus($batchResponse['status']);
                             $batch->save();
                             $this->_showResumeSubscriber($batchResponse['id'], $storeId);
+
                             return array($batchResponse, $limit);
                         } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                             $helper->logError($e->getMessage());
@@ -671,34 +691,37 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     public function getBatchResponse($batchId, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $fileHelper = $this->getMailchimpFileHelper();
         $files = array();
+
         try {
             $baseDir = $this->getMagentoBaseDir();
             $api = $helper->getApi($magentoStoreId);
+
             if ($api) {
                 // check the status of the job
                 $response = $api->batchOperation->status($batchId);
+
                 if (isset($response['status']) && $response['status'] == 'finished') {
                     // get the tar.gz file with the results
                     $fileUrl = urldecode($response['response_body_url']);
                     $fileName = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '.tar.gz';
                     $fd = fopen($fileName, 'w');
 
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $fileUrl);
-                    curl_setopt($ch, CURLOPT_FILE, $fd);
-                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-                    $r = curl_exec($ch);
-
-                    curl_close($ch);
-                    fclose($fd);
-                    mkdir(
-                        $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId,
-                        0750,
-                        true
+                    $curlOptions = array(
+                        CURLOPT_URL => $fileUrl,
+                        CURLOPT_FILE => $fd,
+                        CURLOPT_FOLLOWLOCATION => true, // this will follow redirects
                     );
+
+                    $curlHelper = $this->getMailchimpCurlHelper();
+                    $curlHelper->curlExec($curlOptions);
+                    fclose($fd);
+                    $fileHelper->mkDir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
+
                     $archive = new Mage_Archive();
-                    if (file_exists($fileName)) {
+
+                    if ($fileHelper->fileExists($fileName)) {
                         $files = $this->_unpackBatchFile($files, $batchId, $archive, $fileName, $baseDir);
                     }
                 }
@@ -728,23 +751,22 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _unpackBatchFile($files, $batchId, $archive, $fileName, $baseDir)
     {
-        $archive->unpack($fileName, $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-        $archive->unpack(
-            $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar',
-            $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId
-        );
-        $dir = scandir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId);
-        foreach ($dir as $d) {
-            $name = pathinfo($d);
-            if ($name['extension'] == 'json') {
-                $files[] = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $d;
-            }
+        $path = $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId;
+        $archive->unpack($fileName, $path);
+        $archive->unpack($path . '/' . $batchId . '.tar', $path);
+        $fileHelper = $this->getMailchimpFileHelper();
+        $dirItems = new DirectoryIterator($path);
+
+        foreach ($dirItems as $index => $dirItem) {
+            if ($dirItem->isFile() && $dirItem->getExtension() == 'json')
+                $files[] = $path . '/' . $dirItem->getBasename();
         }
 
-        unlink(
-            $baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId . '/' . $batchId . '.tar'
+        $fileHelper->rm(
+            $path . '/' . $batchId . '.tar'
         );
-        unlink($fileName);
+
+        $fileHelper->rm($fileName);
 
         return $files;
     }
@@ -760,9 +782,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     {
         $helper = $this->getHelper();
         $helper->resetCountersDataSentToMailchimp();
+        $fileHelper = $this->getMailchimpFileHelper();
 
         foreach ($files as $file) {
-            $items = json_decode(file_get_contents($file), true);
+            $fileContent = $fileHelper->read($file);
+            $items = json_decode($fileContent);
 
             if ($items !== false) {
                 foreach ($items as $item) {
@@ -838,7 +862,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
 
-            unlink($file);
+            $fileHelper->rm($file);
         }
 
         $this->_showResumeDataSentToMailchimp($magentoStoreId);
@@ -925,7 +949,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $batchJson = json_encode($batchArray);
 
                     if ($batchJson === false) {
-                        $helper->logRequest('Json encode error: '.json_last_error_msg());
+                        $helper->logRequest('Json encode error: ' . json_last_error_msg());
                     } elseif ($batchJson == '') {
                         $helper->logRequest('An empty operation was detected');
                     } else {
@@ -1176,8 +1200,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         $countersSentPerBatch = $helper->getCountersSentPerBatch();
 
-        if (!empty($countersSentPerBatch) || $helper->getCountersSentPerBatch() != null) {
-            $helper->logBatchStatus("Sent batch $batchId for Magento store $storeId");
+        if (!empty($countersSentPerBatch) || $countersSentPerBatch != null) {
+            $helper->logBatchStatus("Sent batch $batchId for store $storeId");
             $helper->logBatchQuantity($helper->getCountersSentPerBatch());
         } else {
             $helper->logBatchStatus("Nothing to sync for store $storeId");
@@ -1260,12 +1284,20 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function enableMergeFieldsSending($type, Varien_Object $syncDataItem)
     {
-        $syncModified = 0 ;
-        if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
-            && $this->isFirstArrival($syncDataItem)) {
+        $syncModified = 0;
+
+        if ($type == Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER && $this->isFirstArrival($syncDataItem)) {
             $syncModified = 1;
         }
 
         return $syncModified;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_File
+     */
+    protected function getMailchimpFileHelper()
+    {
+        return Mage::helper('mailchimp/file');
     }
 }

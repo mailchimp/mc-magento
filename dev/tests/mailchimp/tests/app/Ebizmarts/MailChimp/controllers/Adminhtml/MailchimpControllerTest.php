@@ -249,7 +249,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $syncDate = "2019-02-01 20:00:05";
         $optionSyncFlag = array(
             'value' => Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY,
-            'label' => 'Initial sync: '.$syncDate
+            'label' => 'Initial sync: ' . $syncDate
         );
         $liElement = "<li>Initial sync: <span style='color: forestgreen;font-weight: bold;'>$syncDate</span></li>";
         $liElementEscaped = "<li>Initial sync: <span style='color: forestgreen;font-weight: bold;'>"
@@ -283,24 +283,24 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
                 'label' => '  Total Carts: 10'
             )
         );
-        $jsonData = '[{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::USERNAME_KEY
-            .',"label":"Username: Ebizmarts Corp."},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ACCOUNT_SUB_KEY
-            .',"label":"Total Account Subscribers: 104"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_LIST_SUB_KEY
-            .',"label":"Total List Subscribers: 18"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::STORENAME_KEY
-            .',"label":"Ecommerce Data uploaded to MailChimp store Madison Island - English:"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY
-            .',"label":"'.$liElementEscaped.'"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_CUS_KEY
-            .',"label":"  Total Customers: 10"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_PRO_KEY
-            .',"label":"  Total Products: 10"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ORD_KEY
-            .',"label":"  Total Orders: 10"},'.
-            '{"value":'.Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_QUO_KEY
-            .',"label":"  Total Carts: 10"}]';
+        $jsonData = '[{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::USERNAME_KEY
+            . ',"label":"Username: Ebizmarts Corp."},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ACCOUNT_SUB_KEY
+            . ',"label":"Total Account Subscribers: 104"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_LIST_SUB_KEY
+            . ',"label":"Total List Subscribers: 18"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::STORENAME_KEY
+            . ',"label":"Ecommerce Data uploaded to MailChimp store Madison Island - English:"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::SYNC_LABEL_KEY
+            . ',"label":"' . $liElementEscaped . '"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_CUS_KEY
+            . ',"label":"  Total Customers: 10"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_PRO_KEY
+            . ',"label":"  Total Products: 10"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_ORD_KEY
+            . ',"label":"  Total Orders: 10"},'
+            . '{"value":' . Ebizmarts_MailChimp_Model_System_Config_Source_Account::TOTAL_QUO_KEY
+            . ',"label":"  Total Carts: 10"}]';
 
         $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
@@ -362,7 +362,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
         $listId = 'a1s2d3f4g5';
 
         $data = array(array('id' => $listId, 'name' => 'Newsletter'));
-        $jsonData = '[{"id":"'.$listId.'","name":"Newsletter"}]';
+        $jsonData = '[{"id":"' . $listId . '","name":"Newsletter"}]';
 
         $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()

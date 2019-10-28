@@ -103,7 +103,7 @@
                                 )):
                         ?>
                         Mage.Cookies.clear('counter');
-                        //document.cookie = 'counter=; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+
                         createCookie(
                             'email',
                             'none',
@@ -219,7 +219,9 @@
         }
         <?php endif; ?>
         function validateEmail(email) {
-            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var user = '(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))';
+            var domain = '((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))';
+            var re = new RegExp('/ˆ' + user + '@' + domain + '$/');
             return re.test(email);
         }
         function emailCookieExists() {
