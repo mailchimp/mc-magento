@@ -414,7 +414,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @throws Mage_Core_Exception
-     * @throws MailChimp_Error
+     * @throws Ebizmarts_MailChimp_Helper_Data_ApiKeyException
      */
     protected function _processBatchOperations($batchArray, $mailchimpStoreId, $magentoStoreId)
     {
