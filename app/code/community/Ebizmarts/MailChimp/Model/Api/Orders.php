@@ -269,7 +269,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         //customer data
-        $data["customer"]["id"] = md5(strtolower($order->getCustomerEmail()));
+        $data["customer"]["id"] = hash('md5', strtolower($order->getCustomerEmail()));
         $data["customer"]["email_address"] = $order->getCustomerEmail();
         $data["customer"]["opt_in_status"] = false;
 

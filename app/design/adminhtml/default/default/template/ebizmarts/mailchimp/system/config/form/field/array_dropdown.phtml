@@ -113,12 +113,12 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
                 // generate default template data
                 if ('' == templateData) {
                     var d = new Date();
-                    templateData = {;
+                    templateData = {
                         <?php foreach ($this->_columns as $columnName => $column):?>
                         <?php echo $this->quoteEscape($columnName) ?>: '',
                         <?php endforeach;?>
-                        _id;: '_' + d.getTime() + '_' + d.getMilliseconds()
-                    }
+                        _id: '_' + d.getTime() + '_' + d.getMilliseconds()
+                    };
                 }
                 // insert before last row
                 if ('' == insertAfterId) {

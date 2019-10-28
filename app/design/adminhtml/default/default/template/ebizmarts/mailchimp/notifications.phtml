@@ -1,30 +1,29 @@
 <?php if ($message = $this->getMessageNotification()) : ?>
-    <div class="notification-global"><?php echo $message ?></div>
+    <div class="notification-global"><?php echo $this->escapeHtml($message) ?></div>
 <?php endif; ?>
 
 <script type="text/javascript">
-        function openResendEcommerceDialog() {
-            var url = '<?php echo $this->escapeUrl($this->getUrlForResendEcommerce()) ?>?';
-            var dialogWindow = Dialog.info(null, {
-                draggable:true,
-                resizable:false,
-                closable:true,
-                className:"magento",
-                windowClassName:"resend_window",
-                title:'Resend Ecommerce Data',
-                top:50,
-                width:1000,
-                height:300,
-                zIndex:1000,
-                recenterAuto:false,
-                hideEffect:Element.hide,
-                showEffect:Element.show,
-                id:"resend_window",
-                url: url,
-                onClose:function (param, el) {
-                    location.reload();
-                }
-            });
-        }
+    function openResendEcommerceDialog() {
+        var url = '<?php echo $this->escapeUrl($this->getUrlForResendEcommerce()) ?>?';
+        Dialog.info(null, {
+            draggable: true,
+            resizable: false,
+            closable: true,
+            className: "magento",
+            windowClassName: "resend_window",
+            title: 'Resend Ecommerce Data',
+            top: 50,
+            width: 1000,
+            height: 300,
+            zIndex: 1000,
+            recenterAuto: false,
+            hideEffect: Element.hide,
+            showEffect: Element.show,
+            id: "resend_window",
+            url: url,
+            onClose: function (param, el) {
+                location.reload();
+            }
+        });
+    }
 </script>
-

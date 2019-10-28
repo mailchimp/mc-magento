@@ -398,7 +398,6 @@ class Ebizmarts_MailChimp
          * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
          */
         $curlHelper = Mage::helper('mailchimp/curl');
-        //$this->setCurlOptionsAddOptions($curlOptions);
         $curlResult = $curlHelper->curlExec($curlOptions);
 
         $responseBody = $curlResult['response'];
@@ -422,31 +421,6 @@ class Ebizmarts_MailChimp
         }
 
         return $result;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCurlOptions()
-    {
-        return $this->_curlOptions;
-    }
-
-    /**
-     * @param array $_curlOptions
-     */
-    protected function setCurlOptions($curlOptions)
-    {
-        $this->_curlOptions = $curlOptions;
-    }
-
-    /**
-     * @param $index
-     * @param $value
-     */
-    protected function setCurlOptionsIndexValue($index, $value)
-    {
-        $this->_curlOptions[$index] = $value;
     }
 
     /**

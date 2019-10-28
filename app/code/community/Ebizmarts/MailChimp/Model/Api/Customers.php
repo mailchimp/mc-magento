@@ -224,7 +224,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function _buildCustomerData($customer)
     {
         $data = array();
-        $data["id"] = md5(strtolower($this->getCustomerEmail($customer)));
+        $data["id"] = hash('md5', strtolower($this->getCustomerEmail($customer)));
         $data["email_address"] = $this->getCustomerEmail($customer);
         $data["first_name"] = $this->getCustomerFirstname($customer);
         $data["last_name"] = $this->getCustomerLastname($customer);
@@ -548,7 +548,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         if ($mergeFieldJSON === false) {
             $this->logCouldNotEncodeMailchimpTags($customer, $mergeFields);
         } else {
-            $md5HashEmail = md5(strtolower($customer->getEmail()));
+            $md5HashEmail = hash('md5', strtolower($customer->getEmail()));
             $batchData = array();
             $batchData['method'] = "PATCH";
             $batchData['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
@@ -649,7 +649,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      * @param               $customer
      * @param               $listId
      * @param               $counter
-     * @param array $customerArray
+     * @param array         $customerArray
      * @return array
      */
     protected function sendMailchimpTags(

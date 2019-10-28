@@ -12,7 +12,7 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
     {
         $storeName = 'Madison Island - English';
         $date = '2017-10-23-19-34-31-92333600';
-        $mailchimpStoreId = md5($storeName . '_' . $date);
+        $mailchimpStoreId = hash('md5', $storeName . '_' . $date);
         $apiKey = 'z1x2c3v4b5n6m7k8l9p0-us1';
         $listId = 'a1s2d3f4g5';
         $currencyCode = 'USD';
