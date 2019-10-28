@@ -2113,7 +2113,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $index = 0;
         $statusChanged = "SENT";
-        $count = 1;
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -2122,7 +2121,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
         $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
-            ->with($index, $statusChanged, 2);
+            ->with($index, $statusChanged, 1);
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index);
     }
@@ -2131,7 +2130,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $index = 0;
         $statusChanged = "NOT SENT";
-        $count = 1;
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -2140,7 +2138,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
         $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
-            ->with($index, $statusChanged, 2);
+            ->with($index, $statusChanged, 1);
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index, true);
     }
