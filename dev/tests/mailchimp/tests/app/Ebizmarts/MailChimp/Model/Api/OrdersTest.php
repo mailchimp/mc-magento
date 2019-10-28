@@ -211,11 +211,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             )
             ->getMock();
 
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getCurrentStoreId', 'setCurrentStore'))
-            ->getMock();
-
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getOptIn', 'loadByEmail', 'subscribe', 'getSubscriberId'))
@@ -294,10 +289,11 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $storeMock->expects($this->once())
             ->method('getUrl')
             ->with(
-                'sales/order/view/', array(
-                'order_id' => null,
-                '_nosid' => true,
-                '_secure' => true
+                'sales/order/view/',
+                array(
+                    'order_id' => null,
+                    '_nosid' => true,
+                    '_secure' => true
                 )
             )
             ->willReturn('http://somedomain.com');
@@ -353,12 +349,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(
-                array(
-                'getGeneralList',
-                'getApiKey',
-                'getApi')
-            )
+            ->setMethods(array('getGeneralList', 'getApiKey', 'getApi'))
             ->getMock();
 
         $apiMock = $this->getMockBuilder(Ebizmarts_MailChimp::class)

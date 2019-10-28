@@ -481,7 +481,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @return Ebizmarts_MailChimp_Model_Mysql4_SynchBatches
+     * @return Ebizmarts_MailChimp_Model_Resource_SynchBatches
      */
     protected function getSyncBatchesResource()
     {
@@ -814,7 +814,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param       $scopeId
      * @param       $scope
      * @param bool  $deleteErrorsOnly
-     * @param null $filters
+     * @param null  $filters
      * @throws Mage_Core_Exception
      */
     public function removeEcommerceSyncData($scopeId, $scope, $deleteErrorsOnly = false, $filters = null)
@@ -1075,7 +1075,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param       $scopeId
      * @param       $scope
      * @param bool  $excludeSubscribers
-     * @param null $filters
+     * @param null  $filters
      * @throws Mage_Core_Exception
      */
     public function clearErrorGrid($scopeId, $scope, $excludeSubscribers = false, $filters = null)

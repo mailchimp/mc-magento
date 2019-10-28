@@ -112,7 +112,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         foreach ($collection as $subscriber) {
             $data = $this->_buildSubscriberData($subscriber);
             $emailHash = hash('md5', strtolower($subscriber->getSubscriberEmail()));
-            $subscriberJson = "";
 
             //encode to JSON
             $subscriberJson = json_encode($data);
@@ -255,11 +254,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             }
 
             $mailChimpTags = $this->_buildMailchimpTags($subscriber, $storeId);
-
             $language = $helper->getStoreLanguageCode($storeId);
             $interest = $this->_getInterest($subscriber);
-
             $emailHash = hash('md5', strtolower($subscriber->getSubscriberEmail()));
+
             try {
                 $api->lists->members->addOrUpdate(
                     $listId,
@@ -464,6 +462,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $helper = $this->getMailchimpHelper();
         $storeId = $subscriber->getStoreId();
         $listId = $helper->getGeneralList($storeId);
+
         try {
             $api = $helper->getApi($storeId);
             $emailHash = hash('md5', strtolower($subscriber->getSubscriberEmail()));
@@ -610,6 +609,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                 ->setWebsiteId($this->getWebsiteByStoreId($storeId))->load($subscriber->getCustomerId())
         );
         $mailChimpTags->buildMailChimpTags();
+
         return $mailChimpTags;
     }
 

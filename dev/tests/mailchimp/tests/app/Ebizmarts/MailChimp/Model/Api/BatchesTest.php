@@ -596,7 +596,7 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->getMock();
 
         $syncBatchesCollectionMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Mysql4_Synchbatches_Collection::class)
+            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Synchbatches_Collection::class)
             ->disableOriginalConstructor()
             ->setMethods(array('addFieldToFilter', 'getIterator'))
             ->getMock();
@@ -608,21 +608,17 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->expects($this->exactly(2))
             ->method('getHelper')
             ->willReturnOnConsecutiveCalls($helperMock);
-        $apiBatchesMock
-            ->expects($this->once())
-            ->method('getSyncBatchesModel')
-            ->willReturn($syncBatchesMock);
 
         $helperMock
             ->expects($this->once())
             ->method('getMCStoreId')
             ->with($magentoStoreId)
             ->willReturn($mailchimpStoreId);
-        $helperMock
+
+        $apiBatchesMock
             ->expects($this->once())
-            ->method('isEcomSyncDataEnabled')
-            ->with($magentoStoreId)
-            ->willReturn(true);
+            ->method('getSyncBatchesModel')
+            ->willReturn($syncBatchesMock);
 
         $syncBatchesMock->expects($this->once())->method('getCollection')->willReturn($syncBatchesCollectionMock);
 
@@ -631,6 +627,13 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->method('addFieldToFilter')
             ->with('status', array('eq' => 'pending'))
             ->willReturnSelf();
+
+        $helperMock
+            ->expects($this->once())
+            ->method('isEcomSyncDataEnabled')
+            ->with($magentoStoreId)
+            ->willReturn(true);
+
         $syncBatchesCollectionMock
             ->expects($this->at(1))
             ->method('addFieldToFilter')
@@ -642,14 +645,26 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
             ->method('getBatchId')
             ->willReturn($batchId);
 
+        $apiBatchesMock
+            ->expects($this->once())
+            ->method('getBatchResponse')
+            ->with($batchId, $magentoStoreId)
+            ->willReturn($files);
+
         $syncBatchesTwoMock
             ->expects($this->once())
             ->method('setStatus')
             ->with($status)
             ->willReturn($batchId);
+
         $syncBatchesTwoMock
             ->expects($this->once())
             ->method('save');
+
+        $apiBatchesMock
+            ->expects($this->once())
+            ->method('processEachResponseFile')
+            ->with($files, $batchId, $mailchimpStoreId);
 
         $syncBatchesCollectionMock
             ->expects($this->once())
@@ -658,23 +673,15 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
 
         $apiBatchesMock
             ->expects($this->once())
-            ->method('getBatchResponse')
-            ->with($batchId, $magentoStoreId)
-            ->willReturn($files);
-        $apiBatchesMock
-            ->expects($this->once())
-            ->method('processEachResponseFile')
-            ->with($files, $batchId, $mailchimpStoreId);
-
-        $apiBatchesMock
-            ->expects($this->once())
             ->method('getMagentoBaseDir')
             ->willReturn($magentoBaseDir);
+
         $apiBatchesMock
             ->expects($this->once())
             ->method('batchDirExists')
             ->with($magentoBaseDir, $batchId)
             ->willReturn(true);
+
         $apiBatchesMock
             ->expects($this->once())
             ->method('removeBatchDir')
