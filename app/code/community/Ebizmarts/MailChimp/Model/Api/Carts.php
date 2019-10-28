@@ -128,6 +128,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
             $allCarts[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/carts/' . $cartId;
             $allCarts[$counter]['operation_id'] = $batchId . '_' . $cartId;
             $allCarts[$counter]['body'] = '';
+
             $this->markSyncDataAsDeleted($cartId, $mailchimpStoreId);
             $this->setCounter($this->getCounter() + 1);
         }

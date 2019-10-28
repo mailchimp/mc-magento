@@ -23,7 +23,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     protected $_dateHelper;
 
     /**
-     * @var Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection
+     * @var Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
      */
     protected $_ecommerceData;
 
@@ -296,7 +296,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     }
 
     /**
-     * @return Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
      */
     protected function getEcommerceCollection()
     {

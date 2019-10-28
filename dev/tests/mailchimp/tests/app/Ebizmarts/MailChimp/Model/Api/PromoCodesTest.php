@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->getMock();
 
         $syncDataItemCollectionMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection::class)
+            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection::class)
             ->disableOriginalConstructor()
             ->getMock();
 

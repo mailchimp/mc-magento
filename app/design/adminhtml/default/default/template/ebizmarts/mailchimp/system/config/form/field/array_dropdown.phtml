@@ -19,7 +19,7 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
         <tbody>
 
         <tr class="headings" id="headings<?php echo $this->quoteEscape($htmlId) ?>">
-            <?php foreach ($this->_columns as $columnName => $column):?>
+            <?php foreach ($this->_columns as $columnName => $column): ?>
                 <th><?php echo $this->quoteEscape($column['label']) ?></th>
             <?php endforeach; ?>
             <th <?php echo $this->quoteEscape($colspan) ?>></th>
@@ -64,7 +64,7 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
 
         </tbody>
     </table>
-    <input type="hidden" name="<?php echo $this->quoteEscape($this->getElement()->getName()) ?>[__empty]" value="" />
+    <input type="hidden" name="<?php echo $this->quoteEscape($this->getElement()->getName()) ?>[__empty]" value=""/>
 </div>
 <div id="empty<?php echo $this->quoteEscape($htmlId) ?>">
     <button style=""
@@ -86,32 +86,27 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
     // create row creator
     var arrayRow<?php echo $this->quoteEscape($htmlId) ?> = {
         // define row prototypeJS template
-        template : new Template(
+        template: new Template(
             '<tr id="#{_id}">'
             <?php foreach ($this->_columns as $columnName => $column):?>
-                +'<td>'
-                +'<?php echo $this->jsQuoteEscape($this->_renderCellTemplate($columnName)) ?>'
-                +'<\/td>'
+            + '<td>'
+            + '<?php echo $this->jsQuoteEscape($this->_renderCellTemplate($columnName)) ?>'
+            + '<\/td>'
             <?php endforeach;?>
             <?php if ($this->_addAfter):?>
-                +'<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><span><span>'
-                +<?php
-                    echo $this->jsQuoteEscape(
-                        Mage::helper('adminhtml')->__(
-                            'Add after'
-                        )
-                    ) ?>
-                +'<\/span><\/span><\/span><\/button><\/td>'
-            <?php endif;?>
-            +'<td><button onclick="arrayRow<?php echo $this->quoteEscape($htmlId) ?>.del(\'#{_id}\')" '
-            +'class="scalable delete" type="button"><span><span><span>'
-            +'<?php echo $this->jsQuoteEscape(Mage::helper('adminhtml')->__('Delete')) ?>'
+            + '<td><button onclick="" class="scalable add" type="button" id="addAfterBtn#{_id}"><span><span><span>'
+            +<?php
+            echo $this->jsQuoteEscape(Mage::helper('adminhtml')->__('Add after'))?>
             +'<\/span><\/span><\/span><\/button><\/td>'
-            +'<\/tr>'
+            <?php endif;?>
+            + '<td><button onclick="arrayRow<?php echo $this->quoteEscape($htmlId) ?>.del(\'#{_id}\')" '
+            + 'class="scalable delete" type="button"><span><span><span>'
+            + '<?php echo $this->jsQuoteEscape(Mage::helper('adminhtml')->__('Delete')) ?>'
+            + '<\/span><\/span><\/span><\/button><\/td>'
+            + '<\/tr>'
         ),
-        rowsCount : 0,
-        add : function(templateData, insertAfterId)
-        {
+        rowsCount: 0,
+        add: function (templateData, insertAfterId) {
             if (this.rowsCount >= 30) {
                 alert("Max. merge fields reached. \nOnly up to 30 merge fields are allowed.");
             } else {
@@ -120,9 +115,9 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
                     var d = new Date();
                     templateData = {
                         <?php foreach ($this->_columns as $columnName => $column):?>
-                        <?php echo $this->quoteEscape($columnName) ?> : '',
+                        <?php echo $this->quoteEscape($columnName) ?>: '',
                         <?php endforeach;?>
-                            _id: '_' + d.getTime() + '_' + d.getMilliseconds()
+                        _id: '_' + d.getTime() + '_' + d.getMilliseconds()
                     };
                 }
                 // insert before last row
@@ -156,36 +151,34 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
         open: function () {
             var url = '<?php echo $this->escapeUrl($this->getUrl("adminhtml/mergevars/addmergevar/")) ?>?';
             var dialogWindow = Dialog.info(null, {
-                draggable:true,
-                resizable:false,
-                closable:true,
-                className:"magento",
-                windowClassName:"popup-window",
-                title:'Add new Merge Var to send to Mailchimp',
-                top:50,
-                width:1000,
-                height:300,
-                zIndex:1000,
-                recenterAuto:false,
-                hideEffect:Element.hide,
-                showEffect:Element.show,
-                id:"browser_window",
+                draggable: true,
+                resizable: false,
+                closable: true,
+                className: "magento",
+                windowClassName: "popup-window",
+                title: 'Add new Merge Var to send to Mailchimp',
+                top: 50,
+                width: 1000,
+                height: 300,
+                zIndex: 1000,
+                recenterAuto: false,
+                hideEffect: Element.hide,
+                showEffect: Element.show,
+                id: "browser_window",
                 url: url,
-                onClose:function (param, el) {
+                onClose: function (param, el) {
                     location.reload();
                 }
             });
         },
-        del : function(rowId)
-        {
+        del: function (rowId) {
             $(rowId).remove();
             this.rowsCount -= 1;
             if (0 == this.rowsCount) {
                 this.showButtonOnly();
             }
         },
-        showButtonOnly : function()
-        {
+        showButtonOnly: function () {
             $('grid<?php echo $this->quoteEscape($htmlId) ?>').hide();
             $('empty<?php echo $this->quoteEscape($htmlId) ?>').show();
         }
@@ -228,6 +221,6 @@ $colspan = $colspan > 1 ? 'colspan="' . $colspan . '"' : '';
     <?php endif;?>
     // toggle the grid, if element is disabled (depending on scope)
     <?php if ($this->getElement()->getDisabled()):?>
-    toggleValueElements({checked:true}, $('grid<?php echo $this->quoteEscape($htmlId) ?>').parentNode);
+    toggleValueElements({checked: true}, $('grid<?php echo $this->quoteEscape($htmlId) ?>').parentNode);
     <?php endif;?>
 </script>

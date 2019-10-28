@@ -772,7 +772,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
         foreach ($files as $file) {
             $fileContent = $fileHelper->read($file);
-            $items = json_decode($fileContent);
+            $items = json_decode($fileContent, true);
 
             if ($items !== false) {
                 foreach ($items as $item) {
@@ -1186,7 +1186,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $countersSentPerBatch = $helper->getCountersSentPerBatch();
 
         if (!empty($countersSentPerBatch) || $countersSentPerBatch != null) {
-            $helper->logBatchStatus("Sent batch $batchId for store $storeId");
+            $helper->logBatchStatus("Sent batch $batchId for Magento store $storeId");
             $helper->logBatchQuantity($helper->getCountersSentPerBatch());
         } else {
             $helper->logBatchStatus("Nothing to sync for store $storeId");
