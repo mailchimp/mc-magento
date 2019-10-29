@@ -1147,10 +1147,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $mailchimpStoreId = $this->getMCStoreId($storeId);
 
             if ($mailchimpStoreId) {
-                $error->setMailchimpStoreId($mailchimpStoreId)
-                    ->save();
+                $this->_saveErrorItem($error, $mailchimpStoreId);
             }
         }
+    }
+
+    /**
+     * @param $error
+     * @param $mailchimpStoreId
+     */
+    protected function _saveErrorItem($error, $mailchimpStoreId)
+    {
+        $error->setMailchimpStoreId($mailchimpStoreId)->save();
     }
 
     /**
@@ -1359,23 +1367,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
 
                 if (!empty($mailchimpFields)) {
-                    foreach ($maps as $map) {
-                        $customAtt = $map['magento'];
-                        $chimpTag = $map['mailchimp'];
-                        $alreadyExists = false;
-
-                        foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
-                            if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
-                                $alreadyExists = true;
-                            }
-                        }
-
-                        if (!$alreadyExists) {
-                            $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
-                        }
-                    }
-
-                    $success = 1;
+                    $success = $this->_mapFieldsIteration($maps, $mailchimpFields, $customFieldTypes, $api, $listId);
                 }
             } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                 $this->logError($e->getMessage());
@@ -1385,6 +1377,44 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         return $success;
     }
 
+    /**
+     * @param $maps
+     * @param $mailchimpFields
+     * @param $customFieldTypes
+     * @param $api
+     * @param $listId
+     * @return int
+     */
+    protected function _mapFieldsIteration($maps, $mailchimpFields, $customFieldTypes, $api, $listId)
+    {
+        foreach ($maps as $map) {
+            $customAtt = $map['magento'];
+            $chimpTag = $map['mailchimp'];
+            $alreadyExists = false;
+
+            foreach ($mailchimpFields['merge_fields'] as $mailchimpField) {
+                if ($mailchimpField['tag'] == $chimpTag || strtoupper($chimpTag) == 'EMAIL') {
+                    $alreadyExists = true;
+                }
+            }
+
+            if (!$alreadyExists) {
+                $this->_createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag);
+            }
+        }
+
+        $success = 1;
+
+        return $success;
+    }
+
+    /**
+     * @param $customFieldTypes
+     * @param $api
+     * @param $customAtt
+     * @param $listId
+     * @param $chimpTag
+     */
     protected function _createCustomFieldTypes($customFieldTypes, $api, $customAtt, $listId, $chimpTag)
     {
         $created = false;
@@ -2486,7 +2516,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         do {
             $collection->setCurPage($currentPage);
-            $collection->load();
+            $this->_loadItemCollection($collection);
 
             foreach ($collection as $collectionItem) {
                 $callback($collectionItem, $mailchimpStoreId);
@@ -2508,6 +2538,14 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } while ($currentPage <= $pages);
 
         return $finished;
+    }
+
+    /**
+     * @param $collection
+     */
+    protected function _loadItemCollection($collection)
+    {
+        $collection->load();
     }
 
     /**
@@ -2830,7 +2868,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             if ($webhookId && $apiKey && $listId) {
                 try {
-                    $api->lists->webhooks->delete($listId, $webhookId);
+                    $api->getLists()->getWebhooks()->delete($listId, $webhookId);
                 } catch (MailChimp_Error $e) {
                     $this->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
@@ -2858,13 +2896,23 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     protected function _deletedWebhooksByListId($api, $listId, $webhookUrl)
     {
-        $webhooks = $api->lists->webhooks->getAll($listId);
+        $webhooks = $api->getLists()->getWebhooks()->getAll($listId);
 
         foreach ($webhooks['webhooks'] as $webhook) {
             if (strpos($webhook['url'], $webhookUrl) !== false) {
-                $api->lists->webhooks->delete($listId, $webhook['id']);
+                $this->_deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
             }
         }
+    }
+
+    /**
+     * @param $apiWebhook
+     * @param $listId
+     * @param $webhookId
+     */
+    protected function _deleteWebhookFromList($apiWebhook, $listId, $webhookId)
+    {
+        $apiWebhook->delete($listId, $webhookId);
     }
 
     /**
@@ -2908,7 +2956,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             try {
-                $response = $api->lists->webhooks->getAll($listId);
+                $response = $api->getLists()->getWebhooks()->getAll($listId);
                 $createWebhook = true;
 
                 if (isset($response['total_items']) && $response['total_items'] > 0) {
@@ -2921,7 +2969,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
 
                 if ($createWebhook) {
-                    $newWebhook = $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                    $newWebhook = $api->getLists()->getWebhooks()->add($listId, $hookUrl, $events, $sources);
                     $newWebhookId = $newWebhook['id'];
                     $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
                     $this->saveMailchimpConfig($configValues, $scopeId, $scope);

@@ -100,7 +100,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         foreach ($modifiedOrders as $item) {
             try {
                 $orderId = $item->getEntityId();
-                $order = Mage::getModel('sales/order')->load($orderId);
+                $order = $this->_getOrderById($orderId);
                 $incrementId = $order->getIncrementId();
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
@@ -189,7 +189,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         foreach ($newOrders as $item) {
             try {
                 $orderId = $item->getEntityId();
-                $order = Mage::getModel('sales/order')->load($orderId);
+                $order = $this->_getOrderById($orderId);
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
@@ -246,6 +246,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         return $batchArray;
+    }
+
+    /**
+     * @param $id
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _getOrderById($id)
+    {
+        return Mage::getModel('sales/order')->load($id);
     }
 
     /**
@@ -401,7 +410,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             if ($this->isItemConfigurable($item)) {
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
-                $variant = $this->getModelProduct()->getIdBySku($sku);
+                $variant = $this->_getProductIdBySku($sku);
 
                 if (!$variant) {
                     continue;
@@ -936,6 +945,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     protected function getModelProduct()
     {
         return Mage::getModel('catalog/product');
+    }
+
+    /**
+     * @param $sku
+     * @return string
+     */
+    protected function _getProductIdBySku($sku)
+    {
+        return $this->getModelProduct()->getIdBySku($sku);
     }
 
     /**

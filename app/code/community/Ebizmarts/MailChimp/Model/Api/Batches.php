@@ -289,18 +289,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 try {
                     $batchId = $item->getBatchId();
                     $files = $this->getBatchResponse($batchId, $magentoStoreId);
-
-                    if (!empty($files)) {
-                        if (isset($files['error'])) {
-                            $item->setStatus('error');
-                            $item->save();
-                            $helper->logBatchStatus('There was an error getting the result ');
-                        } else {
-                            $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
-                            $item->setStatus('completed');
-                            $item->save();
-                        }
-                    }
+                    $this->_saveItemStatus($item, $files, $batchId, $mailchimpStoreId, $magentoStoreId);
 
                     $baseDir = $this->getMagentoBaseDir();
 
@@ -310,6 +299,31 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 } catch (Exception $e) {
                     Mage::log("Error with a response: " . $e->getMessage());
                 }
+            }
+        }
+    }
+
+    /**
+     * @param $item
+     * @param $files
+     * @param $batchId
+     * @param $mailchimpStoreId
+     * @param $magentoStoreId
+     * @throws Mage_Core_Exception
+     */
+    protected function _saveItemStatus($item, $files, $batchId, $mailchimpStoreId, $magentoStoreId)
+    {
+        $helper = $this->getHelper();
+
+        if (!empty($files)) {
+            if (isset($files['error'])) {
+                $item->setStatus('error');
+                $item->save();
+                $helper->logBatchStatus('There was an error getting the result ');
+            } else {
+                $this->processEachResponseFile($files, $batchId, $mailchimpStoreId, $magentoStoreId);
+                $item->setStatus('completed');
+                $item->save();
             }
         }
     }
@@ -783,7 +797,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                     if ($item['status_code'] != 200) {
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
-
                         //parse error
                         $response = json_decode($item['response'], true);
                         $errorDetails = $this->_processFileErrors($response);
@@ -822,6 +835,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         }
 
                         $mailchimpErrors->save();
+
                         $helper->modifyCounterDataSentToMailchimp($type, true);
                         $helper->logError($error);
                     } else {

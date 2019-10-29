@@ -183,34 +183,45 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresController extends Mage_Admin
                         continue;
                     }
 
-                    $storeData = Mage::getModel('mailchimp/stores');
-                    $storeData->setApikey($apiKey)
-                        ->setStoreid($store['id'])
-                        ->setListid($store['list_id'])
-                        ->setName($store['name'])
-                        ->setPlatform($store['platform'])
-                        ->setIsSync($store['is_syncing'])
-                        ->setEmailAddress($store['email_address'])
-                        ->setCurrencyCode($store['currency_code'])
-                        ->setMoneyFormat($store['money_format'])
-                        ->setPrimaryLocale($store['primary_locale'])
-                        ->setTimezone($store['timezone'])
-                        ->setPhone($store['phone'])
-                        ->setAddressAddressOne($store['address']['address1'])
-                        ->setAddressAddressTwo($store['address']['address2'])
-                        ->setAddressCity($store['address']['city'])
-                        ->setAddressProvince($store['address']['province'])
-                        ->setAddressProvinceCode($store['address']['province_code'])
-                        ->setAddressPostalCode($store['address']['postal_code'])
-                        ->setAddressCountry($store['address']['country'])
-                        ->setAddressCountryCode($store['address']['country_code'])
-                        ->setDomain($store['domain'])
-                        ->setMcAccountName($root['account_name'])
-                        ->setListName(key_exists('name', $list) ? $list['name'] : '')
-                        ->save();
+                    $this->_saveStoreData($apiKey, $store, $root, $list);
                 }
             }
         }
+    }
+
+    /**
+     * @param $apiKey
+     * @param $store
+     * @param $root
+     * @param $list
+     */
+    protected function _saveStoreData($apiKey, $store, $root, $list)
+    {
+        $storeData = Mage::getModel('mailchimp/stores');
+        $storeData->setApikey($apiKey)
+            ->setStoreid($store['id'])
+            ->setListid($store['list_id'])
+            ->setName($store['name'])
+            ->setPlatform($store['platform'])
+            ->setIsSync($store['is_syncing'])
+            ->setEmailAddress($store['email_address'])
+            ->setCurrencyCode($store['currency_code'])
+            ->setMoneyFormat($store['money_format'])
+            ->setPrimaryLocale($store['primary_locale'])
+            ->setTimezone($store['timezone'])
+            ->setPhone($store['phone'])
+            ->setAddressAddressOne($store['address']['address1'])
+            ->setAddressAddressTwo($store['address']['address2'])
+            ->setAddressCity($store['address']['city'])
+            ->setAddressProvince($store['address']['province'])
+            ->setAddressProvinceCode($store['address']['province_code'])
+            ->setAddressPostalCode($store['address']['postal_code'])
+            ->setAddressCountry($store['address']['country'])
+            ->setAddressCountryCode($store['address']['country_code'])
+            ->setDomain($store['domain'])
+            ->setMcAccountName($root['account_name'])
+            ->setListName(key_exists('name', $list) ? $list['name'] : '')
+            ->save();
     }
 
     public function getstoresAction()

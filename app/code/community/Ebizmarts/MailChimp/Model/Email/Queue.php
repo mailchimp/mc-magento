@@ -20,9 +20,6 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
      */
     public function send()
     {
-        $mageMCHelper = Mage::helper('mailchimp');
-        $mageMCDateHelper = Mage::helper('mailchimp/date');
-
         /**
         * @var $collection Mage_Core_Model_Resource_Email_Queue_Collection
         */
@@ -37,7 +34,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
         foreach ($collection as $message) {
             if ($message->getId()) {
                 if ($message->getEntityType() == 'order') {
-                    $order = Mage::getModel('sales/order')->load($message->getEntityId());
+                    $order = $this->_getOrderByEntityId($message->getEntityId());
                     $storeId = $order->getStoreId();
                 } else {
                     //If email is not an order confirmation email, it will check if Mandrill enable in default config
@@ -49,8 +46,7 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
 
                     try {
                         $this->_sendMandrillEnabled($message, $parameters, $storeId);
-                        $message->setProcessedAt($mageMCDateHelper->formatDate(null, 'Y-m-d H:i:s'));
-                        $message->save();
+                        $this->_saveMessage($message);
                     } catch (Exception $e) {
                         Mage::logException($e);
                     }
@@ -63,13 +59,32 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                     }
 
                     $this->_sendMandrillNotEnabled($message, $parameters);
-                    $message->setProcessedAt($mageMCDateHelper->formatDate(null, 'Y-m-d H:i:s'));
-                    $message->save();
+                    $this->_saveMessage($message);
                 }
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @param $entityId
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _getOrderByEntityId($entityId)
+    {
+        return Mage::getModel('sales/order')->load($entityId);
+    }
+
+    /**
+     * @param $message
+     */
+    protected function _saveMessage($message)
+    {
+        $mageMCDateHelper = Mage::helper('mailchimp/date');
+
+        $message->setProcessedAt($mageMCDateHelper->formatDate(null, 'Y-m-d H:i:s'));
+        $message->save();
     }
 
     /**
