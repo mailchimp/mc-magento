@@ -2543,7 +2543,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param $collection
      */
-    protected function _loadItemCollection(&$collection)
+    protected function _loadItemCollection($collection)
     {
         $collection->load();
     }
