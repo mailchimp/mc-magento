@@ -2900,7 +2900,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
         foreach ($webhooks['webhooks'] as $webhook) {
             if (strpos($webhook['url'], $webhookUrl) !== false) {
-                $this->_deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
+                $this->deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
             }
         }
     }
@@ -2910,7 +2910,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $listId
      * @param $webhookId
      */
-    protected function _deleteWebhookFromList($apiWebhook, $listId, $webhookId)
+    public function deleteWebhookFromList($apiWebhook, $listId, $webhookId)
     {
         $apiWebhook->delete($listId, $webhookId);
     }

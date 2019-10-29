@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 $webhooks = $api->getLists()->getWebhooks()->getAll($listId);
                 foreach ($webhooks['webhooks'] as $webhook) {
                     if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                        $helper->_deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
+                        $helper->deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
                     }
                 }
             } catch (MailChimp_Error $e) {
