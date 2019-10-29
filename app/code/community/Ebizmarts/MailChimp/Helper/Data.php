@@ -2868,7 +2868,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             if ($webhookId && $apiKey && $listId) {
                 try {
-                    $api->lists->webhooks->delete($listId, $webhookId);
+                    $api->getLists()->getWebhooks()->delete($listId, $webhookId);
                 } catch (MailChimp_Error $e) {
                     $this->logError($e->getFriendlyMessage());
                 } catch (Exception $e) {
@@ -2896,11 +2896,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     protected function _deletedWebhooksByListId($api, $listId, $webhookUrl)
     {
-        $webhooks = $api->lists->webhooks->getAll($listId);
+        $webhooks = $api->getLists()->getWebhooks()->getAll($listId);
 
         foreach ($webhooks['webhooks'] as $webhook) {
             if (strpos($webhook['url'], $webhookUrl) !== false) {
-                $this->_deleteWebhookFromList($api->lists->webhooks, $listId, $webhook['id']);
+                $this->_deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
             }
         }
     }
@@ -2956,7 +2956,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             try {
-                $response = $api->lists->webhooks->getAll($listId);
+                $response = $api->getLists()->getWebhooks()->getAll($listId);
                 $createWebhook = true;
 
                 if (isset($response['total_items']) && $response['total_items'] > 0) {
@@ -2969,7 +2969,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                 }
 
                 if ($createWebhook) {
-                    $newWebhook = $api->lists->webhooks->add($listId, $hookUrl, $events, $sources);
+                    $newWebhook = $api->getLists()->getWebhooks()->add($listId, $hookUrl, $events, $sources);
                     $newWebhookId = $newWebhook['id'];
                     $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
                     $this->saveMailchimpConfig($configValues, $scopeId, $scope);

@@ -795,7 +795,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $type = $line[1];
                     $id = $line[3];
 
-                    if ($item->status_code != 200) {
+                    if ($item['status_code'] != 200) {
                         $mailchimpErrors = Mage::getModel('mailchimp/mailchimperrors');
                         //parse error
                         $response = json_decode($item['response'], true);
@@ -901,7 +901,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _processFileErrors($response)
     {
         $errorDetails = "";
-        $errors = $response->errors;
 
         if (!empty($response['errors'])) {
             foreach ($response['errors'] as $error) {
