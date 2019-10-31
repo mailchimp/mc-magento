@@ -439,7 +439,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
                 $productId = $item->getProductId();
-                $dataProduct = $helper->getEcommerceSyncDataItem(
+                $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                     $productId,
                     Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $mailchimpStoreId
@@ -452,6 +452,14 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $observer;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata
+     */
+    public function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 
     /**
@@ -735,7 +743,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
 
                 $productId = $item->getProductId();
-                $dataProduct = $helper->getEcommerceSyncDataItem(
+                $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                     $productId,
                     Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $mailchimpStoreId
@@ -778,7 +786,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 }
 
                 $productId = $item->getProductId();
-                $dataProduct = $helper->getEcommerceSyncDataItem(
+                $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                     $productId,
                     Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $mailchimpStoreId
@@ -814,7 +822,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
 
             $productId = $item->getProductId();
-            $dataProduct = $helper->getEcommerceSyncDataItem(
+            $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                 $productId,
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $mailchimpStoreId
@@ -849,7 +857,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
                 $status = $this->getCatalogProductStatusModel()->getProductStatus($product->getId(), $storeId);
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
-                    $dataProduct = $helper->getEcommerceSyncDataItem(
+                    $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                         $product->getId(),
                         Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $mailchimpStoreId
@@ -889,7 +897,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
             if ($ecommEnabled) {
                 foreach ($productIds as $productId) {
-                    $dataProduct = $helper->getEcommerceSyncDataItem(
+                    $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                         $productId,
                         Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $mailchimpStoreId

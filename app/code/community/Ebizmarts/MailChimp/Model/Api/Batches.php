@@ -1006,7 +1006,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
-            $helper->saveEcommerceSyncData(
+            $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+            $ecommerceSyncData->saveEcommerceSyncData(
                 $itemId,
                 $itemType,
                 $mailchimpStoreId,
@@ -1021,6 +1022,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 false
             );
         }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
+     */
+    protected function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 
     /**
@@ -1186,7 +1195,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function getDataProduct($helper, $mailchimpStoreId, $id, $type)
     {
-        return $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+        return $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
     }
 
     /**

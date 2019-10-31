@@ -1228,7 +1228,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $lastCustomerSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
-        $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
+        $syncDataCollection = $this->getMailchimpEcommerceSyncDataModel()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER))
             ->setOrder('related_id', 'DESC')
@@ -1251,7 +1251,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $lastProductSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
-        $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
+        $syncDataCollection = $this->getMailchimpEcommerceSyncDataModel()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_PRODUCT))
             ->setOrder('related_id', 'DESC')
@@ -1274,7 +1274,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $lastOrderSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
-        $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
+        $syncDataCollection = $this->getMailchimpEcommerceSyncDataModel()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_ORDER))
             ->setOrder('related_id', 'DESC')
@@ -1297,7 +1297,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $lastCartSent = null;
         $mcStoreId = $this->getMCStoreId($scopeId, $scope);
-        $syncDataCollection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
+        $syncDataCollection = $this->getMailchimpEcommerceSyncDataModel()->getCollection()
             ->addFieldToFilter('mailchimp_store_id', array('eq' => $mcStoreId))
             ->addFieldToFilter('type', array('eq' => Ebizmarts_MailChimp_Model_Config::IS_QUOTE))
             ->setOrder('related_id', 'DESC')
@@ -1550,86 +1550,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $api;
-    }
-
-    /**
-     * Save entry for ecommerce_sync_data table overwriting old item if exists or creating a new one if it does not.
-     *
-     * @param       $itemId
-     * @param       $itemType
-     * @param       $mailchimpStoreId
-     * @param null  $syncDelta
-     * @param null  $syncError
-     * @param int   $syncModified
-     * @param null  $syncDeleted
-     * @param null  $token
-     * @param null  $syncedFlag
-     * @param bool  $saveOnlyIfexists
-     * @param null  $deletedRelatedId
-     * @param bool  $allowBatchRemoval
-     */
-    public function saveEcommerceSyncData(
-        $itemId,
-        $itemType,
-        $mailchimpStoreId,
-        $syncDelta = null,
-        $syncError = null,
-        $syncModified = 0,
-        $syncDeleted = null,
-        $token = null,
-        $syncedFlag = null,
-        $saveOnlyIfexists = false,
-        $deletedRelatedId = null,
-        $allowBatchRemoval = true
-    ) {
-        $ecommerceSyncDataItem = $this->getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId);
-
-        if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
-            $this->setEcommerceSyncDataItemValues(
-                $itemType, $syncDelta, $syncError, $syncModified, $syncDeleted,
-                $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, $ecommerceSyncDataItem
-            );
-
-            $ecommerceSyncDataItem->save();
-        }
-    }
-
-    /**
-     *  Load Ecommerce Sync Data Item if exists or set the values for a new one and return it.
-     *
-     * @param  $itemId
-     * @param  $itemType
-     * @param  $mailchimpStoreId
-     * @return Varien_Object
-     */
-    public function getEcommerceSyncDataItem($itemId, $itemType, $mailchimpStoreId)
-    {
-        $collection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
-            ->addFieldToFilter('related_id', array('eq' => $itemId))
-            ->addFieldToFilter('type', array('eq' => $itemType))
-            ->addFieldToFilter('mailchimp_store_id', array('eq' => $mailchimpStoreId))
-            ->setCurPage(1)
-            ->setPageSize(1);
-
-        if ($collection->getSize()) {
-            $ecommerceSyndDataItem = $collection->getLastItem();
-        } else {
-            $ecommerceSyndDataItem = $this->getModelMailchimpEcommerceSyncData()
-                ->setData("related_id", $itemId)
-                ->setData("type", $itemType)
-                ->setData("mailchimp_store_id", $mailchimpStoreId);
-        }
-
-        return $ecommerceSyndDataItem;
-    }
-
-    public function getAllEcommerceSyncDataItemsPerId($itemId, $itemType)
-    {
-        $collection = $this->getModelMailchimpEcommerceSyncData()->getCollection()
-            ->addFieldToFilter('related_id', array('eq' => $itemId))
-            ->addFieldToFilter('type', array('eq' => $itemType));
-
-        return $collection;
     }
 
     /**
@@ -2248,7 +2168,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $syncModified = $customer->getMailchimpSyncModified();
                         }
 
-                        $this->saveEcommerceSyncData(
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData->saveEcommerceSyncData(
                             $customerId,
                             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                             $mailchimpStoreId,
@@ -2312,7 +2233,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $syncModified = $product->getMailchimpSyncModified();
                         }
 
-                        $this->saveEcommerceSyncData(
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData->saveEcommerceSyncData(
                             $productId,
                             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                             $mailchimpStoreId,
@@ -2377,7 +2299,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $syncModified = $order->getMailchimpSyncModified();
                         }
 
-                        $this->saveEcommerceSyncData(
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData->saveEcommerceSyncData(
                             $orderId,
                             Ebizmarts_MailChimp_Model_Config::IS_ORDER,
                             $mailchimpStoreId,
@@ -2448,7 +2371,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
                             $token = $quote->getMailchimpToken();
                         }
 
-                        $this->saveEcommerceSyncData(
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData->saveEcommerceSyncData(
                             $quoteId,
                             Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                             $mailchimpStoreId,
@@ -4873,7 +4797,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
      */
-    protected function getModelMailchimpEcommerceSyncData()
+    protected function getMailchimpEcommerceSyncDataModel()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
     }
@@ -5170,7 +5094,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $syncedFlag
      * @param $deletedRelatedId
      * @param $allowBatchRemoval
-     * @param Ebizmarts_MailChimp_Model_Api_SyncItem $ecommerceSyncDataItem
+     * @param Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
      */
     protected function setEcommerceSyncDataItemValues(
         $itemType,
@@ -5182,7 +5106,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $syncedFlag,
         $deletedRelatedId,
         $allowBatchRemoval,
-        Ebizmarts_MailChimp_Model_Api_SyncItem $ecommerceSyncDataItem
+        Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
     ) {
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);

@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     const BATCH_LIMIT = 100;
 
@@ -477,7 +477,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
         foreach ($items as $item) {
             $productId = $item->getProductId();
             $isTypeProduct = $this->isTypeProduct();
-            $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
+            $productSyncData = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
             $line = array();
 
             if ($item->getProductType() == 'bundle' || $item->getProductType() == 'grouped') {
@@ -817,7 +817,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_QUOTE;
     }

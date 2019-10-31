@@ -24,7 +24,7 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
             $quote = Mage::getModel('sales/quote')->load($params['id']);
             $storeId = $quote->getStoreId();
             $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
-            $quoteSyncData = Mage::helper('mailchimp')
+            $quoteSyncData = $this->getMailchimpEcommerceSyncDataModel()
                 ->getEcommerceSyncDataItem(
                     $params['id'],
                     Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
@@ -89,7 +89,7 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
             $url = Mage::getUrl('checkout/cart');
 
-            $promoCodeSyncData = $helper->getEcommerceSyncDataItem(
+            $promoCodeSyncData = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                 $id,
                 Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                 $mailchimpStoreId
@@ -137,5 +137,13 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                     ->setRedirect($url);
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 }

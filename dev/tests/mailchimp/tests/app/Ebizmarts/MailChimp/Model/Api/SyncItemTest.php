@@ -1,6 +1,6 @@
 <?php
 
-class Ebizmarts_MailChimp_Model_Api_SyncItemTest extends PHPUnit_Framework_TestCase
+class Ebizmarts_MailChimp_Model_Api_ItemSynchronizerTest extends PHPUnit_Framework_TestCase
 {
     protected $_syncItemApiMock;
 
@@ -11,7 +11,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItemTest extends PHPUnit_Framework_TestC
         /**
          * @var Ebizmarts_MailChimp_Model_Api_PromoRules $apiPromoRulesMock promoRulesApiMock
          */
-        $this->_syncItemApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_SyncItem::class);
+        $this->_syncItemApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_ItemSynchronizer::class);
     }
 
     public function tearDown()
