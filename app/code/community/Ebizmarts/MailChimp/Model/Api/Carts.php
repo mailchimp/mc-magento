@@ -213,7 +213,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
+            $cartJson = $this->makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
 
             if ($cartJson !== false) {
                 if (!empty($cartJson)) {
@@ -334,7 +334,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
+            $cartJson = $this->makeCart($cart, $mailchimpStoreId, $magentoStoreId);
 
             if ($cartJson !== false) {
                 if (!empty($cartJson)) {
@@ -423,7 +423,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
      * @param $isModified
      * @return string
      */
-    public function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
+    public function makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
     {
         $apiProduct = $this->getApiProducts();
         $campaignId = $cart->getMailchimpCampaignId();
@@ -470,7 +470,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
      */
     protected function _processCartLines($items, $mailchimpStoreId, $magentoStoreId, $apiProduct)
     {
-        $helper = $this->getHelper();
         $lines = array();
         $itemCount = 0;
 
