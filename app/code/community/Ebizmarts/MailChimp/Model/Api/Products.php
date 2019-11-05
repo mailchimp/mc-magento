@@ -554,7 +554,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     $this->addSyncDataError(
                         $productId,
                         $mailchimpStoreId,
-                        "This product type is not supported on MailChimp.",
+                        "This product type is not supported on MailChimp. (product id: $productId)",
                         null,
                         null,
                         $dateHelper->formatDate(null, 'Y-m-d H:i:s')

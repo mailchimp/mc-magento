@@ -384,6 +384,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $itemTwoSyncDelta = '2018-03-14 15:03:35';
         $isProductEnabled = false;
         $error = "This product type is not supported on MailChimp.";
+        $error = "This product type is not supported on MailChimp. (product id: $groupedProductId)";
 
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
