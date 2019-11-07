@@ -802,7 +802,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $errorDetails = $this->_processFileErrors($response);
 
                         if (strstr($errorDetails, 'already exists')) {
-                            $this->setItemAsModified($helper, $mailchimpStoreId, $id, $type);
+                            $this->setItemAsModified($mailchimpStoreId, $id, $type);
                             $helper->modifyCounterDataSentToMailchimp($type);
                             continue;
                         }
@@ -839,7 +839,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         $helper->modifyCounterDataSentToMailchimp($type, true);
                         $helper->logError($error);
                     } else {
-                        $syncDataItem = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
+                        $syncDataItem = $this->getDataProduct($mailchimpStoreId, $id, $type);
 
                         if (!$syncDataItem->getMailchimpSyncModified()) {
                             $syncModified = $this->enableMergeFieldsSending($type, $syncDataItem);
@@ -878,10 +878,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     protected function _getError($type, $mailchimpStoreId, $id, $response)
     {
         $error = $response->title . " : " . $response->detail;
-        $helper = $this->getHelper();
 
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
-            $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
+            $dataProduct = $this->getDataProduct($mailchimpStoreId, $id, $type);
             $isProductDisabledInMagento = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
 
             if ($dataProduct->getMailchimpSyncDeleted()
@@ -1006,7 +1005,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
-            $helper->saveEcommerceSyncData(
+            $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+            $ecommerceSyncData->saveEcommerceSyncData(
                 $itemId,
                 $itemType,
                 $mailchimpStoreId,
@@ -1021,6 +1021,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 false
             );
         }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
+     */
+    protected function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 
     /**
@@ -1099,17 +1107,16 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $helper
      * @param $mailchimpStoreId
      * @param $id
      * @param $type
      */
-    protected function setItemAsModified($helper, $mailchimpStoreId, $id, $type)
+    protected function setItemAsModified($mailchimpStoreId, $id, $type)
     {
         $isMarkedAsDeleted = null;
 
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
-            $dataProduct = $this->getDataProduct($helper, $mailchimpStoreId, $id, $type);
+            $dataProduct = $this->getDataProduct($mailchimpStoreId, $id, $type);
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
             $isProductDisabledInMagento = Ebizmarts_MailChimp_Model_Api_Products::PRODUCT_DISABLED_IN_MAGENTO;
 
@@ -1178,15 +1185,14 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $helper
      * @param $mailchimpStoreId
      * @param $id
      * @param $type
      * @return Varien_Object
      */
-    protected function getDataProduct($helper, $mailchimpStoreId, $id, $type)
+    protected function getDataProduct($mailchimpStoreId, $id, $type)
     {
-        return $helper->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
+        return $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem($id, $type, $mailchimpStoreId);
     }
 
     /**

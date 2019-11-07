@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     const BATCH_LIMIT = 100;
 
@@ -19,11 +19,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
     protected $_api = null;
     protected $_token = null;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * @param $mailchimpStoreId
@@ -213,7 +208,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
+            $cartJson = $this->makeCart($cart, $mailchimpStoreId, $magentoStoreId, true);
 
             if ($cartJson !== false) {
                 if (!empty($cartJson)) {
@@ -334,7 +329,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $cart, $allCarts);
-            $cartJson = $this->_makeCart($cart, $mailchimpStoreId, $magentoStoreId);
+            $cartJson = $this->makeCart($cart, $mailchimpStoreId, $magentoStoreId);
 
             if ($cartJson !== false) {
                 if (!empty($cartJson)) {
@@ -423,7 +418,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
      * @param $isModified
      * @return string
      */
-    public function _makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
+    public function makeCart($cart, $mailchimpStoreId, $magentoStoreId, $isModified = false)
     {
         $apiProduct = $this->getApiProducts();
         $campaignId = $cart->getMailchimpCampaignId();
@@ -470,14 +465,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
      */
     protected function _processCartLines($items, $mailchimpStoreId, $magentoStoreId, $apiProduct)
     {
-        $helper = $this->getHelper();
         $lines = array();
         $itemCount = 0;
 
         foreach ($items as $item) {
             $productId = $item->getProductId();
             $isTypeProduct = $this->isTypeProduct();
-            $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
+            $productSyncData = $this->getMailchimpEcommerceSyncDataModel()
+                ->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
             $line = array();
 
             if ($item->getProductType() == 'bundle' || $item->getProductType() == 'grouped') {
@@ -817,7 +812,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_QUOTE;
     }

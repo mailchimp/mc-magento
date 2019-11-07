@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     const BATCH_LIMIT = 50;
     const TYPE_FIXED = 'fixed';
@@ -189,7 +189,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId)
     {
-        $deletedPromoRules = Mage::getModel('mailchimp/ecommercesyncdata')->getCollection();
+        $deletedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
         $deletedPromoRules->getSelect()->where(
             "mailchimp_store_id = '" . $mailchimpStoreId
             . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
@@ -226,7 +226,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function deletePromoRuleSyncData($ruleId, $mailchimpStoreId)
     {
-        $ruleSyncDataItem = $this->getHelper()->getEcommerceSyncDataItem(
+        $ruleSyncDataItem = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
             $ruleId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
             $mailchimpStoreId
@@ -334,8 +334,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function _setModified($ruleId)
     {
-        $helper = $this->getHelper();
-        $promoRules = $helper->getAllEcommerceSyncDataItemsPerId(
+        $promoRules = $this->getMailchimpEcommerceSyncDataModel()->getAllEcommerceSyncDataItemsPerId(
             $ruleId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
         );
@@ -358,8 +357,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function _setDeleted($ruleId)
     {
-        $helper = $this->getHelper();
-        $promoRules = $helper->getAllEcommerceSyncDataItemsPerId(
+        $promoRules = $this->getMailchimpEcommerceSyncDataModel()->getAllEcommerceSyncDataItemsPerId(
             $ruleId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
         );
@@ -439,7 +437,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE;
     }
