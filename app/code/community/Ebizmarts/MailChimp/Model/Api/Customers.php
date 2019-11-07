@@ -548,10 +548,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         if ($mergeFieldJSON === false) {
             $this->logCouldNotEncodeMailchimpTags($customer, $mergeFields);
         } else {
-            $md5HashEmail = hash('md5', strtolower($customer->getEmail()));
+            $hashedEmail = hash('md5', strtolower($customer->getEmail()));
             $batchData = array();
             $batchData['method'] = "PATCH";
-            $batchData['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+            $batchData['path'] = "/lists/" . $listId . "/members/" . $hashedEmail;
             $batchData['operation_id'] = "{$this->_batchId}_{$customerId}_SUB";
             $batchData['body'] = $mergeFieldJSON;
         }

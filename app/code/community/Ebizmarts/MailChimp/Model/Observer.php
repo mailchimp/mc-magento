@@ -1003,7 +1003,8 @@ class Ebizmarts_MailChimp_Model_Observer
 
     protected function markProductsAsModified()
     {
-        $tableName = $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
+        $tableName = $mailchimpTableName = $this->getCoreResource()
+            ->getTableName('mailchimp/ecommercesyncdata');
         $sqlQuery = "UPDATE " . $tableName . " "
             . "SET mailchimp_sync_modified = 1 "
             . "WHERE type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT . "';";

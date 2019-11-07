@@ -53,7 +53,9 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $helperMock->expects($this->once())->method('getAllMailChimpStoreIds')->willReturn($mailchimpStoreIdsArray);
         $helperMock->expects($this->once())->method('isEcommerceEnabled')->with($scopeId, $scope)->willReturn(true);
 
-        $modelMock->expects($this->exactly(2))->method('getMailchimpEcommerceSyncDataModel')->willReturn($dataProductMock);
+        $modelMock->expects($this->exactly(2))
+            ->method('getMailchimpEcommerceSyncDataModel')
+            ->willReturn($dataProductMock);
 
         $dataProductMock->expects($this->exactly(2))->method('getEcommerceSyncDataItem')
             ->withConsecutive(

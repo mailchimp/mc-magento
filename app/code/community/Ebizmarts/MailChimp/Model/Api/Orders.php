@@ -29,11 +29,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     protected $_api = null;
     protected $_listsCampaignIds = array();
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Set the request for orders to be created on MailChimp
      *
@@ -404,7 +399,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         foreach ($items as $item) {
             $productId = $item->getProductId();
             $isTypeProduct = $this->isTypeProduct();
-            $productSyncData = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
+            $productSyncData = $this->getMailchimpEcommerceSyncDataModel()
+                ->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
 
             if ($this->isItemConfigurable($item)) {
                 $options = $item->getProductOptions();

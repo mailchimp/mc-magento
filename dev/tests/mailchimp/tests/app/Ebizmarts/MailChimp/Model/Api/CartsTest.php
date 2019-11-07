@@ -380,16 +380,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())
             ->method('addSyncDataToken')
             ->with(self::CART_ID, self::MAILCHIMP_STORE_ID, $token);
-//        $cartsApiMock->expects($this->exactly(2))
-//            ->method('_updateSyncData')
-//            ->withConsecutive(
-//                array(
-//                    self::ALREADY_SENT_CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, 1, null
-//                ),
-//                array(
-//                    self::CART_ID, self::MAILCHIMP_STORE_ID, null, null, null, null, null, $token
-//                )
-//            );
         $cartsApiMock->expects($this->exactly(2))
             ->method('setCounter')
             ->withConsecutive(
