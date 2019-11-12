@@ -3819,7 +3819,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCartAmountLimit()
     {
         return $this->getConfigValueForScope(
-            Ebizmarts_MailChimp_Model_Config::CART_AMOUNT,
+            Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_AMOUNT,
             0,
             'default'
         );
