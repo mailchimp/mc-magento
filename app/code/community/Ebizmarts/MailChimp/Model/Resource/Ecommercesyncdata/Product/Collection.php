@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     }
 
     /**
-     * @param Mage_Sales_Model_Resource_Quote_Collection $preFilteredQuotesCollection
+     * @param Mage_Catalog_Model_Resource_Product_Collection $preFilteredQuotesCollection
      * @param $where
      * @param int null $limit
      */

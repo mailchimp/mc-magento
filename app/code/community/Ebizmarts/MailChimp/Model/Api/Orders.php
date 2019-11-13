@@ -30,6 +30,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     protected $_listsCampaignIds = array();
 
     /**
+     * @var $_ecommerceQuotesCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
+     */
+    protected $_ecommerceOrdersCollection;
+
+    /**
      * Set the request for orders to be created on MailChimp
      *
      * @param $mailchimpStoreId
@@ -39,6 +44,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $this->_ecommerceOrdersCollection = $this->getEcommerceOrdersCollection();
+        $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
+        $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
+
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $oldStore = $helper->getCurrentStoreId();
@@ -74,23 +83,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $batchArray = array();
         $modifiedOrders = $this->getResourceModelOrderCollection();
         // select orders for the current Magento store id
         $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
-        $modifiedOrders->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_ORDER
-            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            array('m4m.*')
-        );
+        $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($modifiedOrders);
         // be sure that the order are already in mailchimp and not deleted
-        $modifiedOrders->getSelect()->where("m4m.mailchimp_sync_modified = 1");
-        // limit the collection
-        $modifiedOrders->getSelect()->limit($this->getBatchLimitFromConfig());
+        $this->_ecommerceOrdersCollection->addWhere(
+            $modifiedOrders,
+            "m4m.mailchimp_sync_modified = 1",
+            $this->getBatchLimitFromConfig()
+        );
 
         foreach ($modifiedOrders as $item) {
             try {
@@ -175,11 +179,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
         }
 
-        $this->joinMailchimpSyncDataWithoutWhere($newOrders, $mailchimpStoreId);
-        // be sure that the orders are not in mailchimp
-        $newOrders->getSelect()->where("m4m.mailchimp_sync_delta IS NULL");
-        // limit the collection
-        $newOrders->getSelect()->limit($this->getBatchLimitFromConfig());
+        $this->joinMailchimpSyncDataWithoutWhere($newOrders);
+        $this->_ecommerceOrdersCollection->addWhere(
+            $newOrders,
+            "m4m.mailchimp_sync_delta IS NULL",
+            $this->getBatchLimitFromConfig()
+        );
 
         foreach ($newOrders as $item) {
             try {
@@ -725,18 +730,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $orderCollection->addFieldToFilter('entity_id', array('gt' => $lastId));
         }
 
-        $orderCollection->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_ORDER
-            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            array('m4m.*')
-        );
+        $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($orderCollection);
+
         // be sure that the orders are not in mailchimp
-        $orderCollection->getSelect()->where(
-            "m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''"
+        $this->_ecommerceOrdersCollection->addWhere(
+            $orderCollection,
+            "m4m.mailchimp_sync_delta IS NOT NULL AND m4m.mailchimp_sync_error = ''",
+            self::BATCH_LIMIT_ONLY_ORDERS
         );
-        $orderCollection->getSelect()->limit(self::BATCH_LIMIT_ONLY_ORDERS);
 
         foreach ($orderCollection as $order) {
             //Delete order
@@ -822,16 +823,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      * @param $newOrders
      * @param $mailchimpStoreId
      */
-    public function joinMailchimpSyncDataWithoutWhere($newOrders, $mailchimpStoreId)
+    public function joinMailchimpSyncDataWithoutWhere($newOrders)
     {
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $newOrders->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_ORDER
-            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            array('m4m.*')
-        );
+        $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($newOrders);
     }
 
     /**
@@ -1082,5 +1076,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_ORDER;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
+     */
+    public function getEcommerceOrdersCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_orders_collection');
+
+        return $collection;
     }
 }
