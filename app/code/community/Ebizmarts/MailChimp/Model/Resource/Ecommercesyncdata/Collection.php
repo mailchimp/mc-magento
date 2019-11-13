@@ -79,4 +79,9 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection extends
     {
         $this->_mailchimpStoreId = $mailchimpStoreId;
     }
+
+    public function limitCollection($collection, $limit)
+    {
+        $collection->getSelect()->limit($limit);
+    }
 }

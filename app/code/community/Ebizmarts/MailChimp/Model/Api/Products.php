@@ -21,6 +21,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected $_visibility = null;
 
     /**
+     * @var $_ecommerceQuotesCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+     */
+    protected $_ecommerceProductsCollection;
+
+    /**
      * @var Mage_Catalog_Model_Product_Type_Configurable
      */
     protected $_productTypeConfigurable;
@@ -51,6 +56,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $this->_ecommerceProductsCollection = $this->getEcommerceQuoteCollection();
+        $this->_ecommerceProductsCollection->setMailchimpStoreId($mailchimpStoreId);
+        $this->_ecommerceProductsCollection->setStoreId($magentoStoreId);
+
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $oldStore = $helper->getCurrentStoreId();
@@ -154,8 +163,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     public function createDeletedProductsBatchJson($mailchimpStoreId, $magentoStoreId)
     {
         $deletedProducts = $this->getProductResourceCollection();
-
-        $this->joinMailchimpSyncDataDeleted($mailchimpStoreId, $deletedProducts);
+        $this->_ecommerceProductsCollection->joinMailchimpSyncDataDeleted($deletedProducts);
 
         $batchArray = array();
         $batchId = $this->makeBatchId($magentoStoreId);
@@ -635,7 +643,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $this->joinQtyAndBackorders($collection);
 
         if (!$isParentProduct) {
-            $collection->getSelect()->limit($this->getBatchLimitFromConfig());
+            $this->_ecommerceProductsCollection->limitCollection($collection, $this->getBatchLimitFromConfig());
         }
 
         return $collection;
@@ -879,33 +887,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
 
     /**
      * @param $collection
-     * @param $mailchimpStoreId
-     * @param $joinCondition
-     */
-    protected function executeMailchimpDataJoin($collection, $mailchimpStoreId, $joinCondition)
-    {
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $mailchimpStoreId),
-            array(
-                "m4m.related_id",
-                "m4m.type",
-                "m4m.mailchimp_store_id",
-                "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified",
-                "m4m.mailchimp_synced_flag"
-            )
-        );
-    }
-
-    /**
-     * @param $collection
      */
     protected function buildMailchimpDataWhere($collection)
     {
         $whereCreateBatchJson = "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1";
-        $collection->getSelect()->where($whereCreateBatchJson);
+        $this->_ecommerceProductsCollection->addWhere($collection, $whereCreateBatchJson);
     }
 
     /**
@@ -1071,16 +1057,21 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $collection->addStoreFilter($magentoStoreId);
         $collection->addFieldToFilter('entity_id', array('eq' => $parentId));
 
-        $collection->getSelect()->joinLeft(
+        $this->_ecommerceProductsCollection->addJoinLeft(
+            $collection,
             array("super_attribute" => $tableName),
             'entity_id=super_attribute.product_id'
         );
 
-        $collection->getSelect()->joinLeft(
-            array("eav_attribute" => $eavTableName),
+        $this->_ecommerceProductsCollection->addJoinLeft(
+            $collection, array("eav_attribute" => $eavTableName),
             'super_attribute.attribute_id=eav_attribute.attribute_id'
         );
-        $collection->getSelect()->reset(Zend_Db_Select::COLUMNS)->columns('eav_attribute.attribute_id');
+
+        $this->_ecommerceProductsCollection->resetColumns(
+            $collection, Zend_Db_Select::COLUMNS, 'eav_attribute.attribute_id'
+        );
+
         return $collection;
     }
 
@@ -1174,26 +1165,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $deletedProducts
-     * @param $mailchimpTableName
-     */
-    protected function joinMailchimpSyncDataDeleted($mailchimpStoreId, $deletedProducts)
-    {
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $deletedProducts->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
-            . "' AND m4m.mailchimp_store_id = '" . $mailchimpStoreId . "'",
-            array('m4m.*')
-        );
-        $deletedProducts->getSelect()->where("m4m.mailchimp_sync_deleted = 1");
-        $deletedProducts->getSelect()->where("m4m.mailchimp_sync_error = ''");
-
-        $deletedProducts->getSelect()->limit($this->getBatchLimitFromConfig());
-    }
-
-    /**
      * @param string $visibility Visibility.
      * @return int or null
      */
@@ -1260,12 +1231,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             'left'
         );
 
-        $whereCondition = $connection->quoteInto(
-            'm4m.mailchimp_sync_delta IS NOT NULL '
-            . 'AND m4m.mailchimp_sync_delta < ?',
-            $this->getDateHelper()->formatDate() . " 00:00:00"
-        );
-        $collection->getSelect()->where($whereCondition);
+        $whereCondition = 'm4m.mailchimp_sync_delta IS NOT NULL '
+            . 'AND m4m.mailchimp_sync_delta < ?';
+            $this->getDateHelper()->formatDate() . " 00:00:00";
+
+        $this->_ecommerceProductsCollection->addWhere($collection, $whereCondition);
 
         foreach ($collection as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
@@ -1292,7 +1262,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             'left'
         );
 
-        $collectionNoSpecialPrice->getSelect()->where($whereCondition);
+        $this->_ecommerceProductsCollection->addWhere($collectionNoSpecialPrice, $whereCondition);
 
         foreach ($collectionNoSpecialPrice as $item) {
             $this->update($item->getEntityId(), $mailchimpStoreId);
@@ -1329,5 +1299,27 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+     */
+    public function getEcommerceQuoteCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_product_collection');
+
+        return $collection;
+    }
+
+    /**
+     * @param $collection
+     * @param $joinCondition
+     */
+    protected function executeMailchimpDataJoin($collection, $joinCondition)
+    {
+        $this->_ecommerceProductsCollection->executeMailchimpDataJoin($collection, $joinCondition);
     }
 }
