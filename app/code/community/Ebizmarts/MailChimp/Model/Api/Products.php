@@ -21,7 +21,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected $_visibility = null;
 
     /**
-     * @var $_ecommerceQuotesCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+     * @var $_ecommerceProductsCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
      */
     protected $_ecommerceProductsCollection;
 

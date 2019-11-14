@@ -25,12 +25,12 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     }
 
     /**
-     * @param Mage_Sales_Model_Resource_Quote_Collection $preFilteredQuotesCollection
+     * @param Mage_Catalog_Model_Resource_Product_Collection $preFilteredProductsCollection
      */
-    public function joinLeftEcommerceSyncData($preFilteredQuotesCollection)
+    public function joinLeftEcommerceSyncData($preFilteredProductsCollection)
     {
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $preFilteredQuotesCollection->getSelect()->joinLeft(
+        $preFilteredProductsCollection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
             . "' AND m4m.mailchimp_store_id = '" . $this->getMailchimpStoreId() . "'",
@@ -39,18 +39,18 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     }
 
     /**
-     * @param Mage_Catalog_Model_Resource_Product_Collection $preFilteredQuotesCollection
+     * @param Mage_Catalog_Model_Resource_Product_Collection $preFilteredProductsCollection
      * @param $where
      * @param int null $limit
      */
-    public function addWhere($preFilteredQuotesCollection, $where = null, $limit = null)
+    public function addWhere($preFilteredProductsCollection, $where = null, $limit = null)
     {
         if (isset($where)) {
-            $preFilteredQuotesCollection->getSelect()->where($where);
+            $preFilteredProductsCollection->getSelect()->where($where);
         }
 
         if (isset($limit)) {
-            $preFilteredQuotesCollection->getSelect()->limit($limit);
+            $preFilteredProductsCollection->getSelect()->limit($limit);
         }
     }
 

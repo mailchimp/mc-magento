@@ -22,6 +22,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected $_mailchimpStoreId;
     protected $_batchId;
 
+    /**
+     * @var $_ecommerceProductsCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     */
+    protected $_ecommerceCustomersCollection;
+
     public function __construct()
     {
         parent::__construct();
@@ -81,6 +86,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $this->_ecommerceCustomersCollection = $this->getEcommerceQuoteCollection();
+        $this->_ecommerceCustomersCollection->setMailchimpStoreId($mailchimpStoreId);
+        $this->_ecommerceCustomersCollection->setStoreId($magentoStoreId);
+
         $this->setMailchimpStoreId($mailchimpStoreId);
         $this->setMagentoStoreId($magentoStoreId);
         $helper = $this->getHelper();
@@ -360,20 +369,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @param $collection
+     * @param $collection Mage_Customer_Model_Resource_Customer_Collection
      */
     protected function joinMailchimpSyncData($collection)
     {
-        $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->_mailchimpStoreId),
-            array()
-        );
-
-        $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
+        $this->_ecommerceCustomersCollection->joinLeftEcommerceSyncData($collection);
     }
 
     /**
@@ -467,11 +467,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @return Object
+     * @return Mage_Customer_Model_Resource_Customer_Collection
      */
     protected function getCustomerResourceCollection()
     {
-        return Mage::getResourceModel('customer/customer_collection');
+        /**
+         * @var $collection Mage_Customer_Model_Resource_Customer_Collection
+         */
+        $collection = Mage::getResourceModel('customer/customer_collection');
+
+        return $collection;
     }
 
     /**
