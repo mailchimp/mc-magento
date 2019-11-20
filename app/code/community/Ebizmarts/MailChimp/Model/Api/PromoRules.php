@@ -21,6 +21,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     protected $_batchId;
 
     /**
+     * @var $_ecommercePromoRulesCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection
+     */
+    protected $_ecommercePromoRulesCollection;
+
+
+    /**
      * @var Ebizmarts_MailChimp_Model_Api_PromoCodes
      */
     protected $_promoCodes;
@@ -38,6 +44,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
+        $this->_ecommercePromoRulesCollection = $this->getEcommercePromoRulesCollection();
+        $this->_ecommercePromoRulesCollection->setMailchimpStoreId($mailchimpStoreId);
+        $this->_ecommercePromoRulesCollection->setStoreId($magentoStoreId);
+
         $batchArray = array();
         $this->_batchId = 'storeid-'
             . $magentoStoreId . '_'
@@ -190,34 +200,16 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     protected function makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId)
     {
         $deletedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
-        $deletedPromoRules->getSelect()->where(
+
+        $this->_ecommercePromoRulesCollection->addWhere(
+            $deletedPromoRules,
             "mailchimp_store_id = '" . $mailchimpStoreId
             . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
-            . "' AND (mailchimp_sync_modified = 1 OR mailchimp_sync_deleted = 1)"
+            . "' AND (mailchimp_sync_modified = 1 OR mailchimp_sync_deleted = 1)",
+            $this->getBatchLimitFromConfig()
         );
-        $deletedPromoRules->getSelect()->limit($this->getBatchLimitFromConfig());
-        return $deletedPromoRules;
-    }
 
-    /**
-     * @param $collection
-     * @param $mailchimpStoreId
-     */
-    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId)
-    {
-        $joinCondition = "m4m.related_id = main_table.rule_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE, $mailchimpStoreId),
-            array(
-                "m4m.related_id",
-                "m4m.type",
-                "m4m.mailchimp_store_id",
-                "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified"
-            )
-        );
+        return $deletedPromoRules;
     }
 
     /**
@@ -440,5 +432,18 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection
+     */
+    public function getEcommercePromoRulesCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_promorules_collection');
+
+        return $collection;
     }
 }

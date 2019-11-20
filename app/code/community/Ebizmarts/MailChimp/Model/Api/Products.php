@@ -12,18 +12,12 @@
 class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     const PRODUCT_IS_ENABLED = 1;
-    const PRODUCT_IS_DISABLED = 2;
     const BATCH_LIMIT = 100;
     protected $_parentImageUrl = null;
     protected $_parentId = null;
     protected $_parentUrl = null;
     protected $_parentPrice = null;
     protected $_visibility = null;
-
-    /**
-     * @var $_ecommerceProductsCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
-     */
-    protected $_ecommerceProductsCollection;
 
     /**
      * @var Mage_Catalog_Model_Product_Type_Configurable
@@ -35,6 +29,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     public static $noChildrenIds = array(0 => array());
 
     const PRODUCT_DISABLED_IN_MAGENTO = 'This product was deleted because it is disabled in Magento.';
+
+    /**
+     * @var $_ecommerceProductsCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+     */
+    protected $_ecommerceProductsCollection;
 
     public function __construct()
     {
@@ -56,7 +55,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $this->_ecommerceProductsCollection = $this->getEcommerceQuoteCollection();
+        $this->_ecommerceProductsCollection = $this->getEcommerceProductsCollection();
         $this->_ecommerceProductsCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceProductsCollection->setStoreId($magentoStoreId);
 
@@ -100,6 +99,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                         $buildUpdateOperations,
                         $batchArray
                     );
+
                     $this->addSyncData($productId, $mailchimpStoreId);
                 }
 
@@ -640,7 +640,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
         );
 
-        $this->joinQtyAndBackorders($collection);
+        $this->_ecommerceProductsCollection->joinQtyAndBackorders($collection);
 
         if (!$isParentProduct) {
             $this->_ecommerceProductsCollection->limitCollection($collection, $this->getBatchLimitFromConfig());
@@ -725,29 +725,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         return $product->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE;
     }
 
-    /**
-     * @param $collection
-     */
-    public function joinQtyAndBackorders($collection)
-    {
-        $collection->joinField(
-            'qty',
-            'cataloginventory/stock_item',
-            'qty',
-            'product_id=entity_id',
-            '{{table}}.stock_id=1',
-            'left'
-        );
 
-        $collection->joinField(
-            'backorders',
-            'cataloginventory/stock_item',
-            'backorders',
-            'product_id=entity_id',
-            '{{table}}.stock_id=1',
-            'left'
-        );
-    }
 
     /**
      * @param $product
@@ -1231,10 +1209,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             'left'
         );
 
-        $whereCondition = 'm4m.mailchimp_sync_delta IS NOT NULL '
-            . 'AND m4m.mailchimp_sync_delta < ?';
-            $this->getDateHelper()->formatDate() . " 00:00:00";
-
+        $whereCondition = $connection->quoteInto(
+            'm4m.mailchimp_sync_delta IS NOT NULL '
+            . 'AND m4m.mailchimp_sync_delta < ?',
+            $this->getDateHelper()->formatDate() . " 00:00:00"
+        );
         $this->_ecommerceProductsCollection->addWhere($collection, $whereCondition);
 
         foreach ($collection as $item) {
@@ -1304,7 +1283,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
      */
-    public function getEcommerceQuoteCollection()
+    public function getEcommerceProductsCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection

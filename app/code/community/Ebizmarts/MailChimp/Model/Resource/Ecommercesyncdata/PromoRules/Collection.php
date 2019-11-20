@@ -10,7 +10,7 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @date:     2019-11-04 17:32
  */
-class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection extends
+class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection extends
     Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
 {
 
@@ -25,16 +25,16 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection exte
     }
 
     /**
-     * @param Mage_Sales_Model_Resource_Quote_Collection $preFilteredQuotesCollection
+     * @param Mage_SalesRule_Model_Resource_Rule_Collection $preFilteredPromoRulesCollection
      */
-    public function joinLeftEcommerceSyncData($preFilteredQuotesCollection)
+    public function joinLeftEcommerceSyncData($preFilteredPromoRulesCollection, $columns = array('m4m.*'))
     {
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $preFilteredQuotesCollection->getSelect()->joinLeft(
+        $preFilteredPromoRulesCollection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
+            "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
             . "' AND m4m.mailchimp_store_id = '" . $this->getMailchimpStoreId() . "'",
-            array('m4m.*')
+            $columns
         );
     }
 }

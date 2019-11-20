@@ -37,20 +37,4 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collectio
             array('m4m.*')
         );
     }
-
-    /**
-     * @param Mage_Newsletter_Model_Resource_Subscriber_Collection $preFilteredOrdersCollection
-     * @param $where
-     * @param int null $limit
-     */
-    public function addWhere($preFilteredOrdersCollection, $where = null, $limit = null)
-    {
-        if (isset($where)) {
-            $preFilteredOrdersCollection->getSelect()->where($where);
-        }
-
-        if (isset($limit)) {
-            $preFilteredOrdersCollection->getSelect()->limit($limit);
-        }
-    }
 }

@@ -20,6 +20,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     protected $_mcDateHelper;
     protected $_storeId;
 
+    /**
+     * @var $_ecommerceSubscribersCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collection
+     */
+    protected $_ecommerceSubscribersCollection;
+
     public function __construct()
     {
         $mageMCHelper = Mage::helper('mailchimp');
@@ -66,6 +71,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $this->getStoreId()
         );
 
+        $this->_ecommerceSubscribersCollection = $this->getEcommerceSubscribersCollection();
+        $this->_ecommerceSubscribersCollection->setStoreId($this->getStoreId());
+
         $subscriberArray = array();
 
         if ($thisScopeHasList && !$thisScopeHasSubMinSyncDateFlag
@@ -102,8 +110,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
                     array('eq' => 1)
                 )
             );
+
         $collection->addFieldToFilter('mailchimp_sync_error', array('eq' => ''));
-        $collection->getSelect()->limit($limit);
+        $this->_ecommerceSubscribersCollection->limitCollection($collection, $limit);
         $date = $dateHelper->getDateMicrotime();
         $batchId = 'storeid-' . $this->getStoreId() . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER . '_' . $date;
@@ -611,6 +620,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $mailChimpTags->buildMailChimpTags();
 
         return $mailChimpTags;
+    }
+
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collection
+     */
+    public function getEcommerceSubscribersCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_subscribers_collection');
+
+        return $collection;
     }
 
 }

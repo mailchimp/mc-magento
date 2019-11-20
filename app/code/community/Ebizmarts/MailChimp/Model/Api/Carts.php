@@ -644,7 +644,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     }
 
     /**
-     * @param Mage_Sales_Model_Resource_Quote_Collection $preFilteredQuotesCollection
+     * @param Mage_Sales_Model_Resource_Quote_Collection $preFilteredCollection
      */
     public function joinLeftEcommerceSyncData($preFilteredCollection)
     {
@@ -657,19 +657,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     public function getQuoteCollection()
     {
         return Mage::getResourceModel('sales/quote_collection');
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection
-     */
-    public function getEcommerceQuoteCollection()
-    {
-        /**
-         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection
-         */
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_quote_collection');
-
-        return $collection;
     }
 
     /**
@@ -809,5 +796,18 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_QUOTE;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection
+     */
+    public function getEcommerceQuoteCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_quote_collection');
+
+        return $collection;
     }
 }

@@ -39,22 +39,6 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     }
 
     /**
-     * @param Mage_Catalog_Model_Resource_Product_Collection $preFilteredProductsCollection
-     * @param $where
-     * @param int null $limit
-     */
-    public function addWhere($preFilteredProductsCollection, $where = null, $limit = null)
-    {
-        if (isset($where)) {
-            $preFilteredProductsCollection->getSelect()->where($where);
-        }
-
-        if (isset($limit)) {
-            $preFilteredProductsCollection->getSelect()->limit($limit);
-        }
-    }
-
-    /**
      * @param $collection
      * @param $joinCondition
      */
@@ -93,6 +77,30 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     public function resetColumns($collection, $reset, $columns)
     {
         $collection->getSelect()->reset($reset)->columns($columns);
+    }
+
+    /**
+     * @param $collection Mage_Catalog_Model_Resource_Product_Collection
+     */
+    public function joinQtyAndBackorders($collection)
+    {
+        $collection->joinField(
+            'qty',
+            'cataloginventory/stock_item',
+            'qty',
+            'product_id=entity_id',
+            '{{table}}.stock_id=1',
+            'left'
+        );
+
+        $collection->joinField(
+            'backorders',
+            'cataloginventory/stock_item',
+            'backorders',
+            'product_id=entity_id',
+            '{{table}}.stock_id=1',
+            'left'
+        );
     }
 
 }

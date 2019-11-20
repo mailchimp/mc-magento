@@ -80,8 +80,28 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection extends
         $this->_mailchimpStoreId = $mailchimpStoreId;
     }
 
+    /**
+     * @param $collection Varien_Data_Collection_Db
+     * @param $limit
+     */
     public function limitCollection($collection, $limit)
     {
         $collection->getSelect()->limit($limit);
+    }
+
+    /**
+     * @param $collection Varien_Data_Collection_Db
+     * @param $where
+     * @param int null $limit
+     */
+    public function addWhere($collection, $where = null, $limit = null)
+    {
+        if (isset($where)) {
+            $collection->getSelect()->where($where);
+        }
+
+        if (isset($limit)) {
+            $collection->getSelect()->limit($limit);
+        }
     }
 }

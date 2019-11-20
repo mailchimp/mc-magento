@@ -23,7 +23,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected $_batchId;
 
     /**
-     * @var $_ecommerceProductsCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     * @var $_ecommerceCustomersCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
      */
     protected $_ecommerceCustomersCollection;
 
@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      */
     public function createBatchJson($mailchimpStoreId, $magentoStoreId)
     {
-        $this->_ecommerceCustomersCollection = $this->getEcommerceQuoteCollection();
+        $this->_ecommerceCustomersCollection = $this->getEcommerceCustomersCollection();
         $this->_ecommerceCustomersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceCustomersCollection->setStoreId($magentoStoreId);
 
@@ -488,32 +488,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @param       $collection
-     * @param null  $mailchimpStoreId
-     */
-    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId = null)
-    {
-        if (!$mailchimpStoreId) {
-            $mailchimpStoreId = $this->_mailchimpStoreId;
-        }
-
-        $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId),
-            array(
-                "m4m.related_id",
-                "m4m.type",
-                "m4m.mailchimp_store_id",
-                "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified"
-            )
-        );
-    }
-
-    /**
      * @param $mailchimpStoreId
      */
     protected function setMailchimpStoreId($mailchimpStoreId)
@@ -689,6 +663,19 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     */
+    public function getEcommerceCustomersCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_customers_collection');
+
+        return $collection;
     }
 
 }

@@ -25,32 +25,16 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection 
     }
 
     /**
-     * @param Mage_Customer_Model_Resource_Customer_Collection $preFilteredOrdersCollection
+     * @param Mage_Customer_Model_Resource_Customer_Collection $preFilteredCustomersCollection
      */
-    public function joinLeftEcommerceSyncData($preFilteredOrdersCollection)
+    public function joinLeftEcommerceSyncData($preFilteredCustomersCollection, $columns = array('m4m.*'))
     {
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-        $preFilteredOrdersCollection->getSelect()->joinLeft(
+        $preFilteredCustomersCollection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
             "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
             . "' AND m4m.mailchimp_store_id = '" . $this->getMailchimpStoreId() . "'",
-            array('m4m.*')
+            $columns
         );
-    }
-
-    /**
-     * @param Mage_Customer_Model_Resource_Customer_Collection $preFilteredOrdersCollection
-     * @param $where
-     * @param int null $limit
-     */
-    public function addWhere($preFilteredOrdersCollection, $where = null, $limit = null)
-    {
-        if (isset($where)) {
-            $preFilteredOrdersCollection->getSelect()->where($where);
-        }
-
-        if (isset($limit)) {
-            $preFilteredOrdersCollection->getSelect()->limit($limit);
-        }
     }
 }
