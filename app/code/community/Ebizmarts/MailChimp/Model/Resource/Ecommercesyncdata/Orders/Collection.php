@@ -32,7 +32,8 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection ext
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $preFilteredOrdersCollection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_ORDER
+            "m4m.related_id = main_table.entity_id AND m4m.type = '"
+            . Ebizmarts_MailChimp_Model_Config::IS_ORDER
             . "' AND m4m.mailchimp_store_id = '" . $this->getMailchimpStoreId() . "'",
             array('m4m.*')
         );

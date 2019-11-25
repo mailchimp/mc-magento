@@ -16,7 +16,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     const TYPE_PERCENTAGE = 'percentage';
     const TARGET_PER_ITEM = 'per_item';
     const TARGET_TOTAL = 'total';
-    const TARGET_SHIPPING = 'shipping';
 
     protected $_batchId;
 
@@ -38,12 +37,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @return array
      */
-    public function createBatchJson($mailchimpStoreId, $magentoStoreId)
+    public function createBatchJson()
     {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
+
         $this->_ecommercePromoRulesCollection = $this->getEcommercePromoRulesCollection();
         $this->_ecommercePromoRulesCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommercePromoRulesCollection->setStoreId($magentoStoreId);
@@ -66,8 +66,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     {
         $batchArray = array();
         $deletedPromoRules = $this->makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId);
-
         $counter = 0;
+
         foreach ($deletedPromoRules as $promoRule) {
             $ruleId = $promoRule->getRelatedId();
             $batchArray[$counter]['method'] = "DELETE";
@@ -108,7 +108,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                         . $dateHelper->getDateMicrotime() . '_' . $ruleId;
                     $promoData['body'] = $promoRuleJson;
                     //update promo rule delta
-                    $this->addSyncData($ruleId, $mailchimpStoreId);
+                    $this->addSyncData($ruleId);
                 } else {
                     $error = $promoRule->getMailchimpSyncError();
                     if (!$error) {
@@ -117,7 +117,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
 
                     $this->addSyncDataError(
                         $ruleId,
-                        $mailchimpStoreId,
                         $error,
                         null,
                         false,
@@ -134,7 +133,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
 
                 $this->addSyncDataError(
                     $ruleId,
-                    $mailchimpStoreId,
                     $jsonErrorMsg,
                     null,
                     false,
@@ -330,9 +328,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             $ruleId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
         );
+
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $this->markSyncDataAsModified($ruleId, $mailchimpStoreId);
+            $this->markSyncDataAsModified($ruleId);
         }
     }
 
@@ -353,9 +352,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             $ruleId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
         );
+
         foreach ($promoRules as $promoRule) {
-            $mailchimpStoreId = $promoRule->getMailchimpStoreId();
-            $this->markSyncDataAsDeleted($ruleId, $mailchimpStoreId);
+            $this->setMailchimpStoreId($promoRule->getMailchimpStoreId());
+            $this->markSyncDataAsDeleted($ruleId);
         }
     }
 

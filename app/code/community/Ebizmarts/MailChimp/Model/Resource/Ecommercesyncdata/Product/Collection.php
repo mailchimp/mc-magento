@@ -32,14 +32,14 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $preFilteredProductsCollection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+            "m4m.related_id = e.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
             . "' AND m4m.mailchimp_store_id = '" . $this->getMailchimpStoreId() . "'",
             array('m4m.*')
         );
     }
 
     /**
-     * @param $collection
+     * @param $collection Mage_Catalog_Model_Resource_Product_Collection
      * @param $joinCondition
      */
     public function executeMailchimpDataJoin($collection, $joinCondition)
@@ -66,7 +66,7 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     {
         $this->joinLeftEcommerceSyncData($deletedProducts);
         $deletedProducts->getSelect()->where("m4m.mailchimp_sync_deleted = 1 AND m4m.mailchimp_sync_error = ''");
-        $deletedProducts->getSelect()->limit($this->getBatchLimitFromConfig());
+        $deletedProducts->getSelect()->limit(200);
     }
 
     public function addJoinLeft($collection, array $array, $colString)

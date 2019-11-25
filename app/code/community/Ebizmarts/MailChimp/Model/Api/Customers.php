@@ -79,13 +79,14 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @return array
      * @throws Mage_Core_Exception
      */
-    public function createBatchJson($mailchimpStoreId, $magentoStoreId)
+    public function createBatchJson()
     {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
+
         $this->_ecommerceCustomersCollection = $this->getEcommerceCustomersCollection();
         $this->_ecommerceCustomersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceCustomersCollection->setStoreId($magentoStoreId);
@@ -126,7 +127,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                     );
 
                     $customerArray[$counter] = $this->makePutBatchStructure($customerJson, $customer);
-                    $this->addSyncData($customer->getId(), $mailchimpStoreId);
+                    $this->addSyncData($customer->getId());
                     $counter++;
 
                     if (!$isSubscribed) {
@@ -148,7 +149,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                 } else {
                     $this->addSyncDataError(
                         $customer->getId(),
-                        $mailchimpStoreId,
                         'Customer with no data',
                         null,
                         false,
@@ -159,7 +159,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                 $jsonErrorMessage = $this->logCouldNotEncodeCustomerError($customer);
                 $this->addSyncDataError(
                     $customer->getId(),
-                    $mailchimpStoreId,
                     $jsonErrorMessage,
                     null,
                     false,
@@ -314,10 +313,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      * @param $customerId
      * @param $storeId
      */
-    public function update($customerId, $storeId)
+    public function update($customerId)
     {
-        $mailchimpStoreId = $this->getHelper()->getMCStoreId($storeId);
-        $this->markSyncDataAsModified($customerId, $mailchimpStoreId);
+        $this->markSyncDataAsModified($customerId);
     }
 
     /**
@@ -485,22 +483,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function getBatchMagentoStoreId()
     {
         return $this->_magentoStoreId;
-    }
-
-    /**
-     * @param $mailchimpStoreId
-     */
-    protected function setMailchimpStoreId($mailchimpStoreId)
-    {
-        $this->_mailchimpStoreId = $mailchimpStoreId;
-    }
-
-    /**
-     * @param $magentoStoreId
-     */
-    protected function setMagentoStoreId($magentoStoreId)
-    {
-        $this->_magentoStoreId = $magentoStoreId;
     }
 
     /**
