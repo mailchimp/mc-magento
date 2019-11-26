@@ -164,7 +164,8 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $magentoStoreId = $this->getMagentoStoreId();
 
         $deletedProducts = $this->getProductResourceCollection();
-        $this->_ecommerceProductsCollection->joinMailchimpSyncDataDeleted($deletedProducts);
+        $this->_ecommerceProductsCollection
+            ->joinMailchimpSyncDataDeleted($deletedProducts, $this->getBatchLimitFromConfig());
 
         $batchArray = array();
         $batchId = $this->makeBatchId($magentoStoreId);
