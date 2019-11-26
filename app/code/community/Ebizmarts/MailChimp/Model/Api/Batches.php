@@ -398,10 +398,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $apiPromoRules->setMailchimpStoreId($mailchimpStoreId);
                     $apiPromoRules->setMagentoStoreId($magentoStoreId);
 
-                    Mage::log("B4 PromoRules: createBatchJson", null, "DUMP.log", true);
                     $promoRulesArray = $apiPromoRules->createBatchJson();
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
-                    Mage::log("After PromoRules: createBatchJson", null, "DUMP.log", true);
 
                     //promo code operations
                     $helper->logBatchStatus('Generate Promo Codes Payload');
@@ -409,12 +407,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $apiPromoCodes->setMailchimpStoreId($mailchimpStoreId);
                     $apiPromoCodes->setMagentoStoreId($magentoStoreId);
 
-                    Mage::log("B4 PromoCodes: createBatchJson", null, "DUMP.log", true);
                     $promoCodesArray = $apiPromoCodes->createBatchJson();
-
-                    Mage::log("After PromoCodes: createBatchJson", null, "DUMP.log", true);
-
-
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
                 }
 

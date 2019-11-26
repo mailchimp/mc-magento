@@ -34,7 +34,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
      */
     public function createBatchJson()
     {
-        Mage::log("Inside createBatchJson", null, "DUMP.log", true);
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
@@ -47,12 +46,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
             . $magentoStoreId . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE . '_'
             . $this->getDateHelper()->getDateMicrotime();
-        Mage::log("before _getDeletedPromoCodes", null, "DUMP.log", true);
         $batchArray = array_merge($batchArray, $this->_getDeletedPromoCodes());
-        Mage::log("AFTER _getDeletedPromoCodes", null, "DUMP.log", true);
-        Mage::log("B4 _getNewPromoCodes", null, "DUMP.log", true);
         $batchArray = array_merge($batchArray, $this->_getNewPromoCodes($mailchimpStoreId, $magentoStoreId));
-        Mage::log("AFTER _getNewPromoCodes", null, "DUMP.log", true);
         return $batchArray;
     }
 

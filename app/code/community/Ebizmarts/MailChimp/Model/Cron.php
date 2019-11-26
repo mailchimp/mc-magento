@@ -24,12 +24,8 @@ class Ebizmarts_MailChimp_Model_Cron
 
     public function syncEcommerceBatchData()
     {
-        Mage::log("B4 IF:  " . __METHOD__, null, "DUMP.log", true);
-
         if ($this->getHelper()->migrationFinished()) {
-            Mage::log("Entró al if!! de: " . __METHOD__, null, "DUMP.log", true);
             Mage::getModel('mailchimp/api_batches')->handleEcommerceBatches();
-            Mage::log("After OK!!!!!! if!! de: " . __METHOD__, null, "DUMP.log", true);
         } else {
             $this->getHelper()->handleMigrationUpdates();
         }
