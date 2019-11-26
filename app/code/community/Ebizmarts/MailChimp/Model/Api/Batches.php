@@ -73,9 +73,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $this->_apiCustomers = Mage::getModel('mailchimp/api_customers');
         $this->_apiCarts = Mage::getModel('mailchimp/api_carts');
         $this->_apiOrders = Mage::getModel('mailchimp/api_orders');
-        /*$this->_apiPromoRules = Mage::getModel('mailchimp/api_promoRules');
+        $this->_apiPromoRules = Mage::getModel('mailchimp/api_promoRules');
         $this->_apiPromoCodes = Mage::getModel('mailchimp/api_promoCodes');
-        $this->_apiSubscribers = Mage::getModel('mailchimp/api_subscribers');*/
+        $this->_apiSubscribers = Mage::getModel('mailchimp/api_subscribers');
     }
 
     /**
@@ -217,11 +217,9 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function handleEcommerceBatches()
     {
-        Mage::log("Starting " . 'method: ' . __METHOD__, null, "DUMP.log", true);
         $helper = $this->getHelper();
         $stores = $this->getStores();
         $helper->handleResendDataBefore();
-        Mage::log("Before foreach " . 'method: ' . __METHOD__, null, "DUMP.log", true);
 
         foreach ($stores as $store) {
             $storeId = $store->getId();
@@ -240,8 +238,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
             }
         }
-
-        Mage::log("After foreach " . 'method: ' . __METHOD__, null, "DUMP.log", true);
 
         $helper->handleResendDataAfter();
         $syncedDateArray = array();
@@ -342,7 +338,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     public function _sendEcommerceBatch($magentoStoreId)
     {
-        Mage::log("Starting " . __METHOD__, null, "DUMP.log", true);
         $helper = $this->getHelper();
         $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
 
@@ -365,18 +360,13 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 //product operations
                 $helper->logBatchStatus('Generate Products Payload');
 
-                Mage::log("Getting APIproducts " . __METHOD__, null, "DUMP.log", true);
-
                 $apiProducts = $this->getApiProducts();
                 $apiProducts->setMailchimpStoreId($mailchimpStoreId);
                 $apiProducts->setMagentoStoreId($magentoStoreId);
 
-                Mage::log("IDS sets to he APIproducts" . __METHOD__, null, "DUMP.log", true);
-
                 $productsArray = $apiProducts->createBatchJson();
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
-                Mage::log("BatchJson created" . __METHOD__, null, "DUMP.log", true);
 
                 if ($helper->getMCIsSyncing($mailchimpStoreId)) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
@@ -401,27 +391,33 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
 
-                /*if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
+                if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
                     //promo rule operations
                     $helper->logBatchStatus('Generate Promo Rules Payload');
                     $apiPromoRules = $this->getApiPromoRules();
-                    $promoRulesArray = $apiPromoRules->createBatchJson($mailchimpStoreId, $magentoStoreId);
+                    $apiPromoRules->setMailchimpStoreId($mailchimpStoreId);
+                    $apiPromoRules->setMagentoStoreId($magentoStoreId);
+
+                    $promoRulesArray = $apiPromoRules->createBatchJson();
                     $batchArray['operations'] = array_merge($batchArray['operations'], $promoRulesArray);
+
                     //promo code operations
                     $helper->logBatchStatus('Generate Promo Codes Payload');
                     $apiPromoCodes = $this->getApiPromoCodes();
-                    $promoCodesArray = $apiPromoCodes->createBatchJson($mailchimpStoreId, $magentoStoreId);
-                    $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
-                }*/
+                    $apiPromoCodes->setMailchimpStoreId($mailchimpStoreId);
+                    $apiPromoCodes->setMagentoStoreId($magentoStoreId);
 
-                Mage::log("Before creating createDeletedProductsBatchJson" . __METHOD__, null, "DUMP.log", true);
+                    $promoCodesArray = $apiPromoCodes->createBatchJson();
+
+
+                    $batchArray['operations'] = array_merge($batchArray['operations'], $promoCodesArray);
+                }
+
                 //deleted product operations
                 $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson();
                 $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
                 $batchJson = null;
                 $batchResponse = null;
-
-                Mage::log("DeletedProductsBatchJson created" . __METHOD__, null, "DUMP.log", true);
 
                 try {
                     $this->_processBatchOperations($batchArray, $mailchimpStoreId, $magentoStoreId);
@@ -433,6 +429,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                     $helper->logError($e->getMessage());
                 } catch (MailChimp_Error $e) {
                     $helper->logError($e->getFriendlyMessage());
+
                     if ($batchJson && !isset($batchResponse['id'])) {
                         $helper->logRequest($batchJson);
                     }

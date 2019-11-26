@@ -24,7 +24,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected $_ecommercePromoRulesCollection;
 
-
     /**
      * @var Ebizmarts_MailChimp_Model_Api_PromoCodes
      */
@@ -53,19 +52,19 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             . $magentoStoreId . '_'
             . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE . '_'
             . $this->getDateHelper()->getDateMicrotime();
-        $batchArray = array_merge($batchArray, $this->_getModifiedAndDeletedPromoRules($mailchimpStoreId));
+        $batchArray = array_merge($batchArray, $this->_getModifiedAndDeletedPromoRules());
 
         return $batchArray;
     }
 
     /**
-     * @param $mailchimpStoreId
      * @return array
      */
-    protected function _getModifiedAndDeletedPromoRules($mailchimpStoreId)
+    protected function _getModifiedAndDeletedPromoRules()
     {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
         $batchArray = array();
-        $deletedPromoRules = $this->makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId);
+        $deletedPromoRules = $this->makeModifiedAndDeletedPromoRulesCollection();
         $counter = 0;
 
         foreach ($deletedPromoRules as $promoRule) {
@@ -75,7 +74,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $ruleId;
             $batchArray[$counter]['body'] = '';
             $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
-            $this->deletePromoRuleSyncData($ruleId, $mailchimpStoreId);
+            $this->deletePromoRuleSyncData($ruleId);
             $counter++;
         }
 
@@ -94,6 +93,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $promoRule = $this->getPromoRule($ruleId);
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
+
         try {
             $ruleData = $this->generateRuleData($promoRule);
             $promoRuleJson = json_encode($ruleData);
@@ -111,6 +111,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
                     $this->addSyncData($ruleId);
                 } else {
                     $error = $promoRule->getMailchimpSyncError();
+
                     if (!$error) {
                         $error = $helper->__('Something went wrong when retrieving the information.');
                     }
@@ -192,16 +193,15 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     }
 
     /**
-     * @param $mailchimpStoreId
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
      */
-    protected function makeModifiedAndDeletedPromoRulesCollection($mailchimpStoreId)
+    protected function makeModifiedAndDeletedPromoRulesCollection()
     {
         $deletedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
 
         $this->_ecommercePromoRulesCollection->addWhere(
             $deletedPromoRules,
-            "mailchimp_store_id = '" . $mailchimpStoreId
+            "mailchimp_store_id = '" . $this->getMailchimpStoreId()
             . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
             . "' AND (mailchimp_sync_modified = 1 OR mailchimp_sync_deleted = 1)",
             $this->getBatchLimitFromConfig()
@@ -212,14 +212,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
 
     /**
      * @param $ruleId
-     * @param $mailchimpStoreId
      */
-    protected function deletePromoRuleSyncData($ruleId, $mailchimpStoreId)
+    protected function deletePromoRuleSyncData($ruleId)
     {
         $ruleSyncDataItem = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
             $ruleId,
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
-            $mailchimpStoreId
+            $this->getMailchimpStoreId()
         );
         $ruleSyncDataItem->delete();
     }
