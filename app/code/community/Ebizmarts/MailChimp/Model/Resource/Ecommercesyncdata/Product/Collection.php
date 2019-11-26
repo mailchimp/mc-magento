@@ -62,11 +62,14 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection ex
     /**
      * @param $deletedProducts
      */
-    public function joinMailchimpSyncDataDeleted($deletedProducts)
+    public function joinMailchimpSyncDataDeleted($deletedProducts, $limit = null)
     {
         $this->joinLeftEcommerceSyncData($deletedProducts);
         $deletedProducts->getSelect()->where("m4m.mailchimp_sync_deleted = 1 AND m4m.mailchimp_sync_error = ''");
-        $deletedProducts->getSelect()->limit(200);
+
+        if (isset($limit)) {
+            $deletedProducts->getSelect()->limit($limit);
+        }
     }
 
     public function addJoinLeft($collection, array $array, $colString)
