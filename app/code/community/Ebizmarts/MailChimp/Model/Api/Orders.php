@@ -179,7 +179,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $newOrders->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
         }
 
-        $this->joinMailchimpSyncDataWithoutWhere($newOrders);
+        $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($newOrders);
         $this->_ecommerceOrdersCollection->addWhere(
             $newOrders,
             "m4m.mailchimp_sync_delta IS NULL",

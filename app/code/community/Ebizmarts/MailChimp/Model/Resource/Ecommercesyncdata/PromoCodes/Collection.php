@@ -29,17 +29,17 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
      */
     public function joinLeftEcommerceSyncData($preFilteredPromoCodesCollection, $columns = array('m4m.*'))
     {
+        $joinCondition = "m4m.related_id = main_table.coupon_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $preFilteredPromoCodesCollection->getSelect()->joinLeft(
-            array('m4m' => $mailchimpTableName),
-            "m4m.related_id = main_table.entity_id AND m4m.type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
-            . "' AND m4m.mailchimp_store_id = '" . $this->getMailchimpStoreId() . "'",
+            array("m4m" => $mailchimpTableName),
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, $this->getMailchimpStoreId()),
             $columns
         );
     }
 
     /**
-     * @param $collection Mage_SalesRule_Model_Resource_Rule_Collection
+     * @param $collection Mage_SalesRule_Model_Resource_Coupon_Collection
      */
     public function addWebsiteColumn($collection)
     {
@@ -52,7 +52,7 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
     }
 
     /**
-     * @param $collection Mage_SalesRule_Model_Resource_Rule_Collection
+     * @param $collection Mage_SalesRule_Model_Resource_Coupon_Collection
      */
     public function joinPromoRuleData($collection)
     {

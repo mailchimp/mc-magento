@@ -900,6 +900,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                         $attribute->getAttributeId(),
                         $magentoStoreId
                     );
+
                     if ($count > 0) {
                         $tailUrl .= '&';
                     }
@@ -1074,8 +1075,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     {
         $price = null;
         $parentId = null;
+
         if (!$this->currentProductIsVisible()) {
             $parentId = $this->getParentId($product->getId());
+
             if ($parentId) {
                 $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
             }
