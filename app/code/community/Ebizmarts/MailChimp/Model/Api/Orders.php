@@ -1011,14 +1011,17 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         if ($mailchimpCampaignId) {
             $helper = $this->getHelper();
             $listId = $helper->getGeneralList($magentoStoreId);
+
             try {
                 $apiKey = $helper->getApiKey($magentoStoreId);
+
                 if ($apiKey) {
                     if (isset($this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId])) {
                         $isCampaingFromCurrentList = $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId];
                     } else {
                         $api = $helper->getApi($magentoStoreId);
                         $campaignData = $api->getCampaign()->get($mailchimpCampaignId, 'recipients');
+
                         if (isset($campaignData['recipients']['list_id'])
                             && $campaignData['recipients']['list_id'] == $listId
                         ) {

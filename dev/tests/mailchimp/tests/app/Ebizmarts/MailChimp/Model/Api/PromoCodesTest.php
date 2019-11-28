@@ -36,15 +36,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $promoCodesApiMock
             ->expects($this->once())
             ->method('_getDeletedPromoCodes')
-            ->with(self::MC_STORE_ID)
             ->willReturn($batchArray);
         $promoCodesApiMock
             ->expects($this->once())
             ->method('_getNewPromoCodes')
-            ->with(self::MC_STORE_ID, $magentoStoreId)
             ->willReturn($batchArray);
 
-        $promoCodesApiMock->createBatchJson(self::MC_STORE_ID, $magentoStoreId);
+        $promoCodesApiMock->createBatchJson();
     }
 
 
@@ -176,11 +174,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $syncDataItemMock
             ->expects($this->once())
             ->method('getEcommerceSyncDataItem')
-            ->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE, self::MC_STORE_ID)
+            ->with(self::PROMOCODE_ID, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE)
             ->willReturn($syncDataItemMock);
 
         $syncDataItemMock->expects($this->once())->method('delete');
 
-        $promoCodesApiMock->deletePromoCodeSyncData(self::PROMOCODE_ID, self::MC_STORE_ID);
+        $promoCodesApiMock->deletePromoCodeSyncData(self::PROMOCODE_ID);
     }
 }

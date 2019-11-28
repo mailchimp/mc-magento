@@ -252,7 +252,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             )
             ->willReturn(array(0 => $rtnArray, 1 => 2));
 
-        $return = $this->_customersApiMock->createBatchJson($mailchimpStoreId, $storeId);
+        $return = $this->_customersApiMock->createBatchJson();
 
         $this->assertEquals($operationData['method'], $return[0]['method']);
         $this->assertEquals($operationData['path'], $return[0]['path']);
@@ -438,7 +438,7 @@ class Ebizmarts_MailChimp_Model_Api_CustomersTest extends PHPUnit_Framework_Test
             ->with($customerEmail)
             ->willReturnSelf();
 
-        $return = $this->_customersApiMock->createBatchJson($mailchimpStoreId, $storeId);
+        $return = $this->_customersApiMock->createBatchJson();
 
         $this->assertEquals($operationData['method'], $return[0]['method']);
         $this->assertEquals($operationData['path'], $return[0]['path']);

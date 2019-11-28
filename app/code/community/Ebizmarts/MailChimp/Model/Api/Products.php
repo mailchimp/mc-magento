@@ -236,7 +236,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             //json encode failed
             $jsonErrorMsg = json_last_error_msg();
             $this->logSyncError(
-                "Product " . $product->getId() . " json encode failed (".$jsonErrorMsg.")",
+                "Product " . $product->getId() . " json encode failed (" . $jsonErrorMsg . ")",
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $mailchimpStoreId, $magentoStoreId
             );
@@ -817,7 +817,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $joinCondition = $this->buildMailchimpDataJoin();
         $this->executeMailchimpDataJoin($collection, $joinCondition);
         $this->buildMailchimpDataWhere($collection);
-
     }
 
     /**

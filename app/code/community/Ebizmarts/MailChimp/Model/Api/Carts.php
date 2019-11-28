@@ -197,7 +197,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
             // send the products that not already sent
             $allCarts = $this->addProductNotSentData($cart, $allCarts);
-            $cartJson = $this->makeCart($cart,  true);
+            $cartJson = $this->makeCart($cart, true);
 
             if ($cartJson !== false) {
                 if (!empty($cartJson)) {

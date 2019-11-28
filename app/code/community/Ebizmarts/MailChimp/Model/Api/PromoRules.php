@@ -144,7 +144,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             $this->logSyncError(
                 $e->getMessage(),
                 Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
-                $mailchimpStoreId, $magentoStoreId
+                $magentoStoreId
             );
         }
 
@@ -330,6 +330,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
 
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
+            $this->setMailchimpStoreId($mailchimpStoreId);
             $this->markSyncDataAsModified($ruleId);
         }
     }

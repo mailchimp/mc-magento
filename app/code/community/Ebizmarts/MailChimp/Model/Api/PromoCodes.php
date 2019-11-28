@@ -47,7 +47,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
             . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE . '_'
             . $this->getDateHelper()->getDateMicrotime();
         $batchArray = array_merge($batchArray, $this->_getDeletedPromoCodes());
-        $batchArray = array_merge($batchArray, $this->_getNewPromoCodes($mailchimpStoreId, $magentoStoreId));
+        $batchArray = array_merge($batchArray, $this->_getNewPromoCodes());
         return $batchArray;
     }
 
@@ -78,12 +78,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @return array
      */
-    protected function _getNewPromoCodes($mailchimpStoreId, $magentoStoreId)
+    protected function _getNewPromoCodes()
     {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
         $batchArray = array();
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
