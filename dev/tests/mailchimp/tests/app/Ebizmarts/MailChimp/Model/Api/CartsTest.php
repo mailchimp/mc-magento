@@ -1775,7 +1775,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(
                 array(
                         'getMailchimpEcommerceDataTableName', 'getQuoteCollection',
-                        'getQuoteCollection', 'getMagentoStoreId', 'joinLeftEcommerceSyncData'
+                        'getMagentoStoreId', 'joinLeftEcommerceSyncData'
                 )
             )->getMock();
 

@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceProductsCollection = $this->getEcommerceProductsCollection();
+        $this->_ecommerceProductsCollection = $this->createEcommerceProductsCollection();
         $this->_ecommerceProductsCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceProductsCollection->setStoreId($magentoStoreId);
 
@@ -162,7 +162,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $magentoStoreId = $this->getMagentoStoreId();
 
         $deletedProducts = $this->getProductResourceCollection();
-        $this->_ecommerceProductsCollection
+        $this->getEcommerceProductsCollection()
             ->joinMailchimpSyncDataDeleted($deletedProducts, $this->getBatchLimitFromConfig());
 
         $batchArray = array();
@@ -633,10 +633,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
         );
 
-        $this->_ecommerceProductsCollection->joinQtyAndBackorders($collection);
+        $productsCollectionResource = $this->getEcommerceProductsCollection();
+        $productsCollectionResource->joinQtyAndBackorders($collection);
 
         if (!$isParentProduct) {
-            $this->_ecommerceProductsCollection->limitCollection($collection, $this->getBatchLimitFromConfig());
+            $productsCollectionResource->limitCollection($collection, $this->getBatchLimitFromConfig());
         }
 
         return $collection;
@@ -1200,7 +1201,9 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             . 'AND m4m.mailchimp_sync_delta < ?',
             $this->getDateHelper()->formatDate() . " 00:00:00"
         );
-        $this->_ecommerceProductsCollection->addWhere($collection, $whereCondition);
+
+        $productsCollectionResource = $this->getEcommerceProductsCollection();
+        $productsCollectionResource->addWhere($collection, $whereCondition);
 
         foreach ($collection as $item) {
             $this->update($item->getEntityId());
@@ -1227,7 +1230,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             'left'
         );
 
-        $this->_ecommerceProductsCollection->addWhere($collectionNoSpecialPrice, $whereCondition);
+        $productsCollectionResource->addWhere($collectionNoSpecialPrice, $whereCondition);
 
         foreach ($collectionNoSpecialPrice as $item) {
             $this->update($item->getEntityId());
@@ -1270,6 +1273,14 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
      */
     public function getEcommerceProductsCollection()
+    {
+        return $this->_ecommerceProductsCollection;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+     */
+    public function createEcommerceProductsCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
