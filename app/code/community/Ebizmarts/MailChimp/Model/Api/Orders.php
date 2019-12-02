@@ -21,7 +21,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     const REFUNDED = 'refunded';
     const PARTIALLY_REFUNDED = 'partially_refunded';
     const CANCELED = 'canceled';
-    const COMPLETE = 'complete';
     protected $_firstDate;
     protected $_counter;
     protected $_batchId;
@@ -44,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceOrdersCollection = $this->getEcommerceOrdersCollection();
+        $this->_ecommerceOrdersCollection = $this->createEcommerceProductsCollection();
         $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
 
@@ -1091,10 +1090,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function getEcommerceOrdersCollection()
     {
+        return $this->_ecommerceOrdersCollection;
+    }
+
+    public function createEcommerceProductsCollection()
+    {
         /**
-         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
          */
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_orders_collection');
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_product_collection');
 
         return $collection;
     }
