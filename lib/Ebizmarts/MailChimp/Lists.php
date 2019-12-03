@@ -50,6 +50,9 @@ class MailChimp_Lists extends MailChimp_Abstract
      */
     public $webhooks;
 
+    /**
+     * @return MailChimp_ListsWebhooks
+     */
     public function getWebhooks()
     {
         return $this->webhooks;
