@@ -10,7 +10,7 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     const BATCH_LIMIT = 100;
 
@@ -106,7 +106,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
             if (false !== $customerJson) {
                 if (!empty($customerJson)) {
                     $isSubscribed = $this->isSubscribed($subscriber, $customer);
-                    $dataCustomer = $helper->getEcommerceSyncDataItem(
+                    $dataCustomer = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                         $customer->getId(),
                         Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                         $mailchimpStoreId
@@ -341,7 +341,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function makeBatchId()
     {
         $this->_batchId = "storeid-{$this->getBatchMagentoStoreId()}_";
-        $this->_batchId .= Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER . '_';
+        $this->_batchId .= $this->getItemType() . '_';
         $this->_batchId .= $this->getDateHelper()->getDateMicrotime();
     }
 
@@ -548,10 +548,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         if ($mergeFieldJSON === false) {
             $this->logCouldNotEncodeMailchimpTags($customer, $mergeFields);
         } else {
-            $md5HashEmail = hash('md5', strtolower($customer->getEmail()));
+            $hashedEmail = hash('md5', strtolower($customer->getEmail()));
             $batchData = array();
             $batchData['method'] = "PATCH";
-            $batchData['path'] = "/lists/" . $listId . "/members/" . $md5HashEmail;
+            $batchData['path'] = "/lists/" . $listId . "/members/" . $hashedEmail;
             $batchData['operation_id'] = "{$this->_batchId}_{$customerId}_SUB";
             $batchData['body'] = $mergeFieldJSON;
         }
@@ -681,7 +681,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER;
     }

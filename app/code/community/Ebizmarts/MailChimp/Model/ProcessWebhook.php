@@ -80,8 +80,16 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 }
             }
 
-            $webhookRequest->setProcessed(1)->save();
+            $this->_saveProcessedWebhook($webhookRequest);
         }
+    }
+
+    /**
+     * @param $webhookRequest
+     */
+    protected function _saveProcessedWebhook($webhookRequest)
+    {
+        $webhookRequest->setProcessed(1)->save();
     }
 
     /**

@@ -170,7 +170,7 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @param $e MailChimp_Error
      * @return string
      */
-    private function getUserFriendlyMessage($e)
+    protected function getUserFriendlyMessage($e)
     {
         $helper = $this->makeHelper();
         $errorMessage = $e->getFriendlyMessage();
@@ -215,10 +215,12 @@ class Ebizmarts_MailChimp_Model_Api_Stores
      * @param  $apiKey
      * @return mixed|string
      * @throws Mage_Core_Exception
+     * @throws Ebizmarts_MailChimp_Helper_Data_ApiKeyException
      */
     public function deleteMailChimpStore($mailchimpStoreId, $apiKey)
     {
         $helper = $this->makeHelper();
+
         try {
             $api = $helper->getApiByKey($apiKey);
             $response = $api->getEcommerce()->getStores()->delete($mailchimpStoreId);

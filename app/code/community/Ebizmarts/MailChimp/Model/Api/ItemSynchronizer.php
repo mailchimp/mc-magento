@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
@@ -53,7 +53,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         $allowBatchRemoval = true,
         $deletedRelatedId = null
     ) {
-        $type = $this->getClassConstant();
+        $type = $this->getItemType();
 
         if ($syncError !== null) {
             $this->logSyncError(
@@ -64,8 +64,8 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
         }
 
         if (!empty($type)) {
-            $helper = $this->getHelper();
-            $helper->saveEcommerceSyncData(
+            $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+            $ecommerceSyncData->saveEcommerceSyncData(
                 $id,
                 $type,
                 $mailchimpStoreId,
@@ -263,6 +263,14 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata
+     */
+    public function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
+    }
+
+    /**
      * @param $magentoStoreId
      * @return mixed
      */
@@ -282,7 +290,7 @@ class Ebizmarts_MailChimp_Model_Api_SyncItem
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return null;
     }

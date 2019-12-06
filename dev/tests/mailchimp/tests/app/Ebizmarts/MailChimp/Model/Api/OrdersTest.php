@@ -123,29 +123,24 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
     public function testGetSyncedOrder()
     {
-
         $orderId = 1;
         $mailchimpStoreId = '5axx998994cxxxx47e6b3b5dxxxx26e2';
 
         $modelMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Orders::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getHelper'))
-            ->getMock();
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerceSyncDataItem'))
+            ->setMethods(array('getMailchimpEcommerceSyncDataModel'))
             ->getMock();
 
         $ecommerceMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Ecommercesyncdata::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMailchimpSyncedFlag', 'getId'))
+            ->setMethods(array('getMailchimpSyncedFlag', 'getId', 'getEcommerceSyncDataItem'))
             ->getMock();
 
-        $modelMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $modelMock->expects($this->once())
+            ->method('getMailchimpEcommerceSyncDataModel')
+            ->willReturn($ecommerceMock);
 
-        $helperMock
-            ->expects($this->once())
+        $ecommerceMock->expects($this->once())
             ->method('getEcommerceSyncDataItem')
             ->with($orderId, 'ORD', $mailchimpStoreId)
             ->willReturn($ecommerceMock);
@@ -162,7 +157,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
     {
         $mailchimpStoreId = '44a100c71040d4ec27fd707d7c667114';
         $magentoStoreId = 1;
-        $oldStore = $magentoStoreId;
         $statusArray = array('financial_status' => '', 'fulfillment_status' => '');
         $customerEmail = 'test@ebizmarts.com';
         $customerFirstName = 'testFirstName';

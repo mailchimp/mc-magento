@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
 
     const BATCH_LIMIT = 50;
@@ -28,11 +28,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     protected $_batchId;
     protected $_api = null;
     protected $_listsCampaignIds = array();
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     /**
      * Set the request for orders to be created on MailChimp
@@ -100,7 +95,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         foreach ($modifiedOrders as $item) {
             try {
                 $orderId = $item->getEntityId();
-                $order = Mage::getModel('sales/order')->load($orderId);
+                $order = $this->_getOrderById($orderId);
                 $incrementId = $order->getIncrementId();
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
@@ -189,7 +184,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         foreach ($newOrders as $item) {
             try {
                 $orderId = $item->getEntityId();
-                $order = Mage::getModel('sales/order')->load($orderId);
+                $order = $this->_getOrderById($orderId);
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($mailchimpStoreId, $magentoStoreId, $order, $batchArray);
 
@@ -246,6 +241,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         return $batchArray;
+    }
+
+    /**
+     * @param $id
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _getOrderById($id)
+    {
+        return Mage::getModel('sales/order')->load($id);
     }
 
     /**
@@ -396,7 +400,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     protected function _getPayloadDataLines($order, $mailchimpStoreId, $magentoStoreId)
     {
-        $helper = $this->getHelper();
         $apiProduct = $this->getApiProduct();
 
         $lines = array();
@@ -406,12 +409,13 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         foreach ($items as $item) {
             $productId = $item->getProductId();
             $isTypeProduct = $this->isTypeProduct();
-            $productSyncData = $helper->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
+            $productSyncData = $this->getMailchimpEcommerceSyncDataModel()
+                ->getEcommerceSyncDataItem($productId, $isTypeProduct, $mailchimpStoreId);
 
             if ($this->isItemConfigurable($item)) {
                 $options = $item->getProductOptions();
                 $sku = $options['simple_sku'];
-                $variant = $this->getModelProduct()->getIdBySku($sku);
+                $variant = $this->_getProductIdBySku($sku);
 
                 if (!$variant) {
                     continue;
@@ -900,8 +904,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function getSyncedOrder($orderId, $mailchimpStoreId)
     {
-        $helper = $this->getHelper();
-        $result = $helper->getEcommerceSyncDataItem(
+        $result = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
             $orderId,
             Ebizmarts_MailChimp_Model_Config::IS_ORDER,
             $mailchimpStoreId
@@ -946,6 +949,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     protected function getModelProduct()
     {
         return Mage::getModel('catalog/product');
+    }
+
+    /**
+     * @param $sku
+     * @return string
+     */
+    protected function _getProductIdBySku($sku)
+    {
+        return $this->getModelProduct()->getIdBySku($sku);
     }
 
     /**
@@ -1077,7 +1089,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_ORDER;
     }

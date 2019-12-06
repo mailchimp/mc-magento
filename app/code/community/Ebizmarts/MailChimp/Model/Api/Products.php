@@ -9,7 +9,7 @@
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_Api_SyncItem
+class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 {
     const PRODUCT_IS_ENABLED = 1;
     const PRODUCT_IS_DISABLED = 2;
@@ -94,7 +94,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     $this->addSyncData($productId, $mailchimpStoreId);
                 }
 
-                $counter = count($batchArray);
+                $counter = $this->_getBatchCounter($batchArray);
                 continue;
             } else {
                 $data = $this->_buildNewProductRequest($product, $batchId, $mailchimpStoreId, $magentoStoreId);
@@ -105,7 +105,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     $batchArray[$counter] = $data;
                     $counter++;
 
-                    $dataProduct = $helper->getEcommerceSyncDataItem(
+                    $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                         $productId,
                         Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $mailchimpStoreId
@@ -135,6 +135,15 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $helper->setCurrentStore($oldStore);
 
         return $batchArray;
+    }
+
+    /**
+     * @param $batchArray
+     * @return int
+     */
+    protected function _getBatchCounter($batchArray)
+    {
+        return count($batchArray);
     }
 
     /**
@@ -266,15 +275,14 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             $parentIds = $this->_productTypeConfigurableResource->getParentIdsByChild($product->getId());
 
             foreach ($parentIds as $parentId) {
-                $helper = $this->getHelper();
-                $productSyncDataItem = $helper->getEcommerceSyncDataItem(
+                $productSyncDataItem = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                     $parentId,
                     Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                     $mailchimpStoreId
                 );
 
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
-                    $parent = Mage::getModel('catalog/product')->load($parentId);
+                    $parent = $this->_getParentProduct($parentId);
                     $variantProducts = $this->makeProductChildrenArray(
                         $product,
                         $magentoStoreId,
@@ -359,6 +367,15 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $operations[] = $data;
 
         return $operations;
+    }
+
+    /**
+     * @param $id
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _getParentProduct($id)
+    {
+        return Mage::getModel('catalog/product')->load($id);
     }
 
     /**
@@ -515,14 +532,13 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $data = array();
         $batchId = $this->makeBatchId($magentoStoreId);
         $items = $order->getAllVisibleItems();
-        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
 
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
             $product = $this->loadProductById($itemProductId);
             $productId = $product->getId();
-            $productSyncData = $helper->getEcommerceSyncDataItem(
+            $productSyncData = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                 $productId,
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $mailchimpStoreId
@@ -536,7 +552,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     $this->addSyncDataError(
                         $productId,
                         $mailchimpStoreId,
-                        "This product type is not supported on MailChimp.",
+                        "This product type is not supported on MailChimp. (product id: $productId)",
                         null,
                         null,
                         $dateHelper->formatDate(null, 'Y-m-d H:i:s')
@@ -1310,7 +1326,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     /**
      * @return string
      */
-    protected function getClassConstant()
+    protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_PRODUCT;
     }

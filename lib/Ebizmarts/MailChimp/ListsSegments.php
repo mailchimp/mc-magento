@@ -126,11 +126,11 @@ class MailChimp_ListsSegments extends MailChimp_Abstract
     {
         $_params = array('name'=>$name);
 
-        if ($staticSegment) {
+        if (null !== $staticSegment) {
             $_params['static_segment'] = $staticSegment;
         }
 
-        if ($options) {
+        if (null !== $options) {
             $_params['options'] = $options;
         }
 
