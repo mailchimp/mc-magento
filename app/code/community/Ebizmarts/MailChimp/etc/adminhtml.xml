@@ -16,11 +16,6 @@
                             <sort_order>820</sort_order>
                             <action>adminhtml/mailchimpstores/index</action>
                         </mailchimpstores>
-                        <mailchimpconfiguration>
-                            <title>Mailchimp Configuration</title>
-                            <sort_order>830</sort_order>
-                            <action>adminhtml/system_config/edit/section/mailchimp</action>
-                        </mailchimpconfiguration>
                     </children>
                 </mailchimp>
             </children>
