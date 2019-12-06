@@ -41,6 +41,9 @@
                                     <mailchimpstores translate="title" module="mailchimp">
                                         <title>Mailchimp Stores</title>
                                     </mailchimpstores>
+                                    <mailchimpconfiguration translate="title" module="mailchimp">
+                                        <title>Mailchimp configuration</title>
+                                    </mailchimpconfiguration>
                                 </children>
                             </mailchimp>
                         </children>
