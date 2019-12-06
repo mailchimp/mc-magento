@@ -37,7 +37,7 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
             }
 
             if (!isset($params['token']) || $params['token'] != $quoteSyncData->getMailchimpToken()) {
-                Mage::getSingleton('customer/session')->addNotice("Your token cart is incorrect");
+                Mage::getSingleton('customer/session')->addNotice($this->_("Your token cart is incorrect"));
                 $this->getResponse()
                     ->setRedirect($url);
             } else {
@@ -62,7 +62,7 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                         $this->getResponse()
                             ->setRedirect($url, 301);
                     } else {
-                        Mage::getSingleton('customer/session')->addNotice("Login to complete your order");
+                        Mage::getSingleton('customer/session')->addNotice($this->_("Login to complete your order"));
                         Mage::getSingleton('customer/session')->setAfterAuthUrl($url, $storeId);
                         $url = Mage::getUrl('customer/account/login');
 
