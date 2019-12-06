@@ -218,14 +218,11 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
          * @var Mage_SalesRule_Model_Resource_Coupon_Collection $collection
          */
         $collection = $this->getPromoCodeResourceCollection();
-        $helper->addResendFilter(
-            $collection,
-            $magentoStoreId,
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
-        );
+        $helper->addResendFilter($collection, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE);
 
-        $this->_ecommercePromoCodesCollection->addWebsiteColumn($collection);
-        $this->_ecommercePromoCodesCollection->joinPromoRuleData($collection);
+        $promoCollectionResource = $this->getEcommercePromoCodesCollection();
+        $promoCollectionResource->addWebsiteColumn($collection);
+        $promoCollectionResource->joinPromoRuleData($collection);
 
         return $collection;
     }
