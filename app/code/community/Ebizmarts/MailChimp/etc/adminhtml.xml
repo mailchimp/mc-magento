@@ -42,7 +42,7 @@
                                         <title>Mailchimp Stores</title>
                                     </mailchimpstores>
                                     <mailchimpconfiguration translate="title" module="mailchimp">
-                                        <title>Mailchimp configuration</title>
+                                        <title>Mailchimp Configuration</title>
                                     </mailchimpconfiguration>
                                 </children>
                             </mailchimp>
