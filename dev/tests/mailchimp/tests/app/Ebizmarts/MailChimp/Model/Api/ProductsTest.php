@@ -68,6 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             )->getMock();
 
        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+           ->disableOriginalConstructor()
             ->setMethods(
                 array(
                     'getCurrentStoreId', 'setCurrentStore', 'modifyCounterSentPerBatch',
@@ -775,6 +776,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->getMock();
 
         $productIdArrayMock = $this->getMockBuilder(ArrayObject::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getIterator'))
             ->getMock();
 
@@ -814,6 +816,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             . "AND m4m.mailchimp_sync_delta < '$dateToday 00:00:00'";
 
         $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('formatDate'))
             ->getMock();
 

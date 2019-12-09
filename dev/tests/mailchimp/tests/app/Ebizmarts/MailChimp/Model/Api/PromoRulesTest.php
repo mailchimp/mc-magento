@@ -44,7 +44,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoCollectionResourceMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('setMailchimpStoreId', 'setStoreId'))->getMock();
+
+        $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getDateMicrotime'))->disableOriginalConstructor()->getMock();
 
         $promoRulesApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn($mailchimpStoreId);
         $promoRulesApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn($magentoStoreId);
@@ -53,9 +58,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
         $promoCollectionResourceMock->expects($this->once())->method('setStoreId')->with($magentoStoreId);
-
-        $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
-            ->setMethods(array('getDateMicrotime'))->disableOriginalConstructor()->getMock();
 
         $promoRulesApiMock->expects($this->once())->method('getDateHelper')->willReturn($mailChimpDateHelperMock);
         $mailChimpDateHelperMock->expects($this->once())->method('getDateMicrotime')

@@ -782,10 +782,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $newCartsCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -971,10 +973,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $newCartsCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -982,26 +986,11 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('addFieldToFilter', 'getSelect', 'getIterator'))
             ->getMock();
 
-        $customerModelMock = $this->getMockBuilder(Mage_Customer_Model_Customer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array('getEntityId', 'getCustomerEmail', 'getAllVisibleItems',
-                    'getEmail')
-            )->getMock();
-
-        $cartByEmailCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
-            ->disableOriginalConstructor()->setMethods(array('clear', 'getIterator'))
-            ->getMock();
-
         $cartModelMock = $this->getMockBuilder(Mage_Sales_Model_Quote::class)
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getEntityId', 'getCustomerEmail', 'getCustomerId', 'getUpdatedAt', 'getAllVisibleItems')
             )->getMock();
-
-        $cartByEmailModelMock = $this->getMockBuilder(Mage_Sales_Model_Quote::class)
-            ->disableOriginalConstructor()->setMethods(array('getEntityId'))
-            ->getMock();
 
         $ordersCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
             ->disableOriginalConstructor()->setMethods(array('getSize', 'addFieldToFilter'))
@@ -1110,10 +1099,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $newCartsCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -1121,26 +1112,11 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('addFieldToFilter', 'getSelect', 'getIterator'))
             ->getMock();
 
-        $customerModelMock = $this->getMockBuilder(Mage_Customer_Model_Customer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array('getEntityId', 'getCustomerEmail', 'getAllVisibleItems',
-                    'getEmail')
-            )->getMock();
-
-        $cartByEmailCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
-            ->disableOriginalConstructor()->setMethods(array('clear', 'getIterator'))
-            ->getMock();
-
         $cartModelMock = $this->getMockBuilder(Mage_Sales_Model_Quote::class)
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getEntityId', 'getCustomerEmail', 'getCustomerId', 'getUpdatedAt', 'getAllVisibleItems')
             )->getMock();
-
-        $cartByEmailModelMock = $this->getMockBuilder(Mage_Sales_Model_Quote::class)
-            ->disableOriginalConstructor()->setMethods(array('getEntityId'))
-            ->getMock();
 
         $ordersCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Order_Collection::class)
             ->disableOriginalConstructor()->setMethods(array('getSize', 'addFieldToFilter'))
@@ -1252,10 +1228,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter'))
             ->getMock();
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $newCartsCollectionMock = $this->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -1410,10 +1388,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch'))
             ->getMock();
 
         $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getCurrentDateTime'))
             ->getMock();
 

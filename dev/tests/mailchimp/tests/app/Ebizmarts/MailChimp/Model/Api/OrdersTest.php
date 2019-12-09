@@ -247,6 +247,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $billingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getStreet'))
             ->getMock();
 
@@ -293,6 +294,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('subscribe')->with($customerEmail);
 
         $storeMock = $this->getMockBuilder(Mage_Core_Model_Resource_Store::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getUrl'))
             ->getMock();
 
