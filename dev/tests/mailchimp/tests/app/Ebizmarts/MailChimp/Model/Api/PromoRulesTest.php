@@ -37,38 +37,31 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         );
 
         $promoRulesApiMock = $this->_promoRulesApiMock
-            ->setMethods(array(
-                'getDateHelper', '_getModifiedAndDeletedPromoRules',
-                'getMailchimpStoreId', 'getMagentoStoreId'
-            ))
-            ->getMock();
+            ->setMethods(
+                array('getMailchimpStoreId', 'getMagentoStoreId', 'getEcommercePromoRulesCollection',
+                    'getDateHelper', '_getModifiedAndDeletedPromoRules')
+            )->getMock();
 
-        $promoRulesApiMock
-            ->expects($this->once())
-            ->method('getMailchimpStoreId')
-            ->willReturn($magentoStoreId);
+        $promoCollectionResourceMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection::class)
+            ->setMethods(array('setMailchimpStoreId', 'setStoreId'))->getMock();
 
-        $promoRulesApiMock
-            ->expects($this->once())
-            ->method('getMagentoStoreId')
-            ->willReturn($mailchimpStoreId);
+        $promoRulesApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn($mailchimpStoreId);
+        $promoRulesApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn($magentoStoreId);
+        $promoRulesApiMock->expects($this->once())->method('getEcommercePromoRulesCollection')
+            ->willReturn($promoCollectionResourceMock);
+
+        $promoCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
+        $promoCollectionResourceMock->expects($this->once())->method('setStoreId')->with($magentoStoreId);
 
         $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
-            ->setMethods(array('getDateMicrotime'))
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->setMethods(array('getDateMicrotime'))->disableOriginalConstructor()->getMock();
 
-        $promoRulesApiMock
-            ->expects($this->once())
-            ->method('getDateHelper')
-            ->willReturn($mailChimpDateHelperMock);
-        $mailChimpDateHelperMock
-            ->expects($this->once())
-            ->method('getDateMicrotime')
+        $promoRulesApiMock->expects($this->once())->method('getDateHelper')->willReturn($mailChimpDateHelperMock);
+        $mailChimpDateHelperMock->expects($this->once())->method('getDateMicrotime')
             ->willReturn('2017-10-23-19-34-31-92333600');
-        $promoRulesApiMock
-            ->expects($this->once())
-            ->method('_getModifiedAndDeletedPromoRules')
+
+        $promoRulesApiMock->expects($this->once())->method('_getModifiedAndDeletedPromoRules')
             ->willReturn($promoRulesArray);
 
         $promoRulesApiMock->createBatchJson();
