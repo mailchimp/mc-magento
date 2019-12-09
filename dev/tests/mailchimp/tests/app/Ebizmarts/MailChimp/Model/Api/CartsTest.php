@@ -778,6 +778,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsCollectionResourceMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
             ->getMock();
 
@@ -969,6 +970,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsCollectionResourceMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
             ->getMock();
 
@@ -1095,6 +1097,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsCollectionResourceMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
             ->getMock();
 
@@ -1224,6 +1227,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsCollectionResourceMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'addWhere'))
             ->getMock();
 
@@ -1384,6 +1388,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsCollectionResourceMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
             ->getMock();
 
