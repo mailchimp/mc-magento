@@ -22,7 +22,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         Mage::app('default');
-        $this->_cartsApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Carts::class);
+        $this->_cartsApiMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Carts::class)
+            ->disableOriginalConstructor();
     }
 
     public function tearDown()
