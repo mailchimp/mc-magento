@@ -5050,7 +5050,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function serialize($value, array $options = array())
     {
-        return Zend_Serializer::serialize($value, $options);
+        $parser = Mage::getModel('dataflow/convert_parser_serialize');
+        $parser->setData($value);
+        $parser->unparse();
+        return $parser->getData();
     }
 
     /**
@@ -5063,7 +5066,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function unserialize($serialized, array $options = array())
     {
-        return Zend_Serializer::unserialize($serialized, $options);
+        $parser = Mage::getModel('dataflow/convert_parser_serialize');
+        $parser->setData($serialized);
+        $parser->parse();
+        return $parser->getData();
     }
 
     /**

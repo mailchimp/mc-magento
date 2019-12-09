@@ -2142,4 +2142,37 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index, true);
     }
+
+    public function testSerialize()
+    {
+        $data = array('data1' => 'value1', 'data2' => 'value2');
+        $serializedData = 'a:2:{s:5:"data1";s:6:"value1";s:5:"data2";s:6:"value2";}';
+
+        // Sets any methods so the mock initializes the required method
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('unserialize'))
+            ->getMock();
+
+        $testData = $helperDataMock->serialize($data);
+
+        $this->assertEquals($testData, $serializedData);
+    }
+
+    public function testUnserialize()
+    {
+        $unserializedData = array('data1' => 'value1', 'data2' => 'value2');
+        $serializedData = 'a:2:{s:5:"data1";s:6:"value1";s:5:"data2";s:6:"value2";}';
+
+
+        // Sets any methods so the mock initializes the required method
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('serialize'))
+            ->getMock();
+
+        $testData = $helperDataMock->unserialize($serializedData);
+
+        $this->assertEquals($testData, $unserializedData);
+    }
 }
