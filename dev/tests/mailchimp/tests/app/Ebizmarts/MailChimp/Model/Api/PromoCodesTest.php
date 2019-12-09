@@ -9,6 +9,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
     const PROMOCODE_ID = 603;
 
     const MC_STORE_ID = 'a1s2d3f4g5h6j7k8l9n0';
+    const STORE_ID = '1';
 
     public function setUp()
     {
@@ -27,16 +28,34 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
     public function testCreateBatchJson()
     {
-        $magentoStoreId = 1;
         $batchArray = array();
         $promoCodesApiMock = $this->_promoCodesApiMock
-            ->setMethods(array('_getDeletedPromoCodes', '_getNewPromoCodes'))
-            ->getMock();
+            ->setMethods(
+                array('getMailchimpStoreId', 'getMagentoStoreId', 'getEcommercePromoCodesCollection',
+                    'getDateHelper', '_getDeletedPromoCodes', '_getNewPromoCodes')
+            )->getMock();
 
-        $promoCodesApiMock
-            ->expects($this->once())
-            ->method('_getDeletedPromoCodes')
-            ->willReturn($batchArray);
+        $promoCollectionResourceMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection::class)
+            ->setMethods(array('setMailchimpStoreId', 'setStoreId'))->getMock();
+
+        $mailchimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->setMethods(array('getDateMicrotime'))->getMock();
+
+        $promoCodesApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MC_STORE_ID);
+        $promoCodesApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::STORE_ID);
+        $promoCodesApiMock->expects($this->once())->method('getEcommercePromoCodesCollection')
+            ->willReturn($promoCollectionResourceMock);
+
+        $promoCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with(self::MC_STORE_ID);
+        $promoCollectionResourceMock->expects($this->once())->method('setStoreId')->with(self::STORE_ID);
+
+        $promoCodesApiMock->expects($this->once())->method('getDateHelper')->willReturn($mailchimpDateHelperMock);
+
+        $mailchimpDateHelperMock->expects($this->once())->method('getDateMicrotime');
+
+        $promoCodesApiMock->expects($this->once())->method('_getDeletedPromoCodes')->willReturn($batchArray);
+
         $promoCodesApiMock
             ->expects($this->once())
             ->method('_getNewPromoCodes')
