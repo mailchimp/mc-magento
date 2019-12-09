@@ -37,71 +37,63 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
+                'getMailchimpStoreId',
+                'getMagentoStoreId',
+                'createEcommerceQuoteCollection',
                 'getHelper',
+                'getDateHelper',
                 '_getConvertedQuotes',
                 '_getModifiedQuotes',
                 '_getNewQuotes',
                 'setBatchId',
-                'getDateHelper',
-                'getMailchimpStoreId',
-                'getMagentoStoreId'
+                'setCounter',
             )
-        )
-        ->getMock();
+        )->getMock();
 
-        $cartsApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MAILCHIMP_STORE_ID);
-        $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
+        $cartsCollectionResourceMock = $this
+            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
+            ->disableOriginalConstructor()->setMethods(array('setMailchimpStoreId', 'setStoreId'))
+            ->getMock();
 
+        $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()->setMethods(array('getDateMicrotime'))
+            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(
-                array(
-                    'isAbandonedCartEnabled',
-                    'getAbandonedCartFirstDate',
-                    'getResendTurn'
-                )
-            )
-            ->getMock();
+                array('getCurrentStoreId', 'setCurrentStore', 'isAbandonedCartEnabled',
+                    'getAbandonedCartFirstDate', 'getResendTurn')
+            )->getMock();
 
-        $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getDateMicrotime'))
-            ->getMock();
+        $cartsApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MAILCHIMP_STORE_ID);
+        $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
+        $cartsApiMock->expects($this->once())->method('createEcommerceQuoteCollection')
+            ->willReturn($cartsCollectionResourceMock);
 
-        $cartsApiMock->expects($this->once())->method('setBatchId')->with(self::BATCH_ID);
+        $cartsCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')
+            ->with(self::MAILCHIMP_STORE_ID);
+        $cartsCollectionResourceMock->expects($this->once())->method('setStoreId')->with(self::MAGENTO_STORE_ID);
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
-        $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($helperDateMock);
+        $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn(self::MAGENTO_STORE_ID);
+        $helperMock->expects($this->exactly(2))->method('setCurrentStore')
+            ->withConsecutive(array(self::MAGENTO_STORE_ID), array(self::MAGENTO_STORE_ID));
 
-        $cartsApiMock
-            ->expects($this->once())
-            ->method('_getConvertedQuotes')
-            ->willReturn($batchArray);
-
-        $cartsApiMock
-            ->expects($this->once())
-            ->method('_getModifiedQuotes')
-            ->willReturn($batchArray);
-
-        $cartsApiMock
-            ->expects($this->once())
-            ->method('_getNewQuotes')
-            ->willReturn($batchArray);
-
-        $helperMock
-            ->expects($this->once())
-            ->method('isAbandonedCartEnabled')
-            ->with(self::MAGENTO_STORE_ID)
+        $helperMock->expects($this->once())->method('isAbandonedCartEnabled')->with(self::MAGENTO_STORE_ID)
             ->willReturn(true);
-
-        $helperMock
-            ->expects($this->once())
-            ->method('getAbandonedCartFirstDate')
-            ->with(self::MAGENTO_STORE_ID)
-            ->willReturn('00-00-00 00:00:00');
-
+        $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($helperDateMock);
+        $helperMock->expects($this->once())->method('getAbandonedCartFirstDate')->with(self::MAGENTO_STORE_ID)
+        ->willReturn(self::DATE);
+        $cartsApiMock->expects($this->once())->method('setCounter')->with(0);
         $helperDateMock->expects($this->once())->method('getDateMicrotime')->willReturn(self::DATE);
+        $cartsApiMock->expects($this->once())->method('setBatchId')->with(self::BATCH_ID);
         $helperMock->expects($this->once())->method('getResendTurn')->with(self::MAGENTO_STORE_ID)->willReturn(null);
+        $cartsApiMock->expects($this->once())->method('_getConvertedQuotes')->willReturn($batchArray);
+        $cartsApiMock->expects($this->once())->method('_getModifiedQuotes')->willReturn($batchArray);
+        $cartsApiMock->expects($this->once())->method('_getNewQuotes')->willReturn($batchArray);
+
+        $helperMock->expects($this->once())->method('getAbandonedCartFirstDate')->with(self::MAGENTO_STORE_ID)
+            ->willReturn('00-00-00 00:00:00');
 
         $cartsApiMock->createBatchJson();
     }
