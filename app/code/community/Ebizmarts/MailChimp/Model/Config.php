@@ -80,23 +80,20 @@ class Ebizmarts_MailChimp_Model_Config
     const POPUP_COOKIE_TIME             = 'mailchimp/emailcatcher/popup_cookie_time';
     const POPUP_INSIST                  = 'mailchimp/emailcatcher/popup_insist';
 
-    const ABANDONEDCART_ACTIVE      = 'mailchimp/abandonedcart/active';
-    const ABANDONEDCART_FIRSTDATE   = 'mailchimp/abandonedcart/firstdate';
-    const ABANDONEDCART_PAGE        = 'mailchimp/abandonedcart/page';
-    const CART_AMOUNT               = 'mailchimp/abandonedcart/cart_batch_amount';
+    const ABANDONEDCART_ACTIVE          = 'mailchimp/abandonedcart/active';
+    const ABANDONEDCART_FIRSTDATE       = 'mailchimp/abandonedcart/firstdate';
+    const ABANDONEDCART_PAGE            = 'mailchimp/abandonedcart/page';
+    const ABANDONEDCART_AMOUNT          = 'mailchimp/abandonedcart/cart_batch_amount';
 
-    const WARNING_MESSAGE           = 'mailchimp/warning_message';
-    const POPUP_MESSAGE             = 'mailchimp/popup_message';
+    const MANDRILL_APIKEY               = 'mandrill/general/apikey';
+    const MANDRILL_ACTIVE               = 'mandrill/general/active';
+    const MANDRILL_LOG                  = 'mandrill/general/enable_log';
 
-    const MANDRILL_APIKEY           = 'mandrill/general/apikey';
-    const MANDRILL_ACTIVE           = 'mandrill/general/active';
-    const MANDRILL_LOG              = 'mandrill/general/enable_log';
-
-    const IS_CUSTOMER   = "CUS";
-    const IS_PRODUCT    = "PRO";
-    const IS_ORDER      = "ORD";
-    const IS_QUOTE      = "QUO";
-    const IS_SUBSCRIBER = "SUB";
-    const IS_PROMO_RULE = "PRL";
-    const IS_PROMO_CODE = "PCD";
+    const IS_CUSTOMER                   = "CUS";
+    const IS_PRODUCT                    = "PRO";
+    const IS_ORDER                      = "ORD";
+    const IS_QUOTE                      = "QUO";
+    const IS_SUBSCRIBER                 = "SUB";
+    const IS_PROMO_RULE                 = "PRL";
+    const IS_PROMO_CODE                 = "PCD";
 }
