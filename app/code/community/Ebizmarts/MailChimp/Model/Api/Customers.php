@@ -121,11 +121,8 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                         Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
                         $mailchimpStoreId
                     );
-                    $this->incrementCounterSentPerBatch(
-                        $dataCustomer,
-                        $helper
-                    );
 
+                    $this->incrementCounterSentPerBatch($dataCustomer, $helper);
                     $customerArray[$counter] = $this->makePutBatchStructure($customerJson, $customer);
                     $this->addSyncData($customer->getId());
                     $counter++;
