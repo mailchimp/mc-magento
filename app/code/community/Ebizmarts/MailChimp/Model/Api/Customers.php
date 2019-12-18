@@ -22,6 +22,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected $_mailchimpStoreId;
     protected $_batchId;
 
+    /**
+     * @var $_ecommerceCustomersCollection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     */
+    protected $_ecommerceCustomersCollection;
+
     public function __construct()
     {
         parent::__construct();
@@ -74,13 +79,18 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @param $mailchimpStoreId
-     * @param $magentoStoreId
      * @return array
      * @throws Mage_Core_Exception
      */
-    public function createBatchJson($mailchimpStoreId, $magentoStoreId)
+    public function createBatchJson()
     {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
+
+        $this->_ecommerceCustomersCollection = $this->createEcommerceCustomersCollection();
+        $this->_ecommerceCustomersCollection->setMailchimpStoreId($mailchimpStoreId);
+        $this->_ecommerceCustomersCollection->setStoreId($magentoStoreId);
+
         $this->setMailchimpStoreId($mailchimpStoreId);
         $this->setMagentoStoreId($magentoStoreId);
         $helper = $this->getHelper();
@@ -117,7 +127,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                     );
 
                     $customerArray[$counter] = $this->makePutBatchStructure($customerJson, $customer);
-                    $this->addSyncData($customer->getId(), $mailchimpStoreId);
+                    $this->addSyncData($customer->getId());
                     $counter++;
 
                     if (!$isSubscribed) {
@@ -139,7 +149,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                 } else {
                     $this->addSyncDataError(
                         $customer->getId(),
-                        $mailchimpStoreId,
                         'Customer with no data',
                         null,
                         false,
@@ -150,7 +159,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
                 $jsonErrorMessage = $this->logCouldNotEncodeCustomerError($customer);
                 $this->addSyncDataError(
                     $customer->getId(),
-                    $mailchimpStoreId,
                     $jsonErrorMessage,
                     null,
                     false,
@@ -305,10 +313,9 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      * @param $customerId
      * @param $storeId
      */
-    public function update($customerId, $storeId)
+    public function update($customerId)
     {
-        $mailchimpStoreId = $this->getHelper()->getMCStoreId($storeId);
-        $this->markSyncDataAsModified($customerId, $mailchimpStoreId);
+        $this->markSyncDataAsModified($customerId);
     }
 
     /**
@@ -360,20 +367,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @param $collection
+     * @param $collection Mage_Customer_Model_Resource_Customer_Collection
      */
     protected function joinMailchimpSyncData($collection)
     {
-        $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->_mailchimpStoreId),
-            array()
-        );
-
-        $collection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
+        $this->_ecommerceCustomersCollection->joinLeftEcommerceSyncData($collection);
     }
 
     /**
@@ -467,11 +465,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     }
 
     /**
-     * @return Object
+     * @return Mage_Customer_Model_Resource_Customer_Collection
      */
     protected function getCustomerResourceCollection()
     {
-        return Mage::getResourceModel('customer/customer_collection');
+        /**
+         * @var $collection Mage_Customer_Model_Resource_Customer_Collection
+         */
+        $collection = Mage::getResourceModel('customer/customer_collection');
+
+        return $collection;
     }
 
     /**
@@ -480,48 +483,6 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function getBatchMagentoStoreId()
     {
         return $this->_magentoStoreId;
-    }
-
-    /**
-     * @param       $collection
-     * @param null  $mailchimpStoreId
-     */
-    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId = null)
-    {
-        if (!$mailchimpStoreId) {
-            $mailchimpStoreId = $this->_mailchimpStoreId;
-        }
-
-        $joinCondition = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
-        $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
-
-        $collection->getSelect()->joinLeft(
-            array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $mailchimpStoreId),
-            array(
-                "m4m.related_id",
-                "m4m.type",
-                "m4m.mailchimp_store_id",
-                "m4m.mailchimp_sync_delta",
-                "m4m.mailchimp_sync_modified"
-            )
-        );
-    }
-
-    /**
-     * @param $mailchimpStoreId
-     */
-    protected function setMailchimpStoreId($mailchimpStoreId)
-    {
-        $this->_mailchimpStoreId = $mailchimpStoreId;
-    }
-
-    /**
-     * @param $magentoStoreId
-     */
-    protected function setMagentoStoreId($magentoStoreId)
-    {
-        $this->_magentoStoreId = $magentoStoreId;
     }
 
     /**
@@ -684,6 +645,27 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function getItemType()
     {
         return Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     */
+    public function getEcommerceCustomersCollection()
+    {
+        return $this->getEcommerceCustomersCollection();
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     */
+    public function createEcommerceCustomersCollection()
+    {
+        /**
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+         */
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_customers_collection');
+
+        return $collection;
     }
 
 }

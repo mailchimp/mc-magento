@@ -439,24 +439,21 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiCustomersMock
             ->expects($this->once())
             ->method('createBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($customerArray);
 
         $apiBatchesMock->expects($this->once())->method('getApiProducts')->willReturn($apiProductsMock);
         $apiProductsMock->expects($this->once())
             ->method('createBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($productsArray);
+
         $apiProductsMock->expects($this->once())
             ->method('createDeletedProductsBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($deletedProductsArray);
 
         $apiBatchesMock->expects($this->once())->method('getApiCarts')->willReturn($apiCartsMock);
         $apiCartsMock
             ->expects($this->once())
             ->method('createBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($cartsArray);
 
         $apiBatchesMock
@@ -467,7 +464,6 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiOrdersMock
             ->expects($this->once())
             ->method('createBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($ordersArray);
 
         $apiBatchesMock
@@ -477,7 +473,6 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiPromoRulesMock
             ->expects($this->exactly($sendPromo))
             ->method('createBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($promoRulesArray);
 
         $apiBatchesMock
@@ -487,7 +482,6 @@ class Ebizmarts_MailChimp_Model_Api_BatchesTest extends PHPUnit_Framework_TestCa
         $apiPromoCodesMock
             ->expects($this->exactly($sendPromo))
             ->method('createBatchJson')
-            ->with($mailchimpStoreId, $magentoStoreId)
             ->willReturn($promoCodesArray);
 
         $helperMock->expects($this->once())->method('getPromoConfig')->with($magentoStoreId)->willReturn($sendPromo);
