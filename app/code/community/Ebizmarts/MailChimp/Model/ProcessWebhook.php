@@ -51,8 +51,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     public function processWebhookData()
     {
-        Mage::log('processWebhookData', null, 'giorello.log', true);
-
         $collection = Mage::getModel('mailchimp/webhookrequest')->getCollection();
         $collection->addFieldToFilter('processed', array('eq' => 0));
         $collection->getSelect()->limit(self::BATCH_LIMIT);
