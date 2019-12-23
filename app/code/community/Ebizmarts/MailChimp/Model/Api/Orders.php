@@ -32,6 +32,18 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     protected $_ecommerceOrdersCollection;
 
+    public function __construct()
+    {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
+
+        $this->_ecommerceOrdersCollection = $this->createEcommerceProductsCollection();
+        $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
+        $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
+
+        parent::__construct();
+    }
+
     /**
      * Set the request for orders to be created on MailChimp
      *
@@ -40,12 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function createBatchJson()
     {
-        $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
-
-        $this->_ecommerceOrdersCollection = $this->createEcommerceProductsCollection();
-        $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
-        $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
 
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
