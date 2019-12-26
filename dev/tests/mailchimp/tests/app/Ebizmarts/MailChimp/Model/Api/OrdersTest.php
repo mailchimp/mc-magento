@@ -210,6 +210,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $data['order_url'] = 'http://somedomain.com';
 
         $ordersApiMock = $this->_ordersApiMock
+            ->disableOriginalConstructor()
             ->setMethods(
                 array(
                     'getMagentoStoreId',
@@ -358,6 +359,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         );
 
         $ordersApiMock = $this->_ordersApiMock
+            ->disableOriginalConstructor()
             ->setMethods(array('getHelper', 'getMagentoStoreId'))
             ->getMock();
 
