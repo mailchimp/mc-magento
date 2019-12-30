@@ -391,21 +391,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-    protected function _getGroups($groups, $cat)
-    {
-        $rc = [];
-        $gr = explode(",",$groups);
-        foreach ($gr as $g) {
-            foreach ($this->groups as $group) {
-                if (trim($g) == $group['name'] && $group['category_id'] == $cat) {
-                    $rc [$group['id']]= $group['id'];
-                    break;
-                }
-            }
-        }
-        return $rc;
-    }
-
     /**
      * @return Ebizmarts_MailChimp_Model_Api_Subscribers
      */
