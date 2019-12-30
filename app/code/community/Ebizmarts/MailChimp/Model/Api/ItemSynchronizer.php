@@ -282,7 +282,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
      */
     public function getMailchimpEcommerceSyncDataModel()
     {
-        //return Mage::getModel('mailchimp/ecommercesyncdata');
         return new Ebizmarts_MailChimp_Model_Ecommercesyncdata();
     }
 

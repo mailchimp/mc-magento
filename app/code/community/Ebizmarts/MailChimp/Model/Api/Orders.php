@@ -728,8 +728,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $orderCollection->addFieldToFilter('entity_id', array('gt' => $lastId));
         }
 
-        if(!$this->_ecommerceOrdersCollection){
-            $this->_ecommerceOrdersCollection = $this->createEcommerceProductsCollection();
+        if(empty($this->_ecommerceOrdersCollection)){
+            $this->_ecommerceOrdersCollection = $this->createEcommerceOrdersCollection();
             $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
             $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
         }

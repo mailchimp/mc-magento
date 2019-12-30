@@ -19,14 +19,17 @@ class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
      * @param array $options
      * @return array An array with...
      */
-    public function curlExec($url, $method, $curlOptions = array(), $params = array())
+    public function curlExec($url, $httpMethod, $curlOptions = array(), $params = array())
     {
         if ($url === false) {
-            return array();
+            return array('error' => "It's required an URL to be requested with any http method.");
+        }
+
+        if ($httpMethod === false) {
+            return array('error' => "It's required to specify the HTTP method.");
         }
 
         $curlError = null;
-        $info = null;
         $curl = new Mage_HTTP_Client_Curl();
 
         foreach ($curlOptions as $key => $value) {
@@ -38,17 +41,17 @@ class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
         $curlResult = null;
 
         try {
-            if ($method == Zend_Http_Client::GET) {
+            if ($httpMethod == Zend_Http_Client::GET) {
                 $curl->get($url);
-            } elseif ($method == Zend_Http_Client::POST) {
+            } elseif ($httpMethod == Zend_Http_Client::POST) {
                 $curl->post($url, $params);
             }
 
             $curlResult = $curl->getBody();
         } catch (Exception $e) {
-            Mage::log(__METHOD__ . " " . $e->getTraceAsString(), null, '', true);
+            $curlError = $e->getMessage();
         }
 
-        return array('response' => $curlResult, 'error' => $curlError, 'info' => $info);
+        return array('response' => $curlResult, 'error' => $curlError);
     }
 }
