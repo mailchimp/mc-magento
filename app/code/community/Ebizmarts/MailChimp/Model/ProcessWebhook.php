@@ -289,22 +289,22 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-    protected function _processGroupsData($grouping, $data, $isDataSubscriber = false)
+    protected function _processGroupsData($grouping, $customerData, $isDataSubscriber = false)
     {
         $helper = $this->getHelper();
         $storeId = $this->_getStoreId();
 
-        $customerEmail = $data->getEmail();
+        $customerEmail = $customerData->getEmail();
         $subscriber = $this->getSubscriberModel()->loadByEmail($customerEmail);
 
         if (!$isDataSubscriber) {
-            $customerId = $data->getId();
-            $name = $data->getName();
-            $lastName = $data->getLastName();
+            $customerId = $customerData->getId();
+            $name = $customerData->getName();
+            $lastName = $customerData->getLastName();
         } else {
-            $customerId = $data->getCustomerId();
-            $name = $data->getSubscriberFirstname();
-            $lastName = $data->getSubscriberLastname();
+            $customerId = $customerData->getCustomerId();
+            $name = $customerData->getSubscriberFirstname();
+            $lastName = $customerData->getSubscriberLastname();
         }
 
         $interestGroup = $this->getInterestGroupModel();
