@@ -1098,6 +1098,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         return $this->_ecommerceOrdersCollection;
     }
 
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
+     */
     public function createEcommerceOrdersCollection()
     {
         /**
