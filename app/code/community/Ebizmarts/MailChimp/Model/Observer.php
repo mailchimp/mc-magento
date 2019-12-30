@@ -986,7 +986,11 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($storeId == 0) {
             $this->handleAdminOrderUpdate($order);
         } else {
-            $this->makeApiOrder()->update($order->getId(), $storeId);
+            $helper = $this->makeHelper();
+            $apiOrder =  $this->makeApiOrder();
+            $apiOrder->setMagentoStoreId($storeId);
+            $apiOrder->setMailchimpStoreId($helper->getMCStoreId($storeId));
+            $apiOrder->update($order->getId(), $storeId);
         }
     }
 
