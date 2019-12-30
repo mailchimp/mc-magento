@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceOrdersCollection = $this->createEcommerceProductsCollection();
+        $this->_ecommerceOrdersCollection = $this->createEcommerceOrdersCollection();
         $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
 
@@ -1098,12 +1098,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         return $this->_ecommerceOrdersCollection;
     }
 
-    public function createEcommerceProductsCollection()
+    public function createEcommerceOrdersCollection()
     {
         /**
-         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
          */
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_product_collection');
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_orders_collection');
 
         return $collection;
     }

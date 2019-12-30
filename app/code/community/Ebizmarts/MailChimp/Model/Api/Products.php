@@ -62,7 +62,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
 
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $oldStore = $helper->getCurrentStoreId();
+        $oldStoreId = $helper->getCurrentStoreId();
         $helper->setCurrentStore($magentoStoreId);
 
         if ($this->isProductFlatTableEnabled()) {
@@ -88,17 +88,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             $productId = $product->getId();
 
             if ($this->shouldSendProductUpdate($product)) {
-                $buildUpdateOperations = $this->_buildUpdateProductRequest(
-                    $product,
-                    $batchId
-                );
+                $buildUpdateOperations = $this->_buildUpdateProductRequest($product, $batchId);
 
                 if ($buildUpdateOperations !== false) {
-                    $batchArray = array_merge(
-                        $buildUpdateOperations,
-                        $batchArray
-                    );
-
+                    $batchArray = array_merge($buildUpdateOperations, $batchArray);
                     $this->addSyncData($productId);
                 }
 
@@ -139,7 +132,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             }
         }
 
-        $helper->setCurrentStore($oldStore);
+        $helper->setCurrentStore($oldStoreId);
 
         return $batchArray;
     }

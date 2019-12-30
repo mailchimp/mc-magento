@@ -881,6 +881,7 @@ class Ebizmarts_MailChimp_Model_Observer
             if ($ecommEnabled) {
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
                 $apiProduct->setMailchimpStoreId($mailchimpStoreId);
+                $apiProduct->setMagentoStoreId($storeId);
                 $status = $this->getCatalogProductStatusModel()->getProductStatus($product->getId(), $storeId);
 
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
