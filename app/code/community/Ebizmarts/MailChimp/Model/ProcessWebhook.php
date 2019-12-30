@@ -390,15 +390,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             }
         }
     }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Api_Subscribers
-     */
-    protected function getApiSubscriber()
-    {
-        return Mage::getModel('mailchimp/api_subscribers');
-    }
-
+    
     /**
      * @return Ebizmarts_MailChimp_Model_Interestgroup
      */
