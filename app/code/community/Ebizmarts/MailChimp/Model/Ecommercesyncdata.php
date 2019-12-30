@@ -132,7 +132,6 @@ class Ebizmarts_MailChimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstra
         $allowBatchRemoval,
         Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
     ) {
-        Mage::log(__METHOD__. " syncDelta: $syncDelta");
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
         } elseif ($allowBatchRemoval === true) {

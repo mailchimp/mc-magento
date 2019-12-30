@@ -730,19 +730,11 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         CURLOPT_FOLLOWLOCATION => true, // this will follow redirects
                     );
 
-
                     $curlHelper = $this->getMailchimpCurlHelper();
                     $curlResult = $curlHelper->curlExec($fileUrl, Zend_Http_Client::GET, $curlOptions);
 
-                    /*$ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, $fileUrl);
-                    curl_setopt($ch, CURLOPT_FILE, $fd);
-                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // this will follow redirects
-                    $curlResult = curl_exec($ch);*/
-
                     fclose($fd);
                     $fileHelper->mkDir($baseDir . DS . 'var' . DS . 'mailchimp' . DS . $batchId, 0750, true);
-
                     $archive = new Mage_Archive();
 
                     if ($fileHelper->fileExists($fileName)) {
@@ -1022,6 +1014,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $saveOnlyIfExists = false
     ) {
         $helper = $this->getHelper();
+
         if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_SUBSCRIBER) {
             $helper->updateSubscriberSyndData($itemId, $syncDelta, $syncError, 0, null);
         } else {
