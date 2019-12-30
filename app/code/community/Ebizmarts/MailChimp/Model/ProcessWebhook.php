@@ -33,6 +33,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         $this->_helper = Mage::helper('mailchimp');
         $this->_dateHelper = Mage::helper('mailchimp/date');
+
+        $this->_loadGroups();
     }
 
     public function saveWebhookRequest(array $data)
@@ -54,8 +56,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $collection = Mage::getModel('mailchimp/webhookrequest')->getCollection();
         $collection->addFieldToFilter('processed', array('eq' => 0));
         $collection->getSelect()->limit(self::BATCH_LIMIT);
-
-        $this->_loadGroups();
 
         foreach ($collection as $webhookRequest) {
             $data = $this->_helper->unserialize($webhookRequest->getDataRequest());
@@ -390,7 +390,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             }
         }
     }
-    
+
     /**
      * @return Ebizmarts_MailChimp_Model_Interestgroup
      */
