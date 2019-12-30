@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected $_helper;
     protected $_dateHelper;
-    protected $groups = [];
+    protected $_groups = array();
 
     /**
      * Webhooks request url path
@@ -375,7 +375,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             $interestsCat = $api->getLists()->interestCategory->getAll($listId);
             foreach ($interestsCat['categories'] as $cat) {
                 $interests = $api->lists->interestCategory->interests->getAll($listId,$cat['id']);
-                $this->groups = array_merge_recursive($this->groups, $interests['interests']);
+                $this->_groups = array_merge_recursive($this->_groups, $interests['interests']);
             }
         }
     }
