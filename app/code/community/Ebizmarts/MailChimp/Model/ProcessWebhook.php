@@ -299,22 +299,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
         if (!$isDataSubscriber) {
             $customerId = $customerData->getId();
-            $name = $customerData->getName();
-            $lastName = $customerData->getLastName();
         } else {
             $customerId = $customerData->getCustomerId();
-            $name = $customerData->getSubscriberFirstname();
-            $lastName = $customerData->getSubscriberLastname();
         }
 
         $interestGroup = $this->getInterestGroupModel();
-
-        if (!$subscriber->getSubscriberId()) {
-            $subscriber->setSubscriberEmail($customerEmail);
-            $subscriber->setSubscriberFirstname($name);
-            $subscriber->setSubscriberLastname($lastName);
-            $subscriber->subscribe($customerEmail);
-        }
 
         $subscriberId = $subscriber->getSubscriberId();
         $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
