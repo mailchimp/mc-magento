@@ -1,22 +1,32 @@
 # Changelog
-## [1.1.18](https://github.com/mailchimp/mc-magento/releases/tag/1.1.18) - 2019-09-13
-**Fixed**
-- Product resend internal problem [\#1066](https://github.com/mailchimp/mc-magento/issues/1066)
-- Notice: Undefined index: NOT SENT  in app/code/community/Ebizmarts/MailChimp/Helper/Data.php [\#1050](https://github.com/mailchimp/mc-magento/issues/1050)
-- Use empty function correctly [\#1039](https://github.com/mailchimp/mc-magento/issues/1039)
-- Fix for bug preventing carts from synchronising [\#1029](https://github.com/mailchimp/mc-magento/issues/1029)
-- Problems when resending Ecommerce Data [\#1024](https://github.com/mailchimp/mc-magento/issues/1024)
-- PHP notice when MC API call fails [\#1021](https://github.com/mailchimp/mc-magento/issues/1021)
-- Cannot resend Ecommerce data from particular scope [\#1017](https://github.com/mailchimp/mc-magento/issues/1017)
-- Handle json_encode errors correctly [\#1010](https://github.com/mailchimp/mc-magento/issues/1010)
-
+## [1.1.19](https://github.com/mailchimp/mc-magento/releases/tag/1.1.19) - 2020-01-03
 **Changed**
+- Refactor collection filters to avoid doing joins, where, etc outside resources. [\#1119](https://github.com/mailchimp/mc-magento/issues/1119)
+- Allow translation of texts on app/code/community/Ebizmarts/MailChimp/controllers/CartController.php [\#1118](https://github.com/mailchimp/mc-magento/issues/1118)
+- Add Mailchimp configuration link at Newsletter -> Mailchimp menu [\#1107](https://github.com/mailchimp/mc-magento/issues/1107)
+- Log the product id if is not supported by Mailchimp [\#1101](https://github.com/mailchimp/mc-magento/issues/1101)
+- Exceptions not treated properly. [\#1098](https://github.com/mailchimp/mc-magento/issues/1098)
+- Unnecessary function call: getProductResourceModel() [\#1094](https://github.com/mailchimp/mc-magento/issues/1094)
+-  Mysql4 classes are obsolete for M1.6+ [\#1089](https://github.com/mailchimp/mc-magento/issues/1089)
+- Unify error logging methods. [\#1065](https://github.com/mailchimp/mc-magento/issues/1065)
+- Unify Ecommerce Items Classes [\#1064](https://github.com/mailchimp/mc-magento/issues/1064)
+- Create option in backend adminhtml to subsribe customers [\#450](https://github.com/mailchimp/mc-magento/issues/450)
+
+**Fixed**
+- Serializer error when Magento is compiled. [\#1116](https://github.com/mailchimp/mc-magento/issues/1116)
+- Missing getWebhooks() function on Lib. [\#1115](https://github.com/mailchimp/mc-magento/issues/1115)
+- Fix incorrect class declaration in function setEcommerceSyncDataItemValues [\#1103](https://github.com/mailchimp/mc-magento/issues/1103)
+
+## [1.1.18](https://github.com/mailchimp/mc-magento/releases/tag/1.1.18) - 2019-10-07
+**Changed**
+- Avoid sending carts until the initial sync finishes [\#1073](https://github.com/mailchimp/mc-magento/issues/1073)
+- Remove GENERAL_ECOMMMINSYNCDATEFLAG usages. [\#1072](https://github.com/mailchimp/mc-magento/issues/1072)
+- Allow campaignCatcher.js to save campaign for URL with style domain.com/mc_cid/{#campaignIdNumber} [\#1071](https://github.com/mailchimp/mc-magento/issues/1071)
 - Fix for re-using synch batch models causing batch responses to not be processed [\#1057](https://github.com/mailchimp/mc-magento/issues/1057)
 - Apply MEQP1 code standar [\#1055](https://github.com/mailchimp/mc-magento/issues/1055)
 - Validate API key field at Mailchimp configuration [\#1052](https://github.com/mailchimp/mc-magento/issues/1052)
 - Add Invalid API Key message when adding a new Mailchimp Store [\#1045](https://github.com/mailchimp/mc-magento/issues/1045)
-- Remove redundant system config and template file [\#1043](https://github.com/mailchimp/mc-magento/pull/1043)
-- Stop flagging Customers as modified after an order is made. [\#1027](https://github.com/mailchimp/mc-magento/issues/1027)
+- Stop sending order_total and total_spent in Customer data. [\#1027](https://github.com/mailchimp/mc-magento/issues/1027)
 - Improve batch behavior [\#1025](https://github.com/mailchimp/mc-magento/issues/1025)
 - Serialize/Unserialize deprecated - MEQP [\#1019](https://github.com/mailchimp/mc-magento/issues/1019)
 - Improve performance when resetting errors [\#975](https://github.com/mailchimp/mc-magento/issues/975)
@@ -24,14 +34,23 @@
 - How can we clean the table mailchimp_ecommerce_sync_data [\#897](https://github.com/mailchimp/mc-magento/issues/897)
 - Certain Merge fields not transferred [\#425](https://github.com/mailchimp/mc-magento/issues/425)
 
+**Fixed**
+- Product resend problem [\#1066](https://github.com/mailchimp/mc-magento/issues/1066)
+- Notice: Undefined index: NOT SENT  in app/code/community/Ebizmarts/MailChimp/Helper/Data.php [\#1050](https://github.com/mailchimp/mc-magento/issues/1050)
+- Use empty function correctly [\#1039](https://github.com/mailchimp/mc-magento/issues/1039)
+- Fix for infinite sync of carts with unsupported products and emptied carts not being removed [\#1032](https://github.com/mailchimp/mc-magento/issues/1032)
+- Problems when resending Ecommerce Data [\#1024](https://github.com/mailchimp/mc-magento/issues/1024)
+- PHP notice when MC API call fails [\#1021](https://github.com/mailchimp/mc-magento/issues/1021)
+- Cannot resend Ecommerce data from particular scope [\#1017](https://github.com/mailchimp/mc-magento/issues/1017)
+- Uncaught Error: Call to undefined method Ebizmarts_MailChimp_Model_Api_Products::joinMailchimpSyncDataWithoutWhere() in /mc-magento/app/code/community/Ebizmarts/MailChimp/Helper/Data.php:3274 [\#1014](https://github.com/mailchimp/mc-magento/issues/1014)
+- Handle json_encode errors correctly [\#1010](https://github.com/mailchimp/mc-magento/issues/1010)
+
 ## [1.1.17](https://github.com/mailchimp/mc-magento/releases/tag/1.1.17) - 2019-07-23
 **Changed**
 - Avoid sending Subscriber via cron job when setting "Use Magento Emails" enabled. [\#996](https://github.com/mailchimp/mc-magento/issues/996)
 - Rename delete customer account option [\#992](https://github.com/mailchimp/mc-magento/issues/992)
-- Coding standards fix [\#989](https://github.com/mailchimp/mc-magento/pull/989)
 - Change "List" appearances to "Audience" [\#977](https://github.com/mailchimp/mc-magento/issues/977)
 - Encrypt sensitive data [\#955](https://github.com/mailchimp/mc-magento/issues/955)
-- Improve logging [\#947](https://github.com/mailchimp/mc-magento/pull/947)
 - Add default merge var for province/state [\#937](https://github.com/mailchimp/mc-magento/issues/937)
 - Add the options to resend all the ecommerce data or resend only the products, customers, orders or quotes [\#891](https://github.com/mailchimp/mc-magento/issues/891)
 - Improve logging [\#886](https://github.com/mailchimp/mc-magento/issues/886)
@@ -55,7 +74,6 @@
 - Error syncing order with disabled product [\#943](https://github.com/mailchimp/mc-magento/issues/943)
 - Orders don't sync with Mailchimp when the order have a child disabled product [\#930](https://github.com/mailchimp/mc-magento/issues/930)
 - Interest groups in checkout success with the option disabled [\#927](https://github.com/mailchimp/mc-magento/issues/927)
-- Fixed grammar in success message after group subscription in order success page. [\#925](https://github.com/mailchimp/mc-magento/pull/925)
 - Problem with disabled products and multi-stores [\#913](https://github.com/mailchimp/mc-magento/issues/913)
 - Missing template: group/types.phtml [\#912](https://github.com/mailchimp/mc-magento/issues/912)
 - MC 1.1.15 Reset Local Errors gives an error [\#911](https://github.com/mailchimp/mc-magento/issues/911)
@@ -97,15 +115,14 @@
 - Add subscription option on order success page [\#770](https://github.com/mailchimp/mc-magento/issues/770)
 
 ## [1.1.14](https://github.com/mailchimp/mc-magento/releases/tag/1.1.14) - 2019-01-16
-**Changed**
-- create a reference to the Mailchimp tutorials [\#847](https://github.com/mailchimp/mc-magento/pull/847)
-- Replace old MailChimp logo with the new one. [\#839](https://github.com/mailchimp/mc-magento/issues/839)
-- Send subscription confirmation email via Magento [\#793](https://github.com/mailchimp/mc-magento/issues/793)
-- Add support for List Groups [\#514](https://github.com/mailchimp/mc-magento/issues/514)
-
 **Fixed**
 - Orders belonging to deleted stores do not show correct syncing status under "synced to MailChimp" column [\#840](https://github.com/mailchimp/mc-magento/issues/840)
 - Change modified abandoned carts sending method from DELETE -> POST to PATCH [\#836](https://github.com/mailchimp/mc-magento/issues/836)
+
+**Changed**
+- Replace old MailChimp logo with the new one. [\#839](https://github.com/mailchimp/mc-magento/issues/839)
+- Send subscription confirmation email via Magento [\#793](https://github.com/mailchimp/mc-magento/issues/793)
+- Add support for List Groups [\#514](https://github.com/mailchimp/mc-magento/issues/514)
 
 ## [1.1.13](https://github.com/mailchimp/mc-magento/releases/tag/1.1.13) - 2018-12-11
 **Changed**
@@ -121,10 +138,8 @@
 - Remove addFilterToMap from order grid observer [\#744](https://github.com/mailchimp/mc-magento/issues/744)
 - Avoid re-creating the store after Reset. [\#741](https://github.com/mailchimp/mc-magento/issues/741)
 - Stop syncing process if no connection to MailChimp's API available. [\#738](https://github.com/mailchimp/mc-magento/issues/738)
-- Send most recently created promo codes first [\#736](https://github.com/mailchimp/mc-magento/pull/736)
 - No Double Opt-in Option for MailChimp for Magento [\#727](https://github.com/mailchimp/mc-magento/issues/727)
 - Capitalization at Newsletter top menu [\#718](https://github.com/mailchimp/mc-magento/issues/718)
-- Index customer_id on sales_flat_order [\#712](https://github.com/mailchimp/mc-magento/pull/712)
 - Add translations file. [\#689](https://github.com/mailchimp/mc-magento/issues/689)
 - Order confirmation email is bypassing Aschroder_SMTPPro [\#673](https://github.com/mailchimp/mc-magento/issues/673)
 - Remove disabled products to aovid using them in promotions. [\#582](https://github.com/mailchimp/mc-magento/issues/582)
@@ -143,7 +158,6 @@
 - Incorrect store domain when setting up at website level. [\#754](https://github.com/mailchimp/mc-magento/issues/754)
 - Send products with no description available [\#747](https://github.com/mailchimp/mc-magento/issues/747)
 - Error Report when Export Orders CSV or Excel [\#732](https://github.com/mailchimp/mc-magento/issues/732)
-- Set subcribers correct language in mailchimp during signup #729 [\#730](https://github.com/mailchimp/mc-magento/pull/730)
 - Synced status not reporting correctly in orders grid [\#726](https://github.com/mailchimp/mc-magento/issues/726)
 - Upgrade to 1.1.2 : You cannot define a correlation name 'mc' more than once [\#725](https://github.com/mailchimp/mc-magento/issues/725)
 - Clear mail object after sending message [\#719](https://github.com/mailchimp/mc-magento/issues/719)
@@ -165,8 +179,6 @@
 **Changed**
 - Add new message for store creation error. [\#681](https://github.com/mailchimp/mc-magento/issues/681)
 - Request: add ability to send the actual BRAND/Manufacturer in the Vendor field [\#672](https://github.com/mailchimp/mc-magento/issues/672)
-- Subscriber resend issue482 [\#671](https://github.com/mailchimp/mc-magento/pull/671)
-- add guest checkout name to subscriber data [\#664](https://github.com/mailchimp/mc-magento/pull/664)
 - Sort categories by name [\#659](https://github.com/mailchimp/mc-magento/issues/659)
 - query optimizations 1 [\#583](https://github.com/mailchimp/mc-magento/issues/583)
 - Add resend for subscriber data [\#482](https://github.com/mailchimp/mc-magento/issues/482)
@@ -185,7 +197,6 @@
 - Small and thumbnail images not sent [\#589](https://github.com/mailchimp/mc-magento/issues/589)
 - All orders marked with Mailchimp logo even if they're not coming from Mailchimp [\#576](https://github.com/mailchimp/mc-magento/issues/576)
 - Child product update when parent has not been sent yet [\#575](https://github.com/mailchimp/mc-magento/issues/575)
-- Removes exception in order grid if for example a used payment method has [\#563](https://github.com/mailchimp/mc-magento/pull/563)
 - Images are not sent in certain versions of PHP [\#559](https://github.com/mailchimp/mc-magento/issues/559)
 - When Mandrill disabled in default scope and enabled in certain store views email sending fails. [\#550](https://github.com/mailchimp/mc-magento/issues/550)
 - When api key is changed deleteCurrentWebhook method fails [\#548](https://github.com/mailchimp/mc-magento/issues/548)
@@ -194,11 +205,9 @@
 **Changed**
 - Load campaignCatcher.js async [\#624](https://github.com/mailchimp/mc-magento/issues/624)
 - Improve performance when retrieving the last date of purchase [\#619](https://github.com/mailchimp/mc-magento/issues/619)
-- Cache management page - Do not flush cache [\#594](https://github.com/mailchimp/mc-magento/pull/594)
 - add index [\#584](https://github.com/mailchimp/mc-magento/issues/584)
 - Added Mailchimperrors grid column Created At [\#569](https://github.com/mailchimp/mc-magento/issues/569)
 - Put a column in the order grid to show if the order was synced [\#557](https://github.com/mailchimp/mc-magento/issues/557)
-- load MCJs async [\#546](https://github.com/mailchimp/mc-magento/pull/546)
 - Send parent price for not visible products belonging to a configurable [\#538](https://github.com/mailchimp/mc-magento/issues/538)
 - Check if webhook exists after batch process and create it if missing [\#535](https://github.com/mailchimp/mc-magento/issues/535)
 - Ebizmarts_MailChimp properties are not defined correctly [\#361](https://github.com/mailchimp/mc-magento/issues/361)
@@ -300,10 +309,8 @@
 - Ignore already exists error [\#360](https://github.com/mailchimp/mc-magento/issues/360)
 - Send out of stock products [\#353](https://github.com/mailchimp/mc-magento/issues/353)
 - Modify webhook creation [\#340](https://github.com/mailchimp/mc-magento/issues/340)
-- Set limit on Collection to 1. [\#333](https://github.com/mailchimp/mc-magento/pull/333)
 - New Feature: flag is_syncing  [\#323](https://github.com/mailchimp/mc-magento/issues/323)
 - API Products constant array declaration unsupported in PHP 5.5 [\#316](https://github.com/mailchimp/mc-magento/issues/316)
-- Do not translate customer group [\#315](https://github.com/mailchimp/mc-magento/pull/315)
 - Send order id in stead of increment id in operation id for batches. [\#286](https://github.com/mailchimp/mc-magento/issues/286)
 - Sent orderId in stead of incrementId in operation id in Orders.php [\#281](https://github.com/mailchimp/mc-magento/issues/281)
 - Split cron jobs. [\#277](https://github.com/mailchimp/mc-magento/issues/277)
@@ -322,14 +329,10 @@
 ## [1.1.7](https://github.com/mailchimp/mc-magento/releases/tag/1.1.7) - 2017-06-01
 **Fixed**
 - All orders are marked with landing page & as coming from MailChimp. [\#239](https://github.com/mailchimp/mc-magento/issues/239)
-- Added fix for storage foreach [\#223](https://github.com/mailchimp/mc-magento/pull/223)
 - Guest orders are not synced [\#150](https://github.com/mailchimp/mc-magento/issues/150)
 - Integrity constraint violation when syncing e-commerce data [\#147](https://github.com/mailchimp/mc-magento/issues/147)
 
 **Changed**
-- Fix case mixing and make class namespace/prefix the same for all classes [\#207](https://github.com/mailchimp/mc-magento/pull/207)
-- Error in `getBatchResponse` method when `/var/mailchimp` directory does not exist [\#203](https://github.com/mailchimp/mc-magento/pull/203)
-- Added pagination for too huge collections in data-upgrade [\#192](https://github.com/mailchimp/mc-magento/pull/192)
 - Recommend products no images when only configurable product has images [\#140](https://github.com/mailchimp/mc-magento/issues/140)
 
 ## [1.1.6](https://github.com/mailchimp/mc-magento/releases/tag/1.1.6) - 2017-03-30
@@ -400,7 +403,6 @@
 - Utilty to download the batch response [\#66](https://github.com/mailchimp/mc-magento/issues/66)
 - Add the Batch Id to the mailchimp error grid [\#65](https://github.com/mailchimp/mc-magento/issues/65)
 - Generate one log per each batch [\#64](https://github.com/mailchimp/mc-magento/issues/64)
-- Feature composer modman support [\#62](https://github.com/mailchimp/mc-magento/pull/62)
 - Add composer.json and modman support [\#61](https://github.com/mailchimp/mc-magento/issues/61)
 
 **Fixed**
@@ -408,7 +410,6 @@
 - Invalid country code error shown in MailChimp_Errors.log [\#72](https://github.com/mailchimp/mc-magento/issues/72)
 - Customers generating resource not found error [\#71](https://github.com/mailchimp/mc-magento/issues/71)
 - Carts not existing on MailChimp being deleted before getting sent. [\#70](https://github.com/mailchimp/mc-magento/issues/70)
-- #68 - fix of bug which caused campaign_id not being associated with o… [\#69](https://github.com/mailchimp/mc-magento/pull/69)
 - campaign_id isn't associated to order when cookie lifetime != 3600 [\#68](https://github.com/mailchimp/mc-magento/issues/68)
 
 ## [1.1.1](https://github.com/mailchimp/mc-magento/releases/tag/1.1.1) - 2016-09-13
