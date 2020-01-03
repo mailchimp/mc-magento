@@ -1,5 +1,5 @@
 # Changelog
-## [1.1.19](https://github.com/mailchimp/mc-magento/releases/tag/1.1.19) - 2019-12-12
+## [1.1.19](https://github.com/mailchimp/mc-magento/releases/tag/1.1.19) - 2020-01-03
 **Changed**
 - Refactor collection filters to avoid doing joins, where, etc outside resources. [\#1119](https://github.com/mailchimp/mc-magento/issues/1119)
 - Allow translation of texts on app/code/community/Ebizmarts/MailChimp/controllers/CartController.php [\#1118](https://github.com/mailchimp/mc-magento/issues/1118)

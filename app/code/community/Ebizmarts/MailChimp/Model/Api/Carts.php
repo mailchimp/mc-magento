@@ -164,10 +164,12 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
              */
             $customer = $this->getCustomerModel();
             $customer->setWebsiteId($this->getWebSiteIdFromMagentoStoreId($magentoStoreId));
-            $customer->loadByEmail($cart->getCustomerEmail());
+            $cartCustomerEmail = $cart->getCustomerEmail();
+            $customer->loadByEmail($cartCustomerEmail);
 
-            if ($customer->getEmail() != $cart->getCustomerEmail()) {
-                $allCartsForEmail = $this->getAllCartsByEmail($cart->getCustomerEmail());
+            $customerEmail = $customer->getEmail();
+            if ($customerEmail != $cartCustomerEmail) {
+                $allCartsForEmail = $this->getAllCartsByEmail($cartCustomerEmail);
 
                 foreach ($allCartsForEmail as $cartForEmail) {
                     $alreadySentCartId = $cartForEmail->getEntityId();
@@ -183,7 +185,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                         $allCarts[$counter]['body'] = '';
 
                         $this->markSyncDataAsDeleted($cartId);
-                        $this->setCounter($this->getCounter() + 1);
+                        $this->setCounter($counter + 1);
                     }
                 }
 
@@ -191,7 +193,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
             }
 
             // avoid carts abandoned as guests when customer email associated to a registered customer.
-            if (!$cart->getCustomerId() && $customer->getEmail() == $cart->getCustomerEmail()) {
+            if (!$cart->getCustomerId() && $customerEmail == $cartCustomerEmail) {
                 $this->addSyncData($cartId);
                 continue;
             }
@@ -302,7 +304,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                     $allCarts[$counter]['body'] = '';
 
                     $this->markSyncDataAsDeleted($alreadySentCartId);
-                    $this->setCounter($this->getCounter() + 1);
+                    $this->setCounter($counter + 1);
                 }
 
                 $allCartsForEmail->clear();

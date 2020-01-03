@@ -239,7 +239,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartByEmailModelMock->expects($this->once())->method('getEntityId')->willReturn(self::ALREADY_SENT_CART_ID);
 
         $cartsApiMock->expects($this->exactly(4))->method('getCounter')
-            ->willReturnOnConsecutiveCalls(self::COUNTER, self::COUNTER);
+            ->willReturnOnConsecutiveCalls(self::COUNTER, self::COUNTER, self::COUNTER, self::COUNTER);
 
         $cartsApiMock->expects($this->exactly(2))->method('markSyncDataAsDeleted')
             ->withConsecutive(
@@ -386,7 +386,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $customerModelMock->expects($this->once())->method('loadByEmail')->with(self::CUSTOMER_EMAIL_BY_CART);
 
-        $cartModelMock->expects($this->exactly(3))->method('getCustomerEmail')
+        $cartModelMock->expects($this->once())->method('getCustomerEmail')
             ->willReturnOnConsecutiveCalls(
                 self::CUSTOMER_EMAIL_BY_CART, self::CUSTOMER_EMAIL_BY_CART, self::CUSTOMER_EMAIL_BY_CART
             );
@@ -400,7 +400,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartByEmailModelMock->expects($this->once())->method('getEntityId')->willReturn(self::ALREADY_SENT_CART_ID);
 
-        $cartsApiMock->expects($this->exactly(4))->method('getCounter')
+        $cartsApiMock->expects($this->exactly(3))->method('getCounter')
             ->willReturnOnConsecutiveCalls(self::COUNTER, self::COUNTER, self::COUNTER, self::COUNTER);
 
         $cartsApiMock->expects($this->once())->method('markSyncDataAsDeleted')->with(self::CART_ID);
@@ -532,12 +532,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $customerModelMock->expects($this->once())->method('loadByEmail')->with(self::CUSTOMER_EMAIL_BY_CART);
 
-        $cartModelMock->expects($this->exactly(3))->method('getCustomerEmail')
+        $cartModelMock->expects($this->once())->method('getCustomerEmail')
             ->willReturnOnConsecutiveCalls(
                 self::CUSTOMER_EMAIL_BY_CART, self::CUSTOMER_EMAIL_BY_CART, self::CUSTOMER_EMAIL_BY_CART
             );
 
-        $customerModelMock->expects($this->exactly(2))->method('getEmail')
+        $customerModelMock->expects($this->once())->method('getEmail')
             ->willReturnOnConsecutiveCalls($customerEmailAddress, $customerEmailAddress);
 
         $cartModelMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
@@ -671,7 +671,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $customerModelMock->expects($this->once())->method('loadByEmail')->with(self::CUSTOMER_EMAIL_BY_CART);
 
-        $cartModelMock->expects($this->exactly(3))->method('getCustomerEmail')
+        $cartModelMock->expects($this->once())->method('getCustomerEmail')
             ->willReturnOnConsecutiveCalls(
                 self::CUSTOMER_EMAIL_BY_CART, self::CUSTOMER_EMAIL_BY_CART, self::CUSTOMER_EMAIL_BY_CART
             );
@@ -685,8 +685,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartByEmailModelMock->expects($this->once())->method('getEntityId')->willReturn(self::ALREADY_SENT_CART_ID);
 
-        $cartsApiMock->expects($this->exactly(2))->method('getCounter')
-            ->willReturnOnConsecutiveCalls(self::COUNTER, self::COUNTER, self::COUNTER, self::COUNTER);
+        $cartsApiMock->expects($this->once())->method('getCounter')
+            //->willReturnOnConsecutiveCalls(self::COUNTER, self::COUNTER, self::COUNTER, self::COUNTER);
+            ->willReturn(self::COUNTER);
 
         $cartsApiMock->expects($this->once())->method('markSyncDataAsDeleted')->with(self::CART_ID);
         $cartsApiMock->expects($this->once())->method('setCounter')
@@ -889,9 +890,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartByEmailCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartByEmailModelMock)));
 
-        $cartsApiMock->expects($this->exactly(4))->method('getCounter')
+        $cartsApiMock->expects($this->exactly(3))->method('getCounter')
             ->willReturnOnConsecutiveCalls(
-                self::COUNTER,
                 self::COUNTER,
                 self::COUNTER,
                 self::COUNTER
@@ -1494,11 +1494,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartByEmailCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartByEmailModelMock)));
 
-        $cartsApiMock->expects($this->exactly(2))->method('getCounter')
-            ->willReturnOnConsecutiveCalls(
-                self::COUNTER,
-                self::COUNTER
-            );
+        $cartsApiMock->expects($this->once(2))->method('getCounter')->willReturn(self::COUNTER);
 
         $cartByEmailModelMock->expects($this->once())->method('getEntityId')->willReturn(self::ALREADY_SENT_CART_ID);
         $cartsApiMock->expects($this->once())->method('markSyncDataAsDeleted')->with(self::ALREADY_SENT_CART_ID);
