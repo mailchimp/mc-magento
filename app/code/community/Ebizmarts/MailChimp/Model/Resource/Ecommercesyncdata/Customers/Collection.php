@@ -33,8 +33,7 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection 
         $joinCondition      = "m4m.related_id = e.entity_id AND m4m.type = '%s' AND m4m.mailchimp_store_id = '%s'";
         $preFilteredCustomersCollection->getSelect()->joinLeft(
             array("m4m" => $mailchimpTableName),
-            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->getMailchimpStoreId() ),
-            array()
+            sprintf($joinCondition, Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER, $this->getMailchimpStoreId())
         );
 
         $preFilteredCustomersCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1");
