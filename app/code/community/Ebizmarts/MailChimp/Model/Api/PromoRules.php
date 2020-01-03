@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommercePromoRulesCollection = $this->getEcommercePromoRulesCollection();
+        $this->_ecommercePromoRulesCollection = $this->createEcommercePromoRulesCollection();
         $this->_ecommercePromoRulesCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommercePromoRulesCollection->setStoreId($magentoStoreId);
 
@@ -157,6 +157,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     protected function getBatchLimitFromConfig()
     {
         $batchLimit = self::BATCH_LIMIT;
+
         return $batchLimit;
     }
 
@@ -189,6 +190,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $collection = $this->getPromoRuleResourceCollection();
         $websiteId = $this->getWebsiteIdByStoreId($magentoStoreId);
         $collection->addWebsiteFilter($websiteId);
+
         return $collection;
     }
 
@@ -220,6 +222,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
             $this->getMailchimpStoreId()
         );
+
         $ruleSyncDataItem->delete();
     }
 
@@ -297,6 +300,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     protected function getMailChimpTarget($promoAction)
     {
         $mailChimpTarget = null;
+
         switch ($promoAction) {
         case Mage_SalesRule_Model_Rule::CART_FIXED_ACTION:
         case Mage_SalesRule_Model_Rule::BY_PERCENT_ACTION:
@@ -348,10 +352,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function _setDeleted($ruleId)
     {
-        $promoRules = $this->getMailchimpEcommerceSyncDataModel()->getAllEcommerceSyncDataItemsPerId(
-            $ruleId,
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
-        );
+        $promoRules = $this->getMailchimpEcommerceSyncDataModel()
+            ->getAllEcommerceSyncDataItemsPerId($ruleId, Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
 
         foreach ($promoRules as $promoRule) {
             $this->setMailchimpStoreId($promoRule->getMailchimpStoreId());
@@ -366,6 +368,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     protected function getMailChimpDiscountAmount($promoRule)
     {
         $action = $promoRule->getSimpleAction();
+
         if ($action == Mage_SalesRule_Model_Rule::BY_PERCENT_ACTION) {
             $mailChimpDiscount = ($promoRule->getDiscountAmount() / 100);
         } else {
@@ -437,7 +440,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection
      */
-    public function getEcommercePromoRulesCollection()
+    public function createEcommercePromoRulesCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection

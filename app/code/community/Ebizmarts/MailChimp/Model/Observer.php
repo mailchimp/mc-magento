@@ -458,6 +458,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 if (!$isMarkedAsDeleted) {
                     $apiProducts = $this->makeApiProduct();
                     $apiProducts->setMailchimpStoreId($mailchimpStoreId);
+                    $apiProducts->setMagentoStoreId($storeId);
                     $apiProducts->update($productId);
                 }
             }
@@ -751,6 +752,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($ecomEnabled) {
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
             $apiProduct->setMailchimpStoreId($mailchimpStoreId);
+            $apiProduct->setMagentoStoreId($storeId);
             $items = $creditMemo->getAllItems();
 
             foreach ($items as $item) {
@@ -791,7 +793,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $storeId = $order->getStoreId();
         $helper = $this->makeHelper();
         $ecomEnabled = $helper->isEcomSyncDataEnabled($storeId);
-
         $apiProduct = $this->makeApiProduct();
         $apiOrder = $this->makeApiOrder();
 
@@ -799,7 +800,6 @@ class Ebizmarts_MailChimp_Model_Observer
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
             $apiProduct->setMagentoStoreId($storeId);
             $apiProduct->setMailchimpStoreId($mailchimpStoreId);
-
             $items = $creditMemo->getAllItems();
 
             foreach ($items as $item) {
@@ -845,6 +845,7 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($ecomEnabled) {
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
             $apiProduct->setMailchimpStoreId($mailchimpStoreId);
+            $apiProduct->setMagentoStoreId($storeId);
 
             $productId = $item->getProductId();
             $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
@@ -852,6 +853,7 @@ class Ebizmarts_MailChimp_Model_Observer
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                 $mailchimpStoreId
             );
+
             $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
 
             if (!$this->isBundleItem($item) && !$this->isConfigurableItem($item) && !$isMarkedAsDeleted) {
@@ -1191,6 +1193,7 @@ class Ebizmarts_MailChimp_Model_Observer
             $helper->saveInterestGroupData($params, $storeId, $customerId, $subscriber);
         } elseif (isset($params['customer_id'])) {
             $groups = $helper->getInterestGroupsIfAvailable($params);
+
             if ($groups) {
                 $helper->saveInterestGroupData($params, $storeId, $customerId);
                 $this->getWarningMessageAdminHtmlSession($helper);
@@ -1209,6 +1212,7 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getEmailCookie()
     {
         $emailCookie = Mage::getModel('core/cookie')->get('email');
+
         return $emailCookie;
     }
 
@@ -1218,6 +1222,7 @@ class Ebizmarts_MailChimp_Model_Observer
     protected function getMcEidCookie()
     {
         $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
+
         return $mcEidCookie;
     }
 
@@ -1317,5 +1322,4 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE;
     }
-
 }
