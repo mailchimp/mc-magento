@@ -37,7 +37,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommercePromoCodesCollection = $this->getEcommercePromoCodesCollection();
+        $this->_ecommercePromoCodesCollection = $this->createEcommercePromoCodesCollection();
         $this->_ecommercePromoCodesCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommercePromoCodesCollection->setStoreId($magentoStoreId);
 
@@ -48,6 +48,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
             . $this->getDateHelper()->getDateMicrotime();
         $batchArray = array_merge($batchArray, $this->_getDeletedPromoCodes());
         $batchArray = array_merge($batchArray, $this->_getNewPromoCodes());
+
         return $batchArray;
     }
 
@@ -298,6 +299,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     protected function getToken()
     {
         $token = hash('md5', rand(0, 9999999));
+
         return $token;
     }
 
@@ -360,7 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     }
 
     /**
-     * @param $mailchimpStoreId
+     * @param $promoCodeId
      */
     public function deletePromoCodeSyncData($promoCodeId)
     {
@@ -451,7 +453,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
      */
-    public function getEcommercePromoCodesCollection()
+    public function createEcommercePromoCodesCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
@@ -459,5 +461,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_promocodes_collection');
 
         return $collection;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
+     */
+    public function getEcommercePromoCodesCollection()
+    {
+        return $this->_ecommercePromoCodesCollection;
     }
 }

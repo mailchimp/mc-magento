@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock = $this->_promoRulesApiMock
             ->setMethods(
-                array('getMailchimpStoreId', 'getMagentoStoreId', 'getEcommercePromoRulesCollection',
+                array('getMailchimpStoreId', 'getMagentoStoreId', 'createEcommercePromoRulesCollection',
                     'getDateHelper', '_getModifiedAndDeletedPromoRules')
             )->getMock();
 
@@ -53,7 +53,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
 
         $promoRulesApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn($mailchimpStoreId);
         $promoRulesApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn($magentoStoreId);
-        $promoRulesApiMock->expects($this->once())->method('getEcommercePromoRulesCollection')
+        $promoRulesApiMock->expects($this->once())->method('createEcommercePromoRulesCollection')
             ->willReturn($promoCollectionResourceMock);
 
         $promoCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
