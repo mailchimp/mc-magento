@@ -31,7 +31,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $batchArray = array();
         $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(
-                array('getMailchimpStoreId', 'getMagentoStoreId', 'getEcommercePromoCodesCollection',
+                array('getMailchimpStoreId', 'getMagentoStoreId', 'createEcommercePromoCodesCollection',
                     'getDateHelper', '_getDeletedPromoCodes', '_getNewPromoCodes')
             )->getMock();
 
@@ -46,7 +46,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
         $promoCodesApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MC_STORE_ID);
         $promoCodesApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::STORE_ID);
-        $promoCodesApiMock->expects($this->once())->method('getEcommercePromoCodesCollection')
+        $promoCodesApiMock->expects($this->once())->method('createEcommercePromoCodesCollection')
             ->willReturn($promoCollectionResourceMock);
 
         $promoCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with(self::MC_STORE_ID);
