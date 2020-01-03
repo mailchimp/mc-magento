@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceOrdersCollection = $this->createEcommerceProductsCollection();
+        $this->_ecommerceOrdersCollection = $this->createEcommerceOrdersCollection();
         $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
 
@@ -692,7 +692,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $helper = $this->getHelper();
 
         if ($helper->isEcomSyncDataEnabled($magentoStoreId)) {
-            $mailchimpStoreId = $helper->getMCStoreId($magentoStoreId);
             $this->markSyncDataAsModified($orderId);
         }
     }
@@ -727,6 +726,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
         if ($lastId) {
             $orderCollection->addFieldToFilter('entity_id', array('gt' => $lastId));
+        }
+
+        if(empty($this->_ecommerceOrdersCollection)){
+            $this->_ecommerceOrdersCollection = $this->createEcommerceOrdersCollection();
+            $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
+            $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
         }
 
         $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($orderCollection);
@@ -843,12 +848,14 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
         if ($couponCode !== null) {
             $code = $this->makeSalesRuleCoupon()->load($couponCode, 'code');
+
             if ($code->getCouponId() !== null) {
                 $rule = $this->makeSalesRule()->load($code->getRuleId());
+
                 if ($rule->getRuleId() !== null) {
                     $amountDiscounted = $order->getBaseDiscountAmount();
-
                     $type = $rule->getSimpleAction();
+
                     if ($type == 'by_percent') {
                         $type = 'percentage';
                     } else {
@@ -1025,12 +1032,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                             && $campaignData['recipients']['list_id'] == $listId
                         ) {
                             $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] =
-                            $isCampaingFromCurrentList =
-                                true;
+                            $isCampaingFromCurrentList = true;
                         } else {
                             $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] =
-                            $isCampaingFromCurrentList =
-                                false;
+                            $isCampaingFromCurrentList = false;
                         }
                     }
                 }
@@ -1093,12 +1098,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         return $this->_ecommerceOrdersCollection;
     }
 
-    public function createEcommerceProductsCollection()
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
+     */
+    public function createEcommerceOrdersCollection()
     {
         /**
-         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
+         * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
          */
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_product_collection');
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_orders_collection');
 
         return $collection;
     }

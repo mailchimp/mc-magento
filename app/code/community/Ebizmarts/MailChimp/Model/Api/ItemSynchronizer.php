@@ -90,11 +90,7 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         $type = $this->getItemType();
 
         if ($syncError !== null) {
-            $this->logSyncError(
-                "Update Sync Data error: " . $syncError,
-                $type,
-                $this->getMailchimpStoreId()
-            );
+            $this->logSyncError("Update Sync Data error: " . $syncError, $type, $this->getMailchimpStoreId());
         }
 
         if (!empty($type)) {
@@ -172,12 +168,7 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     protected function markSyncDataAsModified($id)
     {
-        $this->_updateSyncData(
-            $id,
-            null,
-            null,
-            1
-        );
+        $this->_updateSyncData($id, null, null, 1);
     }
 
     protected function markSyncDataAsDeleted($id, $syncedFlag = null)
@@ -287,11 +278,11 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
     }
 
     /**
-     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata
+     * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
      */
     public function getMailchimpEcommerceSyncDataModel()
     {
-        return Mage::getModel('mailchimp/ecommercesyncdata');
+        return new Ebizmarts_MailChimp_Model_Ecommercesyncdata();
     }
 
     /**

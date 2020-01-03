@@ -881,6 +881,7 @@ class Ebizmarts_MailChimp_Model_Observer
             if ($ecommEnabled) {
                 $mailchimpStoreId = $helper->getMCStoreId($storeId);
                 $apiProduct->setMailchimpStoreId($mailchimpStoreId);
+                $apiProduct->setMagentoStoreId($storeId);
                 $status = $this->getCatalogProductStatusModel()->getProductStatus($product->getId(), $storeId);
 
                 if ($status[$product->getId()] == self::PRODUCT_IS_ENABLED) {
@@ -985,7 +986,11 @@ class Ebizmarts_MailChimp_Model_Observer
         if ($storeId == 0) {
             $this->handleAdminOrderUpdate($order);
         } else {
-            $this->makeApiOrder()->update($order->getId(), $storeId);
+            $helper = $this->makeHelper();
+            $apiOrder =  $this->makeApiOrder();
+            $apiOrder->setMagentoStoreId($storeId);
+            $apiOrder->setMailchimpStoreId($helper->getMCStoreId($storeId));
+            $apiOrder->update($order->getId(), $storeId);
         }
     }
 
