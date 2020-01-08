@@ -180,11 +180,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (isset($scopeArray['scope'])) {
             switch ($scopeArray['scope']) {
             case 'stores':
-                $store = $this->getMageApp()->getStore($scopeArray[1]);
+                $store = $this->getMageApp()->getStore($scopeArray['scope_id']);
                 $storeName = $store->getName();
                 break;
             case 'websites':
-                $website = $this->getMageApp()->getWebsite($scopeArray[1]);
+                $website = $this->getMageApp()->getWebsite($scopeArray['scope_id']);
                 $storeName = $website->getName();
                 break;
             case 'default':
