@@ -1103,7 +1103,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $where[] = $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
 
         if ($filters !== null) {
-            $where[] = $connection->quoteInto('type IN (?)', $filters);
+            $where[] = $connection->quoteInto('regtype IN (?)', $filters);
         }
 
         $connection->delete($tableName, $where);
