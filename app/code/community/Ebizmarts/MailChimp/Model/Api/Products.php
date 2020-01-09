@@ -626,7 +626,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
         );
 
-        $productsCollectionResource = $this->getEcommerceProductsCollection();
+        $productsCollectionResource = $this->createEcommerceProductsCollection();
         $productsCollectionResource->joinQtyAndBackorders($collection);
 
         if (!$isParentProduct) {
@@ -1016,6 +1016,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $collection->addStoreFilter($magentoStoreId);
         $collection->addFieldToFilter('entity_id', array('eq' => $parentId));
 
+        $this->_ecommerceProductsCollection = $this->createEcommerceProductsCollection();
         $this->_ecommerceProductsCollection->addJoinLeft(
             $collection,
             array("super_attribute" => $tableName),
