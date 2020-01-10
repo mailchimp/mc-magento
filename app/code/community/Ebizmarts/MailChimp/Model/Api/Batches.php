@@ -406,6 +406,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
 
                 //deleted product operations
+                $helper->logBatchStatus('Generate Deleted Products Payload');
                 $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson();
                 $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
                 $batchJson = null;
@@ -461,6 +462,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             } elseif (empty($batchJson)) {
                 $helper->logRequest('An empty operation was detected');
             } else {
+                $helper->logBatchStatus('Send batch operation');
                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                 $helper->logRequest($batchJson, $batchResponse['id']);
                 //save batch id to db
