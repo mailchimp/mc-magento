@@ -263,7 +263,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->getMock();
 
         $promoRulesApiMock
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getHelper')
             ->willReturn($mailChimpHelperMock);
 
