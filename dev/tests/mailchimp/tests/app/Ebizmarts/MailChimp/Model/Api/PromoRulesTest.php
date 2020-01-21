@@ -226,6 +226,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
     {
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
         $magentoStoreId = 1;
+        $date = '2020-01-21 09:00:00';
         $ruleName = $promoRuleData['title'];
         $ruleSimpleAction = 'by_percent';
         $ruleIsActive = true;
@@ -235,9 +236,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->disableOriginalConstructor()
             ->setMethods(
                 array(
-                    'getPromoRule', '_updateSyncData', 'getHelper',
-                    'getMailChimpDiscountAmount', 'getMailChimpType', 'getDateHelper',
-                    'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation'
+                    'getPromoRule', '_updateSyncData', 'getHelper', 'getMailChimpDiscountAmount', 'getMailChimpType',
+                    'getDateHelper', 'getMailChimpTarget', 'ruleIsNotCompatible', 'ruleHasMissingInformation',
+                    'addSyncDataError'
                 )
             )
             ->getMock();
@@ -246,9 +247,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->disableOriginalConstructor()
             ->setMethods(
                 array(
-                    'getRuleId', 'getName', 'getDescription',
-                    'getFromDate', 'getToDate', 'getSimpleAction',
-                    'getIsActive', 'setMailchimpSyncError'
+                    'getRuleId', 'getName', 'getDescription', 'getFromDate', 'getToDate', 'getSimpleAction',
+                    'getIsActive', 'setMailchimpSyncError', 'getMailchimpSyncError'
                 )
             )
             ->getMock();
@@ -258,12 +258,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
             ->getMock();
 
         $mailChimpDateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
-            ->setMethods(array('getDateMicrotime'))
+            ->setMethods(array('getDateMicrotime', 'formatDate'))
             ->disableOriginalConstructor()
             ->getMock();
 
         $promoRulesApiMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getHelper')
             ->willReturn($mailChimpHelperMock);
 
@@ -307,6 +307,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoRulesTest extends PHPUnit_Framework_Tes
         $promoRuleMock->expects($this->once())->method('getSimpleAction')->willReturn($ruleSimpleAction);
         $promoRuleMock->expects($this->once())->method('getIsActive')->willReturn($ruleIsActive);
         $promoRuleMock->expects($this->once())->method('setMailchimpSyncError')->with($error);
+        $promoRuleMock->expects($this->once())->method('getMailchimpSyncError')->willReturn($error);
+
+        $mailChimpDateHelperMock->expects($this->once())
+            ->method('formatDate')
+            ->with(null, "Y-m-d H:i:s")
+            ->willReturn($date);
+
+        $promoRulesApiMock->expects($this->once())
+            ->method('addSyncDataError')
+            ->with($promoRuleData['id'], $promoRuleData['error'], null, false, $date);
+
 
         $return = $promoRulesApiMock->getNewPromoRule(self::PROMORULE_ID, $mailchimpStoreId, $magentoStoreId);
 
