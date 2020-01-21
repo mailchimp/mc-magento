@@ -833,7 +833,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             0,
                             null,
                             null,
-                            null,
+                            0,
                             true
                         );
 
@@ -891,7 +891,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _getError($type, $mailchimpStoreId, $id, $response)
     {
-        $error = $response->title . " : " . $response->detail;
+        $error = $response['title'] . " : " . $response['detail'];
 
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
             $dataProduct = $this->getDataProduct($mailchimpStoreId, $id, $type);

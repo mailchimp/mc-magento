@@ -440,10 +440,16 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     protected function logCouldNotEncodeCustomerError($customer)
     {
         $jsonErrorMessage = json_last_error_msg();
+
         $this->logSyncError(
-            "Customer " . $customer->getId() . " json encode failed (".$jsonErrorMessage.") on store "
-            . $this->getBatchMagentoStoreId(),
-            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+            $jsonErrorMessage,
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+            ($customer->getStoreId() === 0) ? $customer->getMailchimpStoreView() : $customer->getStoreId(),
+            'magento_side_error',
+            'Json Encode Failure',
+            0,
+            $customer->getId(),
+            0
         );
         return $jsonErrorMessage;
     }
@@ -454,10 +460,17 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      */
     protected function logCouldNotEncodeMailchimpTags($customer, $mailchimpTags)
     {
+        $jsonErrorMessage = json_last_error_msg();
+
         $this->logSyncError(
-            "MailChimp tags encode failed, Customer " . $customer->getId() . " on store " .
-            $this->getBatchMagentoStoreId()." mergeFields: " . $mailchimpTags,
-            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER
+            $jsonErrorMessage,
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+            ($customer->getStoreId() === 0) ? $customer->getMailchimpStoreView() : $customer->getStoreId(),
+            'magento_side_error',
+            'Json Encode Failure',
+            0,
+            $customer->getId(),
+            0
         );
     }
 

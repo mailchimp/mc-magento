@@ -58,7 +58,7 @@ class Ebizmarts_MailChimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstra
 
         if (!$saveOnlyIfexists || $ecommerceSyncDataItem->getMailchimpSyncDelta()) {
             $this->setEcommerceSyncDataItemValues(
-                $itemType, $syncDelta, $syncError, $syncModified, $syncDeleted,
+                $itemId, $itemType, $syncDelta, $syncError, $syncModified, $syncDeleted,
                 $token, $syncedFlag, $deletedRelatedId, $allowBatchRemoval, $ecommerceSyncDataItem
             );
 
@@ -109,6 +109,7 @@ class Ebizmarts_MailChimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstra
     }
 
     /**
+     * @param $itemId
      * @param $itemType
      * @param $syncDelta
      * @param $syncError
@@ -121,6 +122,7 @@ class Ebizmarts_MailChimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstra
      * @param Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
      */
     protected function setEcommerceSyncDataItemValues(
+        $itemId,
         $itemType,
         $syncDelta,
         $syncError,
@@ -132,6 +134,10 @@ class Ebizmarts_MailChimp_Model_Ecommercesyncdata extends Mage_Core_Model_Abstra
         $allowBatchRemoval,
         Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
     ) {
+        if ($itemId) {
+            $ecommerceSyncDataItem->setData("related_id", $itemId);
+        }
+
         if ($syncDelta) {
             $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
         } elseif ($allowBatchRemoval === true) {
