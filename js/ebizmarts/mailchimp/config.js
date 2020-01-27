@@ -119,9 +119,10 @@ function loadList()
                         }
                         listId.options.add(option);
                     }
+
+                    loadInfo();
+                    loadInterest();
                 }
-                loadInfo();
-                loadInterest();
             }
         }
     );
