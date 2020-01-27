@@ -119,10 +119,10 @@ function loadList()
                         }
                         listId.options.add(option);
                     }
-
-                    loadInfo();
-                    loadInterest();
                 }
+
+                loadInfo();
+                loadInterest();
             }
         }
     );
@@ -132,8 +132,7 @@ function loadInterest()
 {
     var listOptions = $('mailchimp_general_list');
     var index = listOptions.selectedIndex;
-    var listId = listOptions.options[index].value;
-    var apiKey = $('mailchimp_general_apikey').value;
+    var listIdOptions = listOptions.options[index];
 
     $("mailchimp_general_interest_categories").select('option').each(
         function (i) {
@@ -144,28 +143,33 @@ function loadInterest()
         }
     );
 
-    new Ajax.Request(
-        MGETINTERESTURL, {
-            method: 'get',
-            parameters: {api_key: apiKey, list_id: listId},
-            onComplete: function (transport) {
-                var json = transport.responseText.evalJSON(true);
+    if (listIdOptions != null) {
+        var listId = listIdOptions.value;
+        var apiKey = $('mailchimp_general_apikey').value;
 
-                if (json.length) {
-                    for (var i = 0; i < json.length; i++) {
-                        var option = null;
+        new Ajax.Request(
+            MGETINTERESTURL, {
+                method: 'get',
+                parameters: {api_key: apiKey, list_id: listId},
+                onComplete: function (transport) {
+                    var json = transport.responseText.evalJSON(true);
 
-                        if (interestSelected[json[i].value] === true) {
-                            option = new Option(json[i].label, json[i].value, true, true);
-                        } else {
-                            option = new Option(json[i].label, json[i].value);
+                    if (json.length) {
+                        for (var i = 0; i < json.length; i++) {
+                            var option = null;
+
+                            if (interestSelected[json[i].value] === true) {
+                                option = new Option(json[i].label, json[i].value, true, true);
+                            } else {
+                                option = new Option(json[i].label, json[i].value);
+                            }
+                            $("mailchimp_general_interest_categories").options.add(option);
                         }
-                        $("mailchimp_general_interest_categories").options.add(option);
                     }
                 }
             }
-        }
-    );
+        );
+    }
 }
 
 function changeApikey()
