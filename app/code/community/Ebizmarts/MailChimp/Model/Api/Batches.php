@@ -362,7 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
-                if ($helper->getMCIsSyncing($mailchimpStoreId)) {
+                if ($helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId) === 1) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
                 } else {
                     //cart operations
