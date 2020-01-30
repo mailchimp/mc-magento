@@ -63,7 +63,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             if ($data) {
                 switch ($webhookRequest->getType()) {
                     case 'subscribe':
-                    // TODO: ver si vienen grupos
                     $this->_subscribe($data);
                     break;
                 case 'unsubscribe':
