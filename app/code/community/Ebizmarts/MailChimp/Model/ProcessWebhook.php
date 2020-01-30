@@ -63,19 +63,19 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             if ($data) {
                 switch ($webhookRequest->getType()) {
                     case 'subscribe':
-                    $this->_subscribe($data);
-                    break;
-                case 'unsubscribe':
-                    $this->_unsubscribe($data);
-                    break;
-                case 'cleaned':
-                    $this->_clean($data);
-                    break;
-                case 'upemail':
-                    $this->_updateEmail($data);
-                    break;
-                case 'profile':
-                    $this->_profile($data);
+                        $this->_subscribe($data);
+                        break;
+                    case 'unsubscribe':
+                        $this->_unsubscribe($data);
+                        break;
+                    case 'cleaned':
+                        $this->_clean($data);
+                        break;
+                    case 'upemail':
+                        $this->_updateEmail($data);
+                        break;
+                    case 'profile':
+                        $this->_profile($data);
                 }
             }
 
@@ -288,9 +288,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         }
     }
 
-    protected function _processGroupsData($grouping, $customerData, $isDataSubscriber = false)
+    public function _processGroupsData($grouping, $customerData, $isDataSubscriber = false)
     {
         $helper = $this->getHelper();
+        $dateHelper = $this->getDateHelper();
         $storeId = $this->_getStoreId();
 
         $customerEmail = $customerData->getEmail();
@@ -312,7 +313,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $interestGroup->setSubscriberId($subscriberId);
         $interestGroup->setCustomerId($customerId);
         $interestGroup->setStoreId($storeId);
-        $interestGroup->setUpdatedAt($this->getDateHelper()->getCurrentDateTime());
+        $interestGroup->setUpdatedAt($dateHelper->getCurrentDateTime());
         $interestGroup->save();
     }
 

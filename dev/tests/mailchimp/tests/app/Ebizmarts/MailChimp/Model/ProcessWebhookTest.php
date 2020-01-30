@@ -213,6 +213,77 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         $processWebhookMock->_profile($data);
     }
 
+    public function testProcessGroupDataNoSubscriber()
+    {
+        $storeId = 1;
+
+        $groups = array();
+        $groupsEncoded = '';
+
+        $customerId = 1;
+        $customerMail = '';
+        $subscriberId = 1;
+
+        $currentDateTime = '2020-01-30 10:24:42';
+
+        $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHelper', 'getDateHelper', '_getStoreId',
+                'getInterestGroupModel', 'getSubscriberModel')) //agregar mock de load by email y eso.
+            ->getMock();
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('arrayEncode'))
+            ->getMock();
+
+        $dateHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCurrentDateTime'))
+            ->getMock();
+
+        $customerMock = $this->getMockBuilder(Mage_Customer_Model_Customer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEmail','getId'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSubscriberId'))
+            ->getMock();
+
+        $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getByRelatedIdStoreId', 'setGroupdata', 'setSubscriberId',
+                'setCustomerId', 'setStoreId', 'setUpdatedAt', 'save'))
+            ->getMock();
+
+        $processWebhookMock->expects($this->once())->method('_getStoreId')->willReturn($storeId);
+        $processWebhookMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $processWebhookMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
+
+        $customerMock->expects($this->once())->method('getEmail')->willReturn($customerMail);
+        $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
+        $subscriberMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
+
+        $processWebhookMock->expects($this->once())->method('getInterestGroupModel')->willReturn($interestGroupMock);
+        $helperMock->expects($this->once())->method('arrayEncode')->with($groups)->willReturn($groupsEncoded);
+        $dateHelperMock->expects($this->once())->method('getCurrentDateTime')->with()->willReturn($currentDateTime);
+
+        $interestGroupMock
+            ->expects($this->once())
+            ->method('getByRelatedIdStoreId')
+            ->with($customerId, $subscriberId, $storeId)
+            ->willReturnSelf();
+        $interestGroupMock->expects($this->once())->method('setGroupdata')->with($groupsEncoded)->willReturnSelf();
+        $interestGroupMock->expects($this->once())->method('setSubscriberId')->with($subscriberId)->willReturnSelf();
+        $interestGroupMock->expects($this->once())->method('setCustomerId')->with($customerId)->willReturnSelf();
+        $interestGroupMock->expects($this->once())->method('setStoreId')->with($storeId)->willReturnSelf();
+        $interestGroupMock->expects($this->once())->method('setUpdatedAt')->with($currentDateTime)->willReturnSelf();
+        $interestGroupMock->expects($this->once())->method('save')->willReturnSelf();
+
+        $processWebhookMock->_processGroupsData($groups, $customerMock, false);
+    }
+
     public function testWebhookProfileSubscriberNotExistsMemberUnsubscribed()
     {
         $data = array();
