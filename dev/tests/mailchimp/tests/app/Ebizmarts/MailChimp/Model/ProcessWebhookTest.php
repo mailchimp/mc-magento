@@ -240,10 +240,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         );
         $groupsEncoded = json_encode($groups);
 
-        $grouping = array(
+        $grouping = array(array(
             'unique_id' => $uniqueId,
             'groups' => 'group1, group2'
-        );
+        ));
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
@@ -359,10 +359,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhookTest extends PHPUnit_Framework_Tes
         );
         $groupsEncoded = json_encode($groups);
 
-        $grouping = array(
+        $grouping = array(array(
             'unique_id' => $uniqueId,
             'groups' => 'group1, group2'
-        );
+        ));
 
         $processWebhookMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_ProcessWebhook::class)
             ->disableOriginalConstructor()
