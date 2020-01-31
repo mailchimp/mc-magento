@@ -19,7 +19,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected $_helper;
     protected $_dateHelper;
-    protected $_groups = array();
 
     /**
      * Webhooks request url path
@@ -33,8 +32,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         $this->_helper = Mage::helper('mailchimp');
         $this->_dateHelper = Mage::helper('mailchimp/date');
-
-        $this->_loadGroups();
     }
 
     public function saveWebhookRequest(array $data)
@@ -381,19 +378,6 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $tableName = $resource->getTableName('mailchimp/webhookrequest');
         $where = array("fired_at < NOW() - INTERVAL 30 DAY AND processed = 1");
         $connection->delete($tableName, $where);
-    }
-
-    protected function _loadGroups()
-    {
-        foreach ($this->_helper->getMageApp()->getStores() as $storeId => $val) {
-            $listId = $this->_helper->getGeneralList($storeId);
-            $api = $this->_helper->getApi($storeId);
-            $interestsCat = $api->getLists()->interestCategory->getAll($listId);
-            foreach ($interestsCat['categories'] as $cat) {
-                $interests = $api->lists->interestCategory->interests->getAll($listId,$cat['id']);
-                $this->_groups = array_merge_recursive($this->_groups, $interests['interests']);
-            }
-        }
     }
 
     /**
