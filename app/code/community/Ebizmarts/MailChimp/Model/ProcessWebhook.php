@@ -173,7 +173,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     $helper->subscribeMember($subscriber);
 
                     if (isset($data['merges']['GROUPINGS'])) {
-                        $this->_processGroupsData($data['merges']['GROUPINGS'], $subscriber, true);
+                        $this->_processGroupsData($data['merges']['GROUPINGS'][0], $subscriber, $listId, true);
                     }
                 }
             }
@@ -253,7 +253,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             }
 
             if (isset($data['merges']['GROUPINGS'])) {
-                $this->_processGroupsData($data['merges']['GROUPINGS'], $customer);
+                $this->_processGroupsData($data['merges']['GROUPINGS'][0], $customer, $listId, false);
             }
         } else {
             $subscriber = $helper->loadListSubscriber($listId, $email);
@@ -282,20 +282,32 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 }
 
                 if (isset($data['merges']['GROUPINGS'])) {
-                    $this->_processGroupsData($data['merges']['GROUPINGS'], $subscriber, true);
+                    $this->_processGroupsData($data['merges']['GROUPINGS'][0], $subscriber, $listId, true);
                 }
             }
         }
     }
 
-    public function _processGroupsData($grouping, $customerData, $isDataSubscriber = false)
+    public function _processGroupsData($grouping, $customerData, $listId, $isDataSubscriber = false)
     {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $storeId = $this->_getStoreId();
 
         $customerEmail = $customerData->getEmail();
         $subscriber = $this->getSubscriberModel()->loadByEmail($customerEmail);
+        $storeId = $subscriber->getStoreId();
+
+        $api = $helper->getApi($storeId);
+        $apiInterests = $api->getLists()->getInterestCategory()->getInterests();
+        $interests = $apiInterests->getAll($listId, $grouping['unique_id']);
+
+        $groupsSave = array();
+        foreach ($interests['interests'] as $mcGroup) {
+            if (strpos($grouping['groups'], $mcGroup['name']) !== false) {
+                $groupsSave [$mcGroup['id']] = $mcGroup['id'];
+            }
+        }
+        $groups = array($grouping['unique_id'] => $groupsSave);
 
         if (!$isDataSubscriber) {
             $customerId = $customerData->getId();
@@ -307,7 +319,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
         $subscriberId = $subscriber->getSubscriberId();
         $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-        $encodedGroups = $helper->arrayEncode($grouping);
+        $encodedGroups = $helper->arrayEncode($groups);
 
         $interestGroup->setGroupdata($encodedGroups);
         $interestGroup->setSubscriberId($subscriberId);
