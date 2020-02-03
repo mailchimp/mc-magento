@@ -177,8 +177,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
 
                     if (isset($data['merges']['GROUPINGS'])) {
                         $this
-                            ->getInterestGroupHandleModel()
-                            ->processGroupsData($data['merges']['GROUPINGS'], $subscriber, $listId, true);
+                            ->setGroupings($data['merges']['GROUPINGS'])
+                            ->setSubscriber($subscriber)
+                            ->setListId($listId)
+                            ->processGroupsData();
                     }
                 }
             }
@@ -260,7 +262,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             if (isset($data['merges']['GROUPINGS'])) {
                 $this
                     ->getInterestGroupHandleModel()
-                    ->processGroupsData($data['merges']['GROUPINGS'], $customer, $listId, false);
+                    ->setGroupings($data['merges']['GROUPINGS'])
+                    ->setCustomer($customer)
+                    ->setListId($listId)
+                    ->processGroupsData();
             }
         } else {
             $subscriber = $helper->loadListSubscriber($listId, $email);
@@ -291,7 +296,10 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 if (isset($data['merges']['GROUPINGS'])) {
                     $this
                         ->getInterestGroupHandleModel()
-                        ->processGroupsData($data['merges']['GROUPINGS'], $subscriber, $listId, true);
+                        ->setGroupings($data['merges']['GROUPINGS'])
+                        ->setSubscriber($subscriber)
+                        ->setListId($listId)
+                        ->processGroupsData();
                 }
             }
         }

@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getHelper', 'getDateHelper', '_getStoreId',
-                'getInterestGroupModel', 'getSubscriberModel')) //agregar mock de load by email y eso.
+                'getInterestGroupModel', 'getSubscriber'))
             ->getMock();
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -59,12 +59,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
 
         $customerMock = $this->getMockBuilder(Mage_Customer_Model_Customer::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEmail','getId'))
+            ->setMethods(array('getId'))
             ->getMock();
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getSubscriberId', 'loadByEmail', 'getStoreId'))
+            ->setMethods(array('getSubscriberId', 'getStoreId'))
             ->getMock();
 
         $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
@@ -95,11 +95,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
 
         $interestGroupHandleMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $interestGroupHandleMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
-        $interestGroupHandleMock->expects($this->once())->method('getSubscriberModel')->willReturn($subscriberMock);
+        $interestGroupHandleMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
 
-        $subscriberMock->expects($this->once())->method('loadByEmail')->with($customerMail)->willReturnSelf();
-
-        $customerMock->expects($this->once())->method('getEmail')->willReturn($customerMail);
         $customerMock->expects($this->once())->method('getId')->willReturn($customerId);
         $subscriberMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
         $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
@@ -126,7 +123,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
         $interestGroupMock->expects($this->once())->method('setUpdatedAt')->with($currentDateTime)->willReturnSelf();
         $interestGroupMock->expects($this->once())->method('save')->willReturnSelf();
 
-        $interestGroupHandleMock->processGroupsData($grouping, $customerMock, $listId, false);
+        $interestGroupHandleMock->setGroupings($grouping);
+        $interestGroupHandleMock->setCustomer($customerMock);
+        $interestGroupHandleMock->setListId($listId);
+
+        $interestGroupHandleMock->processGroupsData();
     }
 
     public function testProcessGroupDataSubscriber()
@@ -165,7 +166,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getHelper', 'getDateHelper', '_getStoreId',
-                'getInterestGroupModel', 'getSubscriberModel')) //agregar mock de load by email y eso.
+                'getInterestGroupModel', 'getSubscriberModel'))
             ->getMock();
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -184,7 +185,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
 
         $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getSubscriberId', 'loadByEmail', 'getStoreId'))
+            ->setMethods(array('getSubscriberId', 'loadByEmail', 'getStoreId', 'getCustomerId'))
             ->getMock();
 
         $interestGroupMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Interestgroup::class)
@@ -215,12 +216,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
 
         $interestGroupHandleMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $interestGroupHandleMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
-        $interestGroupHandleMock->expects($this->once())->method('getSubscriberModel')->willReturn($subscriberMock);
 
-        $subscriberMock->expects($this->once())->method('loadByEmail')->with($customerMail)->willReturnSelf();
-
-        $customerMock->expects($this->once())->method('getEmail')->willReturn($customerMail);
-        $customerMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
+        $subscriberMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
         $subscriberMock->expects($this->once())->method('getSubscriberId')->willReturn($subscriberId);
         $subscriberMock->expects($this->once())->method('getStoreId')->willReturn($storeId);
 
@@ -246,7 +243,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
         $interestGroupMock->expects($this->once())->method('setUpdatedAt')->with($currentDateTime)->willReturnSelf();
         $interestGroupMock->expects($this->once())->method('save')->willReturnSelf();
 
-        $interestGroupHandleMock->processGroupsData($grouping, $customerMock, $listId, true);
+        $interestGroupHandleMock->setGroupings($grouping);
+        $interestGroupHandleMock->setSubscriber($subscriberMock);
+        $interestGroupHandleMock->setListId($listId);
+
+        $interestGroupHandleMock->processGroupsData();
     }
 }
 

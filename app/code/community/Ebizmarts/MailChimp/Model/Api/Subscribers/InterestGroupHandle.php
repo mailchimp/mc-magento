@@ -20,6 +20,26 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
      */
     protected $_dateHelper;
 
+    /**
+     * @var Array
+     */
+    protected $_groupings;
+
+    /**
+     * @var Mage_Customer_Model_Customer
+     */
+    protected $_customer;
+
+    /**
+     * @var Mage_Newsletter_Model_Subscriber
+     */
+    protected $_subscriber;
+
+    /**
+     * @var String
+     */
+    protected $_listId;
+
     public function __construct()
     {
         $this->_helper = Mage::helper('mailchimp');
@@ -27,57 +47,141 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
     }
 
     /**
-     * @param $groupings
-     * @param $customerData
-     * @param $listId
-     * @param bool $isDataSubscriber
      * @throws Ebizmarts_MailChimp_Helper_Data_ApiKeyException
      * @throws MailChimp_Error
      * @throws MailChimp_HttpError
      */
-    public function processGroupsData($groupings, $customerData, $listId, $isDataSubscriber = false)
+    public function processGroupsData()
     {
         $groups = array();
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
 
-        $customerEmail = $customerData->getEmail();
-        $subscriber = $this->getSubscriberModel()->loadByEmail($customerEmail);
+        $subscriber = $this->getSubscriber();
         $storeId = $subscriber->getStoreId();
 
-        $api = $helper->getApi($storeId);
-        $apiInterests = $api->getLists()->getInterestCategory()->getInterests();
-
-        foreach ($groupings as $grouping) {
-            $interests = $apiInterests->getAll($listId, $grouping['unique_id']);
-
-            $groupsSave = array();
-            foreach ($interests['interests'] as $mcGroup) {
-                if (strpos($grouping['groups'], $mcGroup['name']) !== false) {
-                    $groupsSave [$mcGroup['id']] = $mcGroup['id'];
-                }
-            }
-            $groups [$grouping['unique_id']]= $groupsSave;
+        try {
+            $api = $helper->getApi($storeId);
+        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
+            $helper->logError($e->getMessage());
+            return;
         }
 
-        if (!$isDataSubscriber) {
-            $customerId = $customerData->getId();
+        try
+        {
+            $apiInterests = $api->getLists()->getInterestCategory()->getInterests();
+            $groups = $this->_getSubscribedGroups($apiInterests);
+
+            $customerId = $this->_getCustomerId();
+            $interestGroup = $this->getInterestGroupModel();
+
+            $subscriberId = $subscriber->getSubscriberId();
+            $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+            $encodedGroups = $helper->arrayEncode($groups);
+
+            $interestGroup->setGroupdata($encodedGroups);
+            $interestGroup->setSubscriberId($subscriberId);
+            $interestGroup->setCustomerId($customerId);
+            $interestGroup->setStoreId($storeId);
+            $interestGroup->setUpdatedAt($dateHelper->getCurrentDateTime());
+            $interestGroup->save();
+        } catch (MailChimp_Error $e) {
+            $helper->logError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+        } catch (Exception $e) {
+            $helper->logError($e->getMessage());
+        }
+
+        return $this;
+    }
+
+    public function getSubscriber()
+    {
+        if ($this->_subscriber === null) {
+            $customerEmail = $this->_customer->getEmail();
+            $this->setSubscriber($this->getSubscriberModel()->loadByEmail($customerEmail));
+        }
+
+        return $this->_subscriber;
+    }
+
+    protected function _getCustomerId()
+    {
+        if ($this->_subscriber === null) {
+            $customerId = $this->_customer->getId();
         } else {
-            $customerId = $customerData->getCustomerId();
+            $customerId = $this->_subscriber->getCustomerId();
         }
 
-        $interestGroup = $this->getInterestGroupModel();
+        return $customerId;
+    }
 
-        $subscriberId = $subscriber->getSubscriberId();
-        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-        $encodedGroups = $helper->arrayEncode($groups);
+    protected function _getCustomerGroups($interests, $grouping)
+    {
+        $groups = array();
+        $groupsSave = array();
 
-        $interestGroup->setGroupdata($encodedGroups);
-        $interestGroup->setSubscriberId($subscriberId);
-        $interestGroup->setCustomerId($customerId);
-        $interestGroup->setStoreId($storeId);
-        $interestGroup->setUpdatedAt($dateHelper->getCurrentDateTime());
-        $interestGroup->save();
+        foreach ($interests['interests'] as $mcGroup) {
+            if (strpos($grouping['groups'], $mcGroup['name']) !== false) {
+                $groupsSave [$mcGroup['id']] = $mcGroup['id'];
+            }
+        }
+
+        $groups [$grouping['unique_id']]= $groupsSave;
+
+        return $groups;
+    }
+
+    protected function _getSubscribedGroups($apiInterests)
+    {
+        $groups = array();
+
+        foreach ($this->_groupings as $grouping) {
+            $interests = $apiInterests->getAll($this->_listId, $grouping['unique_id']);
+            $groups = $this->_getCustomerGroups($interests, $grouping);
+        }
+
+        return $groups;
+    }
+
+    /**
+     * @param $groupings
+     * @return $this
+     */
+    public function setGroupings($groupings)
+    {
+        $this->_groupings = $groupings;
+        return $this;
+    }
+
+    /**
+     * @param $customer
+     * @return $this
+     */
+    public function setCustomer($customer)
+    {
+        $this->_customer = $customer;
+        return $this;
+    }
+
+    /**
+     * @param $subscriber
+     * @return $this
+     */
+    public function setSubscriber($subscriber)
+    {
+        $this->_subscriber = $subscriber;
+        return $this;
+    }
+
+    /**
+     * @param $listId
+     * @return $this
+     */
+    public function setListId($listId)
+    {
+        $this->_listId = $listId;
+        return $this;
     }
 
     /**
