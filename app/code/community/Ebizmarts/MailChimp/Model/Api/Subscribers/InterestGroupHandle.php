@@ -67,34 +67,28 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
             return;
         }
 
-        try
-        {
-            $apiInterests = $api->getLists()->getInterestCategory()->getInterests();
-            $groups = $this->_getSubscribedGroups($apiInterests);
+        $groups = $this->_getSubscribedGroups($api);
 
-            $customerId = $this->_getCustomerId();
-            $interestGroup = $this->getInterestGroupModel();
+        $customerId = $this->_getCustomerId();
+        $interestGroup = $this->getInterestGroupModel();
 
-            $subscriberId = $subscriber->getSubscriberId();
-            $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-            $encodedGroups = $helper->arrayEncode($groups);
+        $subscriberId = $subscriber->getSubscriberId();
+        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
+        $encodedGroups = $helper->arrayEncode($groups);
 
-            $interestGroup->setGroupdata($encodedGroups);
-            $interestGroup->setSubscriberId($subscriberId);
-            $interestGroup->setCustomerId($customerId);
-            $interestGroup->setStoreId($storeId);
-            $interestGroup->setUpdatedAt($dateHelper->getCurrentDateTime());
-            $interestGroup->save();
-        } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $helper->logError($e->getMessage());
-        }
+        $interestGroup->setGroupdata($encodedGroups);
+        $interestGroup->setSubscriberId($subscriberId);
+        $interestGroup->setCustomerId($customerId);
+        $interestGroup->setStoreId($storeId);
+        $interestGroup->setUpdatedAt($dateHelper->getCurrentDateTime());
+        $interestGroup->save();
 
         return $this;
     }
 
+    /**
+     * @return Mage_Newsletter_Model_Subscriber
+     */
     public function getSubscriber()
     {
         if ($this->_subscriber === null) {
@@ -105,6 +99,9 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
         return $this->_subscriber;
     }
 
+    /**
+     * @return int
+     */
     protected function _getCustomerId()
     {
         if ($this->_subscriber === null) {
@@ -116,6 +113,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
         return $customerId;
     }
 
+    /**
+     * @param $interests
+     * @param $grouping
+     * @return array
+     */
     protected function _getCustomerGroups($interests, $grouping)
     {
         $groups = array();
@@ -132,13 +134,28 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
         return $groups;
     }
 
-    protected function _getSubscribedGroups($apiInterests)
+    /**
+     * @param $api
+     * @return array
+     */
+    protected function _getSubscribedGroups($api)
     {
         $groups = array();
+        $helper = $this->getHelper();
 
-        foreach ($this->_groupings as $grouping) {
-            $interests = $apiInterests->getAll($this->_listId, $grouping['unique_id']);
-            $groups = $this->_getCustomerGroups($interests, $grouping);
+        try
+        {
+            $apiInterests = $api->getLists()->getInterestCategory()->getInterests();
+
+            foreach ($this->_groupings as $grouping) {
+                $interests = $apiInterests->getAll($this->_listId, $grouping['unique_id']);
+                $groups = $this->_getCustomerGroups($interests, $grouping);
+            }
+        } catch (MailChimp_Error $e) {
+            $helper->logError($e->getFriendlyMessage());
+            Mage::getSingleton('adminhtml/session')->addError($e->getFriendlyMessage());
+        } catch (Exception $e) {
+            $helper->logError($e->getMessage());
         }
 
         return $groups;

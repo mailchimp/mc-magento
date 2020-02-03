@@ -93,7 +93,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
             ->setMethods(array('getAll'))
             ->getMock();
 
-        $interestGroupHandleMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $interestGroupHandleMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
         $interestGroupHandleMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
         $interestGroupHandleMock->expects($this->once())->method('getSubscriber')->willReturn($subscriberMock);
 
@@ -214,7 +214,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandleTest extends 
             ->setMethods(array('getAll'))
             ->getMock();
 
-        $interestGroupHandleMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $interestGroupHandleMock->expects($this->exactly(2))->method('getHelper')->willReturn($helperMock);
         $interestGroupHandleMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
 
         $subscriberMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
