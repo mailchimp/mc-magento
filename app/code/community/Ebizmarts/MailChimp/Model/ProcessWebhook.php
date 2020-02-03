@@ -21,6 +21,11 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected $_dateHelper;
 
     /**
+     * @var InterestGroupHandle
+     */
+    protected $_interestGroupHandle;
+
+    /**
      * Webhooks request url path
      *
      * @const string
@@ -32,6 +37,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         $this->_helper = Mage::helper('mailchimp');
         $this->_dateHelper = Mage::helper('mailchimp/date');
+        $this->_interestGroupHandle = Mage::getModel('mailchimp/api_subscribers_InterestGroupHandle');
     }
 
     public function saveWebhookRequest(array $data)
@@ -170,7 +176,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                     $helper->subscribeMember($subscriber);
 
                     if (isset($data['merges']['GROUPINGS'])) {
-                        $this->_processGroupsData($data['merges']['GROUPINGS'], $subscriber, $listId, true);
+                        $this
+                            ->getInterestGroupHandleModel()
+                            ->processGroupsData($data['merges']['GROUPINGS'], $subscriber, $listId, true);
                     }
                 }
             }
@@ -250,7 +258,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
             }
 
             if (isset($data['merges']['GROUPINGS'])) {
-                $this->_processGroupsData($data['merges']['GROUPINGS'], $customer, $listId, false);
+                $this
+                    ->getInterestGroupHandleModel()
+                    ->processGroupsData($data['merges']['GROUPINGS'], $customer, $listId, false);
             }
         } else {
             $subscriber = $helper->loadListSubscriber($listId, $email);
@@ -279,55 +289,12 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
                 }
 
                 if (isset($data['merges']['GROUPINGS'])) {
-                    $this->_processGroupsData($data['merges']['GROUPINGS'], $subscriber, $listId, true);
+                    $this
+                        ->getInterestGroupHandleModel()
+                        ->processGroupsData($data['merges']['GROUPINGS'], $subscriber, $listId, true);
                 }
             }
         }
-    }
-
-    public function _processGroupsData($groupings, $customerData, $listId, $isDataSubscriber = false)
-    {
-        $groups = array();
-        $helper = $this->getHelper();
-        $dateHelper = $this->getDateHelper();
-
-        $customerEmail = $customerData->getEmail();
-        $subscriber = $this->getSubscriberModel()->loadByEmail($customerEmail);
-        $storeId = $subscriber->getStoreId();
-
-        $api = $helper->getApi($storeId);
-        $apiInterests = $api->getLists()->getInterestCategory()->getInterests();
-
-        foreach ($groupings as $grouping) {
-            $interests = $apiInterests->getAll($listId, $grouping['unique_id']);
-
-            $groupsSave = array();
-            foreach ($interests['interests'] as $mcGroup) {
-                if (strpos($grouping['groups'], $mcGroup['name']) !== false) {
-                    $groupsSave [$mcGroup['id']] = $mcGroup['id'];
-                }
-            }
-            $groups [$grouping['unique_id']]= $groupsSave;
-        }
-
-        if (!$isDataSubscriber) {
-            $customerId = $customerData->getId();
-        } else {
-            $customerId = $customerData->getCustomerId();
-        }
-
-        $interestGroup = $this->getInterestGroupModel();
-
-        $subscriberId = $subscriber->getSubscriberId();
-        $interestGroup->getByRelatedIdStoreId($customerId, $subscriberId, $storeId);
-        $encodedGroups = $helper->arrayEncode($groups);
-
-        $interestGroup->setGroupdata($encodedGroups);
-        $interestGroup->setSubscriberId($subscriberId);
-        $interestGroup->setCustomerId($customerId);
-        $interestGroup->setStoreId($storeId);
-        $interestGroup->setUpdatedAt($dateHelper->getCurrentDateTime());
-        $interestGroup->save();
     }
 
     /**
@@ -380,25 +347,17 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
         $connection->delete($tableName, $where);
     }
 
-    /**
-     * @return Ebizmarts_MailChimp_Model_Interestgroup
-     */
-    protected function getInterestGroupModel()
+    protected function _getStoreId()
     {
-        return Mage::getModel('mailchimp/interestgroup');
+        return Mage::app()->getStore()->getId();
     }
 
     /**
      * @return false|Mage_Core_Model_Abstract
      */
-    protected function getSubscriberModel()
+    protected function getInterestGroupHandleModel()
     {
-        return Mage::getModel('newsletter/subscriber');
-    }
-
-    protected function _getStoreId()
-    {
-        return Mage::app()->getStore()->getId();
+        return $this->_interestGroupHandle;
     }
 
     /**
