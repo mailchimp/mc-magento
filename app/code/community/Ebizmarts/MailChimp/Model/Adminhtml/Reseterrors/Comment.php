@@ -42,7 +42,7 @@ class Ebizmarts_MailChimp_Model_Adminhtml_Reseterrors_Comment
         } else {
             $websiteOrStoreViewScope = $this->_getScope($scopeArray);
             $comment = $this->_mcHelper->__("This will reset the errors "
-                ."for ". $websiteOrStoreViewScope . " only.");
+                ."for %s only.", $websiteOrStoreViewScope);
         }
 
         return $comment;
