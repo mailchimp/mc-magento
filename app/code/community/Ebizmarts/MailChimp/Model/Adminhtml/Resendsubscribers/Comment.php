@@ -33,15 +33,16 @@ class Ebizmarts_MailChimp_Model_Adminhtml_Resendsubscribers_Comment
      */
     public function getCommentText()
     {
-        $scopeArray = $this->_mcHelper->getCurrentScope();
+        $helper = $this->getMcHelper();
+        $scopeArray = $helper->getCurrentScope();
         $scope = $scopeArray['scope'];
 
-        if ($scope == "default"){
-            $comment = $this->_mcHelper->__("This will resend the subscribers "
+        if ($scope === "default"){
+            $comment = $helper->__("This will resend the subscribers "
             ."for all Websites and Store Views.");
         } else {
             $websiteOrStoreViewScope = $this->_getScope($scopeArray);
-            $comment = $this->_mcHelper->__("This will resend the subscribers "
+            $comment = $helper->__("This will resend the subscribers "
             ."for %s only.", $websiteOrStoreViewScope);
         }
 

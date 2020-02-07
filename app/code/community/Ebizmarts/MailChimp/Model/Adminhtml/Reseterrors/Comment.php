@@ -33,15 +33,16 @@ class Ebizmarts_MailChimp_Model_Adminhtml_Reseterrors_Comment
      */
     public function getCommentText()
     {
-        $scopeArray = $this->_mcHelper->getCurrentScope();
+        $helper = $this->getMcHelper();
+        $scopeArray = $helper->getCurrentScope();
         $scope = $scopeArray['scope'];
 
         if ($scope == "default"){
-            $comment = $this->_mcHelper->__("This will reset the errors "
+            $comment = $helper->__("This will reset the errors "
                 ."for all Websites and Store Views.");
         } else {
             $websiteOrStoreViewScope = $this->_getScope($scopeArray);
-            $comment = $this->_mcHelper->__("This will reset the errors "
+            $comment = $helper->__("This will reset the errors "
                 ."for %s only.", $websiteOrStoreViewScope);
         }
 

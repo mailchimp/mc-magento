@@ -33,15 +33,16 @@ class Ebizmarts_MailChimp_Model_Adminhtml_Resendecommercedata_Comment
      */
     public function getCommentText()
     {
-        $scopeArray = $this->_mcHelper->getCurrentScope();
+        $helper = $this->getMcHelper();
+        $scopeArray = $helper->getCurrentScope();
         $scope = $scopeArray['scope'];
 
-        if ($scope == "default"){
-            $comment = $this->_mcHelper->__("This will resend the ecommerce data "
+        if ($scope === "default"){
+            $comment = $helper->__("This will resend the ecommerce data "
                 ."for all Websites and Store Views.");
         } else {
             $websiteOrStoreViewScope = $this->_getScope($scopeArray);
-            $comment = $this->_mcHelper->__("This will resend the ecommerce data "
+            $comment = $helper->__("This will resend the ecommerce data "
                 ."for %s only.", $websiteOrStoreViewScope);
         }
 
