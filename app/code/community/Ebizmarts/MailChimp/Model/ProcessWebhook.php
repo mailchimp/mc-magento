@@ -159,38 +159,9 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     protected function _subscribe(array $data)
     {
-        $helper = $this->getHelper();
         try {
-            $listId = $data['list_id'];
-            $email = $data['email'];
-            $subscriber = $helper->loadListSubscriber($listId, $email);
-            if ($subscriber) {
-                if ($subscriber->getId()) {
-                    if ($subscriber->getSubscriberStatus() != Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED) {
-                        $helper->subscribeMember($subscriber);
-                    }
-                } else {
-                    if (isset($data['merges']['FNAME'])) {
-                        $subscriberFname = filter_var($data['merges']['FNAME'], FILTER_SANITIZE_STRING);
-                        $subscriber->setSubscriberFirstname($subscriberFname);
-                    }
-
-                    if (isset($data['merges']['LNAME'])) {
-                        $subscriberLname = filter_var($data['merges']['LNAME'], FILTER_SANITIZE_STRING);
-                        $subscriber->setSubscriberLastname($subscriberLname);
-                    }
-
-                    $helper->subscribeMember($subscriber);
-
-                    if (isset($data['merges']['GROUPINGS'])) {
-                        $this
-                            ->setGroupings($data['merges']['GROUPINGS'])
-                            ->setSubscriber($subscriber)
-                            ->setListId($listId)
-                            ->processGroupsData();
-                    }
-                }
-            }
+            $subscribe = true;
+            $this->getMailchimpTagsModel()->processMergeFields($data, $subscribe);
         } catch (Exception $e) {
             Mage::logException($e);
         }

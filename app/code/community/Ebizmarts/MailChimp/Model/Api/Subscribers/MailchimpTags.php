@@ -205,9 +205,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
     /**
      * @param $data
+     * @param bool $subscribe
      * @throws Mage_Core_Exception
      */
-    public function processMergeFields($data)
+    public function processMergeFields($data, $subscribe = false)
     {
         $helper = $this->getMailchimpHelper();
         $email = $data['email'];
@@ -236,6 +237,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
                  * Get mailchimp subscriber status and add missing newsletter subscriber.
                  */
                 $this->_addSubscriberData($subscriber, $fname, $lname, $email, $listId);
+
+                if ($subscribe) {
+                    $helper->subscribeMember($subscriber);
+                }
             }
 
             $subscriber->save();
