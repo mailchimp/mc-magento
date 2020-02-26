@@ -21,9 +21,14 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected $_dateHelper;
 
     /**
-     * @var InterestGroupHandle
+     * @var Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
      */
     protected $_interestGroupHandle;
+
+    /**
+     * @var Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
+     */
+    protected $_tags;
 
     /**
      * Webhooks request url path
@@ -37,6 +42,8 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     {
         $this->_helper = Mage::helper('mailchimp');
         $this->_dateHelper = Mage::helper('mailchimp/date');
+
+        $this->_tags = Mage::getModel('mailchimp/api_subscribers_MailchimpTags');
         $this->_interestGroupHandle = Mage::getModel('mailchimp/api_subscribers_InterestGroupHandle');
     }
 
@@ -236,113 +243,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
      */
     public function _profile(array $data)
     {
-        $helper = $this->getHelper();
-        $listId = $data['list_id'];
-        $email = $data['email'];
-        $fname = isset($data['merges']['FNAME']) ? $data['merges']['FNAME'] : null;
-        $lname = isset($data['merges']['LNAME']) ? $data['merges']['LNAME'] : null;
-        $customer = $helper->loadListCustomer($listId, $email);
-
-        $saveRequired = false;
-        if ($customer) {
-            if ($fname && $fname !== $customer->getFirstname()) {
-                $customer->setFirstname($fname);
-                $saveRequired = true;
-            }
-
-            if ($lname && $lname !== $customer->getLastname()) {
-                $customer->setLastname($lname);
-                $saveRequired = true;
-            }
-
-            if ($saveRequired) {
-                $customer->save();
-            }
-
-            if (isset($data['merges']['GROUPINGS'])) {
-                $this
-                    ->getInterestGroupHandleModel()
-                    ->setGroupings($data['merges']['GROUPINGS'])
-                    ->setCustomer($customer)
-                    ->setListId($listId)
-                    ->processGroupsData();
-            }
-        } else {
-            $subscriber = $helper->loadListSubscriber($listId, $email);
-            if ($subscriber) {
-                if ($subscriber->getId()) {
-                    if ($fname && $fname !== $subscriber->getSubscriberFirstname()) {
-                        $subscriber->setSubscriberFirstname($fname);
-                        $saveRequired = true;
-                    }
-
-                    if ($lname && $lname !== $subscriber->getSubscriberLastname()) {
-                        $subscriber->setSubscriberLastname($lname);
-                        $saveRequired = true;
-                    }
-
-                    if ($saveRequired) {
-                        $subscriber->setSubscriberSource(Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE);
-                        $subscriber->save();
-                    }
-                } else {
-                    /**
-                     * Mailchimp subscriber not currently in magento newsletter subscribers.
-                     * Get mailchimp subscriber status and add missing newsletter subscriber.
-                     */
-                    $this->_addSubscriberData($subscriber, $fname, $lname, $email, $listId);
-                }
-
-                if (isset($data['merges']['GROUPINGS'])) {
-                    $this
-                        ->getInterestGroupHandleModel()
-                        ->setGroupings($data['merges']['GROUPINGS'])
-                        ->setSubscriber($subscriber)
-                        ->setListId($listId)
-                        ->processGroupsData();
-                }
-            }
-        }
-    }
-
-    /**
-     * @param $subscriber
-     * @param $fname
-     * @param $lname
-     * @param $email
-     * @param $listId
-     * @throws Exception
-     */
-    protected function _addSubscriberData($subscriber, $fname, $lname, $email, $listId)
-    {
-        $helper = $this->getHelper();
-        $scopeArray = $helper->getFirstScopeFromConfig(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
-            $listId
-        );
-        $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
-        try {
-            $subscriber->setSubscriberFirstname($fname);
-            $subscriber->setSubscriberLastname($lname);
-            $md5HashEmail = hash('md5', strtolower($email));
-            $member = $api->getLists()->getMembers()->get(
-                $listId,
-                $md5HashEmail,
-                null,
-                null
-            );
-            if ($member['status'] == 'subscribed') {
-                $helper->subscribeMember($subscriber);
-            } elseif ($member['status'] == 'unsubscribed') {
-                if (!$helper->getWebhookDeleteAction($subscriber->getStoreId())) {
-                    $helper->unsubscribeMember($subscriber);
-                }
-            }
-        } catch (MailChimp_Error $e) {
-            $helper->logError($e->getFriendlyMessage());
-        } catch (Exception $e) {
-            $helper->logError($e->getMessage());
-        }
+        $this->getMailchimpTagsModel()->processMergeFields($data);
     }
 
     public function deleteProcessed()
@@ -366,6 +267,14 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     protected function getInterestGroupHandleModel()
     {
         return $this->_interestGroupHandle;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
+     */
+    protected function getMailchimpTagsModel()
+    {
+        return $this->_tags;
     }
 
     /**
