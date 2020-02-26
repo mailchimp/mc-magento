@@ -219,7 +219,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getMailchimpHelper', 'unserializeMapFields',
-                    'getInterestGroupHandleModel', 'setCustomer', '_processMerges'
+                    'getInterestGroupHandleModel', 'setCustomer', '_setMailchimpTagsToCustomer'
                 )
             )
             ->getMock();
@@ -269,7 +269,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             ->willReturnSelf();
 
         $mailchimpTagsApiMock->expects($this->once())
-            ->method('_processMerges')
+            ->method('_setMailchimpTagsToCustomer')
             ->with($data)
             ->willReturnSelf();
 
@@ -463,7 +463,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getMailchimpHelper', 'unserializeMapFields',
-                    '_getInterestGroupHandleModel', 'setCustomer', '_processMerges',
+                    '_getInterestGroupHandleModel', 'setCustomer', '_setMailchimpTagsToCustomer',
                     'getSubscriber', 'getCustomer'
                 )
             )
@@ -520,7 +520,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             ->willReturnSelf();
 
         $mailchimpTagsApiMock->expects($this->once())
-            ->method('_processMerges')
+            ->method('_setMailchimpTagsToCustomer')
             ->with($data)
             ->willReturnSelf();
 
