@@ -203,22 +203,12 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         }
     }
 
+    /**
+     * @param $data
+     * @throws Mage_Core_Exception
+     */
     public function processMergeFields($data)
     {
-        // TODO GIORELLO: buscar en mergevars los nombres y devolverlos.
-        /*
-        Unificar el tema de que se fije si es customer o subscirbes en "procesar mergeFields"
-        hacer metodo para procesar interestGroups
-
-        nueva info:
-        los map fields se pueden obtener con el LIst id que viene en la $data, para no meter al customer
-        o subscriber ahi, usando el metodo getMagentoStoreIdsByListId. La discriminacion por customer o
-        subscriber es solo porque en el subscriber solo se tienen que cambiar el $fname y $lname.
-
-        ademas unificar el subscribe y el profile con un metodo a los que los dos llamen para procesar
-        los merge fields (interest groups)
-        */
-
         $helper = $this->getMailchimpHelper();
         $email = $data['email'];
         $listId = $data['list_id'];
@@ -231,7 +221,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
         if ($customer) {
             $this->setCustomer($customer);
-            $this->_processMerges($data);
+            $this->_setMailchimpTagsToCustomer($data);
         } else {
             $subscriber = $helper->loadListSubscriber($listId, $email);
             $fname = $this->_getFName($data);
@@ -1041,11 +1031,13 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     }
 
     /**
+     * Iterates the mailchimp tags.
+     *
      * @param $data
      * @param $listId
      * @throws Mage_Core_Exception
      */
-    protected function _processMerges($data)
+    protected function _setMailchimpTagsToCustomer($data)
     {
         $customer = $this->getCustomer();
 
@@ -1053,7 +1045,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
             if (!empty($value)) {
                 if (is_array($this->_mailChimpTags)) {
                     if ($key !== 'GROUPINGS') {
-                        $this->_matchMergesWithMaps($key, $value, $this->_mailChimpTags, $customer);
+                        $this->_setMailchimpTagToCustomer($key, $value, $this->_mailChimpTags, $customer);
                     }
                 }
             }
@@ -1063,12 +1055,14 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     }
 
     /**
+     * Sets the mailchimp tag value for tue customer.
+     *
      * @param $key
      * @param $value
      * @param $mapFields
      * @param $customer
      */
-    protected function _matchMergesWithMaps($key, $value, $mapFields, $customer)
+    protected function _setMailchimpTagToCustomer($key, $value, $mapFields, $customer)
     {
         $ignore = array(
             'billing_company', 'billing_country', 'billing_zipcode', 'billing_state', 'billing_telephone',
@@ -1132,6 +1126,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         return $attrId;
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     protected function _getFName($data)
     {
         $attrId = $this->_getAttrbuteId('firstname');
@@ -1147,6 +1145,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         return $data['merges'][$magentoTag];
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     protected function _getLName($data)
     {
         $attrId = $this->_getAttrbuteId('lastname');
