@@ -4,7 +4,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
 {
     const DEFAULT_STORE_ID = 1;
 
-    protected $_mapFieldsSerialized = '';
+    protected $_mapFieldsSerialized;
     protected $_mapsFields = array(
         1 => array('mailchimp' => 'WEBSITE', 'magento' => 1),
         2 => array('mailchimp' => 'STOREID', 'magento' => 2),
