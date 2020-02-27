@@ -4,8 +4,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
 {
     const DEFAULT_STORE_ID = 1;
 
-    private $_mapFieldsSerialized = 'a:25:{s:18:"_1468601283719_719";a:2:{s:9:"mailchimp";s:7:"WEBSITE";s:7:'
-        . '"magento";s:1:"1";}'
+    protected $_mapFieldsSerialized =
+        'a:25:{s:18:"_1468601283719_719";a:2:{s:9:"mailchimp";s:7:"WEBSITE";s:7:"magento";s:1:"1";}'
         . 's:18:"_1468609069544_544";a:2:{s:9:"mailchimp";s:7:"STOREID";s:7:"magento";s:1:"2";}'
         . 's:18:"_1469026825907_907";a:2:{s:9:"mailchimp";s:9:"STORENAME";s:7:"magento";s:1:"3";}'
         . 's:18:"_1469027411717_717";a:2:{s:9:"mailchimp";s:6:"PREFIX";s:7:"magento";s:1:"4";}'
@@ -32,7 +32,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
         . '{s:9:"mailchimp";s:10:"STELEPHONE";s:7:"magento";s:18:"shipping_telephone";}'
         . 's:18:"_1472846591374_374";a:2:{s:9:"mailchimp";s:8:"SZIPCODE";s:7:"magento";s:16:"shipping_zipcode";}'
         . 's:18:"_1490127043147_147";a:2:{s:9:"mailchimp";s:3:"DOP";s:7:"magento";s:3:"dop";}}';
-    private $_mapsFields = array(
+    protected $_mapsFields = array(
         1 => array('mailchimp' => 'WEBSITE', 'magento' => 1),
         2 => array('mailchimp' => 'STOREID', 'magento' => 2),
         3 => array('mailchimp' => 'STORENAME', 'magento' => 3),
@@ -59,7 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
         24 => array('mailchimp' => 'SZIPCODE', 'magento' => 'shipping_zipcode'),
         25 => array('mailchimp' => 'DOP', 'magento' => 'dop')
     );
-    private $_mergeFields = array(
+    protected $_mergeFields = array(
             'email'     => 'email@ebizmarts.com',
             'list_id'   => '1b2c3d4e5f6g7h8'
         );
