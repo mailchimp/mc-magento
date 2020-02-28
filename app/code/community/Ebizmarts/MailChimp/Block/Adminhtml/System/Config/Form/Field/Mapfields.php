@@ -91,7 +91,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
             $rendered .= '</select>';
         } else {
             return
-                '<input type="text" name="'
+                '<input type="text" onkeyup="keyupMapField(this)" name="'
                 . $inputName . '" value="#{' . $columnName . '}" '
                 . ($column['size'] ? 'size="' . $column['size'] . '"' : '') . '/>';
         }
