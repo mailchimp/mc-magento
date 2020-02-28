@@ -195,7 +195,6 @@ function keyupMapField(obj)
     }
 
     obj.value = newValue;
-
 }
 
 function initAdmin()
