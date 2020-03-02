@@ -23,8 +23,8 @@ function getCampaign() {
         );
     } else {
         urlparams = location.href.split('/');
-        let utmIndex = $.inArray('utm_source', urlparams);
-        let mccidIndex = $.inArray('mc_cid', urlparams);
+        let utmIndex = jQuery.inArray('utm_source', urlparams);
+        let mccidIndex = jQuery.inArray('mc_cid', urlparams);
 
         if (utmIndex !== -1) {
             let value = urlparams[utmIndex + 1];
