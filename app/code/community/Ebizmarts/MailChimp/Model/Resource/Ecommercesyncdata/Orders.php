@@ -1,4 +1,8 @@
 <?php
+
+//resource
+
+
 /**
  * mc-magento Magento Component
  *
@@ -7,21 +11,15 @@
  * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date:     5/16/16 6:53 PM
- * @file:     Collection.php
+ * @date:     2019-11-04 17:41
  */
-
-class Ebizmarts_MailChimp_Model_Mysql4_Ecommercesyncdata_Collection extends Mage_Core_Model_Mysql4_Collection_Abstract
+class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders extends
+    Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata
 {
-
-    /**
-     * Set resource type
-     *
-     * @return void
-     */
     public function _construct()
     {
         parent::_construct();
-        $this->_init('mailchimp/ecommercesyncdata');
+        $this->setType(Ebizmarts_MailChimp_Model_Config::IS_ORDER);
     }
 }
+

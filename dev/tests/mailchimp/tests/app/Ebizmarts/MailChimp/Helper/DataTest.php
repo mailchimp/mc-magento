@@ -232,7 +232,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getResendTurnConfigCollection', 'getResendTurn', 'getResendEnabled',
-                'setIsSyncingIfFinishedPerScope', 'isEcomSyncDataEnabled')
+                    'setIsSyncingIfFinishedPerScope', 'isEcomSyncDataEnabled')
             )
             ->getMock();
 
@@ -271,7 +271,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getResendTurnConfigCollection', 'getResendTurn', 'setIsSyncingIfFinishedPerScope',
-                'setResendTurn', 'handleResendFinish', 'isEcomSyncDataEnabled')
+                    'setResendTurn', 'handleResendFinish', 'isEcomSyncDataEnabled')
             )
             ->getMock();
 
@@ -338,7 +338,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getRealScopeForConfig', 'getGeneralList', 'deleteCurrentWebhook',
-                'isSubscriptionEnabled', 'createNewWebhook')
+                    'isSubscriptionEnabled', 'createNewWebhook')
             )
             ->getMock();
 
@@ -376,7 +376,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
-                'setCurrentStore', 'getImageUrl', 'getImageUrlForSize')
+                    'setCurrentStore', 'getImageUrl', 'getImageUrlForSize')
             )
             ->getMock();
 
@@ -464,7 +464,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getProductResourceModel', 'getProductModel', 'getImageSize', 'getCurrentStoreId',
-                'setCurrentStore', 'getImageUrl', 'getOriginalPath')
+                    'setCurrentStore', 'getImageUrl', 'getOriginalPath')
             )
             ->getMock();
 
@@ -597,11 +597,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $mailchimpEcommTableName = 'mailchimp_ecommerce_sync_data';
 
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $storeReturnWhere = "mailchimp_store_id = ".$mailchimpStoreId;
+        $storeReturnWhere = "mailchimp_store_id = " . $mailchimpStoreId;
         $storeWhere = "mailchimp_store_id = ?";
 
         $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
-        $filterReturnWhere = "type IN (".$mailchimpFilters.')';
+        $filterReturnWhere = "type IN (" . $mailchimpFilters . ')';
         $filterWhere = "type IN (?)";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -689,7 +689,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     public function testRemoveAllEcommerceSynddataErrors()
     {
         $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
-        $filterReturnWhere = "type IN (".$mailchimpFilters.')';
+        $filterReturnWhere = "type IN (" . $mailchimpFilters . ')';
         $filterWhere = "type IN (?)";
 
         $tableName = 'mailchimp_ecommerce_sync_data';
@@ -743,7 +743,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeReturnWhere = "mailchimp_store_id = $mailchimpStoreId AND mailchimp_sync_error != ''";
 
         $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
-        $filterReturnWhere = "type IN (".$mailchimpFilters.')';
+        $filterReturnWhere = "type IN (" . $mailchimpFilters . ')';
         $filterWhere = "type IN (?)";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -795,12 +795,12 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $mailchimpEcommTableName = 'mailchimp_errors';
 
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $storeReturnWhere = "mailchimp_store_id = ".$mailchimpStoreId;
+        $storeReturnWhere = "mailchimp_store_id = " . $mailchimpStoreId;
         $storeWhere = "mailchimp_store_id = ?";
 
         $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
-        $filterReturnWhere = "type IN (".$mailchimpFilters.')';
-        $filterWhere = "type IN (?)";
+        $filterReturnWhere = "regtype IN (" . $mailchimpFilters . ')';
+        $filterWhere = "regtype IN (?)";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -851,13 +851,9 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $connectionType = 'core_write';
         $mailchimpEcommTableAlias = 'mailchimp/mailchimperrors';
         $mailchimpEcommTableName = 'mailchimp_errors';
-
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $storeReturnWhere = "store_id = ".$mailchimpStoreId;
-        $storeWhere = "store_id = ?";
-
         $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
-        $filterReturnWhere = "type IN (".$mailchimpFilters.')';
+        $filterReturnWhere = "type IN (" . $mailchimpFilters . ')';
         $filterWhere = "type IN (?)";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -911,7 +907,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $mailchimpEcommTableName = 'mailchimp_errors';
 
         $mailchimpStoreId = 'a1s2d3f4g5h6j7k8l9n0';
-        $storeReturnWhere = "store_id = ". $scopeId;
+        $storeReturnWhere = "store_id = " . $scopeId;
         $storeWhere = "store_id = ?";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -1053,7 +1049,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
             Ebizmarts_MailChimp_Model_Config::IS_ORDER,
             Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
-            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE. ', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE . ', ' . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE);
 
         $resendEnabled = 1;
         $resendTurn = 1;
@@ -1543,7 +1539,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getByRelatedIdStoreId', 'getSubscriberId', 'getCustomerId', 'setSubscriberId',
-                'setCustomerId', 'setGroupdata', 'getGroupdata', 'setStoreId', 'setUpdatedAt', 'save')
+                    'setCustomerId', 'setGroupdata', 'getGroupdata', 'setStoreId', 'setUpdatedAt', 'save')
             )
             ->getMock();
 
@@ -1621,7 +1617,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array('getMageApp', 'isEcomSyncDataEnabled', 'getConfigValueForScope',
-                'retrieveAndSaveMCJsUrlInConfig', 'getMCStoreId')
+                    'retrieveAndSaveMCJsUrlInConfig', 'getMCStoreId')
             )
             ->getMock();
 
@@ -1816,39 +1812,39 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function testGetCurrentStoreId()
     {
-         $storeId = 1;
-         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-             ->disableOriginalConstructor()
-             ->setMethods(array('getMageApp'))
-             ->getMock();
+        $storeId = 1;
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMageApp'))
+            ->getMock();
 
-         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
-             ->disableOriginalConstructor()
-             ->setMethods(array('getStore'))
-             ->getMock();
+        $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStore'))
+            ->getMock();
 
-         $mageAppMockStore = $this->getMockBuilder(Mage_Core_Model_Store::class)
-             ->disableOriginalConstructor()
-             ->setMethods(array('getId'))
-             ->getMock();
+        $mageAppMockStore = $this->getMockBuilder(Mage_Core_Model_Store::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getId'))
+            ->getMock();
 
-         $helperMock
-             ->expects($this->once())
-             ->method('getMageApp')
-             ->willReturn($mageAppMock);
+        $helperMock
+            ->expects($this->once())
+            ->method('getMageApp')
+            ->willReturn($mageAppMock);
 
-         $mageAppMock
-             ->expects($this->once())
-             ->method('getStore')
-             ->willReturn($mageAppMockStore);
+        $mageAppMock
+            ->expects($this->once())
+            ->method('getStore')
+            ->willReturn($mageAppMockStore);
 
-         $mageAppMockStore
-             ->expects($this->once())
-             ->method('getId')->willReturn($storeId);
+        $mageAppMockStore
+            ->expects($this->once())
+            ->method('getId')->willReturn($storeId);
 
-         $return  = $helperMock->getCurrentStoreId();
+        $return = $helperMock->getCurrentStoreId();
 
-         $this->assertInternalType('int', $return);
+        $this->assertInternalType('int', $return);
     }
 
     public function testResetErrors()
@@ -1886,7 +1882,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeRelation = array(
             'a1s2d3f4g5h6j7k8l9p0' => 1,
             'a1s2d3f5h6h6j7k8l9p0' => 2
-            );
+        );
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -1920,11 +1916,11 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             's:7:"magento";s:1:"5";}}';
 
         $mapFieldsUnserialized = array(
-                "_1468601283719_719", array("mailchimp", "WEBSITE", "magento", "1"), "_1468609069544_544",
-                array("mailchimp", "STOREID", "magento", "2"), "_1469026825907_907",
-                array("mailchimp", "STORENAME", "magento", "3"),
-                "_1469027411717_717", array("mailchimp","PREFIX","magento", "4"), "_1469027418285_285",
-                array("mailchimp", "FNAME", "magento", "5")
+            "_1468601283719_719" => array("mailchimp" => "WEBSITE", "magento" => "1"),
+            "_1468609069544_544" => array("mailchimp" => "STOREID", "magento"=>  "2"),
+            "_1469026825907_907" => array("mailchimp" => "STORENAME", "magento" => "3"),
+            "_1469027411717_717" => array("mailchimp" => "PREFIX","magento" => "4"),
+            "_1469027418285_285" => array("mailchimp" => "FNAME", "magento" => "5")
         );
 
         $arrayMergeFieldsGetAll = array
@@ -1961,9 +1957,9 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields",
                             "method" => "GET",
                             "targetSchema" => "https://us20.api.mailchimp.com"
-                                                . "/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
+                                . "/schema/3.0/Definitions/Lists/MergeFields/CollectionResponse.json",
                             "schema" => "https://us20.api.mailchimp.com"
-                                                . "/schema/3.0/CollectionLinks/Lists/MergeFields.json",
+                                . "/schema/3.0/CollectionLinks/Lists/MergeFields.json",
                         ),
 
                         2 => array
@@ -1972,7 +1968,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
                             "href" => "https://us20.api.mailchimp.com/3.0/lists/b514eebd1a/merge-fields/3",
                             "method" => "PATCH",
                             "targetSchema" => "https://us20.api.mailchimp.com"
-                                                . "/schema/3.0/Definitions/Lists/MergeFields/Response.json",
+                                . "/schema/3.0/Definitions/Lists/MergeFields/Response.json",
                             "schema" => "https://us20.api.mailchimp.com"
                                 . "/schema/3.0/Definitions/Lists/MergeFields/PATCH.json",
                         ),
@@ -2037,15 +2033,15 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             ->with($listId, null, null, 50)
             ->willReturn($arrayMergeFieldsGetAll);
 
-        $times = 10;
+        $times = 5;
 
         $helperDataMock->expects($this->exactly($times))->method('_createCustomFieldTypes')
             ->withConsecutive(
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized),
-                array($mapFieldsUnserialized), array($mapFieldsUnserialized)
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized),
+                array($mapFieldsUnserialized)
             );
 
         $helperDataMock->createMergeFields($scopeId, $scope);
@@ -2066,7 +2062,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             "_1468601283719_719", array("mailchimp", "WEBSITE", "magento", "1"), "_1468609069544_544",
             array("mailchimp", "STOREID", "magento", "2"), "_1469026825907_907",
             array("mailchimp", "STORENAME", "magento", "3"),
-            "_1469027411717_717", array("mailchimp","PREFIX","magento", "4"), "_1469027418285_285",
+            "_1469027411717_717", array("mailchimp", "PREFIX", "magento", "4"), "_1469027418285_285",
             array("mailchimp", "FNAME", "magento", "5")
         );
 
@@ -2117,7 +2113,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $index = 0;
         $statusChanged = "SENT";
-        $count = 1;
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -2126,7 +2121,7 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
         $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
-            ->with($index, $statusChanged, $count);
+            ->with($index, $statusChanged, 1);
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index);
     }
@@ -2135,7 +2130,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
     {
         $index = 0;
         $statusChanged = "NOT SENT";
-        $count = 1;
 
         $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -2144,8 +2138,41 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
 
         $helperDataMock->expects($this->once())->method('getCountersDataSentToMailchimp');
         $helperDataMock->expects($this->once())->method('setCountersDataSentToMailchimp')
-            ->with($index, $statusChanged, $count);
+            ->with($index, $statusChanged, 1);
 
         $helperDataMock->modifyCounterDataSentToMailchimp($index, true);
+    }
+
+    public function testSerialize()
+    {
+        $data = array('data1' => 'value1', 'data2' => 'value2');
+        $serializedData = 'a:2:{s:5:"data1";s:6:"value1";s:5:"data2";s:6:"value2";}';
+
+        // Sets any methods so the mock initializes the required method
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('unserialize'))
+            ->getMock();
+
+        $testData = $helperDataMock->serialize($data);
+
+        $this->assertEquals($testData, $serializedData);
+    }
+
+    public function testUnserialize()
+    {
+        $unserializedData = array('data1' => 'value1', 'data2' => 'value2');
+        $serializedData = 'a:2:{s:5:"data1";s:6:"value1";s:5:"data2";s:6:"value2";}';
+
+
+        // Sets any methods so the mock initializes the required method
+        $helperDataMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('serialize'))
+            ->getMock();
+
+        $testData = $helperDataMock->unserialize($serializedData);
+
+        $this->assertEquals($testData, $unserializedData);
     }
 }

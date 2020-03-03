@@ -1,4 +1,8 @@
 <?php
+
+//resource
+
+
 /**
  * mc-magento Magento Component
  *
@@ -7,19 +11,15 @@
  * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date:     3/5/18 1:36 PM
- * @file:     Stores.php
+ * @date:     2019-11-04 17:41
  */
-class Ebizmarts_MailChimp_Model_Mysql4_Stores extends Mage_Core_Model_Mysql4_Abstract
+class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote extends
+    Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata
 {
-
-    /**
-     * Initialize
-     *
-     * @return void
-     */
     public function _construct()
     {
-        $this->_init('mailchimp/stores', 'id');
+        parent::_construct();
+        $this->setType(Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
     }
 }
+

@@ -16,7 +16,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
     protected function _afterSave()
     {
         $helper = $this->makeHelper();
-        $dateHelper = $this->makeDateHelper();
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
         $groups = $this->getData('groups');
@@ -24,23 +23,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_Store extends Mage_Core_Mo
         $newMailchimpStoreId = (isset($groups['general']['fields']['storeid']['value']))
             ? $groups['general']['fields']['storeid']['value']
             : null;
+
         $oldMailchimpStoreId = $helper->getMCStoreId($scopeId, $scope);
         $isSyncing = $helper->getMCIsSyncing($newMailchimpStoreId, $scopeId, $scope);
-        $ecommMinSyncDate = $helper->getEcommMinSyncDateFlag($newMailchimpStoreId, $scopeId, $scope);
-
         $helper->cancelAllPendingBatches($oldMailchimpStoreId);
         $helper->restoreAllCanceledBatches($newMailchimpStoreId);
+
         if ($this->isValueChanged() && $this->getValue()) {
-                $helper->deletePreviousConfiguredMCStoreLocalData($oldMailchimpStoreId, $scopeId, $scope);
-            if ($ecommMinSyncDate === null) {
-                $configValues = array(
-                    array(
-                        Ebizmarts_MailChimp_Model_Config::GENERAL_ECOMMMINSYNCDATEFLAG."_$newMailchimpStoreId",
-                        $dateHelper->formatDate(null, "Y-m-d H:i:s")
-                    )
-                );
-                $helper->saveMailchimpConfig($configValues, 0, 'default');
-            }
+            $helper->deletePreviousConfiguredMCStoreLocalData($oldMailchimpStoreId, $scopeId, $scope);
 
             if ($isSyncing === null) {
                 $configValues = array(

@@ -18,32 +18,36 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
     public function loadquoteAction()
     {
         $params = $this->getRequest()->getParams();
+
         if (isset($params['id'])) {
             //restore the quote
             $quote = Mage::getModel('sales/quote')->load($params['id']);
             $storeId = $quote->getStoreId();
             $mailchimpStoreId = Mage::helper('mailchimp')->getMCStoreId($storeId);
-            $quoteSyncData = Mage::helper('mailchimp')
+            $quoteSyncData = $this->getMailchimpEcommerceSyncDataModel()
                 ->getEcommerceSyncDataItem(
                     $params['id'],
                     Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
                     $mailchimpStoreId
                 );
             $url = Mage::getUrl(Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_PAGE, $storeId));
+
             if (isset($params['mc_cid'])) {
-                $url .= '?mc_cid='.$params['mc_cid'];
+                $url .= '?mc_cid=' . $params['mc_cid'];
             }
 
             if (!isset($params['token']) || $params['token'] != $quoteSyncData->getMailchimpToken()) {
-                Mage::getSingleton('customer/session')->addNotice("Your token cart is incorrect");
+                Mage::getSingleton('customer/session')->addNotice($this->_("Your token cart is incorrect"));
                 $this->getResponse()
                     ->setRedirect($url);
             } else {
                 $quote->setMailchimpAbandonedcartFlag(1);
                 $quote->save();
+
                 if (!$quote->getCustomerId()) {
                     $this->_getSession()->setQuoteId($quote->getId());
                     $newQuote = $this->_getSession()->getQuote();
+
                     if ($newQuote->getId() != $quote->getId()) {
                         $newQuote = $this->_getSession()->getQuote();
                         $newQuote->delete();
@@ -58,11 +62,12 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                         $this->getResponse()
                             ->setRedirect($url, 301);
                     } else {
-                        Mage::getSingleton('customer/session')->addNotice("Login to complete your order");
+                        Mage::getSingleton('customer/session')->addNotice($this->_("Login to complete your order"));
                         Mage::getSingleton('customer/session')->setAfterAuthUrl($url, $storeId);
                         $url = Mage::getUrl('customer/account/login');
+
                         if (isset($params['mc_cid'])) {
-                            $url .= '?mc_cid='.$params['mc_cid'];
+                            $url .= '?mc_cid=' . $params['mc_cid'];
                         }
 
                         $this->getResponse()->setRedirect($url, 301);
@@ -75,6 +80,7 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
     public function loadcouponAction()
     {
         $params = $this->getRequest()->getParams();
+
         if (isset($params['coupon_id']) && isset($params['coupon_token'])) {
             $helper = Mage::helper('mailchimp');
             $id = $params['coupon_id'];
@@ -83,20 +89,23 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
             $mailchimpStoreId = $helper->getMCStoreId($storeId);
             $url = Mage::getUrl('checkout/cart');
 
-            $promoCodeSyncData = $helper->getEcommerceSyncDataItem(
+            $promoCodeSyncData = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
                 $id,
                 Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                 $mailchimpStoreId
             );
             $couponId = $promoCodeSyncData->getRelatedId();
+
             if ($couponId && $promoCodeSyncData->getMailchimpToken() == $token) {
                 $coupon = Mage::getModel('salesrule/coupon')->load($couponId);
+
                 if ($coupon->getId()) {
                     $code = $coupon->getCode();
                     Mage::getSingleton("checkout/session")->setData("coupon_code", $code);
                     $quote = Mage::getSingleton('checkout/cart')->getQuote();
                     $quote->setCouponCode($code)->save();
                     Mage::getSingleton('core/session')->addSuccess($this->__('Coupon was automatically applied.'));
+
                     if (!$quote->getItemsCount()) {
                         Mage::getSingleton('core/session')
                             ->addWarning(
@@ -128,5 +137,13 @@ class Ebizmarts_MailChimp_CartController extends Mage_Checkout_CartController
                     ->setRedirect($url);
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 }

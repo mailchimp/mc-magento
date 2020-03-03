@@ -26,6 +26,7 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
         $customerId = $order->getCustomerId();
         $subscriber = $this->getSubscriberModel()
             ->loadByEmail($customerEmail);
+
         try {
             if (!$subscriber->getSubscriberId()) {
                 $subscriber->setSubscriberEmail($customerEmail);

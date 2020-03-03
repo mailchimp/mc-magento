@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -22,6 +23,7 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
             Mage::log($message, null, 'Mandrill_Request.log', true);
         }
     }
+
     /**
      * Get module User-Agent to use on API requests
      *
@@ -43,8 +45,8 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
     /**
      * Get if Mandrill logs are enabled for given scope.
      *
-     * @param  int  $scopeId
-     * @param  null $scope
+     * @param int $scopeId
+     * @param null $scope
      * @return mixed
      */
     public function isMandrillLogEnabled($scopeId = 0, $scope = null)
@@ -60,8 +62,8 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
     /**
      * Get if Mandrill module is enabled for given scope.
      *
-     * @param  int  $scopeId
-     * @param  null $scope
+     * @param int $scopeId
+     * @param null $scope
      * @return mixed
      */
     public function isMandrillEnabled($scopeId = 0, $scope = null)
@@ -77,8 +79,8 @@ class Ebizmarts_MailChimp_Helper_Mandrill extends Mage_Core_Helper_Abstract
     /**
      * Get if Mandrill Api Key for given scope.
      *
-     * @param  int  $scopeId
-     * @param  null $scope
+     * @param int $scopeId
+     * @param null $scope
      * @return mixed
      */
     public function getMandrillApiKey($scopeId = 0, $scope = null)

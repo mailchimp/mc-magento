@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -14,7 +15,6 @@ class Ebizmarts_MailChimp_Adminhtml_MergevarsController extends Mage_Adminhtml_C
 
     public function addmergevarAction()
     {
-
         $this->loadLayout();
         $this->renderLayout();
     }

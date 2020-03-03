@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpstoresControllerTest extends PHPUni
             ->disableOriginalConstructor()
             ->setMethods(
                 array('_title', 'getRequest', 'loadMailchimpStore', 'sessionregisterStore', '_initAction',
-                '_addBreadcrumb', 'getLayout', 'getUrl', '_addContent', 'renderLayout')
+                    '_addBreadcrumb', 'getLayout', 'getUrl', '_addContent', 'renderLayout')
             )
             ->getMock();
 

@@ -12,7 +12,7 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
     {
         $storeName = 'Madison Island - English';
         $date = '2017-10-23-19-34-31-92333600';
-        $mailchimpStoreId = md5($storeName . '_' . $date);
+        $mailchimpStoreId = hash('md5', $storeName . '_' . $date);
         $apiKey = 'z1x2c3v4b5n6m7k8l9p0-us1';
         $listId = 'a1s2d3f4g5';
         $currencyCode = 'USD';
@@ -35,7 +35,7 @@ class Ebizmarts_MailChimp_Model_Api_StoresTest extends PHPUnit_Framework_TestCas
             'email_address' => $storeEmail,
             'currency_code' => $currencyCode,
             'connected_site' => array(
-                'site_foreign_id'  => 'a1s2d3f4g5h6j7k8l9p0',
+                'site_foreign_id' => 'a1s2d3f4g5h6j7k8l9p0',
                 'site_script' => array(
                     'url' => 'https://chimpstatic.com/mcjs-connected/js/users/1647ea7abc3f2f3259e2613f9'
                         . '/a946187aed2d57d15cdac9987.js',

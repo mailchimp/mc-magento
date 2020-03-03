@@ -16,7 +16,8 @@ class MailChimp_ListsWebhooks extends MailChimp_Abstract
      * @param       $listId     The unique id for the list.
      * @param null  $url        Email address for a subscriber.
      * @param null  $events     The events that can trigger the webhook and whether they are enabled.
-     * @param null  $sources    The possible sources of any events that can trigger a webhook and whether they are enabled.
+     * @param null  $sources    The possible sources of any events that can trigger a webhook and
+     *                              whether they are enabled.
      * @return mixed
      */
     public function add($listId, $url = null, $events = null, $sources = null)

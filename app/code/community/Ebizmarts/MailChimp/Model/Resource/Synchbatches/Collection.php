@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -7,19 +8,19 @@
  * @author    Ebizmarts Team <info@ebizmarts.com>
  * @copyright Ebizmarts (http://ebizmarts.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @date:     6/9/16 4:46 PM
- * @file:     Mailchimperrors.php
+ * @date:     2019-10-02 15:58
  */
-class Ebizmarts_MailChimp_Model_Mysql4_Webhookrequest extends Mage_Core_Model_Mysql4_Abstract
+class Ebizmarts_MailChimp_Model_Resource_Synchbatches_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
 
     /**
-     * Initialize
+     * Set resource type
      *
      * @return void
      */
     public function _construct()
     {
-        $this->_init('mailchimp/webhookrequest', 'id');
+        parent::_construct();
+        $this->_init('mailchimp/synchbatches');
     }
 }

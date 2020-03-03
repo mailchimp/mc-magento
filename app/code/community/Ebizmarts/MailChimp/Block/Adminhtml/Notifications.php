@@ -1,4 +1,5 @@
 <?php
+
 /**
  * mc-magento Magento Component
  *
@@ -17,10 +18,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
     {
         $helper = $this->makeHelper();
         if ($helper->isImageCacheFlushed() && $helper->isEcomSyncDataEnabledInAnyScope()) {
-            $message = '<strong style=color:red>Important: </strong>'.
+            $message = '<strong style=color:red>Important: </strong>' .
                 '<span>Image cache has been flushed please '
                 . '<a href="#" onclick="openResendEcommerceDialog();">'
-            . 'resend the products</a> in order to update image URL</span>';
+                . 'resend the products</a> in order to update image URL</span>';
             return $message;
         }
     }
@@ -32,8 +33,8 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
     {
         $helper = $this->makeHelper();
         $message = 'Are you sure you want to delete the local data in order to send all items again?\n'
-        .'Automations will work normally but the synchronization process for the old data will take '
-        . 'longer than resetting the MailChimp store.';
+            . 'Automations will work normally but the synchronization process for the old data will take '
+            . 'longer than resetting the MailChimp store.';
         return $helper->__($message);
     }
 
@@ -57,7 +58,6 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Notifications extends Mage_Adminhtml_B
 
         return $url;
     }
-
 
 
     /**
