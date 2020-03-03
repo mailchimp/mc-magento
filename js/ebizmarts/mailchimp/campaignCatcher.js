@@ -4,8 +4,6 @@ function getCampaign() {
     let mc_cid = null;
     let isMailchimp = false;
 
-    var mc_eid = null;
-
     if (isGet !== -1) {
         urlparams = getUrlVars();
         urlparams.forEach(
@@ -20,10 +18,6 @@ function getCampaign() {
                     if (item.key === 'mc_cid') {
                         mc_cid = item.value;
                     }
-
-                    if (item.key == 'mc_eid') {
-                        mc_eid = item.value;
-                    }
                 }
             }
         );
@@ -31,7 +25,6 @@ function getCampaign() {
         urlparams = location.href.split('/');
         let utmIndex = jQuery.inArray('utm_source', urlparams);
         let mccidIndex = jQuery.inArray('mc_cid', urlparams);
-        let mceidIndex = jQuery.inArray('mc_eid', urlparams);
 
         if (utmIndex !== -1) {
             let value = urlparams[utmIndex + 1];
@@ -44,21 +37,12 @@ function getCampaign() {
             if (mccidIndex !== -1) {
                 mc_cid = urlparams[mccidIndex + 1];
             }
-
-            if (mceidIndex !== -1) {
-                mc_eid = urlparams[mceidIndex + 1];
-            }
-
         }
     }
 
     if (mc_cid && !isMailchimp) {
         Mage.Cookies.clear('mailchimp_campaign_id');
         Mage.Cookies.set('mailchimp_campaign_id', mc_cid);
-    }
-
-    if (mc_eid) {
-        Mage.Cookies.set('mailchimp_email_id', mc_eid);
     }
 
     let landingPage = Mage.Cookies.get('mailchimp_landing_page');
