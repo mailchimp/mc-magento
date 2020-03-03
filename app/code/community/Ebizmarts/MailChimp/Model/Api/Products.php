@@ -123,7 +123,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                 } else {
                     $this->addSyncDataError(
                         $productId,
-                        "This product type is not supported on MailChimp.",
+                        "This product type is not supported on MailChimp. (product id: $productId)",
                         null,
                         false,
                         $dateHelper->formatDate(null, 'Y-m-d H:i:s')
@@ -229,9 +229,14 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             //json encode failed
             $jsonErrorMsg = json_last_error_msg();
             $this->logSyncError(
-                "Product " . $product->getId() . " json encode failed (" . $jsonErrorMsg . ")",
+                $jsonErrorMsg,
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                $mailchimpStoreId, $magentoStoreId
+                $magentoStoreId,
+                'magento_side_error',
+                'Json Encode Failure',
+                0,
+                $product->getId(),
+                0
             );
 
             $this->addSyncDataError(
@@ -294,9 +299,14 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     if ($body === false) {
                         $jsonErrorMsg = json_last_error_msg();
                         $this->logSyncError(
-                            "Product " . $parent->getId() . " json encode failed (".$jsonErrorMsg.")",
+                            $jsonErrorMsg,
                             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                            $mailchimpStoreId, $magentoStoreId
+                            $magentoStoreId,
+                            'magento_side_error',
+                            'Json Encode Failure',
+                            0,
+                            $product->getId(),
+                            0
                         );
 
                         $this->addSyncDataError(
@@ -331,18 +341,30 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $body = json_encode($bodyData, JSON_HEX_APOS | JSON_HEX_QUOT);
 
         if ($body === false) {
+            $jsonErrorMsg = json_last_error_msg();
             //json encode failed
             $this->logSyncError(
-                "Product " . $product->getId() . " json encode failed (".json_last_error_msg().")",
+                $jsonErrorMsg,
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                null, $magentoStoreId
+                $magentoStoreId,
+                'magento_side_error',
+                'Json Encode Failure',
+                0,
+                $product->getId(),
+                0
             );
 
             $jsonErrorMsg = json_last_error_msg();
+
             $this->logSyncError(
-                "Product " . $product->getId() . " json encode failed (".$jsonErrorMsg.")",
+                $jsonErrorMsg,
                 Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                null, $magentoStoreId
+                $magentoStoreId,
+                'magento_side_error',
+                'Json Encode Failure',
+                0,
+                $product->getId(),
+                0
             );
 
             $this->addSyncDataError(
@@ -532,6 +554,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
 
         foreach ($items as $item) {
             $itemProductId = $item->getProductId();
+
             $product = $this->loadProductById($itemProductId);
             $productId = $product->getId();
             $productSyncData = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
@@ -626,7 +649,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
         );
 
-        $productsCollectionResource = $this->getEcommerceProductsCollection();
+        $productsCollectionResource = $this->createEcommerceProductsCollection();
         $productsCollectionResource->joinQtyAndBackorders($collection);
 
         if (!$isParentProduct) {
@@ -1016,6 +1039,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $collection->addStoreFilter($magentoStoreId);
         $collection->addFieldToFilter('entity_id', array('eq' => $parentId));
 
+        $this->_ecommerceProductsCollection = $this->createEcommerceProductsCollection();
         $this->_ecommerceProductsCollection->addJoinLeft(
             $collection,
             array("super_attribute" => $tableName),

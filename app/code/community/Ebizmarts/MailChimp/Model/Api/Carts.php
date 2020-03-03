@@ -224,9 +224,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
                 //json encode failed
                 $this->logSyncError(
-                    "Carts " . $cart->getId() . " json encode failed (" . $jsonErrorMessage . ")",
+                    $jsonErrorMessage,
                     Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
-                    $mailchimpStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $cart->getId(),
+                    0
                 );
             }
 
@@ -356,9 +361,14 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
                 //json encode failed
                 $this->logSyncError(
-                    "Carts " . $cart->getId() . " json encode failed (" . $jsonErrorMessage . ")",
+                    $jsonErrorMessage,
                     Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
-                    $mailchimpStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $cart->getId(),
+                    0
                 );
             }
 

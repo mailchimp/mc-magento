@@ -97,8 +97,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         );
 
         foreach ($modifiedOrders as $item) {
-            try {
                 $orderId = $item->getEntityId();
+
+            try {
                 $order = $this->_getOrderById($orderId);
                 $incrementId = $order->getIncrementId();
                 //create missing products first
@@ -130,10 +131,17 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                         continue;
                     }
                 } else {
-                    $jsonErrorMsg = json_last_error_msg();$this->logSyncError(
-                        "Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")",
+                    $jsonErrorMsg = json_last_error_msg();
+                    $this->logSyncError(
+                        $jsonErrorMsg,
                         Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                        $mailchimpStoreId, $magentoStoreId
+                        $magentoStoreId,
+                        'magento_side_error',
+                        'Json Encode Failure',
+                        0,
+                        $orderId,
+                        0
+
                     );
 
                     $this->addSyncDataError(
@@ -148,7 +156,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                 $this->logSyncError(
                     $e->getMessage(),
                     Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                    $mailchimpStoreId, $magentoStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $orderId,
+                    0
                 );
             }
         }
@@ -186,8 +199,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         );
 
         foreach ($newOrders as $item) {
-            try {
                 $orderId = $item->getEntityId();
+            try {
                 $order = $this->_getOrderById($orderId);
                 //create missing products first
                 $batchArray = $this->addProductNotSentData($order, $batchArray);
@@ -222,7 +235,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                     $this->logSyncError(
                         "Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")",
                         Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                        $mailchimpStoreId, $magentoStoreId
+                        $magentoStoreId,
+                        'magento_side_error',
+                        'Json Encode Failure',
+                        0,
+                        $orderId,
+                        0
                     );
 
                     $this->addSyncDataError(
@@ -237,7 +255,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                 $this->logSyncError(
                     $e->getMessage(),
                     Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                    $mailchimpStoreId, $magentoStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $orderId,
+                    0
                 );
             }
         }
@@ -341,7 +364,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $dataPromo = $this->getPromoData($order);
         $mailchimpCampaignId = $order->getMailchimpCampaignId();
 
-        if ($this->shouldSendCampaignId($mailchimpCampaignId)) {
+        if ($this->shouldSendCampaignId($mailchimpCampaignId, $order->getEntityId())) {
             $data['campaign_id'] = $mailchimpCampaignId;
         }
 
@@ -815,10 +838,10 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $magentoStoreId = $this->getMagentoStoreId();
 
         $helper = $this->getHelper();
-        $productData = $this->getApiProduct();
-        $productData->setMailchimpStoreId($mailchimpStoreId);
-        $productData->setMagentoStoreId($magentoStoreId);
-        $productData->sendModifiedProduct($order);
+        $apiProduct = $this->getApiProduct();
+        $apiProduct->setMailchimpStoreId($mailchimpStoreId);
+        $apiProduct->setMagentoStoreId($magentoStoreId);
+        $productData = $apiProduct->sendModifiedProduct($order);
 
         $productDataArray = $helper->addEntriesToArray($batchArray, $productData, $this->_counter);
         $batchArray = $productDataArray[0];
@@ -1006,10 +1029,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
     /**
      * @param $mailchimpCampaignId
-     * @return bool \ return true if the campaign is from the current list.
-     * @throws Exception
+     * @param $orderId
+     * @return bool return true if the campaign is from the current list.
+     * @throws Mage_Core_Exception
      */
-    public function shouldSendCampaignId($mailchimpCampaignId)
+    public function shouldSendCampaignId($mailchimpCampaignId, $orderId)
     {
         $magentoStoreId = $this->getMagentoStoreId();
         $isCampaingFromCurrentList = false;
@@ -1044,21 +1068,36 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                 $this->logSyncError(
                     $e->getMessage(),
                     Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                    null, $magentoStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $orderId,
+                    0
                 );
             } catch (MailChimp_Error $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = false;
                 $this->logSyncError(
                     $e->getFriendlyMessage(),
                     Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                    null, $magentoStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $orderId,
+                    0
                 );
             } catch (Exception $e) {
                 $this->_listsCampaignIds[$apiKey][$listId][$mailchimpCampaignId] = $isCampaingFromCurrentList = true;
                 $this->logSyncError(
                     $e->getMessage(),
                     Ebizmarts_MailChimp_Model_Config::IS_ORDER,
-                    null, $magentoStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $orderId,
+                    0
                 );
             }
         }
