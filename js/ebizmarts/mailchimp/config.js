@@ -185,18 +185,6 @@ function changeApikey()
     loadStores();
 }
 
-function keyupMapField(obj)
-{
-    var value = obj.value;
-    var newValue = value;
-
-    if (value.length > 10) {
-        newValue = value.slice(0, 10);
-    }
-
-    obj.value = newValue;
-}
-
 function initAdmin()
 {
     $('mailchimp_general_apikey').onchange = changeApikey;
