@@ -36,6 +36,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         );
 
         $scopeArray = $this->getScopeArrayIfValueExists();
+
         if ($scopeArray !== false) {
             $jsCondition = 'true';
         } else {
@@ -107,8 +108,9 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Mailchimpstores_Edit extends Mage_Admi
         $helper = $this->makeHelper();
         $currentMCStoreId = Mage::registry('current_mailchimpstore')->getStoreid();
         $keyIfExist = $helper->getScopeByMailChimpStoreId($currentMCStoreId);
+
         if ($keyIfExist === null) {
-            $keyIfExist = 'false';
+            $keyIfExist = false;
         }
 
         return $keyIfExist;

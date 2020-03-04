@@ -168,7 +168,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                     $this->logSyncError(
                         "Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")",
                         Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
-                        $mailchimpStoreId, $magentoStoreId
+                        $magentoStoreId,
+                        'magento_side_error',
+                        'Json Encode Failure',
+                        0,
+                        $codeId,
+                        0
                     );
 
                     $this->addSyncDataError(
@@ -183,7 +188,12 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                 $this->logSyncError(
                     $e->getMessage(),
                     Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
-                    $mailchimpStoreId, $magentoStoreId
+                    $magentoStoreId,
+                    'magento_side_error',
+                    'Json Encode Failure',
+                    0,
+                    $codeId,
+                    0
                 );
             }
         }
@@ -402,8 +412,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                 } catch (MailChimp_Error $e) {
                     $this->logSyncError(
                         $e->getFriendlyMessage(),
-                        Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
-                        $mailchimpStoreId
+                        Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE,
+                        $this->getMagentoStoreId(),
+                        'magento_side_error',
+                        'Problem retrieving object',
+                        0,
+                        $promoRuleId,
+                        0
                     );
                 }
             }

@@ -799,8 +799,8 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         $storeWhere = "mailchimp_store_id = ?";
 
         $mailchimpFilters = Ebizmarts_MailChimp_Model_Config::IS_ORDER;
-        $filterReturnWhere = "type IN (" . $mailchimpFilters . ')';
-        $filterWhere = "type IN (?)";
+        $filterReturnWhere = "regtype IN (" . $mailchimpFilters . ')';
+        $filterWhere = "regtype IN (?)";
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
