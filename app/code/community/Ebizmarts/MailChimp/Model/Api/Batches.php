@@ -362,7 +362,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
-                if ($helper->getMCIsSyncing($mailchimpStoreId)) {
+                if ($helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId) === 1) {
                     $helper->logBatchStatus('No Carts will be synced until the store is completely synced');
                 } else {
                     //cart operations
@@ -406,6 +406,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 }
 
                 //deleted product operations
+                $helper->logBatchStatus('Generate Deleted Products Payload');
                 $deletedProductsArray = $apiProducts->createDeletedProductsBatchJson();
                 $batchArray['operations'] = array_merge($batchArray['operations'], $deletedProductsArray);
                 $batchJson = null;
@@ -461,6 +462,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             } elseif (empty($batchJson)) {
                 $helper->logRequest('An empty operation was detected');
             } else {
+                $helper->logBatchStatus('Send batch operation');
                 $batchResponse = $mailchimpApi->getBatchOperation()->add($batchJson);
                 $helper->logRequest($batchJson, $batchResponse['id']);
                 //save batch id to db
@@ -831,7 +833,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                             0,
                             null,
                             null,
-                            null,
+                            0,
                             true
                         );
 
@@ -889,7 +891,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
      */
     protected function _getError($type, $mailchimpStoreId, $id, $response)
     {
-        $error = $response->title . " : " . $response->detail;
+        $error = $response['title'] . " : " . $response['detail'];
 
         if ($type == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT) {
             $dataProduct = $this->getDataProduct($mailchimpStoreId, $id, $type);

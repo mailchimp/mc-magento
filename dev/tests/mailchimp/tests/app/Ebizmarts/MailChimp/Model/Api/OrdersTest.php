@@ -352,6 +352,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
     public function testShouldSendCampaignId()
     {
         $mailchimpCampaignId = 'ddf1830cf9';
+        $orderId = 1;
         $magentoStoreId = '1';
         $listId = 'c7ce5a3c4e';
         $apiKey = 'asdasdqweqweqwedasd484848asd15';
@@ -414,6 +415,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->with($mailchimpCampaignId, 'recipients')
             ->willReturn($campaignData);
 
-        $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId);
+        $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId, $orderId);
     }
 }
