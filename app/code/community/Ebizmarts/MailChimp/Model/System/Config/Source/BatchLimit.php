@@ -20,9 +20,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_BatchLimit
             array('value' => 50, 'label' => Mage::helper('mailchimp')->__('50')),
             array('value' => 100, 'label' => Mage::helper('mailchimp')->__('100')),
             array('value' => 200, 'label' => Mage::helper('mailchimp')->__('200')),
-            array('value' => 500, 'label' => Mage::helper('mailchimp')->__('500')),
-            array('value' => 1000, 'label' => Mage::helper('mailchimp')->__('1000')),
-            array('value' => 5000, 'label' => Mage::helper('mailchimp')->__('5000'))
+            array('value' => 500, 'label' => Mage::helper('mailchimp')->__('500'))
         );
     }
 }

@@ -43,10 +43,17 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected $_lastOrder;
 
+    /**
+     * @var Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
+     */
+    protected $_interestGroupHandle;
+
     public function __construct()
     {
         $this->setMailChimpHelper();
         $this->setMailChimpDateHelper();
+
+        $this->_interestGroupHandle = Mage::getModel('mailchimp/api_subscribers_InterestGroupHandle');
     }
 
     /**
@@ -95,6 +102,20 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     public function getCustomer()
     {
         return $this->_customer;
+    }
+
+    /**
+     * @return int
+     */
+    protected function _getCustomerId()
+    {
+        if ($this->_subscriber === null) {
+            $customerId = $this->_customer->getId();
+        } else {
+            $customerId = $this->_subscriber->getCustomerId();
+        }
+
+        return $customerId;
     }
 
     /**
@@ -179,6 +200,107 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
 
         if ($newVars->hasData()) {
             $this->mergeMailchimpTags($newVars->getData());
+        }
+    }
+
+    /**
+     * @param $data
+     * @param bool $subscribe
+     * @throws Mage_Core_Exception
+     */
+    public function processMergeFields($data, $subscribe = false)
+    {
+        $helper = $this->getMailchimpHelper();
+        $email = $data['email'];
+        $listId = $data['list_id'];
+        $storeId = $helper->getMagentoStoreIdsByListId($listId)[0];
+
+        $this->_mailChimpTags = $helper->getMapFields($storeId);
+        $this->_mailChimpTags = $this->unserializeMapFields($this->_mailChimpTags);
+
+        $customer = $helper->loadListCustomer($listId, $email);
+
+        if ($customer) {
+            $this->setCustomer($customer);
+            $this->_setMailchimpTagsToCustomer($data);
+        } else {
+            $subscriber = $helper->loadListSubscriber($listId, $email);
+            $fname = $this->_getFName($data);
+            $lname = $this->_getLName($data);
+
+            if ($subscriber->getId()) {
+                $subscriber->setSubscriberFirstname($fname);
+                $subscriber->setSubscriberLastname($lname);
+            } else {
+                /**
+                 * Mailchimp subscriber not currently in magento newsletter subscribers.
+                 * Get mailchimp subscriber status and add missing newsletter subscriber.
+                 */
+                $this->_addSubscriberData($subscriber, $fname, $lname, $email, $listId);
+
+                if ($subscribe) {
+                    $helper->subscribeMember($subscriber);
+                }
+            }
+
+            $subscriber->save();
+            $this->setSubscriber($subscriber);
+        }
+
+        if (isset($data['merges']['GROUPINGS'])) {
+            $interestGroupHandle = $this->_getInterestGroupHandleModel();
+
+            if ($this->getSubscriber() === null) {
+                $interestGroupHandle->setCustomer($this->getCustomer());
+            } else {
+                $interestGroupHandle->setSubscriber($this->getSubscriber());
+            }
+
+            $interestGroupHandle->setGroupings($data['merges']['GROUPINGS'])
+                ->setListId($listId)
+                ->processGroupsData();
+        }
+    }
+
+    /**
+     * @param $subscriber
+     * @param $fname
+     * @param $lname
+     * @param $email
+     * @param $listId
+     * @throws Exception
+     */
+    protected function _addSubscriberData($subscriber, $fname, $lname, $email, $listId)
+    {
+        $helper = $this->getHelper();
+        $scopeArray = $helper->getFirstScopeFromConfig(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
+            $listId
+        );
+        $api = $helper->getApi($scopeArray['scope_id'], $scopeArray['scope']);
+
+        try {
+            $subscriber->setSubscriberFirstname($fname);
+            $subscriber->setSubscriberLastname($lname);
+            $md5HashEmail = hash('md5', strtolower($email));
+            $member = $api->getLists()->getMembers()->get(
+                $listId,
+                $md5HashEmail,
+                null,
+                null
+            );
+
+            if ($member['status'] == 'subscribed') {
+                $helper->subscribeMember($subscriber);
+            } else if ($member['status'] == 'unsubscribed') {
+                if (!$helper->getWebhookDeleteAction($subscriber->getStoreId())) {
+                    $helper->unsubscribeMember($subscriber);
+                }
+            }
+        } catch (MailChimp_Error $e) {
+            $helper->logError($e->getFriendlyMessage());
+        } catch (Exception $e) {
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -389,7 +511,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      * @param $genderValue
      * @return string | return a string with the gender of the customer.
      */
-    protected function getGenderValue($mergeVars, $key, $genderValue)
+    protected function getGenderLabel($mergeVars, $key, $genderValue)
     {
         if ($genderValue == self::GENDER_VALUE_MALE) {
             $mergeVars[$key] = 'Male';
@@ -398,6 +520,23 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         }
 
         return $mergeVars[$key];
+    }
+
+    /**
+     * @param $genderLabel
+     * @return int
+     */
+    protected function getGenderValue($genderLabel)
+    {
+        $genderValue = 0;
+
+        if ($genderLabel == 'Male') {
+            $genderValue = self::GENDER_VALUE_MALE;
+        } elseif ($genderLabel == 'Female') {
+            $genderValue = self::GENDER_VALUE_FEMALE;
+        }
+
+        return $genderValue;
     }
 
     /**
@@ -718,7 +857,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     {
         if ($this->getCustomerGroupLabel($attributeCode, $customer)) {
             $genderValue = $this->getCustomerGroupLabel($attributeCode, $customer);
-            $this->addMailChimpTag($key, $this->getGenderValue($this->_mailChimpTags, $key, $genderValue));
+            $this->addMailChimpTag($key, $this->getGenderLabel($this->_mailChimpTags, $key, $genderValue));
         }
     }
 
@@ -896,5 +1035,146 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         $this->addMailChimpTag($key, $storeCode);
     }
 
+    /**
+     * Iterates the mailchimp tags.
+     *
+     * @param $data
+     * @param $listId
+     * @throws Mage_Core_Exception
+     */
+    protected function _setMailchimpTagsToCustomer($data)
+    {
+        $customer = $this->getCustomer();
+
+        foreach($data['merges'] as $key => $value) {
+            if (!empty($value)) {
+                if (is_array($this->_mailChimpTags)) {
+                    if ($key !== 'GROUPINGS') {
+                        $this->_setMailchimpTagToCustomer($key, $value, $this->_mailChimpTags, $customer);
+                    }
+                }
+            }
+        }
+
+        $customer->save();
+    }
+
+    /**
+     * Sets the mailchimp tag value for tue customer.
+     *
+     * @param $key
+     * @param $value
+     * @param $mapFields
+     * @param $customer
+     */
+    protected function _setMailchimpTagToCustomer($key, $value, $mapFields, $customer)
+    {
+        $ignore = array(
+            'billing_company', 'billing_country', 'billing_zipcode', 'billing_state', 'billing_telephone',
+            'shipping_company', 'shipping_telephone', 'shipping_country', 'shipping_zipcode', 'shipping_state',
+            'dop', 'store_code');
+
+        foreach ($mapFields as $map) {
+            if ($map['mailchimp'] == $key) {
+                if (!in_array($map['magento'], $ignore) && !$this->_isAddress($map['magento'])) {
+                    if ($key != 'GENDER') {
+                        $customer->setData($map['magento'], $value);
+                    } else {
+                        $customer->setData('gender', $this->getGenderValue($value));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $attrId
+     * @return bool
+     */
+    protected function _isAddress($attrId)
+    {
+        if (is_numeric($attrId)) {
+            // Gets the magento attr_code.
+            $attributeCode = $this->_getAttrbuteCode($attrId);
+
+            if ($attributeCode == 'default_billing' || $attributeCode == 'default_shipping') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $attrId
+     * @return string
+     */
+    protected function _getAttrbuteCode($attrId)
+    {
+        $attributeCode = Mage::getModel('eav/entity_attribute')->load($attrId)->getAttributeCode();
+
+        return $attributeCode;
+    }
+
+    /**
+     * @param $attrCode
+     * @return int
+     */
+    protected function _getAttrbuteId($attrCode)
+    {
+        $attribute = Mage::getModel('eav/entity_attribute')
+            ->getCollection()
+            ->addFieldToFilter('attribute_code', $attrCode)
+            ->getFirstItem();
+        $attrId = $attribute->getId();
+
+        return $attrId;
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    protected function _getFName($data)
+    {
+        $attrId = $this->_getAttrbuteId('firstname');
+        $magentoTag = '';
+
+        foreach ($this->_mailChimpTags as $tag) {
+            if ($tag['magento'] == $attrId) {
+                $magentoTag = $tag['mailchimp'];
+                break;
+            }
+        }
+
+        return $data['merges'][$magentoTag];
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    protected function _getLName($data)
+    {
+        $attrId = $this->_getAttrbuteId('lastname');
+        $magentoTag = '';
+
+        foreach ($this->_mailChimpTags as $tag) {
+            if ($tag['magento'] == $attrId) {
+                $magentoTag = $tag['mailchimp'];
+                break;
+            }
+        }
+
+        return $data['merges'][$magentoTag];
+    }
+
+    /**
+     * @return false|Mage_Core_Model_Abstract
+     */
+    protected function _getInterestGroupHandleModel()
+    {
+        return $this->_interestGroupHandle;
+    }
 }
 

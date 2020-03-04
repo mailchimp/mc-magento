@@ -89,10 +89,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
     ) {
         $type = $this->getItemType();
 
-        if ($syncError !== null) {
-            $this->logSyncError("Update Sync Data error: " . $syncError, $type, $this->getMailchimpStoreId());
-        }
-
         if (!empty($type)) {
             $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
             $ecommerceSyncData->saveEcommerceSyncData(
@@ -135,13 +131,26 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         $saveOnlyIfExists = false,
         $syncDelta = null
     ) {
+        $type = $this->getItemType();
+
+        $this->logSyncError(
+            $error,
+            $type,
+            $this->getMagentoStoreId(),
+            'magento_side_error',
+            'Invalid Magento Resource',
+            0,
+            $id,
+            0
+        );
+
         $this->_updateSyncData(
             $id,
             $syncDelta,
             $error,
             0,
             null,
-            null,
+            0,
             $token,
             $saveOnlyIfExists,
             -1
@@ -185,23 +194,23 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     /**
      * @param $error
-     * @param string $type
-     * @param null $title
-     * @param null $status
-     * @param null $originalId
-     * @param int $batchId
-     * @param null $storeId
-     * @param null $regType
+     * @param $type
+     * @param $title
+     * @param $status
+     * @param $originalId
+     * @param $batchId
+     * @param $storeId
+     * @param $regType
      */
     protected function logSyncError(
         $error,
-        $regType = null,
-        $storeId = null,
-        $type = 'magento_side_error',
-        $title = null,
-        $status = null,
-        $originalId = null,
-        $batchId = -1
+        $regType,
+        $storeId,
+        $type,
+        $title,
+        $status,
+        $originalId,
+        $batchId
     ) {
         $this->getHelper()->logError($error);
 

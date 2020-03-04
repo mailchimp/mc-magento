@@ -175,10 +175,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $magentoStoreId = 1;
         $this->_productsApiMock = $this->_productsApiMock->setMethods(
             array(
-                'getProductResourceCollection',
+                'createEcommerceProductsCollection',
                 'getMagentoStoreId',
                 'getHelper',
-                'getEcommerceProductsCollection',
+                'getProductResourceCollection',
                 'getBatchLimitFromConfig',
             )
         )->getMock();
@@ -215,16 +215,14 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $helperMock->expects($this->once())->method('addResendFilter')
             ->with($productsCollectionMock, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
-        $this->_productsApiMock->expects($this->once())->method('getEcommerceProductsCollection')
+        $this->_productsApiMock->expects($this->once())->method('createEcommerceProductsCollection')
             ->willReturn($productResourceCollectionMock);
 
         $productResourceCollectionMock->expects($this->once())->method('joinQtyAndBackorders');
         $this->_productsApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
         $productResourceCollectionMock->expects($this->once())->method('limitCollection');
 
-        $collection = $this->_productsApiMock->makeProductsNotSentCollection(false);
-
-        $this->assertInstanceOf("Mage_Catalog_Model_Resource_Product_Collection", $collection);
+        $this->_productsApiMock->makeProductsNotSentCollection(false);
     }
 
     public function testGetNotVisibleProductUrl()
