@@ -155,7 +155,7 @@ class Mandrill_Mandrill
          */
         $curlHelper = Mage::helper('mailchimp/curl');
         $this->setCurlOptionsAddOptions($curlOptions);
-        $curlFullResponse = $curlHelper->curlExec($this->_curlOptions);
+        $curlFullResponse = $curlHelper->curlExec($url, 'GET', $this->_curlOptions);
         $info = $curlFullResponse['info'];
         $responseBody = $curlFullResponse['response'];
         $curlError = $curlFullResponse['error'];
