@@ -153,9 +153,9 @@ class Mandrill_Mandrill
         /**
          * @var $curlHelper Ebizmarts_MailChimp_Helper_Curl
          */
-        $curlHelper = Mage::helper('mailchimp/curl');
+        $curlHelper = Mage::helper('mailchimp/curl');Mage::log("antes". print_r($this->_curlOptions, true), null, 'extra.log', true);
         $this->setCurlOptionsAddOptions($curlOptions);
-        $curlFullResponse = $curlHelper->curlExec($url, 'GET', $this->_curlOptions);
+        $curlFullResponse = $curlHelper->curlExec($url, 'GET', $this->_curlOptions);Mage::log("después" . print_r($this->_curlOptions, true), null, 'extra.log', true);
         $info = $curlFullResponse['info'];
         $responseBody = $curlFullResponse['response'];
         $curlError = $curlFullResponse['error'];

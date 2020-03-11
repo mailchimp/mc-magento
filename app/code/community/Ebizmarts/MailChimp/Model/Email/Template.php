@@ -69,6 +69,9 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
         $headers[] = $mandrillHelper->getUserAgent();
         $email['headers'] = $headers;
 
+        Mage::log('email_array.....' . print_r($email, true), null, 'mandril.log', true);
+        Mage::log('mail_object.....' . print_r($mail, true), null, 'mandril.log', true);
+
         if ($att = $mail->getAttachments()) {
             $email['attachments'] = $att;
         }
@@ -95,18 +98,19 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
                 ->addRecipients($emails, $names, Mage_Core_Model_Email_Queue::EMAIL_TYPE_TO)
                 ->addRecipients($this->_bccEmails, array(), Mage_Core_Model_Email_Queue::EMAIL_TYPE_BCC);
             $emailQueue->addMessageToQueue();
+            Mage::log('B4 return true', null, 'mandril.log', true);
             return true;
         }
 
         try {
-            $result = $this->sendMail($email, $mail);
+            $result = $this->sendMail($email, $mail);Mage::log('Sending email result: ' . print_r($result, true), null, 'mandril.log', true);
             $this->_mail = null;
         } catch (Exception $e) {
             $this->_mail = null;
             Mage::logException($e);
             return false;
         }
-
+        Mage::log('OKOKOKOKOKOKO!!!!!!!!!!!', null, 'mandril.log', true);
         return true;
     }
 
@@ -227,16 +231,16 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      * @throws Mandrill_Error
      */
     public function getMail()
-    {
+    {Mage::log('getMail.....', null, 'mandril.log', true);
         $helper = $this->makeMandrillHelper();
         $emailConfig = $this->getDesignConfig();
         $storeId = (integer) $emailConfig->getStore();
 
-        if (!$this->isMandrillEnabled($storeId)) {
+        if (!$this->isMandrillEnabled($storeId)) {Mage::log('Mandril is not enabled', null, 'mandril.log', true);
             return parent::getMail();
         }
 
-        if ($this->_mail) {
+        if ($this->_mail) {Mage::log('$this->_mail.....' . $this->_mail, null, 'mandril.log', true);
             return $this->_mail;
         } else {
             $helper->log("store: $storeId API: " . $helper->getMandrillApiKey($storeId), $storeId);
@@ -336,6 +340,9 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     protected function createMandrillMessage($storeId)
     {
-        return $this->_mail = new Mandrill_Message($this->makeMandrillHelper()->getMandrillApiKey($storeId));
+        Mage::log('createMandrillMessage.....', null, 'mandril.log', true);
+        $mandrillApiKey = $this->makeMandrillHelper()->getMandrillApiKey($storeId);
+        Mage::log('$mandrillApiKey.....' . $mandrillApiKey, null, 'mandril.log', true);
+        return $this->_mail = new Mandrill_Message($mandrillApiKey);
     }
 }
