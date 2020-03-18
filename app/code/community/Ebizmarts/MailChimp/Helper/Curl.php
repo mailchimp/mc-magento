@@ -16,8 +16,11 @@
 class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
 {
     /**
-     * @param array $options
-     * @return array An array with...
+     * @param $url
+     * @param $httpMethod
+     * @param array $curlOptions
+     * @param array $params
+     * @return array
      */
     public function curlExec($url, $httpMethod, $curlOptions = array(), $params = array())
     {
