@@ -782,7 +782,7 @@ class Ebizmarts_MailChimp_Model_Observer
      *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
-     */
+     */ 
     public function createCreditmemo($observer) 
     {
         $creditMemo = $observer->getEvent()->getCreditmemo();

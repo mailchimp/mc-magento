@@ -1827,7 +1827,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->with('mailchimp_unsubscribe')
             ->willReturn($mailchimpUnsubscribe);
 
-        // Inside $mailchimpUnsubscribe == "on" if:
+        // Inside mailchimpUnsubscribe if:
         $orderMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
         $mailchimpObserverMock->expects($this->once())->method('getSubscriberModel')->willReturn($subscriberMock);
         $subscriberMock
