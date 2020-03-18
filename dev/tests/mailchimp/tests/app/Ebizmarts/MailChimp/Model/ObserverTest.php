@@ -1771,6 +1771,137 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpObserverMock->newCreditMemo($observerMock);
     }
 
+    public function testCreateCreditmemoUbsubscribe()
+    {
+        $customerEmail = 'customer@mailchimp.com';
+        $mailchimpUnsubscribe = 'on';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRequest', 'getSubscriberModel', 'makeHelper'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCreditmemo'))
+            ->getMock();
+
+        $creditMemoMock = $this->getMockBuilder(Mage_Sales_Model_Order_Creditmemo::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getOrder', 'getAllItems'))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCustomerEmail'))
+            ->getMock();
+
+        $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getParam'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('loadByCustomer'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('unsubscribeMember'))
+            ->getMock();
+
+        $observerMock->expects($this->once())->method('getEvent')->willReturn($eventObserverMock);
+        $eventObserverMock->expects($this->once())->method('getCreditmemo')->willReturn($creditMemoMock);
+        $creditMemoMock->expects($this->once())->method('getOrder')->willReturn($orderMock);
+        $mailchimpObserverMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $requestMock
+            ->expects($this->once())
+            ->method('getParam')
+            ->with('mailchimp_unsubscribe')
+            ->willReturn($mailchimpUnsubscribe);
+
+        // Inside $mailchimpUnsubscribe == "on" if:
+        $orderMock->expects($this->once())->method('getCustomerEmail')->willReturn($customerEmail);
+        $mailchimpObserverMock->expects($this->once())->method('getSubscriberModel')->willReturn($subscriberMock);
+        $subscriberMock
+            ->expects($this->once())
+            ->method('loadByEmail')
+            ->with($customerEmail)
+            ->willReturnSelf();
+        $helperMock->expects($this->once())
+            ->method('unsubscribeMember')
+            ->with($subscriberMock)
+            ->willReturnSelf();
+
+        $mailchimpObserverMock->createCreditmemo($observerMock);
+    }
+
+    public function testCreateCreditmemo()
+    {
+        $customerEmail = 'customer@mailchimp.com';
+        $mailchimpUnsubscribe = '';
+
+        $mailchimpObserverMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRequest', 'getSubscriberModel', 'makeHelper'))
+            ->getMock();
+
+        $observerMock = $this->getMockBuilder(Varien_Event_Observer::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getEvent'))
+            ->getMock();
+
+        $eventObserverMock = $this->getMockBuilder(Varien_Event::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCreditmemo'))
+            ->getMock();
+
+        $creditMemoMock = $this->getMockBuilder(Mage_Sales_Model_Order_Creditmemo::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getOrder', 'getAllItems'))
+            ->getMock();
+
+        $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getCustomerEmail'))
+            ->getMock();
+
+        $requestMock = $this->getMockBuilder(Mage_Core_Controller_Request_Http::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getParam'))
+            ->getMock();
+
+        $subscriberMock = $this->getMockBuilder(Mage_Newsletter_Model_Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('loadByCustomer'))
+            ->getMock();
+
+        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('unsubscribeMember'))
+            ->getMock();
+
+        $observerMock->expects($this->once())->method('getEvent')->willReturn($eventObserverMock);
+        $eventObserverMock->expects($this->once())->method('getCreditmemo')->willReturn($creditMemoMock);
+        $creditMemoMock->expects($this->once())->method('getOrder')->willReturn($orderMock);
+        $mailchimpObserverMock->expects($this->once())->method('getRequest')->willReturn($requestMock);
+        $mailchimpObserverMock->expects($this->once())->method('makeHelper')->willReturn($helperMock);
+        $requestMock
+            ->expects($this->once())
+            ->method('getParam')
+            ->with('mailchimp_unsubscribe')
+            ->willReturn($mailchimpUnsubscribe);
+
+        $mailchimpObserverMock->createCreditmemo($observerMock);
+    }
+
     public function testCancelCreditMemo()
     {
         $isBundle = false;
