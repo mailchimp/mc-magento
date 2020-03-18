@@ -779,7 +779,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
     /**
      * If "unsubscribe" checkbox is checked, ubsubscribes the customer.
-     * 
+     *
      * @param  Varien_Event_Observer $observer
      * @return Varien_Event_Observer
      */
