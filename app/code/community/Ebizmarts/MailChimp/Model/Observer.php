@@ -787,7 +787,6 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         $creditMemo = $observer->getEvent()->getCreditmemo();
         $order = $creditMemo->getOrder();
-        $storeId = $order->getStoreId();
         $helper = $this->makeHelper();
         $mailchimpUnsubscribe = $this->getRequest()->getParam('mailchimp_unsubscribe');
         
