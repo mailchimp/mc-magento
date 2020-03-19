@@ -790,7 +790,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $helper = $this->makeHelper();
         $mailchimpUnsubscribe = $this->getRequest()->getParam('mailchimp_unsubscribe');
 
-        if ($mailchimpUnsubscribe == "on") {
+        if ($this->isUnsubscribeChecked($mailchimpUnsubscribe)) {
             $email = $order->getCustomerEmail();
             $subscriberModel = $this->getSubscriberModel();
             $subscriber = $subscriberModel->loadByEmail($email);
@@ -1207,6 +1207,18 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $subscriber;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function isUnsubscribeChecked($mailchimpUnsubscribe)
+    {
+        if ($mailchimpUnsubscribe === 'on') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
