@@ -1875,25 +1875,26 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $mailchimpUnsubscribe = '';
 
         $this->_observerMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getEvent')
             ->willReturn($this->_eventObserverMock);
         $this->_eventObserverMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getCreditmemo')
             ->willReturn($this->_creditMemoMock);
         $this->_creditMemoMock
-            ->expects($this->once())
+            ->expects($this->never())
             ->method('getOrder')
             ->willReturn($this->_orderMock);
+        $this->_mailchimpObserverMock
+            ->expects($this->never())
+            ->method('makeHelper')
+            ->willReturn($this->_helperMock);
+
         $this->_mailchimpObserverMock
             ->expects($this->once())
             ->method('getRequest')
             ->willReturn($this->_requestMock);
-        $this->_mailchimpObserverMock
-            ->expects($this->once())
-            ->method('makeHelper')
-            ->willReturn($this->_helperMock);
         $this->_requestMock
             ->expects($this->once())
             ->method('getParam')

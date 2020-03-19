@@ -785,13 +785,14 @@ class Ebizmarts_MailChimp_Model_Observer
      */
     public function createCreditmemo($observer)
     {
-        $creditMemo = $observer->getEvent()->getCreditmemo();
-        $order = $creditMemo->getOrder();
-        $helper = $this->makeHelper();
         $mailchimpUnsubscribe = $this->getRequest()->getParam('mailchimp_unsubscribe');
 
         if ($this->isUnsubscribeChecked($mailchimpUnsubscribe)) {
+            $creditMemo = $observer->getEvent()->getCreditmemo();
+            $helper = $this->makeHelper();
+            $order = $creditMemo->getOrder();
             $email = $order->getCustomerEmail();
+            
             $subscriberModel = $this->getSubscriberModel();
             $subscriber = $subscriberModel->loadByEmail($email);
             $helper->unsubscribeMember($subscriber);
