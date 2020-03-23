@@ -390,21 +390,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param       $scopeId
-     * @param null  $scope
-     * @return mixed
-     * @throws Mage_Core_Exception
-     */
-    public function getWebhookDeleteAction($scopeId, $scope = null)
-    {
-        return $this->getConfigValueForScope(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_UNSUBSCRIBE,
-            $scopeId,
-            $scope
-        );
-    }
-
-    /**
      * Get local store_id value of the MC store for given scope.
      *
      * @param       $scopeId
@@ -699,23 +684,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return $this->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_TWO_WAY_SYNC,
-            $scopeId,
-            $scope
-        );
-    }
-
-    /**
-     * Get webhook Id.
-     *
-     * @param int   $scopeId
-     * @param null  $scope
-     * @return mixed
-     * @throws Mage_Core_Exception
-     */
-    public function getWebhookId($scopeId = 0, $scope = null)
-    {
-        return $this->getConfigValueForScope(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID,
             $scopeId,
             $scope
         );
@@ -1036,17 +1004,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $logEnabled;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWebhooksKey()
-    {
-        $crypt = hash('md5', (string)$this->getConfig()->getNode('global/crypt/key'));
-        $key = substr($crypt, 0, (strlen($crypt) / 2));
-
-        return $key;
     }
 
     /**
@@ -2754,197 +2711,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $customer;
-    }
-
-    /**
-     * @param           $scopeId
-     * @param string    $scope
-     */
-    public function handleWebhookChange($scopeId, $scope = 'stores')
-    {
-        $webhookScope = $this->getRealScopeForConfig(
-            Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
-            $scopeId,
-            $scope
-        );
-        $listId = $this->getGeneralList($scopeId, $scope);
-        $this->deleteCurrentWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
-
-        if ($this->isSubscriptionEnabled($scopeId, $scope)) {
-            $this->createNewWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
-        }
-    }
-
-    /**
-     * @param $scopeId
-     * @param $scope
-     * @param $listId
-     * @throws Mage_Core_Exception
-     */
-    protected function deleteCurrentWebhook($scopeId, $scope, $listId)
-    {
-        try {
-            $api = $this->getApi($scopeId, $scope);
-            $webhookId = $this->getWebhookId($scopeId, $scope);
-            $apiKey = $this->getApiKey($scopeId, $scope);
-
-            if ($webhookId && $apiKey && $listId) {
-                try {
-                    $api->getLists()->getWebhooks()->delete($listId, $webhookId);
-                } catch (MailChimp_Error $e) {
-                    $this->logError($e->getFriendlyMessage());
-                } catch (Exception $e) {
-                    $this->logError($e->getMessage());
-                }
-
-                $this->getConfig()
-                    ->deleteConfig(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $scope, $scopeId);
-            } else {
-                $webhookUrl = $this->getWebhookUrl($scopeId, $scope);
-                try {
-                    if ($listId) {
-                        $this->_deletedWebhooksByListId($api, $listId, $webhookUrl);
-                    }
-                } catch (MailChimp_Error $e) {
-                    $this->logError($e->getFriendlyMessage());
-                } catch (Exception $e) {
-                    $this->logError($e->getMessage());
-                }
-            }
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage());
-        }
-    }
-
-    protected function _deletedWebhooksByListId($api, $listId, $webhookUrl)
-    {
-        $webhooks = $api->getLists()->getWebhooks()->getAll($listId);
-
-        foreach ($webhooks['webhooks'] as $webhook) {
-            if (strpos($webhook['url'], $webhookUrl) !== false) {
-                $this->deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
-            }
-        }
-    }
-
-    /**
-     * @param $apiWebhook
-     * @param $listId
-     * @param $webhookId
-     */
-    public function deleteWebhookFromList($apiWebhook, $listId, $webhookId)
-    {
-        $apiWebhook->delete($listId, $webhookId);
-    }
-
-    /**
-     * Returns true on successful creation, or error message if it fails
-     */
-    public function createNewWebhook($scopeId, $scope, $listId)
-    {
-        $hookUrl = $this->getWebhookUrl();
-
-        try {
-            $api = $this->getApi($scopeId, $scope);
-
-            if ($this->getTwoWaySyncEnabled($scopeId, $scope)) {
-                $events = array(
-                    'subscribe' => true,
-                    'unsubscribe' => true,
-                    'profile' => false,
-                    'cleaned' => true,
-                    'upemail' => true,
-                    'campaign' => false
-                );
-                $sources = array(
-                    'user' => true,
-                    'admin' => true,
-                    'api' => true
-                );
-            } else {
-                $events = array(
-                    'subscribe' => true,
-                    'unsubscribe' => true,
-                    'profile' => false,
-                    'cleaned' => false,
-                    'upemail' => false,
-                    'campaign' => false
-                );
-                $sources = array(
-                    'user' => true,
-                    'admin' => true,
-                    'api' => false
-                );
-            }
-
-            try {
-                $response = $api->getLists()->getWebhooks()->getAll($listId);
-                $createWebhook = true;
-
-                if (isset($response['total_items']) && $response['total_items'] > 0) {
-                    foreach ($response['webhooks'] as $webhook) {
-                        if ($webhook['url'] == $hookUrl) {
-                            $createWebhook = false;
-                            break;
-                        }
-                    }
-                }
-
-                if ($createWebhook) {
-                    $newWebhook = $api->getLists()->getWebhooks()->add($listId, $hookUrl, $events, $sources);
-                    $newWebhookId = $newWebhook['id'];
-                    $configValues = array(array(Ebizmarts_MailChimp_Model_Config::GENERAL_WEBHOOK_ID, $newWebhookId));
-                    $this->saveMailchimpConfig($configValues, $scopeId, $scope);
-
-                    return true;
-                } else {
-                    return $this->__('The webhook already exists.');
-                }
-            } catch (MailChimp_Error $e) {
-                $errorMessage = $e->getFriendlyMessage();
-                $this->logError($errorMessage);
-                $textToCompare = 'The resource submitted could not be validated. '
-                    . 'For field-specific details, see the \'errors\' array.';
-
-                if ($e->getMailchimpDetails() == $textToCompare) {
-                    $errorMessage = 'Your store could not be accessed by MailChimp\'s Api. '
-                        . 'Please confirm the URL: ' . $hookUrl
-                        . ' is accessible externally to allow the webhook creation.';
-                    $this->logError($errorMessage);
-                }
-
-                return $this->__($errorMessage);
-            } catch (Exception $e) {
-                $this->logError($e->getMessage());
-            }
-        } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
-            $this->logError($e->getMessage());
-        }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getWebhookUrl()
-    {
-        $store = $this->getMageApp()->getDefaultStoreView();
-        $webhooksKey = $this->getWebhooksKey();
-        //Generating Webhooks URL
-        $url = Ebizmarts_MailChimp_Model_ProcessWebhook::WEBHOOKS_PATH;
-        $hookUrl = $store->getUrl(
-            $url,
-            array(
-                'wkey' => $webhooksKey,
-                '_nosid' => true,
-                '_secure' => true,
-            )
-        );
-
-        if (false != strstr($hookUrl, '?', true)) {
-            $hookUrl = strstr($hookUrl, '?', true);
-        }
-
-        return $hookUrl;
     }
 
     /**

@@ -39,6 +39,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected $_mcDateHelper;
     /**
+     * @var Ebizmarts_MailChimp_Helper_Webhook
+     */
+    protected $_mcWebhookHelper;
+    /**
      * @var Mage_Sales_Model_Order
      */
     protected $_lastOrder;
@@ -52,6 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     {
         $this->setMailChimpHelper();
         $this->setMailChimpDateHelper();
+        $this->setMailChimpWebhookHelper();
 
         $this->_interestGroupHandle = Mage::getModel('mailchimp/api_subscribers_InterestGroupHandle');
     }
@@ -272,7 +277,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      */
     protected function _addSubscriberData($subscriber, $fname, $lname, $email, $listId)
     {
-        $helper = $this->getHelper();
+        $helper = $this->getMailchimpHelper();
+        $webhookHelper = $this->getMailchimpWebhookHelper();
         $scopeArray = $helper->getFirstScopeFromConfig(
             Ebizmarts_MailChimp_Model_Config::GENERAL_LIST,
             $listId
@@ -293,7 +299,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
             if ($member['status'] == 'subscribed') {
                 $helper->subscribeMember($subscriber);
             } else if ($member['status'] == 'unsubscribed') {
-                if (!$helper->getWebhookDeleteAction($subscriber->getStoreId())) {
+                if (!$webhookHelper->getWebhookDeleteAction($subscriber->getStoreId())) {
                     $helper->unsubscribeMember($subscriber);
                 }
             }
@@ -782,6 +788,22 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     protected function setMailChimpDateHelper()
     {
         $this->_mcDateHelper = Mage::helper('mailchimp/date');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Webhook
+     */
+    public function getMailchimpWebhookHelper()
+    {
+        return $this->_mcWebhookHelper;
+    }
+
+    /**
+     * @param $mageMCWebhookHelper
+     */
+    protected function setMailChimpWebhookHelper()
+    {
+        $this->_mcWebhookHelper = Mage::helper('mailchimp/webhook');
     }
 
     /**
