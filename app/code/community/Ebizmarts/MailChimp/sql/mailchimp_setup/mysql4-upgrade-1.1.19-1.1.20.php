@@ -61,13 +61,7 @@ try {
                 ->getApi($webhook['store_id'])
                 ->lists
                 ->webhooks
-                ->edit(
-                    $webhook['list_id'], 
-                    $webhook['webhook_id'], 
-                    null, 
-                    $events, 
-                    $sources
-                );
+                ->edit($webhook['list_id'], $webhook['webhook_id'], null, $events, $sources);
         }
     }
 } catch (Exception $e) {

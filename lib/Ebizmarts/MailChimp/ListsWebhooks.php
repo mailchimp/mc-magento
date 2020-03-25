@@ -55,11 +55,9 @@ class MailChimp_ListsWebhooks extends MailChimp_Abstract
             $_params['sources'] = $sources;
         }
 
-        return $this->_master->call(
-            'lists/' . $listId . '/webhooks/' . $webhookId, 
-            $_params, 
-            Ebizmarts_MailChimp::PATCH
-        );
+        $urlCall = 'lists/' . $listId . '/webhooks/' . $webhookId;
+
+        return $this->_master->call($urlCall, $_params, Ebizmarts_MailChimp::PATCH);
     }
 
     /**
