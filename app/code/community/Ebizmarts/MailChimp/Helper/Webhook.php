@@ -19,7 +19,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
 
     public function __construct()
     {
-        $this->_helper = Mage::getHelper('mailchimp');
+        $this->_helper = Mage::helper('mailchimp');
     }
 
     /**

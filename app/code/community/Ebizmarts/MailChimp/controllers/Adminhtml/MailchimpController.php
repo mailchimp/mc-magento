@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     public function preDispatch()
     {
         $this->_helper = $this->makeHelper();
-        $this->_helper = $this->makeWebhookHelper();
+        $this->_webhookHelper = $this->makeWebhookHelper();
         return parent::preDispatch();
     }
 
