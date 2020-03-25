@@ -10,7 +10,7 @@
  * @date:     3/20/2020 11:14 AM
  * @file:     Webhook.php
  */
-class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
+class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
 {
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $scope
         );
         $listId = $helper->getGeneralList($scopeId, $scope);
-        $helper->deleteCurrentWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
+        $this->deleteCurrentWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);
 
         if ($helper->isSubscriptionEnabled($scopeId, $scope)) {
             $this->createNewWebhook($webhookScope['scope_id'], $webhookScope['scope'], $listId);

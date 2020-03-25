@@ -39,7 +39,7 @@ class MailChimp_ListsWebhooks extends MailChimp_Abstract
         return $this->_master->call('lists/' . $listId . '/webhooks', $_params, Ebizmarts_MailChimp::POST);
     }
 
-    public function edit($listId, $wrbhookId, $url = null, $events = null, $sources = null)
+    public function edit($listId, $webhookId, $url = null, $events = null, $sources = null)
     {
         $_params = array();
 
@@ -56,7 +56,7 @@ class MailChimp_ListsWebhooks extends MailChimp_Abstract
         }
 
         return $this->_master->call(
-            'lists/' . $listId . '/webhooks/' . $wrbhookId, 
+            'lists/' . $listId . '/webhooks/' . $webhookId, 
             $_params, 
             Ebizmarts_MailChimp::PATCH
         );

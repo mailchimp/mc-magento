@@ -3,54 +3,71 @@
 $installer = $this;
 
 try {
-    /* Mailchimp field change and migration */
-    $installer->run(
-        "ALTER TABLE `{$this->getTable('mailchimp_stores')}`
-        CHANGE COLUMN `apikey` `apikey` VARCHAR(128) NOT NULL;"
-    );
+    $webhookStores = array();
 
-    $installer->run(
-        "TRUNCATE `{$this->getTable('mailchimp_stores')}`;"
-    );
-
+    /* Check if webhook is created */
     $configDataCollection = Mage::getModel('core/config_data')
         ->getCollection()
-        ->addFieldToFilter('path', 'mailchimp/general/apikey');
+        ->addFieldToFilter('path', 'mailchimp/general/webhook_active')
+        ->addFieldToFilter('value', '1');
 
-    $mailchimpShards = array('us');
     foreach ($configDataCollection as $data) {
-        $dbApiKey = $data->getValue();
-        foreach ($mailchimpShards as $shard) {
-            if (strpos($dbApiKey, "-$shard") !== false) {
-                list($hash, $server) = explode("-$shard", $dbApiKey);
-                if (is_numeric($server) && strlen($hash) === 32) {
-                    $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
-                    $installer->setConfigData(
-                        'mailchimp/general/apikey',
-                        $encryptedApiKey,
-                        $data->getScope(),
-                        $data->getScopeId()
-                    );
+        $webhookStores []= $data->getScopeId();
+    }
+
+    /* If webhook is created, edites it and place the new "event" variable */
+    if (!empty($webhookStores)) {
+        $webhookData = array();
+        $webhookIds = array();
+        $helper = Mage::helper('mailchimp');
+
+        // Get all the Webhooks ID related to the Stores.
+        $configDataCollection = Mage::getModel('core/config_data')
+            ->getCollection()
+            ->addFieldToFilter('path', 'mailchimp/general/webhook_id')
+            ->addFieldToFilter('scope_id', array('in' => $webhookStores));
+
+        foreach ($configDataCollection as $data) {
+            foreach ($webhookData as $webhook) {
+                if ($webhook['store_id'] == $data->getScopeId()) {
+                    $webhook ['webhook_id'] = $data->getValue();
                 }
             }
         }
-    }
 
-    /* Mandrill migration */
-    $configDataCollection = Mage::getModel('core/config_data')
-        ->getCollection()
-        ->addFieldToFilter('path', 'mandrill/general/apikey');
+        foreach ($webhookStores as $storeId) {
+            $listId = $helper->getGeneralList($storeId);
+            $webhookData []= array('list_id' => $listId, 'store_id' => $storeId);
+        }
 
-    foreach ($configDataCollection as $data) {
-        $dbApiKey = $data->getValue();
-        if (strlen($dbApiKey) == 22) {
-            $encryptedApiKey = Mage::helper('core')->encrypt($dbApiKey);
-            $installer->setConfigData(
-                'mandrill/general/apikey',
-                $encryptedApiKey,
-                $data->getScope(),
-                $data->getScopeId()
-            );
+        $events = array(
+            'subscribe' => true,
+            'unsubscribe' => true,
+            'profile' => true,
+            'cleaned' => true,
+            'upemail' => true,
+            'campaign' => false
+        );
+
+        $sources = array(
+            'user' => true,
+            'admin' => true,
+            'api' => false
+        );
+
+        // Edits the webhooks through API.
+        foreach ($webhookData as $webhook) {
+            $helper
+                ->getApi($webhook['store_id'])
+                ->lists
+                ->webhooks
+                ->edit(
+                    $webhook['list_id'], 
+                    $webhook['webhook_id'], 
+                    null, 
+                    $events, 
+                    $sources
+                );
         }
     }
 } catch (Exception $e) {
