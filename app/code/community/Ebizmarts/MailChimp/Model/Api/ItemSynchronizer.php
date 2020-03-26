@@ -21,6 +21,42 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
      */
     protected $_mailchimpDateHelper;
 
+    /**
+     * @return mixed
+     */
+    public function getMailchimpStoreId()
+    {
+        return $this->_mailchimpStoreId;
+    }
+
+    /**
+     * @param mixed $mailchimpStoreId
+     */
+    public function setMailchimpStoreId($mailchimpStoreId)
+    {
+        $this->_mailchimpStoreId = $mailchimpStoreId;
+    }
+
+    protected $_mailchimpStoreId;
+
+    protected $_magentoStoreId;
+
+    /**
+     * @return mixed
+     */
+    public function getMagentoStoreId()
+    {
+        return $this->_magentoStoreId;
+    }
+
+    /**
+     * @param mixed $magentoStoreId
+     */
+    public function setMagentoStoreId($magentoStoreId)
+    {
+        $this->_magentoStoreId = $magentoStoreId;
+    }
+
     public function __construct()
     {
         $this->_mailchimpHelper = Mage::helper('mailchimp');
@@ -29,7 +65,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     /**
      * @param $id
-     * @param $mailchimpStoreId
      * @param null $syncDelta
      * @param null $syncError
      * @param int $syncModified
@@ -42,7 +77,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
      */
     protected function _updateSyncData(
         $id,
-        $mailchimpStoreId,
         $syncDelta = null,
         $syncError = null,
         $syncModified = 0,
@@ -55,20 +89,12 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
     ) {
         $type = $this->getItemType();
 
-        if ($syncError !== null) {
-            $this->logSyncError(
-                "Update Sync Data error: " . $syncError,
-                $type,
-                $mailchimpStoreId
-            );
-        }
-
         if (!empty($type)) {
             $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
             $ecommerceSyncData->saveEcommerceSyncData(
                 $id,
                 $type,
-                $mailchimpStoreId,
+                $this->getMailchimpStoreId(),
                 $syncDelta,
                 $syncError,
                 $syncModified,
@@ -82,11 +108,10 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         }
     }
 
-    protected function addDeletedRelatedId($id, $mailchimpStoreId, $relatedId)
+    protected function addDeletedRelatedId($id, $relatedId)
     {
         $this->_updateSyncData(
             $id,
-            $mailchimpStoreId,
             null,
             null,
             0,
@@ -101,36 +126,46 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     protected function addSyncDataError(
         $id,
-        $mailchimpStoreId,
         $error,
         $token = null,
         $saveOnlyIfExists = false,
         $syncDelta = null
     ) {
+        $type = $this->getItemType();
+
+        $this->logSyncError(
+            $error,
+            $type,
+            $this->getMagentoStoreId(),
+            'magento_side_error',
+            'Invalid Magento Resource',
+            0,
+            $id,
+            0
+        );
+
         $this->_updateSyncData(
             $id,
-            $mailchimpStoreId,
             $syncDelta,
             $error,
             0,
             null,
-            null,
+            0,
             $token,
             $saveOnlyIfExists,
             -1
         );
     }
 
-    protected function addSyncData($id, $mailchimpStoreId)
+    protected function addSyncData($id)
     {
-        $this->_updateSyncData($id, $mailchimpStoreId);
+        $this->_updateSyncData($id);
     }
 
-    protected function addSyncDataToken($id, $mailchimpStoreId, $token)
+    protected function addSyncDataToken($id, $token)
     {
         $this->_updateSyncData(
             $id,
-            $mailchimpStoreId,
             null,
             null,
             0,
@@ -140,22 +175,15 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         );
     }
 
-    protected function markSyncDataAsModified($id, $mailchimpStoreId)
+    protected function markSyncDataAsModified($id)
     {
-        $this->_updateSyncData(
-            $id,
-            $mailchimpStoreId,
-            null,
-            null,
-            1
-        );
+        $this->_updateSyncData($id, null, null, 1);
     }
 
-    protected function markSyncDataAsDeleted($id, $mailchimpStoreId, $syncedFlag = null)
+    protected function markSyncDataAsDeleted($id, $syncedFlag = null)
     {
         $this->_updateSyncData(
             $id,
-            $mailchimpStoreId,
             null,
             null,
             0,
@@ -166,31 +194,29 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     /**
      * @param $error
-     * @param null $mailchimpStoreId
-     * @param string $type
-     * @param null $title
-     * @param null $status
-     * @param null $originalId
-     * @param int $batchId
-     * @param null $storeId
-     * @param null $regType
+     * @param $type
+     * @param $title
+     * @param $status
+     * @param $originalId
+     * @param $batchId
+     * @param $storeId
+     * @param $regType
      */
     protected function logSyncError(
         $error,
-        $regType = null,
-        $mailchimpStoreId = null,
-        $storeId = null,
-        $type = 'magento_side_error',
-        $title = null,
-        $status = null,
-        $originalId = null,
-        $batchId = -1
+        $regType,
+        $storeId,
+        $type,
+        $title,
+        $status,
+        $originalId,
+        $batchId
     ) {
         $this->getHelper()->logError($error);
 
         try {
             $this->_logMailchimpError(
-                $error, $mailchimpStoreId, $type, $title,
+                $error, $type, $title,
                 $status, $originalId, $batchId, $storeId, $regType
             );
         } catch (Exception $e) {
@@ -200,7 +226,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     /**
      * @param $error
-     * @param $mailchimpStoreId
      * @param $type
      * @param $title
      * @param $status
@@ -213,7 +238,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
      */
     protected function _logMailchimpError(
         $error,
-        $mailchimpStoreId,
         $type,
         $title,
         $status,
@@ -232,7 +256,7 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         $mailchimpErrors->setOriginalId($originalId);
         $mailchimpErrors->setBatchId($batchId);
         $mailchimpErrors->setStoreId($storeId);
-        $mailchimpErrors->setMailchimpStoreId($mailchimpStoreId);
+        $mailchimpErrors->setMailchimpStoreId($this->getMailchimpStoreId());
 
         $mailchimpErrors->save();
     }
@@ -263,11 +287,11 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
     }
 
     /**
-     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata
+     * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
      */
     public function getMailchimpEcommerceSyncDataModel()
     {
-        return Mage::getModel('mailchimp/ecommercesyncdata');
+        return new Ebizmarts_MailChimp_Model_Ecommercesyncdata();
     }
 
     /**

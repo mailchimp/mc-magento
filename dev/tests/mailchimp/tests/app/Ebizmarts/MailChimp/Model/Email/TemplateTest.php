@@ -90,7 +90,8 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
             ->expects($this->exactly(2))
             ->method('getSenderEmail')
             ->willReturnOnConsecutiveCalls($senderEmail, $senderEmail);
-        $templateMock->expects($this->once())->method('getMail')->willReturn($mailObjectMock);
+        $templateMock->expects($this->exactly(3))->method('getMail')
+            ->willReturnOnConsecutiveCalls($mailObjectMock, $mailObjectMock, $mailObjectMock);
 
         $mailObjectMock->expects($this->once())->method('getBcc')->willReturn($bcc);
 

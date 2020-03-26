@@ -86,21 +86,27 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </account_details>
-                        <reset_errors>
+                        <reset_errors translate="comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resetErrors</frontend_model>
                             <sort_order>42</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>
+                                <model>mailchimp/adminhtml_reseterrors_comment</model>
+                            </comment>
                         </reset_errors>
-                        <resend_subscriber>
+                        <resend_subscriber translate ="comment">
                             <frontend_type>button</frontend_type>
                             <frontend_model>mailchimp/adminhtml_system_config_resendSubscribers</frontend_model>
                             <sort_order>44</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <comment>
+                                <model>mailchimp/adminhtml_resendsubscribers_comment</model>
+                            </comment>
                         </resend_subscriber>
                         <list translate="label comment">
                             <label>General Subscription</label>
@@ -361,7 +367,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[This will not affect the behaviour of Automations.]]></comment>
+                            <comment>
+                                <model>mailchimp/adminhtml_resendecommercedata_comment</model>
+                            </comment>
                             <depends>
                                 <active>1</active>
                             </depends>

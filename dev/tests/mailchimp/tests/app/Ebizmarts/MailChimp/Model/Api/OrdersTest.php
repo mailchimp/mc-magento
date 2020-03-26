@@ -26,12 +26,22 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $batchArray = array();
 
         $ordersApiMock = $this->_ordersApiMock
-            ->setMethods(array('getHelper', '_getModifiedOrders', '_getNewOrders', 'getDateHelper'))
+            ->setMethods(
+                array(
+                        'getMailchimpStoreId', 'getMagentoStoreId', 'createEcommerceOrdersCollection',
+                        'getHelper', '_getModifiedOrders', '_getNewOrders', 'getDateHelper'
+                    )
+            )->getMock();
+
+        $ordersCollectionResourceMock =
+            $this->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('setMailchimpStoreId', 'setStoreId'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getEcommerceFirstDate', 'getResendTurn'))
+            ->setMethods(array('getEcommerceFirstDate', 'getResendTurn', 'getCurrentStoreId', 'setCurrentStore'))
             ->getMock();
 
         $helperDateMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Date::class)
@@ -39,25 +49,35 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->setMethods(array('getDateMicrotime'))
             ->getMock();
 
+        $ordersApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn($mailchimpStoreId);
+        $ordersApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn($magentoStoreId);
+
+        $ordersApiMock->expects($this->once())->method('createEcommerceOrdersCollection')
+            ->willReturn($ordersCollectionResourceMock);
+
+        $ordersCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
+        $ordersCollectionResourceMock->expects($this->once())->method('setStoreId')->with($magentoStoreId);
+
         $ordersApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $ordersApiMock->expects($this->once())->method('getDateHelper')->willReturn($helperDateMock);
-        $ordersApiMock
-            ->expects($this->once())
-            ->method('_getModifiedOrders')
-            ->with($mailchimpStoreId, $magentoStoreId)
-            ->willReturn($batchArray);
-        $ordersApiMock
-            ->expects($this->once())
-            ->method('_getNewOrders')
-            ->with($mailchimpStoreId, $magentoStoreId)
-            ->willReturn($batchArray);
+
+        $helperMock->expects($this->once())->method('getCurrentStoreId')->willReturn($magentoStoreId);
+        $helperMock->expects($this->exactly(2))->method('setCurrentStore')
+            ->withConsecutive(
+                array($magentoStoreId),
+                array($magentoStoreId)
+            );
+
+        $helperMock->expects($this->once())->method('getEcommerceFirstDate')
+            ->with($magentoStoreId)->willReturn(null);
 
         $helperDateMock->expects($this->once())->method('getDateMicrotime')->willReturn('00-00-00 00:00:00');
-
-        $helperMock->expects($this->once())->method('getEcommerceFirstDate')->with($magentoStoreId)->willReturn(null);
         $helperMock->expects($this->once())->method('getResendTurn')->with($magentoStoreId)->willReturn(null);
 
-        $ordersApiMock->createBatchJson($mailchimpStoreId, $magentoStoreId);
+        $ordersApiMock->expects($this->once())->method('_getModifiedOrders')->willReturn($batchArray);
+        $ordersApiMock->expects($this->once())->method('_getNewOrders')->willReturn($batchArray);
+
+        $ordersApiMock->createBatchJson();
     }
 
     /**
@@ -155,13 +175,12 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
     public function testGeneratePOSTPayload()
     {
-        $mailchimpStoreId = '44a100c71040d4ec27fd707d7c667114';
         $magentoStoreId = 1;
         $statusArray = array('financial_status' => '', 'fulfillment_status' => '');
         $customerEmail = 'test@ebizmarts.com';
         $customerFirstName = 'testFirstName';
         $billingAddressStreet = array('billingAddress1', 'billingAddress2');
-        $currentDate = Mage::getSingleton('core/date');
+        $currentDate = now();
 
         $lines['itemsCount'] = 9;
         $lines['lines'][] = array(
@@ -173,8 +192,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             "discount" => 9
         );
 
+        $orderId = 12;
         $data = array();
-        $data['id'] = '12';
+        $data['id'] = $orderId;
         $data['currency_code'] = "USD";
         $data['order_total'] = 100;
         $data['tax_total'] = 3;
@@ -198,6 +218,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock = $this->_ordersApiMock
             ->setMethods(
                 array(
+                    'getMagentoStoreId',
                     '_getPayloadData', '_getPayloadDataLines', '_getPayloadBilling',
                     '_getPayloadShipping', 'getCustomerModel', 'getStoreModelFromMagentoStoreId',
                     'getSubscriberModel'
@@ -209,10 +230,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->disableOriginalConstructor()
             ->setMethods(array('getOptIn', 'loadByEmail', 'subscribe', 'getSubscriberId'))
             ->getMock();
-
-        $ordersApiMock->expects($this->once())
-            ->method('getSubscriberModel')
-            ->willReturn($subscriberMock);
 
         $orderMock = $this->getMockBuilder(Mage_Sales_Model_Order::class)
             ->disableOriginalConstructor()
@@ -228,14 +245,23 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             )
             ->getMock();
 
+        $billingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getStreet'))
+            ->getMock();
+
+        $ordersApiMock->expects($this->once())
+            ->method('getMagentoStoreId')
+            ->willReturn($magentoStoreId);
+
         $ordersApiMock->expects($this->once())
             ->method('_getPayloadData')
-            ->with($orderMock, $magentoStoreId)
+            ->with($orderMock)
             ->willReturn($data);
 
         $ordersApiMock->expects($this->once())
             ->method('_getPayloadDataLines')
-            ->with($orderMock, $mailchimpStoreId, $magentoStoreId)
+            ->with($orderMock)
             ->willReturn($lines);
 
         $orderMock->expects($this->exactly(4))
@@ -247,13 +273,13 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
                 $customerEmail
             );
 
-        $subscriberMock->expects($this->once())
-            ->method('getOptIn')->with($magentoStoreId)
-            ->willReturn(true);
-
         $ordersApiMock->expects($this->once())
             ->method('getSubscriberModel')
             ->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())
+            ->method('getOptIn')->with($magentoStoreId)
+            ->willReturn(true);
 
         $subscriberMock->expects($this->once())
             ->method('loadByEmail')->with($customerEmail)
@@ -267,13 +293,9 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('subscribe')->with($customerEmail);
 
         $storeMock = $this->getMockBuilder(Mage_Core_Model_Resource_Store::class)
+            ->disableOriginalConstructor()
             ->setMethods(array('getUrl'))
             ->getMock();
-
-        $ordersApiMock->expects($this->once())
-            ->method('getStoreModelFromMagentoStoreId')
-            ->with($magentoStoreId)
-            ->willReturn($storeMock);
 
         $ordersApiMock->expects($this->once())
             ->method('getStoreModelFromMagentoStoreId')
@@ -285,20 +307,20 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->with(
                 'sales/order/view/',
                 array(
-                    'order_id' => null,
+                    'order_id' => $orderId,
                     '_nosid' => true,
                     '_secure' => true
                 )
             )
             ->willReturn('http://somedomain.com');
 
+        $orderMock->expects($this->once())
+            ->method('getId')
+            ->willReturn($orderId);
+
         $orderMock->expects($this->exactly(2))
             ->method('getCustomerFirstname')
             ->willReturnOnConsecutiveCalls($customerFirstName, $customerFirstName);
-
-        $billingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
-            ->setMethods(array('getStreet'))
-            ->getMock();
 
         $orderMock->expects($this->once())
             ->method('getBillingAddress')
@@ -320,12 +342,17 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getShippingAddress')
             ->willReturn($shippingAddressMock);
 
-        $ordersApiMock->GeneratePOSTPayload($orderMock, $mailchimpStoreId, $magentoStoreId);
+        $ordersApiMock->expects($this->once())
+            ->method('_getPayloadShipping')
+            ->with($data, $shippingAddressMock);
+
+        $ordersApiMock->GeneratePOSTPayload($orderMock);
     }
 
     public function testShouldSendCampaignId()
     {
         $mailchimpCampaignId = 'ddf1830cf9';
+        $orderId = 1;
         $magentoStoreId = '1';
         $listId = 'c7ce5a3c4e';
         $apiKey = 'asdasdqweqweqwedasd484848asd15';
@@ -338,7 +365,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         );
 
         $ordersApiMock = $this->_ordersApiMock
-            ->setMethods(array('getHelper'))
+            ->setMethods(array('getHelper', 'getMagentoStoreId'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
@@ -357,6 +384,10 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->getMock();
 
         $ordersApiMock->expects($this->once())
+            ->method('getMagentoStoreId')
+            ->willReturn($magentoStoreId);
+
+        $ordersApiMock->expects($this->once())
             ->method('getHelper')
             ->willReturn($helperMock);
 
@@ -364,10 +395,12 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->method('getGeneralList')
             ->with($magentoStoreId)
             ->willReturn($listId);
+
         $helperMock->expects($this->once())
             ->method('getApiKey')
             ->with($magentoStoreId)
             ->willReturn($apiKey);
+
         $helperMock->expects($this->once())
             ->method('getApi')
             ->with($magentoStoreId)
@@ -382,6 +415,6 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             ->with($mailchimpCampaignId, 'recipients')
             ->willReturn($campaignData);
 
-        $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId, $magentoStoreId);
+        $ordersApiMock->shouldSendCampaignId($mailchimpCampaignId, $orderId);
     }
 }

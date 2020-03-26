@@ -33,9 +33,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
     const BATCH_STATUS_LOG = 'Mailchimp_Batch_Status.log';
     const BATCH_CANCELED = 'canceled';
-    const BATCH_COMPLETED = 'completed';
     const BATCH_PENDING = 'pending';
-    const BATCH_ERROR = 'error';
 
     protected $_countersSendBatch = array();
     protected $_countersSubscribers = array();
@@ -182,11 +180,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         if (isset($scopeArray['scope'])) {
             switch ($scopeArray['scope']) {
             case 'stores':
-                $store = $this->getMageApp()->getStore($scopeArray[1]);
+                $store = $this->getMageApp()->getStore($scopeArray['scope_id']);
                 $storeName = $store->getName();
                 break;
             case 'websites':
-                $website = $this->getMageApp()->getWebsite($scopeArray[1]);
+                $website = $this->getMageApp()->getWebsite($scopeArray['scope_id']);
                 $storeName = $website->getName();
                 break;
             case 'default':
@@ -1105,7 +1103,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         $where[] = $connection->quoteInto("mailchimp_store_id = ?", $mailchimpStoreId);
 
         if ($filters !== null) {
-            $where[] = $connection->quoteInto('type IN (?)', $filters);
+            $where[] = $connection->quoteInto('regtype IN (?)', $filters);
         }
 
         $connection->delete($tableName, $where);
@@ -3819,7 +3817,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCartAmountLimit()
     {
         return $this->getConfigValueForScope(
-            Ebizmarts_MailChimp_Model_Config::CART_AMOUNT,
+            Ebizmarts_MailChimp_Model_Config::ABANDONEDCART_AMOUNT,
             0,
             'default'
         );
@@ -4466,7 +4464,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
 
             foreach ($interest as $interestId) {
-                $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
+                $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId, null, null, 100);
 
                 foreach ($mailchimpInterest['interests'] as $mi) {
                     $rc[$mi['category_id']]['category'][$mi['display_order']] =
@@ -5088,68 +5086,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return true;
-    }
-
-    /**
-     * @param $itemType
-     * @param $syncDelta
-     * @param $syncError
-     * @param $syncModified
-     * @param $syncDeleted
-     * @param $token
-     * @param $syncedFlag
-     * @param $deletedRelatedId
-     * @param $allowBatchRemoval
-     * @param Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
-     */
-    protected function setEcommerceSyncDataItemValues(
-        $itemType,
-        $syncDelta,
-        $syncError,
-        $syncModified,
-        $syncDeleted,
-        $token,
-        $syncedFlag,
-        $deletedRelatedId,
-        $allowBatchRemoval,
-        Ebizmarts_MailChimp_Model_Ecommercesyncdata $ecommerceSyncDataItem
-    ) {
-        if ($syncDelta) {
-            $ecommerceSyncDataItem->setData("mailchimp_sync_delta", $syncDelta);
-        } elseif ($allowBatchRemoval === true) {
-            $ecommerceSyncDataItem->setData("batch_id", null);
-        }
-
-        if ($allowBatchRemoval === -1) {
-            $ecommerceSyncDataItem->setData("batch_id", '-1');
-        }
-
-        if ($syncError) {
-            $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
-        }
-
-        //Always set modified value to 0 when saving sync delta or errors.
-        $ecommerceSyncDataItem->setData("mailchimp_sync_modified", $syncModified);
-
-        if ($syncDeleted !== null) {
-            $ecommerceSyncDataItem->setData("mailchimp_sync_deleted", $syncDeleted);
-
-            if ($itemType == Ebizmarts_MailChimp_Model_Config::IS_PRODUCT && $syncError == '') {
-                $ecommerceSyncDataItem->setData("mailchimp_sync_error", $syncError);
-            }
-        }
-
-        if ($token) {
-            $ecommerceSyncDataItem->setData("mailchimp_token", $token);
-        }
-
-        if ($deletedRelatedId) {
-            $ecommerceSyncDataItem->setData("deleted_related_id", $deletedRelatedId);
-        }
-
-        if ($syncedFlag !== null) {
-            $ecommerceSyncDataItem->setData("mailchimp_synced_flag", $syncedFlag);
-        }
     }
 
     /**
