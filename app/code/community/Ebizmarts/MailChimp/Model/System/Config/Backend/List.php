@@ -54,7 +54,6 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
 
         if ($apiKey && $moduleIsActive && $valueChanged) {
             $helper->handleWebhookChange($scopeId, $scope);
-            
         }
     }
 
