@@ -706,13 +706,10 @@ class Ebizmarts_MailChimp_Model_Observer
             $onCheckout = ($action == 'saveOrder' || $action == 'savePayment' ||
                 $action == 'saveShippingMethod' || $action == 'saveBilling');
             $emailCookie = $this->getEmailCookie();
-            $mcEidCookie = $this->getMcEidCookie();
 
             if ($emailCookie && $emailCookie != 'none' && !$onCheckout
             ) {
                 $email = $this->getEmailFromPopUp($emailCookie);
-            } elseif ($mcEidCookie) {
-                $email = $this->getEmailFromMcEid($storeId, $mcEidCookie);
             }
 
             if ($quote->getCustomerEmail() != $email && $email !== null) {
@@ -962,23 +959,6 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
-     * @param $helper
-     * @param $storeId
-     * @param $mcEidCookie
-     * @return mixed
-     */
-    protected function getEmailFromMcEid($storeId, $mcEidCookie)
-    {
-        $helper = $this->makeHelper();
-        $mailchimpApi = $helper->getApi($storeId);
-        $listId = $helper->getGeneralList($storeId);
-        $listMember = $mailchimpApi->lists->members->getEmailByMcEid($listId, $mcEidCookie);
-        $email = $listMember['members'][0]['email_address'];
-
-        return $email;
-    }
-
-    /**
      * @param $order
      */
     protected function handleOrderUpdate($order)
@@ -1214,16 +1194,6 @@ class Ebizmarts_MailChimp_Model_Observer
         $emailCookie = Mage::getModel('core/cookie')->get('email');
 
         return $emailCookie;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getMcEidCookie()
-    {
-        $mcEidCookie = Mage::getModel('core/cookie')->get('mailchimp_email_id');
-
-        return $mcEidCookie;
     }
 
     /**

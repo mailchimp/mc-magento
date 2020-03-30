@@ -4464,7 +4464,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $apiInterestCategoryInterest = $apiInterestCategory->getInterests();
 
             foreach ($interest as $interestId) {
-                $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId);
+                $mailchimpInterest = $apiInterestCategoryInterest->getAll($listId, $interestId, null, null, 100);
 
                 foreach ($mailchimpInterest['interests'] as $mi) {
                     $rc[$mi['category_id']]['category'][$mi['display_order']] =

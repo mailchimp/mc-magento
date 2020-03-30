@@ -16,8 +16,15 @@
 class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
 {
     /**
-     * @param array $options
-     * @return array An array with...
+     * @var Mage_HTTP_Client_Curl
+     */
+    protected $_curl;
+    /**
+     * @param $url
+     * @param $httpMethod
+     * @param array $curlOptions
+     * @param array $params
+     * @return array
      */
     public function curlExec($url, $httpMethod, $curlOptions = array(), $params = array())
     {
@@ -30,11 +37,11 @@ class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
         }
 
         $curlError = null;
-        $curl = new Mage_HTTP_Client_Curl();
+        $this->_curl = new Mage_HTTP_Client_Curl();
 
         foreach ($curlOptions as $key => $value) {
             if (isset($value)) {
-                $curl->setOption($key, $value);
+                $this->_curl->setOption($key, $value);
             }
         }
 
@@ -42,16 +49,24 @@ class Ebizmarts_MailChimp_Helper_Curl extends Mage_Core_Helper_Abstract
 
         try {
             if ($httpMethod == Zend_Http_Client::GET) {
-                $curl->get($url);
+                $this->_curl->get($url);
             } elseif ($httpMethod == Zend_Http_Client::POST) {
-                $curl->post($url, $params);
+                $this->_curl->post($url, $params);
             }
 
-            $curlResult = $curl->getBody();
+            $curlResult = $this->_curl->getBody();
         } catch (Exception $e) {
             $curlError = $e->getMessage();
         }
 
         return array('response' => $curlResult, 'error' => $curlError);
+    }
+
+    /**+
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->_curl->getStatus();
     }
 }
