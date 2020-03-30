@@ -473,7 +473,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
          */
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_promocodes_collection');
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_promoCodes_collection');
 
         return $collection;
     }
