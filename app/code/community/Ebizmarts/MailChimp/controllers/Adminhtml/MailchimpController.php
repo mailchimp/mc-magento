@@ -19,8 +19,8 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
 
     public function preDispatch()
     {
-        $this->_helper = $this->makeHelper();
-        $this->_webhookHelper = $this->makeWebhookHelper();
+        $this->_helper = Mage::helper('mailchimp');
+        $this->_webhookHelper = Mage::helper('mailchimp/webhook');
         return parent::preDispatch();
     }
 
@@ -197,11 +197,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function makeHelper()
-    {
-        return Mage::helper('mailchimp');
-    }
-
     protected function getHelper()
     {
         return $this->_helper;
@@ -210,11 +205,6 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpController extends Mage_Adminhtml_C
     /**
      * @return Ebizmarts_MailChimp_Helper_Webhook
      */
-    protected function makeWebhookHelper()
-    {
-        return Mage::helper('mailchimp/webhook');
-    }
-
     protected function getWebhookHelper()
     {
         return $this->_webhookHelper;

@@ -131,6 +131,11 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
         }
     }
 
+    /**
+     * @param $api
+     * @param $listId
+     * @param $webhookUrl
+     */
     protected function _deletedWebhooksByListId($api, $listId, $webhookUrl)
     {
         $webhooks = $api->getLists()->getWebhooks()->getAll($listId);
