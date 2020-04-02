@@ -156,7 +156,7 @@ class Mandrill_Mandrill
         $curlHelper = Mage::helper('mailchimp/curl');
         $this->setCurlOptionsAddOptions($curlOptions);
         $curlFullResponse = $curlHelper->curlExec($url, 'GET', $this->_curlOptions);
-        $info = $curlFullResponse['info'];
+        $info = $curlHelper->getStatus();
         $responseBody = $curlFullResponse['response'];
         $curlError = $curlFullResponse['error'];
         $time = microtime(true) - $start;
@@ -183,7 +183,7 @@ class Mandrill_Mandrill
         }
 
         try {
-            if (floor($info['http_code'] / 100) >= 4) {
+            if (floor($info / 100) >= 4) {
                 throw $this->castError($result);
             }
         } catch (Exception $e) {

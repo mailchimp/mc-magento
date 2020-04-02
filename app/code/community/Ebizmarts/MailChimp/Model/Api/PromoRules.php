@@ -455,7 +455,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection
          */
-        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_promorules_collection');
+        $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_promoRules_collection');
 
         return $collection;
     }
