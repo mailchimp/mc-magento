@@ -1986,6 +1986,11 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             0,
             'default'
         );
+        $migrateFrom1120 = $this->getConfigValueForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
+            0,
+            'default'
+        );
 
         if ($migrateFrom115) {
             $this->_migrateFrom115($initialTime);
@@ -1993,6 +1998,8 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             $this->_migrateFrom116($initialTime);
         } elseif ($migrateFrom1164 && !$dateHelper->timePassed($initialTime)) {
             $this->_migrateFrom1164($initialTime);
+        } elseif ($migrateFrom1120 && !$dateHelper->timePassed($initialTime)) {
+            $this->_migrateFrom1120($initialTime);
         }
     }
 
@@ -2520,7 +2527,13 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
             'default'
         );
 
-        if (!$migrateFrom115 && !$migrateFrom116 && !$migrateFrom1164) {
+        $migrateFrom1120 = $this->getConfigValueForScope(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
+            0,
+            'default'
+        );
+
+        if (!$migrateFrom115 && !$migrateFrom116 && !$migrateFrom1164 && !$migrateFrom1120) {
             $migrationFinished = true;
         }
 
@@ -2579,6 +2592,78 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Helper_Webhook
+     */
+    protected function getWebhookHelper()
+    {
+        return Mage::helper('mailchimp/webhook');
+    }
+
+    /**
+     * Migrate data from version 1.1.21.
+     *
+     * @param $initialTime
+     */
+    protected function _migrateFrom1120($initialTime)
+    {
+        $dateHelper = $this->getDateHelper();
+        $webhookHelper = $this->getWebhookHelper();
+
+        if (!$dateHelper->timePassed($initialTime)) {
+            // Get all stores data.
+            $stores = $this->getMageApp()->getStores();
+
+            $events = array(
+                'subscribe' => true,
+                'unsubscribe' => true,
+                'profile' => true,
+                'cleaned' => true,
+                'upemail' => true,
+                'campaign' => false
+            );
+    
+            $sources = array(
+                'user' => true,
+                'admin' => true,
+                'api' => false
+            );
+
+            foreach ($stores as $storeId => $store) {
+                // Gets the ListId and WebhookId for the iterated store.
+                $listId = $this->getGeneralList($scopeId, $scope);
+                $webhookId = $webhookHelper->getWebhookId($scopeId, $scope);
+
+                // Edits the webhook with the new $event array.
+                $this
+                    ->getApi($storeId, $store)
+                    ->getLists()
+                    ->getWebhooks()
+                    ->edit($listId, $webhookId, null, $events, $sources);
+
+                if ($dateHelper->timePassed($initialTime)) {
+                    $finished = false;
+                    break;
+                }
+            }
+
+            $arrayMigrationConfigData = array('115' => false, '116' => false, '1164' => false, '1120' => true);
+            $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
+        }
+    }
+
+    /**
+     * Delete config data for migration from 1.1.21.
+     */
+    protected function delete1120MigrationConfigData()
+    {
+        $this->getConfig()->deleteConfig(
+            Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
+            'default',
+            0
+        );
+    }
+
+    /**
      * @param $arrayMigrationConfigData
      */
     public function handleDeleteMigrationConfigData($arrayMigrationConfigData)
@@ -2594,6 +2679,10 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
 
             if ($migrationConfigData == '1164' && $value) {
                 $this->delete1164MigrationConfigData();
+            }
+
+            if ($migrationConfigData == '1120' && $value) {
+                $this->delete1120MigrationConfigData();
             }
         }
 
