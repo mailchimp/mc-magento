@@ -12,7 +12,6 @@ try {
 
     /* If webhook is created, edites it and place the new "event" variable */
     if ($configDataCollection->getSize()) {
-        Mage::log('Setting constant', null, 'giorello.log', true);
         // Sets the migration flag to edit webhooks.
         Mage::helper('mailchimp')
         ->saveMailChimpConfig(
