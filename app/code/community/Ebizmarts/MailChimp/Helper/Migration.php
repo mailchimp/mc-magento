@@ -10,7 +10,7 @@
  * @date:     3/20/2020 11:14 AM
  * @file:     Webhook.php
  */
-class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
+class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
 {
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
@@ -39,25 +39,26 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     public function handleMigrationUpdates()
     {
+        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
 
         $initialTime = $dateHelper->getTimestamp();
-        $migrateFrom115 = $this->getConfigValueForScope(
+        $migrateFrom115 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
             0,
             'default'
         );
-        $migrateFrom116 = $this->getConfigValueForScope(
+        $migrateFrom116 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116,
             0,
             'default'
         );
-        $migrateFrom1164 = $this->getConfigValueForScope(
+        $migrateFrom1164 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164,
             0,
             'default'
         );
-        $migrateFrom1120 = $this->getConfigValueForScope(
+        $migrateFrom1120 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
             0,
             'default'
@@ -82,10 +83,11 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom115($initialTime)
     {
+        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $arrayMigrationConfigData = array('115' => true, '116' => false, '1164' => false);
         //migrate data from older version to the new schemma
-        if ($this->isEcommerceEnabled(0)) {
+        if ($helper->isEcommerceEnabled(0)) {
             $mailchimpStoreId = $this->getMCStoreId(0);
 
             //migrate customers
@@ -125,6 +127,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _makeForCollectionItem($collection, $mailchimpStoreId, $initialTime, Closure $callback)
     {
+        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $finished = false;
 
@@ -139,7 +142,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
 
         do {
             $collection->setCurPage($currentPage);
-            $this->_loadItemCollection($collection);
+            $helper->_loadItemCollection($collection);
 
             foreach ($collection as $collectionItem) {
                 $callback($collectionItem, $mailchimpStoreId);
@@ -165,6 +168,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
 
     protected function _migrateFrom115dropColumn($arrayMigrationConfigData)
     {
+        $helper = $this->getHelper();
         $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
 
         //Remove attributes no longer used
@@ -178,10 +182,10 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
             $setup->removeAttribute('customer', 'mailchimp_sync_error');
             $setup->removeAttribute('customer', 'mailchimp_sync_modified');
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         }
 
-        $coreResource = $this->getCoreResource();
+        $coreResource = $helper->getCoreResource();
 
         try {
             $quoteTable = $coreResource->getTableName('sales/quote');
@@ -191,7 +195,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
             $connectionQuote->dropColumn($quoteTable, 'mailchimp_deleted');
             $connectionQuote->dropColumn($quoteTable, 'mailchimp_token');
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         }
 
         try {
@@ -201,7 +205,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
             $connectionOrder->dropColumn($orderTable, 'mailchimp_sync_error');
             $connectionOrder->dropColumn($orderTable, 'mailchimp_sync_modified');
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -214,12 +218,14 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateCustomersFrom115($mailchimpStoreId, $initialTime)
     {
+        $helper = $this->getHelper();
+
         try {
             $entityType = Mage::getSingleton('eav/config')->getEntityType('customer');
             $attribute = Mage::getModel('customer/attribute')->loadByCode($entityType, 'mailchimp_sync_delta');
 
             if ($attribute->getId()) {
-                $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
+                $mailchimpTableName = $helper->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
                 $customerCollection = Mage::getResourceModel('customer/customer_collection');
                 $customerCollection->addAttributeToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
                 $customerCollection->getSelect()->joinLeft(
@@ -250,7 +256,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                             $syncModified = $customer->getMailchimpSyncModified();
                         }
 
-                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $customerId,
                             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
@@ -263,7 +269,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                 );
             }
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -276,13 +282,15 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateProductsFrom115($mailchimpStoreId, $initialTime)
     {
+        $helper = $this->getHelper();
+
         try {
             $entityType = Mage_Catalog_Model_Product::ENTITY;
             $attributeCode = 'mailchimp_sync_delta';
             $attribute = Mage::getModel('eav/entity_attribute')->loadByCode($entityType, $attributeCode);
 
             if ($attribute->getId()) {
-                $mailchimpTableName = $this->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
+                $mailchimpTableName = $helper->getCoreResource()->getTableName('mailchimp/ecommercesyncdata');
                 $productCollection = Mage::getResourceModel('catalog/product_collection');
                 $productCollection->addAttributeToFilter('mailchimp_sync_delta', array('gt' => '0000-00-00 00:00:00'));
                 $productCollection->getSelect()->joinLeft(
@@ -302,7 +310,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                         $syncDelta = $_resource->getAttributeRawValue(
                             $productId,
                             'mailchimp_sync_delta',
-                            $this->getMageApp()->getStore()
+                            $helper->getMageApp()->getStore()
                         );
                         $syncError = null;
                         $syncModified = null;
@@ -315,7 +323,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                             $syncModified = $product->getMailchimpSyncModified();
                         }
 
-                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $productId,
                             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
@@ -328,7 +336,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                 );
             }
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -341,8 +349,10 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateOrdersFrom115($mailchimpStoreId, $initialTime)
     {
+        $helper = $this->getHelper();
+
         try {
-            $resource = $this->getCoreResource();
+            $resource = $helper->getCoreResource();
             $readConnection = $resource->getConnection('core_read');
             $tableName = $resource->getTableName('sales/order');
             $orderFields = $readConnection->describeTable($tableName);
@@ -370,7 +380,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                         $orderId = $order->getEntityId();
                         $syncError = null;
                         $syncModified = null;
-                        $orderObject = $this->getSalesOrderModel()->load($orderId);
+                        $orderObject = $helper->getSalesOrderModel()->load($orderId);
                         $syncDelta = $orderObject->getMailchimpSyncDelta();
 
                         if ($order->getMailchimpSyncError()) {
@@ -381,7 +391,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                             $syncModified = $order->getMailchimpSyncModified();
                         }
 
-                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $orderId,
                             Ebizmarts_MailChimp_Model_Config::IS_ORDER,
@@ -394,7 +404,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                 );
             }
         } catch (Exception $e) {
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
         }
     }
 
@@ -408,8 +418,10 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateCartsFrom115($mailchimpStoreId, $initialTime)
     {
+        $helper = $this->getHelper();
+
         try {
-            $resource = $this->getCoreResource();
+            $resource = $helper->getCoreResource();
             $readConnection = $resource->getConnection('core_read');
             $tableName = $resource->getTableName('sales/quote');
             $quoteFields = $readConnection->describeTable($tableName);
@@ -438,7 +450,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                         $syncError = null;
                         $syncDeleted = null;
                         $token = null;
-                        $quoteObject = $this->getSalesOrderModel()->load($quoteId);
+                        $quoteObject = $helper->getSalesOrderModel()->load($quoteId);
                         $syncDelta = $quoteObject->getMailchimpSyncDelta();
 
                         if ($quote->getMailchimpSyncError()) {
@@ -453,7 +465,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
                             $token = $quote->getMailchimpToken();
                         }
 
-                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $quoteId,
                             Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
@@ -472,14 +484,14 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
 
             return $finished;
         } catch (Exception $e) {
-            $this->logError(
-                $this->__(
+            $helper->logError(
+                $helper->__(
                     'Unexpected error happened during migration from version 1.1.5 to 1.1.6.'
                     . 'Please contact our support at '
                 ) . 'mailchimp@ebizmarts-desk.zendesk.com'
-                . $this->__(' See error details below.')
+                . $helper->__(' See error details below.')
             );
-            $this->logError($e->getMessage());
+            $helper->logError($e->getMessage());
 
             return false;
         }
@@ -490,7 +502,8 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function delete115MigrationConfigData()
     {
-        $this->getConfig()->deleteConfig(
+        $helper = $this->getHelper();
+        $helper->getConfig()->deleteConfig(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
             'default',
             0
@@ -504,11 +517,12 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom116($initialTime)
     {
-        $this->_setIsSyncingIfFinishedInAllStores(true);
+        $helper = $this->getHelper();
+        $helper->_setIsSyncingIfFinishedInAllStores(true);
         $finished = $this->_migrateOrdersFrom116($initialTime);
 
         if ($finished) {
-            $this->_setIsSyncingIfFinishedInAllStores(false);
+            $helper->_setIsSyncingIfFinishedInAllStores(false);
             $arrayMigrationConfigData = array('115' => false, '116' => true, '1164' => false);
             $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
         }
@@ -522,15 +536,16 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateOrdersFrom116($initialTime)
     {
+        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $finished = false;
 
         if (!$dateHelper->timePassed($initialTime)) {
             $finished = true;
-            $stores = $this->getMageApp()->getStores();
+            $stores = $helper->getMageApp()->getStores();
 
             foreach ($stores as $storeId => $store) {
-                if ($this->isEcomSyncDataEnabled($storeId)) {
+                if ($helper->isEcomSyncDataEnabled($storeId)) {
                     Mage::getModel('mailchimp/api_batches')->replaceAllOrders($initialTime, $storeId);
                 }
 
@@ -552,27 +567,28 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     public function migrationFinished()
     {
+        $helper = $this->getHelper();
         $migrationFinished = false;
 
-        $migrateFrom115 = $this->getConfigValueForScope(
+        $migrateFrom115 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_115,
             0,
             'default'
         );
 
-        $migrateFrom116 = $this->getConfigValueForScope(
+        $migrateFrom116 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116,
             0,
             'default'
         );
 
-        $migrateFrom1164 = $this->getConfigValueForScope(
+        $migrateFrom1164 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164,
             0,
             'default'
         );
 
-        $migrateFrom1120 = $this->getConfigValueForScope(
+        $migrateFrom1120 = $helper->getConfigValueForScope(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
             0,
             'default'
@@ -590,15 +606,16 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     public function delete116MigrationConfigData()
     {
-        $stores = $this->getMageApp()->getStores();
-        $this->getConfig()->deleteConfig(
+        $helper = $this->getHelper();
+        $stores = $helper->getMageApp()->getStores();
+        $helper->getConfig()->deleteConfig(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_116,
             'default',
             0
         );
 
         foreach ($stores as $storeId => $store) {
-            $this->getConfig()->deleteConfig(
+            $helper->getConfig()->deleteConfig(
                 Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_LAST_ORDER_ID,
                 'stores',
                 $storeId
@@ -613,10 +630,11 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom1164($initialTime)
     {
+        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
 
         if (!$dateHelper->timePassed($initialTime)) {
-            $writeConnection = $this->getCoreResource()->getConnection('core_write');
+            $writeConnection = $helper->getCoreResource()->getConnection('core_write');
             $resource = Mage::getResourceModel('mailchimp/ecommercesyncdata');
             $writeConnection->update($resource->getMainTable(), array('batch_id' => '1'), "batch_id = 0");
             $arrayMigrationConfigData = array('115' => false, '116' => false, '1164' => true);
@@ -629,7 +647,9 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function delete1164MigrationConfigData()
     {
-        $this->getConfig()->deleteConfig(
+        $helper = $this->getHelper();
+
+        $helper->getConfig()->deleteConfig(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1164,
             'default',
             0
@@ -643,12 +663,13 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function _migrateFrom1120($initialTime)
     {
+        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $webhookHelper = $this->getWebhookHelper();
 
         if (!$dateHelper->timePassed($initialTime)) {
             // Get all stores data.
-            $stores = $this->getMageApp()->getStores();
+            $stores = $helper->getMageApp()->getStores();
 
             $events = array(
                 'subscribe' => true,
@@ -667,11 +688,11 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
 
             foreach ($stores as $storeId => $store) {
                 // Gets the ListId and WebhookId for the iterated store.
-                $listId = $this->getGeneralList($scopeId, $scope);
+                $listId = $helper->getGeneralList($scopeId, $scope);
                 $webhookId = $webhookHelper->getWebhookId($scopeId, $scope);
 
                 // Edits the webhook with the new $event array.
-                $this
+                $helper
                     ->getApi($storeId, $store)
                     ->getLists()
                     ->getWebhooks()
@@ -693,7 +714,9 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     protected function delete1120MigrationConfigData()
     {
-        $this->getConfig()->deleteConfig(
+        $helper = $this->getHelper();
+
+        $helper->getConfig()->deleteConfig(
             Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
             'default',
             0
@@ -705,6 +728,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
      */
     public function handleDeleteMigrationConfigData($arrayMigrationConfigData)
     {
+        $helper = $this->getHelper();
         foreach ($arrayMigrationConfigData as $migrationConfigData => $value) {
             if ($migrationConfigData == '115' && $value) {
                 $this->delete115MigrationConfigData();
@@ -723,13 +747,13 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
             }
         }
 
-        $this->getConfig()->cleanCache();
+        $helper->getConfig()->cleanCache();
     }
 
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected function _getHelper()
+    protected function getHelper()
     {
         return $this->_helper;
     }
@@ -737,7 +761,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
     /**
      * @var Ebizmarts_MailChimp_Helper_Date
      */
-    protected function _getDateHelper()
+    protected function getDateHelper()
     {
         return $this->_dateHelper;
     }
@@ -745,7 +769,7 @@ class Ebizmarts_MailChimp_Helper_Webhook extends Mage_Core_Helper_Abstract
     /**
      * @var Ebizmarts_MailChimp_Helper_Webhook
      */
-    protected function _getWebhookHelper()
+    protected function getWebhookHelper()
     {
         return $this->_webhookHelper;
     }
