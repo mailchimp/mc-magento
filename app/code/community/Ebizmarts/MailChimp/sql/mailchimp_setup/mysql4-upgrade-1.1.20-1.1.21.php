@@ -14,15 +14,15 @@ try {
     if ($configDataCollection->getSize()) {
         // Sets the migration flag to edit webhooks.
         Mage::helper('mailchimp')
-        ->saveMailChimpConfig(
-            array(
+            ->saveMailChimpConfig(
                 array(
-                    Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
-                    1)
-            ),
-            0,
-            'default'
-        );  
+                    array(
+                        Ebizmarts_MailChimp_Model_Config::GENERAL_MIGRATE_FROM_1120,
+                        1)
+                ),
+                0,
+                'default'
+            );  
     }
 } catch (Exception $e) {
     Mage::log($e->getMessage(), null, 'MailChimp_Errors.log', true);

@@ -679,7 +679,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                 'upemail' => true,
                 'campaign' => false
             );
-    
+
             $sources = array(
                 'user' => true,
                 'admin' => true,
