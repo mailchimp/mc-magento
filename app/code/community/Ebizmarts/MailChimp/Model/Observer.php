@@ -778,6 +778,29 @@ class Ebizmarts_MailChimp_Model_Observer
     }
 
     /**
+     * If "unsubscribe" checkbox is checked, ubsubscribes the customer.
+     *
+     * @param  Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     */
+    public function createCreditmemo($observer)
+    {
+        $mailchimpUnsubscribe = $this->getRequest()->getParam('mailchimp_unsubscribe');
+
+        if ($this->isUnsubscribeChecked($mailchimpUnsubscribe)) {
+            $creditMemo = $observer->getEvent()->getCreditmemo();
+            $helper = $this->makeHelper();
+            $order = $creditMemo->getOrder();
+            $email = $order->getCustomerEmail();
+            $subscriberModel = $this->getSubscriberModel();
+            $subscriber = $subscriberModel->loadByEmail($email);
+            $helper->unsubscribeMember($subscriber);
+        }
+
+        return $observer;
+    }
+
+    /**
      * Set the products included in the credit memo to be updated on MailChimp on the next cron job run.
      *
      * @param  Varien_Event_Observer $observer
@@ -1184,6 +1207,18 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $subscriber;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function isUnsubscribeChecked($mailchimpUnsubscribe)
+    {
+        if ($mailchimpUnsubscribe === 'on') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
