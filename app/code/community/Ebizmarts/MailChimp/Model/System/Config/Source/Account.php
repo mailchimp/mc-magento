@@ -61,7 +61,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     {
         $mcStore = null;
         $helper = $this->_helper = $this->makeHelper();
-        $migrationHelper = $this->makeMigrationHelper();
+        $migrationHelper = $this->_migrationHelper = $this->makeMigrationHelper();
         $scopeArray = $helper->getCurrentScope();
         $apiKey = (empty($params))
             ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope'])
