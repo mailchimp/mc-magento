@@ -327,37 +327,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
             );
     }
 
-    public function testHandleWebhookChange()
-    {
-        $scopeId = 0;
-        $scope = 'default';
-        $realScopeArray = array('scope_id' => 0, 'scope' => 'default');
-        $listId = 'a1s2d3f4g5';
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array('getRealScopeForConfig', 'getGeneralList', 'deleteCurrentWebhook',
-                    'isSubscriptionEnabled', 'createNewWebhook')
-            )
-            ->getMock();
-
-        $helperMock
-            ->expects($this->once())
-            ->method('getRealScopeForConfig')
-            ->with(Ebizmarts_MailChimp_Model_Config::GENERAL_LIST, $scopeId, $scope)
-            ->willReturn($realScopeArray);
-        $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId, $scope)->willReturn($listId);
-        $helperMock
-            ->expects($this->once())
-            ->method('deleteCurrentWebhook')
-            ->with($realScopeArray['scope_id'], $realScopeArray['scope'], $listId);
-        $helperMock->expects($this->once())->method('isSubscriptionEnabled')->with($scopeId, $scope)->willReturn(1);
-        $helperMock->expects($this->once())->method('createNewWebhook')->with($scopeId, $scope, $listId);
-
-        $helperMock->handleWebhookChange($scopeId, $scope);
-    }
-
     /**
      * @param array $data
      * @dataProvider testGetImageUrlByIdDataProvider
@@ -1701,35 +1670,6 @@ class Ebizmarts_MailChimp_Helper_DataTest extends PHPUnit_Framework_TestCase
         );
 
         $helperMock->getAllApiKeys();
-    }
-
-    public function testHandleDeleteMigrationConfigData()
-    {
-        $arrayMigrationConfigData = array('115' => true, '116' => true, '1164' => true);
-
-        $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
-            ->disableOriginalConstructor()
-            ->setMethods(
-                array(
-                    'delete115MigrationConfigData', 'delete116MigrationConfigData',
-                    'delete1164MigrationConfigData', 'getConfig'
-                )
-            )
-            ->getMock();
-
-        $modelConfigMock = $this->getMockBuilder(Mage_Core_Model_Config::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('cleanCache'))
-            ->getMock();
-
-        $helperMock->expects($this->once())->method('delete115MigrationConfigData');
-        $helperMock->expects($this->once())->method('delete116MigrationConfigData');
-        $helperMock->expects($this->once())->method('delete1164MigrationConfigData');
-        $helperMock->expects($this->once())->method('getConfig')->willReturn($modelConfigMock);
-
-        $modelConfigMock->expects($this->once())->method('cleanCache');
-
-        $helperMock->handleDeleteMigrationConfigData($arrayMigrationConfigData);
     }
 
     public function testGetSessionLastRealOrderM19()

@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
      */
     public function getMigrationFinishedStatus()
     {
-        return $this->makeHelper()->migrationFinished();
+        return $this->makeMigrationHelper()->migrationFinished();
     }
 
     /**
@@ -100,5 +100,13 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Fieldset_Mailchimp_Hint
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Migration
+     */
+    protected function makeMigrationHelper()
+    {
+        return Mage::helper('mailchimp/migration');
     }
 }
