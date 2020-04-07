@@ -138,12 +138,17 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
 
         $mailchimpControllerMock = $this->_mailchimpController
             ->disableOriginalConstructor()
-            ->setMethods(array('getHelper'))
+            ->setMethods(array('getHelper', 'getWebhookHelper'))
             ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getMageApp', 'createNewWebhook', 'getGeneralList'))
+            ->setMethods(array('getMageApp', 'getGeneralList'))
+            ->getMock();
+
+        $webhookHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Webhook::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('createNewWebhook'))
             ->getMock();
 
         $mageAppMock = $this->getMockBuilder(Mage_Core_Model_App::class)
@@ -162,6 +167,10 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
             ->getMock();
 
         $mailchimpControllerMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
+        $mailchimpControllerMock
+            ->expects($this->once())
+            ->method('getWebhookHelper')
+            ->willReturn($webhookHelperMock);
 
         $helperMock->expects($this->once())->method('getGeneralList')->with($scopeId)->willReturn($listId);
         $helperMock->expects($this->once())->method('getMageApp')->willReturn($mageAppMock);
@@ -177,7 +186,7 @@ class Ebizmarts_MailChimp_Adminhtml_MailchimpControllerTest extends PHPUnit_Fram
                 $scopeId
             );
 
-        $helperMock
+        $webhookHelperMock
             ->expects($this->once())
             ->method('createNewWebhook')
             ->with($scopeId, $scope, $listId)
