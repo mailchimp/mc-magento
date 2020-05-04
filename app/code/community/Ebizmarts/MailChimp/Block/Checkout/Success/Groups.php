@@ -82,6 +82,14 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
+     */
+    public function getMailChimpHelper()
+    {
+        return $this->_helper;
+    }
+
+    /**
      * @return false|Mage_Core_Model_Abstract
      */
     protected function getSubscriberModel()
@@ -100,13 +108,5 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
     protected function getSessionLastRealOrder()
     {
         return $this->getMailChimpHelper()->getSessionLastRealOrder();
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
-     */
-    protected function getMailChimpHelper()
-    {
-        return $this->_helper;
     }
 }

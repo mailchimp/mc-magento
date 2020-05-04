@@ -6,8 +6,8 @@ $interest = $block->getInterest();
     <?php foreach($interest as $i): ?>
         <ul class="form-list">
             <li class="field no-label">
-            <label class="label" for="<?php echo $this->quoteEscape($i['interest']['id']) ?>">
-                <h4><?php echo $this->quoteEscape($i['interest']['title']) ?></h4>
+            <label class="label" for="<?php echo $this->getMailchimpHelper()->mcEscapeQuote($i['interest']['id']) ?>">
+                <h4><?php echo $this->getMailchimpHelper()->mcEscapeQuote($i['interest']['title']) ?></h4>
             </label>
             </li>
             <?php echo $this->getLayout()->createBlock(

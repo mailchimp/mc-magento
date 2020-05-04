@@ -1175,6 +1175,15 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * @param $data
+     * @return string
+     */
+    public function mcEscapeQuote($data)
+    {
+        return htmlspecialchars($data, ENT_QUOTES, null, false);
+    }
+
+    /**
      * @param $scopeId
      * @param $scope
      * @return int

@@ -10,13 +10,13 @@ $i = $this->getCurrentInterest();
                type="radio"
                value="<?php echo $this->escapeHtml($c['id']) ?>"
                id="<?php echo $this->escapeHtml('mailchimp_group_'.$c['id']) ?>"
-               title="<?php echo $this->quoteEscape($c['name']) ?>"
+               title="<?php echo $this->gethelper()->mcEscapeQuote($c['name']) ?>"
             <?php if ($c['checked']) {
                 echo $this->escapeHtml('checked');
             } ?>
         />
         <label for="<?php echo $this->escapeHtml('mailchimp_group_'.$c['id']) ?>"
-               class="field label"><?php echo $this->quoteEscape($c['name']) ?>
+               class="field label"><?php echo $this->gethelper()->mcEscapeQuote($c['name']) ?>
         </label>
     </li>
 <?php endforeach; ?>

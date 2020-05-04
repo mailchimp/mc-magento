@@ -57,6 +57,14 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    public function getMailChimpHelper()
+    {
+        return $this->_helper;
+    }
+
+    /**
      * Retrieve email from Customer object in session
      *
      * @return string Email address
@@ -64,14 +72,6 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
     protected function _getEmail()
     {
         return $this->getCustomerSession()->getCustomer()->getEmail();
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Helper_Data
-     */
-    protected function getMailChimpHelper()
-    {
-        return $this->_helper;
     }
 
     /**

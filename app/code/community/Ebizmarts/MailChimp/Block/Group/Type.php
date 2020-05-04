@@ -11,9 +11,12 @@
 class Ebizmarts_MailChimp_Block_Group_Type extends Mage_Core_Block_Template
 {
     protected $_currentInterest;
+    protected $_helper;
 
     public function __construct(array $args = array())
     {
+        $this->_helper = Mage::helper('mailchimp');
+
         if (isset($args['interests'])) {
             $this->_currentInterest = $interests = $args['interests'];
             $type = $interests['interest']['type'];
@@ -21,6 +24,14 @@ class Ebizmarts_MailChimp_Block_Group_Type extends Mage_Core_Block_Template
         }
 
         parent::__construct($args);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    public function getHelper()
+    {
+        return $this->_helper;
     }
 
     /**
