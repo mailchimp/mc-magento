@@ -12,7 +12,7 @@ $i = $this->getCurrentInterest();
             <option value="<?php echo $this->escapeHtml($c['id']) ?>" <?php if ($c['checked']) {
                 echo 'selected';
            }
-        ?>><?php echo $this->gethelper()->mcEscapeQuote($c['name']) ?></option>
+        ?>><?php echo $this->escapeQuote($c['name']) ?></option>
         <?php endforeach; ?>
     </select>
 </div>

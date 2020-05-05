@@ -5,13 +5,13 @@ $helper = $block->getMailChimpHelper();
 ?>
 <p>
     <?php if($helper->isInterestGroupEnabled($this->_getStoreId())): ?>
-    <?php echo $this->getMailChimpHelper()->mcEscapeQuote($block->getMessageBefore()) ?>
-<form class="form" action="<?php echo $this->getMailChimpHelper()->mcEscapeQuote($block->getFormUrl()) ?>" method="get" id="mailchimp-groups">
+    <?php echo $this->escapeQuote($block->getMessageBefore()) ?>
+<form class="form" action="<?php echo $this->escapeQuote($block->getFormUrl()) ?>" method="get" id="mailchimp-groups">
     <fieldset class="fieldset">
         <?php foreach($interest as $i): ?>
             <div class="field">
-                <label class="label" for="<?php echo $this->getMailChimpHelper()->mcEscapeQuote($i['interest']['id']) ?>">
-                    <span><?php echo $this->getMailChimpHelper()->mcEscapeQuote($i['interest']['title']) ?></span>
+                <label class="label" for="<?php echo $this->escapeQuote($i['interest']['id']) ?>">
+                    <span><?php echo $this->escapeQuote($i['interest']['title']) ?></span>
                 </label>
                 <div class="control">
                     <div class="fields">

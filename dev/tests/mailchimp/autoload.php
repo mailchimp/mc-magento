@@ -2,7 +2,7 @@
 
 $magentoRoot = getenv('MAGENTO_ROOT');
 if (empty($magentoRoot)) {
-    $magentoRoot = realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))));
+    $magentoRoot = realpath(dirname(dirname(dirname(__DIR__))));
 }
 
 define('MAGENTO_ROOT', $magentoRoot);

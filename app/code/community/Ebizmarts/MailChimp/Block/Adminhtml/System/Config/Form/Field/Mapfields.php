@@ -69,10 +69,15 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
         ksort($this->_customerAttributes);
     }
 
+    public function escapeQuote($data)
+    {
+        return $this->getHelper()->mcEscapeQuote($data);
+    }
+
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    public function getHelper()
+    protected function getHelper()
     {
         return $this->_helper;
     }

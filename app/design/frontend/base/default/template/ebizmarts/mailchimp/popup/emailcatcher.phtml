@@ -3,11 +3,11 @@
         && Mage::getStoreConfig(Ebizmarts_MailChimp_Model_Config::ENABLE_POPUP, $this->_getStoreId())): ?>
     <div id="email" style="text-align:right; display:none">
         <div id="popup-heading">
-            <h2><?php echo $this->gethelper()->mcEscapeQuote($this->_popupHeading()); ?></h2>
+            <h2><?php echo $this->escapeQuote($this->_popupHeading()); ?></h2>
         </div>
         <div id="popup-form-content">
             <div id="popup-text">
-                <p><?php echo $this->gethelper()->mcEscapeQuote($this->_popupMessage()); ?></p>
+                <p><?php echo $this->escapeQuote($this->_popupMessage()); ?></p>
             </div>
 
             <p><span id='email_error_msg' class="email_error" style="display:none">&nbsp;</span></p>
@@ -87,10 +87,10 @@
                     width: popupWidth,
 
                     zIndex: 2001,
-                    okLabel: '<?php echo $this->gethelper()->mcEscapeQuote($this->__('Confirm')) ?>',
+                    okLabel: '<?php echo $this->escapeQuote($this->__('Confirm')) ?>',
                     <?php if(!$this->_canCancel()): ?>closeOnEsc: false,
                     <?php else: ?>
-                    cancelLabel: '<?php echo $this->gethelper()->mcEscapeQuote($this->__('Close')) ?>',
+                    cancelLabel: '<?php echo $this->escapeQuote($this->__('Close')) ?>',
                     onCancel: function (win) {
                         <?php
                             if(Mage::getSingleton('core/cookie')->get('counter') !== null):
@@ -192,7 +192,7 @@
                             <?php endif ?>
                         } else {
                             $('email_error_msg').innerHTML = '<?php
-                                    echo $this->gethelper()->mcEscapeQuote(
+                                    echo $this->escapeQuote(
                                         $this->__('Not a valid e-mail address')
                                     );
                                 ?>';

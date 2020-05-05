@@ -66,7 +66,7 @@ $generalList = $this->getGeneralList();
 endif; ?>>
     <!-- General Subscription -->
     <div class="page-title">
-        <h1><?php echo $this->gethelper()->mcEscapeQuote($this->__('Newsletter Subscription')); ?></h1>
+        <h1><?php echo $this->escapeQuote($this->__('Newsletter Subscription')); ?></h1>
     </div>
     <?php echo $this->getBlockHtml('formkey'); ?>
     <div class="mailchimp-multisubscribe">
@@ -80,7 +80,7 @@ endif; ?>>
                      title="<?php echo $this->escapeHtml($generalList); ?>"
                      class="mailchimp-list-subscriber"/>
                 <label for="mailchimp-trigger">
-                    <?php echo $this->gethelper()->mcEscapeQuote($this->__('General Subscription')); ?>
+                    <?php echo $this->escapeQuote($this->__('General Subscription')); ?>
                 </label>
             </li>
         </ul>
