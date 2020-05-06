@@ -66,6 +66,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Sales_Order_View_Info_Monkey extends M
         return $this->_campaignName;
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function escapeQuote($data)
     {
         return $this->getMailChimpHelper()->mcEscapeQuote($data);

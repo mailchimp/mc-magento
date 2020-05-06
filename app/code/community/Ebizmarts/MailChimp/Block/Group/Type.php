@@ -26,6 +26,10 @@ class Ebizmarts_MailChimp_Block_Group_Type extends Mage_Core_Block_Template
         parent::__construct($args);
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function escapeQuote($data)
     {
         return $this->getHelper()->mcEscapeQuote($data);

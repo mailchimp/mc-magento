@@ -30,6 +30,10 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
         $this->_storeId = Mage::app()->getStore()->getId();
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function escapeQuote($data)
     {
         return $this->getHelper()->mcEscapeQuote($data);

@@ -81,6 +81,10 @@ class Ebizmarts_MailChimp_Block_Checkout_Success_Groups extends Mage_Core_Block_
         return $message;
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function escapeQuote($data)
     {
         return $this->getMailChimpHelper()->mcEscapeQuote($data);

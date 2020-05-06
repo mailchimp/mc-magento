@@ -51,6 +51,10 @@ class Ebizmarts_MailChimp_Block_Adminhtml_Customer_Edit_Tab_Mailchimp extends Ma
         return $interest;
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function escapeQuote($data)
     {
         return $this->getHelper()->mcEscapeQuote($data);

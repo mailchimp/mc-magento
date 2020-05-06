@@ -56,6 +56,10 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
         return $interest;
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     public function escapeQuote($data)
     {
         return $this->getMailChimpHelper()->mcEscapeQuote($data);
