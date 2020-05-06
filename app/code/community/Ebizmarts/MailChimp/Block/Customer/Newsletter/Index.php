@@ -64,7 +64,7 @@ class Ebizmarts_MailChimp_Block_Customer_Newsletter_Index extends Mage_Customer_
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getMailChimpHelper()
+    public function getMailChimpHelper()
     {
         return $this->_helper;
     }
