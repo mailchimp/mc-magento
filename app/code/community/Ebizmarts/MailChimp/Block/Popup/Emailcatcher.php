@@ -12,6 +12,22 @@
  */
 class Ebizmarts_MailChimp_Block_Popup_Emailcatcher extends Mage_Core_Block_Template
 {
+    /**
+     * @param $data
+     * @return string
+     */
+    public function escapeQuote($data)
+    {
+        return $this->getHelper()->mcEscapeQuote($data);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    public function getHelper()
+    {
+        return Mage::helper('mailchimp');
+    }
 
     protected function _canCancel()
     {
