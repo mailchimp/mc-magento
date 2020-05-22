@@ -445,7 +445,7 @@ class Ebizmarts_MailChimp_Model_Observer
                     if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
                         continue;
                     }
-    
+
                     $mailchimpStoreId = $helper->getMCStoreId($storeId);
                     $productId = $item->getProductId();
                     $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
@@ -453,7 +453,7 @@ class Ebizmarts_MailChimp_Model_Observer
                         Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
                         $mailchimpStoreId
                     );
-    
+
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
                     $isMarkedAsModified = $dataProduct->getMailchimpSyncModified();
     
