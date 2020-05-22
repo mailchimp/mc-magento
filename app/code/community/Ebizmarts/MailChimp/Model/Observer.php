@@ -456,7 +456,7 @@ class Ebizmarts_MailChimp_Model_Observer
 
                     $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
                     $isMarkedAsModified = $dataProduct->getMailchimpSyncModified();
-    
+
                     if (!$isMarkedAsDeleted && !$isMarkedAsModified) {
                         $apiProducts = $this->makeApiProduct();
                         $apiProducts->setMailchimpStoreId($mailchimpStoreId);
