@@ -1,7 +1,7 @@
 <?php if($this->isReferred()) : ?>
 <div class="entry-edit box-right">
     <div class="entry-edit-head">
-        <h4 class="icon-head"><?php echo $this->quoteEscape($this->__('MailChimp')) ?></h4>
+        <h4 class="icon-head"><?php echo $this->escapeQuote($this->__('MailChimp')) ?></h4>
     </div>
     <fieldset>
         <div id="mailchimp_monkey">
@@ -16,7 +16,7 @@
                     </td>
                     <td class="value">
                         <?php if ($this->isDataAvailable()): ?>
-                            <strong><?php echo $this->quoteEscape(
+                            <strong><?php echo $this->escapeQuote(
                                 $this->__("Yaay! Recovered by Mailchimp's campaign.") .
                                     "<br />" .
                                     $this->__("Name") .
@@ -27,7 +27,7 @@
                             ); ?>
                             </strong>
                         <?php else: ?>
-                            <strong><?php echo $this->quoteEscape(
+                            <strong><?php echo $this->escapeQuote(
                                 $this->__("The campaign does not belong to the audience configured for ") .
                                     $this->getStoreCodeFromOrder() .
                                 $this->__(" view.")

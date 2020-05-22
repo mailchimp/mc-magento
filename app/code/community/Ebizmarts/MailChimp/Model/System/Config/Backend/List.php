@@ -17,6 +17,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         $groups = $this->getData('groups');
         $helper = $this->getMailchimpHelper();
         $dateHelper = $this->getMailchimpDateHelper();
+        $webhookHelper = $this->getMailchimpWebhookHelper();
         $scopeId = $this->getScopeId();
         $scope = $this->getScope();
         $valueChanged = $this->isValueChanged();
@@ -53,7 +54,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
         }
 
         if ($apiKey && $moduleIsActive && $valueChanged) {
-            $helper->handleWebhookChange($scopeId, $scope);
+            $webhookHelper->handleWebhookChange($scopeId, $scope);
         }
     }
 
@@ -71,6 +72,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Backend_List extends Mage_Core_Mod
     protected function getMailchimpDateHelper()
     {
         return Mage::helper('mailchimp/date');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Webhook
+     */
+    protected function getMailchimpWebhookHelper()
+    {
+        return Mage::helper('mailchimp/webhook');
     }
 
     /**

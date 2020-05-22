@@ -84,6 +84,14 @@
                     </mailchimp_creditmemo_cancel>
                 </observers>
             </sales_order_creditmemo_cancel>
+            <sales_order_creditmemo_save_after>
+                <observers>
+                    <mailchimp_creditmemo_create>
+                        <class>mailchimp/observer</class>
+                        <method>createCreditmemo</method>
+                    </mailchimp_creditmemo_create>
+                </observers>
+            </sales_order_creditmemo_save_after>
             <sales_order_item_cancel>
                 <observers>
                     <mailchimp_item_cancel>

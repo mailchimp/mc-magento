@@ -26,6 +26,11 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
      */
     protected $_helper;
 
+    /**
+     * @var Ebizmarts_MailChimp_Helper_Migration
+     */
+    protected $_migrationHelper;
+
     const USERNAME_KEY = 0;
     const TOTAL_ACCOUNT_SUB_KEY = 1;
     const TOTAL_LIST_SUB_KEY = 2;
@@ -56,6 +61,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     {
         $mcStore = null;
         $helper = $this->_helper = $this->makeHelper();
+        $migrationHelper = $this->_migrationHelper = $this->makeMigrationHelper();
         $scopeArray = $helper->getCurrentScope();
         $apiKey = (empty($params))
             ? $helper->getApiKey($scopeArray['scope_id'], $scopeArray['scope'])
@@ -138,6 +144,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     public function toOptionArray()
     {
         $helper = $this->_helper;
+        $migrationHelper = $this->_migrationHelper;
         $scopeArray = $helper->getCurrentScope();
         if (is_array($this->_accountDetails)) {
             $totalAccountSubscribersText = $helper->__('Total Account Subscribers:');
@@ -208,7 +215,7 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
                 );
             }
 
-            if (!$helper->migrationFinished()
+            if (!$migrationHelper->migrationFinished()
                 && $helper->isEcommerceEnabled($scopeArray['scope_id'], $scopeArray['scope'])
             ) {
                 $storeMigrationText = $helper->__(
@@ -237,6 +244,14 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_Account
     protected function makeHelper()
     {
         return Mage::helper('mailchimp');
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Migration
+     */
+    protected function makeMigrationHelper()
+    {
+        return Mage::helper('mailchimp/migration');
     }
 
     /**

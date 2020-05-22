@@ -58,6 +58,11 @@
             <block type="mailchimp/adminhtml_sales_order_view_info_monkey" name="mailchimp.order.info.monkey.block" template="ebizmarts/mailchimp/sales/order/view/monkey.phtml" before="order_history" />
         </reference>
     </adminhtml_sales_order_view>
+	<adminhtml_sales_order_creditmemo_new>
+		<reference name="submit_before">
+			<block type="mailchimp/adminhtml_sales_order_creditmemo_unsubscribe" name="mailchimp.creditmemo.unsubscribe" template="ebizmarts/mailchimp/sales/order/creditmemo/create/unsubscribe.phtml" />
+		</reference>
+	</adminhtml_sales_order_creditmemo_new>
     <default>
         <reference name="notifications">
             <block type="mailchimp/adminhtml_notifications" name="mailchimp_notifications" template="ebizmarts/mailchimp/notifications.phtml"/>

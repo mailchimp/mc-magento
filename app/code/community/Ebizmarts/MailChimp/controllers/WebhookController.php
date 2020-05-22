@@ -13,6 +13,7 @@
 class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_Action
 {
     protected $_mailchimpHelper = null;
+    protected $_mailchimpWebhookHelper = null;
 
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
@@ -27,6 +28,18 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
     }
 
     /**
+     * @return Ebizmarts_MailChimp_Helper_Webhook
+     */
+    protected function getWebhookHelper()
+    {
+        if (!$this->_mailchimpWebhookHelper) {
+            $this->_mailchimpWebhookHelper = Mage::helper('mailchimp/webhook');
+        }
+
+        return $this->_mailchimpWebhookHelper;
+    }
+
+    /**
      * Entry point for all webhook operations
      */
     public function indexAction()
@@ -36,6 +49,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
         $moduleName = $request->getModuleName();
         $data = $request->getPost();
         $helper = $this->getHelper();
+        $webhookHelper = $this->getWebhookHelper();
 
         if ($moduleName == 'monkey') {
             if (isset($data['data']['list_id'])) {
@@ -60,7 +74,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 return $this;
             }
 
-            $myKey = $helper->getWebhooksKey();
+            $myKey = $webhookHelper->getWebhooksKey();
 
             //Validate "wkey" GET parameter
             if ($myKey == $requestKey) {
@@ -84,6 +98,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
     protected function _deleteWebhook($storeId, $listId)
     {
         $helper = $this->getHelper();
+        $webhookHelper = $this->getWebhookHelper();
 
         try {
             $api = $helper->getApi($storeId);
@@ -97,7 +112,7 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
                 $webhooks = $api->getLists()->getWebhooks()->getAll($listId);
                 foreach ($webhooks['webhooks'] as $webhook) {
                     if (strpos($webhook['url'], 'monkey/webhook') !== false) {
-                        $helper->deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
+                        $webhookHelper->deleteWebhookFromList($api->getLists()->getWebhooks(), $listId, $webhook['id']);
                     }
                 }
             } catch (MailChimp_Error $e) {

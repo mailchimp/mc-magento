@@ -70,6 +70,23 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
     }
 
     /**
+     * @param $data
+     * @return string
+     */
+    public function escapeQuote($data)
+    {
+        return $this->getHelper()->mcEscapeQuote($data);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    public function getHelper()
+    {
+        return $this->_helper;
+    }
+
+    /**
      * @param string $columnName
      * @return string
      */
