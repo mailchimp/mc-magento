@@ -440,27 +440,32 @@ class Ebizmarts_MailChimp_Model_Observer
             $this->removeCampaignData();
             $items = $order->getAllItems();
 
-            foreach ($items as $item) {
-                if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
-                    continue;
+            try {
+                foreach ($items as $item) {
+                    if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
+                        continue;
+                    }
+
+                    $mailchimpStoreId = $helper->getMCStoreId($storeId);
+                    $productId = $item->getProductId();
+                    $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
+                        $productId,
+                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+                        $mailchimpStoreId
+                    );
+
+                    $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                    $isMarkedAsModified = $dataProduct->getMailchimpSyncModified();
+
+                    if (!$isMarkedAsDeleted && !$isMarkedAsModified) {
+                        $apiProducts = $this->makeApiProduct();
+                        $apiProducts->setMailchimpStoreId($mailchimpStoreId);
+                        $apiProducts->setMagentoStoreId($storeId);
+                        $apiProducts->update($productId);
+                    }
                 }
-
-                $mailchimpStoreId = $helper->getMCStoreId($storeId);
-                $productId = $item->getProductId();
-                $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
-                    $productId,
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                    $mailchimpStoreId
-                );
-
-                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
-
-                if (!$isMarkedAsDeleted) {
-                    $apiProducts = $this->makeApiProduct();
-                    $apiProducts->setMailchimpStoreId($mailchimpStoreId);
-                    $apiProducts->setMagentoStoreId($storeId);
-                    $apiProducts->update($productId);
-                }
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage());
             }
         }
 
