@@ -1750,14 +1750,14 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array(
-                    'getRequest', 'getSubscriberModel', 'makeHelper', 'makeApiProduct',
+                    'getRequest', 'getSubscriberModel', 'makeHelper', 'makeApiProduct', 
                     'removeCampaignData', 'getMailchimpEcommerceSyncDataModel', 'isBundleItem', 
-                    'isConfigurableItem', 'getRegistry', 'removeRegistry', 'getCoreResource',
-                    'addSuccessIfRequired', 'isMailchimpSave', 'createEmailCookie', 'makeApiSubscriber',
-                    'getStoreViewIdBySubscriber', 'isEmailConfirmationRequired', 'isMagentoSubscription',
-                    'isCustomerLoggedIn', 'getRequestActionName', 'getEmailFromPopUp', 'getEmailCookie',
-                    '_getCampaignCookie', '_getLandingCookie', 'getWarningMessageAdminHtmlSession',
-                    'getAdminSession', 'isListXorStoreInherited', 'getCatalogProductStatusModel',
+                    'isConfigurableItem', 'getRegistry', 'removeRegistry', 'getCoreResource', 
+                    'addSuccessIfRequired', 'isMailchimpSave', 'createEmailCookie', 'makeApiSubscriber', 
+                    'getStoreViewIdBySubscriber', 'isEmailConfirmationRequired', 'isMagentoSubscription', 
+                    'isCustomerLoggedIn', 'getRequestActionName', 'getEmailFromPopUp', 'getEmailCookie', 
+                    '_getCampaignCookie', '_getLandingCookie', 'getWarningMessageAdminHtmlSession', 
+                    'getAdminSession', 'isListXorStoreInherited', 'getCatalogProductStatusModel', 
                     'makeApiOrder', 'makeApiCustomer', 'getCustomerModel'
                 )
             )
@@ -1783,8 +1783,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(
                 array(
-                        'getCreditmemo', 'getOrder', 'getSubscriber', 'getQuote', 'getItem', 
-                        'getHtml', 'setHtml', 'getProduct', 'getProductIds', 'getCustomer',
+                        'getCreditmemo', 'getOrder', 'getSubscriber', 'getQuote', 'getItem',  
+                        'getHtml', 'setHtml', 'getProduct', 'getProductIds', 'getCustomer', 
                         'getCustomerAddress'
                     )
                 )
@@ -1844,8 +1844,8 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
                     'unsubscribeMember', 'getMageApp', 'isEcomSyncDataEnabled', 'isSubscriptionEnabled', 
                     'loadListSubscriber', 'saveEcommerceSyncData', 'getMCStoreId', 'getMonkeyInGrid', 
                     'isEcomSyncDataEnabledInAnyScope','getAllMailChimpStoreIds', 'isEcommerceEnabled', 
-                    'isSubscriptionConfirmationEnabled', 'getStoreId', 'isUseMagentoEmailsEnabled',
-                    'saveInterestGroupData', 'isAbandonedCartEnabled', 'getInterestGroupsIfAvailable',
+                    'isSubscriptionConfirmationEnabled', 'getStoreId', 'isUseMagentoEmailsEnabled', 
+                    'saveInterestGroupData', 'isAbandonedCartEnabled', 'getInterestGroupsIfAvailable', 
                     'saveMailchimpConfig', 'addAdminWarning', 'getCurrentScope', 'getIfConfigExistsForScope', 
                     'getGeneralList', 'getListIdByApiKeyAndMCStoreId'
                 )
