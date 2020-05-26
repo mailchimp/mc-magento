@@ -390,7 +390,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $dataProductMock->expects($this->once())
             ->method('getMailchimpSyncDeleted')
             ->willReturn($isMarkedAsDeleted);
-        
+
         $dataProductMock->expects($this->once())
             ->method('getMailchimpSyncModified')
             ->willReturn($isMarkedAsDeleted);
@@ -482,7 +482,7 @@ class Ebizmarts_MailChimp_Model_ObserverTest extends PHPUnit_Framework_TestCase
         $dataProductMock->expects($this->once())
             ->method('getMailchimpSyncDeleted')
             ->willReturn($isMarkedAsDeleted);
-        
+
         $dataProductMock->expects($this->once())
             ->method('getMailchimpSyncModified')
             ->willReturn($isMarkedAsDeleted);
