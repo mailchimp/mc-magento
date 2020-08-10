@@ -218,6 +218,8 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         $helper = $this->getMailchimpHelper();
         $email = $data['email'];
         $listId = $data['list_id'];
+
+        $STATUS_SUBSCRIBED = Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED;
         $storeId = $helper->getMagentoStoreIdsByListId($listId)[0];
 
         $this->_mailChimpTags = $helper->getMapFields($storeId);
@@ -228,29 +230,32 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
         if ($customer) {
             $this->setCustomer($customer);
             $this->_setMailchimpTagsToCustomer($data);
-        } else {
-            $subscriber = $helper->loadListSubscriber($listId, $email);
-            $fname = $this->_getFName($data);
-            $lname = $this->_getLName($data);
+        }
 
-            if ($subscriber->getId()) {
+        $subscriber = $helper->loadListSubscriber($listId, $email);
+        $fname = $this->_getFName($data);
+        $lname = $this->_getLName($data);
+
+        if ($subscriber->getId()) {
+            if ($subscriber->getStatus() != $STATUS_SUBSCRIBED && $subscribe) {
+                $subscriber->setStatus($STATUS_SUBSCRIBED);
                 $subscriber->setSubscriberFirstname($fname);
                 $subscriber->setSubscriberLastname($lname);
+            }
+        } else {
+            if ($subscribe) {
+                $helper->subscribeMember($subscriber);
             } else {
                 /**
                  * Mailchimp subscriber not currently in magento newsletter subscribers.
                  * Get mailchimp subscriber status and add missing newsletter subscriber.
                  */
                 $this->_addSubscriberData($subscriber, $fname, $lname, $email, $listId);
-
-                if ($subscribe) {
-                    $helper->subscribeMember($subscriber);
-                }
             }
-
-            $subscriber->save();
-            $this->setSubscriber($subscriber);
         }
+
+        $subscriber->save();
+        $this->setSubscriber($subscriber);
 
         if (isset($data['merges']['GROUPINGS'])) {
             $interestGroupHandle = $this->_getInterestGroupHandleModel();
