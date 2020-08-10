@@ -332,7 +332,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     protected function customerAttributes($attributeCode, $key, $attribute)
     {
         $subscriber = $this->getSubscriber();
-        $customer   = $this->getCustomer();
+        $customer = $this->getCustomer();
 
         $eventValue = null;
 
@@ -420,7 +420,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
      *
      * @param $newVars
      */
-    protected function dispatchEventMergeVarAfter( &$newVars)
+    protected function dispatchEventMergeVarAfter(&$newVars)
     {
         Mage::dispatchEvent(
             'mailchimp_merge_field_send_after',
@@ -1073,7 +1073,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     {
         $customer = $this->getCustomer();
 
-        foreach($data['merges'] as $key => $value) {
+        foreach ($data['merges'] as $key => $value) {
             if (!empty($value)) {
                 if (is_array($this->_mailChimpTags)) {
                     if ($key !== 'GROUPINGS') {
