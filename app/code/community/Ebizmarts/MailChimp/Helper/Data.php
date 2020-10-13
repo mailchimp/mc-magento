@@ -1975,7 +1975,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param $collection
      */
-    protected function _loadItemCollection($collection)
+    public function _loadItemCollection($collection)
     {
         $collection->load();
     }
@@ -1985,7 +1985,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param $syncValue
      */
-    protected function _setIsSyncingIfFinishedInAllStores($syncValue)
+    public function _setIsSyncingIfFinishedInAllStores($syncValue)
     {
         $stores = $this->getMageApp()->getStores();
 
@@ -2001,7 +2001,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Helper_Webhook
      */
-    protected function getWebhookHelper()
+    public function getWebhookHelper()
     {
         return Mage::helper('mailchimp/webhook');
     }
@@ -3828,7 +3828,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Model_Interestgroup
      */
-    protected function getInterestGroupModel()
+    public function getInterestGroupModel()
     {
         return Mage::getModel('mailchimp/interestgroup');
     }
@@ -3836,7 +3836,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Mage_Customer_Model_Session
      */
-    protected function getCustomerSession()
+    public function getCustomerSession()
     {
         return Mage::getSingleton('customer/session');
     }
@@ -3967,7 +3967,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
      */
-    protected function getMailchimpEcommerceSyncDataModel()
+    public function getMailchimpEcommerceSyncDataModel()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
     }
@@ -4131,7 +4131,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Mage_Sales_Model_Order
      */
-    protected function getSalesOrderModel()
+    public function getSalesOrderModel()
     {
         return Mage::getModel('sales/order');
     }
@@ -4139,7 +4139,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Helper_Date
      */
-    protected function getDateHelper()
+    public function getDateHelper()
     {
         return Mage::helper('mailchimp/date');
     }
@@ -4263,7 +4263,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Helper_File
      */
-    protected function getFileHelper()
+    public function getFileHelper()
     {
         return Mage::helper('mailchimp/file');
     }
