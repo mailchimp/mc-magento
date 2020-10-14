@@ -403,7 +403,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                         $orderId = $order->getEntityId();
                         $syncError = null;
                         $syncModified = null;
-                        $orderObject = $helper->getSalesOrderModel()->load($orderId);
+                        $orderObject = $this->getSalesOrderModel()->load($orderId);
                         $syncDelta = $orderObject->getMailchimpSyncDelta();
 
                         if ($order->getMailchimpSyncError()) {
@@ -473,7 +473,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                         $syncError = null;
                         $syncDeleted = null;
                         $token = null;
-                        $quoteObject = $helper->getSalesOrderModel()->load($quoteId);
+                        $quoteObject = $this->getSalesOrderModel()->load($quoteId);
                         $syncDelta = $quoteObject->getMailchimpSyncDelta();
 
                         if ($quote->getMailchimpSyncError()) {
