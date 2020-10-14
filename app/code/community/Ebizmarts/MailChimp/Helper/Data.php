@@ -1973,35 +1973,9 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param $collection
-     */
-    public function _loadItemCollection($collection)
-    {
-        $collection->load();
-    }
-
-    /**
-     * Modify is_syncing value if initial sync finished for all stores.
-     *
-     * @param $syncValue
-     */
-    public function _setIsSyncingIfFinishedInAllStores($syncValue)
-    {
-        $stores = $this->getMageApp()->getStores();
-
-        foreach ($stores as $storeId => $store) {
-            $ecommEnabled = $this->isEcomSyncDataEnabled($storeId);
-
-            if ($ecommEnabled) {
-                $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
-            }
-        }
-    }
-
-    /**
      * @return Ebizmarts_MailChimp_Helper_Webhook
      */
-    public function getWebhookHelper()
+    protected function getWebhookHelper()
     {
         return Mage::helper('mailchimp/webhook');
     }
@@ -3828,7 +3802,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Model_Interestgroup
      */
-    public function getInterestGroupModel()
+    protected function getInterestGroupModel()
     {
         return Mage::getModel('mailchimp/interestgroup');
     }
@@ -3836,7 +3810,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Mage_Customer_Model_Session
      */
-    public function getCustomerSession()
+    protected function getCustomerSession()
     {
         return Mage::getSingleton('customer/session');
     }
@@ -3967,7 +3941,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
      */
-    public function getMailchimpEcommerceSyncDataModel()
+    protected function getMailchimpEcommerceSyncDataModel()
     {
         return Mage::getModel('mailchimp/ecommercesyncdata');
     }
@@ -4131,7 +4105,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Mage_Sales_Model_Order
      */
-    public function getSalesOrderModel()
+    protected function getSalesOrderModel()
     {
         return Mage::getModel('sales/order');
     }
@@ -4263,7 +4237,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Helper_File
      */
-    public function getFileHelper()
+    protected function getFileHelper()
     {
         return Mage::helper('mailchimp/file');
     }
