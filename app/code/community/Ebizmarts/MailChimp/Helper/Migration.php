@@ -127,7 +127,6 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
      */
     protected function _makeForCollectionItem($collection, $mailchimpStoreId, $initialTime, Closure $callback)
     {
-        $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $finished = false;
 
@@ -142,7 +141,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
 
         do {
             $collection->setCurPage($currentPage);
-            $helper->_loadItemCollection($collection);
+            $this->_loadItemCollection($collection);
 
             foreach ($collection as $collectionItem) {
                 $callback($collectionItem, $mailchimpStoreId);
@@ -164,6 +163,14 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
         } while ($currentPage <= $pages);
 
         return $finished;
+    }
+
+    /**
+     * @param $collection
+     */
+    protected function _loadItemCollection($collection)
+    {
+        $collection->load();
     }
 
     protected function _migrateFrom115dropColumn($arrayMigrationConfigData)
@@ -207,6 +214,14 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
         }
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Ecommercesyncdata
+     */
+    protected function getMailchimpEcommerceSyncDataModel()
+    {
+        return Mage::getModel('mailchimp/ecommercesyncdata');
     }
 
     /**
@@ -256,7 +271,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                             $syncModified = $customer->getMailchimpSyncModified();
                         }
 
-                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $customerId,
                             Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
@@ -323,7 +338,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                             $syncModified = $product->getMailchimpSyncModified();
                         }
 
-                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $productId,
                             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
@@ -338,6 +353,14 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
         } catch (Exception $e) {
             $helper->logError($e->getMessage());
         }
+    }
+
+    /**
+     * @return Mage_Sales_Model_Order
+     */
+    protected function getSalesOrderModel()
+    {
+        return Mage::getModel('sales/order');
     }
 
     /**
@@ -380,7 +403,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                         $orderId = $order->getEntityId();
                         $syncError = null;
                         $syncModified = null;
-                        $orderObject = $helper->getSalesOrderModel()->load($orderId);
+                        $orderObject = $this->getSalesOrderModel()->load($orderId);
                         $syncDelta = $orderObject->getMailchimpSyncDelta();
 
                         if ($order->getMailchimpSyncError()) {
@@ -391,7 +414,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                             $syncModified = $order->getMailchimpSyncModified();
                         }
 
-                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $orderId,
                             Ebizmarts_MailChimp_Model_Config::IS_ORDER,
@@ -450,7 +473,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                         $syncError = null;
                         $syncDeleted = null;
                         $token = null;
-                        $quoteObject = $helper->getSalesOrderModel()->load($quoteId);
+                        $quoteObject = $this->getSalesOrderModel()->load($quoteId);
                         $syncDelta = $quoteObject->getMailchimpSyncDelta();
 
                         if ($quote->getMailchimpSyncError()) {
@@ -465,7 +488,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                             $token = $quote->getMailchimpToken();
                         }
 
-                        $ecommerceSyncData = $helper->getMailchimpEcommerceSyncDataModel();
+                        $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
                         $ecommerceSyncData->saveEcommerceSyncData(
                             $quoteId,
                             Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
@@ -511,18 +534,35 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Modify is_syncing value if initial sync finished for all stores.
+     *
+     * @param $syncValue
+     */
+    protected function _setIsSyncingIfFinishedInAllStores($syncValue)
+    {
+        $stores = $this->getMageApp()->getStores();
+
+        foreach ($stores as $storeId => $store) {
+            $ecommEnabled = $this->isEcomSyncDataEnabled($storeId);
+
+            if ($ecommEnabled) {
+                $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
+            }
+        }
+    }
+
+    /**
      * Migrate data from version 1.1.6.
      *
      * @param $initialTime
      */
     protected function _migrateFrom116($initialTime)
     {
-        $helper = $this->getHelper();
-        $helper->_setIsSyncingIfFinishedInAllStores(true);
+        $this->_setIsSyncingIfFinishedInAllStores(true);
         $finished = $this->_migrateOrdersFrom116($initialTime);
 
         if ($finished) {
-            $helper->_setIsSyncingIfFinishedInAllStores(false);
+            $this->_setIsSyncingIfFinishedInAllStores(false);
             $arrayMigrationConfigData = array('115' => false, '116' => true, '1164' => false);
             $this->handleDeleteMigrationConfigData($arrayMigrationConfigData);
         }

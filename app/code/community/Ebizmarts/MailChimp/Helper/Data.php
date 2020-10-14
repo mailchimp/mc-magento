@@ -1973,32 +1973,6 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param $collection
-     */
-    protected function _loadItemCollection($collection)
-    {
-        $collection->load();
-    }
-
-    /**
-     * Modify is_syncing value if initial sync finished for all stores.
-     *
-     * @param $syncValue
-     */
-    protected function _setIsSyncingIfFinishedInAllStores($syncValue)
-    {
-        $stores = $this->getMageApp()->getStores();
-
-        foreach ($stores as $storeId => $store) {
-            $ecommEnabled = $this->isEcomSyncDataEnabled($storeId);
-
-            if ($ecommEnabled) {
-                $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
-            }
-        }
-    }
-
-    /**
      * @return Ebizmarts_MailChimp_Helper_Webhook
      */
     protected function getWebhookHelper()
@@ -4139,7 +4113,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return Ebizmarts_MailChimp_Helper_Date
      */
-    protected function getDateHelper()
+    public function getDateHelper()
     {
         return Mage::helper('mailchimp/date');
     }
