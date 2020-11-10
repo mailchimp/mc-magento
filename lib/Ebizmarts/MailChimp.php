@@ -391,6 +391,7 @@ class Ebizmarts_MailChimp
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_VERBOSE, $this->_debug);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
         $responseBody = curl_exec($ch);
 

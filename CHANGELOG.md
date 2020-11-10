@@ -1,30 +1,41 @@
 # Changelog
+## [1.1.21](https://github.com/mailchimp/mc-magento/releases/tag/1.1.21) - 2020-10-21
+**Fixed**
+- Protected functions in HelperData being called from Migration Helper. [\#1189](https://github.com/mailchimp/mc-magento/issues/1189)
+- 1.1.20 PHP Fatal error:  Uncaught Error: Call to undefined method Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags::getHelper() in /app/code/community/Ebizmarts/MailChimp/Model/Api/Subscribers/MailchimpTags.php:275 [\#1177](https://github.com/mailchimp/mc-magento/issues/1177)
+
+**Changed**
+- Set CURL_HTTP_VERSION_1_1 [\#1155](https://github.com/mailchimp/mc-magento/issues/1155)
+- Add Mailchimp webhook trigger "Profile Update" [\#1145](https://github.com/mailchimp/mc-magento/issues/1145)
+- quoteEscape() method doesn't exist on M1.7 [\#1114](https://github.com/mailchimp/mc-magento/issues/1114)
+- Request to delete/unsubscribe customers via Magento in Customer + CreditNote to support Omnivore [\#799](https://github.com/mailchimp/mc-magento/issues/799)
+
 ## [1.1.20](https://github.com/mailchimp/mc-magento/releases/tag/1.1.20) - 2020-03-30
 **Fixed**
 - Not sending emails using Mandrill when new customer register. [\#1159](https://github.com/mailchimp/mc-magento/issues/1159)
 - Mandrill configuration showing: --- Invalid API KEY --- even if API key is correct [\#1157](https://github.com/mailchimp/mc-magento/issues/1157)
 - Warning: include(Ebizmarts/MailChimp/Model/Resource/Ecommercesyncdata/Promorules/Collection.php): failed to open stream: No such file or directory  in /data/web/jenkins/public/builds/current/lib/Varien/Autoload.php on line 94 [\#1156](https://github.com/mailchimp/mc-magento/issues/1156)
 - Limit local length of Merge Field to be the same size as in Mailchimp. [\#1140](https://github.com/mailchimp/mc-magento/issues/1140)
-- Loading animation remains forever if there are no lists in the account after placing API Key [\#1136](https://github.com/mailchimp/mc-magento/issues/1136)
-- Remove the mc_eid logic. [\#1141](https://github.com/mailchimp/mc-magento/issues/1141)
-- Javascript error in campaignCatcher.js [\#1147](https://github.com/mailchimp/mc-magento/issues/1147)
 
 **Changed**
 - Only 10 interest group checkboxes showed after checkout [\#1135](https://github.com/mailchimp/mc-magento/issues/1135)
-- Add Customer data update based on map fields in webhook [\#1110](https://github.com/mailchimp/mc-magento/issues/1110)
-- Add explanation on warning when clicking Resend and Reset buttons with what scope will be deleted. [\#1142](https://github.com/mailchimp/mc-magento/issues/1142)
 
 ## [1.1.19](https://github.com/mailchimp/mc-magento/releases/tag/1.1.19) - 2020-03-03
 **Fixed**
+- Javascript error in campaignCatcher.js [\#1147](https://github.com/mailchimp/mc-magento/issues/1147)
+- Remove the mc_eid logic. [\#1141](https://github.com/mailchimp/mc-magento/issues/1141)
+- Loading animation remains forever if there are no lists in the account after placing API Key [\#1136](https://github.com/mailchimp/mc-magento/issues/1136)
 - Serializer error when Magento is compiled. [\#1116](https://github.com/mailchimp/mc-magento/issues/1116)
 - Missing getWebhooks() function on Lib. [\#1115](https://github.com/mailchimp/mc-magento/issues/1115)
 - Error in Cron error while executing mailchimp_clear_ecommerce_data [\#1112](https://github.com/mailchimp/mc-magento/issues/1112)
 - Fix incorrect class declaration in function setEcommerceSyncDataItemValues [\#1103](https://github.com/mailchimp/mc-magento/issues/1103)
 
 **Changed**
+- Add explanation on warning when clicking Resend and Reset buttons with what scope will be deleted. [\#1142](https://github.com/mailchimp/mc-magento/issues/1142)
 - Refactor collection filters to avoid doing joins, where, etc outside resources. [\#1119](https://github.com/mailchimp/mc-magento/issues/1119)
 - Allow translation of texts on app/code/community/Ebizmarts/MailChimp/controllers/CartController.php [\#1118](https://github.com/mailchimp/mc-magento/issues/1118)
 - Add Customer Interest Groups update based on webhook [\#1111](https://github.com/mailchimp/mc-magento/issues/1111)
+- Add Customer data update based on map fields in webhook [\#1110](https://github.com/mailchimp/mc-magento/issues/1110)
 - Add Mailchimp configuration link at Newsletter -> Mailchimp menu [\#1107](https://github.com/mailchimp/mc-magento/issues/1107)
 - Log the product id if is not supported by Mailchimp [\#1101](https://github.com/mailchimp/mc-magento/issues/1101)
 - Exceptions not treated properly. [\#1098](https://github.com/mailchimp/mc-magento/issues/1098)

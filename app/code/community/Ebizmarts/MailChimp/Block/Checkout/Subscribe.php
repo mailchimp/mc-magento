@@ -31,6 +31,23 @@ class Ebizmarts_MailChimp_Block_Checkout_Subscribe extends Mage_Core_Block_Templ
     }
 
     /**
+     * @param $data
+     * @return string
+     */
+    public function escapeQuote($data)
+    {
+        return $this->getHelper()->mcEscapeQuote($data);
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Helper_Data
+     */
+    public function getHelper()
+    {
+        return $this->_helper;
+    }
+
+    /**
      * Render block HTML
      *
      * @return string

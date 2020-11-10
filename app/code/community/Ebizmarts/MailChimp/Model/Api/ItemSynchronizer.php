@@ -177,7 +177,7 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     protected function markSyncDataAsModified($id)
     {
-        $this->_updateSyncData($id, null, null, 1);
+        $this->_updateSyncData($id, null, null, 1, null, null, null, true);
     }
 
     protected function markSyncDataAsDeleted($id, $syncedFlag = null)

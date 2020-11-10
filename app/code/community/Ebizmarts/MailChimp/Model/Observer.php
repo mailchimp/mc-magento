@@ -440,27 +440,32 @@ class Ebizmarts_MailChimp_Model_Observer
             $this->removeCampaignData();
             $items = $order->getAllItems();
 
-            foreach ($items as $item) {
-                if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
-                    continue;
+            try {
+                foreach ($items as $item) {
+                    if ($this->isBundleItem($item) || $this->isConfigurableItem($item)) {
+                        continue;
+                    }
+
+                    $mailchimpStoreId = $helper->getMCStoreId($storeId);
+                    $productId = $item->getProductId();
+                    $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
+                        $productId,
+                        Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+                        $mailchimpStoreId
+                    );
+
+                    $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
+                    $isMarkedAsModified = $dataProduct->getMailchimpSyncModified();
+
+                    if (!$isMarkedAsDeleted && !$isMarkedAsModified) {
+                        $apiProducts = $this->makeApiProduct();
+                        $apiProducts->setMailchimpStoreId($mailchimpStoreId);
+                        $apiProducts->setMagentoStoreId($storeId);
+                        $apiProducts->update($productId);
+                    }
                 }
-
-                $mailchimpStoreId = $helper->getMCStoreId($storeId);
-                $productId = $item->getProductId();
-                $dataProduct = $this->getMailchimpEcommerceSyncDataModel()->getEcommerceSyncDataItem(
-                    $productId,
-                    Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
-                    $mailchimpStoreId
-                );
-
-                $isMarkedAsDeleted = $dataProduct->getMailchimpSyncDeleted();
-
-                if (!$isMarkedAsDeleted) {
-                    $apiProducts = $this->makeApiProduct();
-                    $apiProducts->setMailchimpStoreId($mailchimpStoreId);
-                    $apiProducts->setMagentoStoreId($storeId);
-                    $apiProducts->update($productId);
-                }
+            } catch (Exception $e) {
+                $helper->logError($e->getMessage());
             }
         }
 
@@ -772,6 +777,29 @@ class Ebizmarts_MailChimp_Model_Observer
             }
 
             $apiOrder->update($order->getEntityId(), $storeId);
+        }
+
+        return $observer;
+    }
+
+    /**
+     * If "unsubscribe" checkbox is checked, ubsubscribes the customer.
+     *
+     * @param  Varien_Event_Observer $observer
+     * @return Varien_Event_Observer
+     */
+    public function createCreditmemo($observer)
+    {
+        $mailchimpUnsubscribe = $this->getRequest()->getParam('mailchimp_unsubscribe');
+
+        if ($this->isUnsubscribeChecked($mailchimpUnsubscribe)) {
+            $creditMemo = $observer->getEvent()->getCreditmemo();
+            $helper = $this->makeHelper();
+            $order = $creditMemo->getOrder();
+            $email = $order->getCustomerEmail();
+            $subscriberModel = $this->getSubscriberModel();
+            $subscriber = $subscriberModel->loadByEmail($email);
+            $helper->unsubscribeMember($subscriber);
         }
 
         return $observer;
@@ -1184,6 +1212,18 @@ class Ebizmarts_MailChimp_Model_Observer
         }
 
         return $subscriber;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function isUnsubscribeChecked($mailchimpUnsubscribe)
+    {
+        if ($mailchimpUnsubscribe === 'on') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
