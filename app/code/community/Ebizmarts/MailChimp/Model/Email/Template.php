@@ -24,91 +24,94 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function send($email, $name = null, array $variables = array())
     {
-        $emailConfig = $this->getDesignConfig();
-        $storeId = (integer)$emailConfig->getStore();
-        $mandrillHelper = $this->makeMandrillHelper();
-
-        if (!$mandrillHelper->isMandrillEnabled($storeId)) {
-            return $this->parentSend($email, $name, $variables);
-        }
-
-        if (!$this->isValidForSend()) {
-            Mage::logException(new Exception('This letter cannot be sent.')); // translation is intentionally omitted
-            return false;
-        }
-
-        $emails = array_values((array)$email);
-        $names = $this->_getEmailsNames($emails, $name);
-
-        // Get message
-        $this->setUseAbsoluteLinks(true);
-        $variables['email'] = reset($emails);
-        $variables['name'] = reset($names);
-        $message = $this->getProcessedTemplate($variables, true);
-        $subject = $this->getProcessedTemplateSubject($variables);
-
-        $email = array('subject' => $subject, 'to' => array());
-        $setReturnPath = $this->getSendingSetReturnPath();
-
-        switch ($setReturnPath) {
-            case 1:
-                $returnPathEmail = $this->getSenderEmail();
-                break;
-            case 2:
-                $returnPathEmail = $this->getSendingReturnPathEmail();
-                break;
-            default:
-                $returnPathEmail = null;
-                break;
-        }
-
-        $email['to'] = $this->_getEmailsTo($emails, $names, $this->getMail());
-        $email['from_email'] = $this->_getEmailFrom($this->getMail());
-        $email['from_name'] = $this->getSenderName();
-        $email['tags'] = $this->_getEmailsTags($variables);
-
-        $mail = $this->getMail();
-        $headers = $mail->getHeaders();
-        $headers[] = $mandrillHelper->getUserAgent();
-        $email['headers'] = $headers;
-
-        if ($att = $mail->getAttachments()) {
-            $email['attachments'] = $att;
-        }
-
-        if ($this->isPlain()) {
-            $email['text'] = $message;
-        } else {
-            $email['html'] = $message;
-        }
-
-        if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
-            $emailQueue = $this->getQueue();
-            $emailQueue->clearRecipients();
-            $emailQueue->setMessageBody($message);
-            $emailQueue->setMessageParameters(
-                array(
-                    'subject' => $subject,
-                    'return_path_email' => $returnPathEmail,
-                    'is_plain' => $this->isPlain(),
-                    'from_email' => $this->getSenderEmail(),
-                    'from_name' => $this->getSenderName()
-                )
-            )
-                ->addRecipients($emails, $names, Mage_Core_Model_Email_Queue::EMAIL_TYPE_TO)
-                ->addRecipients($this->_bccEmails, array(), Mage_Core_Model_Email_Queue::EMAIL_TYPE_BCC);
-            $emailQueue->addMessageToQueue();
-
-            return true;
-        }
-
         try {
-            $this->sendMail($email, $mail);
-            $this->_mail = null;
-        } catch (Exception $e) {
-            $this->_mail = null;
-            Mage::logException($e);
-            return false;
+            $emailConfig = $this->getDesignConfig();
+            $storeId = (integer)$emailConfig->getStore();
+            $mandrillHelper = $this->makeMandrillHelper();
+
+            if (!$mandrillHelper->isMandrillEnabled($storeId)) {
+                return $this->parentSend($email, $name, $variables);
+            }
+
+            if (!$this->isValidForSend()) {
+                Mage::logException(new Exception('This letter cannot be sent.')); // translation is intentionally omitted
+                return false;
+            }
+
+            $emails = array_values((array)$email);
+            $names = $this->_getEmailsNames($emails, $name);
+
+            // Get message
+            $this->setUseAbsoluteLinks(true);
+            $variables['email'] = reset($emails);
+            $variables['name'] = reset($names);
+            $message = $this->getProcessedTemplate($variables, true);
+            $subject = $this->getProcessedTemplateSubject($variables);
+
+//            $email = array('subject' => $subject, 'to' => array());
+            $setReturnPath = $this->getSendingSetReturnPath();
+
+            switch ($setReturnPath) {
+                case 1:
+                    $returnPathEmail = $this->getSenderEmail();
+                    break;
+                case 2:
+                    $returnPathEmail = $this->getSendingReturnPathEmail();
+                    break;
+                default:
+                    $returnPathEmail = null;
+                    break;
+            }
+            /**
+             * @var $mail Mandrill_Message
+             */
+            $mail = $this->getMail();
+            $mail->setFrom($this->getSenderEmail(), $this->getSenderName());
+            $mail->setTags($this->_getEmailsTags($variables));
+            $mail->setReplyTo($this->getSenderEmail(), $this->getSenderName());
+            $mail->addTo($emails, $names);
+            $mail->setSubject($subject);
+            $mail->addHeader('User-Agent', $mandrillHelper->getUserAgent());
+//            if ($att = $mail->getAttachments()) {
+//                $email['attachments'] = $att;
+//            }
+            if ($this->isPlain()) {
+                $mail->setBodyText($message);
+            } else {
+                $mail->setBodyHtml($message);
+            }
+
+//            if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
+//                Mage::log('mando para la cola');
+//                $emailQueue = $this->getQueue();
+//                $emailQueue->clearRecipients();
+//                $emailQueue->setMessageBody($message);
+//                $emailQueue->setMessageParameters(
+//                    array(
+//                        'subject' => $subject,
+//                        'return_path_email' => $returnPathEmail,
+//                        'is_plain' => $this->isPlain(),
+//                        'from_email' => $this->getSenderEmail(),
+//                        'from_name' => $this->getSenderName()
+//                    )
+//                )
+//                    ->addRecipients($emails, $names, Mage_Core_Model_Email_Queue::EMAIL_TYPE_TO)
+//                    ->addRecipients($this->_bccEmails, array(), Mage_Core_Model_Email_Queue::EMAIL_TYPE_BCC);
+//                $emailQueue->addMessageToQueue();
+//
+//                return true;
+//            }
+
+            try {
+                $this->sendMail($mail);
+                $this->_mail = null;
+            } catch (Exception $e) {
+                $this->_mail = null;
+                Mage::logException($e);
+                return false;
+            }
+        } catch(Exception $e) {
+            Mage::log($e);
         }
         return true;
     }
@@ -293,12 +296,12 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      * @param $mail
      * @return mixed
      */
-    protected function sendMail($email, $mail)
+    protected function sendMail($mail)
     {
         $mailSent = false;
 
         try {
-            $mailSent = $mail->messages->send($email);
+            $mailSent = $mail->send();
         } catch (Exception $e) {
             Mage::log($e->getMessage(), null, 'Mandrill.log', true);
         }

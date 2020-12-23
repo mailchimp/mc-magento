@@ -18,6 +18,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     protected $_to = array();
     protected $_headers = array();
     protected $_fromName;
+    protected $_tags = array();
 
     /**
      * Flag: whether or not email has attachments
@@ -113,17 +114,25 @@ class Mandrill_Message extends Mandrill_Mandrill
         return $this->_bcc;
     }
 
-    public function addTo($email, $name = '')
+    public function addTo($emails, $names = '')
     {
-        if (!is_array($email)) {
-            $email = array($name => $email);
-        }
+        $max = count($emails);
 
-        foreach ($email as $n => $recipient) {
-            $this->_to[] = $recipient;
+        for ($i = 0; $i < $max; $i++) {
+            if (isset($names[$i])) {
+                $this->_to[] = array(
+                    'email' => $emails[$i],
+                    'name' => $names[$i],
+                    'type' => 'to'
+                );
+            } else {
+                $this->_to[] = array(
+                    'email' => $emails[$i],
+                    'name' => '',
+                    'type' => 'to'
+                );
+            }
         }
-
-        return $this;
     }
 
     public function getTo()
@@ -175,10 +184,8 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
 
         $email = $this->_filterEmail($email);
-        //$name  = $this->_filterName($name);
         $this->_from = $email;
         $this->_fromName = $name;
-        //$this->_storeHeader('From', $this->_formatAddress($email, $name), true);
 
         return $this;
     }
@@ -235,7 +242,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
         $email = $this->_filterEmail($email);
         $name = $this->_filterName($name);
-        $this->_headers[] = array('Reply-To' => sprintf('%s <%s>', $name, $email));
+        $this->_headers['Reply-To'] = sprintf('%s <%s>', $name, $email);
         return $this;
     }
 
@@ -260,29 +267,23 @@ class Mandrill_Message extends Mandrill_Mandrill
 
     public function getHeaders()
     {
-        if (isset($this->_headers[0])) {
-            return $this->_headers[0];
-        }
-
-        return null;
+        return $this->_headers;
+//        if (isset($this->_headers[0])) {
+//            return $this->_headers[0];
+//        }
+//
+//        return null;
+    }
+    public function setTags($tags)
+    {
+        $this->_tags[] = $tags;
     }
 
     public function send()
     {
         $email = array();
 
-        foreach ($this->_to as $to) {
-            $email['to'][] = array(
-                'email' => $to
-            );
-        }
-
-        foreach ($this->_bcc as $bcc) {
-            $email['to'][] = array(
-                'email' => $bcc,
-                'type' => 'bcc'
-            );
-        }
+        $email['to'] = array_merge($this->getTo(),$this->getBcc());
 
         $email['subject'] = $this->_subject;
 
@@ -307,7 +308,10 @@ class Mandrill_Message extends Mandrill_Mandrill
         if ($this->_bodyText) {
             $email['text'] = $this->_bodyText;
         }
-
+        if ($this->_tags) {
+            $email['tags'] = $this->_tags;
+        }
+        $this->log($email);
         try {
             $this->messages->send($email);
         } catch (Exception $e) {
