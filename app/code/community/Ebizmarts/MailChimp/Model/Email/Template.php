@@ -48,7 +48,6 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             $message = $this->getProcessedTemplate($variables, true);
             $subject = $this->getProcessedTemplateSubject($variables);
 
-//            $email = array('subject' => $subject, 'to' => array());
             $setReturnPath = $this->getSendingSetReturnPath();
 
             switch ($setReturnPath) {
@@ -72,9 +71,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             $mail->addTo($emails, $names);
             $mail->setSubject($subject);
             $mail->addHeader('User-Agent', $mandrillHelper->getUserAgent());
-//            if ($att = $mail->getAttachments()) {
-//                $email['attachments'] = $att;
-//            }
+
             if ($this->isPlain()) {
                 $mail->setBodyText($message);
             } else {
@@ -82,7 +79,6 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             }
 
 //            if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
-//                Mage::log('mando para la cola');
 //                $emailQueue = $this->getQueue();
 //                $emailQueue->clearRecipients();
 //                $emailQueue->setMessageBody($message);
@@ -112,6 +108,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             }
         } catch(Exception $e) {
             Mage::log($e);
+            return false;
         }
         return true;
     }
@@ -236,16 +233,19 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function getMail()
     {
-        $mandrillHelper = $this->makeMandrillHelper();
-        $emailConfig = $this->getDesignConfig();
-        $storeId = (integer)$emailConfig->getStore();
+        if (is_null($this->_mail)) {
+            $mandrillHelper = $this->makeMandrillHelper();
+            $emailConfig = $this->getDesignConfig();
+            $storeId = (integer)$emailConfig->getStore();
 
-        if (!$this->isMandrillEnabled($storeId)) {
-            return parent::getMail();
+            if (!$this->isMandrillEnabled($storeId)) {
+                return parent::getMail();
+            }
+
+//        $mandrillHelper->log("store: $storeId API: " . $mandrillHelper->getMandrillApiKey($storeId), $storeId);
+            $this->_mail = $this->createMandrillMessage($storeId);
         }
-
-        $mandrillHelper->log("store: $storeId API: " . $mandrillHelper->getMandrillApiKey($storeId), $storeId);
-        return $this->createMandrillMessage($storeId);
+        return $this->_mail;
     }
 
     /**

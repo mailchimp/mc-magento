@@ -102,10 +102,16 @@ class Mandrill_Message extends Mandrill_Mandrill
     {
         if (is_array($bcc)) {
             foreach ($bcc as $email) {
-                $this->_bcc[] = $email;
+                $this->_bcc[] = array(
+                    'email' => $email,
+                    'type' => 'bcc'
+                );
             }
         } else {
-            $this->_bcc[] = $bcc;
+            $this->_bcc[] = array(
+                'email' => $bcc,
+                'type' => 'bcc'
+            );
         }
     }
 
@@ -276,7 +282,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     }
     public function setTags($tags)
     {
-        $this->_tags[] = $tags;
+        $this->_tags = $tags;
     }
 
     public function send()
@@ -311,7 +317,6 @@ class Mandrill_Message extends Mandrill_Mandrill
         if ($this->_tags) {
             $email['tags'] = $this->_tags;
         }
-        $this->log($email);
         try {
             $this->messages->send($email);
         } catch (Exception $e) {
