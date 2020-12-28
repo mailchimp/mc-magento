@@ -19,6 +19,7 @@ class Mandrill_Message extends Mandrill_Mandrill
     protected $_headers = array();
     protected $_fromName;
     protected $_tags = array();
+    protected $_returnPath = null;
 
     /**
      * Flag: whether or not email has attachments
@@ -122,25 +123,57 @@ class Mandrill_Message extends Mandrill_Mandrill
 
     public function addTo($emails, $names = '')
     {
-        $max = count($emails);
+        if (is_array($emails)) {
+            $max = count($emails);
 
-        for ($i = 0; $i < $max; $i++) {
-            if (isset($names[$i])) {
-                $this->_to[] = array(
-                    'email' => $emails[$i],
-                    'name' => $names[$i],
-                    'type' => 'to'
-                );
-            } else {
-                $this->_to[] = array(
-                    'email' => $emails[$i],
-                    'name' => '',
-                    'type' => 'to'
-                );
+            for ($i = 0; $i < $max; $i++) {
+                if (isset($names[$i])) {
+                    $this->_to[] = array(
+                        'email' => $emails[$i],
+                        'name' => $names[$i],
+                        'type' => 'to'
+                    );
+                } else {
+                    $this->_to[] = array(
+                        'email' => $emails[$i],
+                        'name' => '',
+                        'type' => 'to'
+                    );
+                }
             }
+        } else {
+            $this->_to[] = array(
+                'email' => $emails,
+                'name' => $names,
+                'type' => 'to'
+            );
         }
     }
+    public function getReplyTo()
+    {
+        $emails = array();
+        foreach ($this->_to as $item) {
+            $emails[] = $item['email'];
+        }
+        return $emails;
+    }
+    public function setReturnPath($email)
+    {
+//        if ($this->_returnPath === null) {
+            $email = $this->_filterEmail($email);
+            $this->_returnPath = $email;
+            $this->_headers['Reply-To'] = sprintf('%s', $email);
+//        }
+        return $this;
+    }
+    public function getReturnPath()
+    {
+        if (null !== $this->_returnPath) {
+            return $this->_returnPath;
+        }
 
+        return $this->_from;
+    }
     public function getTo()
     {
         return $this->_to;
@@ -274,11 +307,6 @@ class Mandrill_Message extends Mandrill_Mandrill
     public function getHeaders()
     {
         return $this->_headers;
-//        if (isset($this->_headers[0])) {
-//            return $this->_headers[0];
-//        }
-//
-//        return null;
     }
     public function setTags($tags)
     {
