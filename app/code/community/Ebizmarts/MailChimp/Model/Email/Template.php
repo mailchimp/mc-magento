@@ -24,6 +24,7 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
      */
     public function send($email, $name = null, array $variables = array())
     {
+
         try {
             $emailConfig = $this->getDesignConfig();
             $storeId = (integer)$emailConfig->getStore();
@@ -61,6 +62,25 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
                     $returnPathEmail = null;
                     break;
             }
+            if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
+                $emailQueue = $this->getQueue();
+                $emailQueue->clearRecipients();
+                $emailQueue->setMessageBody($message);
+                $emailQueue->setMessageParameters(
+                    array(
+                        'subject' => $subject,
+                        'return_path_email' => $returnPathEmail,
+                        'is_plain' => $this->isPlain(),
+                        'from_email' => $this->getSenderEmail(),
+                        'from_name' => $this->getSenderName()
+                    )
+                )
+                    ->addRecipients($emails, $names, Mage_Core_Model_Email_Queue::EMAIL_TYPE_TO)
+                    ->addRecipients($this->_bccEmails, array(), Mage_Core_Model_Email_Queue::EMAIL_TYPE_BCC);
+                $emailQueue->addMessageToQueue();
+
+                return true;
+            }
             /**
              * @var $mail Mandrill_Message
              */
@@ -77,26 +97,6 @@ class Ebizmarts_MailChimp_Model_Email_Template extends Ebizmarts_MailChimp_Model
             } else {
                 $mail->setBodyHtml($message);
             }
-
-//            if ($this->hasQueue() && $this->getQueue() instanceof Mage_Core_Model_Email_Queue) {
-//                $emailQueue = $this->getQueue();
-//                $emailQueue->clearRecipients();
-//                $emailQueue->setMessageBody($message);
-//                $emailQueue->setMessageParameters(
-//                    array(
-//                        'subject' => $subject,
-//                        'return_path_email' => $returnPathEmail,
-//                        'is_plain' => $this->isPlain(),
-//                        'from_email' => $this->getSenderEmail(),
-//                        'from_name' => $this->getSenderName()
-//                    )
-//                )
-//                    ->addRecipients($emails, $names, Mage_Core_Model_Email_Queue::EMAIL_TYPE_TO)
-//                    ->addRecipients($this->_bccEmails, array(), Mage_Core_Model_Email_Queue::EMAIL_TYPE_BCC);
-//                $emailQueue->addMessageToQueue();
-//
-//                return true;
-//            }
 
             try {
                 $this->sendMail($mail);
