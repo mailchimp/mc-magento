@@ -831,6 +831,9 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     public function joinMailchimpSyncData($collection)
     {
+        $this->_ecommerceProductsCollection = $this->createEcommerceProductsCollection();
+        $this->_ecommerceProductsCollection->setMailchimpStoreId($this->getMailchimpStoreId());
+
         $joinCondition = $this->buildMailchimpDataJoin();
         $this->executeMailchimpDataJoin($collection, $joinCondition);
         $this->buildMailchimpDataWhere($collection);

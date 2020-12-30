@@ -2789,14 +2789,19 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      */
     protected function isMissingProductLowerThanId($itemId, $storeId)
     {
+        /**
+         * @var Ebizmarts_MailChimp_Model_Api_Products
+         */
         $apiProducts = Mage::getModel('mailchimp/api_products');
         $mailchimpStoreId = $this->getMCStoreId($storeId);
+        $apiProducts->setMailchimpStoreId($mailchimpStoreId);
+
         $productCollection = Mage::getResourceModel('catalog/product_collection')
             ->addStoreFilter($storeId)
             ->addFieldToFilter('entity_id', array('lteq' => $itemId));
         $productCollection->addFinalPrice();
-        $apiProducts->joinQtyAndBackorders($productCollection);
-        $apiProducts->joinMailchimpSyncData($productCollection, $mailchimpStoreId);
+        $productCollection->joinQtyAndBackorders($productCollection);
+        $apiProducts->joinMailchimpSyncData($productCollection);
         $productCollection->getSelect()->where("m4m.mailchimp_sync_delta IS null");
 
         if ($productCollection->getSize()) {
