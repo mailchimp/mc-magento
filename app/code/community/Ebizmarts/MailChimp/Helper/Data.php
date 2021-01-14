@@ -2357,7 +2357,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
      * @param string    $scope
      * @throws Mage_Core_Exception
      */
-    protected function setIsSyncingIfFinishedPerScope($syncValue, $scopeId, $scope = 'stores')
+    public function setIsSyncingIfFinishedPerScope($syncValue, $scopeId, $scope = 'stores')
     {
         try {
             $mailchimpApi = $this->getApi($scopeId, $scope);

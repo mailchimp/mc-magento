@@ -546,10 +546,10 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
         $stores = $this->_helper->getMageApp()->getStores();
 
         foreach ($stores as $storeId => $store) {
-            $ecommEnabled = $this->isEcomSyncDataEnabled($storeId);
+            $ecommEnabled = $this->_helper->isEcomSyncDataEnabled($storeId);
 
             if ($ecommEnabled) {
-                $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
+                $this->_helper->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
             }
         }
     }
