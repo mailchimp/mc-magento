@@ -524,9 +524,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
         }
 
         $url = Mage::getModel('core/url')->setStore($cart->getStoreId())->getUrl(
-            '',
-            array('_nosid' => true, '_secure' => true)
-        )
+                '',
+                array('_nosid' => true, '_secure' => true)
+            )
             . 'mailchimp/cart/loadquote?id=' . $cart->getEntityId() . '&token=' . $token;
         $this->setToken($token);
         return $url;

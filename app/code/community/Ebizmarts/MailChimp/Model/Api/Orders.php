@@ -97,7 +97,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         );
 
         foreach ($modifiedOrders as $item) {
-                $orderId = $item->getEntityId();
+            $orderId = $item->getEntityId();
 
             try {
                 $order = $this->_getOrderById($orderId);
@@ -199,7 +199,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         );
 
         foreach ($newOrders as $item) {
-                $orderId = $item->getEntityId();
+            $orderId = $item->getEntityId();
             try {
                 $order = $this->_getOrderById($orderId);
                 //create missing products first
@@ -233,7 +233,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
                     $this->logSyncError(
-                        "Order " . $order->getEntityId() . " json encode failed (".$jsonErrorMsg.")",
+                        "Order " . $order->getEntityId() . " json encode failed (" . $jsonErrorMsg . ")",
                         Ebizmarts_MailChimp_Model_Config::IS_ORDER,
                         $magentoStoreId,
                         'magento_side_error',
@@ -751,7 +751,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $orderCollection->addFieldToFilter('entity_id', array('gt' => $lastId));
         }
 
-        if(empty($this->_ecommerceOrdersCollection)){
+        if (empty($this->_ecommerceOrdersCollection)) {
             $this->_ecommerceOrdersCollection = $this->getResourceCollection();
             $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
             $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);

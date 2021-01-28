@@ -622,7 +622,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         return $mailChimpTags;
     }
 
-
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collection
      */

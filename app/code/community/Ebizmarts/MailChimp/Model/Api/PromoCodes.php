@@ -166,7 +166,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                 } else {
                     $jsonErrorMsg = json_last_error_msg();
                     $this->logSyncError(
-                        "Promo code" . $codeId . " json encode failed (".$jsonErrorMsg.")",
+                        "Promo code" . $codeId . " json encode failed (" . $jsonErrorMsg . ")",
                         Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
                         $magentoStoreId,
                         'magento_side_error',
@@ -287,14 +287,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $token = $this->getToken();
         $promoCode->setToken($token);
         $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl(
-            'mailchimp/cart/loadcoupon',
-            array(
+                'mailchimp/cart/loadcoupon',
+                array(
                     '_nosid' => true,
                     '_secure' => true,
                     'coupon_id' => $promoCode->getCouponId(),
                     'coupon_token' => $token
                 )
-        )
+            )
             . 'mailchimp/cart/loadcoupon?coupon_id='
             . $promoCode->getCouponId()
             . '&coupon_token='
