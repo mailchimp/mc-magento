@@ -59,7 +59,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array(
-                    'getMailchimpStoreId', 'getMagentoStoreId', 'createEcommerceProductsCollection',
+                    'getMailchimpStoreId', 'getMagentoStoreId', 'getResourceCollection',
                     'getHelper', 'getDateHelper', 'isProductFlatTableEnabled', '_markSpecialPrices',
                     'makeProductsNotSentCollection', 'joinMailchimpSyncData', 'makeBatchId', 'shouldSendProductUpdate',
                     '_buildUpdateProductRequest', '_getBatchCounter', '_buildNewProductRequest',
@@ -86,7 +86,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock->expects($this->once())->method("getMailchimpStoreId")->willReturn($mailchimpStoreId);
         $productsApiMock->expects($this->once())->method("getMagentoStoreId")->willReturn($magentoStoreId);
-        $productsApiMock->expects($this->once())->method("createEcommerceProductsCollection")
+        $productsApiMock->expects($this->once())->method("getResourceCollection")
             ->willReturn($productCollectionResourceMock);
 
 
@@ -175,7 +175,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $magentoStoreId = 1;
         $this->_productsApiMock = $this->_productsApiMock->setMethods(
             array(
-                'createEcommerceProductsCollection',
+                'getResourceCollection',
                 'getMagentoStoreId',
                 'getHelper',
                 'getProductResourceCollection',
@@ -215,7 +215,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $helperMock->expects($this->once())->method('addResendFilter')
             ->with($productsCollectionMock, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
-        $this->_productsApiMock->expects($this->once())->method('createEcommerceProductsCollection')
+        $this->_productsApiMock->expects($this->once())->method('getResourceCollection')
             ->willReturn($productResourceCollectionMock);
 
         $productResourceCollectionMock->expects($this->once())->method('joinQtyAndBackorders');

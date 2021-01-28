@@ -71,7 +71,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
             $this->getStoreId()
         );
 
-        $this->_ecommerceSubscribersCollection = $this->getEcommerceSubscribersCollection();
+        $this->_ecommerceSubscribersCollection = $this->getResourceCollection();
         $this->_ecommerceSubscribersCollection->setStoreId($this->getStoreId());
 
         $subscriberArray = array();
@@ -626,7 +626,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collection
      */
-    public function getEcommerceSubscribersCollection()
+    public function getResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Subscribers_Collection

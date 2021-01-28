@@ -37,7 +37,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommercePromoCodesCollection = $this->createEcommercePromoCodesCollection();
+        $this->_ecommercePromoCodesCollection = $this->getResourceCollection();
         $this->_ecommercePromoCodesCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommercePromoCodesCollection->setStoreId($magentoStoreId);
 
@@ -468,7 +468,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
      */
-    public function createEcommercePromoCodesCollection()
+    public function getResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoCodes_Collection
