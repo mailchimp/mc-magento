@@ -28,7 +28,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock = $this->_ordersApiMock
             ->setMethods(
                 array(
-                        'getMailchimpStoreId', 'getMagentoStoreId', 'createEcommerceOrdersCollection',
+                        'getMailchimpStoreId', 'getMagentoStoreId', 'getResourceCollection',
                         'getHelper', '_getModifiedOrders', '_getNewOrders', 'getDateHelper'
                     )
             )->getMock();
@@ -52,7 +52,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn($mailchimpStoreId);
         $ordersApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn($magentoStoreId);
 
-        $ordersApiMock->expects($this->once())->method('createEcommerceOrdersCollection')
+        $ordersApiMock->expects($this->once())->method('getResourceCollection')
             ->willReturn($ordersCollectionResourceMock);
 
         $ordersCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);

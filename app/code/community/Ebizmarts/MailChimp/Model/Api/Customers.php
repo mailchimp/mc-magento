@@ -87,7 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceCustomersCollection = $this->createEcommerceCustomersCollection();
+        $this->_ecommerceCustomersCollection = $this->getResourceCollection();
         $this->_ecommerceCustomersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceCustomersCollection->setStoreId($magentoStoreId);
 
@@ -660,15 +660,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
      */
-    public function getEcommerceCustomersCollection()
-    {
-        return $this->getEcommerceCustomersCollection();
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
-     */
-    public function createEcommerceCustomersCollection()
+    public function getResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
