@@ -83,27 +83,16 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     public function _getConvertedQuotes()
     {
         $mailchimpStoreId = $this->getMailchimpStoreId();
-        $magentoStoreId = $this->getMagentoStoreId();
 
         $batchId = $this->getBatchId();
         $allCarts = array();
-        /*$convertedCarts = $this->getItemResourceModelCollection();
-        // get only the converted quotes
-        $convertedCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        $convertedCarts->addFieldToFilter('is_active', array('eq' => 0));
-        //join with mailchimp_ecommerce_sync_data table to filter by sync data.
-        $this->joinLeftEcommerceSyncData($convertedCarts);
-        // be sure that the quotes are already in mailchimp and not deleted limit the collection
-        $this->getEcommerceQuotesCollection()->addWhere(
-            $convertedCarts, "m4m.mailchimp_sync_deleted = 0", $this->getBatchLimitFromConfig()
-        );*/
 
         $convertedCarts = $this->buildEcommerceCollectionToSync(
             Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
             "m4m.mailchimp_sync_deleted = 0",
             "converted"
         );
-        Mage::log((string)$convertedCarts->getSelect(), null, "carts.log", true);
+
         foreach ($convertedCarts as $cart) {
             $cartId = $cart->getEntityId();
             Mage::log("foreach cartId: $cartId", null, "carts.log", true);
@@ -152,23 +141,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
         $helper = $this->getHelper();
         $batchId = $this->getBatchId();
-        /*$modifiedCarts = $this->getItemResourceModelCollection();
-        // select carts with no orders
-        $modifiedCarts->addFieldToFilter('is_active', array('eq' => 1));
-        // select carts for the current Magento store id
-        $modifiedCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        //join with mailchimp_ecommerce_sync_data table to filter by sync data.
-        $this->joinLeftEcommerceSyncData($modifiedCarts);
-        // be sure that the quotes are already in mailchimp and not deleted limited
-        $this->getEcommerceQuotesCollection()->addWhere(
-            $modifiedCarts, "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at",
-            $this->getBatchLimitFromConfig()
-        );*/
 
         $modifiedCarts = $this->buildEcommerceCollectionToSync(
             Ebizmarts_MailChimp_Model_Config::IS_QUOTE,
             "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at",
-            false
+            "modified"
         );
 
         $allCarts = array();
@@ -852,7 +829,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
         Mage_Sales_Model_Resource_Quote_Collection $collectionToSync,
         $isNewItem = "new"
     ){
-        Mage::log("VVVVV addFilters()", null, "orders.log", true);
         $magentoStoreId = $this->getMagentoStoreId();
         $collectionToSync->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
 
@@ -875,6 +851,5 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
         } elseif ($isNewItem == "converted") {
             $collectionToSync->addFieldToFilter('is_active', array('eq' => 0));
         }
-        Mage::log("ˆˆˆˆ addFilters() finished", null, "orders.log", true);
     }
 }

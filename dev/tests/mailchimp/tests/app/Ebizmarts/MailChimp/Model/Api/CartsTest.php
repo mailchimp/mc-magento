@@ -39,7 +39,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             array(
                 'getMailchimpStoreId',
                 'getMagentoStoreId',
-                'createEcommerceQuoteCollection',
+                'initializeEcommerceResourceCollection',
                 'getHelper',
                 'getDateHelper',
                 '_getConvertedQuotes',
@@ -68,7 +68,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
-        $cartsApiMock->expects($this->once())->method('createEcommerceQuoteCollection')
+        $cartsApiMock->expects($this->once())->method('initializeEcommerceResourceCollection')
             ->willReturn($cartsCollectionResourceMock);
 
         $cartsCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')
@@ -103,7 +103,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock = $this->_cartsApiMock
             ->setMethods(
                 array(
-                    'getMailchimpStoreId', 'getMagentoStoreId', 'createEcommerceQuoteCollection',
+                    'getMailchimpStoreId', 'getMagentoStoreId', 'initializeEcommerceResourceCollection',
                     'getHelper', 'getDateHelper', 'setBatchId',
                     '_getConvertedQuotes', '_getModifiedQuotes', '_getNewQuotes'
                 )
@@ -122,7 +122,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartsApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MAILCHIMP_STORE_ID);
         $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
-        $cartsApiMock->expects($this->once())->method('createEcommerceQuoteCollection')
+        $cartsApiMock->expects($this->once())->method('initializeEcommerceResourceCollection')
             ->willReturn($quotesCollectionResource);
 
         $quotesCollectionResource->expects($this->once())
@@ -144,18 +144,13 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetConvertedQuotes()
     {
-        $arrayAddFieldToFilter = array('eq' => 0);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_deleted = 0";
-        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
-            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
                 'getMailchimpStoreId',
                 'getMagentoStoreId',
                 'getQuoteCollection',
-                'joinLeftEcommerceSyncData',
+                'buildEcommerceCollectionToSync',
                 'getEcommerceQuoteCollection',
                 'getBatchLimitFromConfig',
                 'getAllCartsByEmail',
@@ -165,12 +160,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'setCounter'
             )
         )->getMock();
-
-        $quoteResourceCollectionMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addWhere'))
-            ->getMock();
 
         $cartsCollectionMock = $this
         ->getMockBuilder(Mage_Sales_Model_Resource_Quote_Collection::class)
@@ -197,27 +186,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $cartsApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MAILCHIMP_STORE_ID);
-        $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
+
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "converted")
+            ->willReturn($cartsCollectionMock);
+
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($cartsCollectionMock);
-
-        $cartsCollectionMock->expects($this->exactly(2))
-            ->method('addFieldToFilter')
-            ->withConsecutive(
-                array('store_id', $arrayAddFieldToFilterStoreId),
-                array('is_active', $arrayAddFieldToFilter)
-            );
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($cartsCollectionMock);
-
-        $cartsApiMock->expects($this->once())
-            ->method('getEcommerceQuoteCollection')->willReturn($quoteResourceCollectionMock);
-
-        $cartsApiMock->expects($this->once())
-            ->method('getBatchLimitFromConfig')->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $quoteResourceCollectionMock->expects($this->once())
-            ->method('addWhere')->with($cartsCollectionMock, $where, self::BATCH_LIMIT_FROM_CONFIG);
 
         $cartsCollectionMock->expects($this->once())
             ->method('getIterator')->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -267,10 +241,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             . '"order_total":"1700.0000","tax_total":0,"lines":[{"id":"1","product_id":"425",'
             . '"product_variant_id":"310","quantity":5,"price":"1700.0000"}]}';
         $customerId = 1;
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
-        $where = "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at";
+        $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at";
 
         $allCarts = array(
             array(
@@ -289,6 +260,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'joinLeftEcommerceSyncData',
+                'buildEcommerceCollectionToSync',
                 'getEcommerceQuoteCollection',
                 'getAllCartsByEmail',
                 'setCounter',
@@ -335,12 +307,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('clear', 'getIterator'))
             ->getMock();
 
-        $cartsResourceCollectionModelMock = $this->
-        getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addWhere'))
-            ->getMock();
-
         $mailchimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('modifyCounterSentPerBatch', 'getEntityId'))
@@ -350,27 +316,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($mailchimpHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($cartsCollectionMock);
 
-        $cartsCollectionMock->expects($this->exactly(2))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId)
-            );
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($cartsCollectionMock);
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsResourceCollectionModelMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsResourceCollectionModelMock->expects($this->once())->method('addWhere')
-            ->with(
-                $cartsCollectionMock,
-                "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at",
-                self::BATCH_LIMIT_FROM_CONFIG
-            );
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "modified")
+            ->willReturn($cartsCollectionMock);
 
         $cartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -426,19 +375,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetModifiedQuotesGuestCustomer()
     {
-        $mcTableName = 'mailchimp_ecommerce_sync_data';
         $customerId = '';
         $customerEmailAddress = 'test@ebizmarts.com';
-        $stringStoreId = 'store_id';
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
-        $where = "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at";
-        $arrayTableName = array('m4m' => $mcTableName);
-        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
-            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $mailchimpSelect = array('m4m.*');
+        $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at";
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
@@ -447,6 +386,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'joinLeftEcommerceSyncData',
+                'buildEcommerceCollectionToSync',
                 'getEcommerceQuoteCollection',
                 'setCounter',
                 'getCounter',
@@ -481,12 +421,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('setWebsiteId', 'loadByEmail', 'getEmail'))
             ->getMock();
 
-        $cartsResourceCollectionModelMock = $this->
-        getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addWhere'))
-            ->getMock();
-
         $mailchimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('modifyCounterSentPerBatch', 'getEntityId'))
@@ -496,27 +430,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($mailchimpHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($cartsCollectionMock);
 
-        $cartsCollectionMock->expects($this->exactly(2))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId)
-            );
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($cartsCollectionMock);
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsResourceCollectionModelMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsResourceCollectionModelMock->expects($this->once())->method('addWhere')
-            ->with(
-                $cartsCollectionMock,
-                "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at",
-                self::BATCH_LIMIT_FROM_CONFIG
-            );
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "modified")
+            ->willReturn($cartsCollectionMock);
 
         $cartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -550,13 +467,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $customerEmailAddress = '';
         $cartJson = '';
         $customerId = 1;
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
-        $where = "m4m.mailchimp_sync_deleted = 0
-        AND m4m.mailchimp_sync_delta < updated_at";
-        $conditionSelect = "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
-            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
+        $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at";
+
         $allCarts = array(
             array(
                 'method' => 'DELETE',
@@ -573,6 +485,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'joinLeftEcommerceSyncData',
+                'buildEcommerceCollectionToSync',
                 'getEcommerceQuoteCollection',
                 'getAllCartsByEmail',
                 'setCounter',
@@ -620,12 +533,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->setMethods(array('clear', 'getIterator'))
             ->getMock();
 
-        $cartsResourceCollectionModelMock = $this->
-        getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addWhere'))
-            ->getMock();
-
         $mailchimpHelperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(array('modifyCounterSentPerBatch', 'getEntityId'))
@@ -635,27 +542,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($mailchimpHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($cartsCollectionMock);
 
-        $cartsCollectionMock->expects($this->exactly(2))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId)
-            );
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($cartsCollectionMock);
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsResourceCollectionModelMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsResourceCollectionModelMock->expects($this->once())->method('addWhere')
-            ->with(
-                $cartsCollectionMock,
-                "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_sync_delta < updated_at",
-                self::BATCH_LIMIT_FROM_CONFIG
-            );
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "modified")
+            ->willReturn($cartsCollectionMock);
 
         $cartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -685,9 +575,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartByEmailModelMock->expects($this->once())->method('getEntityId')->willReturn(self::ALREADY_SENT_CART_ID);
 
-        $cartsApiMock->expects($this->once())->method('getCounter')
-            //->willReturnOnConsecutiveCalls(self::COUNTER, self::COUNTER, self::COUNTER, self::COUNTER);
-            ->willReturn(self::COUNTER);
+        $cartsApiMock->expects($this->once())->method('getCounter')->willReturn(self::COUNTER);
 
         $cartsApiMock->expects($this->once())->method('markSyncDataAsDeleted')->with(self::CART_ID);
         $cartsApiMock->expects($this->once())->method('setCounter')
@@ -709,7 +597,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetNewQuotesNewQuote()
     {
-        $existFirstDate = '2018-11-30';
         $customerId = 1;
         $token = 'ec4f79b2e4677d2edc5bf78c934e5794';
         $customerEmailAddress = '';
@@ -729,14 +616,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             . 'id=692&token=ec4f79b2e4677d2edc5bf78c934e5794","currency_code":"USD","order_total":"1700.0000",'
             . '"tax_total":0,"lines":[{"id":"1","product_id":"425","product_variant_id":"310","quantity":5,'
             . '"price":"1700.0000"}]}';
-        $stringCustomerEmail = 'customer_email';
-        $stringItemsCount = 'items_count';
-        $stringUpdatedAt = 'updated_at';
-        $arrayAddFieldToFilterUpdatedAt = array('gt' => $existFirstDate);
-        $arrayAddFieldToFilterItemsCount = array('gt' => 0);
-        $arrayAddFieldToFilterCustomerEmail = array('notnull' => true);
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_delta IS NULL";
         $allVisbleItems = array('item');
         $sizeOrderCollection = 0;
@@ -754,6 +633,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'getFirstDate',
+                'buildEcommerceCollectionToSync',
                 'joinLeftEcommerceSyncData',
                 'getBatchLimitFromConfig',
                 'getEcommerceQuoteCollection',
@@ -769,12 +649,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getToken'
             )
         )->getMock();
-
-        $cartsCollectionResourceMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
-            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -820,33 +694,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($newCartsCollectionMock);
 
-        $newCartsCollectionMock->expects($this->exactly(5))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array($stringCustomerEmail, $arrayAddFieldToFilterCustomerEmail),
-                array($stringItemsCount, $arrayAddFieldToFilterItemsCount),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId),
-                array($stringUpdatedAt, $arrayAddFieldToFilterUpdatedAt)
-            );
-
-        $helperMock->expects($this->once())->method('addResendFilter')
-            ->with($newCartsCollectionMock, self::MAGENTO_STORE_ID, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
-
-        $cartsApiMock->expects($this->exactly(2))->method('getFirstDate')
-            ->willReturnOnConsecutiveCalls($existFirstDate, $existFirstDate);
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($newCartsCollectionMock);
-
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsCollectionResourceMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsCollectionResourceMock->expects($this->once())->method('addWhere')
-            ->with($newCartsCollectionMock, $where, self::BATCH_LIMIT_FROM_CONFIG);
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "new")
+            ->willReturn($newCartsCollectionMock);
 
         $newCartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -857,18 +708,12 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartModelMock->expects($this->once(4))->method('getCustomerEmail')
             ->willReturn(self::CUSTOMER_EMAIL_BY_CART);
-            /*->willReturnOnConsecutiveCalls(
-                self::CUSTOMER_EMAIL_BY_CART,
-                self::CUSTOMER_EMAIL_BY_CART,
-                self::CUSTOMER_EMAIL_BY_CART,
-                self::CUSTOMER_EMAIL_BY_CART
-            );*/
 
         $cartsApiMock->expects($this->once())->method('getCustomerModel')->willReturn($customerModelMock);
         $ordersCollectionMock->expects($this->exactly(2))->method('addFieldToFilter')
             ->withConsecutive(
                 array($stringCustomerEmailMainTable, $addFieldToFilterOrderCollection),
-                array($stringUpdated, $updatedFromDate)//$addFieldToFilterUpdated $arrayAddFieldToFilterUpdatedAt
+                array($stringUpdated, $updatedFromDate)
             );
 
         $cartModelMock->expects($this->once())->method('getUpdatedAt')->willReturn(self::DATE);
@@ -899,11 +744,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
         $cartByEmailModelMock->expects($this->once())->method('getEntityId')->willReturn(self::ALREADY_SENT_CART_ID);
         $cartsApiMock->expects($this->once())->method('markSyncDataAsDeleted')->with(self::ALREADY_SENT_CART_ID);
-        /*$cartsApiMock->expects($this->exactly(2))->method('setCounter')
-            ->withConsecutive(
-                array(self::COUNTER + 1),
-                array(self::COUNTER + 1)
-            );*/
+
         $cartByEmailCollectionMock->expects($this->once())->method('clear');
         $cartModelMock->expects($this->once())->method('getCustomerId')->willReturn($customerId);
         $cartsApiMock->expects($this->once())->method('addProductNotSentData')->with($cartModelMock, $allCarts)
@@ -922,19 +763,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetNewQuotesIsOrder()
     {
-        $existFirstDate = '2018-11-30';
-        $stringCustomerEmail = 'customer_email';
-        $stringItemsCount = 'items_count';
-        $stringUpdatedAt = 'updated_at';
-        $arrayAddFieldToFilterUpdatedAt = array('gt' => $existFirstDate);
-        $arrayAddFieldToFilterItemsCount = array('gt' => 0);
-        $arrayAddFieldToFilterCustomerEmail = array('notnull' => true);
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_delta IS NULL";
         $allVisbleItems = array('item');
         $sizeOrderCollection = 1;
-        $addFieldToFilterOrderCollection = array('eq' => '');
         $stringCustomerEmailMainTable = 'main_table.customer_email';
         $stringUpdated = 'main_table.updated_at';
         $updatedFromDate = array('from' => self::DATE);
@@ -948,6 +779,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'getFirstDate',
+                'buildEcommerceCollectionToSync',
                 'joinLeftEcommerceSyncData',
                 'getBatchLimitFromConfig',
                 'getEcommerceQuoteCollection',
@@ -960,12 +792,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'addSyncData'
             )
         )->getMock();
-
-        $cartsCollectionResourceMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
-            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -996,33 +822,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($newCartsCollectionMock);
 
-        $newCartsCollectionMock->expects($this->exactly(5))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array($stringCustomerEmail, $arrayAddFieldToFilterCustomerEmail),
-                array($stringItemsCount, $arrayAddFieldToFilterItemsCount),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId),
-                array($stringUpdatedAt, $arrayAddFieldToFilterUpdatedAt)
-            );
-
-        $helperMock->expects($this->once())->method('addResendFilter')
-            ->with($newCartsCollectionMock, self::MAGENTO_STORE_ID, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
-
-        $cartsApiMock->expects($this->exactly(2))->method('getFirstDate')
-            ->willReturnOnConsecutiveCalls($existFirstDate, $existFirstDate);
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($newCartsCollectionMock);
-
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsCollectionResourceMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsCollectionResourceMock->expects($this->once())->method('addWhere')
-            ->with($newCartsCollectionMock, $where, self::BATCH_LIMIT_FROM_CONFIG);
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "new")
+            ->willReturn($newCartsCollectionMock);
 
         $newCartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -1050,18 +853,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetNewQuotesEmpty()
     {
-        $existFirstDate = '2018-11-30';
-        $stringCustomerEmail = 'customer_email';
-        $stringItemsCount = 'items_count';
-        $stringUpdatedAt = 'updated_at';
-        $arrayAddFieldToFilterUpdatedAt = array('gt' => $existFirstDate);
-        $arrayAddFieldToFilterItemsCount = array('gt' => 0);
-        $arrayAddFieldToFilterCustomerEmail = array('notnull' => true);
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_delta IS NULL";
         $allVisbleItems = array();
-        $addFieldToFilterOrderCollection = array('eq' => '');
         $stringCustomerEmailMainTable = 'main_table.customer_email';
         $stringUpdated = 'main_table.updated_at';
         $updatedFromDate = array('from' => self::DATE);
@@ -1075,6 +868,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'getFirstDate',
+                'buildEcommerceCollectionToSync',
                 'joinLeftEcommerceSyncData',
                 'getBatchLimitFromConfig',
                 'getEcommerceQuoteCollection',
@@ -1087,12 +881,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'addSyncData'
             )
         )->getMock();
-
-        $cartsCollectionResourceMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
-            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -1123,33 +911,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($newCartsCollectionMock);
 
-        $newCartsCollectionMock->expects($this->exactly(5))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array($stringCustomerEmail, $arrayAddFieldToFilterCustomerEmail),
-                array($stringItemsCount, $arrayAddFieldToFilterItemsCount),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId),
-                array($stringUpdatedAt, $arrayAddFieldToFilterUpdatedAt)
-            );
-
-        $helperMock->expects($this->once())->method('addResendFilter')
-            ->with($newCartsCollectionMock, self::MAGENTO_STORE_ID, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
-
-        $cartsApiMock->expects($this->exactly(2))->method('getFirstDate')
-            ->willReturnOnConsecutiveCalls($existFirstDate, $existFirstDate);
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($newCartsCollectionMock);
-
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsCollectionResourceMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsCollectionResourceMock->expects($this->once())->method('addWhere')
-            ->with($newCartsCollectionMock, $where, self::BATCH_LIMIT_FROM_CONFIG);
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "new")
+            ->willReturn($newCartsCollectionMock);
 
         $newCartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -1176,17 +941,8 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetNewQuotesGuestCustomer()
     {
-        $existFirstDate = '2018-11-30';
         $customerId = '';
         $customerEmailAddress = 'test@ebizmarts.com';
-        $stringCustomerEmail = 'customer_email';
-        $stringItemsCount = 'items_count';
-        $stringUpdatedAt = 'updated_at';
-        $arrayAddFieldToFilterUpdatedAt = array('gt' => $existFirstDate);
-        $arrayAddFieldToFilterItemsCount = array('gt' => 0);
-        $arrayAddFieldToFilterCustomerEmail = array('notnull' => true);
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_delta IS NULL";
         $allVisbleItems = array('item');
         $sizeOrderCollection = 0;
@@ -1204,6 +960,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'getFirstDate',
+                'buildEcommerceCollectionToSync',
                 'joinLeftEcommerceSyncData',
                 'getBatchLimitFromConfig',
                 'getEcommerceQuoteCollection',
@@ -1217,12 +974,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'addSyncData'
             )
         )->getMock();
-
-        $cartsCollectionResourceMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addResendFilter', 'addWhere'))
-            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -1260,33 +1011,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($newCartsCollectionMock);
 
-        $newCartsCollectionMock->expects($this->exactly(5))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array($stringCustomerEmail, $arrayAddFieldToFilterCustomerEmail),
-                array($stringItemsCount, $arrayAddFieldToFilterItemsCount),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId),
-                array($stringUpdatedAt, $arrayAddFieldToFilterUpdatedAt)
-            );
-
-        $helperMock->expects($this->once())->method('addResendFilter')
-            ->with($newCartsCollectionMock, self::MAGENTO_STORE_ID, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
-
-        $cartsApiMock->expects($this->exactly(2))->method('getFirstDate')
-            ->willReturnOnConsecutiveCalls($existFirstDate, $existFirstDate);
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($newCartsCollectionMock);
-
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsCollectionResourceMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsCollectionResourceMock->expects($this->once())->method('addWhere')
-            ->with($newCartsCollectionMock, $where, self::BATCH_LIMIT_FROM_CONFIG);
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "new")
+            ->willReturn($newCartsCollectionMock);
 
         $newCartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -1326,7 +1054,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetNewQuotesEmptyJson()
     {
-        $existFirstDate = '2018-11-30';
         $customerId = 1;
         $customerEmailAddress = '';
         $allCarts = array(
@@ -1337,21 +1064,9 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             )
         );
         $cartJson = '';
-        $stringCustomerEmail = 'customer_email';
-        $stringItemsCount = 'items_count';
-        $stringUpdatedAt = 'updated_at';
-        $arrayAddFieldToFilterUpdatedAt = array('gt' => $existFirstDate);
-        $arrayAddFieldToFilterItemsCount = array('gt' => 0);
-        $arrayAddFieldToFilterCustomerEmail = array('notnull' => true);
-        $arrayAddFieldToFilter = array('eq' => 1);
-        $arrayAddFieldToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $where = "m4m.mailchimp_sync_delta IS NULL";
         $allVisbleItems = array('item');
         $sizeOrderCollection = 0;
-        $addFieldToFilterOrderCollection = array('eq' => self::CUSTOMER_EMAIL_BY_CART);
-        $stringCustomerEmailMainTable = 'main_table.customer_email';
-        $stringUpdated = 'main_table.updated_at';
-        $addFieldToFilterUpdated = array('from' => '');
 
         $cartsApiMock = $this->_cartsApiMock->setMethods(
             array(
@@ -1362,6 +1077,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getBatchId',
                 'getQuoteCollection',
                 'getFirstDate',
+                'buildEcommerceCollectionToSync',
                 'joinLeftEcommerceSyncData',
                 'getBatchLimitFromConfig',
                 'getEcommerceQuoteCollection',
@@ -1378,12 +1094,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
                 'getToken'
             )
         )->getMock();
-
-        $cartsCollectionResourceMock = $this
-            ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('addResendFilter', 'modifyCounterSentPerBatch', 'addWhere'))
-            ->getMock();
 
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
@@ -1430,33 +1140,10 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getHelper')->willReturn($helperMock);
         $cartsApiMock->expects($this->once())->method('getDateHelper')->willReturn($dateHelperMock);
         $cartsApiMock->expects($this->once())->method('getBatchId')->willReturn(self::BATCH_ID);
-        $cartsApiMock->expects($this->once())->method('getQuoteCollection')->willReturn($newCartsCollectionMock);
 
-        $newCartsCollectionMock->expects($this->exactly(5))->method('addFieldToFilter')
-            ->withConsecutive(
-                array(self::STRING_IS_ACTIVE, $arrayAddFieldToFilter),
-                array($stringCustomerEmail, $arrayAddFieldToFilterCustomerEmail),
-                array($stringItemsCount, $arrayAddFieldToFilterItemsCount),
-                array(self::STRING_STORE_ID, $arrayAddFieldToFilterStoreId),
-                array($stringUpdatedAt, $arrayAddFieldToFilterUpdatedAt)
-            );
-
-        $helperMock->expects($this->once())->method('addResendFilter')
-            ->with($newCartsCollectionMock, self::MAGENTO_STORE_ID, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
-
-        $cartsApiMock->expects($this->exactly(2))->method('getFirstDate')
-            ->willReturnOnConsecutiveCalls($existFirstDate, $existFirstDate);
-
-        $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->with($newCartsCollectionMock);
-
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
-            ->willReturn($cartsCollectionResourceMock);
-
-        $cartsApiMock->expects($this->once())->method('getBatchLimitFromConfig')
-            ->willReturn(self::BATCH_LIMIT_FROM_CONFIG);
-
-        $cartsCollectionResourceMock->expects($this->once())->method('addWhere')
-            ->with($newCartsCollectionMock, $where, self::BATCH_LIMIT_FROM_CONFIG);
+        $cartsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_QUOTE, $where, "new")
+            ->willReturn($newCartsCollectionMock);
 
         $newCartsCollectionMock->expects($this->once())->method('getIterator')
             ->willReturn(new ArrayIterator(array($cartModelMock)));
@@ -1469,11 +1156,6 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->willReturn(self::CUSTOMER_EMAIL_BY_CART);
 
         $cartsApiMock->expects($this->once())->method('getCustomerModel')->willReturn($customerModelMock);
-        /*$ordersCollectionMock->expects($this->exactly(2))->method('addFieldToFilter')
-            ->withConsecutive(
-                array($stringCustomerEmailMainTable, $addFieldToFilterOrderCollection),
-                array($stringUpdated, $updatedFromDate)//$addFieldToFilterUpdated $arrayAddFieldToFilterUpdatedAt
-            );*/
 
         $cartModelMock->expects($this->once())->method('getUpdatedAt')->willReturn(self::DATE);
         $cartModelMock->expects($this->once())->method('getAllVisibleItems')->willReturn($allVisbleItems);
@@ -1516,25 +1198,19 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
 
     public function testGetAllCartsByEmail()
     {
-        $mailchimpTableName = 'm4m';
         $stringIsActive = 'is_active';
         $arrayAddToFilterIsActive = array('eq' => 1);
         $stringStoreId = 'store_id';
         $arrayAddToFilterStoreId = array('eq' => self::MAGENTO_STORE_ID);
         $stringCustomerId = 'customer_email';
         $arrayAddToFilterCustomerId = array('eq' => self::CUSTOMER_EMAIL_BY_CART);
-        $arrayMailchimpTableName = array('m4m' => $mailchimpTableName);
-        $condition = "m4m.related_id = main_table.entity_id AND m4m.type = '"
-            . Ebizmarts_MailChimp_Model_Config::IS_QUOTE
-            . "' AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
-        $mailchimpSelect = array('m4m.*');
         $where = "m4m.mailchimp_sync_deleted = 0 AND m4m.mailchimp_store_id = '" . self::MAILCHIMP_STORE_ID . "'";
 
         $cartsApiMock = $this->_cartsApiMock
             ->setMethods(
                 array(
-                        'getQuoteCollection', 'getMagentoStoreId', 'joinLeftEcommerceSyncData',
-                        'getMailchimpStoreId', 'getEcommerceQuoteCollection')
+                        'getItemResourceModelCollection', 'getMagentoStoreId', 'joinLeftEcommerceSyncData',
+                        'getMailchimpStoreId', 'getEcommerceResourceCollection')
             )->getMock();
 
         $newCartsCollectionMock = $this
@@ -1550,7 +1226,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
             ->getMock();
 
         $cartsApiMock->expects($this->once())
-            ->method('getQuoteCollection')
+            ->method('getItemResourceModelCollection')
             ->willReturn($newCartsCollectionMock);
 
         $newCartsCollectionMock->expects($this->exactly(3))
@@ -1564,7 +1240,7 @@ class Ebizmarts_MailChimp_Model_Api_CartsTest extends PHPUnit_Framework_TestCase
         $cartsApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::MAGENTO_STORE_ID);
         $cartsApiMock->expects($this->once())->method('joinLeftEcommerceSyncData')->willReturn($newCartsCollectionMock);
         $cartsApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MAILCHIMP_STORE_ID);
-        $cartsApiMock->expects($this->once())->method('getEcommerceQuoteCollection')
+        $cartsApiMock->expects($this->once())->method('getEcommerceResourceCollection')
             ->willReturn($cartsCollectionResourceMock);
         $cartsCollectionResourceMock->expects($this->once())->method('addWhere')
             ->with($newCartsCollectionMock, $where);
