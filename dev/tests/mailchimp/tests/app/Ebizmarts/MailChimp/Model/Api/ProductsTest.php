@@ -31,6 +31,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $products = array();
         $productId = 15;
         $syncDataItemId = 2;
+        $where = "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1";
         $productData = array(
             'method' => 'POST',
             'path' => "/ecommerce/stores/$mailchimpStoreId/products",
@@ -59,11 +60,11 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array(
-                    'getMailchimpStoreId', 'getMagentoStoreId', 'getResourceCollection',
+                    'getMailchimpStoreId', 'getMagentoStoreId', 'initializeEcommerceResourceCollection',
                     'getHelper', 'getDateHelper', 'isProductFlatTableEnabled', '_markSpecialPrices',
-                    'makeProductsNotSentCollection', 'joinMailchimpSyncData', 'makeBatchId', 'shouldSendProductUpdate',
-                    '_buildUpdateProductRequest', '_getBatchCounter', '_buildNewProductRequest',
-                    'getMailchimpEcommerceSyncDataModel', 'addSyncData', 'addSyncDataError'
+                    'makeBatchId', 'shouldSendProductUpdate', '_buildUpdateProductRequest',
+                    '_getBatchCounter', '_buildNewProductRequest', 'getMailchimpEcommerceSyncDataModel',
+                    'addSyncData', 'addSyncDataError', 'buildEcommerceCollectionToSync'
                 )
             )->getMock();
 
@@ -86,24 +87,18 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock->expects($this->once())->method("getMailchimpStoreId")->willReturn($mailchimpStoreId);
         $productsApiMock->expects($this->once())->method("getMagentoStoreId")->willReturn($magentoStoreId);
-        $productsApiMock->expects($this->once())->method("getResourceCollection")
+        $productsApiMock->expects($this->once())->method("initializeEcommerceResourceCollection")
             ->willReturn($productCollectionResourceMock);
+
+        $productsApiMock->expects($this->once())->method('buildEcommerceCollectionToSync')
+            ->with(Ebizmarts_MailChimp_Model_Config::IS_PRODUCT, $where, "not-sent")
+            ->willReturn($productCollection);
 
 
         $productCollectionResourceMock->expects($this->once())->method("setMailchimpStoreId")->with($mailchimpStoreId);
         $productCollectionResourceMock->expects($this->once())->method("setStoreId")->with($magentoStoreId);
 
         $productsApiMock->expects($this->once())->method('_markSpecialPrices');
-
-        $productsApiMock
-            ->expects($this->once())
-            ->method('makeProductsNotSentCollection')
-            ->willReturn($productCollection);
-
-        $productsApiMock
-            ->expects($this->once())
-            ->method('joinMailchimpSyncData')
-            ->with($productCollection);
 
         $productsApiMock
             ->expects($this->once())
@@ -175,11 +170,11 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $magentoStoreId = 1;
         $this->_productsApiMock = $this->_productsApiMock->setMethods(
             array(
-                'getResourceCollection',
                 'getMagentoStoreId',
                 'getHelper',
-                'getProductResourceCollection',
+                'getItemResourceModelCollection',
                 'getBatchLimitFromConfig',
+                'initializeEcommerceResourceCollection'
             )
         )->getMock();
 
@@ -195,13 +190,13 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->setMethods(array('addResendFilter'))
             ->getMock();
 
-        $productResourceCollectionMock = $this
+        $productEcommerceResourceCollectionMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection::class)
             ->disableOriginalConstructor()
             ->setMethods(array('joinQtyAndBackorders', 'limitCollection'))
             ->getMock();
 
-        $this->_productsApiMock->expects($this->once())->method('getProductResourceCollection')
+        $this->_productsApiMock->expects($this->once())->method('getItemResourceModelCollection')
             ->willReturn($productsCollectionMock);
 
         $this->_productsApiMock->expects($this->once())->method('getMagentoStoreId')
@@ -215,12 +210,12 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $helperMock->expects($this->once())->method('addResendFilter')
             ->with($productsCollectionMock, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_PRODUCT);
 
-        $this->_productsApiMock->expects($this->once())->method('getResourceCollection')
-            ->willReturn($productResourceCollectionMock);
+        $this->_productsApiMock->expects($this->once())->method('initializeEcommerceResourceCollection')
+            ->willReturn($productEcommerceResourceCollectionMock);
 
-        $productResourceCollectionMock->expects($this->once())->method('joinQtyAndBackorders');
+        $productEcommerceResourceCollectionMock->expects($this->once())->method('joinQtyAndBackorders');
         $this->_productsApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(100);
-        $productResourceCollectionMock->expects($this->once())->method('limitCollection');
+        $productEcommerceResourceCollectionMock->expects($this->once())->method('limitCollection');
 
         $this->_productsApiMock->makeProductsNotSentCollection(false);
     }
@@ -673,13 +668,15 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array(
-                    'getMailchimpStoreId', 'getMagentoStoreId', 'getProductResourceCollection',
-                    'getEcommerceProductsCollection', 'getBatchLimitFromConfig', 'makeBatchId',
+                    'getMailchimpStoreId', 'getMagentoStoreId',
+                    'getItemResourceModelCollection',
+                    'getEcommerceResourceCollection', 'initializeEcommerceResourceCollection',
+                    'getBatchLimitFromConfig', 'makeBatchId',
                     '_buildDeleteProductRequest', 'addSyncDataError'
                 )
             )->getMock();
 
-        $productCollectionResourceMock = $this->
+        $productsEcommerceResourceCollectionMock = $this->
         getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection::class)
             ->disableOriginalConstructor()
             ->setMethods(array('joinMailchimpSyncDataDeleted'))
@@ -706,17 +703,17 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock
             ->expects($this->once())
-            ->method('getProductResourceCollection')
+            ->method('getItemResourceModelCollection')
             ->willReturn($productCollection);
 
         $productsApiMock
             ->expects($this->once())
-            ->method('getEcommerceProductsCollection')
-            ->willReturn($productCollectionResourceMock);
+            ->method('getEcommerceResourceCollection')
+            ->willReturn($productsEcommerceResourceCollectionMock);
 
         $productsApiMock->expects($this->once())->method('getBatchLimitFromConfig')->willReturn(null);
 
-        $productCollectionResourceMock
+        $productsEcommerceResourceCollectionMock
             ->expects($this->once())
             ->method('joinMailchimpSyncDataDeleted')
             ->with($productCollection, null);
@@ -831,13 +828,13 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
         $productsApiMock = $this->_productsApiMock
             ->setMethods(
                 array(
-                    'getCoreResource', 'getMagentoStoreId', 'getProductResourceCollection',
+                    'getCoreResource', 'getMagentoStoreId', 'getItemResourceModelCollection',
                     'joinMailchimpSyncDataForSpecialPrices', 'getDateHelper',
-                    'update', 'getEcommerceProductsCollection'
+                    'update', 'getEcommerceResourceCollection'
                 )
             )->getMock();
 
-        $productsCollectionResourceMock = $this->
+        $productsEcommerceResourceCollectionMock = $this->
         getMockBuilder(Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection::class)
             ->disableOriginalConstructor()
             ->setMethods(array('addWhere'))
@@ -871,7 +868,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
             ->willReturn($magentoStoreId);
 
         $productsApiMock->expects($this->exactly(2))
-            ->method('getProductResourceCollection')
+            ->method('getItemResourceModelCollection')
             ->willReturn($productsCollectionMock);
 
         $productsCollectionMock->expects($this->exactly(2))
@@ -924,10 +921,10 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
         $productsApiMock
             ->expects($this->once())
-            ->method('getEcommerceProductsCollection')
-            ->willReturn($productsCollectionResourceMock);
+            ->method('getEcommerceResourceCollection')
+            ->willReturn($productsEcommerceResourceCollectionMock);
 
-        $productsCollectionResourceMock->expects($this->exactly(2))
+        $productsEcommerceResourceCollectionMock->expects($this->exactly(2))
             ->method('addWhere')
             ->withConsecutive(
                 array($productsCollectionMock, $whereCondition),

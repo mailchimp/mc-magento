@@ -76,9 +76,9 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     0
                 );
         }
-        //**************************************************
+
         $this->_markSpecialPrices();
-        //00000000000000000000000000000000000
+
         /**
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
@@ -87,8 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1",
             "not-sent"
         );
-        //00000000000000000000000000000000000
-        //**************************************************
+
         $batchArray = array();
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
