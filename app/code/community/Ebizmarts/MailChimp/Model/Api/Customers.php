@@ -45,7 +45,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
      */
     protected function getCustomersToSync()
     {
-        $collection = $this->getCustomerResourceCollection();
+        $collection = $this->getItemResourceModelCollection();
         $collection->addAttributeToFilter(
             array(
                 array('attribute' => 'store_id', 'eq' => $this->getBatchMagentoStoreId()),
@@ -69,7 +69,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
          * @var Mage_Customer_Model_Resource_Customer_Collection $collection
          */
 
-        $collection = $this->getCustomerResourceCollection();
+        $collection = $this->getItemResourceModelCollection();
         $collection->addFieldToFilter('entity_id', array('in' => $customerIdsToSync));
         $collection->addNameToSelect();
         $this->joinDefaultBillingAddress($collection);
@@ -87,7 +87,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceCustomersCollection = $this->getResourceCollection();
+        $this->_ecommerceCustomersCollection = $this->initializeEcommerceResourceCollection();
         $this->_ecommerceCustomersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceCustomersCollection->setStoreId($magentoStoreId);
 
@@ -95,8 +95,11 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         $this->setMagentoStoreId($magentoStoreId);
         $helper = $this->getHelper();
 
+        //******************
         $customersCollection = array();
-        $customerIds = $this->getCustomersToSync();
+        $collection = $this->buildEcommerceCollectionToSync(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
+        $customerIds = $collection->getAllIds($this->getBatchLimitFromConfig());
+        //******************
 
         if (!empty($customerIds)) {
             $customersCollection = $this->makeCustomersNotSentCollection($customerIds);
@@ -477,7 +480,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     /**
      * @return Mage_Customer_Model_Resource_Customer_Collection
      */
-    protected function getCustomerResourceCollection()
+    protected function getItemResourceModelCollection()
     {
         /**
          * @var $collection Mage_Customer_Model_Resource_Customer_Collection
@@ -660,7 +663,7 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
      */
-    public function getResourceCollection()
+    public function initializeEcommerceResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
@@ -668,6 +671,29 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
         $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_customers_collection');
 
         return $collection;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Customers_Collection
+     */
+    public function getEcommerceResourceCollection()
+    {
+        return $this->_ecommerceCustomersCollection;
+    }
+
+//    /**
+//     * @param Mage_Customer_Model_Resource_Customer_Collection $collection
+//     */
+    protected function addFilters($collection, $isNewItem = "new")
+    {
+        $collection->addAttributeToFilter(
+            array(
+                array('attribute' => 'store_id', 'eq' => $this->getBatchMagentoStoreId()),
+                array('attribute' => 'mailchimp_store_view', 'eq' => $this->getBatchMagentoStoreId()),
+            ),
+            null,
+            'left'
+        );
     }
 
 }

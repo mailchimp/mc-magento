@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceOrdersCollection = $this->getResourceCollection();
+        $this->_ecommerceOrdersCollection = $this->initializeEcommerceResourceCollection();
         $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
 
@@ -67,7 +67,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         // get new orders
-        $batchArray = array_merge($batchArray, $this->_getNewOrders());
+        $newOrders = $this->_getNewOrders();
+        $batchArray = array_merge($batchArray, $newOrders);
+
         $helper->setCurrentStore($oldStore);
 
         return $batchArray;
@@ -84,16 +86,23 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
         $batchArray = array();
-        $modifiedOrders = $this->getResourceModelOrderCollection();
-        // select orders for the current Magento store id
-        $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        //join with mailchimp_ecommerce_sync_data table to filter by sync data.
-        $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($modifiedOrders);
-        // be sure that the order are already in mailchimp and not deleted
-        $this->_ecommerceOrdersCollection->addWhere(
-            $modifiedOrders,
+
+        /* $modifiedOrders = $this->getResourceModelOrderCollection();
+         // select orders for the current Magento store id
+         $modifiedOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
+         //join with mailchimp_ecommerce_sync_data table to filter by sync data.
+         $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($modifiedOrders);
+         // be sure that the order are already in mailchimp and not deleted
+         $this->_ecommerceOrdersCollection->addWhere(
+             $modifiedOrders,
+             "m4m.mailchimp_sync_modified = 1",
+             $this->getBatchLimitFromConfig()
+         );*/
+
+        $modifiedOrders = $this->buildEcommerceCollectionToSync(
+            Ebizmarts_MailChimp_Model_Config::IS_ORDER,
             "m4m.mailchimp_sync_modified = 1",
-            $this->getBatchLimitFromConfig()
+            "modified"
         );
 
         foreach ($modifiedOrders as $item) {
@@ -141,7 +150,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
                         0,
                         $orderId,
                         0
-
                     );
 
                     $this->addSyncDataError(
@@ -180,9 +188,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
+        //Mage::log("vvvvv Before buildEcommerceCollectionToSync", null, "orders.log", true);
+        $newOrders = $this->buildEcommerceCollectionToSync(Ebizmarts_MailChimp_Model_Config::IS_ORDER);
+        //Mage::log("ˆˆˆˆ After buildEcommerceCollectionToSync() count: " . count($newOrders) , null, "orders.log", true);
 
-        $batchArray = array();
-        $newOrders = $this->getResourceModelOrderCollection();
+        /*$newOrders = $this->getItemResourceModelCollection();
         // select carts for the current Magento store id
         $newOrders->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
         $helper->addResendFilter($newOrders, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
@@ -196,8 +206,9 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $newOrders,
             "m4m.mailchimp_sync_delta IS NULL",
             $this->getBatchLimitFromConfig()
-        );
+        );*/
 
+        $batchArray = array();
         foreach ($newOrders as $item) {
             $orderId = $item->getEntityId();
             try {
@@ -743,7 +754,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         );
         $batchArray = array();
         $config = array();
-        $orderCollection = $this->getResourceModelOrderCollection();
+        $orderCollection = $this->getItemResourceModelCollection();
         // select carts for the current Magento store id
         $orderCollection->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
 
@@ -752,7 +763,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         if (empty($this->_ecommerceOrdersCollection)) {
-            $this->_ecommerceOrdersCollection = $this->getResourceCollection();
+            $this->_ecommerceOrdersCollection = $this->initializeEcommerceResourceCollection();
             $this->_ecommerceOrdersCollection->setMailchimpStoreId($mailchimpStoreId);
             $this->_ecommerceOrdersCollection->setStoreId($magentoStoreId);
         }
@@ -1020,14 +1031,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     }
 
     /**
-     * @return Mage_Sales_Model_Resource_Order_Collection
-     */
-    protected function getResourceModelOrderCollection()
-    {
-        return Mage::getResourceModel('sales/order_collection');
-    }
-
-    /**
      * @param $mailchimpCampaignId
      * @param $orderId
      * @return bool return true if the campaign is from the current list.
@@ -1132,7 +1135,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
      */
-    public function getEcommerceOrdersCollection()
+    public function getEcommerceResourceCollection()
     {
         return $this->_ecommerceOrdersCollection;
     }
@@ -1140,7 +1143,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
      */
-    public function getResourceCollection()
+    public function initializeEcommerceResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Orders_Collection
@@ -1148,5 +1151,33 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $collection = Mage::getResourceModel('mailchimp/ecommercesyncdata_orders_collection');
 
         return $collection;
+    }
+
+    /**
+     * @return Mage_Sales_Model_Resource_Order_Collection
+     */
+    protected function getItemResourceModelCollection()
+    {
+        return Mage::getResourceModel('sales/order_collection');
+    }
+
+    protected function addFilters(
+        Mage_Sales_Model_Resource_Order_Collection $collectionToSync,
+        $isNewItem = "new"
+    ){
+        //Mage::log("VVVVV addFilters", null, "orders.log", true);
+        $magentoStoreId = $this->getMagentoStoreId();
+        //Mage::log("==== addFieldToFilter magentoStoreId: $magentoStoreId", null, "orders.log", true);
+        $collectionToSync->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
+        //Mage::log("==== addFieldToFilter Filters added", null, "orders.log", true);
+
+        if ($isNewItem == "new") {
+            $helper = $this->getHelper();
+            $helper->addResendFilter($collectionToSync, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_ORDER);
+            // filter by first date if exists.
+            if ($this->_firstDate) {
+                $collectionToSync->addFieldToFilter('created_at', array('gt' => $this->_firstDate));
+            }
+        }
     }
 }

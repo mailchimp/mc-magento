@@ -321,6 +321,43 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     public function joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId)
     {
-        $this->getResourceCollection()->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
+//        $this->getResourceCollection()->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
+        $this->initializeEcommerceResourceCollection()
+            ->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
+    }
+
+    /**
+     * @param $itemType
+     * @param string $where
+     * @param string $isNewItem
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
+    public function buildEcommerceCollectionToSync(
+        $itemType,
+        $where = "m4m.mailchimp_sync_delta IS NULL",
+        $isNewItem = "new"
+    ){
+        $collectionToSync = $this->getItemResourceModelCollection();
+        $ecommerceResourceCollection = $this->getEcommerceResourceCollection();
+
+        $this->addFilters($collectionToSync, $isNewItem);
+
+        $ecommerceResourceCollection->joinLeftEcommerceSyncData($collectionToSync);
+
+        if ($itemType != Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE) {
+            $ecommerceResourceCollection->addWhere(
+                $collectionToSync,
+                $where,
+                $this->getBatchLimitFromConfig()
+            );
+        } else {
+            $ecommerceResourceCollection->addWhere($collectionToSync, $where);
+            $collectionToSync->getSelect()->order(array('salesrule.rule_id DESC'));
+            // limit the collection
+            $ecommerceResourceCollection->limitCollection($collectionToSync, $this->getBatchLimitFromConfig());
+        }
+
+        return $collectionToSync;
     }
 }
