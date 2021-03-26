@@ -248,24 +248,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
         $newCarts = $this->buildEcommerceCollectionToSync(Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
 
         $allCarts = array();
-        /*$newCarts = $this->getQuoteCollection();
-        $newCarts->addFieldToFilter('is_active', array('eq' => 1));
-        $newCarts->addFieldToFilter('customer_email', array('notnull' => true));
-        $newCarts->addFieldToFilter('items_count', array('gt' => 0));
-        // select carts for the current Magento store id
-        $newCarts->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
-        $helper->addResendFilter($newCarts, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE);
-        // filter by first date if exists.
-        if ($this->getFirstDate()) {
-            $newCarts->addFieldToFilter('updated_at', array('gt' => $this->getFirstDate()));
-        }
-
-        //join with mailchimp_ecommerce_sync_data table to filter by sync data.
-        $this->joinLeftEcommerceSyncData($newCarts);
-        // be sure that the quotes are already in mailchimp and not deleted
-        $this->getEcommerceQuoteCollection()->addWhere(
-            $newCarts, "m4m.mailchimp_sync_delta IS NULL", $this->getBatchLimitFromConfig()
-        );*/
 
         foreach ($newCarts as $cart) {
             $cartId = $cart->getEntityId();

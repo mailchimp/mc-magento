@@ -321,7 +321,6 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
 
     public function joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId)
     {
-//        $this->getResourceCollection()->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
         $this->initializeEcommerceResourceCollection()
             ->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
     }
