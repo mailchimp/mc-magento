@@ -56,7 +56,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommerceProductsCollection = $this->createEcommerceProductsCollection();
+        $this->_ecommerceProductsCollection = $this->initializeEcommerceResourceCollection();
         $this->_ecommerceProductsCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommerceProductsCollection->setStoreId($magentoStoreId);
 
@@ -78,8 +78,16 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         }
 
         $this->_markSpecialPrices();
-        $collection = $this->makeProductsNotSentCollection();
-        $this->joinMailchimpSyncData($collection);
+
+        /**
+         * @var Mage_Catalog_Model_Resource_Product_Collection $collection
+         */
+        $collection = $this->buildEcommerceCollectionToSync(
+            Ebizmarts_MailChimp_Model_Config::IS_PRODUCT,
+            "m4m.mailchimp_sync_delta IS null OR m4m.mailchimp_sync_modified = 1",
+            "not-sent"
+        );
+
         $batchArray = array();
         $batchId = $this->makeBatchId($magentoStoreId);
         $counter = 0;
@@ -154,8 +162,8 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $deletedProducts = $this->getProductResourceCollection();
-        $this->getEcommerceProductsCollection()
+        $deletedProducts = $this->getItemResourceModelCollection();
+        $this->getEcommerceResourceCollection()
             ->joinMailchimpSyncDataDeleted($deletedProducts, $this->getBatchLimitFromConfig());
 
         $batchArray = array();
@@ -627,15 +635,16 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     }
 
     /**
-     * @param $magentoStoreId
+     * @param false $isParentProduct
      * @return Mage_Catalog_Model_Resource_Product_Collection
+     * @throws Mage_Core_Exception
      */
     public function makeProductsNotSentCollection($isParentProduct = false)
     {
         /**
          * @var Mage_Catalog_Model_Resource_Product_Collection $collection
          */
-        $collection = $this->getProductResourceCollection();
+        $collection = $this->getItemResourceModelCollection();
         $magentoStoreId = $this->getMagentoStoreId();
 
         if (!$isParentProduct) {
@@ -649,7 +658,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
         );
 
-        $productsCollectionResource = $this->createEcommerceProductsCollection();
+        $productsCollectionResource = $this->initializeEcommerceResourceCollection();
         $productsCollectionResource->joinQtyAndBackorders($collection);
 
         if (!$isParentProduct) {
@@ -764,7 +773,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     /**
      * @return Mage_Catalog_Model_Resource_Product_Collection
      */
-    protected function getProductResourceCollection()
+    protected function getItemResourceModelCollection()
     {
         return Mage::getResourceModel('catalog/product_collection');
     }
@@ -1035,11 +1044,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $tableName = Mage::getSingleton('core/resource')->getTableName('catalog/product_super_attribute');
         $eavTableName = Mage::getSingleton('core/resource')->getTableName('eav/attribute');
 
-        $collection = $this->getProductResourceCollection();
+        $collection = $this->getItemResourceModelCollection();
         $collection->addStoreFilter($magentoStoreId);
         $collection->addFieldToFilter('entity_id', array('eq' => $parentId));
 
-        $this->_ecommerceProductsCollection = $this->createEcommerceProductsCollection();
+        $this->_ecommerceProductsCollection = $this->initializeEcommerceResourceCollection();
         $this->_ecommerceProductsCollection->addJoinLeft(
             $collection,
             array("super_attribute" => $tableName),
@@ -1194,7 +1203,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $connection = $resource->getConnection('core_write');
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $collection = $this->getProductResourceCollection();
+        $collection = $this->getItemResourceModelCollection();
         $collection->addStoreFilter($magentoStoreId);
 
         $this->joinMailchimpSyncDataForSpecialPrices($collection);
@@ -1219,7 +1228,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
             $this->getDateHelper()->formatDate() . " 00:00:00"
         );
 
-        $productsCollectionResource = $this->getEcommerceProductsCollection();
+        $productsCollectionResource = $this->getEcommerceResourceCollection();
         $productsCollectionResource->addWhere($collection, $whereCondition);
 
         foreach ($collection as $item) {
@@ -1229,7 +1238,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         /**
          * get the products that was synced when it have special price and have no more special price
          */
-        $collectionNoSpecialPrice = $this->getProductResourceCollection();
+        $collectionNoSpecialPrice = $this->getItemResourceModelCollection();
         $collectionNoSpecialPrice->addStoreFilter($magentoStoreId);
         $this->joinMailchimpSyncDataForSpecialPrices($collectionNoSpecialPrice);
 
@@ -1289,7 +1298,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
      */
-    public function getEcommerceProductsCollection()
+    public function getEcommerceResourceCollection()
     {
         return $this->_ecommerceProductsCollection;
     }
@@ -1297,7 +1306,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
      */
-    public function createEcommerceProductsCollection()
+    public function initializeEcommerceResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Product_Collection
@@ -1314,5 +1323,49 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected function executeMailchimpDataJoin($collection, $joinCondition)
     {
         $this->_ecommerceProductsCollection->executeMailchimpDataJoin($collection, $joinCondition);
+    }
+
+    /**
+     * @param Mage_Catalog_Model_Resource_Product_Collection $collection
+     * @param string $isNewItem
+     * @throws Mage_Core_Exception
+     */
+    protected function addFilters(Mage_Catalog_Model_Resource_Product_Collection $collection, $isNewItem = "new")
+    {
+        $magentoStoreId = $this->getMagentoStoreId();
+        if ($isNewItem = "new") {
+            $collection->addStoreFilter($magentoStoreId);
+            $this->getHelper()->addResendFilter(
+                $collection,
+                $magentoStoreId,
+                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+            );
+        } else if ($isNewItem == "not-sent") {
+            $collection->addFinalPrice();
+
+            $collection->addStoreFilter($magentoStoreId);
+            $this->getHelper()->addResendFilter(
+                $collection,
+                $magentoStoreId,
+                Ebizmarts_MailChimp_Model_Config::IS_PRODUCT
+            );
+
+            $collection->joinField(
+                'qty',
+                'cataloginventory/stock_item',
+                'qty',
+                'product_id=entity_id',
+                '{{table}}.stock_id=1',
+                'left'
+            );
+            $collection->joinField(
+                'backorders',
+                'cataloginventory/stock_item',
+                'backorders',
+                'product_id=entity_id',
+                '{{table}}.stock_id=1',
+                'left'
+            );
+        }
     }
 }

@@ -29,6 +29,8 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Quote_Collection exte
      */
     public function joinLeftEcommerceSyncData($preFilteredQuotesCollection)
     {
+        Mage::log("joinLeftEcommerceSyncData: Carts Collection, mailchimpId"
+            . $this->getMailchimpStoreId(), null, "orders.log", true);
         $mailchimpTableName = $this->getMailchimpEcommerceDataTableName();
         $preFilteredQuotesCollection->getSelect()->joinLeft(
             array('m4m' => $mailchimpTableName),
