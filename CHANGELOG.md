@@ -1,5 +1,12 @@
 # Changelog
-## [1.1.21](https://github.com/mailchimp/mc-magento/releases/tag/1.1.21) - 2020-10-21
+## [1.1.22](https://github.com/mailchimp/mc-magento/releases/tag/1.1.22) - 2021-05-11
+**Changed**
+- Enhancing the way of using: joinMailchimpSyncDataWithoutWhere [\#1202](https://github.com/mailchimp/mc-magento/issues/1202)
+
+**Fixed**
+- Helper Data's function being used with "$this" into Migration Helper [\#1196](https://github.com/mailchimp/mc-magento/issues/1196)
+
+## [1.1.21](https://github.com/mailchimp/mc-magento/releases/tag/1.1.21) - 2020-11-10
 **Fixed**
 - Protected functions in HelperData being called from Migration Helper. [\#1189](https://github.com/mailchimp/mc-magento/issues/1189)
 - 1.1.20 PHP Fatal error:  Uncaught Error: Call to undefined method Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags::getHelper() in /app/code/community/Ebizmarts/MailChimp/Model/Api/Subscribers/MailchimpTags.php:275 [\#1177](https://github.com/mailchimp/mc-magento/issues/1177)
