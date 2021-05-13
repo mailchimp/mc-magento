@@ -1332,4 +1332,13 @@ class Ebizmarts_MailChimp_Model_Observer
     {
         return $subscriberSource === Ebizmarts_MailChimp_Model_Subscriber::MAILCHIMP_SUBSCRIBE;
     }
+    public function productImportAfter($observer)
+    {
+        $adapter = $observer->getEvent()->getAdapter();
+        $affectedIds = $adapter->getAffectedEntityIds();
+        foreach ($affectedIds as $id) {
+            $apiProduct = $this->makeApiProduct();
+            $apiProduct->update($id);
+        }
+    }
 }
