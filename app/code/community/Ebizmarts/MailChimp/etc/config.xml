@@ -132,6 +132,14 @@
                     </mailchimp_clean_catalog_images_cache_after>
                 </observers>
             </clean_catalog_images_cache_after>
+            <catalog_product_import_finish_before>
+                <observers>
+                    <mailchimp_product_import_after>
+                        <class>mailchimp/observer</class>
+                        <method>productImportAfter</method>
+                    </mailchimp_product_import_after>
+                </observers>
+            </catalog_product_import_finish_before>
         </events>
         <models>
             <mailchimp>

@@ -543,7 +543,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     {
         $this->markSyncDataAsDeleted($productId, 0);
     }
-
+    public function markAllAsModified($productId)
+    {
+        $this->markAllSyncDataAsModified($productId);
+    }
     /**
      * Return products belonging to an order or a cart in a valid format to be sent to MailChimp.
      *

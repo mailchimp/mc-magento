@@ -180,6 +180,14 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         $this->_updateSyncData($id, null, null, 1, null, null, null, true);
     }
 
+    protected function markAllSyncDataAsModified($id)
+    {
+        $type = $this->getItemType();
+        if (!empty($type)) {
+            $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+            $ecommerceSyncData->markAllAsModified($id,$type);
+        }
+    }
     protected function markSyncDataAsDeleted($id, $syncedFlag = null)
     {
         $this->_updateSyncData(
