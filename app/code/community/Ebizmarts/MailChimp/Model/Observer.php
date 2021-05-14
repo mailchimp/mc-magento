@@ -1334,11 +1334,13 @@ class Ebizmarts_MailChimp_Model_Observer
     }
     public function productImportAfter($observer)
     {
+        $helper = $this->makeHelper();
         $adapter = $observer->getEvent()->getAdapter();
         $affectedIds = $adapter->getAffectedEntityIds();
+        Mage::getModel('mailchimp/api_products');
+        $apiProduct = $this->makeApiProduct();
         foreach ($affectedIds as $id) {
-            $apiProduct = $this->makeApiProduct();
-            $apiProduct->update($id);
+            $apiProduct->markAllAsModified($id);
         }
     }
 }
