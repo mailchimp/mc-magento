@@ -318,7 +318,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
-            $this->_getPayloadBilling($data, $billingAddress, $street);
+            $address = $this->_getPayloadBilling($data, $billingAddress, $street);
+            $data['billing_address'] = $address;
         }
 
         $shippingAddress = $order->getShippingAddress();
@@ -455,6 +456,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      * @param $data
      * @param $billingAddress
      * @param $street
+     * @return array
      */
     protected function _getPayloadBilling($data, $billingAddress, $street)
     {
@@ -498,6 +500,8 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         if ($billingAddress->getCompany()) {
             $data["customer"]["company"] = $data["billing_address"]["company"] = $billingAddress->getCompany();
         }
+
+        return $address;
     }
 
     /**
