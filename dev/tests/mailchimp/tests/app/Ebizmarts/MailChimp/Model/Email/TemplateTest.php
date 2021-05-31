@@ -87,30 +87,24 @@ class Ebizmarts_MailChimp_Model_TemplateTest extends PHPUnit_Framework_TestCase
             ->willReturn($subject);
         $templateMock->expects($this->once())->method('getSendingSetReturnPath')->willReturn($returnPath);
         $templateMock
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('getSenderEmail')
-            ->willReturnOnConsecutiveCalls($senderEmail, $senderEmail);
-        $templateMock->expects($this->exactly(3))->method('getMail')
-            ->willReturnOnConsecutiveCalls($mailObjectMock, $mailObjectMock, $mailObjectMock);
-
-        $mailObjectMock->expects($this->once())->method('getBcc')->willReturn($bcc);
-
-        $templateMock->expects($this->once())->method('getSenderName')->willReturn($name);
+            ->willReturn($senderEmail);
         $templateMock
             ->expects($this->once())
-            ->method('getSendersDomains')
-            ->with($mailObjectMock)
-            ->willReturn($mandrillSenders);
+            ->method('getMail')
+            ->willReturn($mailObjectMock);
 
-        $mailObjectMock->expects($this->once())->method('getHeaders')->willReturn(array());
+        $templateMock
+            ->expects($this->exactly(2))
+            ->method('getSenderName')
+            ->willReturn($name);
 
         $mandrillHelperMock->expects($this->once())->method('getUserAgent')->willReturn($userAgent);
 
-        $mailObjectMock->expects($this->once())->method('getAttachments')->willReturn(null);
-
         $templateMock->expects($this->once())->method('isPlain')->willReturn(false);
         $templateMock->expects($this->once())->method('hasQueue')->willReturn(false);
-        $templateMock->expects($this->once())->method('sendMail')->with($emailArray, $mailObjectMock);
+        $templateMock->expects($this->once())->method('sendMail')->with($mailObjectMock);
 
         $templateMock->send($email, $name, $variables);
     }
