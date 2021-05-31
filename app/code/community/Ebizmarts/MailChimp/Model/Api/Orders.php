@@ -268,7 +268,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      */
     public function GeneratePOSTPayload($order)
     {
-        error_log(__METHOD__ . "\n", 3, BP.'/var/log/ebizmarts.log');
         $magentoStoreId = $this->getMagentoStoreId();
 
         $data = $this->_getPayloadData($order);
@@ -323,19 +322,11 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             $data['billing_address'] = $address;
         }
 
-        error_log("ORDER CLASS: " . get_class($order) . "\n", 3, BP.'/var/log/ebizmarts.log');
-
         $shippingAddress = $order->getShippingAddress();
 
         if ($shippingAddress) {
-            error_log("Shipping Address:" . "\n", 3, BP.'/var/log/ebizmarts.log');
-            error_log(json_encode($shippingAddress, JSON_PRETTY_PRINT) . "\n", 3, BP.'/var/log/ebizmarts.log');
             $address = $this->_getPayloadShipping($data, $shippingAddress);
-            error_log("Address:" . "\n", 3, BP.'/var/log/ebizmarts.log');
-            error_log(json_encode($address, JSON_PRETTY_PRINT) . "\n", 3, BP.'/var/log/ebizmarts.log');
             $data['shipping_address'] = $address;
-            error_log("Data:" . "\n", 3, BP.'/var/log/ebizmarts.log');
-            error_log(json_encode($data, JSON_PRETTY_PRINT) . "\n", 3, BP.'/var/log/ebizmarts.log');
         }
 
         $jsonData = "";
@@ -475,17 +466,12 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         $street = $billingAddress->getStreet();
 
         if ($street[0]) {
-            error_log("FLAG2" . "\n", 3, BP.'/var/log/ebizmarts.log');
-            error_log("Street 0: " . $street[0] . "\n", 3, BP.'/var/log/ebizmarts.log');
             $address["address1"] = $data['billing_address']["address1"] = $street[0];
         }
 
         if (count($street) > 1) {
-            error_log("FLAG3" . "\n", 3, BP.'/var/log/ebizmarts.log');
             $address["address2"] = $data['billing_address']["address2"] = $street[1];
         }
-
-        //$this->_getPayloadBillingStreet($data, $address, $street);
 
         if ($billingAddress->getCity()) {
             $address["city"] = $data['billing_address']["city"] = $billingAddress->getCity();
@@ -530,25 +516,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         return $address;
-    }
-
-    /**
-     * @param $data
-     * @param $address
-     * @param $street
-     */
-    protected function _getPayloadBillingStreet($data, $address, $street)
-    {
-        error_log(__METHOD__ . "\n", 3, BP.'/var/log/ebizmarts.log');
-        if ($street[0]) {
-            error_log("FLAG2" . "\n", 3, BP.'/var/log/ebizmarts.log');
-            $address["address1"] = $data['billing_address']["address1"] = $street[0];
-        }
-
-        if (count($street) > 1) {
-            error_log("FLAG3" . "\n", 3, BP.'/var/log/ebizmarts.log');
-            $address["address2"] = $data['billing_address']["address2"] = $street[1];
-        }
     }
 
     /**
