@@ -28,8 +28,8 @@ class Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata extends Mage_Core_Mod
         $connection =  $this->_getWriteAdapter();
         $connection->update(
             $this->getMainTable(),
-            ['mailchimp_sync_modified'=>1],
-            ['related_id = ?'=> $id, 'type = ?'=>$type]
+            array ('mailchimp_sync_modified'=>1),
+            array ('related_id = ?'=> $id, 'type = ?'=>$type)
         );
         return $this;
     }
