@@ -2,7 +2,7 @@
 
 class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCase
 {
-    private $address = [
+    private $address = array(
         "name" => "Test",
         "address1" => "address1",
         "city"=> "city",
@@ -13,7 +13,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         "country_code" => "GB",
         "company" => "Ebizmarts",
         "phone" => "01515740949"
-    ];
+);
 
     /**
      * @var Ebizmarts_MailChimp_Model_Api_Orders
