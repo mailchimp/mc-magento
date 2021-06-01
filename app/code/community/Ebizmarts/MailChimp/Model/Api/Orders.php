@@ -262,7 +262,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     /**
      * Set all the data for each order to be sent
      *
-     * @param $order
+     * @param Mage_Sales_Model_Order $order
      * @return false|string
      * @throws Mage_Core_Model_Store_Exception
      */
@@ -318,13 +318,15 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
 
         if ($billingAddress) {
             $street = $billingAddress->getStreet();
-            $this->_getPayloadBilling($data, $billingAddress, $street);
+            $address = $this->_getPayloadBilling($data, $billingAddress, $street);
+            $data['billing_address'] = $address;
         }
 
         $shippingAddress = $order->getShippingAddress();
 
         if ($shippingAddress) {
-            $this->_getPayloadShipping($data, $shippingAddress);
+            $address = $this->_getPayloadShipping($data, $shippingAddress);
+            $data['shipping_address'] = $address;
         }
 
         $jsonData = "";
@@ -455,12 +457,21 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
      * @param $data
      * @param $billingAddress
      * @param $street
+     * @return array
      */
     protected function _getPayloadBilling($data, $billingAddress, $street)
     {
         $address = array();
 
-        $this->_getPayloadBillingStreet($data, $address, $street);
+        $street = $billingAddress->getStreet();
+
+        if ($street[0]) {
+            $address["address1"] = $data['billing_address']["address1"] = $street[0];
+        }
+
+        if (count($street) > 1) {
+            $address["address2"] = $data['billing_address']["address2"] = $street[1];
+        }
 
         if ($billingAddress->getCity()) {
             $address["city"] = $data['billing_address']["city"] = $billingAddress->getCity();
@@ -491,75 +502,76 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         if ($billingAddress->getName()) {
-            $data['billing_address']['name'] = $billingAddress->getName();
+            $data['billing_address']['name'] = $address['name'] = $billingAddress->getName();
         }
 
         //company
         if ($billingAddress->getCompany()) {
-            $data["customer"]["company"] = $data["billing_address"]["company"] = $billingAddress->getCompany();
-        }
-    }
-
-    /**
-     * @param $data
-     * @param $address
-     * @param $street
-     */
-    protected function _getPayloadBillingStreet($data, $address, $street)
-    {
-        if ($street[0]) {
-            $address["address1"] = $data['billing_address']["address1"] = $street[0];
+            $data["customer"]["company"] = $data["billing_address"]["company"] = $address['company'] = $billingAddress->getCompany();
         }
 
-        if (count($street) > 1) {
-            $address["address2"] = $data['billing_address']["address2"] = $street[1];
+        //phone
+        if ($billingAddress->getTelephone()) {
+            $address['phone'] = $billingAddress->getTelephone();
         }
+
+        return $address;
     }
 
     /**
      * @param $data
      * @param $shippingAddress
+     * @return array
      */
     protected function _getPayloadShipping($data, $shippingAddress)
     {
+
+        $address = array();
+
         $street = $shippingAddress->getStreet();
 
         if ($shippingAddress->getName()) {
-            $data['shipping_address']['name'] = $shippingAddress->getName();
+            $address['name'] = $data['shipping_address']['name'] = $shippingAddress->getName();
         }
 
         if (isset($street[0]) && $street[0]) {
-            $data['shipping_address']['address1'] = $street[0];
+            $address['address1'] = $data['shipping_address']['address1'] = $street[0];
         }
 
         if (isset($street[1]) && $street[1]) {
-            $data['shipping_address']['address2'] = $street[1];
+            $address['address2'] = $data['shipping_address']['address2'] = $street[1];
         }
 
         if ($shippingAddress->getCity()) {
-            $data['shipping_address']['city'] = $shippingAddress->getCity();
+            $address['city'] = $data['shipping_address']['city'] = $shippingAddress->getCity();
         }
 
         if ($shippingAddress->getRegion()) {
-            $data['shipping_address']['province'] = $shippingAddress->getRegion();
+            $address['province'] = $data['shipping_address']['province'] = $shippingAddress->getRegion();
         }
 
         if ($shippingAddress->getRegionCode()) {
-            $data['shipping_address']['province_code'] = $shippingAddress->getRegionCode();
+            $address['province_code'] = $data['shipping_address']['province_code'] = $shippingAddress->getRegionCode();
         }
 
         if ($shippingAddress->getPostcode()) {
-            $data['shipping_address']['postal_code'] = $shippingAddress->getPostcode();
+            $address['postal_code'] = $data['shipping_address']['postal_code'] = $shippingAddress->getPostcode();
         }
 
         if ($shippingAddress->getCountry()) {
-            $data['shipping_address']['country'] = $this->getCountryModelNameFromShippingAddress($shippingAddress);
-            $data['shipping_address']['country_code'] = $shippingAddress->getCountry();
+            $address['country'] = $data['shipping_address']['country'] = $this->getCountryModelNameFromShippingAddress($shippingAddress);
+            $address['country_code'] = $data['shipping_address']['country_code'] = $shippingAddress->getCountry();
         }
 
-        if ($shippingAddress->getCompamy()) {
-            $data["shipping_address"]["company"] = $shippingAddress->getCompany();
+        if ($shippingAddress->getCompany()) {
+            $address['company'] = $data["shipping_address"]["company"] = $shippingAddress->getCompany();
         }
+
+        if ($shippingAddress->getTelephone()) {
+            $address['phone'] = $shippingAddress->getTelephone();
+        }
+
+        return $address;
     }
 
     /**
