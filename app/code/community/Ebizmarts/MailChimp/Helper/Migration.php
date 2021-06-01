@@ -731,8 +731,8 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
 
             foreach ($stores as $storeId => $store) {
                 // Gets the ListId and WebhookId for the iterated store.
-                $listId = $helper->getGeneralList($scopeId, $scope);
-                $webhookId = $webhookHelper->getWebhookId($scopeId, $scope);
+                $listId = $helper->getGeneralList($storeId, "stores");
+                $webhookId = $webhookHelper->getWebhookId($storeId, "stores");
 
                 // Edits the webhook with the new $event array.
                 $helper
