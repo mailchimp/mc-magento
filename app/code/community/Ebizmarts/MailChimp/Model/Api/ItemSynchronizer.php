@@ -180,6 +180,14 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
         $this->_updateSyncData($id, null, null, 1, null, null, null, true);
     }
 
+    protected function markAllSyncDataAsModified($id)
+    {
+        $type = $this->getItemType();
+        if (!empty($type)) {
+            $ecommerceSyncData = $this->getMailchimpEcommerceSyncDataModel();
+            $ecommerceSyncData->markAllAsModified($id,$type);
+        }
+    }
     protected function markSyncDataAsDeleted($id, $syncedFlag = null)
     {
         $this->_updateSyncData(
@@ -317,5 +325,46 @@ class Ebizmarts_MailChimp_Model_Api_ItemSynchronizer
     protected function getItemType()
     {
         return null;
+    }
+
+    public function joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId)
+    {
+        $this->initializeEcommerceResourceCollection()
+            ->joinMailchimpSyncDataWithoutWhere($customerCollection, $mailchimpStoreId);
+    }
+
+    /**
+     * @param $itemType
+     * @param string $where
+     * @param string $isNewItem
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
+    public function buildEcommerceCollectionToSync(
+        $itemType,
+        $where = "m4m.mailchimp_sync_delta IS NULL",
+        $isNewItem = "new"
+    ){
+        $collectionToSync = $this->getItemResourceModelCollection();
+        $ecommerceResourceCollection = $this->getEcommerceResourceCollection();
+
+        $this->addFilters($collectionToSync, $isNewItem);
+
+        $ecommerceResourceCollection->joinLeftEcommerceSyncData($collectionToSync);
+
+        if ($itemType != Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE) {
+            $ecommerceResourceCollection->addWhere(
+                $collectionToSync,
+                $where,
+                $this->getBatchLimitFromConfig()
+            );
+        } else {
+            $ecommerceResourceCollection->addWhere($collectionToSync, $where);
+            $collectionToSync->getSelect()->order(array('salesrule.rule_id DESC'));
+            // limit the collection
+            $ecommerceResourceCollection->limitCollection($collectionToSync, $this->getBatchLimitFromConfig());
+        }
+
+        return $collectionToSync;
     }
 }

@@ -297,6 +297,9 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
      */
     protected function _migrateProductsFrom115($mailchimpStoreId, $initialTime)
     {
+        /**
+         * @var $helper Ebizmarts_MailChimp_Helper_Migration
+         */
         $helper = $this->getHelper();
 
         try {
@@ -540,13 +543,13 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
      */
     protected function _setIsSyncingIfFinishedInAllStores($syncValue)
     {
-        $stores = $this->getMageApp()->getStores();
+        $stores = $this->_helper->getMageApp()->getStores();
 
         foreach ($stores as $storeId => $store) {
-            $ecommEnabled = $this->isEcomSyncDataEnabled($storeId);
+            $ecommEnabled = $this->_helper->isEcomSyncDataEnabled($storeId);
 
             if ($ecommEnabled) {
-                $this->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
+                $this->_helper->setIsSyncingIfFinishedPerScope($syncValue, $storeId);
             }
         }
     }
@@ -728,8 +731,8 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
 
             foreach ($stores as $storeId => $store) {
                 // Gets the ListId and WebhookId for the iterated store.
-                $listId = $helper->getGeneralList($scopeId, $scope);
-                $webhookId = $webhookHelper->getWebhookId($scopeId, $scope);
+                $listId = $helper->getGeneralList($storeId, "stores");
+                $webhookId = $webhookHelper->getWebhookId($storeId, "stores");
 
                 // Edits the webhook with the new $event array.
                 $helper

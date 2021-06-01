@@ -43,7 +43,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $mailchimpStoreId = $this->getMailchimpStoreId();
         $magentoStoreId = $this->getMagentoStoreId();
 
-        $this->_ecommercePromoRulesCollection = $this->createEcommercePromoRulesCollection();
+        $this->_ecommercePromoRulesCollection = $this->getResourceCollection();
         $this->_ecommercePromoRulesCollection->setMailchimpStoreId($mailchimpStoreId);
         $this->_ecommercePromoRulesCollection->setStoreId($magentoStoreId);
 
@@ -450,7 +450,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
     /**
      * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection
      */
-    public function createEcommercePromoRulesCollection()
+    public function getResourceCollection()
     {
         /**
          * @var $collection Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_PromoRules_Collection

@@ -2,6 +2,19 @@
 
 class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCase
 {
+    private $address = array(
+        "name" => "Test",
+        "address1" => "address1",
+        "city"=> "city",
+        "province" => "province",
+        "province_code" => "province code",
+        "postal_code" => "postal code",
+        "country" => "United Kingdom",
+        "country_code" => "GB",
+        "company" => "Ebizmarts",
+        "phone" => "01515740949"
+);
+
     /**
      * @var Ebizmarts_MailChimp_Model_Api_Orders
      */
@@ -28,7 +41,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock = $this->_ordersApiMock
             ->setMethods(
                 array(
-                        'getMailchimpStoreId', 'getMagentoStoreId', 'createEcommerceOrdersCollection',
+                        'getMailchimpStoreId', 'getMagentoStoreId', 'initializeEcommerceResourceCollection',
                         'getHelper', '_getModifiedOrders', '_getNewOrders', 'getDateHelper'
                     )
             )->getMock();
@@ -52,7 +65,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn($mailchimpStoreId);
         $ordersApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn($magentoStoreId);
 
-        $ordersApiMock->expects($this->once())->method('createEcommerceOrdersCollection')
+        $ordersApiMock->expects($this->once())->method('initializeEcommerceResourceCollection')
             ->willReturn($ordersCollectionResourceMock);
 
         $ordersCollectionResourceMock->expects($this->once())->method('setMailchimpStoreId')->with($mailchimpStoreId);
@@ -214,6 +227,27 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
             'first_name' => 'testFirstName'
         );
         $data['order_url'] = 'http://somedomain.com';
+        $data['billing_address']['name'] = 'Test';
+        $data['billing_address']['address1'] = 'address1';
+        $data['billing_address']['city'] = 'city';
+        $data['billing_address']['province'] = 'province';
+        $data['billing_address']['province_code'] = 'province code';
+        $data['billing_address']['postal_code'] = 'postal code';
+        $data['billing_address']['country'] = 'United Kingdom';
+        $data['billing_address']['country_code'] = 'GB';
+        $data['billing_address']['company'] = 'Ebizmarts';
+        $data['billing_address']['phone'] = '01515740949';
+
+        $data['shipping_address']['name'] = 'Test';
+        $data['shipping_address']['address1'] = 'address1';
+        $data['shipping_address']['city'] = 'city';
+        $data['shipping_address']['province'] = 'province';
+        $data['shipping_address']['province_code'] = 'province code';
+        $data['shipping_address']['postal_code'] = 'postal code';
+        $data['shipping_address']['country'] = 'United Kingdom';
+        $data['shipping_address']['country_code'] = 'GB';
+        $data['shipping_address']['company'] = 'Ebizmarts';
+        $data['shipping_address']['phone'] = '01515740949';
 
         $ordersApiMock = $this->_ordersApiMock
             ->setMethods(
@@ -332,7 +366,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $ordersApiMock->expects($this->once())
             ->method('_getPayloadBilling')
-            ->with($data, $billingAddressMock, $billingAddressStreet);
+            ->with($data, $billingAddressMock, $billingAddressStreet)
+            ->willReturn($this->address);
 
         $shippingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
             ->setMethods(array('getStreet'))
@@ -344,7 +379,8 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
 
         $ordersApiMock->expects($this->once())
             ->method('_getPayloadShipping')
-            ->with($data, $shippingAddressMock);
+            ->with($data, $shippingAddressMock)
+            ->willReturn($this->address);
 
         $ordersApiMock->GeneratePOSTPayload($orderMock);
     }
