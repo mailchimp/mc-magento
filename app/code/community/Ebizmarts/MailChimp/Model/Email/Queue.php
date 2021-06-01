@@ -116,14 +116,13 @@ class Ebizmarts_MailChimp_Model_Email_Queue extends Mage_Core_Model_Email_Queue
                 break;
             }
         }
-
-        if ($parameters->getReplyTo() !== null) {
-            $mailer->setReplyTo($parameters->getReplyTo());
+        if ($parameters->getFromEmail() !== null) {
+            $mailer->setReplyTo($parameters->getFromEmail(), $parameters->getFromName());
         }
 
-        if ($parameters->getReturnTo() !== null) {
-            $mailer->setReturnPath($parameters->getReturnTo());
-        }
+//        if ($parameters->getReturnTo() !== null) {
+//            $mailer->setReturnPath($parameters->getReturnTo());
+//        }
 
         try {
             Mage::dispatchEvent(
