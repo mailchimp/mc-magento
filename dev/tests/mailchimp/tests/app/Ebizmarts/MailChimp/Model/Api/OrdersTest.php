@@ -2,7 +2,7 @@
 
 class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCase
 {
-    const ADDRESS = [
+    private $address = [
         "name" => "Test",
         "address1" => "address1",
         "city"=> "city",
@@ -367,7 +367,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())
             ->method('_getPayloadBilling')
             ->with($data, $billingAddressMock, $billingAddressStreet)
-            ->willReturn(self::ADDRESS);
+            ->willReturn($this->address);
 
         $shippingAddressMock = $this->getMockBuilder(Mage_Sales_Model_Order_Address::class)
             ->setMethods(array('getStreet'))
@@ -380,7 +380,7 @@ class Ebizmarts_MailChimp_Model_Api_OrdersTest extends PHPUnit_Framework_TestCas
         $ordersApiMock->expects($this->once())
             ->method('_getPayloadShipping')
             ->with($data, $shippingAddressMock)
-            ->willReturn(self::ADDRESS);
+            ->willReturn($this->address);
 
         $ordersApiMock->GeneratePOSTPayload($orderMock);
     }
