@@ -4241,4 +4241,18 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::helper('mailchimp/file');
     }
+
+    public function getTotalNewItemsSent()
+    {
+        $totalAmount = 0;
+        $itemArray = array (self::ORD_NEW, self::SUB_NEW, self::PRO_NEW, self::CUS_NEW, self::QUO_NEW);
+
+        foreach ($itemArray as $item) {
+            if (array_key_exists($item, $this->_countersSendBatch)) {
+                $totalAmount += $this->_countersSendBatch[$item];
+            }
+        }
+
+        return $totalAmount;
+    }
 }
