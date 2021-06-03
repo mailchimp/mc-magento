@@ -348,7 +348,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $apiCustomers->setMagentoStoreId($magentoStoreId);
 
                 $customersArray = $apiCustomers->createBatchJson();
-                $customerAmount = count($customersArray);
                 $batchArray['operations'] = $customersArray;
 
                 //product operations
@@ -359,7 +358,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $apiProducts->setMagentoStoreId($magentoStoreId);
 
                 $productsArray = $apiProducts->createBatchJson();
-                $productAmount = count($productsArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $productsArray);
 
                 if ($helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId) === 1) {
@@ -382,7 +380,6 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $apiOrders->setMagentoStoreId($magentoStoreId);
 
                 $ordersArray = $apiOrders->createBatchJson();
-                $orderAmount = count($ordersArray);
                 $batchArray['operations'] = array_merge($batchArray['operations'], $ordersArray);
 
                 if ($helper->getPromoConfig($magentoStoreId) == self::SEND_PROMO_ENABLED) {
@@ -414,10 +411,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
 
                 try {
                     $this->_processBatchOperations($batchArray, $mailchimpStoreId, $magentoStoreId);
-                    $this->_updateSyncingFlag(
-                        $customerAmount, $productAmount, $orderAmount,
-                        $mailchimpStoreId, $magentoStoreId
-                    );
+                    $this->_updateSyncingFlag($mailchimpStoreId, $magentoStoreId);
                 } catch (Ebizmarts_MailChimp_Helper_Data_ApiKeyException $e) {
                     $helper->logError($e->getMessage());
                 } catch (MailChimp_Error $e) {
@@ -476,23 +470,18 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     }
 
     /**
-     * @param $customerAmount
-     * @param $productAmount
-     * @param $orderAmount
      * @param $mailchimpStoreId
      * @param $magentoStoreId
      * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
     protected function _updateSyncingFlag(
-        $customerAmount,
-        $productAmount,
-        $orderAmount,
         $mailchimpStoreId,
         $magentoStoreId
     ) {
         $helper = $this->getHelper();
         $dateHelper = $this->getDateHelper();
-        $itemAmount = ($customerAmount + $productAmount + $orderAmount);
+        $itemAmount = $helper->getTotalNewItemsSent();
         $syncingFlag = $helper->getMCIsSyncing($mailchimpStoreId, $magentoStoreId);
 
         if ($this->shouldFlagAsSyncing($syncingFlag, $itemAmount, $helper)) {
