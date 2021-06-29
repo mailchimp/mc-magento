@@ -466,6 +466,8 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                 $this->markItemsAsSent($batchResponse['id'], $mailchimpStoreId);
                 $this->_showResumeEcommerce($batchResponse['id'], $magentoStoreId);
             }
+        } else {
+            $helper->logBatchStatus("Nothing to sync for store $magentoStoreId");
         }
     }
 
