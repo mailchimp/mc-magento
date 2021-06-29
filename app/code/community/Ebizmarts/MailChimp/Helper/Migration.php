@@ -88,7 +88,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
         $arrayMigrationConfigData = array('115' => true, '116' => false, '1164' => false);
         //migrate data from older version to the new schemma
         if ($helper->isEcommerceEnabled(0)) {
-            $mailchimpStoreId = $this->getMCStoreId(0);
+            $mailchimpStoreId = $helper->getMCStoreId(0);
 
             //migrate customers
             $this->_migrateCustomersFrom115($mailchimpStoreId, $initialTime);
