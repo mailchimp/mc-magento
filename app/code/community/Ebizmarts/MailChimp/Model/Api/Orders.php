@@ -385,6 +385,16 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             if ($orderCancelDate) {
                 $data['cancelled_at_foreign'] = $orderCancelDate;
             }
+
+            $data['order_total'] = 0;
+            $data['tax_total'] = 0;
+            $data['discount_total'] = 0;
+            $data['shipping_total'] = 0;
+        } else {
+            $data['order_total'] = $order->getBaseGrandTotal();
+            $data['tax_total'] = $this->returnZeroIfNull($order->getBaseTaxAmount());
+            $data['discount_total'] = abs($order->getBaseDiscountAmount());
+            $data['shipping_total'] = $this->returnZeroIfNull($order->getBaseShippingAmount());
         }
 
         return $data;
