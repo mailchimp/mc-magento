@@ -24,7 +24,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     protected $_productTypeConfigurable;
 
-    protected $_visibilityOptions;
     protected $_productTypeConfigurableResource;
     public static $noChildrenIds = array(0 => array());
 
@@ -43,7 +42,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $this->_productTypeConfigurableResource = Mage::getResourceSingleton(
             'catalog/product_type_configurable'
         );
-        $this->_visibilityOptions = Mage::getModel('catalog/product_visibility')->getOptionArray();
     }
 
     /**
@@ -141,7 +139,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         }
 
         $helper->setCurrentStore($oldStoreId);
-
         return $batchArray;
     }
 
@@ -298,7 +295,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                 if ($productSyncDataItem->getMailchimpSyncDelta()) {
                     $parent = $this->_getParentProduct($parentId);
                     $variantProducts = $this->makeProductChildrenArray(
-                        $product,
+                        $parent,
                         true
                     );
                     $bodyData = $this->_buildProductData($parent, $magentoStoreId, false, $variantProducts);
@@ -334,6 +331,8 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                     $data['operation_id'] = $batchId . '_' . $parent->getId();
                     $data['body'] = $body;
                     $operations[] = $data;
+                    $variantProducts = array();
+                    $variantProducts[] = $product;
                 }
             }
         } elseif ($this->isConfigurableProduct($product)) {
@@ -392,7 +391,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $data['operation_id'] = $batchId . '_' . $product->getId();
         $data['body'] = $body;
         $operations[] = $data;
-
         return $operations;
     }
 
@@ -473,7 +471,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
                 $data = $this->_processVariants($data, $variants, $product, $magentoStoreId);
             }
         }
-
         return $data;
     }
 
@@ -525,11 +522,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     public function update($productId)
     {
-        $parentIdArray = $this->getAllParentIds($productId);
+//        $parentIdArray = $this->getAllParentIds($productId);
 
-        foreach ($parentIdArray as $parentId) {
-            $this->markSyncDataAsModified($parentId);
-        }
+//        foreach ($parentIdArray as $parentId) {
+//            $this->markSyncDataAsModified($parentId);
+//        }
 
         $this->markSyncDataAsModified($productId);
     }
@@ -759,7 +756,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $data["sku"] = $sku ? $sku : '';
 
         $price = $this->getMailChimpProductPrice($product, $magentoStoreId);
-
         if ($price) {
             $data["price"] = $price;
         }
@@ -768,7 +764,7 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
         $data["inventory_quantity"] = (int)$product->getQty();
         $data["backorders"] = (string)$product->getBackorders();
 
-        $data["visibility"] = $this->getVisibility($this->_visibility);
+        $data["visibility"] = $this->currentProductIsVisible() ? 'visible' : 'hidden';
 
         return $data;
     }
@@ -788,7 +784,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected function getConfigurableChildrenIds($product)
     {
         $childrenIds = $this->getChildrenIdsForConfigurable($product);
-
         if ($childrenIds === self::$noChildrenIds) {
             return array();
         }
@@ -1099,19 +1094,16 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
      */
     protected function getMailChimpProductPrice($product, $magentoStoreId)
     {
-        $price = null;
-        $parentId = null;
-        if (!$this->currentProductIsVisible()) {
-            $parentId = $this->getParentId($product->getId());
-            if ($parentId) {
-                $price = $this->getMailchimpFinalPrice($product, $magentoStoreId);
-            }
-        } else {
-            if ($this->_parentPrice) {
+        $prodPrice = $this->getMailchimpFinalPrice($product, $magentoStoreId);
+        if ($this->_parentPrice) {
+            if ($prodPrice && $prodPrice < $this->_parentPrice) {
+                $price = $prodPrice;
+            } else {
                 $price = $this->_parentPrice;
             }
+        } else {
+            $price = $prodPrice;
         }
-
         return $price;
     }
 
@@ -1160,19 +1152,6 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     }
 
     /**
-     * @param string $visibility Visibility.
-     * @return int or null
-     */
-    protected function getVisibility($visibility)
-    {
-        if (array_key_exists($visibility, $this->_visibilityOptions)) {
-            return $this->_visibilityOptions[$visibility];
-        }
-
-        return null;
-    }
-
-    /**
      * Return price with tax if setting enabled.
      *
      * @param  $product
@@ -1183,10 +1162,11 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
     protected function getMailchimpFinalPrice($product, $magentoStoreId)
     {
         $helper = $this->getHelper();
+        $p = $this->loadProductById($product->getId());
         $price = Mage::helper('tax')
             ->getPrice(
-                $product,
-                $product->getFinalPrice(),
+                $p,
+                $p->getFinalPrice(),
                 $helper->isIncludeTaxesEnabled($magentoStoreId)
             );
 
