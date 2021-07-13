@@ -495,6 +495,7 @@ class Ebizmarts_MailChimp_Model_Observer
         $ecommEnabled = $helper->isEcomSyncDataEnabled($storeId);
 
         if ($ecommEnabled) {
+            $apiOrder->setMailchimpStoreId($helper->getMCStoreId($storeId));
             $apiOrder->update($order->getId(), $storeId);
         }
 

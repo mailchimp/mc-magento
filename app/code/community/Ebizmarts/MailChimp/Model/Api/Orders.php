@@ -20,7 +20,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     const PENDING = 'pending';
     const REFUNDED = 'refunded';
     const PARTIALLY_REFUNDED = 'partially_refunded';
-    const CANCELED = 'canceled';
+    const CANCELED = 'cancelled';
     protected $_firstDate;
     protected $_counter;
     protected $_batchId;
