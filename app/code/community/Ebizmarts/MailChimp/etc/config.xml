@@ -454,7 +454,7 @@
             </mailchimp_delete_webhook_processed>
             <mailchimp_clear_ecommerce_data>
                 <schedule>
-                    <cron_expr>0 0 * * 0</cron_expr>
+                    <cron_expr>0 0 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>mailchimp/cron::clearEcommerceData</model>
