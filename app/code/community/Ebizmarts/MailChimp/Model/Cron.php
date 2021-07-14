@@ -55,6 +55,10 @@ class Ebizmarts_MailChimp_Model_Cron
     {
         Mage::getModel('mailchimp/clearEcommerce')->clearEcommerceData();
     }
+    public function clearBatches()
+    {
+        Mage::getModel('mailchimp/clearBatches')->clearBatches();
+    }
 
     protected function getHelper()
     {
