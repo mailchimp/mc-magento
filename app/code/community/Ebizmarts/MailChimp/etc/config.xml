@@ -2,10 +2,10 @@
 <config>
     <modules>
         <Ebizmarts_MailChimp>
-            <version>1.1.21</version>
+            <version>1.1.22</version>
         </Ebizmarts_MailChimp>
         <Ebizmarts_Mandrill>
-            <version>1.1.21</version>
+            <version>1.1.22</version>
         </Ebizmarts_Mandrill>
     </modules>
     <global>
@@ -461,6 +461,15 @@
                 </run>
                 <groups>ebizmarts_mailchimp</groups>
             </mailchimp_clear_ecommerce_data>
+            <mailchimp_clear_batches>
+                <schedule>
+                    <cron_expr>0 0 * * 0</cron_expr>
+                </schedule>
+                <run>
+                    <model>mailchimp/cron::clearBatches</model>
+                </run>
+                <groups>ebizmarts_mailchimp</groups>
+            </mailchimp_clear_batches>
         </jobs>
     </crontab>
 </config>
