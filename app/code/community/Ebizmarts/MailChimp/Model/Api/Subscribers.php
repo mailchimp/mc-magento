@@ -230,8 +230,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers
         $interest = $helper->getInterestGroups(null, $subscriber->getSubscriberId(), $storeId, $interestsAvailable);
 
         foreach ($interest as $i) {
-            foreach ($i['category'] as $key => $value) {
-                $rc[$value['id']] = $value['checked'];
+            if (array_key_exists('category', $i)) {
+                foreach ($i['category'] as $key => $value) {
+                    $rc[$value['id']] = $value['checked'];
+                }
             }
         }
 
