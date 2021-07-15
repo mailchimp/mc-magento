@@ -38,7 +38,7 @@ class Ebizmarts_MailChimp_Block_Group_Type extends Mage_Core_Block_Template
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    public function getHelper()
+    public function getHelper($type='')
     {
         return $this->_helper;
     }

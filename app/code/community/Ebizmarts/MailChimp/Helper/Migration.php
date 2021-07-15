@@ -796,7 +796,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getHelper()
+    protected function getHelper($type='')
     {
         return $this->_helper;
     }

@@ -60,7 +60,7 @@ class Ebizmarts_MailChimp_Model_Cron
         Mage::getModel('mailchimp/clearBatches')->clearBatches();
     }
 
-    protected function getHelper()
+    protected function getHelper($type='')
     {
         return $this->_mailChimpHelper;
     }
