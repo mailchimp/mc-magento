@@ -322,7 +322,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                     $productCollection,
                     $mailchimpStoreId,
                     $initialTime,
-                    function ($product, $mailchimpStoreId) {
+                    function ($product, $mailchimpStoreId, $helper) {
                         $productId = $product->getEntityId();
                         $_resource = Mage::getResourceSingleton('catalog/product');
                         $syncDelta = $_resource->getAttributeRawValue(
@@ -796,7 +796,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     /**
      * @var Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getHelper($type='')
+    protected function getHelper($type='_migrateProductsFrom115')
     {
         return $this->_helper;
     }
