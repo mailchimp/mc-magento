@@ -69,12 +69,21 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
 
         foreach ($deletedPromoRules as $promoRule) {
             $ruleId = $promoRule->getRelatedId();
-            $batchArray[$counter]['method'] = "DELETE";
             $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules/' . $ruleId;
             $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $ruleId;
-            $batchArray[$counter]['body'] = '';
-            $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
-            $this->deletePromoRuleSyncData($ruleId);
+            if ($promoRule->getMailchimpSyncDeleted()) {
+                $batchArray[$counter]['method'] = "DELETE";
+                $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
+                $this->deletePromoRuleSyncData($ruleId);
+                $batchArray[$counter]['body'] = '';
+            } elseif ($promoRule->getMailchimpSyncModified()) {
+                    $batchArray[$counter]['method'] = "PATCH";
+                    $promoRule = $this->getPromoRule($ruleId);
+                    $ruleData = $this->generateRuleData($promoRule);
+                    $promoRuleJson = json_encode($ruleData);
+                    $batchArray[$counter]['body'] = $promoRuleJson;
+            }
+
             $counter++;
         }
 
@@ -89,6 +98,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     public function getNewPromoRule($ruleId, $mailchimpStoreId, $magentoStoreId)
     {
+        $this->setMailchimpStoreId($mailchimpStoreId);
         $promoData = array();
         $promoRule = $this->getPromoRule($ruleId);
         $helper = $this->getHelper();
