@@ -847,7 +847,7 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
     /**
      * @param $newOrders
      */
-    public function joinMailchimpSyncDataWithoutWhere($newOrders)
+    public function joinMailchimpSyncDataWithoutWhere($newOrders, $mailchimpStoreId=null)
     {
         $this->_ecommerceOrdersCollection->joinLeftEcommerceSyncData($newOrders);
     }
