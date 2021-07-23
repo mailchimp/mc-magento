@@ -41,6 +41,14 @@ class Ebizmarts_MailChimp_Helper_File extends Mage_Core_Helper_Abstract
     {
         return $this->_ioFile->dirname($file);
     }
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function isDir($name)
+    {
+        return is_dir($name);
+    }
 
     /**
      * @param $dir
