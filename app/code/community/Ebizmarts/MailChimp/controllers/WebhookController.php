@@ -18,10 +18,10 @@ class Ebizmarts_MailChimp_WebhookController extends Mage_Core_Controller_Front_A
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
      */
-    protected function getHelper()
+    protected function getHelper($type='mailchimp')
     {
         if (!$this->_mailchimpHelper) {
-            $this->_mailchimpHelper = Mage::helper('mailchimp');
+            $this->_mailchimpHelper = Mage::helper($type);
         }
 
         return $this->_mailchimpHelper;

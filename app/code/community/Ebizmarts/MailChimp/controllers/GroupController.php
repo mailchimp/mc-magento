@@ -64,9 +64,9 @@ class Ebizmarts_MailChimp_GroupController extends Mage_Core_Controller_Front_Act
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
      */
-    protected function getHelper()
+    protected function getHelper($type='mailchimp')
     {
-        return Mage::helper('mailchimp');
+        return Mage::helper($type);
     }
 
     /**

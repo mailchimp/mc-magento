@@ -41,7 +41,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
     /**
      * @return Ebizmarts_MailChimp_Helper_Data|Mage_Core_Helper_Abstract
      */
-    protected function getHelper()
+    protected function getHelper($type='')
     {
         return $this->_helper;
     }
