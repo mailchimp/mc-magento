@@ -123,4 +123,8 @@ class Ebizmarts_MailChimp_Helper_File extends Mage_Core_Helper_Abstract
     public function read($filename){
         return $this->_ioFile->read($filename);
     }
+    public function open($args=array())
+    {
+        return $this->_ioFile->open($args);
+    }
 }

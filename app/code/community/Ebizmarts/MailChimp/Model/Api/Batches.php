@@ -793,8 +793,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         $helper->resetCountersDataSentToMailchimp();
         $fileHelper = $this->getMailchimpFileHelper();
+        $fileHelper->open(array('path'=>Mage::getBaseDir('var').DS.'mailchimp'));
 
         foreach ($files as $file) {
+            //$fileHelper->open($file);
             $fileContent = $fileHelper->read($file);
             $items = json_decode($fileContent, true);
 
