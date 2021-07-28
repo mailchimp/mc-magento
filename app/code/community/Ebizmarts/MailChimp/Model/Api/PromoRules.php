@@ -79,7 +79,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             } elseif ($promoRule->getMailchimpSyncModified()) {
                     $batchArray[$counter]['method'] = "PATCH";
                     $promoRule = $this->getPromoRule($ruleId);
-                    $ruleData = $this->generateRuleData($promoRule);
+                    $ruleData = $this->generateRuleData($promoRule, false);
                     $promoRuleJson = json_encode($ruleData);
                     $batchArray[$counter]['body'] = $promoRuleJson;
             }
@@ -250,7 +250,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      * @param $promoRule
      * @return array
      */
-    protected function generateRuleData($promoRule)
+    protected function generateRuleData($promoRule, $new = true)
     {
         $error = null;
         $data = array();
@@ -274,6 +274,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $promoAction = $promoRule->getSimpleAction();
         $data['type'] = $this->getMailChimpType($promoAction);
         $data['target'] = $this->getMailChimpTarget($promoAction);
+
+
+        if ($new) {
+            $data['created_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
+        }
+        else{
+            $data['updated_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
+        }
 
         $data['enabled'] = (bool)$promoRule->getIsActive();
 
@@ -352,6 +360,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
         );
 
+        /**
+         * @var $promoRule Ebizmarts_MailChimp_Model_Api_PromoRules
+         */
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
             $this->setMailchimpStoreId($mailchimpStoreId);

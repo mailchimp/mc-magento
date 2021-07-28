@@ -48,6 +48,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
             . $this->getDateHelper()->getDateMicrotime();
         $batchArray = array_merge($batchArray, $this->_getDeletedPromoCodes());
         $batchArray = array_merge($batchArray, $this->_getNewPromoCodes());
+        $batchArray = array_merge($batchArray, $this->_getModifiedPromoCodes());
 
         return $batchArray;
     }
@@ -197,6 +198,103 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     }
 
     /**
+     * @return array
+     */
+    protected function _getModifiedPromoCodes()
+    {
+        $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
+        $batchArray = array();
+        $counter = 0;
+
+        //=================
+
+        $modifiedPromoCodes = $this->buildEcommerceCollectionToSync(
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
+            "m4m.mailchimp_sync_modified = 1",
+            "modified"
+        );
+        //=================
+
+        foreach ($modifiedPromoCodes as $promoCode) {
+            $promoCodeId = $promoCode->getRelatedId();
+            $promoRuleId = $promoCode->getRuleId();
+
+            Mage::log("promoCodeId " . $promoCodeId, null, "promos.log", true);
+            Mage::log("promoRuleId " . $promoRuleId, null, "promos.log", true);
+            Mage::log("promoCode " . print_r($promoCode, true), null, "promos.log", true);
+
+
+            $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId
+                . '/promo-rules/' . $promoRuleId
+                . '/promo-codes/' . $promoCodeId;
+            $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $promoCodeId;
+
+            if ($promoCode->getMailchimpSyncModified()) {
+                $batchArray[$counter]['method'] = "PATCH";
+                $ruleData = $this->_generatePromoCodeData($promoCode);
+                $promoRuleJson = json_encode($ruleData);
+                $batchArray[$counter]['body'] = $promoRuleJson;
+            }
+
+            $counter++;
+        }
+
+        return $batchArray;
+    }
+
+    protected function _generatePromoCodeData ($promoCode)
+    {
+        $data = array();
+
+        $data['code'] = $promoCode->getCode();
+        $data['usage_count'] = (integer) $promoCode->getTimesUsed();
+        $data['created_at_foreign'] = $promoCode->getCreatedAt();
+        $data['updated_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
+        /*$data['redemption_url'] = '';
+        $data['enabled'] = '';*/
+
+
+        /*$data['enabled'] = (bool)$promoCode->getIsActive();
+
+        if ($this->ruleIsNotCompatible($data)) {
+            $error = 'The rule type is not supported by the MailChimp schema.';
+        }
+
+        if (!$error && $this->ruleHasMissingInformation($data)) {
+            $error = 'There is required information by the MailChimp schema missing.';
+        }
+
+        if ($error) {
+            $data = array();
+            $promoCode->setMailchimpSyncError($error);
+        }*/
+
+        return $data;
+    }
+
+    /**
+     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
+     */
+    protected function _makeModifiedPromoCodesCollection()
+    {
+        $modifiedPromoCodes = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
+
+        $this->_ecommercePromoCodesCollection->addWhere(
+            $modifiedPromoCodes,
+            "mailchimp_store_id = '" . $this->getMailchimpStoreId()
+            . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
+            . "' AND (mailchimp_sync_modified = 1)",
+            $this->getBatchLimitFromConfig()
+        );
+
+        Mage::log("getSelect() " . print_r((string)$this->_ecommercePromoCodesCollection->getSelect(), true), null, "promos.log", true);
+
+
+        return $modifiedPromoCodes;
+    }
+
+    /**
      * @return mixed
      */
     protected function getBatchLimitFromConfig()
@@ -282,14 +380,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $token = $this->getToken();
         $promoCode->setToken($token);
         $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl(
-                'mailchimp/cart/loadcoupon',
-                array(
+            'mailchimp/cart/loadcoupon',
+            array(
                     '_nosid' => true,
                     '_secure' => true,
                     'coupon_id' => $promoCode->getCouponId(),
                     'coupon_token' => $token
                 )
-            )
+        )
             . 'mailchimp/cart/loadcoupon?coupon_id='
             . $promoCode->getCouponId()
             . '&coupon_token='
@@ -318,6 +416,33 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         }
 
         return $this->_apiPromoRules;
+    }
+
+    /**
+     * @param $codeId
+     */
+    public function update($codeId)
+    {
+        $this->_setModified($codeId);
+    }
+
+    /**
+     * @param $codeId
+     */
+    protected function _setModified($codeId)
+    {
+        $promoCodes = $this->getMailchimpEcommerceSyncDataModel()->getAllEcommerceSyncDataItemsPerId(
+            $codeId,
+            Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
+        );
+        /**
+         * @var $promoCode Ebizmarts_MailChimp_Model_Api_PromoCodes
+         */
+        foreach ($promoCodes as $promoCode) {
+            $mailchimpStoreId = $promoCode->getMailchimpStoreId();
+            $this->setMailchimpStoreId($mailchimpStoreId);
+            $this->markSyncDataAsModified($codeId);
+        }
     }
 
     /**
@@ -481,7 +606,8 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         return $this->_ecommercePromoCodesCollection;
     }
 
-    protected function addFilters($collection, $isNewItem = null) {
+    protected function addFilters($collection, $isNewItem = null)
+    {
         $magentoStoreId = $this->getMagentoStoreId();
         $helper = $this->getHelper();
         /**
