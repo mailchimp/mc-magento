@@ -251,7 +251,7 @@ class Ebizmarts_MailChimp_Model_ProcessWebhook
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getHelper()
+    protected function getHelper($type='')
     {
         return $this->_helper;
     }

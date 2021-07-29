@@ -220,7 +220,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getHelper()
+    protected function getHelper($type='')
     {
         return $this->_helper;
     }

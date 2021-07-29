@@ -25,8 +25,8 @@ class Ebizmarts_MailChimp_Model_System_Config_Source_IncludingTaxes
     /**
      * @return Mage_Core_Helper_Abstract
      */
-    protected function getHelper()
+    protected function getHelper($type='mailchimp')
     {
-        return Mage::helper('mailchimp');
+        return Mage::helper($type);
     }
 }

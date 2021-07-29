@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    protected function getHelper()
+    protected function getHelper($type='')
     {
         return $this->_mailchimpHelper;
     }
@@ -706,7 +706,10 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         try {
             $baseDir = $this->getMagentoBaseDir();
             $api = $helper->getApi($magentoStoreId);
-
+            if ($fileHelper->isDir($baseDir.DS.'var'.DS.'mailchimp') == false)
+            {
+                $fileHelper->mkDir($baseDir.DS.'var'.DS.'mailchimp');
+            } 
             if ($api) {
                 // check the status of the job
                 $response = $api->batchOperation->status($batchId);
@@ -790,6 +793,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $helper = $this->getHelper();
         $helper->resetCountersDataSentToMailchimp();
         $fileHelper = $this->getMailchimpFileHelper();
+        $fileHelper->open(array('path'=>Mage::getBaseDir('var').DS.'mailchimp'));
 
         foreach ($files as $file) {
             $fileContent = $fileHelper->read($file);

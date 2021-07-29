@@ -81,7 +81,7 @@ class Ebizmarts_MailChimp_Block_Adminhtml_System_Config_Form_Field_Mapfields
     /**
      * @return Ebizmarts_MailChimp_Helper_Data
      */
-    public function getHelper()
+    public function getHelper($type='')
     {
         return $this->_helper;
     }

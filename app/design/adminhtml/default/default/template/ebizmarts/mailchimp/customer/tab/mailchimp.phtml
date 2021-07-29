@@ -23,9 +23,7 @@ $interest = $this->getInterest();
                                         <?php foreach($i['category'] as $c): ?>
                                             <li class="field no-label">
                                                 <input
-                                                        name="customer[interestgroup]
-                                                                [<?php echo $this->escapeHtml($i['interest']['id']) ?>]
-                                                                [<?php echo $this->escapeHtml($c['id']) ?>]"
+                                                        name="customer[interestgroup][<?php echo $this->escapeHtml($i['interest']['id']) ?>][<?php echo $this->escapeHtml($c['id']) ?>]"
                                                         type="checkbox"
                                                         data-form-part="customer_form"
                                                         value="<?php echo $this->escapeHtml($c['id']) ?>"

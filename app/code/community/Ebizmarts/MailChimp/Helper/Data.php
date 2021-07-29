@@ -952,6 +952,7 @@ class Ebizmarts_MailChimp_Helper_Data extends Mage_Core_Helper_Abstract
         } elseif ($logRequestEnabled) {
             $logDir = Mage::getBaseDir('var') . DS . 'log';
             $fileHelper = $this->getFileHelper();
+            $fileHelper->open(array('path'=>$logDir));
 
             if (!$fileHelper->fileExists($logDir, false)) {
                 $fileHelper->mkDir($logDir, 0750);

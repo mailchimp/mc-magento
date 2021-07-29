@@ -321,7 +321,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     /**
      * @param $collection
      */
-    public function joinMailchimpSyncDataWithoutWhere($collection)
+    public function joinMailchimpSyncDataWithoutWhere($collection, $mailchimpStoreId=null)
     {
         $columns = array(
             "m4m.related_id",
