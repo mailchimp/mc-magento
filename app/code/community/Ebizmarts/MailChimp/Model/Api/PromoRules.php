@@ -219,17 +219,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function makeModifiedAndDeletedPromoRulesCollection()
     {
-        $deletedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
+        $deletedAndModifiedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
 
         $this->_ecommercePromoRulesCollection->addWhere(
-            $deletedPromoRules,
+            $deletedAndModifiedPromoRules,
             "mailchimp_store_id = '" . $this->getMailchimpStoreId()
             . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
             . "' AND (mailchimp_sync_modified = 1 OR mailchimp_sync_deleted = 1)",
             $this->getBatchLimitFromConfig()
         );
 
-        return $deletedPromoRules;
+        return $deletedAndModifiedPromoRules;
     }
 
     /**

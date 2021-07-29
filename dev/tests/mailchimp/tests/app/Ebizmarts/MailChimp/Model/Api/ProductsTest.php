@@ -629,7 +629,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     'sku' => 'PAK001',
                     'finalSku' => 'PAK001',
                     'propertyVisibilityValue' => 1,
-                    'visibilityOptions' => 'Not Visible Individually'
+                    'visibilityOptions' => 'hidden'
                 )),
 
             'Catalog' => array(
@@ -637,7 +637,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     'sku' => null,
                     'finalSku' => '',
                     'propertyVisibilityValue' => 2,
-                    'visibilityOptions' => 'Catalog'
+                    'visibilityOptions' => 'visible'
                 )),
 
             'Search' => array(
@@ -645,7 +645,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     'sku' => 'PAK002',
                     'finalSku' => 'PAK002',
                     'propertyVisibilityValue' => 3,
-                    'visibilityOptions' => 'Search'
+                    'visibilityOptions' => 'visible'
                 )),
 
             'Catalog Search' => array(
@@ -653,7 +653,7 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
                     'sku' => null,
                     'finalSku' => '',
                     'propertyVisibilityValue' => 4,
-                    'visibilityOptions' => 'Catalog, Search'
+                    'visibilityOptions' => 'visible'
                 ))
         );
     }
@@ -762,40 +762,15 @@ class Ebizmarts_MailChimp_Model_Api_ProductsTest extends PHPUnit_Framework_TestC
 
     public function testUpdate()
     {
-        $parentIdArray = array(282, 283, 284, 510, 511, 878, 880, 881);
         $productId = 877;
-        $mailchimpStoreId = '3ade9d9e52e35e9b18d95bdd4d9e9a44';
 
         $productsApiMock = $this->_productsApiMock
             ->setMethods(array('getAllParentIds', 'markSyncDataAsModified'))
             ->getMock();
 
-        $productIdArrayMock = $this->getMockBuilder(ArrayObject::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getIterator'))
-            ->getMock();
-
-        $productsApiMock->expects($this->once())
-            ->method('getAllParentIds')
-            ->with($productId)
-            ->willReturn($productIdArrayMock);
-
-
-        $productIdArrayMock->expects($this->once())
-            ->method('getIterator')
-            ->willReturn(new ArrayIterator($parentIdArray));
-
-        $productsApiMock->expects($this->exactly(9))
+        $productsApiMock->expects($this->exactly(1))
             ->method('markSyncDataAsModified')
             ->withConsecutive(
-                array($parentIdArray[0]),
-                array($parentIdArray[1]),
-                array($parentIdArray[2]),
-                array($parentIdArray[3]),
-                array($parentIdArray[4]),
-                array($parentIdArray[5]),
-                array($parentIdArray[6]),
-                array($parentIdArray[7]),
                 array($productId)
             );
 
