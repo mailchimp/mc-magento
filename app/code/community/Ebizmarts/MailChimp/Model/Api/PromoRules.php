@@ -275,7 +275,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $data['type'] = $this->getMailChimpType($promoAction);
         $data['target'] = $this->getMailChimpTarget($promoAction);
 
-
         if ($new) {
             $data['created_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
         }
