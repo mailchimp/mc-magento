@@ -32,7 +32,6 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
     public function createBatchJson()
     {
         $mailchimpStoreId = $this->getMailchimpStoreId();
-        Mage::log("createBatchJson: $mailchimpStoreId", null, "carts.log", true);
         $magentoStoreId = $this->getMagentoStoreId();
 
         $this->_ecommerceQuotesCollection = $this->initializeEcommerceResourceCollection();
@@ -95,13 +94,11 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
 
         foreach ($convertedCarts as $cart) {
             $cartId = $cart->getEntityId();
-            Mage::log("foreach cartId: $cartId", null, "carts.log", true);
             // we need to delete all the carts associated with this email
             $allCartsForEmail = $this->getAllCartsByEmail($cart->getCustomerEmail());
 
             foreach ($allCartsForEmail as $cartForEmail) {
                 $alreadySentCartId = $cartForEmail->getEntityId();
-                Mage::log("foreach2 alreadySentCartId: $alreadySentCartId", null, "carts.log", true);
                 $counter = $this->getCounter();
 
                 if ($alreadySentCartId != $cartId) {
@@ -815,11 +812,9 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
         $collectionToSync->addFieldToFilter('store_id', array('eq' => $magentoStoreId));
 
         if ($isNewItem == "new") {
-            Mage::log("===== Before addFieldToFilter()", null, "orders.log", true);
             $collectionToSync->addFieldToFilter('is_active', array('eq' => 1));
             $collectionToSync->addFieldToFilter('customer_email', array('notnull' => true));
             $collectionToSync->addFieldToFilter('items_count', array('gt' => 0));
-            Mage::log("===== After addFieldToFilter()", null, "orders.log", true);
 
             $this->getHelper()->addResendFilter(
                 $collectionToSync, $magentoStoreId, Ebizmarts_MailChimp_Model_Config::IS_QUOTE
