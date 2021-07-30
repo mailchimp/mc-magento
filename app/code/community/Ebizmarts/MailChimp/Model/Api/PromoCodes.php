@@ -203,12 +203,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     protected function _getModifiedPromoCodes()
     {
         $mailchimpStoreId = $this->getMailchimpStoreId();
+        $magentoStoreId = $this->getMagentoStoreId();
         $batchArray = array();
         $counter = 0;
 
         $modifiedPromoCodes = $this->buildEcommerceCollectionToSync(
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
-            "m4m.mailchimp_sync_modified = 1 and m4m.mailchimp_store_id = '$mailchimpStoreId'",
+            "m4m.mailchimp_sync_modified = 1",
             "modified"
         );
 
@@ -223,7 +224,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
 
             if ($promoCode->getMailchimpSyncModified()) {
                 $batchArray[$counter]['method'] = "PATCH";
-                $ruleData = $this->generateCodeData($promoCode, $promoRuleId, $mailchimpStoreId);
+                $ruleData = $this->generateCodeData($promoCode, $promoRuleId, $magentoStoreId);
                 $promoRuleJson = json_encode($ruleData);
                 $batchArray[$counter]['body'] = $promoRuleJson;
                 $counter++;
@@ -231,24 +232,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         }
 
         return $batchArray;
-    }
-
-    /**
-     * @return Ebizmarts_MailChimp_Model_Resource_Ecommercesyncdata_Collection
-     */
-    protected function _makeModifiedPromoCodesCollection()
-    {
-        $modifiedPromoCodes = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
-
-        $this->_ecommercePromoCodesCollection->addWhere(
-            $modifiedPromoCodes,
-            "mailchimp_store_id = '" . $this->getMailchimpStoreId()
-            . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE
-            . "' AND (mailchimp_sync_modified = 1)",
-            $this->getBatchLimitFromConfig()
-        );
-
-        return $modifiedPromoCodes;
     }
 
     /**
@@ -322,13 +305,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     protected function generateCodeData($promoCode, $promoRuleId, $magentoStoreId)
     {
         $data = array();
-        $code = $promoCode->getCode();
         $data['id'] = $promoCode->getCouponId();
-        $data['code'] = $code;
-
-        //Set title as description if description null
+        $data['code'] = $promoCode->getCode();;
         $data['redemption_url'] = $this->getRedemptionUrl($promoCode, $magentoStoreId);
-
         $data['usage_count'] = (integer) $promoCode->getTimesUsed();
         $data['created_at_foreign'] = $promoCode->getCreatedAt();
         $data['updated_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
@@ -343,17 +322,19 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
     {
         $token = $this->getToken();
         $promoCode->setToken($token);
+        $couponId = $promoCode->getCouponId();
+
         $url = Mage::getModel('core/url')->setStore($magentoStoreId)->getUrl(
             'mailchimp/cart/loadcoupon',
             array(
                     '_nosid' => true,
                     '_secure' => true,
-                    'coupon_id' => $promoCode->getCouponId(),
+                    'coupon_id' => $couponId,
                     'coupon_token' => $token
                 )
         )
             . 'mailchimp/cart/loadcoupon?coupon_id='
-            . $promoCode->getCouponId()
+            . $couponId
             . '&coupon_token='
             . $token;
 
