@@ -135,7 +135,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
                     continue;
                 }
 
-                $promoCodeData = $this->generateCodeData($promoCode, $magentoStoreId);
+                $promoCodeData = $this->generateCodeData($promoCode, $ruleId, $magentoStoreId);
                 $promoCodeJson = json_encode($promoCodeData);
 
                 if ($promoCodeJson !== false) {
@@ -208,7 +208,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
 
         $modifiedPromoCodes = $this->buildEcommerceCollectionToSync(
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_CODE,
-            "m4m.mailchimp_sync_modified = 1",
+            "m4m.mailchimp_sync_modified = 1 and m4m.mailchimp_store_id = '$mailchimpStoreId'",
             "modified"
         );
 
@@ -223,7 +223,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
 
             if ($promoCode->getMailchimpSyncModified()) {
                 $batchArray[$counter]['method'] = "PATCH";
-                $ruleData = $this->_generatePromoCodeData($promoCode, $promoRuleId);
+                $ruleData = $this->generateCodeData($promoCode, $promoRuleId, $mailchimpStoreId);
                 $promoRuleJson = json_encode($ruleData);
                 $batchArray[$counter]['body'] = $promoRuleJson;
                 $counter++;
@@ -231,21 +231,6 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         }
 
         return $batchArray;
-    }
-
-    protected function _generatePromoCodeData ($promoCode, $promoRuleId)
-    {
-        $data = array();
-
-        $data['code'] = $promoCode->getCode();
-        $data['usage_count'] = (integer) $promoCode->getTimesUsed();
-        $data['created_at_foreign'] = $promoCode->getCreatedAt();
-        $data['updated_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
-
-        $promoRule = $this->getPromoRule($promoRuleId);
-        $data['enabled'] = (boolean)$promoRule->getIsActive();
-
-        return $data;
     }
 
     /**
@@ -334,7 +319,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         $this->_ecommercePromoCodesCollection->joinLeftEcommerceSyncData($collection, $columns);
     }
 
-    protected function generateCodeData($promoCode, $magentoStoreId)
+    protected function generateCodeData($promoCode, $promoRuleId, $magentoStoreId)
     {
         $data = array();
         $code = $promoCode->getCode();
@@ -344,7 +329,14 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
         //Set title as description if description null
         $data['redemption_url'] = $this->getRedemptionUrl($promoCode, $magentoStoreId);
 
-        return $data;
+        $data['usage_count'] = (integer) $promoCode->getTimesUsed();
+        $data['created_at_foreign'] = $promoCode->getCreatedAt();
+        $data['updated_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
+
+        $promoRule = $this->getPromoRule($promoRuleId);
+        $data['enabled'] = (boolean)$promoRule->getIsActive();
+
+      return $data;
     }
 
     protected function getRedemptionUrl($promoCode, $magentoStoreId)
