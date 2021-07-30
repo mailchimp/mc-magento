@@ -1,4 +1,41 @@
 # Changelog
+
+## [1.1.22](https://github.com/mailchimp/mc-magento/tree/1.1.22)
+
+[Full Changelog](https://github.com/mailchimp/mc-magento/compare/1.1.21...1.1.22)
+
+**Implemented enhancements:**
+
+- Add a line in the summary when is nothing to sync [\#1232](https://github.com/mailchimp/mc-magento/issues/1232)
+- Unformatted notification message after flushing Catalog Images Cache [\#1220](https://github.com/mailchimp/mc-magento/issues/1220)
+- Clean up error table when batch table is cleaned [\#1209](https://github.com/mailchimp/mc-magento/issues/1209)
+- Enhancing the way of using: joinMailchimpSyncDataWithoutWhere [\#1202](https://github.com/mailchimp/mc-magento/issues/1202)
+- Fixing unformatted notification message after flushing Catalog Images Cache [\#1221](https://github.com/mailchimp/mc-magento/pull/1221) ([roberto-ebizmarts](https://github.com/roberto-ebizmarts))
+
+**Fixed bugs:**
+
+- Regenerate var/mailchimp directory if is deleted [\#1242](https://github.com/mailchimp/mc-magento/issues/1242)
+- Wrong visibility in products [\#1235](https://github.com/mailchimp/mc-magento/issues/1235)
+- Wrong price for simple products that belongs to a configurable product [\#1234](https://github.com/mailchimp/mc-magento/issues/1234)
+- Bad call to $this-\>getMCStoreId in migration helper and migrantion never ends [\#1230](https://github.com/mailchimp/mc-magento/issues/1230)
+- Mark products as modified when use import products from the admin [\#1217](https://github.com/mailchimp/mc-magento/issues/1217)
+- Order status doesn't get updated when cancelling an order in Mailchimp [\#1215](https://github.com/mailchimp/mc-magento/issues/1215)
+- Undefined variables after upgrading from 1.1.20 to 1.1.21 [\#1214](https://github.com/mailchimp/mc-magento/issues/1214)
+- Ignore modified items when flagging store as synced [\#1212](https://github.com/mailchimp/mc-magento/issues/1212)
+- Fatal Error when entering Mailchimp configuration in MageOne using PHP 8.0 [\#1211](https://github.com/mailchimp/mc-magento/issues/1211)
+- Promo Codes doesn't get sent when updating Promo Rules [\#1210](https://github.com/mailchimp/mc-magento/issues/1210)
+- Interest groups not working on backend suscription [\#1207](https://github.com/mailchimp/mc-magento/issues/1207)
+- Fatal error while trying to turn off "Two-way Sync" [\#1206](https://github.com/mailchimp/mc-magento/issues/1206)
+- Bugs in Log  [\#1205](https://github.com/mailchimp/mc-magento/issues/1205)
+- Helper Data's function being used with "$this" into Migration Helper [\#1196](https://github.com/mailchimp/mc-magento/issues/1196)
+- Uncaught Error: Call to undefined method Ebizmarts\_MailChimp\_Model\_Api\_Products::joinQtyAndBackorders\(\)  [\#1193](https://github.com/mailchimp/mc-magento/issues/1193)
+- Error in Ebizmarts\_MailChimp\_CartController [\#1182](https://github.com/mailchimp/mc-magento/issues/1182)
+- Missing reply-to header [\#1176](https://github.com/mailchimp/mc-magento/issues/1176)
+- Cronjob errors No such file or directory \(errno 2\) in /lib/Varien/Io/File.php [\#1173](https://github.com/mailchimp/mc-magento/issues/1173)
+- Missing Shipping and Billing address [\#1172](https://github.com/mailchimp/mc-magento/issues/1172)
+- Making getMageApp\(\) method being called by the Migration Helper. [\#1200](https://github.com/mailchimp/mc-magento/pull/1200) ([roberto-ebizmarts](https://github.com/roberto-ebizmarts))
+
+
 ## [1.1.21](https://github.com/mailchimp/mc-magento/releases/tag/1.1.21) - 2020-10-21
 **Fixed**
 - Protected functions in HelperData being called from Migration Helper. [\#1189](https://github.com/mailchimp/mc-magento/issues/1189)
