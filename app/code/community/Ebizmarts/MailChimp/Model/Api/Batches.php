@@ -867,6 +867,19 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                                 true
                             );
                             $helper->modifyCounterDataSentToMailchimp($type);
+                        } else {
+                            $this->saveSyncData(
+                                $id,
+                                $type,
+                                $mailchimpStoreId,
+                                null,
+                                '',
+                                0,
+                                null,
+                                null,
+                                1,
+                                true
+                            );
                         }
                     }
                 }

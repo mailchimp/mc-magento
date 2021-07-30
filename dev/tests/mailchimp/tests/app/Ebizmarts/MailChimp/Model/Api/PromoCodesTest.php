@@ -32,7 +32,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
         $promoCodesApiMock = $this->_promoCodesApiMock
             ->setMethods(
                 array('getMailchimpStoreId', 'getMagentoStoreId', 'initializeEcommerceResourceCollection',
-                    'getDateHelper', '_getDeletedPromoCodes', '_getNewPromoCodes')
+                    'getDateHelper', '_getDeletedPromoCodes', '_getNewPromoCodes', '_getModifiedPromoCodes')
             )->getMock();
 
         $promoCollectionResourceMock = $this
@@ -44,8 +44,10 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
             ->disableOriginalConstructor()
             ->setMethods(array('getDateMicrotime'))->getMock();
 
-        $promoCodesApiMock->expects($this->once())->method('getMailchimpStoreId')->willReturn(self::MC_STORE_ID);
-        $promoCodesApiMock->expects($this->once())->method('getMagentoStoreId')->willReturn(self::STORE_ID);
+        $promoCodesApiMock->expects($this->once())->method('getMailchimpStoreId')
+            ->willReturn(self::MC_STORE_ID);
+        $promoCodesApiMock->expects($this->once())->method('getMagentoStoreId')
+            ->willReturn(self::STORE_ID);
         $promoCodesApiMock->expects($this->once())->method('initializeEcommerceResourceCollection')
             ->willReturn($promoCollectionResourceMock);
 
@@ -58,10 +60,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodesTest extends PHPUnit_Framework_Tes
 
         $promoCodesApiMock->expects($this->once())->method('_getDeletedPromoCodes')->willReturn($batchArray);
 
-        $promoCodesApiMock
-            ->expects($this->once())
-            ->method('_getNewPromoCodes')
-            ->willReturn($batchArray);
+        $promoCodesApiMock->expects($this->once())->method('_getNewPromoCodes')->willReturn($batchArray);
+
+        $promoCodesApiMock->expects($this->once())->method('_getModifiedPromoCodes')->willReturn($batchArray);
 
         $promoCodesApiMock->createBatchJson();
     }

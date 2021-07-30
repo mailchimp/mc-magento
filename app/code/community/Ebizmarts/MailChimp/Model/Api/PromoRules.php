@@ -69,12 +69,21 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
 
         foreach ($deletedPromoRules as $promoRule) {
             $ruleId = $promoRule->getRelatedId();
-            $batchArray[$counter]['method'] = "DELETE";
             $batchArray[$counter]['path'] = '/ecommerce/stores/' . $mailchimpStoreId . '/promo-rules/' . $ruleId;
             $batchArray[$counter]['operation_id'] = $this->_batchId . '_' . $ruleId;
-            $batchArray[$counter]['body'] = '';
-            $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
-            $this->deletePromoRuleSyncData($ruleId);
+            if ($promoRule->getMailchimpSyncDeleted()) {
+                $batchArray[$counter]['method'] = "DELETE";
+                $this->getPromoCodes()->deletePromoCodesSyncDataByRule($promoRule);
+                $this->deletePromoRuleSyncData($ruleId);
+                $batchArray[$counter]['body'] = '';
+            } elseif ($promoRule->getMailchimpSyncModified()) {
+                    $batchArray[$counter]['method'] = "PATCH";
+                    $promoRule = $this->getPromoRule($ruleId);
+                    $ruleData = $this->generateRuleData($promoRule, false);
+                    $promoRuleJson = json_encode($ruleData);
+                    $batchArray[$counter]['body'] = $promoRuleJson;
+            }
+
             $counter++;
         }
 
@@ -89,6 +98,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     public function getNewPromoRule($ruleId, $mailchimpStoreId, $magentoStoreId)
     {
+        $this->setMailchimpStoreId($mailchimpStoreId);
         $promoData = array();
         $promoRule = $this->getPromoRule($ruleId);
         $helper = $this->getHelper();
@@ -209,17 +219,17 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      */
     protected function makeModifiedAndDeletedPromoRulesCollection()
     {
-        $deletedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
+        $deletedAndModifiedPromoRules = $this->getMailchimpEcommerceSyncDataModel()->getCollection();
 
         $this->_ecommercePromoRulesCollection->addWhere(
-            $deletedPromoRules,
+            $deletedAndModifiedPromoRules,
             "mailchimp_store_id = '" . $this->getMailchimpStoreId()
             . "' AND type = '" . Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
             . "' AND (mailchimp_sync_modified = 1 OR mailchimp_sync_deleted = 1)",
             $this->getBatchLimitFromConfig()
         );
 
-        return $deletedPromoRules;
+        return $deletedAndModifiedPromoRules;
     }
 
     /**
@@ -240,7 +250,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
      * @param $promoRule
      * @return array
      */
-    protected function generateRuleData($promoRule)
+    protected function generateRuleData($promoRule, $new = true)
     {
         $error = null;
         $data = array();
@@ -264,6 +274,13 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
         $promoAction = $promoRule->getSimpleAction();
         $data['type'] = $this->getMailChimpType($promoAction);
         $data['target'] = $this->getMailChimpTarget($promoAction);
+
+        if ($new) {
+            $data['created_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
+        }
+        else{
+            $data['updated_at_foreign'] = Mage::getSingleton('core/date')->date("Y-m-d H:i:s");
+        }
 
         $data['enabled'] = (bool)$promoRule->getIsActive();
 
@@ -342,6 +359,9 @@ class Ebizmarts_MailChimp_Model_Api_PromoRules extends Ebizmarts_MailChimp_Model
             Ebizmarts_MailChimp_Model_Config::IS_PROMO_RULE
         );
 
+        /**
+         * @var $promoRule Ebizmarts_MailChimp_Model_Api_PromoRules
+         */
         foreach ($promoRules as $promoRule) {
             $mailchimpStoreId = $promoRule->getMailchimpStoreId();
             $this->setMailchimpStoreId($mailchimpStoreId);

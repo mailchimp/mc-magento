@@ -1012,6 +1012,14 @@ class Ebizmarts_MailChimp_Model_Observer
         $ruleId = $rule->getRuleId();
         $promoRulesApi->update($ruleId);
 
+        $promoCodesCollection = Mage::getModel('salesrule/coupon')->getCollection()
+            ->addFieldToFilter('rule_id', $ruleId);
+
+        $promoCodesApi = $this->makeApiPromoCode();
+        foreach ($promoCodesCollection as $promoCode) {
+            $promoCodesApi->update($promoCode->getId());
+        }
+
         return $observer;
     }
 
