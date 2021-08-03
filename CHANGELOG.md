@@ -29,6 +29,7 @@
 - Bugs in Log  [\#1205](https://github.com/mailchimp/mc-magento/issues/1205)
 - Helper Data's function being used with "$this" into Migration Helper [\#1196](https://github.com/mailchimp/mc-magento/issues/1196)
 - Uncaught Error: Call to undefined method Ebizmarts\_MailChimp\_Model\_Api\_Products::joinQtyAndBackorders\(\)  [\#1193](https://github.com/mailchimp/mc-magento/issues/1193)
+- Subscriber as "Not activated" in Magento after confirming email received from Mailchimp [\#1187](https://github.com/mailchimp/mc-magento/issues/1187)
 - Error in Ebizmarts\_MailChimp\_CartController [\#1182](https://github.com/mailchimp/mc-magento/issues/1182)
 - Missing reply-to header [\#1176](https://github.com/mailchimp/mc-magento/issues/1176)
 - Cronjob errors No such file or directory \(errno 2\) in /lib/Varien/Io/File.php [\#1173](https://github.com/mailchimp/mc-magento/issues/1173)
