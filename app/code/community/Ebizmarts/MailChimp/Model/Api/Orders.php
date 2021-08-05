@@ -357,10 +357,6 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
         }
 
         $data['currency_code'] = $order->getOrderCurrencyCode();
-        $data['order_total'] = $order->getGrandTotal();
-        $data['tax_total'] = $this->returnZeroIfNull($order->getTaxAmount());
-        $data['discount_total'] = abs($order->getDiscountAmount());
-        $data['shipping_total'] = $this->returnZeroIfNull($order->getShippingAmount());
 
         if ($dataPromo !== null) {
             $data['promos'] = $dataPromo;
@@ -385,6 +381,16 @@ class Ebizmarts_MailChimp_Model_Api_Orders extends Ebizmarts_MailChimp_Model_Api
             if ($orderCancelDate) {
                 $data['cancelled_at_foreign'] = $orderCancelDate;
             }
+            $data['order_total'] = 0;
+            $data['tax_total'] = 0;
+            $data['discount_total'] = 0;
+            $data['shipping_total'] = 0;
+        } else {
+            $data['order_total'] = $order->getGrandTotal();
+            $data['tax_total'] = $this->returnZeroIfNull($order->getTaxAmount());
+            $data['discount_total'] = abs($order->getDiscountAmount());
+            $data['shipping_total'] = $this->returnZeroIfNull($order->getShippingAmount());
+    
         }
 
         return $data;
