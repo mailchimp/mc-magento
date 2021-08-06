@@ -16,9 +16,9 @@ If you want to use the Mailchimp integration without Mandrill for SMTP, contact 
 * Responsive Email Catcher Popup when accessing the site
 * Compatibility with all the <a href="http://mailchimp.com/features/all/" target="_blank">MailChimp Features</a>
 
-## Prerequisities
+## Prerequisites
 
-Magento Community Edition (1.7 or above) or Magento Enterprise (1.11 or above)
+Magento Community Edition (1.8 or above) or Magento Enterprise (1.11 or above)
 
 <a href="http://www.mailchimp.com/signup?pid=ebizmarts&source=website" target="_blank">MailChimp Account</a>
 
