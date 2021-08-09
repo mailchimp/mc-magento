@@ -1025,10 +1025,15 @@ class Ebizmarts_MailChimp_Model_Observer
 
     public function salesruleDeleteAfter(Varien_Event_Observer $observer)
     {
-        $promoRulesApi = $this->makeApiPromoRule();
         $rule = $observer->getEvent()->getRule();
         $ruleId = $rule->getRuleId();
+        $couponId = $rule->getPrimaryCoupon()->getData() ['coupon_id'];
+
+        $promoRulesApi = $this->makeApiPromoRule();
         $promoRulesApi->markAsDeleted($ruleId);
+
+        $promoCodesApi = $this->makeApiPromoCode();
+        $promoCodesApi->markAsDeleted($couponId, $ruleId);
 
         return $observer;
     }

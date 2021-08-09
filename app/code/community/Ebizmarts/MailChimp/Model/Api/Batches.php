@@ -525,7 +525,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
         $resource = $helper->getCoreResource();
         $connection = $resource->getConnection('core_write');
         $tableName = $resource->getTableName('mailchimp/ecommercesyncdata');
-        $where = array("batch_id IS NULL AND mailchimp_sync_modified != 1");
+        $where = array("batch_id IS NULL AND mailchimp_sync_modified != 1 AND mailchimp_sync_deleted != 1");
         $connection->delete($tableName, $where);
     }
 
@@ -709,7 +709,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
             if ($fileHelper->isDir($baseDir.DS.'var'.DS.'mailchimp') == false)
             {
                 $fileHelper->mkDir($baseDir.DS.'var'.DS.'mailchimp');
-            } 
+            }
             if ($api) {
                 // check the status of the job
                 $response = $api->batchOperation->status($batchId);
