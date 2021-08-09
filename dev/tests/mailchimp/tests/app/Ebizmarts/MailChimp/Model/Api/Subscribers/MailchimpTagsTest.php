@@ -350,7 +350,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
 
     public function testProcessMergeFieldsWithoutCustomerNoSubscriber()
     {
-
         $mapFields = $this->_mapFieldsSerialized;
         $maps = $this->_mapsFields;
         $data = $this->_mergeFields;
