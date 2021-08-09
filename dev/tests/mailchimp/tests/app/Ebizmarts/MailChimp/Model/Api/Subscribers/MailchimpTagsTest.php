@@ -198,6 +198,11 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             )
             ->getMock();
 
+        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getId', 'setSubscriberFirstname', 'setSubscriberLastname', 'save'))
+            ->getMock();
+
         $helperMock = $this->getMockBuilder(Ebizmarts_MailChimp_Helper_Data::class)
             ->disableOriginalConstructor()
             ->setMethods(
@@ -208,12 +213,18 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             )
             ->getMock();
 
+        // Get's into the Subscriber creation/get part.
+        $helperMock->expects($this->once())
+            ->method('loadListSubscriber')
+            ->with($data['list_id'], $data['email'])
+            ->willReturn($subscriberMock);
+
         $customerMock = $this->getMockBuilder(Mage_Customer_Model_Customer::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getFirstName','setFirstName','getLastName','setLastName','save'))
             ->getMock();
 
-        $mailchimpTagsApiMock->expects($this->once())
+        $mailchimpTagsApiMock->expects($this->exactly(2))
             ->method('getMailchimpHelper')
             ->willReturn($helperMock);
 
@@ -283,10 +294,10 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
 
         $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getId', 'setSubscriberFirstname', 'setSubscriberLastname', 'save'))
+            ->setMethods(array('getId', 'getStatus', 'setSubscriberFirstname', 'setSubscriberLastname', 'save'))
             ->getMock();
 
-        $mailchimpTagsApiMock->expects($this->once())
+        $mailchimpTagsApiMock->expects($this->exactly(2))
             ->method('getMailchimpHelper')
             ->willReturn($helperMock);
 
@@ -319,7 +330,7 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
         $mailchimpTagsApiMock->expects($this->once())->method('_getFName')->with($data)->willReturn($fname);
         $mailchimpTagsApiMock->expects($this->once())->method('_getLName')->with($data)->willReturn($lname);
 
-        $subscriberMock->expects($this->once())->method('getId')->willReturn($subscriberMock);
+        $subscriberMock->expects($this->once())->method('getId')->willReturn(null);
         $subscriberMock->expects($this->once())
             ->method('setSubscriberFirstname')
             ->with($fname)
@@ -458,15 +469,28 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
             ->setMethods(array('getFirstName','setFirstName','getLastName','setLastName','save'))
             ->getMock();
 
+        $subscriberMock = $this->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('getId', 'getStatus', 'setSubscriberFirstname', 'setSubscriberLastname', 'save'))
+            ->getMock();
+
         $interestGroupHandleMock = $this
             ->getMockBuilder(Ebizmarts_MailChimp_Model_Api_Subscribers_InterestGroupHandle::class)
             ->disableOriginalConstructor()
             ->setMethods(array('setGroupings', 'setListId', 'processGroupsData', 'setCustomer'))
             ->getMock();
 
-        $mailchimpTagsApiMock->expects($this->once())
+        $mailchimpTagsApiMock->expects($this->exactly(2))
             ->method('getMailchimpHelper')
             ->willReturn($helperMock);
+
+        // Get's into the Subscriber creation/get part.
+        $helperMock->expects($this->once())
+            ->method('loadListSubscriber')
+            ->with($data['list_id'], $data['email'])
+            ->willReturn($subscriberMock);
+
+        $subscriberMock->expects($this->once())->method('getId')->willReturn(null);
 
         $helperMock->expects($this->once())
             ->method('getMagentoStoreIdsByListId')
@@ -535,7 +559,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
 
     public function testProcessMergeFieldsSubscribe()
     {
-
         $mapFields = $this->_mapFieldsSerialized;
         $maps = $this->_mapsFields;
         $data = $this->_mergeFields;
@@ -602,10 +625,6 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTagsTest extends PHPUni
         $mailchimpTagsApiMock->expects($this->once())->method('_getLName')->with($data)->willReturn($lname);
 
         $subscriberMock->expects($this->once())->method('getId')->willReturn(null);
-        $mailchimpTagsApiMock->expects($this->once())
-            ->method('_addSubscriberData')
-            ->with($subscriberMock, $fname, $lname, $data['email'], $data['list_id'])
-            ->willReturn($subscriberMock);
 
         $helperMock->expects($this->once())->method('subscribeMember')->with($subscriberMock);
         $subscriberMock->expects($this->once())->method('save')->willReturn($subscriberMock);
