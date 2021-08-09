@@ -412,6 +412,7 @@ class Ebizmarts_MailChimp_Model_Api_PromoCodes extends Ebizmarts_MailChimp_Model
 
         foreach ($promoCodes as $promoCode) {
             $mailchimpStoreId = $promoCode->getMailchimpStoreId();
+            $this->setMailchimpStoreId($mailchimpStoreId);
             $this->addDeletedRelatedId($codeId, $promoRuleId);
         }
     }
