@@ -737,17 +737,18 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                         $webhookId = $webhookHelper->getWebhookId($storeId, "stores");
 
                         // Edits the webhook with the new $event array.
-                        $helper
-                            ->getApi($storeId, $store)
-                            ->getLists()
-                            ->getWebhooks()
-                            ->edit($listId, $webhookId, null, $events, $sources);
-
-                        if ($dateHelper->timePassed($initialTime)) {
-                            $finished = false;
-                            break;
+                        if ($webhookId) {
+                            $helper
+                                ->getApi($storeId, $store)
+                                ->getLists()
+                                ->getWebhooks()
+                                ->edit($listId, $webhookId, null, $events, $sources);
                         }
                     }
+                }
+                if ($dateHelper->timePassed($initialTime)) {
+                    $finished = false;
+                    break;
                 }
             }
 
