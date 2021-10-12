@@ -221,7 +221,7 @@ class Ebizmarts_MailChimp_Model_ClearEcommerce
             ->setPageSize(100)
             ->setCurPage(1);
 
-        $date = $this->getDateHelper()->formatDate(null, 'YYYY-mm-dd H:i:s');
+        $date = $this->getDateHelper()->formatDate(null, 'Y-m-d H:i:s');
         $collection->addFieldToFilter('expiration_date', array('lteq' => $date));
 
         return $collection->getItems();
