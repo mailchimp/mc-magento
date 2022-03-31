@@ -84,6 +84,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateFrom115($initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Start migration from 115");
         $dateHelper = $this->getDateHelper();
         $arrayMigrationConfigData = array('115' => true, '116' => false, '1164' => false);
         //migrate data from older version to the new schemma
@@ -234,6 +235,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateCustomersFrom115($mailchimpStoreId, $initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Migrate Customers from 115");
 
         try {
             $entityType = Mage::getSingleton('eav/config')->getEntityType('customer');
@@ -301,6 +303,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
          * @var $helper Ebizmarts_MailChimp_Helper_Migration
          */
         $helper = $this->getHelper();
+        $helper->logError("Migrate Products from 115");
 
         try {
             $entityType = Mage_Catalog_Model_Product::ENTITY;
@@ -322,7 +325,8 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                     $productCollection,
                     $mailchimpStoreId,
                     $initialTime,
-                    function ($product, $mailchimpStoreId, $helper) {
+                    function ($product, $mailchimpStoreId) {
+                        $helper = $this->getHelper();
                         $productId = $product->getEntityId();
                         $_resource = Mage::getResourceSingleton('catalog/product');
                         $syncDelta = $_resource->getAttributeRawValue(
@@ -365,6 +369,13 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     {
         return Mage::getModel('sales/order');
     }
+   /**
+     * @return Mage_Sales_Model_Quote
+     */
+    protected function getSalesQuoteModel()
+    {
+        return Mage::getModel('sales/quote');
+    }
 
     /**
      * Migrate Orders from version 1.1.5 to the mailchimp_ecommerce_sync_data table.
@@ -376,6 +387,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateOrdersFrom115($mailchimpStoreId, $initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Migrate Orders from 115");
 
         try {
             $resource = $helper->getCoreResource();
@@ -445,6 +457,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateCartsFrom115($mailchimpStoreId, $initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Migrate Carts from 115");
 
         try {
             $resource = $helper->getCoreResource();
@@ -472,12 +485,14 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
                     $mailchimpStoreId,
                     $initialTime,
                     function ($quote, $mailchimpStoreId) {
+                        $helper = $this->getHelper();
                         $quoteId = $quote->getEntityId();
                         $syncError = null;
                         $syncDeleted = null;
                         $token = null;
-                        $quoteObject = $this->getSalesOrderModel()->load($quoteId);
+                        $quoteObject = $this->getSalesQuoteModel()->loadByIdWithoutStore($quoteId);
                         $syncDelta = $quoteObject->getMailchimpSyncDelta();
+                        $helper->logError("QuoteId [$quoteId] SyncDelta[$syncDelta]");
 
                         if ($quote->getMailchimpSyncError()) {
                             $syncError = $quote->getMailchimpSyncError();
@@ -580,6 +595,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateOrdersFrom116($initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Migrate Orders from 116");
         $dateHelper = $this->getDateHelper();
         $finished = false;
 
@@ -674,6 +690,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateFrom1164($initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Migrate from 1164");
         $dateHelper = $this->getDateHelper();
 
         if (!$dateHelper->timePassed($initialTime)) {
@@ -707,6 +724,7 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
     protected function _migrateFrom1120($initialTime)
     {
         $helper = $this->getHelper();
+        $helper->logError("Migrate from 1120");
         $dateHelper = $this->getDateHelper();
         $webhookHelper = $this->getWebhookHelper();
 
@@ -731,21 +749,16 @@ class Ebizmarts_MailChimp_Helper_Migration extends Mage_Core_Helper_Abstract
 
             foreach ($stores as $storeId => $store) {
                 // Gets the ListId and WebhookId for the iterated store.
-                if ($helper->isMailChimpEnabled( $storeId, 'stores')) {
-                    $listId = $helper->getGeneralList($storeId, "stores");
-                    if ($listId > 0) {
-                        $webhookId = $webhookHelper->getWebhookId($storeId, "stores");
+                $listId = $helper->getGeneralList($storeId, "stores");
+                $webhookId = $webhookHelper->getWebhookId($storeId, "stores");
 
-                        // Edits the webhook with the new $event array.
-                        if ($webhookId) {
-                            $helper
-                                ->getApi($storeId, $store)
-                                ->getLists()
-                                ->getWebhooks()
-                                ->edit($listId, $webhookId, null, $events, $sources);
-                        }
-                    }
-                }
+                // Edits the webhook with the new $event array.
+                $helper
+                    ->getApi($storeId, $store)
+                    ->getLists()
+                    ->getWebhooks()
+                    ->edit($listId, $webhookId, null, $events, $sources);
+
                 if ($dateHelper->timePassed($initialTime)) {
                     $finished = false;
                     break;
