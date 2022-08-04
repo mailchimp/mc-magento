@@ -724,6 +724,7 @@ class Ebizmarts_MailChimp_Model_Api_Batches
                         CURLOPT_RETURNTRANSFER => 1,
                         CURLOPT_FILE => $fd,
                         CURLOPT_FOLLOWLOCATION => true, // this will follow redirects
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     );
 
                     $curlHelper = $this->getMailchimpCurlHelper();
