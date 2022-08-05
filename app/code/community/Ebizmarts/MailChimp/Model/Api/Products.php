@@ -177,8 +177,10 @@ class Ebizmarts_MailChimp_Model_Api_Products extends Ebizmarts_MailChimp_Model_A
 
             $this->addSyncDataError(
                 $product->getId(),
-                $mailchimpStoreId,
-                self::PRODUCT_DISABLED_IN_MAGENTO
+                self::PRODUCT_DISABLED_IN_MAGENTO,
+                null,
+                null,
+                $this->getDateHelper()->getCurrentDateTime()
             );
         }
 
