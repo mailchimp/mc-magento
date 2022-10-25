@@ -464,43 +464,43 @@ class Ebizmarts_MailChimp_Model_Api_Subscribers_MailchimpTags
     }
 
     /**
-     * @param $address
+     * @param $customerAddress
      * @return array | returns an array with the address data of the customer.
      */
-    protected function getAddressData($address)
+    protected function getAddressData($customerAddress)
     {
-        $lastOrder = $this->getLastOrderByEmail();
-        $addressData = $this->getAddressFromLastOrder($lastOrder);
-        if (!empty($addressData)) {
-            if ($address) {
-                $street = $address->getStreet();
-                if (count($street) > 1) {
-                    $addressData["addr1"] = $street[0];
-                    $addressData["addr2"] = $street[1];
-                } else {
-                    if (!empty($street[0])) {
-                        $addressData["addr1"] = $street[0];
-                    }
-                }
+        if (!$customerAddress || !$customerAddress->getId()) {
+            return [];
+        }
 
-                if ($address->getCity()) {
-                    $addressData["city"] = $address->getCity();
-                }
+        $addressData = [];
 
-                if ($address->getRegion()) {
-                    $addressData["state"] = $address->getRegion();
-                }
-
-                if ($address->getPostcode()) {
-                    $addressData["zip"] = $address->getPostcode();
-                }
-
-                if ($address->getCountry()) {
-                    $addressData["country"] = Mage::getModel('directory/country')
-                        ->loadByCode($address->getCountry())
-                        ->getName();
-                }
+        $street = $customerAddress->getStreet();
+        if (count($street) > 1) {
+            $addressData["addr1"] = $street[0];
+            $addressData["addr2"] = $street[1];
+        } else {
+            if (!empty($street[0])) {
+                $addressData["addr1"] = $street[0];
             }
+        }
+
+        if ($customerAddress->getCity()) {
+            $addressData["city"] = $customerAddress->getCity();
+        }
+
+        if ($customerAddress->getRegion()) {
+            $addressData["state"] = $customerAddress->getRegion();
+        }
+
+        if ($customerAddress->getPostcode()) {
+            $addressData["zip"] = $customerAddress->getPostcode();
+        }
+
+        if ($customerAddress->getCountry()) {
+            $addressData["country"] = Mage::getModel('directory/country')
+                ->loadByCode($customerAddress->getCountry())
+                ->getName();
         }
 
         return $addressData;
