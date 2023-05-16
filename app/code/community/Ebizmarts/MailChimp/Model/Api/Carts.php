@@ -173,7 +173,7 @@ class Ebizmarts_MailChimp_Model_Api_Carts extends Ebizmarts_MailChimp_Model_Api_
                         $allCarts[$counter]['operation_id'] = $batchId . '_' . $alreadySentCartId;
                         $allCarts[$counter]['body'] = '';
 
-                        $this->markSyncDataAsDeleted($cartId);
+                        $this->markSyncDataAsDeleted($alreadySentCartId);
                         $this->setCounter($counter + 1);
                     }
                 }
