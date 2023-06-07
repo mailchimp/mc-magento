@@ -97,7 +97,10 @@ class Ebizmarts_MailChimp_Model_Api_Customers extends Ebizmarts_MailChimp_Model_
 
         //******************
         $customersCollection = array();
-        $collection = $this->buildEcommerceCollectionToSync(Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER);
+        $collection = $this->buildEcommerceCollectionToSync(
+            Ebizmarts_MailChimp_Model_Config::IS_CUSTOMER,
+            'm4m.mailchimp_sync_delta IS NULL OR m4m.mailchimp_sync_modified = 1'
+        );
         $customerIds = $collection->getAllIds($this->getBatchLimitFromConfig());
         //******************
 
